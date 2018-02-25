@@ -98,7 +98,9 @@ export default class InstancesFullEditor extends Component {
     this.props.setToolbar(
       <Toolbar
         showPreviewButton={this.props.showPreviewButton}
-        onPreview={this.props.onPreview}
+        onPreview={() => this.props.onPreview({})}
+        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+        onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
         showObjectsList={this.props.showObjectsList}
         instancesSelection={this.instancesSelection}
         openObjectsList={this.openObjectsList}

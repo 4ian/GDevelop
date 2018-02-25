@@ -17,6 +17,7 @@ class TiXmlElement;
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
+#include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
@@ -141,6 +142,16 @@ public:
      * \brief Return a reference to platform assets of the project (icons, splashscreen...).
      */
     const gd::PlatformSpecificAssets & GetPlatformSpecificAssets() const { return platformSpecificAssets; }
+
+    /**
+     * \brief Return a reference to loading screen setup for the project
+     */
+    gd::LoadingScreen & GetLoadingScreen() { return loadingScreen; }
+
+    /**
+     * \brief Return a reference to loading screen setup for the project
+     */
+    const gd::LoadingScreen & GetLoadingScreen() const { return loadingScreen; }
 #endif
 
     /**
@@ -766,6 +777,7 @@ private:
     gd::String                                         latestCompilationDirectory; ///< File of the game
     gd::Platform*                                       currentPlatform; ///< The platform being used to edit the project.
     gd::PlatformSpecificAssets                          platformSpecificAssets;
+    gd::LoadingScreen                                   loadingScreen;
     std::vector < std::unique_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
     mutable unsigned int                                GDMajorVersion; ///< The GD major version used the last time the project was saved.
     mutable unsigned int                                GDMinorVersion; ///< The GD minor version used the last time the project was saved.

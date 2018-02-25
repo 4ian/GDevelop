@@ -537,6 +537,7 @@ void Project::UnserializeFrom(const SerializerElement & element)
     SetProjectFile(propElement.GetStringAttribute("projectFile"));
     SetLastCompilationDirectory(propElement.GetChild("latestCompilationDirectory", 0, "LatestCompilationDirectory").GetValue().GetString());
     platformSpecificAssets.UnserializeFrom(propElement.GetChild("platformSpecificAssets"));
+    loadingScreen.UnserializeFrom(propElement.GetChild("loadingScreen"));
     winExecutableFilename = propElement.GetStringAttribute("winExecutableFilename");
     winExecutableIconFile = propElement.GetStringAttribute("winExecutableIconFile");
     linuxExecutableFilename = propElement.GetStringAttribute("linuxExecutableFilename");
@@ -748,6 +749,7 @@ void Project::SerializeTo(SerializerElement & element) const
     propElement.SetAttribute("packageName", packageName);
     propElement.SetAttribute("orientation", orientation);
     platformSpecificAssets.SerializeTo(propElement.AddChild("platformSpecificAssets"));
+    loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
     propElement.SetAttribute("winExecutableFilename", winExecutableFilename);
     propElement.SetAttribute("winExecutableIconFile", winExecutableIconFile);
     propElement.SetAttribute("linuxExecutableFilename", linuxExecutableFilename);
@@ -1029,6 +1031,7 @@ void Project::Init(const gd::Project & game)
     folderProject = game.folderProject;
     latestCompilationDirectory = game.latestCompilationDirectory;
     platformSpecificAssets = game.platformSpecificAssets;
+    loadingScreen = game.loadingScreen;
     objectGroups = game.objectGroups;
 
     GDMajorVersion = game.GDMajorVersion;

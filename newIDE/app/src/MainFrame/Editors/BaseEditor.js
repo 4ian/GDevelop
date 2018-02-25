@@ -1,17 +1,18 @@
-import { Component } from 'react';
+// @flow
+import * as React from 'react';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import { rgbToHexNumber } from '../../Utils/ColorTransformer';
 
-export default class BaseEditor extends Component {
+export default class BaseEditor extends React.Component<*,*> {
   static defaultProps = {
     setToolbar: () => {},
   };
 
-  getProject() {
+  getProject(): gdProject {
     return this.props.project;
   }
 
-  getLayout() {
+  getLayout() :?gdLayout {
     return null;
   }
 
@@ -27,7 +28,7 @@ export default class BaseEditor extends Component {
     );
   }
 
-  static getLayoutSerializedElements(layout) {
+  static getLayoutSerializedElements(layout: ?gdLayout) {
     if (!layout) return {};
 
     return {

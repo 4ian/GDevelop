@@ -18,6 +18,7 @@
     "electron-updater": "^2.18.2",
     "fs-extra": "^3.0.1",
     "jimp": "^0.2.28",
+    "live-server": "^1.2.0",
     "lodash.throttle": "^4.1.1",
     "minimist": "^1.2.0",
     "recursive-readdir": "^2.2.1"

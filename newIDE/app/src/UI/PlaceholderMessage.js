@@ -25,6 +25,7 @@ export default (props: Props) => {
         zDepth={3}
         style={{
           padding: 10,
+          margin: 5,
         }}
       >
         {props.children}

@@ -149,3 +149,30 @@ export const sendSignupDone = (email: string) => {
     email,
   });
 };
+
+export const sendSubscriptionCheckDialogShown = ({
+  mode,
+  title,
+}: {|
+  mode: string,
+  title: string,
+|}) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('subscription-check-dialog-shown', {
+    mode,
+    title,
+  });
+};
+
+export const sendSubscriptionCheckDismiss = () => {
+  if (isDev || !client) return;
+
+  client.recordEvent('subscription-check-dialog-dismiss');
+};
+
+export const sendSubscriptionDialogShown = () => {
+  if (isDev || !client) return;
+
+  client.recordEvent('subscription-dialog-shown', {});
+};

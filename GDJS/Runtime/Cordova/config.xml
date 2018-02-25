@@ -54,4 +54,5 @@
         <icon src="GDJS_ICON_IOS_167" width="167" height="167" />
     </platform>
     <preference name="orientation" value="GDJS_ORIENTATION" />
+    <preference name="BackgroundColor" value="0xff000000"/>
 </widget>

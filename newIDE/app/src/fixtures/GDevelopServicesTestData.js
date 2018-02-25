@@ -5,6 +5,7 @@ import {
   type Limits,
 } from '../Utils/GDevelopServices/Usage';
 import { type Profile } from '../Utils/GDevelopServices/Authentification';
+import { type UserProfile } from '../Profile/UserProfileContext';
 
 export const profileForIndieUser: Profile = {
   uid: 'indie-user',
@@ -35,7 +36,7 @@ export const usagesForIndieUser: Usages = [
 ];
 
 export const subscriptionForIndieUser: Subscription = {
-  planId: 'gdevelop-indie',
+  planId: 'gdevelop_indie',
   createdAt: 1515084011000,
   updatedAt: 1515084011000,
   userId: 'indie-user',
@@ -62,4 +63,48 @@ export const limitsReached: Limits = {
     max: 10,
     limitReached: true,
   },
+};
+
+export const fakeIndieUserProfile: UserProfile = {
+  authenticated: true,
+  profile: profileForIndieUser,
+  subscription: subscriptionForIndieUser,
+  usages: usagesForIndieUser,
+  limits: limitsForIndieUser,
+  onLogout: () => {},
+  onLogin: () => {},
+  onRefreshUserProfile: () => {},
+};
+
+export const fakeNoSubscriptionUserProfile: UserProfile = {
+  authenticated: true,
+  profile: profileForIndieUser,
+  subscription: noSubscription,
+  usages: usagesForIndieUser,
+  limits: limitsForIndieUser,
+  onLogout: () => {},
+  onLogin: () => {},
+  onRefreshUserProfile: () => {},
+};
+
+export const fakeAuthenticatedButLoadingUserProfile: UserProfile = {
+  authenticated: true,
+  profile: null,
+  subscription: null,
+  usages: null,
+  limits: null,
+  onLogout: () => {},
+  onLogin: () => {},
+  onRefreshUserProfile: () => {},
+};
+
+export const fakeNotAuthenticatedUserProfile: UserProfile = {
+  authenticated: false,
+  profile: null,
+  subscription: null,
+  usages: null,
+  limits: null,
+  onLogout: () => {},
+  onLogin: () => {},
+  onRefreshUserProfile: () => {},
 };

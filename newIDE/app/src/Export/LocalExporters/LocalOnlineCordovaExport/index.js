@@ -10,10 +10,9 @@ import {
   getUrl,
   getBuild,
 } from '../../../Utils/GDevelopServices/Build';
-import {
-  withUserProfile,
-  type WithUserProfileProps,
-} from '../../../Profile/UserProfileContainer';
+import UserProfileContext, {
+  type UserProfile,
+} from '../../../Profile/UserProfileContext';
 import { Column, Line } from '../../../UI/Grid';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { findGDJS } from '../LocalGDJSFinder';
@@ -28,6 +27,7 @@ import LimitDisplayer from '../../../Profile/LimitDisplayer';
 import { displaySanityCheck } from '../../SanityChecker';
 import { getSanityMessages } from '../../SanityChecker/CordovaSanityChecker';
 import { translate, type TranslatorProps } from 'react-i18next';
+import { type Limit } from '../../../Utils/GDevelopServices/Usage';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
@@ -54,7 +54,7 @@ type State = {
   errored: boolean,
 };
 
-type Props = WithUserProfileProps & TranslatorProps & {
+type Props = TranslatorProps & {
   project: gdProject,
   onChangeSubscription: Function,
 };
@@ -154,13 +154,15 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     });
   };
 
-  launchBuild = (uploadBucketKey: string): Promise<string> => {
-    const { authentification, profile } = this.props;
-    if (!profile || !authentification)
-      return Promise.reject(new Error('User is not authenticated'));
+  launchBuild = (
+    userProfile: UserProfile,
+    uploadBucketKey: string
+  ): Promise<string> => {
+    const { getAuthorizationHeader, profile } = userProfile;
+    if (!profile) return Promise.reject(new Error('User is not authenticated'));
 
     return buildCordovaAndroid(
-      authentification,
+      getAuthorizationHeader,
       profile.uid,
       uploadBucketKey
     ).then(build => {
@@ -168,10 +170,12 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     });
   };
 
-  pollBuild = async (buildId: string): Promise<Build> => {
-    const { authentification, profile } = this.props;
-    if (!profile || !authentification)
-      return Promise.reject(new Error('User is not authenticated'));
+  pollBuild = async (
+    userProfile: UserProfile,
+    buildId: string
+  ): Promise<Build> => {
+    const { getAuthorizationHeader, profile } = userProfile;
+    if (!profile) return Promise.reject(new Error('User is not authenticated'));
 
     try {
       let build = null;
@@ -180,7 +184,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       const maxWaitTime = 200000;
       do {
         await delay(waitTime);
-        build = await getBuild(authentification, profile.uid, buildId);
+        build = await getBuild(getAuthorizationHeader, profile.uid, buildId);
         this.setState({
           build,
           buildMax: maxWaitTime,
@@ -200,12 +204,11 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     }
   };
 
-  launchWholeExport = () => {
+  launchWholeExport = (userProfile: UserProfile) => {
     const { t, project } = this.props;
     sendExportLaunched('local-online-cordova');
 
-    if (!displaySanityCheck(t, getSanityMessages(t, project)))
-      return;
+    if (!displaySanityCheck(t, getSanityMessages(t, project))) return;
 
     const handleError = (message: string) => err => {
       if (!this.state.errored) {
@@ -244,21 +247,21 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
         this.setState({
           exportStep: 'waiting-for-build',
         });
-        return this.launchBuild(uploadBucketKey);
+        return this.launchBuild(userProfile, uploadBucketKey);
       }, handleError(t('Error while uploading the game. Check your internet connection or try again later.')))
       .then(buildId => {
         this.setState({
           exportStep: 'build',
         });
 
-        return this.pollBuild(buildId);
+        return this.pollBuild(userProfile, buildId);
       }, handleError(t('Error while lauching the build of the game.')))
       .then(build => {
         this.setState({
           exportStep: 'done',
           build,
         });
-        this.props.onRefreshUserProfile();
+        userProfile.onRefreshUserProfile();
       }, handleError(t('Error while building the game.')));
   };
 
@@ -276,12 +279,6 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     Window.openExternalURL(getUrl(build.logsKey));
   };
 
-  _onChangeSubscription = () => {
-    const { onChangeSubscription } = this.props;
-
-    onChangeSubscription();
-  };
-
   render() {
     const {
       exportStep,
@@ -292,68 +289,75 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       buildProgress,
       errored,
     } = this.state;
-    const {
-      project,
-      authenticated,
-      onLogin,
-      subscription,
-      limits,
-      t,
-    } = this.props;
+    const { project, t } = this.props;
     if (!project) return null;
 
-    const buildLimit = limits ? limits['cordova-build'] : null;
-    const disableBuild =
-      (!errored && exportStep !== '' && exportStep !== 'done') ||
-      (buildLimit && buildLimit.limitReached);
+    const getBuildLimit = (userProfile: UserProfile): ?Limit =>
+      userProfile.limits ? userProfile.limits['cordova-build'] : null;
+    const canLaunchBuild = (userProfile: UserProfile) => {
+      if (!errored && exportStep !== '' && exportStep !== 'done') return false;
+
+      const limit: ?Limit = getBuildLimit(userProfile);
+      if (limit && limit.limitReached) return false;
+
+      return true;
+    };
 
     return (
-      <Column noMargin>
-        <Line>
-          {t("Packaging your game for Android will create an APK file that can be installed on Android phones, based on Cordova framework.")}
-        </Line>
-        {authenticated && (
-          <Line justifyContent="center">
-            <RaisedButton
-              label={t("Package for Android")}
-              primary
-              onClick={this.launchWholeExport}
-              disabled={disableBuild}
-            />
-          </Line>
+      <UserProfileContext.Consumer>
+        {(userProfile: UserProfile) => (
+          <Column noMargin>
+            <Line>
+              {t(
+                'Packaging your game for Android will create an APK file that can be installed on Android phones, based on Cordova framework.'
+              )}
+            </Line>
+            {userProfile.authenticated && (
+              <Line justifyContent="center">
+                <RaisedButton
+                  label={t('Package for Android')}
+                  primary
+                  onClick={() => this.launchWholeExport(userProfile)}
+                  disabled={!canLaunchBuild(userProfile)}
+                />
+              </Line>
+            )}
+            {userProfile.authenticated && (
+              <LimitDisplayer
+                subscription={userProfile.subscription}
+                limit={getBuildLimit(userProfile)}
+                onChangeSubscription={this.props.onChangeSubscription}
+              />
+            )}
+            {!userProfile.authenticated && (
+              <CreateProfile
+                message={t(
+                  'Create an account to build your game for Android in one-click:'
+                )}
+                onLogin={userProfile.onLogin}
+              />
+            )}
+            <Line>
+              <Progress
+                exportStep={exportStep}
+                downloadUrl={
+                  build && build.apkKey ? getUrl(build.apkKey) : null
+                }
+                logsUrl={build && build.logsKey ? getUrl(build.logsKey) : null}
+                onDownload={this._download}
+                onDownloadLogs={this._downloadLogs}
+                uploadMax={uploadMax}
+                uploadProgress={uploadProgress}
+                buildMax={buildMax}
+                buildProgress={buildProgress}
+                errored={errored}
+              />
+            </Line>
+          </Column>
         )}
-        {authenticated && (
-          <LimitDisplayer
-            subscription={subscription}
-            limit={buildLimit}
-            onChangeSubscription={this._onChangeSubscription}
-          />
-        )}
-        {!authenticated && (
-          <CreateProfile
-            message={t("Create an account to build your game for Android in one-click:")}
-            onLogin={onLogin}
-          />
-        )}
-        <Line>
-          <Progress
-            exportStep={exportStep}
-            downloadUrl={build && build.apkKey ? getUrl(build.apkKey) : null}
-            logsUrl={build && build.logsKey ? getUrl(build.logsKey) : null}
-            onDownload={this._download}
-            onDownloadLogs={this._downloadLogs}
-            uploadMax={uploadMax}
-            uploadProgress={uploadProgress}
-            buildMax={buildMax}
-            buildProgress={buildProgress}
-            errored={errored}
-          />
-        </Line>
-      </Column>
+      </UserProfileContext.Consumer>
     );
   }
 }
 
-export default translate()(withUserProfile({ fetchLimits: true, fetchSubscription: true })(
-  LocalOnlineCordovaExport
-));
+export default translate()(LocalOnlineCordovaExport);

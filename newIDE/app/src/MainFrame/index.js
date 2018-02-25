@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import * as React from 'react';
 import './MainFrame.css';
 
 import Providers from './Providers';
@@ -59,6 +59,12 @@ import {
 import ErrorBoundary from '../UI/ErrorBoundary';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
+import Authentification from '../Utils/GDevelopServices/Authentification';
+import {
+  type PreviewLauncher,
+  type PreviewOptions,
+} from '../Export/PreviewLauncher.flow';
+import { type ResourceSource } from '../ResourcesList/ResourceSource.flow';
 
 const gd = global.gd;
 
@@ -90,11 +96,27 @@ type State = {|
   subscriptionDialogOpen: boolean,
   updateStatus: UpdateStatus,
   aboutDialogOpen: boolean,
-  onSubscriptionDialogClosed: ?Function,
   platformSpecificAssetsDialogOpen: boolean,
 |};
 
-export default class MainFrame extends Component<*, State> {
+type Props = {
+  integratedEditor?: boolean,
+  introDialog?: React.Element<*>,
+  onReadFromPathOrURL: (url: string) => Promise<any>,
+  previewLauncher?: React.Element<PreviewLauncher>,
+  onEditObject?: gdObject => void,
+  resourceSources: Array<ResourceSource>,
+  onChooseProject?: () => Promise<string>,
+  saveDialog?: React.Element<*>,
+  onSaveProject?: gdProject => Promise<any>,
+  loading?: boolean,
+  requestUpdate?: () => void,
+  exportDialog?: React.Element<*>,
+  createDialog?: React.Element<*>,
+  authentification: Authentification,
+};
+
+export default class MainFrame extends React.Component<Props, State> {
   state = {
     createDialogOpen: false,
     exportDialogOpen: false,
@@ -115,12 +137,12 @@ export default class MainFrame extends Component<*, State> {
     subscriptionDialogOpen: false,
     updateStatus: { message: '', status: 'unknown' },
     aboutDialogOpen: false,
-    onSubscriptionDialogClosed: null,
     platformSpecificAssetsDialogOpen: false,
   };
   toolbar = null;
   confirmCloseDialog: any = null;
   _resourceSourceDialogs = {};
+  _previewLauncher: ?PreviewLauncher = null;
   _providers = null;
 
   componentWillMount() {
@@ -417,32 +439,41 @@ export default class MainFrame extends Component<*, State> {
     );
   };
 
-  _launchLayoutPreview = (project: gdProject, layout: gdLayout) =>
+  _launchLayoutPreview = (
+    project: gdProject,
+    layout: gdLayout,
+    options: PreviewOptions
+  ) =>
     watchPromiseInState(this, 'previewLoading', () =>
-      this._handlePreviewResult(this.props.onLayoutPreview(project, layout))
+      this._handlePreviewResult(
+        this._previewLauncher &&
+          this._previewLauncher.launchLayoutPreview(project, layout, options)
+      )
     );
 
   _launchExternalLayoutPreview = (
     project: gdProject,
     layout: gdLayout,
-    externalLayout: gdExternalLayout
+    externalLayout: gdExternalLayout,
+    options: PreviewOptions
   ) =>
     watchPromiseInState(this, 'previewLoading', () =>
       this._handlePreviewResult(
-        this.props.onExternalLayoutPreview(project, layout, externalLayout)
+        this._previewLauncher &&
+          this._previewLauncher.launchExternalLayoutPreview(
+            project,
+            layout,
+            externalLayout,
+            options
+          )
       )
     );
 
-  _handlePreviewResult = (previewPromise: Promise<any>): Promise<void> => {
+  _handlePreviewResult = (previewPromise: ?Promise<any>): Promise<void> => {
+    if (!previewPromise) return Promise.reject();
+
     return previewPromise.then(
-      (result: any) => {
-        if (result && result.dialog) {
-          this.setState({
-            genericDialog: result.dialog,
-            genericDialogOpen: true,
-          });
-        }
-      },
+      (result: any) => {},
       (err: any) => {
         showErrorBox('Unable to launch the preview!', err);
       }
@@ -464,7 +495,10 @@ export default class MainFrame extends Component<*, State> {
           layoutName={name}
           setToolbar={this.setEditorToolbar}
           onPreview={this._launchLayoutPreview}
-          showPreviewButton={!!this.props.onLayoutPreview}
+          showPreviewButton={!!this.props.previewLauncher}
+          showNetworkPreviewButton={
+            this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
+          }
           onEditObject={this.props.onEditObject}
           showObjectsList={!this.props.integratedEditor}
           resourceSources={this.props.resourceSources}
@@ -481,7 +515,10 @@ export default class MainFrame extends Component<*, State> {
           layoutName={name}
           setToolbar={this.setEditorToolbar}
           onPreview={this._launchLayoutPreview}
-          showPreviewButton={!!this.props.onLayoutPreview}
+          showPreviewButton={!!this.props.previewLauncher}
+          showNetworkPreviewButton={
+            this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
+          }
           onOpenExternalEvents={this.openExternalEvents}
           onOpenLayout={name =>
             this.openLayout(name, {
@@ -542,7 +579,11 @@ export default class MainFrame extends Component<*, State> {
               externalLayoutName={name}
               setToolbar={this.setEditorToolbar}
               onPreview={this._launchExternalLayoutPreview}
-              showPreviewButton={!!this.props.onExternalLayoutPreview}
+              showPreviewButton={!!this.props.previewLauncher}
+              showNetworkPreviewButton={
+                this._previewLauncher &&
+                this._previewLauncher.canDoNetworkPreview()
+              }
               onEditObject={this.props.onEditObject}
               showObjectsList={!this.props.integratedEditor}
               resourceSources={this.props.resourceSources}
@@ -618,6 +659,8 @@ export default class MainFrame extends Component<*, State> {
   };
 
   chooseProject = () => {
+    if (!this.props.onChooseProject) return;
+
     this.props
       .onChooseProject()
       .then(filepath => {
@@ -635,7 +678,7 @@ export default class MainFrame extends Component<*, State> {
 
     if (this.props.saveDialog) {
       this._openSaveDialog();
-    } else {
+    } else if (this.props.onSaveProject) {
       this.props.onSaveProject(this.state.currentProject).then(
         () => {
           this._showSnackMessage('Project properly saved');
@@ -713,10 +756,9 @@ export default class MainFrame extends Component<*, State> {
     });
   };
 
-  openSubscription = (open: boolean = true, onDone: ?Function = null) => {
+  openSubscription = (open: boolean = true) => {
     this.setState({
       subscriptionDialogOpen: open,
-      onSubscriptionDialogClosed: onDone,
     });
   };
 
@@ -819,6 +861,7 @@ export default class MainFrame extends Component<*, State> {
       saveDialog,
       resourceSources,
       authentification,
+      previewLauncher,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -826,7 +869,10 @@ export default class MainFrame extends Component<*, State> {
       this.props.loading;
 
     return (
-      <Providers themeName={getThemeName(preferences)}>
+      <Providers
+        themeName={getThemeName(preferences)}
+        authentification={authentification}
+      >
         <div className="main-frame">
           <ProjectTitlebar project={currentProject} />
           <Drawer
@@ -864,6 +910,7 @@ export default class MainFrame extends Component<*, State> {
                 onOpenResources={() => this.openResources()}
                 onOpenPlatformSpecificAssets={() =>
                   this.openPlatformSpecificAssets()}
+                onChangeSubscription={() => this.openSubscription(true)}
               />
             )}
           </Drawer>
@@ -911,9 +958,9 @@ export default class MainFrame extends Component<*, State> {
             React.cloneElement(exportDialog, {
               open: this.state.exportDialogOpen,
               onClose: () => this.openExportDialog(false),
-              onChangeSubscription: (onDone: ?Function) => {
+              onChangeSubscription: () => {
                 this.openExportDialog(false);
-                this.openSubscription(true, onDone);
+                this.openSubscription(true);
               },
               project: this.state.currentProject,
               authentification,
@@ -961,27 +1008,35 @@ export default class MainFrame extends Component<*, State> {
               open: this.state.genericDialogOpen,
               onClose: () => this._openGenericDialog(false),
             })}
-          {resourceSources.map((resourceSource, index) =>
-            React.createElement(resourceSource.component, {
-              key: resourceSource.name,
-              ref: dialog =>
-                (this._resourceSourceDialogs[resourceSource.name] = dialog),
-            })
-          )}
+          {!!previewLauncher &&
+            React.cloneElement(previewLauncher, {
+              ref: (previewLauncher: ?PreviewLauncher) =>
+                (this._previewLauncher = previewLauncher),
+              onExport: () => this.openExportDialog(true),
+              onChangeSubscription: () => this.openSubscription(true),
+            })}
+          {resourceSources.map((resourceSource, index) => {
+            // $FlowFixMe
+            const Component = resourceSource.component;
+            return (
+              // $FlowFixMe
+              <Component
+                key={resourceSource.name}
+                ref={dialog =>
+                  (this._resourceSourceDialogs[resourceSource.name] = dialog)}
+              />
+            );
+          })}
           <ProfileDialog
             open={profileDialogOpen}
-            authentification={authentification}
             onClose={() => this.openProfile(false)}
-            onChangeSubscription={onDone => this.openSubscription(true, onDone)}
+            onChangeSubscription={() => this.openSubscription(true)}
           />
           <SubscriptionDialog
             onClose={() => {
               this.openSubscription(false);
-              if (this.state.onSubscriptionDialogClosed)
-                this.state.onSubscriptionDialogClosed();
             }}
             open={subscriptionDialogOpen}
-            authentification={authentification}
           />
           <PreferencesDialog
             open={this.state.preferencesDialogOpen}

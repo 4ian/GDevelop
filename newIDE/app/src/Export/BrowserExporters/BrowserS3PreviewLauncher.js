@@ -1,9 +1,10 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import BrowserS3FileSystem from './BrowserS3FileSystem';
 import BrowserPreviewLinkDialog from './BrowserPreviewLinkDialog';
 import { findGDJS } from './BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
+import { type PreviewOptions } from '../PreviewLauncher.flow';
 import { GDevelopGamesPreview } from '../../Utils/GDevelopServices/ApiConfigs';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
 const awsS3 = require('aws-sdk/clients/s3');
@@ -24,8 +25,25 @@ const awsS3Client = new awsS3({
   correctClockSkew: true,
 });
 
-export default class BrowserS3PreviewLauncher {
-  static _openPreviewWindow = (project: gdProject, url: string): any => {
+type State = {|
+  showPreviewLinkDialog: boolean,
+  url: ?string,
+|};
+
+type Props = {};
+
+export default class BrowserS3PreviewLauncher extends React.Component<
+  Props,
+  State
+> {
+  canDoNetworkPreview = () => false;
+
+  state = {
+    showPreviewLinkDialog: false,
+    url: null,
+  };
+
+  _openPreviewWindow = (project: gdProject, url: string): any => {
     const windowObjectReference = window.open(url, `_blank`);
     return {
       url,
@@ -33,7 +51,7 @@ export default class BrowserS3PreviewLauncher {
     };
   };
 
-  static _prepareExporter = (): Promise<any> => {
+  _prepareExporter = (): Promise<any> => {
     return new Promise((resolve, reject) => {
       findGDJS(({ gdjsRoot, filesContent }) => {
         if (!gdjsRoot) {
@@ -68,13 +86,14 @@ export default class BrowserS3PreviewLauncher {
     });
   };
 
-  static launchLayoutPreview = (
+  launchLayoutPreview = (
     project: gdProject,
-    layout: gdLayout
+    layout: gdLayout,
+    options: PreviewOptions
   ): Promise<any> => {
     if (!project || !layout) return Promise.reject();
 
-    return BrowserS3PreviewLauncher._prepareExporter().then(
+    return this._prepareExporter().then(
       ({ exporter, outputDir, browserS3FileSystem }) => {
         exporter.exportLayoutForPixiPreview(project, layout, outputDir);
         exporter.delete();
@@ -82,25 +101,59 @@ export default class BrowserS3PreviewLauncher {
           .uploadPendingObjects()
           .then(() => {
             const finalUrl = outputDir + '/index.html';
-            return BrowserS3PreviewLauncher._openPreviewWindow(
-              project,
-              finalUrl
-            );
+            return this._openPreviewWindow(project, finalUrl);
           })
           .then(({ url, windowObjectReference }) => {
             if (!windowObjectReference) {
-              return { dialog: <BrowserPreviewLinkDialog url={url} /> };
+              this.setState({
+                showPreviewLinkDialog: true,
+                url,
+              });
             }
           });
       }
     );
   };
 
-  static launchExternalLayoutPreview = (
+  launchExternalLayoutPreview = (
     project: gdProject,
     layout: gdLayout,
-    externalLayout: gdExternalLayout
+    externalLayout: gdExternalLayout,
+    options: PreviewOptions
   ): Promise<any> => {
-    return Promise.reject('Not implemented');
+    if (!project || !layout || !externalLayout) return Promise.reject();
+
+    return this._prepareExporter().then(
+      ({ exporter, outputDir, browserS3FileSystem }) => {
+        exporter.exportExternalLayoutForPixiPreview(
+          project,
+          layout,
+          externalLayout,
+          outputDir
+        );
+        exporter.delete();
+        return browserS3FileSystem
+          .uploadPendingObjects()
+          .then(() => {
+            const finalUrl = outputDir + '/index.html';
+            return this._openPreviewWindow(project, finalUrl);
+          })
+          .then(({ url, windowObjectReference }) => {
+            if (!windowObjectReference) {
+              this.setState({
+                showPreviewLinkDialog: true,
+                url,
+              });
+            }
+          });
+      }
+    );
   };
+
+  render() {
+    const { showPreviewLinkDialog, url } = this.state;
+    if (!showPreviewLinkDialog) return null;
+
+    return <BrowserPreviewLinkDialog url={url} />;
+  }
 }

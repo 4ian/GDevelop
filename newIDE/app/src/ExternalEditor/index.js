@@ -124,7 +124,7 @@ class ExternalEditor extends Component<Props, State> {
     console.log('Update send done');
   };
 
-  editObject = (object: any) => {
+  editObject = (object: gdObject) => {
     this.sendUpdate();
     this.bridge.send('editObject', object.getName());
   };

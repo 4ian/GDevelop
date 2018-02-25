@@ -4,7 +4,7 @@
  * This project is released under the MIT License.
  */
 
-gdjs.LoadingScreenCocosRenderer = function(runtimeGamePixiRenderer)
+gdjs.LoadingScreenCocosRenderer = function(runtimeGamePixiRenderer, loadingScreenSetup)
 {
 }
 
@@ -12,4 +12,8 @@ gdjs.LoadingScreenRenderer = gdjs.LoadingScreenCocosRenderer; //Register the cla
 
 gdjs.LoadingScreenCocosRenderer.prototype.render = function(percent) {
     console.log("Loading " + percent + "%");
+};
+
+gdjs.LoadingScreenCocosRenderer.prototype.unload = function() {
+    // Nothing to do
 };

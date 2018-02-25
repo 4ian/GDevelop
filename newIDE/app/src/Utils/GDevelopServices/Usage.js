@@ -1,6 +1,5 @@
 // @flow
 import axios from 'axios';
-import type Authentification from './Authentification';
 import { GDevelopUsageApi } from './ApiConfigs';
 
 export type Usage = {
@@ -20,11 +19,11 @@ export type Subscription = {|
   stripeCustomerId?: string,
 |};
 
-export type Limit = {
+export type Limit = {|
   limitReached: boolean,
   current: number,
   max: number,
-};
+|};
 
 export type Limits = {
   [string]: Limit,
@@ -35,8 +34,8 @@ export type PlanDetails = {
   name: string,
   monthlyPriceInEuros: number,
   smallDescription: string,
-  description: string,
-  moreDescription1?: string,
+  descriptionBullets: Array<string>,
+  extraDescription?: string,
 };
 
 export const getSubscriptionPlans = (): Array<PlanDetails> => [
@@ -45,8 +44,12 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     name: 'GDevelop Pro',
     monthlyPriceInEuros: 7,
     smallDescription: 'Ideal for advanced game makers',
-    description: 'Allow to package your game for Android up to 70 times a day.',
-    moreDescription1:
+    descriptionBullets: [
+      'Allow to package your game for Android up to 70 times a day.',
+      'Use Live Preview over Wifi to quickly test your game on mobiles and tablets',
+      'Immerse your players by removing GDevelop logo when the game loads',
+    ],
+    extraDescription:
       "You'll also have access to online packaging for Windows, macOS and Linux when it's ready.",
   },
   {
@@ -54,8 +57,12 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     name: 'GDevelop Indie',
     monthlyPriceInEuros: 2,
     smallDescription: 'Ideal for beginners',
-    description: 'Allow to package your game for Android up to 10 times a day.',
-    moreDescription1:
+    descriptionBullets: [
+      'Allow to package your game for Android up to 10 times a day.',
+      'Use Live Preview over Wifi to quickly test your game on mobiles and tablets',
+      'Immerse your players by removing GDevelop logo when the game loads',
+    ],
+    extraDescription:
       "You'll also have access to online packaging for Windows, macOS and Linux when it's ready.",
   },
   {
@@ -63,17 +70,17 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     name: 'No subscription',
     monthlyPriceInEuros: 0,
     smallDescription: '',
-    description:
+    descriptionBullets: [
       'You can use GDevelop for free, but online packaging for Android is limited to twice a day.',
+    ],
   },
 ];
 
 export const getUserUsages = (
-  authentification: Authentification,
+  getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Usages> => {
-  return authentification
-    .getAuthorizationHeader()
+  return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.get(`${GDevelopUsageApi.baseUrl}/usage`, {
         params: {
@@ -88,11 +95,10 @@ export const getUserUsages = (
 };
 
 export const getUserLimits = (
-  authentification: Authentification,
+  getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Limits> => {
-  return authentification
-    .getAuthorizationHeader()
+  return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.get(`${GDevelopUsageApi.baseUrl}/limits`, {
         params: {
@@ -107,11 +113,10 @@ export const getUserLimits = (
 };
 
 export const getUserSubscription = (
-  authentification: Authentification,
+  getAuthorizationHeader: () => Promise<string>,
   userId: string
 ): Promise<Subscription> => {
-  return authentification
-    .getAuthorizationHeader()
+  return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.get(`${GDevelopUsageApi.baseUrl}/subscription`, {
         params: {
@@ -126,12 +131,11 @@ export const getUserSubscription = (
 };
 
 export const changeUserSubscription = (
-  authentification: Authentification,
+  getAuthorizationHeader: () => Promise<string>,
   userId: string,
   newSubscriptionDetails: { planId: string | null, stripeToken?: any }
 ): Promise<Subscription> => {
-  return authentification
-    .getAuthorizationHeader()
+  return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.post(
         `${GDevelopUsageApi.baseUrl}/subscription`,

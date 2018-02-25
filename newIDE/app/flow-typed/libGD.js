@@ -14,6 +14,7 @@ declare type gdSerializerElement = EmscriptenObject;
 declare type gdInitialInstance = EmscriptenObject;
 declare type gdBaseEvent = EmscriptenObject;
 declare type gdResource = EmscriptenObject;
+declare type gdObject = EmscriptenObject;
 
 declare type gdInstruction = EmscriptenObject;
 declare type gdInstructionMetadata = EmscriptenObject;

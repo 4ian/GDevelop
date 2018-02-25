@@ -19,14 +19,14 @@ type Props = {
   showProjectIcons: boolean,
   hasProject: boolean,
   toggleProjectManager: boolean,
-  requestUpdate: Function,
-  simulateUpdateDownloaded: Function,
+  requestUpdate: ?() => void,
+  simulateUpdateDownloaded: ?() => void,
   exportProject: Function,
 } & TranslatorProps;
 
 type State = {
   editorToolbar: any,
-}
+};
 
 export class MainFrameToolbar extends Component<Props, State> {
   state = {
@@ -56,13 +56,13 @@ export class MainFrameToolbar extends Component<Props, State> {
             />
           )}
           {this.props.showProjectIcons && (
-              <ToolbarIcon
-                onClick={this.props.exportProject}
-                src="res/ribbon_default/export32.png"
-                disabled={!this.props.hasProject}
-                tooltip={t('Export the game (Web, Android, iOS...)')}
-              />
-            )}
+            <ToolbarIcon
+              onClick={this.props.exportProject}
+              src="res/ribbon_default/export32.png"
+              disabled={!this.props.hasProject}
+              tooltip={t('Export the game (Web, Android, iOS...)')}
+            />
+          )}
           {this.isDev && (
             <IconMenu
               iconButtonElement={
@@ -71,11 +71,16 @@ export class MainFrameToolbar extends Component<Props, State> {
               buildMenuTemplate={() => [
                 {
                   label: 'Request update from external editor',
-                  click: () => this.props.requestUpdate(),
+                  disabled: !this.props.requestUpdate,
+                  click: () =>
+                    this.props.requestUpdate && this.props.requestUpdate(),
                 },
                 {
                   label: 'Simulate update downloaded',
-                  click: () => this.props.simulateUpdateDownloaded(),
+                  disabled: !this.props.simulateUpdateDownloaded,
+                  click: () =>
+                    this.props.simulateUpdateDownloaded &&
+                    this.props.simulateUpdateDownloaded(),
                 },
               ]}
             />

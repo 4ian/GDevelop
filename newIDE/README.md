@@ -108,6 +108,8 @@ This new editor is still in development and is missing some features:
 
 You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
 
+See also [the roadmap for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
+
 ## Additional help
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app). Check out their documentation for common tasks or help about using it.

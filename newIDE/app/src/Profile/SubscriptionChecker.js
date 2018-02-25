@@ -8,11 +8,17 @@ import Star from 'material-ui/svg-icons/toggle/star';
 import Favorite from 'material-ui/svg-icons/action/favorite';
 import UserProfileContext, { type UserProfile } from './UserProfileContext';
 import { Column, Line } from '../UI/Grid';
+import { sendSubscriptionCheckDialogShown, sendSubscriptionCheckDismiss } from '../Utils/Analytics/EventSender';
+
+type Props = {|
+  title: string,
+  onChangeSubscription?: () => void,
+  mode: 'try' | 'mandatory',
+|};
 
 type DialogProps = {|
-  title: string,
   userProfile: UserProfile,
-  onChangeSubscription?: () => void,
+  ...$Exact<Props>,
 |};
 
 type DialogState = {|
@@ -32,7 +38,7 @@ export class SubscriptionCheckDialog extends Component<
   state = { open: false };
 
   checkHasSubscription() {
-    const { userProfile } = this.props;
+    const { userProfile, mode, title } = this.props;
     if (userProfile.subscription) {
       const hasPlan = !!userProfile.subscription.planId;
       if (hasPlan) {
@@ -46,14 +52,19 @@ export class SubscriptionCheckDialog extends Component<
     this.setState({
       open: true,
     });
+    sendSubscriptionCheckDialogShown({mode, title});
+
     return false;
   }
 
-  _closeDialog = () => this.setState({ open: false });
+  _closeDialog = () => {
+    sendSubscriptionCheckDismiss();
+    this.setState({ open: false });
+  };
 
   render() {
     const { open } = this.state;
-    const { onChangeSubscription } = this.props;
+    const { onChangeSubscription, mode } = this.props;
     if (!open) return null;
 
     return (
@@ -65,7 +76,7 @@ export class SubscriptionCheckDialog extends Component<
               key="subscribe"
               primary
               onClick={() => {
-                this._closeDialog();
+                this.setState({ open: false });
                 onChangeSubscription();
               }}
             />
@@ -73,7 +84,7 @@ export class SubscriptionCheckDialog extends Component<
         ]}
         secondaryActions={[
           <FlatButton
-            label="Continue anyway"
+            label={mode === 'try' ? 'Continue anyway' : 'Not now, thanks!'}
             key="close"
             primary={false}
             onClick={this._closeDialog}
@@ -86,10 +97,17 @@ export class SubscriptionCheckDialog extends Component<
       >
         <Column noMargin>
           <Line noMargin alignItems="center">
-            <p>
-              You can try this feature, but if you're using it regularly, we ask
-              you to get a subscription to GDevelop.
-            </p>
+            {mode === 'try' ? (
+              <p>
+                You can try this feature, but if you're using it regularly, we
+                ask you to get a subscription to GDevelop.
+              </p>
+            ) : (
+              <p>
+                To use this feature, we ask you to get a subscription to
+                GDevelop.
+              </p>
+            )}
           </Line>
           <Line noMargin alignItems="center">
             <Star style={styles.icon} />
@@ -116,11 +134,6 @@ export class SubscriptionCheckDialog extends Component<
   }
 }
 
-type Props = {|
-  title: string,
-  onChangeSubscription?: () => void,
-|};
-
 class SubscriptionChecker extends Component<Props, {}> {
   _dialog: ?SubscriptionCheckDialog = null;
 
@@ -141,6 +154,7 @@ class SubscriptionChecker extends Component<Props, {}> {
             ref={dialog => (this._dialog = dialog)}
             onChangeSubscription={this.props.onChangeSubscription}
             title={this.props.title}
+            mode={this.props.mode}
           />
         )}
       </UserProfileContext.Consumer>

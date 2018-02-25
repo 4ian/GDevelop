@@ -910,6 +910,7 @@ export default class MainFrame extends React.Component<Props, State> {
                 onOpenResources={() => this.openResources()}
                 onOpenPlatformSpecificAssets={() =>
                   this.openPlatformSpecificAssets()}
+                onChangeSubscription={() => this.openSubscription(true)}
               />
             )}
           </Drawer>

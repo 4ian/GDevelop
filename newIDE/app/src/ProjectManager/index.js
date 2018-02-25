@@ -181,6 +181,7 @@ type Props = {|
   onAddExternalEvents: () => void,
   onAddExternalLayout: () => void,
   onOpenPlatformSpecificAssets: () => void,
+  onChangeSubscription: () => void,
 |};
 
 type State = {|
@@ -563,6 +564,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false })}
             onApply={() =>
               this.setState({ projectPropertiesDialogOpen: false })}
+            onChangeSubscription={this.props.onChangeSubscription}
           />
         )}
       </div>

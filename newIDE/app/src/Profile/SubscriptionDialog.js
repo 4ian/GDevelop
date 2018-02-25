@@ -18,6 +18,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import { showMessageBox, showErrorBox } from '../UI/Messages/MessageBox';
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
+import { sendSubscriptionDialogShown } from '../Utils/Analytics/EventSender';
 
 const styles = {
   descriptionText: {
@@ -50,6 +51,18 @@ type State = {|
 export default class SubscriptionDialog extends Component<Props, State> {
   state = { isLoading: false };
   stripeCheckoutHandler: null;
+
+  componentDidMount() {
+    if (this.props.open) {
+      sendSubscriptionDialogShown();
+    }
+  }
+
+  componentWillReceiveProps(newProps: Props) {
+    if (!this.props.open && newProps.open) {
+      sendSubscriptionDialogShown();
+    }
+  }
 
   choosePlan = (userProfile: UserProfile, plan: PlanDetails) => {
     const { getAuthorizationHeader, subscription, profile } = userProfile;

@@ -730,12 +730,23 @@ storiesOf('LocalNetworkPreviewDialog', module)
 
 storiesOf('SubscriptionCheckDialog', module)
   .addDecorator(muiDecorator)
-  .add('default', () => (
+  .add('default (try mode)', () => (
     <RefGetter onRef={ref => ref.checkHasSubscription()}>
       <SubscriptionCheckDialog
         title="Preview over wifi"
         userProfile={fakeNoSubscriptionUserProfile}
         onChangeSubscription={action('change subscription')}
+        mode="try"
+      />
+    </RefGetter>
+  ))
+  .add('default (mandatory mode)', () => (
+    <RefGetter onRef={ref => ref.checkHasSubscription()}>
+      <SubscriptionCheckDialog
+        title="Preview over wifi"
+        userProfile={fakeNoSubscriptionUserProfile}
+        onChangeSubscription={action('change subscription')}
+        mode="mandatory"
       />
     </RefGetter>
   ));

@@ -99,7 +99,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddCondition("AnimationFrame",
         _("Current frame"),
-        _("Check the current animation frame.\nIf the animation is smooth, a float can be (and probably will be) returned."),
+        _("Check the current animation frame.\nIf the animation is set as smooth, a float can be (and probably will be) returned."),
         _("Current animation frame of _PARAM0_ is _PARAM1_ _PARAM2_"),
         _("Animation"),
         "JsPlatform/Extensions/admobicon24.png",
@@ -183,16 +183,183 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
     obj.AddStrExpression("CurrentAnimationName", _("Current animation name"), _("Current animation name"), _("Animation"), "JsPlatform/Extensions/admobicon16.png")
         .AddParameter("object", _("Object"), "Skeleton");
 
-    obj.AddAction("SetColor",
-        _("Color"),
-        _("Change the slot color."),
-        _("Set _PARAM0_ color to _PARAM2_"),
-        _("Slot"),
+    obj.AddCondition("BonePositionX",
+        _("Position X"),
+        _("Check the bone position X."),
+        _("Current position X of _PARAM0_:_PARAM1_ is _PARAM2_ _PARAM3_"),
+        _("Bone"),
         "JsPlatform/Extensions/admobicon24.png",
         "JsPlatform/Extensions/admobicon16.png")
         .AddParameter("object", _("Object"), "Skeleton")
-        .AddParameter("string", _("Sloth path"))
-        .AddParameter("color", _("Color"));
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddAction("SetBonePositionX",
+        _("Position X"),
+        _("Change the bone position X."),
+        _("Set _PARAM0_:_PARAM1_ position X _PARAM2_ _PARAM3_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddExpression("BonePositionX", _("Position X"), _("Bone position X"), _("Bone"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"));
+
+    obj.AddCondition("BonePositionY",
+        _("Position Y"),
+        _("Check the bone position Y."),
+        _("Current position Y of _PARAM0_:_PARAM1_ is _PARAM2_ _PARAM3_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddAction("SetBonePositionY",
+        _("Position Y"),
+        _("Change the bone position Y."),
+        _("Set _PARAM0_:_PARAM1_ position Y _PARAM2_ _PARAM3_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddExpression("BonePositionY", _("Position Y"), _("Bone position Y"), _("Bone"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"));
+
+    obj.AddAction("SetBonePosition",
+        _("Position"),
+        _("Change the bone position."),
+        _("Set _PARAM0_:_PARAM1_ position X _PARAM2_ _PARAM3_; Y _PARAM4_ _PARAM5_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Position X"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Position Y"));
+
+    obj.AddCondition("BoneAngle",
+        _("Angle"),
+        _("Check the bone angle (in degrees)."),
+        _("Current angle of _PARAM0_:_PARAM1_ is _PARAM2_ _PARAM3_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddAction("SetBoneAngle",
+        _("Angle"),
+        _("Change the bone angle (in degrees)."),
+        _("Set _PARAM0_:_PARAM1_ angle _PARAM2_ _PARAM3_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddExpression("BoneAngle", _("Angle"), _("Slot angle (in degrees)"), _("Bone"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"));
+
+    obj.AddCondition("BoneScaleX",
+        _("Scale X"),
+        _("Check the bone scale X."),
+        _("Current scale X of _PARAM0_:_PARAM1_ is _PARAM2_ _PARAM3_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddAction("SetBoneScaleX",
+        _("Scale X"),
+        _("Change the bone scale X."),
+        _("Set _PARAM0_:_PARAM1_ scale X _PARAM2_ _PARAM3_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddExpression("BoneScaleX", _("Scale X"), _("Slot scale X"), _("Bone"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"));
+
+    obj.AddCondition("BoneScaleY",
+        _("Scale Y"),
+        _("Check the bone scale Y."),
+        _("Current scale Y of _PARAM0_:_PARAM1_ is _PARAM2_ _PARAM3_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddAction("SetBoneScaleY",
+        _("Scale Y"),
+        _("Change the bone scale Y."),
+        _("Set _PARAM0_:_PARAM1_ scale Y _PARAM2_ _PARAM3_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddExpression("BoneScaleY", _("Scale Y"), _("Slot scale Y"), _("Bone"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"));
+
+    obj.AddAction("SetBoneScale",
+        _("Scale"),
+        _("Change the bone scale."),
+        _("Set _PARAM0_:_PARAM1_ scale X _PARAM2_ _PARAM3_; Y _PARAM4_ _PARAM5_"),
+        _("Bone"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Bone path"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Scale X"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Scale Y"));
 
     obj.AddCondition("SlotPositionX",
         _("Position X"),
@@ -220,6 +387,10 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("expression", _("Value"))
         .SetManipulatedType("number");
 
+    obj.AddExpression("SlotPositionX", _("Position X"), _("Slot position X"), _("Slot"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"));
+
     obj.AddCondition("SlotPositionY",
         _("Position Y"),
         _("Check the slot position Y."),
@@ -243,11 +414,30 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "Skeleton")
         .AddParameter("string", _("Slot path"))
         .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"));
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddExpression("SlotPositionY", _("Position Y"), _("Slot position Y"), _("Slot"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"));
+
+    obj.AddAction("SetSlotPosition",
+        _("Position"),
+        _("Change the slot position."),
+        _("Set _PARAM0_:_PARAM1_ position X _PARAM2_ _PARAM3_; Y _PARAM4_ _PARAM5_"),
+        _("Slot"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Position X"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Position Y"));
 
     obj.AddCondition("SlotAngle",
         _("Angle"),
-        _("Check the slot angle."),
+        _("Check the slot angle (in degrees)."),
         _("Current angle of _PARAM0_:_PARAM1_ is _PARAM2_ _PARAM3_"),
         _("Slot"),
         "JsPlatform/Extensions/admobicon24.png",
@@ -260,7 +450,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
 
     obj.AddAction("SetSlotAngle",
         _("Angle"),
-        _("Change the slot angle."),
+        _("Change the slot angle (in degrees)."),
         _("Set _PARAM0_:_PARAM1_ angle _PARAM2_ _PARAM3_"),
         _("Slot"),
         "JsPlatform/Extensions/admobicon24.png",
@@ -268,7 +458,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "Skeleton")
         .AddParameter("string", _("Slot path"))
         .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"));
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddExpression("SlotAngle", _("Angle"), _("Slot angle (in degrees)"), _("Slot"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"));
 
     obj.AddCondition("SlotScaleX",
         _("Scale X"),
@@ -293,7 +488,12 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "Skeleton")
         .AddParameter("string", _("Slot path"))
         .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"));
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddExpression("SlotScaleX", _("Scale X"), _("Slot scale X"), _("Slot"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"));
 
     obj.AddCondition("SlotScaleY",
         _("Scale Y"),
@@ -318,13 +518,110 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
         .AddParameter("object", _("Object"), "Skeleton")
         .AddParameter("string", _("Slot path"))
         .AddParameter("operator", _("Modification's sign"))
-        .AddParameter("expression", _("Value"));
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddExpression("SlotScaleY", _("Scale Y"), _("Slot scale Y"), _("Slot"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"));
+
+    obj.AddAction("SetSlotScale",
+        _("Scale"),
+        _("Change the slot scale."),
+        _("Set _PARAM0_:_PARAM1_ scale X _PARAM2_ _PARAM3_; Y _PARAM4_ _PARAM5_"),
+        _("Slot"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Scale X"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Scale Y"));
+
+    obj.AddAction("SlotColor",
+        _("Color"),
+        _("Change the slot color."),
+        _("Set _PARAM0_:_PARAM1_ color to _PARAM2_"),
+        _("Slot"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Sloth path"))
+        .AddParameter("color", _("Color"));
+
+    obj.AddCondition("SlotVisible",
+        _("Visible"),
+        _("Check the slot visibility."),
+        _("_PARAM0_:_PARAM1_ is visible"),
+        _("Slot"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"));
+
+    obj.AddAction("SlotVisible",
+        _("Visible"),
+        _("Change the slot visibility."),
+        _("Set _PARAM0_:_PARAM1_ visible: _PARAM2_"),
+        _("Slot"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"))
+        .AddParameter("yesorno", _("Visible?"));
+
+    obj.AddExpression("SlotVisible", _("Visible"), _("Slot visibility (0: hidden, 1: visible)"), _("Slot"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Sloth path"));
+
+    obj.AddCondition("SlotZOrder",
+        _("Z-order"),
+        _("Check the slot Z-order."),
+        _("Z-order of _PARAM0_:_PARAM1_ is _PARAM2_ _PARAM3_"),
+        _("Slot"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"))
+        .AddParameter("relationalOperator", _("Sign of the test"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddAction("SetSlotZOrder",
+        _("Z-order"),
+        _("Change the slot Z-order."),
+        _("Set _PARAM0_:_PARAM1_ Z-order _PARAM2_ _PARAM3_"),
+        _("Slot"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path"))
+        .AddParameter("operator", _("Modification's sign"))
+        .AddParameter("expression", _("Value"))
+        .SetManipulatedType("number");
+
+    obj.AddExpression("SlotZOrder", _("Z-order"), _("Slot Z-order"), _("Slot"), "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Sloth path"));
+
+    obj.AddCondition("PointInsideSlot",
+        _("Point inside slot"),
+        _("Check if the point is inside the slot"),
+        _("The point _PARAM2_;_PARAM3_ is inside _PARAM0_:_PARAM1_"),
+        _("Collision"),
+        "JsPlatform/Extensions/admobicon24.png",
+        "JsPlatform/Extensions/admobicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Sloth path"))
+        .AddParameter("expression", _("Point X"))
+        .AddParameter("expression", _("Point Y"));
 
     extension.AddCondition("SlotCollidesWithObject",
         _("Collides"),
         _("Check if the slot collides with an object"),
         _("_PARAM0_:_PARAM1_ collides with _PARAM2_"),
-        _("Slot"),
+        _("Collision"),
         "JsPlatform/Extensions/admobicon24.png",
         "JsPlatform/Extensions/admobicon16.png")
         .AddParameter("objectList", _("Skeleton"), "Skeleton")
@@ -334,8 +631,8 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
     extension.AddCondition("SlotCollidesWithSlot",
         _("Collides with slot"),
         _("Check if the slot collides with another skeleton slot"),
-         _("_PARAM0_:_PARAM1_ collides with _PARAM2_:_PARAM3_"),
-        _("Slot"),
+        _("_PARAM0_:_PARAM1_ collides with _PARAM2_:_PARAM3_"),
+        _("Collision"),
         "JsPlatform/Extensions/admobicon24.png",
         "JsPlatform/Extensions/admobicon16.png")
         .AddParameter("objectList", _("Skeleton"), "Skeleton")

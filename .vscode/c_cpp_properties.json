@@ -15,6 +15,8 @@
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                 "/usr/include",
+                "/usr/local/lib/wx/include/osx_cocoa-unicode-3.0",
+                "/usr/local/include/wx-3.0",
                 "${workspaceRoot}"
             ],
             "defines": [

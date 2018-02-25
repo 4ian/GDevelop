@@ -20,6 +20,7 @@ namespace gd { class InitialInstance; }
 namespace gd { class Object; }
 namespace sf { class RenderTarget; }
 class Polygon2d;
+class RaycastResult;
 class RuntimeScene;
 
 /**
@@ -230,6 +231,17 @@ public:
      * \return true if the point is inside the object collision hitboxes.
      */
     bool IsCollidingWithPoint(float pointX, float pointY);
+
+    /**
+     * \brief Check if a ray intersect any object hitbox.
+     * \param x The raycast source X
+     * \param y The raycast source Y
+     * \param angle The raycast angle
+     * \param dist The raycast max distance
+     * \param closest Get the closest or farthest collision mask result?
+     * \return A raycast result with the contact points and distances
+     */
+    RaycastResult RaycastTest(float x, float y, float angle, float dist, bool closest);
 
     /**
      * \brief Check collision with each object of the list using their hitboxes, and move the object

@@ -22,6 +22,9 @@
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/Project/Variable.h"
 #include "GDCpp/Extensions/CppPlatform.h"
+#include "GDCpp/Runtime/PolygonCollision.h"
+#include "GDCpp/Runtime/Polygon2d.h"
+#include <iostream>
 
 gd::String GD_API GetSceneName(RuntimeScene & scene)
 {
@@ -205,6 +208,48 @@ bool GD_API PickNearestObject(std::map <gd::String, std::vector<RuntimeObject*> 
         return false;
 
     PickOnly(pickedObjectLists, bestObject);
+    return true;
+}
+
+bool GD_API RaycastObject(std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, float x, float y, float angle, float dist, gd::Variable & varX, gd::Variable & varY, bool inverted)
+{
+    RuntimeObject * matchObject = NULL;
+    float testSqDist = inverted ? 0 : dist*dist;
+    float resultX = 0.0f;
+    float resultY = 0.0f;
+    for (auto it = pickedObjectLists.begin(); it != pickedObjectLists.end(); ++it)
+    {
+        if ( it->second == NULL ) continue;
+        auto list = *it->second;
+
+        for (std::size_t i = 0; i < list.size(); ++i)
+        {
+
+            RaycastResult result = list[i]->RaycastTest(x, y, angle, dist, !inverted);
+
+            if( result.collision ) {
+                if ( !inverted && (result.closeSqDist <= testSqDist) ) {
+                    testSqDist = result.closeSqDist;
+                    matchObject = list[i];
+                    resultX = result.closePoint.x;
+                    resultY = result.closePoint.y;
+                }
+                else if ( inverted && (result.farSqDist >= testSqDist) ) {
+                    testSqDist = result.farSqDist;
+                    matchObject = list[i];
+                    resultX = result.farPoint.x;
+                    resultY = result.farPoint.y;
+                }
+            }
+        }
+    }
+
+    if ( !matchObject )
+        return false;
+
+    PickOnly(pickedObjectLists, matchObject);
+    varX.SetValue(resultX);
+    varY.SetValue(resultY);
     return true;
 }
 

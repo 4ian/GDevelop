@@ -860,6 +860,23 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
         .AddCodeOnlyParameter("conditionInverted", "")
         .MarkAsAdvanced();
 
+    extension.AddCondition("Raycast",
+                   _("Raycast"),
+                   _("Sends a ray from the given source position and angle, intersecting the closest object.\nThe instersected object will become the only one taken into account.\nIf the condition is inverted, the object to be intersected will be the farthest one within the ray radius."),
+                   _("Raycast _PARAM0_ from _PARAM1_;_PARAM2_, and save the result in _PARAM5_, _PARAM6_"),
+                   _("Collision"),
+                   "res/conditions/raycast24.png",
+                   "res/conditions/raycast.png")
+        .AddParameter("objectList", _("Objects to test against the ray"))
+        .AddParameter("expression", _("Ray source X position"))
+        .AddParameter("expression", _("Ray source Y position"))
+        .AddParameter("expression", _("Ray angle (in degrees)"))
+        .AddParameter("expression", _("Ray maximum distance (in pixels)"))
+        .AddParameter("scenevar", _("Variable where to store the X position of the intersection"))
+        .AddParameter("scenevar", _("Variable where to store the Y position of the intersection"))
+        .AddCodeOnlyParameter("conditionInverted", "")
+        .MarkAsAdvanced();
+
     extension.AddExpression("Count", _("Number of objects"), _("Count the number of the specified objects currently picked"), _("Objects"), "res/conditions/nbObjet.png")
         .AddParameter("objectList", _("Object"));
     #endif

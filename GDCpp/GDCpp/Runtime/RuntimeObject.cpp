@@ -4,6 +4,7 @@
  * This project is released under the MIT License.
  */
 #include <cstring>
+#include <cmath>
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Extensions/Builtin/MathematicalTools.h"
 #include "GDCpp/Runtime/RuntimeObject.h"
@@ -388,6 +389,43 @@ bool RuntimeObject::IsCollidingWithPoint(float pointX, float pointY){
     }
 
     return false;
+}
+
+RaycastResult RuntimeObject::RaycastTest(float x, float y, float angle, float dist, bool closest){
+    float objW = GetWidth();
+    float objH = GetHeight();
+    float diffX = GetDrawableX()+GetCenterX() - x;
+    float diffY = GetDrawableY()+GetCenterY() - y;
+    float boundingRadius = sqrt(objW*objW + objH*objH)/2.0;
+
+    RaycastResult result;
+    result.collision = false;
+
+    if ( sqrt(diffX*diffX + diffY*diffY) > boundingRadius + dist )
+        return result;
+    
+    float endX = x + dist*cos(angle*3.14159/180.0);
+    float endY = y + dist*sin(angle*3.14159/180.0);
+    float testSqDist = closest ? dist*dist : 0.0f;
+
+    vector<Polygon2d> hitboxes = GetHitBoxes();
+    for (std::size_t i = 0; i < hitboxes.size(); ++i)
+    {
+        RaycastResult res = PolygonRaycastTest(hitboxes[i], x, y, endX, endY);
+        
+        if ( res.collision ) {
+            if ( closest && (res.closeSqDist < testSqDist) ) {
+                testSqDist = res.closeSqDist;
+                result = res;
+            }
+            else if ( !closest && (res.farSqDist > testSqDist) && (res.farSqDist <= dist*dist) ) {
+                testSqDist = res.farSqDist;
+                result = res;
+            }
+        }
+    }
+    
+    return result;
 }
 
 void RuntimeObject::SeparateObjectsWithoutForces( std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists)

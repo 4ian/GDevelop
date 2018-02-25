@@ -7,6 +7,7 @@
 #include "GDCpp/Runtime/Polygon2d.h"
 #include <cmath>
 #include <cfloat>
+#include <algorithm>
 
 namespace
 {
@@ -28,6 +29,13 @@ float dotProduct(const sf::Vector2f a, const sf::Vector2f b)
     float dp = a.x*b.x + a.y*b.y;
 
     return dp;
+}
+
+float crossProduct(const sf::Vector2f a, const sf::Vector2f b)
+{
+    float cp = a.x*b.y - a.y*b.x;
+
+    return cp;
 }
 
 void project(const sf::Vector2f axis, const Polygon2d & p, float& min, float& max)
@@ -125,6 +133,96 @@ CollisionResult GD_API PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
     sf::Vector2f d = p1.ComputeCenter() - p2.ComputeCenter();
     if (dotProduct(d, move_axis) < 0.0f) move_axis = -move_axis;
     result.move_axis = move_axis * min_dist;
+
+    return result;
+}
+
+RaycastResult GD_API PolygonRaycastTest(Polygon2d & poly, float startX, float startY, float endX, float endY)
+{
+    RaycastResult result;
+    result.collision = false;
+
+    if ( poly.vertices.size() < 2 )
+    {
+        return result;
+    }
+
+    poly.ComputeEdges();
+    sf::Vector2f p, q, r, s;
+    float minSqDist = FLT_MAX;
+
+    // Ray segment: p + t*r, with p = start and r = end - start
+    p.x = startX;
+    p.y = startY;
+    r.x = endX - startX;
+    r.y = endY - startY;
+
+    for( int i=0; i<poly.edges.size(); i++ )
+    {
+        // Edge segment: q + u*s
+        q = poly.vertices[i];
+        s = poly.edges[i];
+        sf::Vector2f deltaQP = q - p;
+        float crossRS = crossProduct(r, s);
+        float t = crossProduct(deltaQP, s) / crossRS;
+        float u = crossProduct(deltaQP, r) / crossRS;
+        
+        // Collinear
+        if ( abs(crossRS) <= 0.0001 && abs(crossProduct(deltaQP, r)) <= 0.0001 )
+        {
+            // Project the ray and the edge to work on floats, keeping linearity through t
+            sf::Vector2f axis(r.x, r.y);
+            normalise(axis);
+            float rayA = 0.0f;
+            float rayB = dotProduct(axis, r);
+            float edgeA = dotProduct(axis, deltaQP);
+            float edgeB = dotProduct(axis, deltaQP + s);
+            // Get overlapping range
+            float minOverlap = std::max(std::min(rayA, rayB), std::min(edgeA, edgeB));
+            float maxOverlap = std::min(std::max(rayA, rayB), std::max(edgeA, edgeB));
+            if( minOverlap > maxOverlap ){
+                return result;
+            }
+            result.collision = true;
+            // Zero distance ray
+            if( rayB == 0.0f ){
+                result.closePoint = p;
+                result.closeSqDist = 0.0f;
+                result.farPoint = p;
+                result.farSqDist = 0.0f;
+            }
+            float t1 = minOverlap / abs(rayB);
+            float t2 = maxOverlap / abs(rayB);
+            result.closePoint = p + t1*r;
+            result.closeSqDist = t1*t1*(r.x*r.x + r.y*r.y);
+            result.farPoint = p + t2*r;
+            result.farSqDist = t2*t2*(r.x*r.x + r.y*r.y);
+
+            return result;
+        }
+        else if ( crossRS != 0 && 0<=t && t<=1 && 0<=u && u<=1 )
+        {
+            sf::Vector2f point = p + t*r;
+            
+            float sqDist = (point.x-startX)*(point.x-startX) + (point.y-startY)*(point.y-startY);
+            if ( sqDist < minSqDist )
+            {
+                if ( !result.collision ){
+                    result.farPoint = point;
+                    result.farSqDist = sqDist;
+                }
+                minSqDist = sqDist;
+                result.closePoint = point;
+                result.closeSqDist = sqDist;
+                result.collision = true;
+            }
+            else
+            {
+                result.farPoint = point;
+                result.farSqDist = sqDist;
+            }
+        }
+    }
 
     return result;
 }

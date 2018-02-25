@@ -176,3 +176,9 @@ export const sendSubscriptionDialogShown = () => {
 
   client.recordEvent('subscription-dialog-shown', {});
 };
+
+export const sendChoosePlanClicked = (planId: string | null) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('choose-plan-click', { planId });
+};

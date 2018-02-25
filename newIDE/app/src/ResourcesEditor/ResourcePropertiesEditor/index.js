@@ -5,6 +5,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import ImagePreview from '../../ObjectEditor/ImagePreview'; //TODO: Move ImagePreview out of ObjectEditor
 import ResourcesLoader from '../../ResourcesLoader';
+import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 
 const styles = {
   container: {
@@ -60,14 +61,26 @@ export default class ResourcePropertiesEditor extends React.Component<
   }
 
   _renderResourcesProperties() {
-    const { resources } = this.props;
+    const { resources, project } = this.props;
+
+    //TODO: Multiple resources support
+    const properties = resources[0].getProperties(project);
+    const resourceSchema = propertiesMapToSchema(
+      properties,
+      resource => resource.getProperties(project),
+      (resource, name, value) =>
+        resource.updateProperty(name, value, project)
+    );
 
     return (
       <div
         style={styles.propertiesContainer}
         key={resources.map(resource => '' + resource.ptr).join(';')}
       >
-        <PropertiesEditor schema={this.schema} instances={resources} />
+        <PropertiesEditor
+          schema={this.schema.concat(resourceSchema)}
+          instances={resources}
+        />
       </div>
     );
   }

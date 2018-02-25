@@ -34,8 +34,8 @@ export type PlanDetails = {
   name: string,
   monthlyPriceInEuros: number,
   smallDescription: string,
-  description: string,
-  moreDescription1?: string,
+  descriptionBullets: Array<string>,
+  extraDescription?: string,
 };
 
 export const getSubscriptionPlans = (): Array<PlanDetails> => [
@@ -44,8 +44,11 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     name: 'GDevelop Pro',
     monthlyPriceInEuros: 7,
     smallDescription: 'Ideal for advanced game makers',
-    description: 'Allow to package your game for Android up to 70 times a day.',
-    moreDescription1:
+    descriptionBullets: [
+      'Allow to package your game for Android up to 70 times a day.',
+      'Use Live Preview over Wifi to quickly test your game on mobiles and tablets',
+    ],
+    extraDescription:
       "You'll also have access to online packaging for Windows, macOS and Linux when it's ready.",
   },
   {
@@ -53,8 +56,11 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     name: 'GDevelop Indie',
     monthlyPriceInEuros: 2,
     smallDescription: 'Ideal for beginners',
-    description: 'Allow to package your game for Android up to 10 times a day.',
-    moreDescription1:
+    descriptionBullets: [
+      'Allow to package your game for Android up to 10 times a day.',
+      'Use Live Preview over Wifi to quickly test your game on mobiles and tablets',
+    ],
+    extraDescription:
       "You'll also have access to online packaging for Windows, macOS and Linux when it's ready.",
   },
   {
@@ -62,8 +68,9 @@ export const getSubscriptionPlans = (): Array<PlanDetails> => [
     name: 'No subscription',
     monthlyPriceInEuros: 0,
     smallDescription: '',
-    description:
+    descriptionBullets: [
       'You can use GDevelop for free, but online packaging for Android is limited to twice a day.',
+    ],
   },
 ];
 

@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 
 import { storiesOf } from '@storybook/react';
@@ -43,6 +44,7 @@ import ObjectsGroupsList from '../ObjectsGroupsList';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
+import RefGetter from './RefGetter';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
 import ResourcesLoader from '../ResourcesLoader';
 import VariablesList from '../VariablesList';
@@ -61,11 +63,17 @@ import {
   noSubscription,
   usagesForIndieUser,
   profileForIndieUser,
+  fakeNoSubscriptionUserProfile,
+  fakeIndieUserProfile,
+  fakeNotAuthenticatedUserProfile,
+  fakeAuthenticatedButLoadingUserProfile,
 } from '../fixtures/GDevelopServicesTestData';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import LoginDialog from '../Profile/LoginDialog';
+import UserProfileContext from '../Profile/UserProfileContext';
+import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 
 const gd = global.gd;
 const {
@@ -300,6 +308,7 @@ storiesOf('InstructionSelector', module)
     <InstructionSelector
       selectedType=""
       onChoose={action('Instruction chosen')}
+      isCondition
     />
   ));
 
@@ -498,10 +507,13 @@ storiesOf('VariablesList', module)
     </SerializedObjectDisplay>
   ));
 
+const fakeError = new Error('Fake error for storybook');
 storiesOf('ErrorBoundary', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => <ErrorFallbackComponent />);
+  .add('default', () => (
+    <ErrorFallbackComponent componentStack="Fake stack" error={fakeError} />
+  ));
 
 storiesOf('CreateProfile', module)
   .addDecorator(paperDecorator)
@@ -536,23 +548,23 @@ storiesOf('LimitDisplayer', module)
 storiesOf('ProfileDetails', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('profile', () => (
-    <ProfileDetails
-      profile={{
-        email: 'test@example.com',
-      }}
-    />
-  ))
+  .add('profile', () => <ProfileDetails profile={profileForIndieUser} />)
   .add('loading', () => <ProfileDetails profile={null} />);
 
 storiesOf('SubscriptionDetails', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <SubscriptionDetails subscription={subscriptionForIndieUser} />
+    <SubscriptionDetails
+      subscription={subscriptionForIndieUser}
+      onChangeSubscription={action('change subscription')}
+    />
   ))
   .add('limit reached', () => (
-    <SubscriptionDetails subscription={noSubscription} />
+    <SubscriptionDetails
+      subscription={noSubscription}
+      onChangeSubscription={action('change subscription')}
+    />
   ));
 
 storiesOf('UsagesDetails', module)
@@ -564,21 +576,25 @@ storiesOf('UsagesDetails', module)
 storiesOf('SubscriptionDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => (
-    <SubscriptionDialog
-      profile={profileForIndieUser}
-      subscription={subscriptionForIndieUser}
-      open
-      onClose={action('on close')}
-    />
+  .add('not authenticated', () => (
+    <UserProfileContext.Provider value={fakeNotAuthenticatedUserProfile}>
+      <SubscriptionDialog open onClose={action('on close')} />
+    </UserProfileContext.Provider>
   ))
-  .add('loading (no profile/subscription)', () => (
-    <SubscriptionDialog
-      profile={null}
-      subscription={null}
-      open
-      onClose={action('on close')}
-    />
+  .add('authenticated but loading', () => (
+    <UserProfileContext.Provider value={fakeAuthenticatedButLoadingUserProfile}>
+      <SubscriptionDialog open onClose={action('on close')} />
+    </UserProfileContext.Provider>
+  ))
+  .add('authenticated user with subscription', () => (
+    <UserProfileContext.Provider value={fakeIndieUserProfile}>
+      <SubscriptionDialog open onClose={action('on close')} />
+    </UserProfileContext.Provider>
+  ))
+  .add('authenticated user with no subscription', () => (
+    <UserProfileContext.Provider value={fakeNoSubscriptionUserProfile}>
+      <SubscriptionDialog open onClose={action('on close')} />
+    </UserProfileContext.Provider>
   ));
 
 storiesOf('LoginDialog', module)
@@ -589,6 +605,13 @@ storiesOf('LoginDialog', module)
       onClose={action('on close')}
       loginInProgress={false}
       createAccountInProgress={false}
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      resetPasswordDialogOpen={false}
+      forgotPasswordInProgress={false}
+      error={null}
     />
   ))
   .add('login in progress', () => (
@@ -597,6 +620,13 @@ storiesOf('LoginDialog', module)
       onClose={action('on close')}
       loginInProgress
       createAccountInProgress={false}
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      resetPasswordDialogOpen={false}
+      forgotPasswordInProgress={false}
+      error={null}
     />
   ))
   .add('create account in progress', () => (
@@ -605,6 +635,13 @@ storiesOf('LoginDialog', module)
       onClose={action('on close')}
       loginInProgress={false}
       createAccountInProgress
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      resetPasswordDialogOpen={false}
+      forgotPasswordInProgress={false}
+      error={null}
     />
   ))
   .add('weak-password error', () => (
@@ -613,6 +650,12 @@ storiesOf('LoginDialog', module)
       onClose={action('on close')}
       loginInProgress={false}
       createAccountInProgress={false}
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      resetPasswordDialogOpen={false}
+      forgotPasswordInProgress={false}
       error={{
         code: 'auth/weak-password',
       }}
@@ -624,6 +667,12 @@ storiesOf('LoginDialog', module)
       onClose={action('on close')}
       loginInProgress={false}
       createAccountInProgress={false}
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      resetPasswordDialogOpen={false}
+      forgotPasswordInProgress={false}
       error={{
         code: 'auth/invalid-email',
       }}
@@ -635,17 +684,13 @@ storiesOf('LoginDialog', module)
       onClose={action('on close')}
       loginInProgress={false}
       createAccountInProgress={false}
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      forgotPasswordInProgress={false}
       resetPasswordDialogOpen
-    />
-  ))
-  .add('Reset password (invalid-action-code error)', () => (
-    <LoginDialog
-      open
-      onClose={action('on close')}
-      loginInProgress={false}
-      createAccountInProgress={false}
-      resetPasswordDialogOpen
-      resetError={{ code: 'auth/invalid-action-code' }}
+      error={null}
     />
   ));
 
@@ -653,13 +698,44 @@ storiesOf('LocalNetworkPreviewDialog', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <LocalNetworkPreviewDialog open url="192.168.0.1:2929" />
+    <LocalNetworkPreviewDialog
+      open
+      url="192.168.0.1:2929"
+      error={null}
+      onRunPreviewLocally={action('on run preview locally')}
+      onExport={action('on export')}
+      onClose={action('on close')}
+    />
   ))
-  .add('waiting for url', () => <LocalNetworkPreviewDialog open />)
+  .add('waiting for url', () => (
+    <LocalNetworkPreviewDialog
+      open
+      url=""
+      error={null}
+      onRunPreviewLocally={action('on run preview locally')}
+      onExport={action('on export')}
+      onClose={action('on close')}
+    />
+  ))
   .add('error', () => (
     <LocalNetworkPreviewDialog
       open
       url="192.168.0.1:2929"
       error={{ message: 'Oops' }}
+      onRunPreviewLocally={action('on run preview locally')}
+      onExport={action('on export')}
+      onClose={action('on close')}
     />
+  ));
+
+storiesOf('SubscriptionCheckDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <RefGetter onRef={ref => ref.checkHasSubscription()}>
+      <SubscriptionCheckDialog
+        title="Preview over wifi"
+        userProfile={fakeNoSubscriptionUserProfile}
+        onChangeSubscription={action('change subscription')}
+      />
+    </RefGetter>
   ));

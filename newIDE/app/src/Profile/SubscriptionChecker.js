@@ -1,12 +1,16 @@
 // @flow
 
 import React, { Component } from 'react';
+import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
+import Star from 'material-ui/svg-icons/toggle/star';
+import Favorite from 'material-ui/svg-icons/action/favorite';
 import UserProfileContext, { type UserProfile } from './UserProfileContext';
 import { Column, Line } from '../UI/Grid';
 
 type DialogProps = {|
+  title: string,
   userProfile: UserProfile,
   onChangeSubscription?: () => void,
 |};
@@ -14,6 +18,12 @@ type DialogProps = {|
 type DialogState = {|
   open: boolean,
 |};
+
+const styles = {
+  icon: { width: 40, height: 40, marginRight: 20 },
+  iconText: { flex: 1 },
+  thanksText: { textAlign: 'right', marginRight: 20, marginBottom: 0 },
+};
 
 export class SubscriptionCheckDialog extends Component<
   DialogProps,
@@ -29,9 +39,8 @@ export class SubscriptionCheckDialog extends Component<
         this.setState({
           open: false,
         });
+        return true;
       }
-
-      return true;
     }
 
     this.setState({
@@ -48,58 +57,67 @@ export class SubscriptionCheckDialog extends Component<
     if (!open) return null;
 
     return (
-      <UserProfileContext.Consumer>
-        {(userProfile: UserProfile) => (
-          <Dialog
-            actions={[
-              onChangeSubscription && (
-                <FlatButton
-                  label="Get a subscription or login"
-                  key="subscribe"
-                  primary
-                  onClick={() => {
-                    this._closeDialog();
-                    onChangeSubscription();
-                  }}
-                />
-              ),
-            ]}
-            secondaryActions={[
-              <FlatButton
-                label="Continue anyway"
-                key="close"
-                primary={false}
-                onClick={this._closeDialog}
-              />,
-            ]}
-            onRequestClose={this._closeDialog}
-            open={open}
-            autoScrollBodyContent
-          >
-            <Column>
-              <p>
-                You can try this feature, but if you're using it regularly, we
-                ask you to get a subscription to GDevelop. Having a
-                subscription allows you to use the one-click export for
-                Android, launch live previews over wifi, disable the GDevelop
-                splashscreen during loading and more!
-              </p>
-              <p>
-                You're also supporting the development of GDevelop, an
-                open-source software! In the future, more exports (iOS,
-                Windows/Mac/Linux) and online services will be available for
-                users with a subscription.
-              </p>
-              <p><b>Thanks!</b></p>
-            </Column>
-          </Dialog>
-        )}
-      </UserProfileContext.Consumer>
+      <Dialog
+        actions={[
+          onChangeSubscription && (
+            <RaisedButton
+              label="Get a subscription or login"
+              key="subscribe"
+              primary
+              onClick={() => {
+                this._closeDialog();
+                onChangeSubscription();
+              }}
+            />
+          ),
+        ]}
+        secondaryActions={[
+          <FlatButton
+            label="Continue anyway"
+            key="close"
+            primary={false}
+            onClick={this._closeDialog}
+          />,
+        ]}
+        onRequestClose={this._closeDialog}
+        open={open}
+        autoScrollBodyContent
+        title={this.props.title}
+      >
+        <Column noMargin>
+          <Line noMargin alignItems="center">
+            <p>
+              You can try this feature, but if you're using it regularly, we ask
+              you to get a subscription to GDevelop.
+            </p>
+          </Line>
+          <Line noMargin alignItems="center">
+            <Star style={styles.icon} />
+            <p style={styles.iconText}>
+              Having a subscription allows you to use the one-click export for
+              Android, launch live previews over wifi, disable the GDevelop
+              splashscreen during loading and more!
+            </p>
+          </Line>
+          <Line noMargin alignItems="center">
+            <Favorite style={styles.icon} />
+            <p style={styles.iconText}>
+              You're also supporting the development of GDevelop, an open-source
+              software! In the future, more exports (iOS, Windows/Mac/Linux) and
+              online services will be available for users with a subscription.
+            </p>
+          </Line>
+          <p style={styles.thanksText}>
+            <b>Thanks!</b>
+          </p>
+        </Column>
+      </Dialog>
     );
   }
 }
 
 type Props = {|
+  title: string,
   onChangeSubscription?: () => void,
 |};
 
@@ -122,6 +140,7 @@ class SubscriptionChecker extends Component<Props, {}> {
             userProfile={userProfile}
             ref={dialog => (this._dialog = dialog)}
             onChangeSubscription={this.props.onChangeSubscription}
+            title={this.props.title}
           />
         )}
       </UserProfileContext.Consumer>

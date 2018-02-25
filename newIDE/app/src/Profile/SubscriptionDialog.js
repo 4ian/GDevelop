@@ -13,6 +13,7 @@ import {
 } from '../Utils/GDevelopServices/Usage';
 import { StripeCheckoutConfig } from '../Utils/GDevelopServices/ApiConfigs';
 import RaisedButton from 'material-ui/RaisedButton';
+import CheckCircle from 'material-ui/svg-icons/action/check-circle';
 import EmptyMessage from '../UI/EmptyMessage';
 import { showMessageBox, showErrorBox } from '../UI/Messages/MessageBox';
 import LeftLoader from '../UI/LeftLoader';
@@ -33,6 +34,8 @@ const styles = {
     display: 'flex',
     justifyContent: 'flex-end',
   },
+  bulletIcon: { width: 20, height: 20, marginLeft: 15, marginRight: 10 },
+  bulletText: { flex: 1, marginTop: 5, marginBottom: 5 },
 };
 
 type Props = {|
@@ -157,9 +160,10 @@ export default class SubscriptionDialog extends Component<Props, State> {
             <Column>
               <Line>
                 <p>
-                  Get a subscription to package your games for Android. With a
-                  subscription, you're also supporting the development of
-                  GDevelop, an open-source software!
+                  Get a subscription to package your games for Android, use live
+                  preview over wifi and more. With a subscription, you're also
+                  supporting the development of GDevelop, an open-source
+                  software!
                 </p>
               </Line>
             </Column>
@@ -173,9 +177,14 @@ export default class SubscriptionDialog extends Component<Props, State> {
                   }
                   subtitle={plan.smallDescription}
                 />
-                <p style={styles.descriptionText}>{plan.description || ''}</p>
+                {plan.descriptionBullets.map(bulletText => (
+                  <Line noMargin alignItems="center">
+                    <CheckCircle style={styles.bulletIcon} />
+                    <p style={styles.bulletText}>{bulletText}</p>
+                  </Line>
+                ))}
                 <p style={styles.descriptionText}>
-                  {plan.moreDescription1 || ''}
+                  {plan.extraDescription || ''}
                 </p>
                 <CardActions style={styles.actions}>
                   {userProfile.subscription &&

@@ -208,6 +208,7 @@ export default class LocalPreviewLauncher extends React.Component<
             if (this.props.onChangeSubscription)
               this.props.onChangeSubscription();
           }}
+          title="Preview over wifi"
         />
         <LocalNetworkPreviewDialog
           open={networkPreviewDialogOpen}

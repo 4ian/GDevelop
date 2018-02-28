@@ -31,6 +31,7 @@ public:
 
     std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const override;
     bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project) override;
+    sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const override;
 
 private:
     void DoUnserializeFrom(gd::Project & project, const gd::SerializerElement & element) override;

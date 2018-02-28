@@ -75,21 +75,26 @@ void SkeletonObject::DoSerializeTo(gd::SerializerElement & element) const
 #if !defined(GD_NO_WX_GUI)
 void SkeletonObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
 {
-    edittimeIcon.setPosition(instance.GetX(), instance.GetY());
+    edittimeIcon.setPosition(instance.GetX() - 16.0f, instance.GetY() - 16.0f);
     renderTarget.draw(edittimeIcon);
 }
 
 void SkeletonObject::LoadEdittimeIcon()
 {
-    edittimeIconImage.loadFromFile("JsPlatform/Extensions/admobicon.png");
+    edittimeIconImage.loadFromFile("JsPlatform/Extensions/skeletonicon.png");
     edittimeIcon.setTexture(edittimeIconImage);
 }
 
 bool SkeletonObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const
 {
-    thumbnail = wxBitmap("JsPlatform/Extensions/admobicon24.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("JsPlatform/Extensions/skeletonicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
+}
+
+sf::Vector2f SkeletonObject::GetInitialInstanceOrigin(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const 
+{ 
+    return sf::Vector2f(16.0f, 16.0f); 
 }
 #endif
 

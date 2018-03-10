@@ -72,9 +72,10 @@ export default class VariablesList extends Component {
             ? 'This name is already taken'
             : undefined
         }
-        onChangeValue={(event, text) => {
+        onChangeValue={text => {
           variable.setString(text);
           this.forceUpdate();
+          if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
         onBlur={event => {
           const text = event.target.value;
@@ -100,14 +101,18 @@ export default class VariablesList extends Component {
           } else {
             parentVariable.removeChild(name);
           }
+
           this.forceUpdate();
+          if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
         onAddChild={() => {
           const name = newNameGenerator('ChildVariable', name =>
             variable.hasChild(name)
           );
           variable.getChild(name).setString('');
+
           this.forceUpdate();
+          if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
         children={
           isStructure
@@ -171,7 +176,9 @@ export default class VariablesList extends Component {
             variablesContainer.has(name)
           );
           variablesContainer.insert(name, variable, variablesContainer.count());
+
           this.forceUpdate();
+          if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
       />
     );

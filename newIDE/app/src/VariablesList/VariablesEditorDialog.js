@@ -32,6 +32,8 @@ export class VariablesEditorDialog extends Component {
           emptyExplanationSecondMessage={
             this.props.emptyExplanationSecondMessage
           }
+          onSizeUpdated={() =>
+            this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
         />
       </Dialog>
     );

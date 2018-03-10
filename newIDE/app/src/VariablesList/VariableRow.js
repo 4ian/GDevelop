@@ -1,6 +1,7 @@
 import React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import DragHandle from '../UI/DragHandle';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
 import Delete from 'material-ui/svg-icons/action/delete';
 import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirectory-arrow-right';
@@ -48,7 +49,8 @@ const ThemableVariableRow = ({
   if (!isStructure) {
     columns.push(
       <TreeTableCell key="value">
-        <TextField
+        <SemiControlledTextField
+          commitOnBlur
           fullWidth
           name={key + 'value'}
           value={variable.getString()}

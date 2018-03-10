@@ -19,19 +19,22 @@ export default class ObjectsGroupEditor extends Component {
   };
 
   removeObject = objectName => {
-    const { group } = this.props;
+    const { group, onSizeUpdated } = this.props;
 
     group.removeObject(objectName);
+
     this.forceUpdate();
+    if (onSizeUpdated) onSizeUpdated();
   };
 
   addObject = objectName => {
-    const { group } = this.props;
+    const { group, onSizeUpdated } = this.props;
 
     group.addObject(objectName);
     this.setState({
       newObjectName: '',
     });
+    if (onSizeUpdated) onSizeUpdated();
   };
 
   _renderExplanation() {

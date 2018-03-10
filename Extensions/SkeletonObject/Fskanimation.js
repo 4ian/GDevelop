@@ -19,8 +19,9 @@ gdjs.sk.Animation = function(armature, fps){
     this.defaultPlayTimes = 0;
     this.playTimes = 0;
     this.playedTimes = 0;
-    this.duration = 0; // in frames
+    this.duration = 0; // In frames
     this.time = 0.0;
+    this.finished = false;
     this.boneAnimators = [];
     this.slotAnimators = [];
     this.meshAnimators = [];
@@ -36,10 +37,11 @@ gdjs.sk.Animation = function(armature, fps){
 
 gdjs.sk.Animation.prototype.loadDragonBones = function(animationData){
     this.name = animationData.name;
-	this.defaultPlayTimes = animationData.playTimes;
+	this.defaultPlayTimes = 1;
+	if(animationData.hasOwnProperty("playTimes")){
+        this.defaultPlayTimes = animationData.playTimes;
+    }
 	this.duration = animationData.duration;
-
-	console.log(this.name);
 
 	for(var i=0; i<animationData.bone.length; i++){
 		var boneAnimator = new gdjs.sk.BoneAnimator();
@@ -64,15 +66,14 @@ gdjs.sk.Animation.prototype.loadDragonBones = function(animationData){
 			this.armatureAnimators.push(armatureAnimator);
 		}
 	}
-
-	// Meshes not supported until PIXI lib update
-	//~ for(var i=0; i<animationData.ffd.length; i++){
-		//~ var meshAnimator = new gdjs.sk.MeshAnimator();
-		//~ meshAnimator.loadDragonBones(animationData.ffd[i], this.armature.slotsMap);
-		//~ if(meshAnimator.isAnimated()){
-			//~ this.meshAnimators.push(meshAnimator);
-		//~ }
-	//~ }
+	
+	for(var i=0; i<animationData.ffd.length; i++){
+		var meshAnimator = new gdjs.sk.MeshAnimator();
+		meshAnimator.loadDragonBones(animationData.ffd[i], this.armature.slotsMap);
+		if(meshAnimator.isAnimated()){
+			this.meshAnimators.push(meshAnimator);
+		}
+	}
 
 	if(animationData.hasOwnProperty("zOrder")){
 		this.zOrderAnimator.loadDragonBones(animationData.zOrder.frame);
@@ -80,6 +81,8 @@ gdjs.sk.Animation.prototype.loadDragonBones = function(animationData){
 };
 
 gdjs.sk.Animation.prototype.update = function(delta){
+	this.finished = false;
+
 	if(this.blending){
 		this.updateBlending(delta);
 		return;
@@ -97,9 +100,10 @@ gdjs.sk.Animation.prototype.update = function(delta){
 	}
 	if(this.playTimes !== 0 && this.playedTimes >= this.playTimes){
 		this.time = this.duration / this.fps;
+		this.finished = true;
 	}
 
-	var frame = this.getFrame(this.time);
+	var frame = this.getFrameAtTime(this.time);
 
 	for(var i=0; i<this.boneAnimators.length; i++){
 		this.boneAnimators[i].setFrame(frame);
@@ -133,7 +137,7 @@ gdjs.sk.Animation.prototype.updateBlending = function(delta){
 		return;
 	}
 	
-	var frame = this.getFrame(this.blendTime);
+	var frame = this.getFrameAtTime(this.blendTime);
 
 	for(var i=0; i<this.blendBones.length; i++){
 		this.blendBones[i].setFrame(frame);
@@ -146,7 +150,7 @@ gdjs.sk.Animation.prototype.updateBlending = function(delta){
 	}
 };
 
-gdjs.sk.Animation.prototype.getFrame = function(time){
+gdjs.sk.Animation.prototype.getFrameAtTime = function(time){
 	var frame = time * this.fps;
 	if(!this.armature.skeleton.animationSmooth){
 		frame = Math.round(frame);
@@ -158,6 +162,7 @@ gdjs.sk.Animation.prototype.reset = function(loops=-1){
 	this.playTimes = loops < 0 ? this.defaultPlayTimes : loops;
 	this.playedTimes = 0;
 	this.time = 0.0;
+	this.finished = false;
 	this.blending = false;
 	this.blendTime = 0.0;
 	this.blendDuration = 0.0;
@@ -202,6 +207,36 @@ gdjs.sk.Animation.prototype.blendAnimators = function(firstList, secondList, lis
 	}
 };
 
+gdjs.sk.Animation.prototype.isFinished = function(){
+	return this.finished;
+};
+
+gdjs.sk.Animation.prototype.getTime = function(time){
+	return this.time;
+};
+
+gdjs.sk.Animation.prototype.setTime = function(time){
+	this.blending = false;
+	this.time = time %= this.getTimeLength();
+	if(this.time < 0) this.time += this.getTimeLength();
+};
+
+gdjs.sk.Animation.prototype.getTimeLength = function(){
+	return this.duration / this.fps;
+};
+
+gdjs.sk.Animation.prototype.getFrame = function(){
+	return this.getFrameAtTime(this.time);
+};
+
+gdjs.sk.Animation.prototype.setFrame = function(frame){
+	this.blending = false;
+	this.setTime(frame / this.fps);
+};
+
+gdjs.sk.Animation.prototype.getFrameLength = function(){
+	return this.duration;;
+};
 
 
 gdjs.sk.KeyChannel = function(){
@@ -1048,8 +1083,6 @@ gdjs.sk.ArmatureAnimator.prototype.loadDragonBones = function(slotAnimData, slot
 	if(this.channelAction.isEmpty()){
 		this._updateAction = false;
 	}
-
-	
 };
 
 gdjs.sk.ArmatureAnimator.prototype.runToBeginning = function(frame){

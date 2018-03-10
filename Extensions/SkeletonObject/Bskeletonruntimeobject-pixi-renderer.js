@@ -37,6 +37,10 @@ gdjs.SkeletonRuntimeObjectPixiRenderer.prototype.loadDragonBones = function(runt
 gdjs.sk.ArmaturePixiRenderer = function()
 {
     this.container = new PIXI.Container();
+    this.slotsRenderers = new PIXI.Container();
+    this.container.addChild(this.slotsRenderers);
+    this.debugRenderers = new PIXI.Container();
+    this.container.addChild(this.debugRenderers);
 };
 gdjs.sk.ArmatureRenderer = gdjs.sk.ArmaturePixiRenderer;
 
@@ -49,11 +53,18 @@ gdjs.sk.ArmaturePixiRenderer.prototype.getRendererObject = function(){
 };
 
 gdjs.sk.ArmaturePixiRenderer.prototype.addRenderer = function(renderer){
-    this.container.addChild(renderer.getRendererObject());
+    // this.container.addChild(renderer.getRendererObject());
+    this.slotsRenderers.addChild(renderer.getRendererObject());
 };
 
 gdjs.sk.ArmaturePixiRenderer.prototype.sortRenderers = function(){
-    this.container.children.sort(function(a, b){ return a.z - b.z; });
+    // this.container.children.sort(function(a, b){ return a.z - b.z; });
+    this.slotsRenderers.children.sort(function(a, b){ return a.z - b.z; });
+};
+
+gdjs.sk.ArmaturePixiRenderer.prototype.addDebugRenderer = function(renderer){
+    // this.container.addChild(renderer.getRendererObject());
+    this.debugRenderers.addChild(renderer.getRendererObject());
 };
 
 
@@ -144,4 +155,42 @@ gdjs.sk.SlotPixiRenderer.prototype.setVertices = function(vertices, updateList){
 		this.renderer.vertices[2*updateList[i]]     = vertices[i][0];
 		this.renderer.vertices[2*updateList[i] + 1] = vertices[i][1];
 	}
+};
+
+
+gdjs.sk.DebugPixiRenderer = function()
+{
+    this.renderer = new PIXI.Graphics();
+};
+gdjs.sk.DebugRenderer = gdjs.sk.DebugPixiRenderer;
+
+gdjs.sk.DebugPixiRenderer.prototype.getRendererObject = function(){
+    return this.renderer;
+};
+
+gdjs.sk.DebugPixiRenderer.prototype.loadVertices = function(verts, color, fill){
+    color = color[2] | (color[1] << 8) | (color[0] << 16);
+    if(fill){
+        this.renderer.beginFill(color, 0.1);
+    }
+    this.renderer.lineStyle(2, color, 0.8);
+    for(var i=0; i<verts.length; i++){
+        this.renderer.drawPolygon(verts.reduce(function(a, b){ return a.concat(b); }));
+    }
+    if(fill){
+        this.renderer.endFill();
+    }
+};
+
+gdjs.sk.DebugPixiRenderer.prototype.setTransform = function(transform){
+    this.renderer.x = transform.x;
+    this.renderer.y = transform.y;
+    this.renderer.scale.x = transform.sx;
+    this.renderer.scale.y = transform.sy;
+    this.renderer.skew.x = transform.skx;
+    this.renderer.skew.y = transform.sky;
+};
+
+gdjs.sk.DebugPixiRenderer.prototype.skewSupported = function(){
+    return true;
 };

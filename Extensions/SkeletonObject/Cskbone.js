@@ -49,6 +49,22 @@ gdjs.sk.Bone.prototype.resetState = function(){
     this.setScale(1, 1);
 };
 
+gdjs.sk.Bone.prototype.setX = function(x){
+    var prevX = this.x;
+    this.x = this.restX + x;
+    if(this.x !== prevX){
+        this._updateMatrix = true;
+    }
+};
+
+gdjs.sk.Bone.prototype.setY = function(y){
+    var prevY = this.y;
+    this.y = this.restY + y;
+    if(this.y !== prevY){
+        this._updateMatrix = true;
+    }
+};
+
 gdjs.sk.Bone.prototype.setPos = function(x, y){
     var prevX = this.x;
     var prevY = this.y;
@@ -63,6 +79,22 @@ gdjs.sk.Bone.prototype.setRot = function(angle){
     var prevRot = this.rot;
     this.rot = this.restRot + angle*Math.PI/180.0;
     if(this.rot !== prevRot){
+        this._updateMatrix = true;
+    }
+};
+
+gdjs.sk.Bone.prototype.setSx = function(sx){
+    var prevSx = this.sx;
+    this.sx = this.restSx * sx;
+    if(this.sx !== prevSx){
+        this._updateMatrix = true;
+    }
+};
+
+gdjs.sk.Bone.prototype.setSy = function(sy){
+    var prevSy = this.sy;
+    this.sy = this.restSy * sy;
+    if(this.sy !== prevSy){
         this._updateMatrix = true;
     }
 };

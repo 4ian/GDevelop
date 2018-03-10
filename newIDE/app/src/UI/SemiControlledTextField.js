@@ -6,6 +6,8 @@ type State = {
   focused: boolean,
   text: ?string,
   commitOnBlur?: boolean,
+  onFocus?: Function,
+  onBlur?: Function,
 };
 
 /**
@@ -20,18 +22,31 @@ export default class SemiControlledTextField extends React.Component<*, State> {
     text: null,
   };
 
+  _field: ?any = null;
+
+  focus() {
+    if (this._field) this._field.focus();
+  }
+
+  getInputNode() {
+    if (this._field) return this._field.getInputNode();
+  }
+
   render() {
-    const { value, onChange, commitOnBlur, ...otherProps } = this.props;
+    const { value, onChange, commitOnBlur, onFocus, onBlur, ...otherProps } = this.props;
 
     return (
       <TextField
         {...otherProps}
+        ref={field => this._field = field}
         value={this.state.focused ? this.state.text : value}
-        onFocus={() => {
+        onFocus={(event) => {
           this.setState({
             focused: true,
             text: this.props.value,
           });
+
+          if (onFocus) onFocus(event);
         }}
         onChange={(event, newValue) => {
           this.setState({
@@ -46,6 +61,8 @@ export default class SemiControlledTextField extends React.Component<*, State> {
             focused: false,
             text: null,
           });
+
+          if (onBlur) onBlur(event);
         }}
       />
     );

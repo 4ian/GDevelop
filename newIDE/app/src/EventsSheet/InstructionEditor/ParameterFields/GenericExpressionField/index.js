@@ -1,12 +1,14 @@
-// @flow weak
+// @flow
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import TextField from 'material-ui/TextField';
 import Popover, { PopoverAnimationVertical } from 'material-ui/Popover';
 import Functions from 'material-ui/svg-icons/editor/functions';
 import RaisedButton from 'material-ui/RaisedButton';
+import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
 import ExpressionSelector from '../../InstructionOrExpressionSelector/ExpressionSelector';
-import ExpressionParametersEditorDialog from './ExpressionParametersEditorDialog';
+import ExpressionParametersEditorDialog, {
+  type ParameterValues,
+} from './ExpressionParametersEditorDialog';
 import { formatExpressionCall } from './FormatExpressionCall';
 import { type InstructionOrExpressionInformation } from '../../InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
 const gd = global.gd;
@@ -44,8 +46,8 @@ type State = {|
 |};
 
 export default class ExpressionField extends Component<*, State> {
-  _field = null;
-  _fieldElement = null;
+  _field: ?any = null;
+  _fieldElement: ?any = null;
   _inputElement = null;
 
   state = {
@@ -58,7 +60,7 @@ export default class ExpressionField extends Component<*, State> {
   componentDidMount() {
     if (this._field) {
       this._fieldElement = ReactDOM.findDOMNode(this._field);
-      this._inputElement = this._field.getInputNode();
+      this._inputElement = this._field ? this._field.getInputNode() : null;
     }
   }
 
@@ -72,16 +74,9 @@ export default class ExpressionField extends Component<*, State> {
     });
   };
 
-  _handleFocus = event => {
+  _handleFocus = (event: any) => {
     // This prevents ghost click.
     event.preventDefault();
-  };
-
-  _handleBlur = () => {
-    this._doValidation();
-    this.setState({
-      popoverOpen: false,
-    });
   };
 
   _handleRequestClose = () => {
@@ -90,16 +85,21 @@ export default class ExpressionField extends Component<*, State> {
     });
   };
 
-  _handleChange = (e, text) => {
-    if (this.props.onChange) this.props.onChange(text);
+  _handleChange = (value: string) => {
+    if (this.props.onChange) this.props.onChange(value);
+
+    this._doValidation(value);
+    this.setState({
+      popoverOpen: false,
+    });
   };
 
-  _handleMenuMouseDown = event => {
+  _handleMenuMouseDown = (event: any) => {
     // Keep the TextField focused
     event.preventDefault();
   };
 
-  _handleExpressionChosen = expressionInfo => {
+  _handleExpressionChosen = (expressionInfo: InstructionOrExpressionInformation) => {
     this.setState({
       popoverOpen: false,
       parametersDialogOpen: true,
@@ -107,7 +107,10 @@ export default class ExpressionField extends Component<*, State> {
     });
   };
 
-  insertExpression = (expressionInfo, parameterValues) => {
+  insertExpression = (
+    expressionInfo: InstructionOrExpressionInformation,
+    parameterValues: ParameterValues
+  ) => {
     if (!this._inputElement) return;
     const cursorPosition = this._inputElement.selectionStart;
 
@@ -133,14 +136,16 @@ export default class ExpressionField extends Component<*, State> {
     }, 5);
   };
 
-  _getError = () => {
+  _getError = (value?: string) => {
     const { project, layout, expressionType } = this.props;
 
     const callbacks = new gd.CallbacksForExpressionCorrectnessTesting(
       project,
       layout
     );
-    const parser = new gd.ExpressionParser(this.props.value);
+    const parser = new gd.ExpressionParser(
+      value === undefined ? this.props.value : value
+    );
 
     const parseFunction =
       expressionType === 'string'
@@ -161,8 +166,8 @@ export default class ExpressionField extends Component<*, State> {
     return isValid ? null : error;
   };
 
-  _doValidation = () => {
-    this.setState({ errorText: this._getError() });
+  _doValidation = (value?: string) => {
+    this.setState({ errorText: this._getError(value) });
   };
 
   render() {
@@ -185,14 +190,14 @@ export default class ExpressionField extends Component<*, State> {
     return (
       <div style={styles.container}>
         <div style={styles.textFieldContainer}>
-          <TextField
+          <SemiControlledTextField
+            commitOnBlur
             value={value}
             floatingLabelText={description}
             inputStyle={styles.input}
             onChange={this._handleChange}
             ref={field => (this._field = field)}
             onFocus={this._handleFocus}
-            onBlur={this._handleBlur}
             errorText={this.state.errorText}
             fullWidth
           />

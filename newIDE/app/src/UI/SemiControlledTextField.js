@@ -5,6 +5,7 @@ import TextField from 'material-ui/TextField';
 type State = {
   focused: boolean,
   text: ?string,
+  commitOnBlur?: boolean,
 };
 
 /**
@@ -20,7 +21,7 @@ export default class SemiControlledTextField extends React.Component<*, State> {
   };
 
   render() {
-    const { value, onChange, ...otherProps } = this.props;
+    const { value, onChange, commitOnBlur, ...otherProps } = this.props;
 
     return (
       <TextField
@@ -37,7 +38,7 @@ export default class SemiControlledTextField extends React.Component<*, State> {
             text: newValue,
           });
 
-          onChange(newValue);
+          if (!commitOnBlur) onChange(newValue);
         }}
         onBlur={event => {
           onChange(event.target.value);

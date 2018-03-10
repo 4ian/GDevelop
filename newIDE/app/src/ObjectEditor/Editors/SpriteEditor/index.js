@@ -5,10 +5,10 @@ import SpritesList from './SpritesList';
 import Add from 'material-ui/svg-icons/content/add';
 import Delete from 'material-ui/svg-icons/action/delete';
 import IconButton from 'material-ui/IconButton';
-import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import { mapFor } from '../../../Utils/MapFor';
+import SemiControlledTextField from '../../../UI/SemiControlledTextField';
 import Dialog from '../../../UI/Dialog';
 import EmptyMessage from '../../../UI/EmptyMessage';
 import MiniToolbar from '../../../UI/MiniToolbar';
@@ -80,10 +80,11 @@ class Animation extends Component {
           <span style={styles.animationTitle}>
             Animation #
             {id}{' '}
-            <TextField
+            <SemiControlledTextField
+              commitOnBlur
               value={animation.getName()}
               hintText="Optional animation name"
-              onChange={(e, text) => this.props.onChangeName(text)}
+              onChange={text => this.props.onChangeName(text)}
             />
           </span>
           <span style={styles.animationTools}>
@@ -208,6 +209,7 @@ class AnimationsListContainer extends Component {
       showWarningBox(
         'Another animation with this name already exists. Please use another name.'
       );
+      return;
     }
 
     spriteObject.getAnimation(i).setName(newName);

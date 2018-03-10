@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import SemiControlledTextField from './SemiControlledTextField';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
 import Checkbox from 'material-ui/Checkbox';
 import Subheader from 'material-ui/Subheader';
 import FlatButton from 'material-ui/FlatButton';

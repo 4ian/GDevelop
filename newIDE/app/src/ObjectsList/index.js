@@ -95,6 +95,7 @@ class ObjectsList extends Component<*, *> {
               key={objectWithContext.object.ptr}
               project={project}
               object={objectWithContext.object}
+              isGlobalObject={objectWithContext.global}
               style={style}
               onEdit={
                 this.props.onEditObject

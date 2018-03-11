@@ -501,6 +501,7 @@ export default class InstancesFullEditor extends Component {
       initialInstances,
       resourceSources,
       onChooseResource,
+      isActive,
     } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
@@ -539,6 +540,7 @@ export default class InstancesFullEditor extends Component {
           onZoomOut={this.zoomOut}
           onZoomIn={this.zoomIn}
           wrappedEditorRef={editor => (this.editor = editor)}
+          pauseRendering={!isActive}
         />
       ),
       'objects-list': (

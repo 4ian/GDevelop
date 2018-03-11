@@ -77,7 +77,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
   };
 
   render() {
-    const { project, externalLayoutName } = this.props;
+    const { project, externalLayoutName, isActive } = this.props;
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
 
@@ -101,6 +101,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
             onPreview={options =>
               this.props.onPreview(project, layout, externalLayout, options)}
             onOpenMoreSettings={this.openLayoutChooser}
+            isActive={isActive}
           />
         )}
         {!layout && (

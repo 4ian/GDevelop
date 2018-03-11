@@ -32,7 +32,7 @@ type Props = {
   ) => void,
 };
 
-export default class InstancesFullEditor extends React.Component<Props, State> {
+export default class ResourcesEditor extends React.Component<Props, State> {
   static defaultProps = {
     setToolbar: () => {},
   };

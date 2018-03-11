@@ -275,6 +275,14 @@ export default class InstancesEditorContainer extends Component {
     ) {
       this._mountEditorComponents(nextProps);
     }
+
+    // For avoiding useless renderings, which is costly for CPU/GPU, when the editor
+    // is not displayed, `pauseRendering` prop can be set to true.
+    if (nextProps.pauseRendering && !this.props.pauseRendering)
+      this.pauseSceneRendering();
+
+    if (!nextProps.pauseRendering && this.props.pauseRendering)
+      this.restartSceneRendering();
   }
 
   zoomBy(value) {
@@ -476,6 +484,7 @@ export default class InstancesEditorContainer extends Component {
   _renderScene = () => {
     // Protect against rendering scheduled after the component is unmounted.
     if (this._unmounted) return;
+    if (this._renderingPaused) return;
 
     // Avoid killing the CPU by limiting the rendering calls.
     if (this.fpsLimiter.shouldUpdate()) {
@@ -492,6 +501,16 @@ export default class InstancesEditorContainer extends Component {
     }
     this.nextFrame = requestAnimationFrame(this._renderScene);
   };
+
+  pauseSceneRendering = () => {
+    if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
+    this._renderingPaused = true;
+  }
+
+  restartSceneRendering = () => {
+    this._renderingPaused = false;
+    this._renderScene();
+  }
 
   render() {
     if (!this.props.project) return null;

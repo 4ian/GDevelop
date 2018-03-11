@@ -489,7 +489,7 @@ export default class MainFrame extends React.Component<Props, State> {
   ) => {
     const sceneEditorOptions = {
       name,
-      editorCreator: () => (
+      renderEditor: ({ isActive, editorRef }) => (
         <SceneEditor
           project={this.state.currentProject}
           layoutName={name}
@@ -503,13 +503,15 @@ export default class MainFrame extends React.Component<Props, State> {
           showObjectsList={!this.props.integratedEditor}
           resourceSources={this.props.resourceSources}
           onChooseResource={this._onChooseResource}
+          isActive={isActive}
+          ref={editorRef}
         />
       ),
       key: 'layout ' + name,
     };
     const eventsEditorOptions = {
       name: name + ' (Events)',
-      editorCreator: () => (
+      renderEditor: ({ isActive, editorRef }) => (
         <EventsEditor
           project={this.state.currentProject}
           layoutName={name}
@@ -525,6 +527,8 @@ export default class MainFrame extends React.Component<Props, State> {
               openEventsEditor: true,
               openSceneEditor: false,
             })}
+            isActive={isActive}
+            ref={editorRef}
         />
       ),
       key: 'layout events ' + name,
@@ -548,7 +552,7 @@ export default class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name,
-          editorCreator: () => (
+          renderEditor: ({ isActive, editorRef }) => (
             <ExternalEventsEditor
               project={this.state.currentProject}
               externalEventsName={name}
@@ -559,6 +563,8 @@ export default class MainFrame extends React.Component<Props, State> {
                   openEventsEditor: true,
                   openSceneEditor: false,
                 })}
+                isActive={isActive}
+                ref={editorRef}
             />
           ),
           key: 'external events ' + name,
@@ -573,7 +579,7 @@ export default class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name,
-          editorCreator: () => (
+          renderEditor: ({ isActive, editorRef }) => (
             <ExternalLayoutEditor
               project={this.state.currentProject}
               externalLayoutName={name}
@@ -588,6 +594,8 @@ export default class MainFrame extends React.Component<Props, State> {
               showObjectsList={!this.props.integratedEditor}
               resourceSources={this.props.resourceSources}
               onChooseResource={this._onChooseResource}
+              isActive={isActive}
+              ref={editorRef}
             />
           ),
           key: 'external layout ' + name,
@@ -602,7 +610,7 @@ export default class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name: 'Resources',
-          editorCreator: () => (
+          renderEditor: ({ isActive, editorRef }) => (
             <ResourcesEditor
               project={this.state.currentProject}
               setToolbar={this.setEditorToolbar}
@@ -618,6 +626,8 @@ export default class MainFrame extends React.Component<Props, State> {
                 // TODO: Project wide refactoring of objects/events using the resource
                 cb(true);
               }}
+              isActive={isActive}
+              ref={editorRef}
             />
           ),
           key: 'resources',
@@ -632,7 +642,7 @@ export default class MainFrame extends React.Component<Props, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name: 'Start Page',
-          editorCreator: () => (
+          renderEditor: ({ isActive, editorRef }) => (
             <StartPage
               project={this.state.currentProject}
               setToolbar={this.setEditorToolbar}
@@ -642,6 +652,8 @@ export default class MainFrame extends React.Component<Props, State> {
               onOpenProjectManager={() => this.openProjectManager()}
               onCloseProject={() => this.askToCloseProject()}
               onOpenAboutDialog={() => this.openAboutDialog()}
+              isActive={isActive}
+              ref={editorRef}
             />
           ),
           key: 'start page',
@@ -928,20 +940,23 @@ export default class MainFrame extends React.Component<Props, State> {
             onChange={this._onChangeEditorTab}
             hideLabels={!!this.props.integratedEditor}
           >
-            {getEditors(this.state.editorTabs).map((editorTab, id) => (
-              <Tab
-                label={editorTab.name}
-                value={id}
-                key={editorTab.key}
-                onActive={() => this._onEditorTabActive(editorTab)}
-                onClose={() => this._onCloseEditorTab(editorTab)}
-                closable={editorTab.closable}
-              >
-                <div style={{ display: 'flex', flex: 1, height: '100%' }}>
-                  <ErrorBoundary>{editorTab.render()}</ErrorBoundary>
-                </div>
-              </Tab>
-            ))}
+            {getEditors(this.state.editorTabs).map((editorTab, id) => {
+              const isCurrentTab = getCurrentTabIndex(this.state.editorTabs) === id;
+              return (
+                <Tab
+                  label={editorTab.name}
+                  value={id}
+                  key={editorTab.key}
+                  onActive={() => this._onEditorTabActive(editorTab)}
+                  onClose={() => this._onCloseEditorTab(editorTab)}
+                  closable={editorTab.closable}
+                >
+                  <div style={{ display: 'flex', flex: 1, height: '100%' }}>
+                    <ErrorBoundary>{editorTab.render(isCurrentTab)}</ErrorBoundary>
+                  </div>
+                </Tab>
+              );
+            })}
           </Tabs>
           <LoaderModal show={showLoader} />
           <ConfirmCloseDialog

@@ -31,7 +31,7 @@ export default class SceneEditor extends BaseEditor {
   }
 
   render() {
-    const { project, layoutName } = this.props;
+    const { project, layoutName, isActive } = this.props;
     const layout = this.getLayout();
     if (!layout) {
       //TODO: Error component
@@ -48,6 +48,7 @@ export default class SceneEditor extends BaseEditor {
         initialUiSettings={serializeToJSObject(layout.getAssociatedSettings())}
         onPreview={(options: PreviewOptions) =>
           this.props.onPreview(project, layout, options)}
+        isActive={isActive}
       />
     );
   }

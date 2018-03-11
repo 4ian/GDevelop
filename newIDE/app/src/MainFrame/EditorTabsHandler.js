@@ -1,10 +1,8 @@
 // @flow
-
-import React from 'react';
 import findIndex from 'lodash/findIndex';
 
 export type EditorTab = {|
-  render: () => React$Element<*>,
+  render: (isCurrentTab: boolean) => React$Element<*>,
   editorRef: ?any,
   name: string,
   key: string,
@@ -23,17 +21,22 @@ export const getEditorTabsInitialState = (): EditorTabsState => {
   };
 };
 
+type renderEditorProps = {|
+  isActive: boolean,
+  editorRef: Function,
+|};
+
 export const openEditorTab = (
   state: EditorTabsState,
   {
     name,
-    editorCreator,
+    renderEditor,
     key,
     dontFocusTab,
     closable,
   }: {
     name: string,
-    editorCreator: () => React$Element<*>,
+    renderEditor: (props: renderEditorProps) => React$Element<*>,
     key: string,
     dontFocusTab?: boolean,
     closable?: boolean,
@@ -51,9 +54,10 @@ export const openEditorTab = (
   }
 
   const editorTab: EditorTab = {
-    render: () =>
-      React.cloneElement(editorCreator(), {
-        ref: editorRef => (editorTab.editorRef = editorRef),
+    render: (isCurrentTab: boolean) =>
+      renderEditor({
+        isActive: isCurrentTab,
+        editorRef: editorRef => (editorTab.editorRef = editorRef),
       }),
     editorRef: null,
     name,
@@ -107,7 +111,10 @@ export const getCurrentTab = (state: EditorTabsState): EditorTab => {
   return state.editors[state.currentTab];
 };
 
-export const closeProjectTabs = (state: EditorTabsState, project: ?gdProject) => {
+export const closeProjectTabs = (
+  state: EditorTabsState,
+  project: ?gdProject
+) => {
   return changeCurrentTab(
     {
       ...state,

@@ -1,7 +1,9 @@
+// @flow
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
-import { mapFor } from '../../../Utils/MapFor';
+import { enumerateVariables } from './EnumerateVariables';
+import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
 const styles = {
   container: {
@@ -20,10 +22,24 @@ const fuzzyFilterOrEmpty = (searchText, key) => {
   return !key || AutoComplete.fuzzyFilter(searchText, key);
 };
 
-export default class VariableField extends Component {
+type Props = ParameterFieldProps & {
+  variablesContainer: ?gdVariablesContainer,
+  onOpenDialog: () => void,
+};
+
+type State = {|
+  focused: boolean,
+  text: ?string,
+|};
+
+export default class VariableField extends Component<Props, State> {
   state = { focused: false, text: null };
 
-  constructor(props) {
+  _description: ?string;
+  _field: ?AutoComplete;
+  _variableNames: Array<string> = [];
+
+  constructor(props: Props) {
     super(props);
 
     const { parameterMetadata } = this.props;
@@ -42,22 +58,14 @@ export default class VariableField extends Component {
     if (this._field) this._field.focus();
   }
 
-  componentWillReceiveProps(newProps) {
+  componentWillReceiveProps(newProps: Props) {
     if (newProps.variablesContainer !== this.props.variablesContainer) {
       this._loadNamesFrom(newProps);
     }
   }
 
-  _loadNamesFrom(props) {
-    if (!props.variablesContainer) {
-      this._variableNames = [];
-      return;
-    }
-
-    this._variableNames = mapFor(0, props.variablesContainer.count(), i => {
-      const variableAndName = props.variablesContainer.getAt(i);
-      return variableAndName.getName();
-    });
+  _loadNamesFrom(props: Props) {
+    this._variableNames = enumerateVariables(props.variablesContainer);
   }
 
   render() {

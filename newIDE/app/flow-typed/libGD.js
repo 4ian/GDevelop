@@ -21,5 +21,8 @@ declare type gdInstructionMetadata = EmscriptenObject;
 declare type gdInstructionsList = EmscriptenObject;
 declare type gdParameterMetadata = EmscriptenObject;
 
+declare type gdVariable = EmscriptenObject;
+declare type gdVariablesContainer = EmscriptenObject;
+
 //Represents all objects that have serializeTo and unserializeFrom methods.
 declare type gdSerializable = EmscriptenObject;

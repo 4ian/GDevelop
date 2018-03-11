@@ -1,5 +1,7 @@
+// @flow
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
+import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
 const styles = {
   autoCompleteTextField: {
@@ -11,8 +13,19 @@ const fuzzyFilterOrEmpty = (searchText, key) => {
   return !key || AutoComplete.fuzzyFilter(searchText, key);
 };
 
-export default class KeyField extends Component {
-  constructor(props) {
+type State = {|
+  focused: boolean,
+  text: ?string,
+|};
+
+export default class KeyField extends Component<ParameterFieldProps, State> {
+  state = { focused: false, text: null };
+
+  _description: ?string;
+  _field: ?any;
+  _keyNames: Array<string> = [];
+
+  constructor(props: ParameterFieldProps) {
     super(props);
 
     const { parameterMetadata } = this.props;
@@ -124,9 +137,25 @@ export default class KeyField extends Component {
         menuProps={{
           maxHeight: 250,
         }}
-        searchText={this.props.value}
+        searchText={this.state.focused ? this.state.text : this.props.value}
+        onFocus={() => {
+          this.setState({
+            focused: true,
+            text: this.props.value,
+          });
+        }}
         onUpdateInput={value => {
-          this.props.onChange(value);
+          this.setState({
+            focused: true,
+            text: value,
+          });
+        }}
+        onBlur={event => {
+          this.props.onChange(event.target.value);
+          this.setState({
+            focused: false,
+            text: null,
+          });
         }}
         onNewRequest={data => {
           // Note that data may be a string or a {text, value} object.

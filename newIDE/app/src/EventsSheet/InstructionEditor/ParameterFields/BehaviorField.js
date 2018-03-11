@@ -13,10 +13,10 @@ const fuzzyFilterOrEmpty = (searchText, key) => {
 };
 
 export default class BehaviorField extends Component {
+  state = { errorText: null, focused: false, text: null };
+
   constructor(props) {
     super(props);
-
-    this.state = { errorText: null };
 
     const { parameterMetadata } = this.props;
     this._description = parameterMetadata
@@ -61,8 +61,8 @@ export default class BehaviorField extends Component {
     if (this._field) this._field.focus();
   }
 
-  _getError = () => {
-    if (!this.props.value) return null;
+  _getError = (value?: string) => {
+    if (!value && !this.props.value) return null;
 
     const isValidChoice =
       this._behaviorNames.filter(choice => this.props.value === choice)
@@ -73,8 +73,8 @@ export default class BehaviorField extends Component {
     return null;
   };
 
-  _doValidation = () => {
-    this.setState({ errorText: this._getError() });
+  _doValidation = (value?: string) => {
+    this.setState({ errorText: this._getError(value) });
   };
 
   componentDidUpdate() {
@@ -115,12 +115,27 @@ export default class BehaviorField extends Component {
             ? noBehaviorErrorText
             : this.state.errorText
         }
-        searchText={this.props.value}
-        onUpdateInput={value => {
-          this.setState({ errorText: null });
-          this.props.onChange(value);
+        searchText={this.state.focused ? this.state.text : this.props.value}
+        onFocus={() => {
+          this.setState({
+            focused: true,
+            text: this.props.value,
+          });
         }}
-        onBlur={this._doValidation}
+        onUpdateInput={value => {
+          this.setState({
+            focused: true,
+            text: value,
+          });
+        }}
+        onBlur={event => {
+          this.props.onChange(event.target.value);
+          this.setState({
+            focused: false,
+            text: null,
+          });
+          this._doValidation(event.target.value);
+        }}
         onNewRequest={data => {
           // Note that data may be a string or a {text, value} object.
           if (typeof data === 'string') {

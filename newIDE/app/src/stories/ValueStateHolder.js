@@ -1,7 +1,17 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 
-export default class ValueStateHolder extends Component {
-  constructor(props) {
+type Props = {|
+  initialValue: any,
+  render: (value: any, onChange: (value: any) => void) => React.Element<*>,
+|};
+
+type State = {|
+  value: any,
+|};
+
+export default class ValueStateHolder extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -9,10 +19,9 @@ export default class ValueStateHolder extends Component {
     };
   }
 
+  _handleChange = (value: any) => this.setState({ value });
+
   render() {
-    return React.cloneElement(this.props.children, {
-      onChange: value => this.setState({ value }),
-      value: this.state.value,
-    });
+    return this.props.render(this.state.value, this._handleChange);
   }
 }

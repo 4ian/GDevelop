@@ -27,6 +27,10 @@ import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ImageThumbnail from '../ObjectEditor/ImageThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterFields/ExternalEventsField';
+import LayerField from '../EventsSheet/InstructionEditor/ParameterFields/LayerField';
+import MouseField from '../EventsSheet/InstructionEditor/ParameterFields/MouseField';
+import SceneVariableField from '../EventsSheet/InstructionEditor/ParameterFields/SceneVariableField';
+import KeyField from '../EventsSheet/InstructionEditor/ParameterFields/KeyField';
 import ExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/InstructionEditor/ParameterFields/StringField';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
@@ -144,24 +148,86 @@ storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('ExpressionField', () => (
-    <ValueStateHolder initialValue={'MySpriteObject.X() + MouseX("", 0)'}>
-      <ExpressionField
-        project={project}
-        layout={testLayout}
-        parameterRenderingService={ParameterRenderingService}
-      />
-    </ValueStateHolder>
+    <ValueStateHolder
+      initialValue={'MySpriteObject.X() + MouseX("", 0)'}
+      render={(value, onChange) => (
+        <ExpressionField
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+          parameterRenderingService={ParameterRenderingService}
+        />
+      )}
+    />
   ))
   .add('StringField', () => (
     <ValueStateHolder
       initialValue={'ToString(0) + "Test" + NewLine() + VariableString(MyVar)'}
-    >
-      <StringField
-        project={project}
-        layout={testLayout}
-        parameterRenderingService={ParameterRenderingService}
-      />
-    </ValueStateHolder>
+      render={(value, onChange) => (
+        <StringField
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+          parameterRenderingService={ParameterRenderingService}
+        />
+      )}
+    />
+  ))
+  .add('ExternalEventsField', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <ExternalEventsField
+          project={project}
+          value={value}
+          onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('LayerField', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <LayerField
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('KeyField', () => (
+    <ValueStateHolder
+      initialValue={'Space'}
+      render={(value, onChange) => (
+        <KeyField project={project} value={value} onChange={onChange} />
+      )}
+    />
+  ))
+  .add('MouseField', () => (
+    <ValueStateHolder
+      initialValue={'Left'}
+      render={(value, onChange) => (
+        <MouseField project={project} value={value} onChange={onChange} />
+      )}
+    />
+  ))
+  .add('SceneVariableField', () => (
+    <ValueStateHolder
+      initialValue={'Variable1'}
+      render={(value, onChange) => (
+        <SceneVariableField
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+        />
+      )}
+    />
   ));
 
 storiesOf('LocalExport', module)
@@ -169,15 +235,6 @@ storiesOf('LocalExport', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LocalExport open project={project} onClose={action('close')} />
-  ));
-
-storiesOf('ParameterFields', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('ExternalEventsField', () => (
-    <ValueStateHolder initialValue={'Test'}>
-      <ExternalEventsField project={project} />
-    </ValueStateHolder>
   ));
 
 storiesOf('LocalS3Export', module)

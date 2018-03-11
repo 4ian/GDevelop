@@ -21,10 +21,10 @@ const fuzzyFilterOrEmpty = (searchText, key) => {
 };
 
 export default class VariableField extends Component {
+  state = { focused: false, text: null };
+
   constructor(props) {
     super(props);
-
-    this.state = { errorText: null };
 
     const { parameterMetadata } = this.props;
     this._description = parameterMetadata
@@ -66,10 +66,25 @@ export default class VariableField extends Component {
           menuProps={{
             maxHeight: 250,
           }}
-          searchText={this.props.value}
+          searchText={this.state.focused ? this.state.text : this.props.value}
+          onFocus={() => {
+            this.setState({
+              focused: true,
+              text: this.props.value,
+            });
+          }}
           onUpdateInput={value => {
-            this.setState({ errorText: null });
-            this.props.onChange(value);
+            this.setState({
+              focused: true,
+              text: value,
+            });
+          }}
+          onBlur={event => {
+            this.props.onChange(event.target.value);
+            this.setState({
+              focused: false,
+              text: null,
+            });
           }}
           onNewRequest={data => {
             // Note that data may be a string or a {text, value} object.

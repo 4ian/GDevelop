@@ -5,9 +5,14 @@ import TextField from 'material-ui/TextField';
 type State = {
   focused: boolean,
   text: ?string,
+};
+
+type Props = {
+  onChange: string => void,
+  value: string,
   commitOnBlur?: boolean,
-  onFocus?: Function,
-  onBlur?: Function,
+  onFocus?: (event: any) => void,
+  onBlur?: (event: any) => void,
 };
 
 /**
@@ -16,7 +21,10 @@ type State = {
  * is typing. This is useful if the parent component can do modifications on the value:
  * the user won't be interrupted or have the value changed until he blurs the field.
  */
-export default class SemiControlledTextField extends React.Component<*, State> {
+export default class SemiControlledTextField extends React.Component<
+  Props,
+  State
+> {
   state = {
     focused: false,
     text: null,
@@ -33,14 +41,21 @@ export default class SemiControlledTextField extends React.Component<*, State> {
   }
 
   render() {
-    const { value, onChange, commitOnBlur, onFocus, onBlur, ...otherProps } = this.props;
+    const {
+      value,
+      onChange,
+      commitOnBlur,
+      onFocus,
+      onBlur,
+      ...otherProps
+    } = this.props;
 
     return (
       <TextField
         {...otherProps}
-        ref={field => this._field = field}
+        ref={field => (this._field = field)}
         value={this.state.focused ? this.state.text : value}
-        onFocus={(event) => {
+        onFocus={event => {
           this.setState({
             focused: true,
             text: this.props.value,

@@ -128,6 +128,10 @@ export const makeTestProject = gd => {
   testLayoutInstance1.setX(10);
   testLayoutInstance1.setY(15);
 
+  // Add layers
+  testLayout.insertNewLayer("GUI", 0);
+  testLayout.insertNewLayer("OtherLayer", 1);
+
   //Add a few variables
   const testLayoutVariables = testLayout.getVariables();
   testLayoutVariables

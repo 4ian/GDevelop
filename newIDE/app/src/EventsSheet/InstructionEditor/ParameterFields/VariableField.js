@@ -34,6 +34,10 @@ export default class VariableField extends Component {
     this._loadNamesFrom(props);
   }
 
+  forceUpdateVariables() {
+    this._loadNamesFrom(this.props);
+  }
+
   focus() {
     if (this._field) this._field.focus();
   }

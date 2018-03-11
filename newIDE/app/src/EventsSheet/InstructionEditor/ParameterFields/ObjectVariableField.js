@@ -43,7 +43,10 @@ export default class ObjectVariableField extends Component {
             open={this.state.editorOpen}
             variablesContainer={variablesContainer}
             onCancel={() => this.setState({ editorOpen: false })}
-            onApply={() => this.setState({ editorOpen: false })}
+            onApply={() => {
+              this.setState({ editorOpen: false });
+              if (this._field) this._field.forceUpdateVariables();
+            }}
           />
         )}
       </div>

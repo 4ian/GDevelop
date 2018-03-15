@@ -137,6 +137,16 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
     obj.AddExpression("Height", _("Height"), _("Object height"), _("Size"), "JsPlatform/Extensions/skeletonicon16.png")
         .AddParameter("object", _("Object"), "Skeleton");
 
+    obj.AddAction("SetDefaultHitbox",
+        _("Default hitbox"),
+        _("Change the object default hitbox to be used by other conditions and behaviors."),
+        _("Set _PARAM0_ default hitbox to _PARAM1_"),
+        _("Size"),
+        "JsPlatform/Extensions/skeletonicon24.png",
+        "JsPlatform/Extensions/skeletonicon16.png")
+        .AddParameter("object", _("Object"), "Skeleton")
+        .AddParameter("string", _("Slot path")).SetDefaultValue("\"\"");
+
     // Animation instructions
     obj.AddCondition("AnimationPaused",
         _("Paused"),

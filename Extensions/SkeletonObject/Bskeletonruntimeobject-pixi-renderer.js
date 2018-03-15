@@ -175,7 +175,7 @@ gdjs.sk.DebugPixiRenderer.prototype.loadVertices = function(verts, color, fill){
     }
     this.renderer.lineStyle(2, color, 0.8);
     for(var i=0; i<verts.length; i++){
-        this.renderer.drawPolygon(verts.reduce(function(a, b){ return a.concat(b); }));
+        this.renderer.drawPolygon(verts.reduce(function(a, b){ return a.concat(b); }).concat(verts[0]));
     }
     if(fill){
         this.renderer.endFill();

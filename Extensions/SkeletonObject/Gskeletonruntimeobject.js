@@ -23,6 +23,7 @@ gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
     this.scaleX = 1.0;
     this.scaleY = 1.0;
     this.renderer = new gdjs.SkeletonRuntimeObjectRenderer();
+    this.hitboxSlot = null;
     
     var skeletalData = this.renderer.getData(objectData.skeletalDataFilename);
     // Main loaders
@@ -54,6 +55,7 @@ gdjs.SkeletonRuntimeObject.prototype.loadDragonBones = function(runtimeScene, sk
         this.rootArmature.loadDragonBones(skeletalData, 0, this.renderer.textures, objectData.debugPolygons);
     }
     this.rootArmature.renderer.putInScene(this, runtimeScene);
+    this.customHitboxes = [];
 };
 
 // RuntimeObject overwrites
@@ -77,6 +79,9 @@ gdjs.SkeletonRuntimeObject.prototype.getRendererObject = function(){
 };
 
 gdjs.SkeletonRuntimeObject.prototype.getHitBoxes = function(){
+    if(this.hitboxSlot){
+        return this.hitboxSlot.getPolygons();
+    }
     return [this.rootArmature.getAABB()];
 };
 
@@ -113,7 +118,7 @@ gdjs.SkeletonRuntimeObject.prototype.setScaleY = function(scaleY){
 };
 
 gdjs.SkeletonRuntimeObject.prototype.getWidth = function(){
-    return this.rootArmature.getDefaultWidth() * this.scaleX;
+    return this.rootArmature.getDefaultWidth() * Math.abs(this.scaleX);
 };
 
 gdjs.SkeletonRuntimeObject.prototype.setWidth = function(width){
@@ -122,12 +127,23 @@ gdjs.SkeletonRuntimeObject.prototype.setWidth = function(width){
 };
 
 gdjs.SkeletonRuntimeObject.prototype.getHeight = function(){
-    return this.rootArmature.getDefaultHeight() * this.scaleY;
+    return this.rootArmature.getDefaultHeight() * Math.abs(this.scaleY);
 };
 
 gdjs.SkeletonRuntimeObject.prototype.setHeight = function(height){
     if(height < 0) height = 0;
     this.setScaleY(height / this.rootArmature.getDefaultHeight());
+};
+
+gdjs.SkeletonRuntimeObject.prototype.setDefaultHitbox = function(slotPath){
+    if(slotPath === ""){
+        this.hitboxSlot = null;
+        return;
+    }
+    var slot = this.getSlot(slotPath);
+    if(slot){
+        this.hitboxSlot = slot;
+    }
 };
 
 // Animation instructions

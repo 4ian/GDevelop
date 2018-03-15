@@ -30,7 +30,7 @@ public:
 
         GetObjectMetadata("SkeletonObject::Skeleton")
             .SetIncludeFile("Extensions/SkeletonObject/Hsk-tools.js")
-            .SetIncludeFile("Extensions/SkeletonObject/Gskeletonruntimeobject.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Gskeletonruntimeobject.js")
             .AddIncludeFile("Extensions/SkeletonObject/Fskanimation.js")
             .AddIncludeFile("Extensions/SkeletonObject/Eskarmature.js")
             .AddIncludeFile("Extensions/SkeletonObject/Dskslot.js")
@@ -59,6 +59,8 @@ public:
         conditions["SkeletonObject::Height"].SetFunctionName("getHeight");
         actions["SkeletonObject::SetHeight"].SetFunctionName("setHeight").SetGetter("getHeight");
         expressions["Height"].SetFunctionName("getHeight");
+
+        actions["SkeletonObject::SetDefaultHitbox"].SetFunctionName("setDefaultHitbox");
 
         // Animation instructions
         conditions["SkeletonObject::AnimationPaused"].SetFunctionName("isAnimationPaused");

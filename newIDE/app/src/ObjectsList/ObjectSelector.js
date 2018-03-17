@@ -69,6 +69,7 @@ export default class ObjectSelector extends Component {
       layout,
       allowedObjectType,
       noGroups,
+      onBlur,
       ...rest
     } = this.props;
 
@@ -97,6 +98,8 @@ export default class ObjectSelector extends Component {
             focused: false,
             text: null,
           });
+
+          if (onBlur) onBlur(event);
         }}
         onNewRequest={data => {
           // Note that data may be a string or a {text, value} object.

@@ -1,6 +1,4 @@
 // @flow
-import ParameterRenderingService from '../ParameterRenderingService';
-
 export type ParameterFieldProps = {|
   parameterMetadata?: gdParameterMetadata,
   project: gdProject,
@@ -8,5 +6,8 @@ export type ParameterFieldProps = {|
   onChange: string => void,
   value: string,
   isInline?: boolean,
-  parameterRenderingService?: typeof ParameterRenderingService,
+  parameterRenderingService?: {
+    components: any,
+    getParameterComponent: (type: string) => any,
+  },
 |};

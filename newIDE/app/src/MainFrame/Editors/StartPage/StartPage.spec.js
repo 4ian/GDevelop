@@ -2,8 +2,8 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import defaultTheme from '../../UI/Theme/DefaultTheme';
-import StartPage from './StartPage';
+import defaultTheme from '../../../UI/Theme/DefaultTheme';
+import StartPage from '.';
 const gd = global.gd;
 
 describe('StartPage', () => {

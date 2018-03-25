@@ -79,7 +79,6 @@ export default class Authentification {
   getUserProfile = (cb: (any, ?Profile) => void) => {
     if (!this.isAuthenticated()) return cb({ unauthenticated: true });
 
-    console.log('User found', this.user);
     cb(null, this.user);
   };
 

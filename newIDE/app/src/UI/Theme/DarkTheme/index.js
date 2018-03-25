@@ -95,9 +95,6 @@ const theme: Theme = {
   logo: {
     src: 'res/GD-logo.png',
   },
-  startPage: {
-    backgroundColor,
-  },
   mosaicRootClassName: 'mosaic-gd-dark-theme',
   eventsSheetRootClassName: 'gd-events-sheet-dark-theme',
 };

@@ -80,9 +80,6 @@ const theme = {
   logo: {
     src: 'res/GD-logo-big.png',
   },
-  startPage: {
-    backgroundColor,
-  },
   mosaicRootClassName: 'mosaic-gd-default-theme',
   eventsSheetRootClassName: 'gd-events-sheet-default-theme',
 };

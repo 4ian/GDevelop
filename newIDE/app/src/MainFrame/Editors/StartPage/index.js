@@ -1,18 +1,15 @@
+// @flow
 import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
 import IconButton from 'material-ui/IconButton';
-import muiThemeable from 'material-ui/styles/muiThemeable';
-import BaseEditor from './BaseEditor';
-import Window from '../../Utils/Window';
-import { Line } from '../../UI/Grid';
+import BaseEditor from '../BaseEditor';
+import Window from '../../../Utils/Window';
+import { Line } from '../../../UI/Grid';
+import GDevelopLogo from './GDevelopLogo';
+import ScrollBackground from './ScrollBackground';
 
 const styles = {
-  scrollContainer: {
-    flex: 1,
-    display: 'flex',
-    overflowY: 'scroll',
-  },
   innerContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -35,14 +32,11 @@ const styles = {
   buttonsPaper: {
     width: '100%',
   },
-  logo: {
-    width: '100%',
-  },
 };
 
-class ThemableStartPage extends BaseEditor {
-  constructor(props) {
-    super(props);
+class StartPage extends BaseEditor {
+  constructor() {
+    super();
 
     this.state = {
       aboutDialogOpen: false,
@@ -65,28 +59,21 @@ class ThemableStartPage extends BaseEditor {
       onCreate,
       onOpenProjectManager,
       onCloseProject,
-      muiTheme,
       onOpenAboutDialog,
     } = this.props;
 
     return (
-      <div
-        style={{
-          backgroundColor: muiTheme.palette.canvasColor,
-          ...styles.scrollContainer,
-        }}
-      >
+      <ScrollBackground>
         <div style={styles.innerContainer}>
           <Line expand justifyContent="center">
             <div style={styles.centerContainer}>
               <Paper
                 zDepth={1}
                 style={{
-                  backgroundColor: muiTheme.startPage.backgroundColor,
                   ...styles.logoPaper,
                 }}
               >
-                <img src={muiTheme.logo.src} alt="" style={styles.logo} />
+                <GDevelopLogo />
                 <p>
                   GDevelop is an easy-to-use game creator with no programming
                   language to learn.
@@ -160,10 +147,9 @@ class ThemableStartPage extends BaseEditor {
             </div>
           </Line>
         </div>
-      </div>
+      </ScrollBackground>
     );
   }
 }
 
-const StartPage = muiThemeable()(ThemableStartPage);
 export default StartPage;

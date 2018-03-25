@@ -8,7 +8,7 @@ export default class BaseEditor extends React.Component<*,*> {
     setToolbar: () => {},
   };
 
-  getProject(): gdProject {
+  getProject(): ?gdProject {
     return this.props.project;
   }
 

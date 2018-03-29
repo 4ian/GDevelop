@@ -48,6 +48,11 @@ class ThemableObjectRow extends React.Component {
             click: () => this.props.onEditName(),
           },
           {
+            label: 'Set as a global object',
+            enabled: !!this.props.onSetAsGlobalObject,
+            click: () => this.props.onSetAsGlobalObject(),
+          },
+          {
             label: 'Delete',
             enabled: !!this.props.onEdit,
             click: () => this.props.onDelete(),

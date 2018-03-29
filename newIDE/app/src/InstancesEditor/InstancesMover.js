@@ -12,7 +12,7 @@ export default class InstancesResizer {
   }
 
   _roundXPosition(x) {
-    if (!this.options.snap || !this.options.grid) return x;
+    if (!this.options.snap || !this.options.grid) return Math.round(x);
 
     return (
       Math.round((x - this.options.gridOffsetX) / this.options.gridWidth) *
@@ -22,7 +22,7 @@ export default class InstancesResizer {
   }
 
   _roundYPosition(y) {
-    if (!this.options.snap || !this.options.grid) return y;
+    if (!this.options.snap || !this.options.grid) return Math.round(y);
 
     return (
       Math.round((y - this.options.gridOffsetY) / this.options.gridHeight) *

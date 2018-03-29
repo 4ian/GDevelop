@@ -5,17 +5,17 @@ Copyright (c) 2017-2018 Franco Maciel (francomaciel10@gmail.com)
 This project is released under the MIT License.
 */
 
-gdjs.SkeletonRuntimeObjectPixiRenderer = function()
+gdjs.sk.PixiDataLoader = function()
 {
     this.textures = {};
 };
-gdjs.SkeletonRuntimeObjectRenderer = gdjs.SkeletonRuntimeObjectPixiRenderer;
+gdjs.sk.DataLoader = gdjs.sk.PixiDataLoader;
 
-gdjs.SkeletonRuntimeObjectPixiRenderer.prototype.getData = function(dataName){
+gdjs.sk.PixiDataLoader.prototype.getData = function(dataName){
     return PIXI.loader.resources[dataName].data;
 };
 
-gdjs.SkeletonRuntimeObjectPixiRenderer.prototype.loadDragonBones = function(runtimeScene, objectData){
+gdjs.sk.PixiDataLoader.prototype.loadDragonBones = function(runtimeScene, objectData){
     var textureData = this.getData(objectData.textureDataFilename);
     var texture = runtimeScene.getGame().getImageManager().getPIXITexture(objectData.textureName);
     
@@ -83,22 +83,17 @@ gdjs.sk.SlotPixiRenderer.prototype.loadAsSprite = function(texture){
     this.renderer = new PIXI.Sprite(texture);
     this.renderer.pivot = new PIXI.Point(this.renderer.width/2.0, this.renderer.height/2.0);
     this.renderer.z = 0;
-    // console.log(this.renderer);
 };
 
 gdjs.sk.SlotPixiRenderer.prototype.loadAsMesh = function(texture, vertices, uvs, triangles){
-	this.renderer = new PIXI.mesh.Mesh(texture,
-									   new Float32Array(vertices),
-									   new Float32Array(uvs),
-									   new Uint16Array(triangles),
-									   PIXI.mesh.Mesh.DRAW_MODES.TRIANGLES);
+    this.renderer = new PIXI.mesh.Mesh(texture,
+                                       new Float32Array(vertices),
+                                       new Float32Array(uvs),
+                                       new Uint16Array(triangles),
+                                       PIXI.mesh.Mesh.DRAW_MODES.TRIANGLES);
 
-	this.renderer.uploadUvTransform = true;
-	this.renderer.z = 0;
-
-	// TODO
-	// this.render.cacheAsBitmap = true;
-	// meshes won't fully work with current PIXI version
+    this.renderer.uploadUvTransform = true;
+    this.renderer.z = 0;
 };
 
 gdjs.sk.SlotPixiRenderer.prototype.getWidth = function(){
@@ -138,23 +133,23 @@ gdjs.sk.SlotPixiRenderer.prototype.setZ = function(z){
 };
 
 gdjs.sk.SlotPixiRenderer.prototype.setColor = function(color){
-	this.renderer.tint = (color[0] << 16) + (color[1] << 8) + color[2];
+    this.renderer.tint = (color[0] << 16) + (color[1] << 8) + color[2];
 };
 
 gdjs.sk.SlotPixiRenderer.prototype.setAlpha = function(alpha){
-	this.renderer.alpha = alpha;
+    this.renderer.alpha = alpha;
 };
 
 gdjs.sk.SlotPixiRenderer.prototype.setVisible = function(visible){
-	this.renderer.visible = visible;
+    this.renderer.visible = visible;
 };
 
 // Mesh only
 gdjs.sk.SlotPixiRenderer.prototype.setVertices = function(vertices, updateList){
-	for(var i=0; i<updateList.length; i++){
-		this.renderer.vertices[2*updateList[i]]     = vertices[i][0];
-		this.renderer.vertices[2*updateList[i] + 1] = vertices[i][1];
-	}
+    for(var i=0; i<updateList.length; i++){
+        this.renderer.vertices[2*updateList[i]]     = vertices[i][0];
+        this.renderer.vertices[2*updateList[i] + 1] = vertices[i][1];
+    }
 };
 
 

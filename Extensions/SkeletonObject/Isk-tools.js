@@ -6,17 +6,17 @@ This project is released under the MIT License.
 */
 
 gdjs.sk.slotObjectCollision = function(objectsLists1, slotPath, objectsLists2, inverted){
-	return gdjs.evtTools.object.twoListsTest(gdjs.SkeletonRuntimeObject.slotObjectCollisionTest,
+    return gdjs.evtTools.object.twoListsTest(gdjs.SkeletonRuntimeObject.slotObjectCollisionTest,
                                              objectsLists1, objectsLists2, inverted, slotPath);
 };
 
 gdjs.sk.slotSlotCollision = function(objectsLists1, slotPath1, objectsLists2, slotPath2, inverted){
-	return gdjs.evtTools.object.twoListsTest(gdjs.SkeletonRuntimeObject.slotSlotCollisionTest,
+    return gdjs.evtTools.object.twoListsTest(gdjs.SkeletonRuntimeObject.slotSlotCollisionTest,
                                              objectsLists1, objectsLists2, inverted, [slotPath1, slotPath2]);
 };
 
 gdjs.sk.raycastSlot = function(objectsLists, slotPath, x, y, angle, dist, varX, varY, inverted){
-	var matchObject = null;
+    var matchObject = null;
     var testSqDist = inverted ? 0 : dist*dist;
     var resultX = 0;
     var resultY = 0;

@@ -29,7 +29,8 @@ public:
         DeclareSkeletonObjectExtension(*this);
 
         GetObjectMetadata("SkeletonObject::Skeleton")
-            .SetIncludeFile("Extensions/SkeletonObject/Hsk-tools.js")
+            .SetIncludeFile("Extensions/SkeletonObject/Isk-tools.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Hskmanager.js")
             .AddIncludeFile("Extensions/SkeletonObject/Gskeletonruntimeobject.js")
             .AddIncludeFile("Extensions/SkeletonObject/Fskanimation.js")
             .AddIncludeFile("Extensions/SkeletonObject/Eskarmature.js")

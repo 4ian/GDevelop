@@ -7,55 +7,45 @@ This project is released under the MIT License.
 
 
 /**
- * The Slot display images transformed by itself and bones.
- *
  * @namespace gdjs.sk
- * @class Slot
- * @extends gdjs.sk.Transform
+ * @class SharedSlot
  */
-gdjs.sk.Slot = function(armature){
-    gdjs.sk.Transform.call(this);
+gdjs.sk.SharedSlot = function(){
+    // Transform
+    this.x = 0;
+    this.y = 0;
+    this.rot = 0;
+    this.sx = 1;
+    this.sy = 1;
+    // Slot
     this.name = "";
-    this.armature = armature;
     this.type = gdjs.sk.SLOT_UNDEFINED;
+    this.path = "";
+    this.parent = -1;
     this.defaultZ = 0;
     this.defaultR = 255;
     this.defaultG = 255;
     this.defaultB = 255;
     this.defaultAlpha = 1.0;
     this.defaultVisible = true;
-    this.z = this.defaultZ;
-    this.r = this.defaultR;
-    this.g = this.defaultG;
-    this.b = this.defaultB;
-    this.alpha = this.defaultAlpha;
-    this.visible = this.defaultVisible;
-    this.renderer = new gdjs.sk.SlotRenderer();
-    this._updateRender = false;
-    this.aabb = gdjs.Polygon.createRectangle(0, 0);
-
-    // Polygon only
+    this.aabb = null;
+    // Polygon
     this.polygons = [];
+    // Mesh
+    this.rawVertices = [];
+    this.rawUVs = [];
+    this.rawTriangles = [];
+    this.defaultVertices = [];
+    this.skinned = false;
+    this.skinBones = [];
+    this.skinBonesMatricesInverses = [];
+    this.vertexBones = [];
+    this.vertexWeights = [];
+    // Armature
+    this.armature = "";
+};
 
-    // Mesh only
-    this.defaultVertices = []; // original vertices location (relative to mesh slot)
-    this.vertices = []; // same as defaultVertices, but modified on animations
-    this.skinned = false; // is the mesh skinned?
-    this.skinBones = []; // skinning bones
-    this.skinBonesMatricesInverses = []; // bones inverse local matrices (relative to mesh slot)
-    this.vertexBones = []; // list of bone indices (on this.skinBones) for each vertex
-    this.vertexWeights = []; // list of weights for each vertex
-    this.worldMatrixInverse = null; // precomputed mesh slot inverse world matrix
-
-    // Armature only
-    this.childArmature = null;
-
-    // Debug only
-    this.debugRenderer = null;
-}
-gdjs.sk.Slot.prototype = Object.create(gdjs.sk.Transform.prototype);
-
-gdjs.sk.Slot.prototype.loadDragonBonesSlotData = function(slotData){
+gdjs.sk.SharedSlot.prototype.loadDragonBonesSlotData = function(slotData){
     this.name = slotData.name;
     
     this.defaultZ = slotData.hasOwnProperty("z") ? slotData.z : 0;
@@ -63,12 +53,12 @@ gdjs.sk.Slot.prototype.loadDragonBonesSlotData = function(slotData){
     this.defaultG = slotData.color.hasOwnProperty("gM") ? Math.ceil(slotData.color.gM * 255 / 100) : 255;
     this.defaultB = slotData.color.hasOwnProperty("bM") ? Math.ceil(slotData.color.bM * 255 / 100) : 255;
     this.defaultAlpha = slotData.color.hasOwnProperty("aM") ? slotData.color.aM / 100.0 : 1.0;
-    this.defaultVisible = slotData.hasOwnProperty("displayIndex") ? (slotData.displayIndex + 1) / 2 : 1;
+    this.defaultVisible = slotData.hasOwnProperty("displayIndex") ? (slotData.displayIndex + 1) / 2 : 1; // {-1, 1} -> {0, 1}
 };
 
-gdjs.sk.Slot.prototype.loadDragonBonesSkinData = function(skinDatas, index, skeletalData, bonesIndex, textures, debugPolygons){
+gdjs.sk.SharedSlot.prototype.loadDragonBonesSkinData = function(skinDatas, index){
     var skinData = skinDatas[index];
-    
+
     var transformData = skinData.display[0].transform;
     this.x = transformData.hasOwnProperty("x") ? transformData.x : 0;
     this.y = transformData.hasOwnProperty("y") ? transformData.y : 0;
@@ -80,298 +70,385 @@ gdjs.sk.Slot.prototype.loadDragonBonesSkinData = function(skinDatas, index, skel
     if(!skinData.display[0].hasOwnProperty("path")){
         for(var i=0; i<skinDatas.length; i++){
             if(skinDatas[i].display[0].name === skinData.display[0].name && skinDatas[i].display[0].path){
-                skinData.display[0].path = skinDatas[i].display[0].path;
+                this.path = skinDatas[i].display[0].path;
                 break;
             }
         }
     }
+    else{
+        this.path = skinData.display[0].path;
+    }
 
     if(skinData.display[0].type === "image"){
         this.type = gdjs.sk.SLOT_IMAGE;
-
-        this.renderer.loadAsSprite(textures[skinData.display[0].path]);
-
-        this.aabb.vertices[0] = [-this.renderer.getWidth()/2.0,-this.renderer.getHeight()/2.0];
-        this.aabb.vertices[1] = [ this.renderer.getWidth()/2.0,-this.renderer.getHeight()/2.0];
-        this.aabb.vertices[2] = [ this.renderer.getWidth()/2.0, this.renderer.getHeight()/2.0];
-        this.aabb.vertices[3] = [-this.renderer.getWidth()/2.0, this.renderer.getHeight()/2.0];
-
-        if(debugPolygons){
-        	this.debugRenderer = new gdjs.sk.DebugRenderer();
-        	this.debugRenderer.loadVertices(this.aabb.vertices, [255, 100, 100], false);
-        }
     }
     
     else if(skinData.display[0].type === "armature"){
-		this.type = gdjs.sk.SLOT_ARMATURE;
+        this.type = gdjs.sk.SLOT_ARMATURE;
+    }
 
-		for(var i=0; i<skeletalData.armature.length; i++){
-			if(skeletalData.armature[i].name === skinData.display[0].path){
+    else if(skinData.display[0].type === "boundingBox"){
+        this.type = gdjs.sk.SLOT_POLYGON;
 
-				this.childArmature = new gdjs.sk.Armature(this.armature.skeleton, this.armature, this);
-				this.childArmature.loadDragonBones(skeletalData, i, textures, debugPolygons);
-				this.addChild(this.childArmature);
-
-				var verts = this.childArmature.getAABB().vertices;
-				for(var j=0; j<verts.length; j++){
-					this.aabb.vertices[i] = [verts[j][0], verts[j][1]];
-				}
-			}
-		}
-	}
-
-	else if(skinData.display[0].type === "boundingBox"){
-		this.type = gdjs.sk.SLOT_POLYGON;
-
-		var polygon = new gdjs.Polygon();
-		var verts = skinData.display[0].vertices;
-		for(var i=0; i<verts.length; i+=2){
-			polygon.vertices.push([verts[i], verts[i+1]]);
-		}
-		this.polygons.push(polygon);
-
-		if(debugPolygons){
-        	this.debugRenderer = new gdjs.sk.DebugRenderer();
-        	this.debugRenderer.loadVertices(this.polygons[0].vertices, [100, 255, 100], true);
+        var polygon = [];
+        var verts = skinData.display[0].vertices;
+        for(var i=0; i<verts.length; i+=2){
+            polygon.push([verts[i], verts[i+1]]);
         }
-	}
+        this.polygons.push(polygon);
+    }
 
-	else if(skinData.display[0].type === "mesh"){
-		this.type = gdjs.sk.SLOT_MESH;
+    else if(skinData.display[0].type === "mesh"){
+        this.type = gdjs.sk.SLOT_MESH;
 
-		for(var i=0; i<skinData.display[0].vertices.length; i+=2){
-			this.defaultVertices.push([skinData.display[0].vertices[i],
-									   skinData.display[0].vertices[i+1]]);
-		}
-
-		this.renderer.loadAsMesh(textures[skinData.display[0].path],
-								 skinData.display[0].vertices,
-								 skinData.display[0].uvs,
-								 skinData.display[0].triangles);
-
-		if(skinData.display[0].hasOwnProperty("weights")){
-			this.skinned = true;
-			
-			this.update();
-			var worldMatrixInverse = this.worldMatrix.inverse();
-
-			// maps Armature.bones index -> skinBones index
-			var boneMap = {};
-			for(var i=0, j=0; i<skinData.display[0].bonePose.length; i+=7, j++){
-				boneMap[skinData.display[0].bonePose[i]] = j;
-				this.skinBones.push(bonesIndex[skinData.display[0].bonePose[i]]);
-				var boneWorldMatrix = bonesIndex[skinData.display[0].bonePose[i]].worldMatrix;
-				this.skinBonesMatricesInverses.push(worldMatrixInverse.mul(boneWorldMatrix).inverse());
-			}
-
-			for(var i=0; i<skinData.display[0].weights.length;){
-				var boneCount = skinData.display[0].weights[i];
-
-				var vertexWeights = [];
-				var vertexBones = [];
-				for(var k=0; k<boneCount; k++){
-
-					var boneId = skinData.display[0].weights[i + 2*k + 1];
-					vertexBones.push(boneMap[boneId]);
-
-					var boneWeight = skinData.display[0].weights[i + 2*k + 2];
-					vertexWeights.push(boneWeight);
-				}
-				this.vertexBones.push(vertexBones);
-				this.vertexWeights.push(vertexWeights);
-
-				i += 2 * boneCount + 1;
-			}
-		}
-
-		this.aabb.vertices[0] = [-this.renderer.getWidth()/2.0,-this.renderer.getHeight()/2.0];
-		this.aabb.vertices[1] = [ this.renderer.getWidth()/2.0,-this.renderer.getHeight()/2.0];
-		this.aabb.vertices[2] = [ this.renderer.getWidth()/2.0, this.renderer.getHeight()/2.0];
-		this.aabb.vertices[3] = [-this.renderer.getWidth()/2.0, this.renderer.getHeight()/2.0];
-
-		if(debugPolygons){
-        	this.debugRenderer = new gdjs.sk.DebugRenderer();
-        	this.debugRenderer.loadVertices(this.aabb.vertices, [255, 100, 100], false);
+        for(var i=0; i<skinData.display[0].vertices.length; i+=2){
+            this.defaultVertices.push([skinData.display[0].vertices[i],
+                                       skinData.display[0].vertices[i+1]]);
         }
-	}
+
+        this.rawVertices = skinData.display[0].vertices;
+        this.rawUVs = skinData.display[0].uvs;
+        this.rawTriangles = skinData.display[0].triangles;
+
+        if(skinData.display[0].hasOwnProperty("weights")){
+            this.skinned = true;
+            
+            var slotPose = skinData.display[0].slotPose;
+            var worldMatrixInverse = new gdjs.sk.Matrix( slotPose[0],-slotPose[1], slotPose[4],
+                                                        -slotPose[2], slotPose[3], slotPose[5]);
+            worldMatrixInverse.invert();
+
+            // maps Armature.bones index -> skinBones index
+            var boneMap = {};
+            for(var i=0, j=0; i<skinData.display[0].bonePose.length; i+=7, j++){
+                var bonePose = skinData.display[0].bonePose;
+                var boneWorldMatrix = new gdjs.sk.Matrix( bonePose[i+1],-bonePose[i+2], bonePose[i+5],
+                                                         -bonePose[i+3], bonePose[i+4], bonePose[i+6]);
+                boneMap[bonePose[i]] = j;
+                this.skinBones.push(bonePose[i]);
+                this.skinBonesMatricesInverses.push(worldMatrixInverse.mul(boneWorldMatrix).invert());
+
+            }
+
+            for(var i=0; i<skinData.display[0].weights.length;){
+                var boneCount = skinData.display[0].weights[i];
+
+                var vertexWeights = [];
+                var vertexBones = [];
+                for(var k=0; k<boneCount; k++){
+
+                    var boneId = skinData.display[0].weights[i + 2*k + 1];
+                    vertexBones.push(boneMap[boneId]);
+
+                    var boneWeight = skinData.display[0].weights[i + 2*k + 2];
+                    vertexWeights.push(boneWeight);
+                }
+                this.vertexBones.push(vertexBones);
+                this.vertexWeights.push(vertexWeights);
+
+                i += 2 * boneCount + 1;
+            }
+        }
+    }
+};
+
+
+
+/**
+ * The Slot display images transformed by animations itself and bones.
+ *
+ * @namespace gdjs.sk
+ * @class Slot
+ * @extends gdjs.sk.Transform
+ */
+gdjs.sk.Slot = function(armature){
+    gdjs.sk.Transform.call(this);
     
-    this.resetState();
+    this.shared = null;
+    this.armature = armature;
+    this.z = 0;
+    this.r = 0;
+    this.g = 0;
+    this.b = 0;
+    this.alpha = 0;
+    this.visible = false;
+    this.renderer = new gdjs.sk.SlotRenderer();
+    this._updateRender = false;
+    // Mesh only
+    this.vertices = []; // same as this.shared.defaultVertices, but modified on animations
+    this.skinBones = [];
+    // Armature only
+    this.childArmature = null;
+    // Debug only
+    this.debugRenderer = null;
+}
+gdjs.sk.Slot.prototype = Object.create(gdjs.sk.Transform.prototype);
+
+gdjs.sk.Slot.prototype.loadData = function(slotData, skeletalData, textures, debugPolygons){
+    this.shared = slotData;
+
+    this.z = this.shared.defaultZ;
+    this.r = this.shared.defaultR;
+    this.g = this.shared.defaultG;
+    this.b = this.shared.defaultB;
+    this.alpha = this.shared.defaultAlpha;
+    this.visible = this.shared.defaultVisible;
+    this.x = this.shared.x;
+    this.y = this.shared.y;
+    this.rot = this.shared.rot;
+    this.sx = this.shared.sx;
+    this.sy = this.shared.sy;
+    this._updateMatrix = true;
+    this._updateWorldMatrix = true;
+
+    if(this.shared.type === gdjs.sk.SLOT_IMAGE){
+        this.renderer.loadAsSprite(textures[this.shared.path]);
+
+        if(!this.shared.aabb){
+            this.shared.aabb = [];
+            this.shared.aabb.push([-this.renderer.getWidth()/2.0,-this.renderer.getHeight()/2.0]);
+            this.shared.aabb.push([ this.renderer.getWidth()/2.0,-this.renderer.getHeight()/2.0]);
+            this.shared.aabb.push([ this.renderer.getWidth()/2.0, this.renderer.getHeight()/2.0]);
+            this.shared.aabb.push([-this.renderer.getWidth()/2.0, this.renderer.getHeight()/2.0]);
+        }
+
+        if(debugPolygons){
+            this.debugRenderer = new gdjs.sk.DebugRenderer();
+            this.debugRenderer.loadVertices(this.shared.aabb, [255, 100, 100], false);
+        }
+    }
+    else if(this.shared.type === gdjs.sk.SLOT_MESH){
+        for(var i=0; i<this.shared.defaultVertices.length; i++){
+            this.vertices.push([this.shared.defaultVertices[i][0], this.shared.defaultVertices[i][1]]);
+        }
+
+        for(var i=0; i<this.shared.skinBones.length; i++){
+            this.skinBones.push(this.armature.bones[this.shared.skinBones[i]]);
+        }
+
+        this.renderer.loadAsMesh(textures[this.shared.path],
+                                 this.shared.rawVertices,
+                                 this.shared.rawUVs,
+                                 this.shared.rawTriangles);
+
+        if(!this.shared.aabb){
+            this.shared.aabb = [];
+            this.shared.aabb.push([-this.renderer.getWidth()/2.0,-this.renderer.getHeight()/2.0]);
+            this.shared.aabb.push([ this.renderer.getWidth()/2.0,-this.renderer.getHeight()/2.0]);
+            this.shared.aabb.push([ this.renderer.getWidth()/2.0, this.renderer.getHeight()/2.0]);
+            this.shared.aabb.push([-this.renderer.getWidth()/2.0, this.renderer.getHeight()/2.0]);
+        }
+
+        if(debugPolygons){
+            this.debugRenderer = new gdjs.sk.DebugRenderer();
+            this.debugRenderer.loadVertices(this.shared.aabb, [255, 100, 100], false);
+        }
+    }
+    else if(this.shared.type === gdjs.sk.SLOT_POLYGON){
+        if(debugPolygons){
+            this.debugRenderer = new gdjs.sk.DebugRenderer();
+            this.debugRenderer.loadVertices(this.shared.polygons[0], [100, 255, 100], true);
+        }
+    }
+    else if(this.shared.type === gdjs.sk.SLOT_ARMATURE){
+        for(var i=0; i<skeletalData.armatures.length; i++){
+            if(skeletalData.armatures[i].name === this.shared.path){
+
+                this.childArmature = new gdjs.sk.Armature(this.armature.skeleton, this.armature, this);
+                this.childArmature.loadData(skeletalData.armatures[i], skeletalData, debugPolygons);
+                this.addChild(this.childArmature);
+
+                if(!this.shared.aabb){
+                    this.shared.aabb = [];
+                    var verts = this.childArmature.getAABB().vertices;
+                    for(var j=0; j<verts.length; j++){
+                        this.shared.aabb.push([verts[j][0], verts[j][1]]);
+                    }
+                }
+            }
+        }
+    }
+
+    this.updateRendererColor();
+    this.updateRendererAlpha();
+    this.updateRendererVisible();
 };
 
 gdjs.sk.Slot.prototype.resetState = function(){
-    this.setZ(this.defaultZ);
-    this.setColor(this.defaultR, this.defaultG, this.defaultB);
-    this.setAlpha(this.defaultAlpha);
-    this.setVisible(this.defaultVisible);
-    if(this.type === gdjs.sk.SLOT_MESH){
+    this.setZ(this.shared.defaultZ);
+    this.setColor(this.shared.defaultR, this.shared.defaultG, this.shared.defaultB);
+    this.setAlpha(this.shared.defaultAlpha);
+    this.setVisible(this.shared.defaultVisible);
+    if(this.shared.type === gdjs.sk.SLOT_MESH){
         var verts = [];
         var updateList = [];
-        for(var i=0; i<this.defaultVertices.length; i++){
+        for(var i=0; i<this.shared.defaultVertices.length; i++){
             verts.push([0, 0]);
             updateList.push(i);
         }
         this.setVertices(verts, updateList);
     }
+    if(this.shared.type === gdjs.sk.SLOT_ARMATURE){
+        this.childArmature.resetState();
+    }
 };
 
 gdjs.sk.Slot.prototype.getZ = function(){
-	return this.z;
+    return this.z;
 };
 
 gdjs.sk.Slot.prototype.setZ = function(z){
-	this.z = z;
-	if(this.type === gdjs.sk.SLOT_IMAGE || this.type === gdjs.sk.SLOT_MESH){
-		this.renderer.setZ(z);
-	}
+    this.z = z;
+    if(this.shared.type === gdjs.sk.SLOT_IMAGE || this.shared.type === gdjs.sk.SLOT_MESH){
+        this.renderer.setZ(z);
+    }
 };
 
 gdjs.sk.Slot.prototype.getColor = function(){
-	if(!this.armature.parentSlot){
-		return [this.r, this.g, this.b];
-	}
+    if(!this.armature.parentSlot){
+        return [this.r, this.g, this.b];
+    }
 
-	var armatureColor = this.armature.parentSlot.getColor();
-	return [this.r * armatureColor[0] / 255,
-			this.g * armatureColor[1] / 255,
-			this.b * armatureColor[2] / 255];
+    var armatureColor = this.armature.parentSlot.getColor();
+    return [this.r * armatureColor[0] / 255,
+            this.g * armatureColor[1] / 255,
+            this.b * armatureColor[2] / 255];
 };
 
 gdjs.sk.Slot.prototype.setColor = function(r, g, b){
-	if(this.r !== r || this.g !== g || this.b !== b){
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.updateRendererColor();
-	}
+    if(this.r !== r || this.g !== g || this.b !== b){
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.updateRendererColor();
+    }
 };
 
 gdjs.sk.Slot.prototype.updateRendererColor = function(){
-	if(this.type === gdjs.sk.SLOT_IMAGE || this.type === gdjs.sk.SLOT_MESH){
-		this.renderer.setColor(this.getColor());
-	}
-	else if(this.type === gdjs.sk.SLOT_ARMATURE && this.childArmature){
-		for(var i=0; i<this.childArmature.slots.length; i++){
-			this.childArmature.slots[i].updateRendererColor();
-		}
-	}
+    if(this.shared.type === gdjs.sk.SLOT_IMAGE || this.shared.type === gdjs.sk.SLOT_MESH){
+        this.renderer.setColor(this.getColor());
+    }
+    else if(this.shared.type === gdjs.sk.SLOT_ARMATURE && this.childArmature){
+        for(var i=0; i<this.childArmature.slots.length; i++){
+            this.childArmature.slots[i].updateRendererColor();
+        }
+    }
 };
 
 gdjs.sk.Slot.prototype.getAlpha = function(){
-	if(!this.armature.parentSlot){
-		return this.alpha;
-	}
-	var armatureAlpha = this.armature.parentSlot.getAlpha();
-	return (this.alpha * armatureAlpha);
+    if(!this.armature.parentSlot){
+        return this.alpha;
+    }
+    var armatureAlpha = this.armature.parentSlot.getAlpha();
+    return (this.alpha * armatureAlpha);
 };
 
 gdjs.sk.Slot.prototype.setAlpha = function(alpha){
-	if(this.alpha !== alpha){
-		this.alpha = alpha;
-		this.updateRendererAlpha();
-	}
+    if(this.alpha !== alpha){
+        this.alpha = alpha;
+        this.updateRendererAlpha();
+    }
 };
 
 gdjs.sk.Slot.prototype.updateRendererAlpha = function(){
-	if(this.type === gdjs.sk.SLOT_IMAGE || this.type === gdjs.sk.SLOT_MESH){
-		this.renderer.setAlpha(this.getAlpha());
-	}
-	else if(this.type === gdjs.sk.SLOT_ARMATURE && this.childArmature){
-		for(var i=0; i<this.childArmature.slots.length; i++){
-			this.childArmature.slots[i].updateRendererAlpha();
-		}
-	}
+    if(this.shared.type === gdjs.sk.SLOT_IMAGE || this.shared.type === gdjs.sk.SLOT_MESH){
+        this.renderer.setAlpha(this.getAlpha());
+    }
+    else if(this.shared.type === gdjs.sk.SLOT_ARMATURE && this.childArmature){
+        for(var i=0; i<this.childArmature.slots.length; i++){
+            this.childArmature.slots[i].updateRendererAlpha();
+        }
+    }
 };
 
 gdjs.sk.Slot.prototype.getVisible = function(){
-	if(!this.armature.parentSlot){
-		return this.visible;
-	}
-	var armatureVisible = this.armature.parentSlot.getVisible();
-	return (this.visible && armatureVisible);
+    if(!this.armature.parentSlot){
+        return this.visible;
+    }
+    return (this.visible && this.armature.parentSlot.getVisible());
 };
 
 gdjs.sk.Slot.prototype.setVisible = function(visible){
-	if(this.visible !== visible){
-		this.visible = visible;
-		this.updateRendererVisible();
-	}
+    if(this.visible !== visible){
+        this.visible = visible;
+        this.updateRendererVisible();
+    }
 };
 
 gdjs.sk.Slot.prototype.updateRendererVisible = function(){
-	if(this.type === gdjs.sk.SLOT_IMAGE || this.type === gdjs.sk.SLOT_MESH){
-		this.renderer.setVisible(this.getVisible());
-	}
-	else if(this.type === gdjs.sk.SLOT_ARMATURE && this.childArmature){
-		for(var i=0; i<this.childArmature.slots.length; i++){
-			this.childArmature.slots[i].updateRendererVisible();
-		}
-	}
+    if(this.shared.type === gdjs.sk.SLOT_IMAGE || this.shared.type === gdjs.sk.SLOT_MESH){
+        this.renderer.setVisible(this.getVisible());
+    }
+    else if(this.shared.type === gdjs.sk.SLOT_ARMATURE && this.childArmature){
+        for(var i=0; i<this.childArmature.slots.length; i++){
+            this.childArmature.slots[i].updateRendererVisible();
+        }
+    }
 };
 
 // Mesh only
 gdjs.sk.Slot.prototype.setVertices = function(vertices, updateList){
-	var verts = [];
-	for(var i=0; i<updateList.length; i++){
-		this.vertices[updateList[i]] = [vertices[i][0] + this.defaultVertices[updateList[i]][0],
-										vertices[i][1] + this.defaultVertices[updateList[i]][1]];
-		verts.push(this.vertices[updateList[i]]);
-	}
-	this.renderer.setVertices(verts, updateList);
+    var verts = [];
+    for(var i=0; i<updateList.length; i++){
+        this.vertices[updateList[i]] = [vertices[i][0] + this.shared.defaultVertices[updateList[i]][0],
+                                        vertices[i][1] + this.shared.defaultVertices[updateList[i]][1]];
+        verts.push(this.vertices[updateList[i]]);
+    }
+    this.renderer.setVertices(verts, updateList);
 }
 // Mesh only
 gdjs.sk.Slot.prototype.updateSkinning = function(){
-	var verts = [];
-	var updateList = [];
-	var boneMatrices = [];
-	var inverseWorldMatrix = this.worldMatrix.inverse();
-	for(var i=0; i<this.skinBones.length; i++){
-		var localBoneMatrix = inverseWorldMatrix.mul(this.skinBones[i].worldMatrix);
-		boneMatrices.push(localBoneMatrix.mul(this.skinBonesMatricesInverses[i]));
-	}
-	for(var i=0; i<this.vertexWeights.length; i++){
-		var vx = 0.0;
-		var vy = 0.0;
-		for(var j=0; j<this.vertexWeights[i].length; j++){
-			var v = boneMatrices[this.vertexBones[i][j]].mulVec(this.vertices[i]);
-			vx += this.vertexWeights[i][j] * v[0];
-			vy += this.vertexWeights[i][j] * v[1];
-		}
-		verts.push([vx, vy]);
-		updateList.push(i);
-	}
-	this.renderer.setVertices(verts, updateList);
+    var verts = [];
+    var updateList = [];
+    var boneMatrices = [];
+    var inverseWorldMatrix = this.worldMatrix.inverse();
+    for(var i=0; i<this.skinBones.length; i++){
+        var localBoneMatrix = inverseWorldMatrix.mul(this.skinBones[i].worldMatrix);
+        boneMatrices.push(localBoneMatrix.mul(this.shared.skinBonesMatricesInverses[i]));
+    }
+    for(var i=0; i<this.shared.vertexWeights.length; i++){
+        var vx = 0.0;
+        var vy = 0.0;
+        for(var j=0; j<this.shared.vertexWeights[i].length; j++){
+            var v = boneMatrices[this.shared.vertexBones[i][j]].mulVec(this.vertices[i]);
+            vx += this.shared.vertexWeights[i][j] * v[0];
+            vy += this.shared.vertexWeights[i][j] * v[1];
+        }
+        verts.push([vx, vy]);
+        updateList.push(i);
+    }
+    this.renderer.setVertices(verts, updateList);
 };
 
 gdjs.sk.Slot.prototype.getPolygons = function(){
-	if(this.type === gdjs.sk.SLOT_POLYGON){
-		var worldPolygons = [];
-		for(var i=0; i<this.polygons.length; i++){
-			worldPolygons.push(this.transformPolygon(this.polygons[i]));
-		}
-		return worldPolygons;
-	}
-
-	return [this.transformPolygon(this.aabb)];
+    if(this.shared.type === gdjs.sk.SLOT_POLYGON){
+        var worldPolygons = [];
+        for(var i=0; i<this.shared.polygons.length; i++){
+            worldPolygons.push(this.transformPolygon(this.shared.polygons[i]));
+        }
+        return worldPolygons;
+    }
+    return [this.transformPolygon(this.shared.aabb)];
 };
 
 gdjs.sk.Slot.prototype.update = function(){
     gdjs.sk.Transform.prototype.update.call(this);
 
-    if(this._updateRender && (this.type === gdjs.sk.SLOT_IMAGE || this.type === gdjs.sk.SLOT_MESH)){
-		var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix, this.renderer.skewSupported());
-		this.renderer.setPos(transform.x, transform.y);
-		this.renderer.setScale(transform.sx, transform.sy);
-		if(this.renderer.skewSupported()){
-			this.renderer.setSkew(transform.skx, transform.sky);
-		}
-		else{
-			this.renderer.setRotation(transform.rot);
-		}
+    if(this._updateRender && (this.shared.type === gdjs.sk.SLOT_IMAGE || this.shared.type === gdjs.sk.SLOT_MESH)){
+        var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix, this.renderer.skewSupported());
+        this.renderer.setPos(transform.x, transform.y);
+        this.renderer.setScale(transform.sx, transform.sy);
+        if(this.renderer.skewSupported()){
+            this.renderer.setSkew(transform.skx, transform.sky);
+        }
+        else{
+            this.renderer.setRotation(transform.rot);
+        }
     }
 
     if(this._updateRender && this.debugRenderer){
-    	var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix, this.debugRenderer.skewSupported());
-    	this.debugRenderer.setTransform(transform);
+        var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix, this.debugRenderer.skewSupported());
+        this.debugRenderer.setTransform(transform);
     }
 
     this._updateRender = false;

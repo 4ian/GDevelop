@@ -7,28 +7,30 @@ This project is released under the MIT License.
 
 
 /**
- * The Bone holds basic transform data in a hierarchy tree.
- *
  * @namespace gdjs.sk
- * @class Bone
- * @extends gdjs.sk.Transform
+ * @class SharedBone
  */
-gdjs.sk.Bone = function(armature){
-    gdjs.sk.Transform.call(this);
-    this.armature = armature;
+gdjs.sk.SharedBone = function(){
+    this.x = 0;
+    this.y = 0;
+    this.rot = 0;
+    this.sx = 1;
+    this.sy = 1;
     this.name = "";
     this.length = 0;
+    this.parent = -1;
+    this.childBones = [];
+    this.childSlots = [];
     this.restX = 0;
     this.restY = 0;
     this.restRot = 0;
     this.restSx = 1;
     this.restSy = 1;
 };
-gdjs.sk.Bone.prototype = Object.create(gdjs.sk.Transform.prototype);
 
-gdjs.sk.Bone.prototype.loadDragonBones = function(boneData){
+gdjs.sk.SharedBone.prototype.loadDragonBones = function(boneData){
     this.name = boneData.name;
-    this.length = boneData.hasOwnProperty("length") ? boneData.length : 0; // Debug only
+    this.length = boneData.hasOwnProperty("length") ? boneData.length : 0;
     
     var transformData = boneData.transform;
     this.restX = transformData.hasOwnProperty("x") ? transformData.x : 0;
@@ -39,7 +41,26 @@ gdjs.sk.Bone.prototype.loadDragonBones = function(boneData){
 
     this.inheritRotation = boneData.hasOwnProperty("inheritRotation") ? transformData.inheritRotation : true;
     this.inheritScale = boneData.hasOwnProperty("inheritScale") ? transformData.inheritScale : true;
+};
 
+
+/**
+ * The Bone holds basic transform data in a hierarchy tree.
+ *
+ * @namespace gdjs.sk
+ * @class Bone
+ * @extends gdjs.sk.Transform
+ */
+gdjs.sk.Bone = function(armature){
+    gdjs.sk.Transform.call(this);
+
+    this.shared = null;
+    this.armature = armature;
+};
+gdjs.sk.Bone.prototype = Object.create(gdjs.sk.Transform.prototype);
+
+gdjs.sk.Bone.prototype.loadData = function(boneData){
+    this.shared = boneData;
     this.resetState();
 };
 
@@ -51,7 +72,7 @@ gdjs.sk.Bone.prototype.resetState = function(){
 
 gdjs.sk.Bone.prototype.setX = function(x){
     var prevX = this.x;
-    this.x = this.restX + x;
+    this.x = this.shared.restX + x;
     if(this.x !== prevX){
         this._updateMatrix = true;
     }
@@ -59,7 +80,7 @@ gdjs.sk.Bone.prototype.setX = function(x){
 
 gdjs.sk.Bone.prototype.setY = function(y){
     var prevY = this.y;
-    this.y = this.restY + y;
+    this.y = this.shared.restY + y;
     if(this.y !== prevY){
         this._updateMatrix = true;
     }
@@ -68,8 +89,8 @@ gdjs.sk.Bone.prototype.setY = function(y){
 gdjs.sk.Bone.prototype.setPos = function(x, y){
     var prevX = this.x;
     var prevY = this.y;
-    this.x = this.restX + x;
-    this.y = this.restY + y;
+    this.x = this.shared.restX + x;
+    this.y = this.shared.restY + y;
     if(this.x !== prevX || this.y !== prevY){
         this._updateMatrix = true;
     }
@@ -77,7 +98,7 @@ gdjs.sk.Bone.prototype.setPos = function(x, y){
 
 gdjs.sk.Bone.prototype.setRot = function(angle){
     var prevRot = this.rot;
-    this.rot = this.restRot + angle*Math.PI/180.0;
+    this.rot = this.shared.restRot + angle*Math.PI/180.0;
     if(this.rot !== prevRot){
         this._updateMatrix = true;
     }
@@ -85,7 +106,7 @@ gdjs.sk.Bone.prototype.setRot = function(angle){
 
 gdjs.sk.Bone.prototype.setSx = function(sx){
     var prevSx = this.sx;
-    this.sx = this.restSx * sx;
+    this.sx = this.shared.restSx * sx;
     if(this.sx !== prevSx){
         this._updateMatrix = true;
     }
@@ -93,7 +114,7 @@ gdjs.sk.Bone.prototype.setSx = function(sx){
 
 gdjs.sk.Bone.prototype.setSy = function(sy){
     var prevSy = this.sy;
-    this.sy = this.restSy * sy;
+    this.sy = this.shared.restSy * sy;
     if(this.sy !== prevSy){
         this._updateMatrix = true;
     }
@@ -102,8 +123,8 @@ gdjs.sk.Bone.prototype.setSy = function(sy){
 gdjs.sk.Bone.prototype.setScale = function(sx, sy){
     var prevSx = this.sx;
     var prevSy = this.sy;
-    this.sx = this.restSx * sx;
-    this.sy = this.restSy * sy;
+    this.sx = this.shared.restSx * sx;
+    this.sy = this.shared.restSy * sy;
     if(this.sx !== prevSx || this.sy !== prevSy){
         this._updateMatrix = true;
     }

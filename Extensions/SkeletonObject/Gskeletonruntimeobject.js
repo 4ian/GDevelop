@@ -22,14 +22,10 @@ gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
     this.timeScale = 1.0;
     this.scaleX = 1.0;
     this.scaleY = 1.0;
-    this.renderer = new gdjs.SkeletonRuntimeObjectRenderer();
     this.hitboxSlot = null;
-    
-    var skeletalData = this.renderer.getData(objectData.skeletalDataFilename);
-    // Main loaders
-    if(objectData.apiName === "DragonBones"){
-        this.loadDragonBones(runtimeScene, skeletalData, objectData);
-    }
+
+    this.manager = gdjs.SkeletonObjectsManager.getManager(runtimeScene);
+    this.getSkeletonData(runtimeScene, objectData);
 };
 gdjs.SkeletonRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
 gdjs.SkeletonRuntimeObject.thisIsARuntimeObjectConstructor = "SkeletonObject::Skeleton";
@@ -41,21 +37,15 @@ gdjs.SkeletonRuntimeObject.prototype.extraInitializationFromInitialInstance = fu
     }
 };
 
-gdjs.SkeletonRuntimeObject.prototype.loadDragonBones = function(runtimeScene, skeletalData, objectData){
-    // Load sub-textures
-    this.renderer.loadDragonBones(runtimeScene, objectData);
-    // Load the root armature with the given name
-    for(var i=0; i<skeletalData.armature.length; i++){
-        if(skeletalData.armature[i].name === objectData.rootArmatureName){
-            this.rootArmature.loadDragonBones(skeletalData, i, this.renderer.textures, objectData.debugPolygons);
-        }
+gdjs.SkeletonRuntimeObject.prototype.getSkeletonData = function(runtimeScene, objectData){
+    var skeletonData = this.manager.getSkeleton(runtimeScene, this.name, objectData);
+
+    if(skeletonData.armatures.length > 0){
+        this.rootArmature.loadData(skeletonData.armatures[skeletonData.rootArmature],
+                                   skeletonData,
+                                   objectData.debugPolygons);
+        this.rootArmature.resetState();
     }
-    // If the name was not found, load the first armature
-    if(!this.rootArmature.loaded && skeletalData.armature.length > 0){
-        this.rootArmature.loadDragonBones(skeletalData, 0, this.renderer.textures, objectData.debugPolygons);
-    }
-    this.rootArmature.renderer.putInScene(this, runtimeScene);
-    this.customHitboxes = [];
 };
 
 // RuntimeObject overwrites
@@ -469,7 +459,7 @@ gdjs.SkeletonRuntimeObject.prototype.getBone = function(bonePath){
 };
 
 gdjs.SkeletonRuntimeObject.prototype.getPolygons = function(slotPath){
-    if(slotPath === "" && this.rootArmature !== undefined){
+    if(slotPath === ""){
         return this.rootArmature.getHitBoxes();
     }
 

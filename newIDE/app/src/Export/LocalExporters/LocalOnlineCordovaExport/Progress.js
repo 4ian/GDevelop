@@ -5,6 +5,7 @@ import CircularProgress from 'material-ui/CircularProgress';
 import LinearProgress from 'material-ui/LinearProgress';
 import FlatButton from 'material-ui/FlatButton';
 import { Line, Spacer } from '../../../UI/Grid';
+import HelpButton from '../../../UI/HelpButton';
 
 export default ({
   exportStep,
@@ -16,6 +17,7 @@ export default ({
   buildMax,
   buildProgress,
   errored,
+  onPlayStore,
 }) => (
   <Stepper
     activeStep={
@@ -69,9 +71,7 @@ export default ({
       <StepLabel>Build</StepLabel>
       <StepContent>
         {errored ? (
-          <p>
-            Something wrong happened :(
-          </p>
+          <p>Something wrong happened :(</p>
         ) : exportStep === 'waiting-for-build' ? (
           <Line alignItems="center">
             <CircularProgress size={20} />
@@ -95,6 +95,10 @@ export default ({
       <StepContent>
         <Line>
           <RaisedButton label="Download" primary onClick={onDownload} />
+          <HelpButton
+            label="Upload to Play Store"
+            helpPagePath="/publishing/android_and_ios/play-store"
+          />
           <FlatButton label="See logs" onClick={onDownloadLogs} />
         </Line>
         <Line expand>

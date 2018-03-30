@@ -17,6 +17,7 @@ import ContextMenu from '../../../UI/Menu/ContextMenu';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
+import CollisionMasksEditor from './CollisionMasksEditor';
 import { deleteSpritesFromAnimation } from './Utils/SpriteObjectHelper';
 
 const gd = global.gd;
@@ -283,6 +284,7 @@ class AnimationsListContainer extends Component {
 export default class SpriteEditor extends Component {
   state = {
     pointsEditorOpen: false,
+    collisionMasksEditorOpen: false,
   };
 
   constructor(props) {
@@ -297,10 +299,10 @@ export default class SpriteEditor extends Component {
     });
   };
 
-  openHitboxesEditor = (open = true) => {
-    alert(
-      "Hitboxes editor is not ready yet! We're working on it and it will be available soon."
-    );
+  openCollisionMasksEditor = (open = true) => {
+    this.setState({
+      collisionMasksEditorOpen: open,
+    });
   };
 
   render() {
@@ -327,7 +329,7 @@ export default class SpriteEditor extends Component {
               <RaisedButton
                 label="Edit hitboxes"
                 primary={false}
-                onClick={() => this.openHitboxesEditor(true)}
+                onClick={() => this.openCollisionMasksEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
               />
               <RaisedButton
@@ -359,7 +361,31 @@ export default class SpriteEditor extends Component {
               resourcesLoader={this.resourcesLoader}
               project={project}
               onPointsUpdated={() =>
-                this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+                this.forceUpdate() /*Force update to ensure dialog is properly positioned*/}
+            />
+          </Dialog>
+        )}
+        {this.state.collisionMasksEditorOpen && (
+          <Dialog
+            actions={
+              <FlatButton
+                label="Close"
+                primary
+                onClick={() => this.openCollisionMasksEditor(false)}
+              />
+            }
+            autoScrollBodyContent
+            noMargin
+            modal
+            onRequestClose={() => this.openCollisionMasksEditor(false)}
+            open={this.state.collisionMasksEditorOpen}
+          >
+            <CollisionMasksEditor
+              object={spriteObject}
+              resourcesLoader={this.resourcesLoader}
+              project={project}
+              onCollisionMasksUpdated={() =>
+                this.forceUpdate() /*Force update to ensure dialog is properly positioned*/}
             />
           </Dialog>
         )}

@@ -37,6 +37,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   children?: any,
   style?: Object,
+  onImageLoaded?: (number, number) => void,
 |};
 
 type State = {|
@@ -71,8 +72,7 @@ export default class ImagePreview extends React.Component<Props, State> {
       errored: false,
       imageWidth: null,
       imageHeight: null,
-      imageSource:
-        resourcesLoader.getResourceFullUrl(project, resourceName),
+      imageSource: resourcesLoader.getResourceFullUrl(project, resourceName),
     };
   }
 
@@ -92,10 +92,14 @@ export default class ImagePreview extends React.Component<Props, State> {
   _handleImageLoaded = (e: any) => {
     const imgElement = e.target;
 
+    const imageWidth = imgElement ? imgElement.clientWidth : 0;
+    const imageHeight = imgElement ? imgElement.clientHeight : 0;
     this.setState({
-      imageWidth: imgElement ? imgElement.clientWidth : 0,
-      imageHeight: imgElement ? imgElement.clientHeight : 0,
+      imageWidth,
+      imageHeight,
     });
+    if (this.props.onImageLoaded)
+      this.props.onImageLoaded(imageWidth, imageHeight);
   };
 
   render() {

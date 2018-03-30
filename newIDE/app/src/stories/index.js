@@ -23,6 +23,7 @@ import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
 import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
 import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
+import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ImageThumbnail from '../ObjectEditor/ImageThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
@@ -419,6 +420,15 @@ storiesOf('SpriteEditor and related editors', module)
   .add('PointsEditor', () => (
     <SerializedObjectDisplay object={spriteObject}>
       <PointsEditor
+        object={spriteObject}
+        project={project}
+        resourcesLoader={ResourcesLoader}
+      />
+    </SerializedObjectDisplay>
+  ))
+  .add('CollisionMasksEditor', () => (
+    <SerializedObjectDisplay object={spriteObject}>
+      <CollisionMasksEditor
         object={spriteObject}
         project={project}
         resourcesLoader={ResourcesLoader}

@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import { mapVector } from '../../../../Utils/MapFor';
 
 const styles = {
@@ -40,21 +40,39 @@ export default class CollisionMasksPreview extends React.Component<
   _renderPolygons() {
     const { polygons } = this.props;
 
-    return mapVector(polygons, (polygon, i) => {
-      const vertices = polygon.getVertices();
-      return (
-        <polygon
-          fill="rgba(255,0,0,0.2)"
-          stroke="rgba(255,0,0,0.5)"
-          strokeWidth={1}
-          fileRule="evenodd"
-          points={mapVector(
-            vertices,
-            (vertex, j) => `${vertex.get_x()},${vertex.get_y()}`
-          ).join(' ')}
-        />
-      );
-    });
+    return (
+      <React.Fragment>
+        {mapVector(polygons, (polygon, i) => {
+          const vertices = polygon.getVertices();
+          return (
+            <polygon
+              key={`polygon-${i}`}
+              fill="rgba(255,0,0,0.2)"
+              stroke="rgba(255,0,0,0.5)"
+              strokeWidth={1}
+              fileRule="evenodd"
+              points={mapVector(
+                vertices,
+                (vertex, j) => `${vertex.get_x()},${vertex.get_y()}`
+              ).join(' ')}
+            />
+          );
+        })}
+        {mapVector(polygons, (polygon, i) => {
+          const vertices = polygon.getVertices();
+          return mapVector(vertices, (vertex, j) => (
+            <circle
+              key={`polygon-${i}-vertex-${j}`}
+              fill="rgba(255,0,0,0.5)"
+              strokeWidth={1}
+              cx={vertex.get_x()}
+              cy={vertex.get_y()}
+              r={3}
+            />
+          ));
+        })}
+      </React.Fragment>
+    );
   }
 
   render() {

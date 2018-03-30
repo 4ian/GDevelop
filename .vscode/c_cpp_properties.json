@@ -24,9 +24,9 @@
                 "__WXMAC__",
                 "__WXOSX__",
                 "__WXOSX_COCOA__",
-                "GD_CORE_API=\/* Macro used to export classes on Windows, please ignore *\/",
-                "GD_API=\/* Macro used to export classes on Windows, please ignore *\/",
-                "GD_EXTENSION_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
+                "GD_API=/* Macro used to export classes on Windows, please ignore */",
+                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */",
                 "WXUSINGDLL"
             ],
             "intelliSenseMode": "clang-x64",
@@ -45,7 +45,10 @@
             "macFrameworkPath": [
                 "/System/Library/Frameworks",
                 "/Library/Frameworks"
-            ]
+            ],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
         },
         {
             "name": "Linux",
@@ -66,9 +69,9 @@
                 "__WXMAC__",
                 "__WXOSX__",
                 "__WXOSX_COCOA__",
-                "GD_CORE_API=\/* Macro used to export classes on Windows, please ignore *\/",
-                "GD_API=\/* Macro used to export classes on Windows, please ignore *\/",
-                "GD_EXTENSION_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
+                "GD_API=/* Macro used to export classes on Windows, please ignore */",
+                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */",
                 "WXUSINGDLL"
             ],
             "intelliSenseMode": "clang-x64",
@@ -102,9 +105,9 @@
                 "__WXMAC__",
                 "__WXOSX__",
                 "__WXOSX_COCOA__",
-                "GD_CORE_API=\/* Macro used to export classes on Windows, please ignore *\/",
-                "GD_API=\/* Macro used to export classes on Windows, please ignore *\/",
-                "GD_EXTENSION_API=\/* Macro used to export classes on Windows, please ignore *\/",
+                "GD_CORE_API=/* Macro used to export classes on Windows, please ignore */",
+                "GD_API=/* Macro used to export classes on Windows, please ignore */",
+                "GD_EXTENSION_API=/* Macro used to export classes on Windows, please ignore */",
                 "WXUSINGDLL"
             ],
             "intelliSenseMode": "msvc-x64",

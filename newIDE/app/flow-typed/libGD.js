@@ -24,5 +24,7 @@ declare type gdParameterMetadata = EmscriptenObject;
 declare type gdVariable = EmscriptenObject;
 declare type gdVariablesContainer = EmscriptenObject;
 
+declare type gdVectorPolygon2d = EmscriptenObject;
+
 //Represents all objects that have serializeTo and unserializeFrom methods.
 declare type gdSerializable = EmscriptenObject;

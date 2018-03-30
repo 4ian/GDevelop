@@ -19,12 +19,9 @@ const SortableAddPointRow = SortableElement(AddPointRow);
 const SortablePointRow = SortableElement(PointRow);
 
 class PointsListBody extends Component {
-  constructor() {
-    super();
-    this.state = {
-      nameErrors: {},
-    };
-  }
+  state = {
+    nameErrors: {},
+  };
 
   _onPointsUpdated() {
     this.forceUpdate();

@@ -195,7 +195,10 @@ export default class CollisionMasksEditor extends Component {
           project={project}
         >
           {hasValidSprite && (
-            <CollisionMasksPreview polygons={sprite.getCustomCollisionMask()} />
+            <CollisionMasksPreview
+              isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
+              polygons={sprite.getCustomCollisionMask()}
+            />
           )}
         </ImagePreview>
         <Line>

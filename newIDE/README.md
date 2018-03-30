@@ -97,7 +97,6 @@ yarn deploy #or npm run deploy
 This new editor is still in development and is missing some features:
 
 - [ ] Support for translations (See an [example of a component that can be translated](https://github.com/4ian/GD/blob/master/newIDE/app/src/MainFrame/Toolbar.js#L44))
-- [ ] [Collision mask editor](https://trello.com/c/2Kzwj61r/47-collision-masks-editors-for-sprite-objects-in-the-new-ide)
 - [ ] Support for native games
 - [ ] More [documentation](http://wiki.compilgames.net/doku.php/gdevelop5/start) about how to package for iOS/Android with Cordova/PhoneGap Build or Cocos2d-JS.
 - [ ] Search in events

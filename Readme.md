@@ -9,7 +9,7 @@ Getting started [![Build Status](https://semaphoreci.com/api/v1/4ian/gd/branches
 
 | ❔ I want to... | 🚀 What to do |
 | --- | --- |
-| Download GDevelop to make games | Go on [GDevelop website](http://compilgames.net) to download GD! |
+| Download GDevelop to make games | Go on [GDevelop website](https://gdevelop-app.com) to download GD! |
 | Contribute to the new editor | Download [Node.js] and follow this [README](newIDE/README.md). |
 | Contribute to the old C++ editor | Download and launch [CMake], choose this directory as the source, generate the Makefile and launch it. Be sure to have [required development libraries](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) installed. <br><br> Fully detailed instructions are [available here](http://4ian.github.io/GD-Documentation). |
 | Help to translate GDevelop | Go on the [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop). |
@@ -36,7 +36,7 @@ Links
 ### Community
 
 * [GDevelop forums](http://forum.compilgames.net)
-* [GDevelop homepage](http://www.compilgames.net) ([open source](https://github.com/4ian/GDevelop-website))
+* [GDevelop homepage](https://gdevelop-app.com) ([open-source](https://github.com/4ian/GDevelop-website))
 * [GDevelop wiki](http://wiki.compilgames.net)
 * Help translate GD in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).
 * [GDevelop Nightly Builds](http://nightlies.gd.victorlevasseur.com/) (powered by a [Buildbot](https://github.com/victorlevasseur/GD-Buildbot)) ([open source](https://github.com/victorlevasseur/GD-Nightlies-Website))

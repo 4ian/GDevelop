@@ -26,6 +26,11 @@ const SortablePolygonRow = SortableElement(PolygonRow);
 type PolygonsListBodyProps = {|
   polygons: gdVectorPolygon2d,
   onPolygonsUpdated: () => void,
+
+  // Sprite size is useful to make sure polygon vertices
+  // are not put outside the sprite bounding box, which is not supported:
+  spriteWidth: number,
+  spriteHeight: number,
 |};
 
 class PolygonsListBody extends Component<PolygonsListBodyProps, void> {
@@ -35,12 +40,14 @@ class PolygonsListBody extends Component<PolygonsListBodyProps, void> {
   }
 
   updateVerticeX = (vertice, newValue) => {
-    vertice.set_x(newValue);
+    // Ensure vertice stays inside the sprite bounding box.
+    vertice.set_x(Math.min(this.props.spriteWidth, Math.max(newValue, 0)));
     this._onPolygonUpdated();
   };
 
   updateVerticeY = (vertice, newValue) => {
-    vertice.set_y(newValue);
+    // Ensure vertice stays inside the sprite bounding box.
+    vertice.set_y(Math.min(this.props.spriteHeight, Math.max(newValue, 0)));
     this._onPolygonUpdated();
   };
 
@@ -107,6 +114,10 @@ class PolygonsListBody extends Component<PolygonsListBodyProps, void> {
         disabled
         onAdd={() => {
           const newPolygon = gd.Polygon2d.createRectangle(32, 32);
+          newPolygon.move(
+            this.props.spriteWidth / 2,
+            this.props.spriteHeight / 2
+          );
           polygons.push_back(newPolygon);
 
           this._onPolygonUpdated();
@@ -132,6 +143,8 @@ SortablePolygonsListBody.muiName = 'TableBody';
 type Props = {|
   polygons: gdVectorPolygon2d,
   onPolygonsUpdated: () => void,
+  spriteWidth: number,
+  spriteHeight: number,
 |};
 
 export default class PolygonsList extends Component<Props, void> {
@@ -154,6 +167,8 @@ export default class PolygonsList extends Component<Props, void> {
         <SortablePolygonsListBody
           polygons={this.props.polygons}
           onPolygonsUpdated={this.props.onPolygonsUpdated}
+          spriteWidth={this.props.spriteWidth}
+          spriteHeight={this.props.spriteHeight}
           onSortEnd={({ oldIndex, newIndex }) => {
             // Reordering polygons is not supported for now
           }}

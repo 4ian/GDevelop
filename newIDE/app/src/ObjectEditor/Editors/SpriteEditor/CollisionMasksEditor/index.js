@@ -22,6 +22,8 @@ export default class CollisionMasksEditor extends Component {
     spriteIndex: 0,
     sameCollisionMasksForAnimations: true,
     sameCollisionMasksForSprites: true,
+    spriteWidth: 0,
+    spriteHeight: 0,
   };
 
   componentDidMount() {
@@ -168,6 +170,13 @@ export default class CollisionMasksEditor extends Component {
     );
   };
 
+  _setCurrentSpriteSize = (spriteWidth: number, spriteHeight: number) => {
+    this.setState({
+      spriteWidth,
+      spriteHeight,
+    });
+  };
+
   render() {
     const { object, resourcesLoader, project } = this.props;
     const {
@@ -176,6 +185,8 @@ export default class CollisionMasksEditor extends Component {
       animationIndex,
       directionIndex,
       spriteIndex,
+      spriteWidth,
+      spriteHeight,
     } = this.state;
     const spriteObject = gd.asSpriteObject(object);
 
@@ -193,6 +204,7 @@ export default class CollisionMasksEditor extends Component {
           resourceName={hasValidSprite ? sprite.getImageName() : ''}
           resourcesLoader={resourcesLoader}
           project={project}
+          onImageLoaded={this._setCurrentSpriteSize}
         >
           {hasValidSprite && (
             <CollisionMasksPreview
@@ -228,6 +240,8 @@ export default class CollisionMasksEditor extends Component {
               <PolygonsList
                 polygons={sprite.getCustomCollisionMask()}
                 onPolygonsUpdated={this._updateCollisionMasks}
+                spriteWidth={spriteWidth}
+                spriteHeight={spriteHeight}
               />
               <Line justifyContent="center">
                 <FlatButton

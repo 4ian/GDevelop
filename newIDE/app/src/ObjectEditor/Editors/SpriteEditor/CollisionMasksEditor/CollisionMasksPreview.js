@@ -1,7 +1,6 @@
 // @flow
 import React from 'react';
 import { mapVector } from '../../../../Utils/MapFor';
-import Measure from 'react-measure';
 
 const styles = {
   container: {

@@ -1,8 +1,5 @@
 import React, { Component } from 'react';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
-import Toggle from 'material-ui/Toggle';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
@@ -14,6 +11,7 @@ import {
   allSpritesHaveSameCollisionMasksAs,
   copyAnimationsSpriteCollisionMasks,
 } from '../Utils/SpriteObjectHelper';
+import SpriteSelector from '../Utils/SpriteSelector';
 import every from 'lodash/every';
 const gd = global.gd;
 
@@ -126,7 +124,7 @@ export default class CollisionMasksEditor extends Component {
     this._updateCollisionMasks();
   };
 
-  _onToggleSamePointsForAnimation = enable => {
+  _setSameCollisionMasksForAllAnimations = enable => {
     if (enable) {
       // eslint-disable-next-line
       const answer = confirm(
@@ -148,7 +146,7 @@ export default class CollisionMasksEditor extends Component {
     );
   };
 
-  _onToggleSameCollisionMasksForSprites = enable => {
+  _setSameCollisionMasksForAllSprites = enable => {
     if (enable) {
       // eslint-disable-next-line
       const answer = confirm(
@@ -182,14 +180,7 @@ export default class CollisionMasksEditor extends Component {
     const spriteObject = gd.asSpriteObject(object);
 
     if (!object.getAnimationsCount()) return null;
-    const {
-      hasValidAnimation,
-      animation,
-      hasValidDirection,
-      direction,
-      hasValidSprite,
-      sprite,
-    } = getCurrentElements(
+    const { hasValidSprite, sprite } = getCurrentElements(
       spriteObject,
       animationIndex,
       directionIndex,
@@ -203,80 +194,28 @@ export default class CollisionMasksEditor extends Component {
           resourcesLoader={resourcesLoader}
           project={project}
         >
-          {hasValidSprite && <CollisionMasksPreview polygons={sprite.getCustomCollisionMask()} />}
+          {hasValidSprite && (
+            <CollisionMasksPreview polygons={sprite.getCustomCollisionMask()} />
+          )}
         </ImagePreview>
         <Line>
           <Column expand>
-            <Toggle
-              label="Share same collision masks for all animations"
-              labelPosition="right"
-              toggled={sameCollisionMasksForAnimations}
-              onToggle={(e, checked) =>
-                this._onToggleSamePointsForAnimation(checked)}
-            />
-            <Line>
-              {!sameCollisionMasksForAnimations && ( //TODO: factor with points editor?
-                <SelectField
-                  floatingLabelText="Animation"
-                  value={this.state.animationIndex}
-                  onChange={(e, i, value) => this.chooseAnimation(value)}
-                >
-                  {mapFor(0, spriteObject.getAnimationsCount(), i => {
-                    const animation = spriteObject.getAnimation(i);
-                    return (
-                      <MenuItem
-                        key={i}
-                        value={i}
-                        primaryText={`Animation #${i} ${animation.getName()}`}
-                      />
-                    );
-                  })}
-                </SelectField>
-              )}
-              {!sameCollisionMasksForAnimations &&
-                hasValidAnimation &&
-                animation.getDirectionsCount() > 1 && (
-                  <SelectField
-                    floatingLabelText="Direction"
-                    value={this.state.directionIndex}
-                    onChange={(e, i, value) => this.chooseDirection(value)}
-                  >
-                    {mapFor(0, animation.getDirectionsCount(), i => {
-                      return (
-                        <MenuItem
-                          value={i}
-                          key={i}
-                          primaryText={`Direction #${i}`}
-                        />
-                      );
-                    })}
-                  </SelectField>
-                )}
-              {!sameCollisionMasksForSprites &&
-                hasValidDirection && (
-                  <SelectField
-                    floatingLabelText="Frame"
-                    value={this.state.spriteIndex}
-                    onChange={(e, i, value) => this.chooseSprite(value)}
-                  >
-                    {mapFor(0, direction.getSpritesCount(), i => {
-                      return (
-                        <MenuItem
-                          value={i}
-                          key={i}
-                          primaryText={`Frame #${i}`}
-                        />
-                      );
-                    })}
-                  </SelectField>
-                )}
-            </Line>
-            <Toggle
-              label="Share same collision masks for all sprites of the animation"
-              labelPosition="right"
-              toggled={sameCollisionMasksForSprites}
-              onToggle={(e, checked) =>
-                this._onToggleSameCollisionMasksForSprites(checked)}
+            <SpriteSelector
+              spriteObject={spriteObject}
+              animationIndex={animationIndex}
+              directionIndex={directionIndex}
+              spriteIndex={spriteIndex}
+              chooseAnimation={this.chooseAnimation}
+              chooseDirection={this.chooseDirection}
+              chooseSprite={this.chooseSprite}
+              sameForAllAnimations={sameCollisionMasksForAnimations}
+              sameForAllSprites={sameCollisionMasksForSprites}
+              setSameForAllAnimations={
+                this._setSameCollisionMasksForAllAnimations
+              }
+              setSameForAllSprites={this._setSameCollisionMasksForAllSprites}
+              setSameForAllAnimationsLabel="Share same collision masks for all animations"
+              setSameForAllSpritesLabel="Share same collision masks for all sprites of this animation"
             />
           </Column>
         </Line>
@@ -287,11 +226,13 @@ export default class CollisionMasksEditor extends Component {
                 polygons={sprite.getCustomCollisionMask()}
                 onPolygonsUpdated={this._updateCollisionMasks}
               />
-              <FlatButton
-                label="Restore the default collision mask"
-                primary={false}
-                onClick={() => this._onSetCollisionMaskAutomatic(true)}
-              />
+              <Line justifyContent="center">
+                <FlatButton
+                  label="Restore the default collision mask"
+                  primary={false}
+                  onClick={() => this._onSetCollisionMaskAutomatic(true)}
+                />
+              </Line>
             </React.Fragment>
           )}
         {!!sprite &&
@@ -301,11 +242,13 @@ export default class CollisionMasksEditor extends Component {
                 This sprite uses the default collision mask, a rectangle that is
                 as large as the sprite.
               </EmptyMessage>
-              <FlatButton
-                label="Use a custom collision mask"
-                primary={false}
-                onClick={() => this._onSetCollisionMaskAutomatic(false)}
-              />
+              <Line justifyContent="center">
+                <FlatButton
+                  label="Use a custom collision mask"
+                  primary={false}
+                  onClick={() => this._onSetCollisionMaskAutomatic(false)}
+                />
+              </Line>
             </React.Fragment>
           )}
         {!sprite && (

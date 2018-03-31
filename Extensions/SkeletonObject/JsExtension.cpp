@@ -36,6 +36,7 @@ public:
             .AddIncludeFile("Extensions/SkeletonObject/Eskarmature.js")
             .AddIncludeFile("Extensions/SkeletonObject/Dskslot.js")
             .AddIncludeFile("Extensions/SkeletonObject/Cskbone.js")
+            .AddIncludeFile("Extensions/SkeletonObject/Bskeletonruntimeobject-cocos-renderer.js")
             .AddIncludeFile("Extensions/SkeletonObject/Bskeletonruntimeobject-pixi-renderer.js")
             .AddIncludeFile("Extensions/SkeletonObject/Ask.js");
 

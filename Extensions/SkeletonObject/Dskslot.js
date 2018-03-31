@@ -255,6 +255,7 @@ gdjs.sk.Slot.prototype.loadData = function(slotData, skeletalData, textures, deb
             if(skeletalData.armatures[i].name === this.shared.path){
 
                 this.childArmature = new gdjs.sk.Armature(this.armature.skeleton, this.armature, this);
+                this.childArmature.getRenderer().extraInitialization(this.armature.getRenderer());
                 this.childArmature.loadData(skeletalData.armatures[i], skeletalData, debugPolygons);
                 this.addChild(this.childArmature);
 
@@ -435,19 +436,12 @@ gdjs.sk.Slot.prototype.update = function(){
     gdjs.sk.Transform.prototype.update.call(this);
 
     if(this._updateRender && (this.shared.type === gdjs.sk.SLOT_IMAGE || this.shared.type === gdjs.sk.SLOT_MESH)){
-        var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix, this.renderer.skewSupported());
-        this.renderer.setPos(transform.x, transform.y);
-        this.renderer.setScale(transform.sx, transform.sy);
-        if(this.renderer.skewSupported()){
-            this.renderer.setSkew(transform.skx, transform.sky);
-        }
-        else{
-            this.renderer.setRotation(transform.rot);
-        }
+        var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix);
+        this.renderer.setTransform(transform);
     }
 
     if(this._updateRender && this.debugRenderer){
-        var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix, this.debugRenderer.skewSupported());
+        var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix);
         this.debugRenderer.setTransform(transform);
     }
 

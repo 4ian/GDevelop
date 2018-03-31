@@ -1320,7 +1320,6 @@ gdjs.sk.SharedZOrderAnimator.prototype.isAnimated = function(){
 
 gdjs.sk.ZOrderAnimator = function(){
     this.shared = null;
-
     this.target = [];
     this.armature = null;
     this.lastFrameSet = -1;

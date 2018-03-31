@@ -17,6 +17,8 @@ gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
     this.rootArmature = new gdjs.sk.Armature(this);
+    this.rootArmature.getRenderer().putInScene(this, runtimeScene);
+    this.rootArmature.isRoot = true;
     this.animationPlaying = true;
     this.animationSmooth = true;
     this.timeScale = 1.0;
@@ -44,6 +46,7 @@ gdjs.SkeletonRuntimeObject.prototype.getSkeletonData = function(runtimeScene, ob
         this.rootArmature.loadData(skeletonData.armatures[skeletonData.rootArmature],
                                    skeletonData,
                                    objectData.debugPolygons);
+
         this.rootArmature.resetState();
     }
 };

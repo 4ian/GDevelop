@@ -381,7 +381,7 @@ gdjs.sk.Transform._statics = {
     }
 };
 
-gdjs.sk.Transform.decomposeMatrix = function(matrix, skewSupported){
+gdjs.sk.Transform.decomposeMatrix = function(matrix){
     var transform = gdjs.sk.Transform._statics.transform;
 
     transform.x = matrix.tx
@@ -390,16 +390,9 @@ gdjs.sk.Transform.decomposeMatrix = function(matrix, skewSupported){
     var sy = Math.sqrt(matrix.b*matrix.b + matrix.d*matrix.d);
     transform.sx = sx;
     transform.sy = sy;
-    if(skewSupported){
-        transform.skx = -Math.atan2(matrix.d, matrix.b) + Math.PI/2.0;
-        transform.sky =  Math.atan2(matrix.c, matrix.a);
-        transform.rot = 0;
-    }
-    else{
-        transform.rot = Math.atan2(-matrix.b/sy, matrix.a/sx);
-        transform.skx = 0;
-        transform.sky = 0;
-    }
+    transform.skx = -Math.atan2(matrix.d, matrix.b) + Math.PI/2.0;
+    transform.sky =  Math.atan2(matrix.c, matrix.a);
+    transform.rot = Math.atan2(-matrix.b/sy, matrix.a/sx);
 
     return transform;
 };

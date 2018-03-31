@@ -98,6 +98,7 @@ gdjs.sk.Armature = function(skeleton, parentArmature=null, parentSlot=null){
     this.currentAnimation = -1;
     this.renderer = new gdjs.sk.ArmatureRenderer();
     this.debugRenderer = null;
+    this.isRoot = false;
 };
 gdjs.sk.Armature.prototype = Object.create(gdjs.sk.Transform.prototype);
 
@@ -153,6 +154,10 @@ gdjs.sk.Armature.prototype.updateAnimation = function(delta){
     }
 };
 
+gdjs.sk.Armature.prototype.getRenderer = function(){
+    return this.renderer;
+};
+
 gdjs.sk.Armature.prototype.getRendererObject = function(){
     return this.renderer.getRendererObject();
 };
@@ -178,7 +183,7 @@ gdjs.sk.Armature.prototype.setRenderers = function(){
         }
     }
 
-    if(this.debugRenderer){
+    if(this.isRoot){
         this.renderer.addDebugRenderer(this.debugRenderer);
     }
 };
@@ -327,7 +332,7 @@ gdjs.sk.Armature.prototype.update = function(){
     gdjs.sk.Transform.prototype.update.call(this);
 
     if(this.debugRenderer){
-        var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix, this.debugRenderer.skewSupported());
+        var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix);
         this.debugRenderer.setTransform(transform);
     }
 };

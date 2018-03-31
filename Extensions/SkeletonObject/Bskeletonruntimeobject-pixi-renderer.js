@@ -53,18 +53,19 @@ gdjs.sk.ArmaturePixiRenderer.prototype.getRendererObject = function(){
 };
 
 gdjs.sk.ArmaturePixiRenderer.prototype.addRenderer = function(renderer){
-    // this.container.addChild(renderer.getRendererObject());
     this.slotsRenderers.addChild(renderer.getRendererObject());
 };
 
 gdjs.sk.ArmaturePixiRenderer.prototype.sortRenderers = function(){
-    // this.container.children.sort(function(a, b){ return a.z - b.z; });
     this.slotsRenderers.children.sort(function(a, b){ return a.z - b.z; });
 };
 
 gdjs.sk.ArmaturePixiRenderer.prototype.addDebugRenderer = function(renderer){
-    // this.container.addChild(renderer.getRendererObject());
     this.debugRenderers.addChild(renderer.getRendererObject());
+};
+
+gdjs.sk.ArmaturePixiRenderer.prototype.extraInitialization = function(parentArmatureRenderer){
+
 };
 
 
@@ -104,29 +105,14 @@ gdjs.sk.SlotPixiRenderer.prototype.getHeight = function(){
     return this.renderer.height;
 };
 
-gdjs.sk.SlotPixiRenderer.prototype.setPos = function(x, y){
-    this.renderer.x = x;
-    this.renderer.y = y;
+gdjs.sk.SlotPixiRenderer.prototype.setTransform = function(transform){
+    this.renderer.x = transform.x;
+    this.renderer.y = transform.y;
+    this.renderer.scale.x = transform.sx;
+    this.renderer.scale.y = transform.sy;
+    this.renderer.skew.x = transform.skx;
+    this.renderer.skew.y = transform.sky;
 };
-
-gdjs.sk.SlotPixiRenderer.prototype.setRotation = function(angle){
-    this.renderer.rotation = angle;
-};
-
-gdjs.sk.SlotPixiRenderer.prototype.setScale = function(sx, sy){
-    this.renderer.scale.x = sx;
-    this.renderer.scale.y = sy;
-};
-
-gdjs.sk.SlotPixiRenderer.prototype.skewSupported = function(){
-    return true;
-};
-
-gdjs.sk.SlotPixiRenderer.prototype.setSkew = function(skewX, skewY){
-    this.renderer.skew.x = skewX;
-    this.renderer.skew.y = skewY;
-};
-
 
 gdjs.sk.SlotPixiRenderer.prototype.setZ = function(z){
     this.renderer.z = z;
@@ -168,7 +154,7 @@ gdjs.sk.DebugPixiRenderer.prototype.loadVertices = function(verts, color, fill){
     if(fill){
         this.renderer.beginFill(color, 0.1);
     }
-    this.renderer.lineStyle(2, color, 0.8);
+    this.renderer.lineStyle(3, color, 0.8);
     for(var i=0; i<verts.length; i++){
         this.renderer.drawPolygon(verts.reduce(function(a, b){ return a.concat(b); }).concat(verts[0]));
     }

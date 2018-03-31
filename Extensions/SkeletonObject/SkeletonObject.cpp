@@ -19,12 +19,12 @@ This project is released under the MIT License.
 #include "SkeletonObject.h"
 #include "GDCore/String.h"
 #include "GDCpp/Runtime/ResourcesLoader.h"
-#include <wx/filename.h>
 
 #include <iostream>
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
+#include <wx/filename.h>
 
 sf::Texture SkeletonObject::edittimeIconImage;
 sf::Sprite SkeletonObject::edittimeIcon;
@@ -130,7 +130,7 @@ void SkeletonObject::UpdateSize(gd::Project & project)
     wxFileName fileName(skeletalDataFilename.ToWxString());
     fileName.SetPath(projectDir);
 
-    // Can't unserialize from JSON's with empty arrays/objects
+    // Can't unserialize from JSON's with empty arrays/objects ?
     // gd::String fileContent = gd::ResourcesLoader::Get()->LoadPlainText(gd::String::FromWxString(fileName.GetFullPath()));
     // gd::SerializerElement element = gd::Serializer::FromJSON(fileContent);
 }

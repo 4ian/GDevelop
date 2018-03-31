@@ -83,11 +83,10 @@
     color: rgb(27, 143, 1);
 }
 
-.gd-events-sheet-default-theme
-.instruction-parameter.object,
-.instruction-parameter.objectPtr,
-.instruction-parameter.objectList,
-.instruction-parameter.objectListWithoutPicking {
+.gd-events-sheet-default-theme .instruction-parameter.object,
+.gd-events-sheet-default-theme .instruction-parameter.objectPtr,
+.gd-events-sheet-default-theme .instruction-parameter.objectList,
+.gd-events-sheet-default-theme .instruction-parameter.objectListWithoutPicking {
     color: #3c4698;
     font-weight: bold;
 }

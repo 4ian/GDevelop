@@ -90,11 +90,10 @@
     color: #E8DC59;
 }
 
-.gd-events-sheet-dark-theme
-.instruction-parameter.object,
-.instruction-parameter.objectPtr,
-.instruction-parameter.objectList,
-.instruction-parameter.objectListWithoutPicking {
+.gd-events-sheet-dark-theme .instruction-parameter.object,
+.gd-events-sheet-dark-theme .instruction-parameter.objectPtr,
+.gd-events-sheet-dark-theme .instruction-parameter.objectList,
+.gd-events-sheet-dark-theme .instruction-parameter.objectListWithoutPicking {
     color: #B77CFF;
     font-style: italic;
 }

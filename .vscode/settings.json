@@ -89,5 +89,6 @@
         "newIDE/electron-app/app/www": true
     },
     // Support for Flowtype:
-    "javascript.validate.enable": false
+    "javascript.validate.enable": false,
+    "flow.useNPMPackagedFlow": true
 }

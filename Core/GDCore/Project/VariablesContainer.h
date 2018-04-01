@@ -94,9 +94,15 @@ public:
     Variable & InsertNew(const gd::String & name, std::size_t position = -1);
 
     /**
-     * \brief Remove the specified variable from the container.
+     * \brief Remove the variable with the specified name from the container.
+     * \note This operation is not recursive on variable children.
      */
     void Remove(const gd::String & name);
+
+    /**
+     * \brief Remove the specified variable from the container.
+     */
+    void RemoveRecursively(const gd::Variable & variable);
 
     /**
      * \brief Rename a variable.

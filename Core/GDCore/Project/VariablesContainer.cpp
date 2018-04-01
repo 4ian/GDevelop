@@ -102,6 +102,18 @@ void VariablesContainer::Remove(const gd::String & varName)
         VariableHasName(varName)), variables.end() );
 }
 
+void VariablesContainer::RemoveRecursively(const gd::Variable & variableToRemove)
+{
+    variables.erase(std::remove_if(variables.begin(), variables.end(),
+        [&variableToRemove](const std::pair<gd::String, gd::Variable> & nameAndVariable) {
+            return &variableToRemove == &nameAndVariable.second;
+        }), variables.end() );
+
+    for(auto & it: variables) {
+        it.second.RemoveRecursively(variableToRemove);
+    }
+}
+
 std::size_t VariablesContainer::GetPosition(const gd::String & name) const
 {
     for(std::size_t i = 0;i<variables.size();++i)

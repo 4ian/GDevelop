@@ -153,6 +153,15 @@ public:
      */
     const std::map<gd::String, Variable> & GetAllChildren() const { return children; }
 
+    /**
+     * \brief Search if a variable is part of the children, optionally recursively
+     */
+    bool Contains(const gd::Variable & variableToSearch, bool recursive) const;
+
+    /**
+     * \brief Remove the specified variable if it can be found in the children
+     */
+    void RemoveRecursively(const gd::Variable & variableToRemove);
     ///@}
 
     /** \name Serialization

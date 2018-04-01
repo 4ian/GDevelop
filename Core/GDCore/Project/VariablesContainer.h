@@ -56,14 +56,16 @@ public:
      *
      * \note If index is invalid, an empty variable is returned.
      */
-    std::pair<gd::String, gd::Variable> & Get(std::size_t index);
+    [[deprecated]]
+    std::pair<gd::String, std::shared_ptr<gd::Variable>> & Get(std::size_t index);
 
     /**
      * \brief Return a pair containing the name and the variable at position \index in the container.
      *
      * \note If index is invalid, an empty variable is returned.
      */
-    const std::pair<gd::String, gd::Variable> & Get(std::size_t index) const;
+    [[deprecated]]
+    const std::pair<gd::String, std::shared_ptr<gd::Variable>> & Get(std::size_t index) const;
 
     /**
      * Must add a new variable constructed from the variable passed as parameter.
@@ -95,7 +97,7 @@ public:
 
     /**
      * \brief Remove the variable with the specified name from the container.
-     * \note This operation is not recursive on variable children.
+     * \note This operation is not recursive on variable children
      */
     void Remove(const gd::String & name);
 
@@ -144,8 +146,8 @@ public:
 
 private:
 
-    std::vector < std::pair<gd::String, gd::Variable> > variables;
-    static std::pair<gd::String, Variable> badVariable;
+    std::vector < std::pair<gd::String, std::shared_ptr<gd::Variable>> > variables;
+    static std::pair<gd::String, std::shared_ptr<Variable>> badVariable;
 };
 
 }

@@ -255,10 +255,10 @@ void ChooseVariableDialog::RefreshAll()
 
     for (std::size_t i = 0;i<temporaryContainer->Count();++i)
     {
-        const std::pair<gd::String, gd::Variable> & variable = temporaryContainer->Get(i);
+        const auto & variable = temporaryContainer->Get(i);
 
     	wxTreeListItem item = variablesList->AppendItem(variablesList->GetRootItem(), variable.first);
-        RefreshVariable(item, variable.first, variable.second);
+        RefreshVariable(item, variable.first, *variable.second);
         variablesList->Expand(item);
     }
 
@@ -330,20 +330,11 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
 void ChooseVariableDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 {
     UpdateSelectedAndParentVariable();
-    for (std::size_t i = 1;i<temporaryContainer->Count();++i)
-    {
-        const std::pair<gd::String, gd::Variable> & currentVar = temporaryContainer->Get(i);
-        if ( currentVar.first == selectedVariableName)
-        {
-            const std::pair<gd::String, gd::Variable> & prevVar = temporaryContainer->Get(i-1);
-            temporaryContainer->Swap(i, i-1);
-            RefreshAll();
+    auto position = temporaryContainer->GetPosition(selectedVariableName);
+    temporaryContainer->Move(position, position-1);
+    RefreshAll();
 
-            modificationCount++;
-            return;
-        }
-    }
-
+    modificationCount++;
 }
 
 /**
@@ -352,21 +343,11 @@ void ChooseVariableDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 void ChooseVariableDialog::OnMoveDownVarSelected(wxCommandEvent& event)
 {
     UpdateSelectedAndParentVariable();
-    for (std::size_t i = 0;i<temporaryContainer->Count()-1;++i)
-    {
-        const std::pair<gd::String, gd::Variable> & currentVar = temporaryContainer->Get(i);
-        if ( currentVar.first == selectedVariableName)
-        {
-            const std::pair<gd::String, gd::Variable> & nextVar = temporaryContainer->Get(i+1);
+    auto position = temporaryContainer->GetPosition(selectedVariableName);
+    temporaryContainer->Move(position, position+1);
+    RefreshAll();
 
-            temporaryContainer->Swap(i, i+1);
-            RefreshAll();
-
-            modificationCount++;
-            return;
-        }
-    }
-
+    modificationCount++;
 }
 
 /**

@@ -212,6 +212,7 @@ export default class InstancesEditorContainer extends Component {
     });
     this.windowBorder = new WindowBorder({
       project: props.project,
+      layout: props.layout,
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.windowMask = new WindowMask({

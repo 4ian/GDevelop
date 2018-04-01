@@ -1,9 +1,11 @@
 import PIXI from 'pixi.js';
 import transformRect from '../Utils/TransformRect';
+import { rgbToHexNumber } from '../Utils/ColorTransformer';
 
 export default class WindowBorder {
-  constructor({ project, toCanvasCoordinates }) {
+  constructor({ project, layout, toCanvasCoordinates }) {
     this.project = project;
+    this.layout = layout;
     this.toCanvasCoordinates = toCanvasCoordinates;
 
     this.pixiRectangle = new PIXI.Graphics();
@@ -28,7 +30,15 @@ export default class WindowBorder {
 
     this.pixiRectangle.clear();
     this.pixiRectangle.beginFill(0x000000);
-    this.pixiRectangle.lineStyle(1, 0x000000, 1);
+    this.pixiRectangle.lineStyle(
+      1,
+      rgbToHexNumber(
+        (128 + this.layout.getBackgroundColorRed() % 256),
+        (128 + this.layout.getBackgroundColorBlue() % 256),
+        (128 + this.layout.getBackgroundColorGreen() % 256)
+      ),
+      1
+    );
     this.pixiRectangle.alpha = 1;
     this.pixiRectangle.fillAlpha = 0;
     this.pixiRectangle.drawRect(

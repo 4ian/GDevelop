@@ -245,11 +245,10 @@ gd::String GD_API VariableStructureToJSON(const gd::Variable & variable)
 
     gd::String str = "{";
     bool firstChild = true;
-    for(std::map<gd::String, gd::Variable>::const_iterator i = variable.GetAllChildren().begin();
-        i != variable.GetAllChildren().end();++i)
+    for(auto i = variable.GetAllChildren().begin(); i != variable.GetAllChildren().end();++i)
     {
         if ( !firstChild ) str += ",";
-        str += gd::String::FromUTF8(StringToQuotedJSONString(i->first.c_str()))+": "+VariableStructureToJSON(i->second);
+        str += gd::String::FromUTF8(StringToQuotedJSONString(i->first.c_str()))+": "+VariableStructureToJSON(*i->second);
 
         firstChild = false;
     }

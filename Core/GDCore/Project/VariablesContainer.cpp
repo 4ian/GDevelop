@@ -13,7 +13,8 @@
 
 namespace gd {
 
-std::pair<gd::String, std::shared_ptr<Variable>> VariablesContainer::badVariable = std::make_pair<gd::String, std::shared_ptr<Variable>>("", std::make_shared<gd::Variable>());
+gd::Variable VariablesContainer::badVariable;
+gd::String VariablesContainer::badName;
 
 namespace {
 
@@ -44,29 +45,13 @@ bool VariablesContainer::Has(const gd::String& name) const
     return (i != variables.end());
 }
 
-std::pair<gd::String, std::shared_ptr<gd::Variable>>& VariablesContainer::Get(std::size_t index)
-{
-    if (index < variables.size())
-        return variables[index];
-
-    return badVariable;
-}
-
-const std::pair<gd::String, std::shared_ptr<gd::Variable>>& VariablesContainer::Get(std::size_t index) const
-{
-    if (index < variables.size())
-        return variables[index];
-
-    return badVariable;
-}
-
 Variable& VariablesContainer::Get(const gd::String& name)
 {
     auto i = std::find_if(variables.begin(), variables.end(), VariableHasName(name));
     if (i != variables.end())
         return *i->second;
 
-    return *badVariable.second;
+    return badVariable;
 }
 
 const Variable& VariablesContainer::Get(const gd::String& name) const
@@ -75,7 +60,31 @@ const Variable& VariablesContainer::Get(const gd::String& name) const
     if (i != variables.end())
         return *i->second;
 
-    return *badVariable.second;
+    return badVariable;
+}
+
+Variable & VariablesContainer::Get(std::size_t index)
+{
+    if (index < variables.size())
+        return *variables[index].second;
+
+    return badVariable;
+}
+
+const Variable & VariablesContainer::Get(std::size_t index) const
+{
+    if (index < variables.size())
+        return *variables[index].second;
+
+    return badVariable;
+}
+
+const gd::String & VariablesContainer::GetNameAt(std::size_t index) const
+{
+    if (index < variables.size())
+        return variables[index].first;
+
+    return badName;
 }
 
 Variable& VariablesContainer::Insert(const gd::String& name, const gd::Variable& variable, std::size_t position)

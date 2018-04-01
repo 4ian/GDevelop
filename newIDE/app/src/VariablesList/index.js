@@ -26,6 +26,7 @@ import {
 } from '../Utils/SelectionHandler';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 import Clipboard from '../Utils/Clipboard';
+import { serializeToJSObject, unserializeFromJSObject } from '../Utils/Serializer';
 const gd = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
@@ -71,7 +72,13 @@ export default class VariablesList extends Component<Props, State> {
   };
 
   copySelection = () => {
-    Clipboard.set(CLIPBOARD_KIND, getSelection(this.state.selectedVariables));
+    Clipboard.set(
+      CLIPBOARD_KIND,
+      getSelection(this.state.selectedVariables).map(({ name, variable }) => ({
+        name,
+        serializedVariable: serializeToJSObject(variable),
+      }))
+    );
   };
 
   paste = () => {
@@ -79,9 +86,13 @@ export default class VariablesList extends Component<Props, State> {
     if (!Clipboard.has(CLIPBOARD_KIND)) return;
 
     const variables = Clipboard.get(CLIPBOARD_KIND);
-    variables.forEach(({ name, variable }) =>
-      variablesContainer.insert(name, variable, variablesContainer.count())
-    );
+    variables.forEach(({ name, serializedVariable }) => {
+      const newName = newNameGenerator(name, (name) => variablesContainer.has(name), 'CopyOf');
+      const newVariable = new gd.Variable();
+      unserializeFromJSObject(newVariable, serializedVariable);
+      variablesContainer.insert(newName, newVariable, variablesContainer.count())
+      newVariable.delete();
+    });
     this.forceUpdate();
   };
 
@@ -91,12 +102,24 @@ export default class VariablesList extends Component<Props, State> {
       this.state.selectedVariables
     );
 
-    selection.forEach(({ variable }: VariableAndName) =>
+    // Only delete ancestor variables, as selection can be composed of variables
+    // that are contained inside others.
+    const ancestorOnlyVariables = selection.filter(({ variable }) => {
+      return selection.filter(
+        otherVariableAndName =>
+          variable !== otherVariableAndName &&
+          otherVariableAndName.variable.contains(variable)
+      );
+    });
+
+    // We don't want to ever manipulate/access to variables that have been deleted (by removeRecursively):
+    // that's why it's important to only delete ancestor variables.
+    ancestorOnlyVariables.forEach(({ variable }: VariableAndName) =>
       variablesContainer.removeRecursively(variable)
     );
     this.setState({
       selectedVariables: getInitialSelection(),
-    })
+    });
   };
 
   _renderVariableChildren(
@@ -104,12 +127,11 @@ export default class VariablesList extends Component<Props, State> {
     parentVariable: gdVariable,
     depth: number
   ) {
-    const children = parentVariable.getAllChildren();
-    const names = children.keys().toJSArray();
+    const names = parentVariable.getAllChildrenNames().toJSArray();
 
     return flatten(
       names.map((name, index) => {
-        const variable = children.get(name);
+        const variable = parentVariable.getChild(name);
         return this._renderVariableAndChildrenRows(
           name,
           variable,
@@ -227,9 +249,8 @@ export default class VariablesList extends Component<Props, State> {
       0,
       variablesContainer.count(),
       index => {
-        const nameAndVariable = variablesContainer.getAt(index);
-        const variable = nameAndVariable.getVariable();
-        const name = nameAndVariable.getName();
+        const variable = variablesContainer.getAt(index);
+        const name = variablesContainer.getNameAt(index);
 
         return this._renderVariableAndChildrenRows(
           name,

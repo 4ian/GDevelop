@@ -403,7 +403,7 @@ RaycastResult RuntimeObject::RaycastTest(float x, float y, float angle, float di
 
     if ( sqrt(diffX*diffX + diffY*diffY) > boundingRadius + dist )
         return result;
-    
+
     float endX = x + dist*cos(angle*3.14159/180.0);
     float endY = y + dist*sin(angle*3.14159/180.0);
     float testSqDist = closest ? dist*dist : 0.0f;
@@ -412,7 +412,7 @@ RaycastResult RuntimeObject::RaycastTest(float x, float y, float angle, float di
     for (std::size_t i = 0; i < hitboxes.size(); ++i)
     {
         RaycastResult res = PolygonRaycastTest(hitboxes[i], x, y, endX, endY);
-        
+
         if ( res.collision ) {
             if ( closest && (res.closeSqDist < testSqDist) ) {
                 testSqDist = res.closeSqDist;
@@ -424,7 +424,7 @@ RaycastResult RuntimeObject::RaycastTest(float x, float y, float angle, float di
             }
         }
     }
-    
+
     return result;
 }
 
@@ -752,5 +752,5 @@ void RuntimeObject::VariableClearChildren(gd::Variable & variable)
 unsigned int RuntimeObject::GetVariableChildCount(gd::Variable & variable)
 {
     if (variable.IsStructure() == false) return 0;
-    return variable.GetAllChildren().size();
+    return variable.GetChildrenCount();
 }

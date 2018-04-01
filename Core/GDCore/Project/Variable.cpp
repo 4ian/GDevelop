@@ -54,14 +54,13 @@ bool Variable::HasChild(const gd::String& name) const
  */
 Variable& Variable::GetChild(const gd::String& name)
 {
-    std::map<gd::String, Variable>::iterator it = children.find(name);
+    auto it = children.find(name);
     if (it != children.end())
-        return it->second;
+        return *it->second;
 
     isStructure = true;
-    Variable newEmptyVariable;
-    children[name] = newEmptyVariable;
-    return children[name];
+    children[name] = std::make_shared<gd::Variable>();
+    return *children[name];
 }
 
 /**
@@ -72,14 +71,13 @@ Variable& Variable::GetChild(const gd::String& name)
  */
 const Variable& Variable::GetChild(const gd::String& name) const
 {
-    std::map<gd::String, Variable>::iterator it = children.find(name);
+    auto it = children.find(name);
     if (it != children.end())
-        return it->second;
+        return *it->second;
 
     isStructure = true;
-    Variable newEmptyVariable;
-    children[name] = newEmptyVariable;
-    return children[name];
+    children[name] = std::make_shared<gd::Variable>();
+    return *children[name];
 }
 
 void Variable::RemoveChild(const gd::String& name)
@@ -114,10 +112,10 @@ void Variable::SerializeTo(SerializerElement& element) const
     else {
         SerializerElement& childrenElement = element.AddChild("children");
         childrenElement.ConsiderAsArrayOf("variable");
-        for (std::map<gd::String, gd::Variable>::iterator i = children.begin(); i != children.end(); ++i) {
+        for (auto i = children.begin(); i != children.end(); ++i) {
             SerializerElement& variableElement = childrenElement.AddChild("variable");
             variableElement.SetAttribute("name", i->first);
-            i->second.SerializeTo(variableElement);
+            i->second->SerializeTo(variableElement);
         }
     }
 }
@@ -132,10 +130,8 @@ void Variable::UnserializeFrom(const SerializerElement& element)
         for (int i = 0; i < childrenElement.GetChildrenCount(); ++i) {
             const SerializerElement& childElement = childrenElement.GetChild(i);
             gd::String name = childElement.GetStringAttribute("name", "", "Name");
-
-            gd::Variable childVariable;
-            childVariable.UnserializeFrom(childElement);
-            children[name] = childVariable;
+            children[name] = std::make_shared<gd::Variable>();
+            children[name]->UnserializeFrom(childElement);
         }
     } else
         SetString(element.GetStringAttribute("value", "", "Value"));
@@ -151,12 +147,12 @@ void Variable::SaveToXml(TiXmlElement* element) const
     else {
         TiXmlElement* childrenElem = new TiXmlElement("Children");
         element->LinkEndChild(childrenElem);
-        for (std::map<gd::String, gd::Variable>::iterator i = children.begin(); i != children.end(); ++i) {
+        for (auto i = children.begin(); i != children.end(); ++i) {
             TiXmlElement* variable = new TiXmlElement("Variable");
             childrenElem->LinkEndChild(variable);
 
             variable->SetAttribute("Name", i->first.c_str());
-            i->second.SaveToXml(variable);
+            i->second->SaveToXml(variable);
         }
     }
 }
@@ -172,9 +168,8 @@ void Variable::LoadFromXml(const TiXmlElement* element)
         const TiXmlElement* child = element->FirstChildElement("Children")->FirstChildElement();
         while (child) {
             gd::String name = child->Attribute("Name") ? child->Attribute("Name") : "";
-            gd::Variable childVariable;
-            childVariable.LoadFromXml(child);
-            children[name] = childVariable;
+            children[name] = std::make_shared<gd::Variable>();
+            children[name]->LoadFromXml(child);
 
             child = child->NextSiblingElement();
         }
@@ -182,12 +177,22 @@ void Variable::LoadFromXml(const TiXmlElement* element)
         SetString(element->Attribute("Value"));
 }
 
+std::vector<gd::String> Variable::GetAllChildrenNames() const
+{
+    std::vector<gd::String> names;
+    for (auto& it : children) {
+        names.push_back(it.first);
+    }
+
+    return names;
+}
+
 bool Variable::Contains(const gd::Variable& variableToSearch, bool recursive) const
 {
     for (auto& it : children) {
-        if (&it.second == &variableToSearch)
+        if (it.second.get() == &variableToSearch)
             return true;
-        if (recursive && it.second.Contains(variableToSearch, true))
+        if (recursive && it.second->Contains(variableToSearch, true))
             return true;
     }
 
@@ -197,10 +202,10 @@ bool Variable::Contains(const gd::Variable& variableToSearch, bool recursive) co
 void Variable::RemoveRecursively(const gd::Variable& variableToRemove)
 {
     for (auto it = children.begin(); it != children.end();) {
-        if (&(it->second) == &variableToRemove) {
+        if (it->second.get() == &variableToRemove) {
             it = children.erase(it);
         } else {
-            it->second.RemoveRecursively(variableToRemove);
+            it->second->RemoveRecursively(variableToRemove);
             it++;
         }
     }

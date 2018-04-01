@@ -225,13 +225,13 @@ void ChooseVariableDialog::RefreshVariable(wxTreeListItem item, const gd::String
         variablesList->SetItemText(item, 1, "(Structure)");
 
         //Add/update children
-        const std::map<gd::String, gd::Variable> & children = variable.GetAllChildren();
+        const auto & children = variable.GetAllChildren();
         wxTreeListItem currentChildItem = variablesList->GetFirstChild(item);
         wxTreeListItem lastChildItem;
-        for(std::map<gd::String, gd::Variable>::const_iterator it = children.begin();it != children.end();++it)
+        for(auto it = children.begin();it != children.end();++it)
         {
             if ( !currentChildItem.IsOk() ) currentChildItem = variablesList->AppendItem(item, it->first);
-            RefreshVariable(currentChildItem, it->first, it->second);
+            RefreshVariable(currentChildItem, it->first, *it->second);
             lastChildItem = currentChildItem;
 
             currentChildItem = variablesList->GetNextSibling(currentChildItem);
@@ -255,10 +255,11 @@ void ChooseVariableDialog::RefreshAll()
 
     for (std::size_t i = 0;i<temporaryContainer->Count();++i)
     {
+        const gd::String & name = temporaryContainer->GetNameAt(i);
         const auto & variable = temporaryContainer->Get(i);
 
-    	wxTreeListItem item = variablesList->AppendItem(variablesList->GetRootItem(), variable.first);
-        RefreshVariable(item, variable.first, *variable.second);
+    	wxTreeListItem item = variablesList->AppendItem(variablesList->GetRootItem(), name);
+        RefreshVariable(item, name, variable);
         variablesList->Expand(item);
     }
 

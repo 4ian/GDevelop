@@ -149,9 +149,19 @@ public:
     void ClearChildren();
 
     /**
+     * \brief Get the count of children that the variable has.
+     */
+    size_t GetChildrenCount() const { return children.size(); };
+
+    /**
+     * \brief Get the names of all children
+     */
+    std::vector<gd::String> GetAllChildrenNames() const;
+
+    /**
      * \brief Get the map containing all the children.
      */
-    const std::map<gd::String, Variable> & GetAllChildren() const { return children; }
+    const std::map<gd::String, std::shared_ptr<Variable>> & GetAllChildren() const { return children; }
 
     /**
      * \brief Search if a variable is part of the children, optionally recursively
@@ -195,7 +205,7 @@ private:
     mutable gd::String str;
     mutable bool isNumber; ///< True if the type of the variable is a number.
     mutable bool isStructure; ///< False when the variable is a primitive ( i.e: Number or String ), true when it is a structure and has may have children.
-    mutable std::map<gd::String, Variable> children; ///<Children, when the variable is considered as a structure.
+    mutable std::map<gd::String, std::shared_ptr<Variable>> children; ///<Children, when the variable is considered as a structure.
 };
 
 }

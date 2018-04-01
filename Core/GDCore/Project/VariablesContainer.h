@@ -52,20 +52,14 @@ public:
     const Variable & Get(const gd::String & name) const;
 
     /**
-     * \brief Return a pair containing the name and the variable at position \index in the container.
-     *
-     * \note If index is invalid, an empty variable is returned.
+     * \brief Return a reference to the variable at the specified position in the list.
      */
-    [[deprecated]]
-    std::pair<gd::String, std::shared_ptr<gd::Variable>> & Get(std::size_t index);
+    Variable & Get(std::size_t index);
 
     /**
-     * \brief Return a pair containing the name and the variable at position \index in the container.
-     *
-     * \note If index is invalid, an empty variable is returned.
+     * \brief Return a reference to the variable at the specified position in the list.
      */
-    [[deprecated]]
-    const std::pair<gd::String, std::shared_ptr<gd::Variable>> & Get(std::size_t index) const;
+    const Variable & Get(std::size_t index) const;
 
     /**
      * Must add a new variable constructed from the variable passed as parameter.
@@ -80,6 +74,11 @@ public:
      * \brief Return the number of variables.
      */
     std::size_t Count() const { return variables.size(); };
+
+    /**
+     * \brief Return the name of the variable at a position
+     */
+    const gd::String & GetNameAt(std::size_t index) const;
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -147,7 +146,8 @@ public:
 private:
 
     std::vector < std::pair<gd::String, std::shared_ptr<gd::Variable>> > variables;
-    static std::pair<gd::String, std::shared_ptr<Variable>> badVariable;
+    static gd::Variable badVariable;
+    static gd::String badName;
 };
 
 }

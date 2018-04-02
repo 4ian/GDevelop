@@ -266,9 +266,10 @@ export default class ObjectsListContainer extends React.Component<
     const { project, objectsContainer, onObjectPasted } = this.props;
 
     const newName = newNameGenerator(
-      'CopyOf' + name,
+      name,
       name =>
-        objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name)
+        objectsContainer.hasObjectNamed(name) || project.hasObjectNamed(name),
+      'CopyOf'
     );
 
     const newObject = global

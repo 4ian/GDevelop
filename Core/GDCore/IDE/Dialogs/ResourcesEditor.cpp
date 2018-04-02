@@ -52,6 +52,7 @@
 #include "GDCore/Tools/Log.h"
 #include "GDCore/IDE/Dialogs/DndResourcesEditor.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
@@ -635,7 +636,7 @@ void ResourcesEditor::OnresourcesTreeSelectionChanged( wxTreeEvent& event )
 
 void ResourcesEditor::UpdatePropertyGrid()
 {
-    std::vector<gd::String> commonProperties; ///< The name of the properties to be displayed
+    std::map<gd::String, gd::PropertyDescriptor> commonProperties; ///< The name of the properties to be displayed
     bool aFolderIsSelected = false;
 
     //First construct the list of common properties
@@ -646,18 +647,29 @@ void ResourcesEditor::UpdatePropertyGrid()
         gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
         if ( data && data->GetString() == "Image")
         {
-            std::vector<gd::String> properties = project.GetResourcesManager().GetResource(data->GetSecondString()).GetAllProperties(project);
+            const std::map<gd::String, gd::PropertyDescriptor> & properties =
+                project.GetResourcesManager().GetResource(data->GetSecondString()).GetProperties(project);
             if ( i == 0 )
                 commonProperties = properties;
             else
             {
-                //Keep only properties that are common to all the selected resources
-                for (std::size_t j = 0;j<commonProperties.size();)
+                // TODO: This could be factored with helpers like ObjectsPropgridHelper
+
+                //Merge custom properties
+                for(std::map<gd::String, gd::PropertyDescriptor>::const_iterator it = properties.begin();
+                    it != properties.end();++it)
                 {
-                    if ( find(properties.begin(), properties.end(), commonProperties[j]) == properties.end() )
-                        commonProperties.erase(commonProperties.begin()+j);
-                    else
-                        ++j;
+                    if ( commonProperties.find(it->first) == commonProperties.end() ) continue;
+                    if ( commonProperties[it->first].GetValue() != it->second.GetValue() )
+                        commonProperties[it->first].SetValue(_("(Multiples values)"));
+                }
+                //Also erase properties which are not in common.
+                for(std::map<gd::String, gd::PropertyDescriptor>::iterator it = commonProperties.begin();
+                    it != commonProperties.end();)
+                {
+                    if ( properties.find(it->first) == properties.end() )
+                        commonProperties.erase(it++);
+                    else ++it;
                 }
             }
         }
@@ -721,32 +733,11 @@ void ResourcesEditor::UpdatePropertyGrid()
 
         //Other properties
         if ( !commonProperties.empty() ) propertyGrid->Append( new wxPropertyCategory(_("Other properties")) );
-        for (std::size_t j = 0;j<commonProperties.size();++j)
+        for(auto & propertyIterator: commonProperties)
         {
-            wxPGProperty * property = propertyGrid->Append( new wxStringProperty("", commonProperties[j], "") );
-            wxString commonValue;
-
-            for (std::size_t i = 0;i<selection.size();++i)
-            {
-                gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(selection[i]));
-                if ( data && data->GetString() == "Image")
-                {
-                    //It is assumed that the description and the user friendly name
-                    //are the same for all the properties with the same name.
-                    gd::String propertyUserFriendlyName;
-                    gd::String propertyDescription;
-                    project.GetResourcesManager().GetResource(data->GetSecondString()).GetPropertyInformation(project, commonProperties[j], propertyUserFriendlyName, propertyDescription);
-                    propertyGrid->SetPropertyLabel(property, propertyUserFriendlyName);
-                    propertyGrid->SetPropertyHelpString(property, propertyDescription);
-
-                    //Values can be different though
-                    gd::String propertyValue = project.GetResourcesManager().GetResource(data->GetSecondString()).GetProperty(project, commonProperties[j]);
-                    if ( i == 0 ) commonValue = propertyValue;
-                    else if ( commonValue != propertyValue ) commonValue = _("(Multiple values)");
-                }
-            }
-
-            propertyGrid->SetPropertyValue(property, commonValue);
+            // TODO: For now, all other properties are assumed to be booleans.
+            auto & propertyName = propertyIterator.first;
+            propertyGrid->Append(new wxBoolProperty(propertyName, propertyName, propertyIterator.second.GetValue() == "true"));
         }
     }
 }
@@ -782,7 +773,7 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
                 RenameInTree(resourcesTree->GetRootItem(), renamedItemOldName, propertyNewValue, "Image");
             }
             else
-                project.GetResourcesManager().GetResource(data->GetSecondString()).ChangeProperty(project, propertyName, propertyNewValue);
+                project.GetResourcesManager().GetResource(data->GetSecondString()).UpdateProperty(propertyName, propertyNewValue, project);
 
             for ( std::size_t j = 0; j < project.GetUsedPlatforms().size();++j)
                 project.GetUsedPlatforms()[j]->GetChangesNotifier().OnResourceModified(project, data->GetSecondString());
@@ -945,7 +936,7 @@ void ResourcesEditor::Refresh()
         gd::ResourceFolder & folder = project.GetResourcesManager().GetFolder(folders[i]);
         wxTreeItemId folderItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), folders[i], -1, -1, new gd::TreeItemStringData("Folder", folders[i] ));
 
-        std::vector<gd::String> resources = folder.GetAllResourcesList();
+        std::vector<gd::String> resources = folder.GetAllResourceNames();
         for (std::size_t j=0;j<resources.size();++j)
         {
             gd::Resource & resource = folder.GetResource(resources[j]);
@@ -959,7 +950,7 @@ void ResourcesEditor::Refresh()
 
     //All images
     allImagesItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), _("All images"), -1,-1, new gd::TreeItemStringData("BaseFolder", "" ));
-    std::vector<gd::String> resources = project.GetResourcesManager().GetAllResourcesList();
+    std::vector<gd::String> resources = project.GetResourcesManager().GetAllResourceNames();
     for ( std::size_t i = 0;i <resources.size();i++ )
     {
         gd::Resource & resource = project.GetResourcesManager().GetResource(resources[i]);

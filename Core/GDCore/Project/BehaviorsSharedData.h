@@ -8,9 +8,13 @@
 #define BEHAVIORSSHAREDDATA_H
 
 #include <memory>
+#include <map>
 #include "GDCore/String.h"
 class BehaviorsRuntimeSharedData;
 namespace gd { class SerializerElement; }
+namespace gd { class PropertyDescriptor; }
+namespace gd { class Project; }
+namespace gd { class Layout; }
 
 namespace gd
 {
@@ -52,6 +56,31 @@ public:
     virtual void SetTypeName(const gd::String & type_) { type = type_; };
 
     #if defined(GD_IDE_ONLY)
+
+    /**
+     * \brief Called when the IDE wants to know about the properties of the shared data.
+     *
+     * Usage example:
+     \code
+        std::map<gd::String, gd::PropertyDescriptor> properties;
+        properties[_("Initial speed")].SetValue(gd::String::From(initialSpeed));
+
+        return properties;
+     \endcode
+     *
+     * \return a std::map with properties names as key.
+     * \see gd::PropertyDescriptor
+     */
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
+
+    /**
+     * \brief Called when the IDE wants to update a property of the shared data
+     *
+     * \return false if the new value cannot be set
+     * \see gd::InitialInstance
+     */
+    virtual bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project) {return false;};
+
     /**
      * \brief Serialize behaviors shared data.
      */

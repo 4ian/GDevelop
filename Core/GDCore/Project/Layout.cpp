@@ -29,6 +29,7 @@ namespace gd
 {
 
 gd::Layer Layout::badLayer;
+gd::BehaviorsSharedData Layout::badBehaviorSharedData;
 
 Layout::Layout(const Layout & other)
 {
@@ -74,6 +75,53 @@ void Layout::SetName(const gd::String & name_)
     mangledName = gd::SceneNameMangler::GetMangledSceneName(name);
 };
 
+bool Layout::HasBehaviorSharedData(const gd::String & behaviorName)
+{
+    return behaviorsInitialSharedDatas.find(behaviorName) != behaviorsInitialSharedDatas.end();
+}
+
+std::vector <gd::String> Layout::GetAllBehaviorSharedDataNames() const
+{
+    std::vector < gd::String > allNames;
+
+    for (auto & it : behaviorsInitialSharedDatas)
+    	allNames.push_back(it.first);
+
+    return allNames;
+}
+
+const gd::BehaviorsSharedData & Layout::GetBehaviorSharedData(const gd::String & behaviorName) const
+{
+    auto it = behaviorsInitialSharedDatas.find(behaviorName);
+    if (it != behaviorsInitialSharedDatas.end())
+        return *it->second;
+
+    return badBehaviorSharedData;
+}
+
+gd::BehaviorsSharedData & Layout::GetBehaviorSharedData(const gd::String & behaviorName)
+{
+    auto it = behaviorsInitialSharedDatas.find(behaviorName);
+    if (it != behaviorsInitialSharedDatas.end())
+        return *it->second;
+
+    return badBehaviorSharedData;
+}
+
+std::shared_ptr<gd::BehaviorsSharedData> Layout::GetBehaviorSharedDataSmartPtr(const gd::String & behaviorName)
+{
+    auto it = behaviorsInitialSharedDatas.find(behaviorName);
+    if (it != behaviorsInitialSharedDatas.end())
+        return it->second;
+
+    return std::shared_ptr<gd::BehaviorsSharedData>();
+}
+
+const std::map < gd::String, std::shared_ptr<gd::BehaviorsSharedData> > & Layout::GetAllBehaviorSharedData() const
+{
+    return behaviorsInitialSharedDatas;
+}
+
 gd::Layer & Layout::GetLayer(const gd::String & name)
 {
     std::vector<gd::Layer>::iterator layer = find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name));
@@ -83,6 +131,7 @@ gd::Layer & Layout::GetLayer(const gd::String & name)
 
     return badLayer;
 }
+
 const gd::Layer & Layout::GetLayer(const gd::String & name) const
 {
     std::vector<gd::Layer>::const_iterator layer = find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name));
@@ -92,14 +141,17 @@ const gd::Layer & Layout::GetLayer(const gd::String & name) const
 
     return badLayer;
 }
+
 gd::Layer & Layout::GetLayer(std::size_t index)
 {
     return initialLayers[index];
 }
+
 const gd::Layer & Layout::GetLayer (std::size_t index) const
 {
     return initialLayers[index];
 }
+
 std::size_t Layout::GetLayersCount() const
 {
     return initialLayers.size();

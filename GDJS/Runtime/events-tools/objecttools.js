@@ -316,6 +316,47 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
     return true;
 };
 
+gdjs.evtTools.object.raycastObject = function(objectsLists, x, y, angle, dist, varX, varY, inverted) {
+    var matchObject = null;
+    var testSqDist = inverted ? 0 : dist*dist;
+    var resultX = 0;
+    var resultY = 0;
+
+    var lists = gdjs.staticArray(gdjs.evtTools.object.raycastObject);
+    objectsLists.values(lists);
+    for (var i = 0; i < lists.length; i++) {
+        var list = lists[i];
+
+        for (var j = 0; j < list.length; j++) {
+            var object = list[j];
+            var result = object.raycastTest(x, y, angle, dist, !inverted);
+            
+            if( result.collision ) {
+                if ( !inverted && (result.closeSqDist <= testSqDist) ) {
+                    testSqDist = result.closeSqDist;
+                    matchObject = object;
+                    resultX = result.closeX;
+                    resultY = result.closeY;
+                }
+                else if ( inverted && (result.farSqDist >= testSqDist) ) {
+                    testSqDist = result.farSqDist;
+                    matchObject = object;
+                    resultX = result.farX;
+                    resultY = result.farY;
+                }
+            }
+        }
+    }
+
+    if ( !matchObject )
+        return false;
+
+    gdjs.evtTools.object.pickOnly(objectsLists, matchObject);
+    varX.setNumber(resultX);
+    varY.setNumber(resultY);
+    return true;
+};
+
 /**
  * Do the work of creating a new object
  * @private

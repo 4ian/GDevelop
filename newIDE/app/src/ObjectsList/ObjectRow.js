@@ -48,6 +48,11 @@ class ThemableObjectRow extends React.Component {
             click: () => this.props.onEditName(),
           },
           {
+            label: 'Set as a global object',
+            enabled: !!this.props.onSetAsGlobalObject,
+            click: () => this.props.onSetAsGlobalObject(),
+          },
+          {
             label: 'Delete',
             enabled: !!this.props.onEdit,
             click: () => this.props.onDelete(),
@@ -89,7 +94,14 @@ class ThemableObjectRow extends React.Component {
   };
 
   render() {
-    const { project, object, selected, style, muiTheme } = this.props;
+    const {
+      project,
+      object,
+      selected,
+      isGlobalObject,
+      style,
+      muiTheme,
+    } = this.props;
 
     const objectName = object.getName();
     const label = this.props.editingName ? (
@@ -112,6 +124,7 @@ class ThemableObjectRow extends React.Component {
         style={{
           ...styles.objectName,
           color: selected ? muiTheme.listItem.selectedTextColor : undefined,
+          fontStyle: isGlobalObject ? 'italic' : undefined,
         }}
       >
         {objectName}

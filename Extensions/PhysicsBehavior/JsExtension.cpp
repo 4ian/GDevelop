@@ -6,29 +6,23 @@ This project is released under the MIT License.
 */
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/PlatformExtension.h"
-
-
-#include <iostream>
 #include "GDCore/Tools/Localization.h"
+
+void DeclarePhysicsBehaviorExtension(gd::PlatformExtension & extension);
 
 /**
  * \brief This class declares information about the JS extension.
  */
-class JsExtension : public gd::PlatformExtension
+class PhysicsBehaviorJsExtension : public gd::PlatformExtension
 {
 public:
 
     /**
      * \brief Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
      */
-    JsExtension()
+    PhysicsBehaviorJsExtension()
     {
-        SetExtensionInformation("PhysicsBehavior",
-                              _("Physics behavior"),
-                              _("Behavior allowing to move objects as if they were subject to the laws of physics."),
-                              "Florian Rival",
-                              "Open source (MIT License)");
-        CloneExtension("GDevelop C++ platform", "PhysicsBehavior");
+        DeclarePhysicsBehaviorExtension(*this);
 
         GetBehaviorMetadata("PhysicsBehavior::PhysicsBehavior")
             .SetIncludeFile("Extensions/PhysicsBehavior/box2djs/box2d.js")
@@ -145,14 +139,21 @@ public:
 */
 
         StripUnimplementedInstructionsAndExpressions();
+        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };
 };
 
+#if defined(EMSCRIPTEN)
+extern "C" gd::PlatformExtension * CreateGDJSPhysicsBehaviorExtension() {
+    return new PhysicsBehaviorJsExtension;
+}
+#else
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
 extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
-    return new JsExtension;
+    return new PhysicsBehaviorJsExtension;
 }
+#endif
 #endif

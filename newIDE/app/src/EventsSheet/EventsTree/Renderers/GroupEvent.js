@@ -1,12 +1,14 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+// @flow
+import * as React from 'react';
 import classNames from 'classnames';
 import TextField from 'material-ui/TextField';
 import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
+  disabledText,
 } from '../ClassNames';
+import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;
 
 const styles = {
@@ -22,18 +24,11 @@ const styles = {
   },
 };
 
-export default class GroupEvent extends Component {
-  static propTypes = {
-    event: PropTypes.object.isRequired,
+export default class GroupEvent extends React.Component<EventRendererProps, *> {
+  state = {
+    editing: false,
   };
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      editing: false,
-    };
-  }
+  _textField: ?TextField = null;
 
   edit = () => {
     this.setState(
@@ -98,6 +93,7 @@ export default class GroupEvent extends Component {
           <span
             className={classNames({
               [selectableArea]: true,
+              [disabledText]: this.props.disabled,
             })}
             style={{ ...styles.title, color: textColor }}
           >

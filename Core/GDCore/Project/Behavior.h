@@ -68,7 +68,7 @@ public:
      * Usage example:
      \code
         std::map<gd::String, gd::PropertyDescriptor> properties;
-        properties[ToString(_("Initial speed"))].SetValue("5");
+        properties[_("Initial speed")].SetValue(gd::String::From(initialSpeed));
 
         return properties;
      \endcode

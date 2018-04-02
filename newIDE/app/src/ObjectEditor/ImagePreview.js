@@ -1,4 +1,6 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
+import ResourcesLoader from '../ResourcesLoader';
 
 const MARGIN = 50;
 
@@ -29,12 +31,50 @@ const styles = {
   },
 };
 
-export default class ImagePreview extends React.Component {
-  state = {
-    errored: false,
-    imageWidth: null,
-    imageHeight: null,
-  };
+type Props = {|
+  project: gdProject,
+  resourceName: string,
+  resourcesLoader: typeof ResourcesLoader,
+  children?: any,
+  style?: Object,
+  onImageLoaded?: (number, number) => void,
+|};
+
+type State = {|
+  errored: boolean,
+  imageWidth: ?number,
+  imageHeight: ?number,
+  imageSource: ?string,
+|};
+
+export default class ImagePreview extends React.Component<Props, State> {
+  _container: ?HTMLDivElement = null;
+
+  constructor(props: Props) {
+    super(props);
+
+    this.state = this._loadFrom(props);
+  }
+
+  componentWillReceiveProps(newProps: Props) {
+    if (
+      newProps.resourceName !== this.props.resourceName ||
+      newProps.project !== this.props.project ||
+      newProps.resourcesLoader !== this.props.resourcesLoader
+    ) {
+      this.setState(this._loadFrom(newProps));
+    }
+  }
+
+  _loadFrom(props: Props): State {
+    const { project, resourceName, resourcesLoader } = props;
+    return {
+      errored: false,
+      imageWidth: null,
+      imageHeight: null,
+      imageSource: resourcesLoader.getResourceFullUrl(project, resourceName),
+    };
+  }
 
   componentDidMount() {
     if (this._container) {
@@ -49,25 +89,23 @@ export default class ImagePreview extends React.Component {
     });
   };
 
-  _handleImageLoaded = (e, t) => {
+  _handleImageLoaded = (e: any) => {
     const imgElement = e.target;
 
+    const imageWidth = imgElement ? imgElement.clientWidth : 0;
+    const imageHeight = imgElement ? imgElement.clientHeight : 0;
     this.setState({
-      imageWidth: imgElement ? imgElement.clientWidth : 0,
-      imageHeight: imgElement ? imgElement.clientHeight : 0,
+      imageWidth,
+      imageHeight,
     });
+    if (this.props.onImageLoaded)
+      this.props.onImageLoaded(imageWidth, imageHeight);
   };
 
   render() {
-    const {
-      project,
-      resourceName,
-      resourcesLoader,
-      style,
-      children,
-    } = this.props;
+    const { resourceName, style, children } = this.props;
 
-    const { imageHeight, imageWidth } = this.state;
+    const { imageHeight, imageWidth, imageSource } = this.state;
 
     const overlayStyle = {
       ...styles.overlayContainer,
@@ -86,9 +124,10 @@ export default class ImagePreview extends React.Component {
           <img
             style={styles.spriteThumbnailImage}
             alt={resourceName}
-            src={resourcesLoader.getResourceFullFilename(project, resourceName)}
+            src={imageSource}
             onError={this._handleError}
             onLoad={this._handleImageLoaded}
+            crossOrigin="anonymous"
           />
         )}
         {canDisplayOverlays &&

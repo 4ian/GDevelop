@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -12,7 +13,41 @@ const styles = {
   content: { padding: 24 },
 };
 
-export default class AboutDialog extends Component {
+export type UpdateStatus = {
+  message: string,
+  status:
+    | 'checking-for-update'
+    | 'update-available'
+    | 'update-not-available'
+    | 'error'
+    | 'download-progress'
+    | 'update-downloaded'
+    | 'unknown',
+};
+
+type Props = {
+  open: boolean,
+  onClose: Function,
+  updateStatus: UpdateStatus,
+};
+
+const getUpdateString = (status: string) => {
+  if (status === 'checking-for-update') return 'Checking for update...';
+  if (status === 'update-available') return 'Update available';
+  if (status === 'update-not-available')
+    return "No update available. You're using the latest version!";
+  if (status === 'error') return 'Error while checking update';
+  if (status === 'download-progress')
+    return 'A new update is being downloaded...';
+  if (status === 'update-downloaded')
+    return 'A new update will be installed after you quit and relaunch GDevelop';
+  return '';
+};
+
+export default class AboutDialog extends Component<Props, *> {
+  gdVersionString = '';
+  appVersionString = '';
+
   constructor() {
     super();
     this.gdVersionString = gd ? gd.VersionWrapper.fullString() : 'Unknown';
@@ -20,12 +55,12 @@ export default class AboutDialog extends Component {
   }
 
   render() {
-    const { open, onClose } = this.props;
+    const { open, onClose, updateStatus } = this.props;
     const actions = [
       <FlatButton
         label="GDevelop Website"
         primary={false}
-        onClick={() => Window.openExternalURL('http://compilgames.net')}
+        onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
       />,
       <FlatButton label="Close" primary={false} onClick={onClose} />,
     ];
@@ -52,6 +87,7 @@ export default class AboutDialog extends Component {
               GDevelop {this.appVersionString} based on GDevelop.js{' '}
               {this.gdVersionString}
             </Line>
+            <Line>{getUpdateString(updateStatus.status)}</Line>
           </div>
         </Column>
       </Dialog>

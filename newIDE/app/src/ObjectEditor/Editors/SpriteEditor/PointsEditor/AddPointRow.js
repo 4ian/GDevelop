@@ -4,7 +4,7 @@ import Add from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
 import styles from './styles';
 
-const AddLayerRow = ({ onAdd }) => (
+const AddPointRow = ({ onAdd }) => (
   <TableRow>
     <TableRowColumn style={styles.handleColumn} />
     <TableRowColumn />
@@ -18,4 +18,4 @@ const AddLayerRow = ({ onAdd }) => (
   </TableRow>
 );
 
-export default AddLayerRow;
+export default AddPointRow;

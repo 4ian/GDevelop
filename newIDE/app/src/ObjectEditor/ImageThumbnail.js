@@ -58,13 +58,14 @@ const ThemableImageThumbnail = ({
       }}
       onContextMenu={e => {
         e.stopPropagation();
-        onContextMenu(e.clientX, e.clientY);
+        if (onContextMenu) onContextMenu(e.clientX, e.clientY);
       }}
     >
       <img
         style={styles.spriteThumbnailImage}
         alt={resourceName}
-        src={resourcesLoader.getResourceFullFilename(project, resourceName)}
+        src={resourcesLoader.getResourceFullUrl(project, resourceName)}
+        crossOrigin="anonymous"
       />
       {selectable && (
         <div style={styles.checkboxContainer}>

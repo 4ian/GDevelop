@@ -1,7 +1,12 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import Paper from 'material-ui/Paper';
 
-export default props => {
+type Props = {|
+  children: React.Node,
+|};
+
+export default (props: Props) => {
   return (
     <div
       style={{
@@ -20,6 +25,7 @@ export default props => {
         zDepth={3}
         style={{
           padding: 10,
+          margin: 5,
         }}
       >
         {props.children}

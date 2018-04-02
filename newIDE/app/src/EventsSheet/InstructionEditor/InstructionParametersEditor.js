@@ -87,11 +87,20 @@ export default class InstructionParametersEditor extends Component {
         <div key={type} style={styles.parametersContainer}>
           {mapFor(0, instructionMetadata.getParametersCount(), i => {
             const parameterMetadata = instructionMetadata.getParameter(i);
+            const parameterMetadataType = parameterMetadata.getType();
             const ParameterComponent = ParameterRenderingService.getParameterComponent(
-              parameterMetadata.getType()
+              parameterMetadataType
             );
 
             if (parameterMetadata.isCodeOnly()) return null;
+            if (!ParameterComponent) {
+              console.warn(
+                'Missing parameter component for',
+                parameterMetadataType
+              );
+              return null;
+            }
+
             return (
               <ParameterComponent
                 parameterMetadata={parameterMetadata}

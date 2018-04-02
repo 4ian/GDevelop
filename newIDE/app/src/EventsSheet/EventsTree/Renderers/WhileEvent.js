@@ -1,15 +1,20 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import InstructionsList from '../InstructionsList';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { largeSelectedArea, largeSelectableArea } from '../ClassNames';
+import {
+  largeSelectedArea,
+  largeSelectableArea,
+  executableEventContainer,
+  disabledText,
+} from '../ClassNames';
+import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;
 
 const styles = {
   container: {
     display: 'flex',
     flexDirection: 'column',
-    borderBottom: '1px solid #d3d3d3',
   },
   instructionsContainer: {
     display: 'flex',
@@ -19,19 +24,10 @@ const styles = {
   },
 };
 
-export default class ForEachEvent extends Component {
-  static propTypes = {
-    event: PropTypes.object.isRequired,
-    onAddNewInstruction: PropTypes.func.isRequired,
-    onInstructionClick: PropTypes.func.isRequired,
-    onInstructionDoubleClick: PropTypes.func.isRequired,
-    onInstructionContextMenu: PropTypes.func.isRequired,
-    onInstructionsListContextMenu: PropTypes.func.isRequired,
-    onParameterClick: PropTypes.func.isRequired,
-    selection: PropTypes.object.isRequired,
-    onUpdate: PropTypes.func.isRequired,
-  };
-
+export default class ForEachEvent extends React.Component<
+  EventRendererProps,
+  *
+> {
   render() {
     var whileEvent = gd.asWhileEvent(this.props.event);
 
@@ -45,9 +41,16 @@ export default class ForEachEvent extends Component {
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
+          [executableEventContainer]: true,
         })}
       >
-        <div>While these conditions are true:</div>
+        <div
+          className={classNames({
+            [disabledText]: this.props.disabled,
+          })}
+        >
+          While these conditions are true:
+        </div>
         <InstructionsList
           instrsList={whileEvent.getWhileConditions()}
           selection={this.props.selection}
@@ -56,9 +59,19 @@ export default class ForEachEvent extends Component {
           onInstructionClick={this.props.onInstructionClick}
           onInstructionDoubleClick={this.props.onInstructionDoubleClick}
           onInstructionContextMenu={this.props.onInstructionContextMenu}
+          onInstructionsListContextMenu={
+            this.props.onInstructionsListContextMenu
+          }
           onParameterClick={this.props.onParameterClick}
+          disabled={this.props.disabled}
         />
-        <div>Repeat these:</div>
+        <div
+          className={classNames({
+            [disabledText]: this.props.disabled,
+          })}
+        >
+          Repeat these:
+        </div>
         <div style={styles.instructionsContainer}>
           <InstructionsList
             instrsList={whileEvent.getConditions()}
@@ -73,6 +86,7 @@ export default class ForEachEvent extends Component {
               this.props.onInstructionsListContextMenu
             }
             onParameterClick={this.props.onParameterClick}
+            disabled={this.props.disabled}
           />
           <InstructionsList
             instrsList={whileEvent.getActions()}
@@ -87,6 +101,7 @@ export default class ForEachEvent extends Component {
               this.props.onInstructionsListContextMenu
             }
             onParameterClick={this.props.onParameterClick}
+            disabled={this.props.disabled}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import * as React from 'react';
 import './MainFrame.css';
 
 import Providers from './Providers';
@@ -14,9 +14,13 @@ import Toolbar from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import ConfirmCloseDialog from './ConfirmCloseDialog';
+import AboutDialog, { type UpdateStatus } from './AboutDialog';
 import ProjectManager from '../ProjectManager';
+import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
 import EditorBar from '../UI/EditorBar';
+import CloseConfirmDialog from '../UI/CloseConfirmDialog';
+import ProfileDialog from '../Profile/ProfileDialog';
 import Window from '../Utils/Window';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { Tabs, Tab } from '../UI/Tabs';
@@ -45,12 +49,22 @@ import ExternalEventsEditor from './Editors/ExternalEventsEditor';
 import SceneEditor from './Editors/SceneEditor';
 import ExternalLayoutEditor from './Editors/ExternalLayoutEditor';
 import StartPage from './Editors/StartPage';
+import ResourcesEditor from './Editors/ResourcesEditor';
 import {
   type PreferencesState,
   getThemeName,
   setThemeName,
   getDefaultPreferences,
 } from './Preferences/PreferencesHandler';
+import ErrorBoundary from '../UI/ErrorBoundary';
+import SubscriptionDialog from '../Profile/SubscriptionDialog';
+import ResourcesLoader from '../ResourcesLoader/index';
+import Authentification from '../Utils/GDevelopServices/Authentification';
+import {
+  type PreviewLauncher,
+  type PreviewOptions,
+} from '../Export/PreviewLauncher.flow';
+import { type ResourceSource } from '../ResourcesList/ResourceSource.flow';
 
 const gd = global.gd;
 
@@ -78,9 +92,31 @@ type State = {|
   snackMessageOpen: boolean,
   preferencesDialogOpen: boolean,
   preferences: PreferencesState,
+  profileDialogOpen: boolean,
+  subscriptionDialogOpen: boolean,
+  updateStatus: UpdateStatus,
+  aboutDialogOpen: boolean,
+  platformSpecificAssetsDialogOpen: boolean,
 |};
 
-export default class MainFrame extends Component<*, State> {
+type Props = {
+  integratedEditor?: boolean,
+  introDialog?: React.Element<*>,
+  onReadFromPathOrURL: (url: string) => Promise<any>,
+  previewLauncher?: React.Element<PreviewLauncher>,
+  onEditObject?: gdObject => void,
+  resourceSources: Array<ResourceSource>,
+  onChooseProject?: () => Promise<string>,
+  saveDialog?: React.Element<*>,
+  onSaveProject?: gdProject => Promise<any>,
+  loading?: boolean,
+  requestUpdate?: () => void,
+  exportDialog?: React.Element<*>,
+  createDialog?: React.Element<*>,
+  authentification: Authentification,
+};
+
+export default class MainFrame extends React.Component<Props, State> {
   state = {
     createDialogOpen: false,
     exportDialogOpen: false,
@@ -97,10 +133,16 @@ export default class MainFrame extends Component<*, State> {
     snackMessageOpen: false,
     preferencesDialogOpen: false,
     preferences: getDefaultPreferences(),
+    profileDialogOpen: false,
+    subscriptionDialogOpen: false,
+    updateStatus: { message: '', status: 'unknown' },
+    aboutDialogOpen: false,
+    platformSpecificAssetsDialogOpen: false,
   };
   toolbar = null;
   confirmCloseDialog: any = null;
   _resourceSourceDialogs = {};
+  _previewLauncher: ?PreviewLauncher = null;
   _providers = null;
 
   componentWillMount() {
@@ -125,6 +167,11 @@ export default class MainFrame extends Component<*, State> {
 
   loadFromProject = (project: gdProject, cb: Function) => {
     this.closeProject(() => {
+      // Make sure that the ResourcesLoader cache is emptied, so that
+      // the URL to a resource with a name in the old project is not re-used
+      // for another resource with the same name in the new project.
+      ResourcesLoader.burstUrlsCache();
+
       this.setState(
         {
           currentProject: project,
@@ -216,6 +263,7 @@ export default class MainFrame extends Component<*, State> {
   setEditorToolbar = (editorToolbar: any) => {
     if (!this.toolbar) return;
 
+    // $FlowFixMe
     this.toolbar.getWrappedInstance().setEditorToolbar(editorToolbar);
   };
 
@@ -226,7 +274,11 @@ export default class MainFrame extends Component<*, State> {
     const name = newNameGenerator('NewScene', name =>
       currentProject.hasLayoutNamed(name)
     );
-    currentProject.insertNewLayout(name, currentProject.getLayoutsCount());
+    const newLayout = currentProject.insertNewLayout(
+      name,
+      currentProject.getLayoutsCount()
+    );
+    newLayout.updateBehaviorsSharedData(currentProject);
     this.forceUpdate();
   };
 
@@ -387,32 +439,41 @@ export default class MainFrame extends Component<*, State> {
     );
   };
 
-  _launchLayoutPreview = (project: gdProject, layout: gdLayout) =>
+  _launchLayoutPreview = (
+    project: gdProject,
+    layout: gdLayout,
+    options: PreviewOptions
+  ) =>
     watchPromiseInState(this, 'previewLoading', () =>
-      this._handlePreviewResult(this.props.onLayoutPreview(project, layout))
+      this._handlePreviewResult(
+        this._previewLauncher &&
+          this._previewLauncher.launchLayoutPreview(project, layout, options)
+      )
     );
 
   _launchExternalLayoutPreview = (
     project: gdProject,
     layout: gdLayout,
-    externalLayout: gdExternalLayout
+    externalLayout: gdExternalLayout,
+    options: PreviewOptions
   ) =>
     watchPromiseInState(this, 'previewLoading', () =>
       this._handlePreviewResult(
-        this.props.onExternalLayoutPreview(project, layout, externalLayout)
+        this._previewLauncher &&
+          this._previewLauncher.launchExternalLayoutPreview(
+            project,
+            layout,
+            externalLayout,
+            options
+          )
       )
     );
 
-  _handlePreviewResult = (previewPromise: Promise<any>): Promise<void> => {
+  _handlePreviewResult = (previewPromise: ?Promise<any>): Promise<void> => {
+    if (!previewPromise) return Promise.reject();
+
     return previewPromise.then(
-      (result: any) => {
-        if (result && result.dialog) {
-          this.setState({
-            genericDialog: result.dialog,
-            genericDialogOpen: true,
-          });
-        }
-      },
+      (result: any) => {},
       (err: any) => {
         showErrorBox('Unable to launch the preview!', err);
       }
@@ -428,36 +489,46 @@ export default class MainFrame extends Component<*, State> {
   ) => {
     const sceneEditorOptions = {
       name,
-      editorCreator: () => (
+      renderEditor: ({ isActive, editorRef }) => (
         <SceneEditor
           project={this.state.currentProject}
           layoutName={name}
           setToolbar={this.setEditorToolbar}
           onPreview={this._launchLayoutPreview}
-          showPreviewButton={!!this.props.onLayoutPreview}
+          showPreviewButton={!!this.props.previewLauncher}
+          showNetworkPreviewButton={
+            this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
+          }
           onEditObject={this.props.onEditObject}
           showObjectsList={!this.props.integratedEditor}
           resourceSources={this.props.resourceSources}
           onChooseResource={this._onChooseResource}
+          isActive={isActive}
+          ref={editorRef}
         />
       ),
       key: 'layout ' + name,
     };
     const eventsEditorOptions = {
       name: name + ' (Events)',
-      editorCreator: () => (
+      renderEditor: ({ isActive, editorRef }) => (
         <EventsEditor
           project={this.state.currentProject}
           layoutName={name}
           setToolbar={this.setEditorToolbar}
           onPreview={this._launchLayoutPreview}
-          showPreviewButton={!!this.props.onLayoutPreview}
+          showPreviewButton={!!this.props.previewLauncher}
+          showNetworkPreviewButton={
+            this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
+          }
           onOpenExternalEvents={this.openExternalEvents}
           onOpenLayout={name =>
             this.openLayout(name, {
               openEventsEditor: true,
               openSceneEditor: false,
             })}
+            isActive={isActive}
+            ref={editorRef}
         />
       ),
       key: 'layout events ' + name,
@@ -481,7 +552,7 @@ export default class MainFrame extends Component<*, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name,
-          editorCreator: () => (
+          renderEditor: ({ isActive, editorRef }) => (
             <ExternalEventsEditor
               project={this.state.currentProject}
               externalEventsName={name}
@@ -492,6 +563,8 @@ export default class MainFrame extends Component<*, State> {
                   openEventsEditor: true,
                   openSceneEditor: false,
                 })}
+                isActive={isActive}
+                ref={editorRef}
             />
           ),
           key: 'external events ' + name,
@@ -506,20 +579,58 @@ export default class MainFrame extends Component<*, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name,
-          editorCreator: () => (
+          renderEditor: ({ isActive, editorRef }) => (
             <ExternalLayoutEditor
               project={this.state.currentProject}
               externalLayoutName={name}
               setToolbar={this.setEditorToolbar}
               onPreview={this._launchExternalLayoutPreview}
-              showPreviewButton={!!this.props.onExternalLayoutPreview}
+              showPreviewButton={!!this.props.previewLauncher}
+              showNetworkPreviewButton={
+                this._previewLauncher &&
+                this._previewLauncher.canDoNetworkPreview()
+              }
               onEditObject={this.props.onEditObject}
               showObjectsList={!this.props.integratedEditor}
               resourceSources={this.props.resourceSources}
               onChooseResource={this._onChooseResource}
+              isActive={isActive}
+              ref={editorRef}
             />
           ),
           key: 'external layout ' + name,
+        }),
+      },
+      () => this.updateToolbar()
+    );
+  };
+
+  openResources = () => {
+    this.setState(
+      {
+        editorTabs: openEditorTab(this.state.editorTabs, {
+          name: 'Resources',
+          renderEditor: ({ isActive, editorRef }) => (
+            <ResourcesEditor
+              project={this.state.currentProject}
+              setToolbar={this.setEditorToolbar}
+              onDeleteResource={(resource: gdResource, cb: boolean => void) => {
+                // TODO: Project wide refactoring of objects/events using the resource
+                cb(true);
+              }}
+              onRenameResource={(
+                resource: gdResource,
+                newName: string,
+                cb: boolean => void
+              ) => {
+                // TODO: Project wide refactoring of objects/events using the resource
+                cb(true);
+              }}
+              isActive={isActive}
+              ref={editorRef}
+            />
+          ),
+          key: 'resources',
         }),
       },
       () => this.updateToolbar()
@@ -531,7 +642,7 @@ export default class MainFrame extends Component<*, State> {
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name: 'Start Page',
-          editorCreator: () => (
+          renderEditor: ({ isActive, editorRef }) => (
             <StartPage
               project={this.state.currentProject}
               setToolbar={this.setEditorToolbar}
@@ -540,6 +651,9 @@ export default class MainFrame extends Component<*, State> {
               onCreate={() => this.openCreateDialog()}
               onOpenProjectManager={() => this.openProjectManager()}
               onCloseProject={() => this.askToCloseProject()}
+              onOpenAboutDialog={() => this.openAboutDialog()}
+              isActive={isActive}
+              ref={editorRef}
             />
           ),
           key: 'start page',
@@ -557,6 +671,8 @@ export default class MainFrame extends Component<*, State> {
   };
 
   chooseProject = () => {
+    if (!this.props.onChooseProject) return;
+
     this.props
       .onChooseProject()
       .then(filepath => {
@@ -574,7 +690,7 @@ export default class MainFrame extends Component<*, State> {
 
     if (this.props.saveDialog) {
       this._openSaveDialog();
-    } else {
+    } else if (this.props.onSaveProject) {
       this.props.onSaveProject(this.state.currentProject).then(
         () => {
           this._showSnackMessage('Project properly saved');
@@ -646,6 +762,18 @@ export default class MainFrame extends Component<*, State> {
     });
   };
 
+  openProfile = (open: boolean = true) => {
+    this.setState({
+      profileDialogOpen: open,
+    });
+  };
+
+  openSubscription = (open: boolean = true) => {
+    this.setState({
+      subscriptionDialogOpen: open,
+    });
+  };
+
   _onChangeEditorTab = (value: number) => {
     this.setState(
       {
@@ -689,6 +817,33 @@ export default class MainFrame extends Component<*, State> {
     editorTab.editorRef.updateToolbar();
   }
 
+  openAboutDialog = (open: boolean = true) => {
+    this.setState({
+      aboutDialogOpen: open,
+    });
+  };
+
+  openPlatformSpecificAssets = (open: boolean = true) => {
+    this.setState({
+      platformSpecificAssetsDialogOpen: open,
+    });
+  };
+
+  setUpdateStatus = (status: UpdateStatus) => {
+    this.setState({
+      updateStatus: status,
+    });
+  };
+
+  simulateUpdateDownloaded = () =>
+    this.setUpdateStatus({
+      status: 'update-downloaded',
+      message: 'update-downloaded',
+      info: {
+        releaseName: 'Fake update',
+      },
+    });
+
   _showSnackMessage = (snackMessage: string) =>
     this.setState({
       snackMessage,
@@ -706,6 +861,10 @@ export default class MainFrame extends Component<*, State> {
       genericDialog,
       projectManagerOpen,
       preferences,
+      profileDialogOpen,
+      subscriptionDialogOpen,
+      updateStatus,
+      aboutDialogOpen,
     } = this.state;
     const {
       exportDialog,
@@ -713,6 +872,8 @@ export default class MainFrame extends Component<*, State> {
       introDialog,
       saveDialog,
       resourceSources,
+      authentification,
+      previewLauncher,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -720,7 +881,10 @@ export default class MainFrame extends Component<*, State> {
       this.props.loading;
 
     return (
-      <Providers themeName={getThemeName(preferences)}>
+      <Providers
+        themeName={getThemeName(preferences)}
+        authentification={authentification}
+      >
         <div className="main-frame">
           <ProjectTitlebar project={currentProject} />
           <Drawer
@@ -755,6 +919,10 @@ export default class MainFrame extends Component<*, State> {
                 onCloseProject={this.askToCloseProject}
                 onExportProject={this.openExportDialog}
                 onOpenPreferences={() => this.openPreferences(true)}
+                onOpenResources={() => this.openResources()}
+                onOpenPlatformSpecificAssets={() =>
+                  this.openPlatformSpecificAssets()}
+                onChangeSubscription={() => this.openSubscription(true)}
               />
             )}
           </Drawer>
@@ -763,43 +931,37 @@ export default class MainFrame extends Component<*, State> {
             showProjectIcons={!this.props.integratedEditor}
             hasProject={!!this.state.currentProject}
             toggleProjectManager={this.toggleProjectManager}
-            canOpenProject={!!this.props.onChooseProject}
-            openProject={this.chooseProject}
+            exportProject={() => this.openExportDialog(true)}
             requestUpdate={this.props.requestUpdate}
+            simulateUpdateDownloaded={this.simulateUpdateDownloaded}
           />
           <Tabs
             value={getCurrentTabIndex(this.state.editorTabs)}
             onChange={this._onChangeEditorTab}
             hideLabels={!!this.props.integratedEditor}
           >
-            {getEditors(this.state.editorTabs).map((editorTab, id) => (
-              <Tab
-                label={editorTab.name}
-                value={id}
-                key={editorTab.key}
-                onActive={() => this._onEditorTabActive(editorTab)}
-                onClose={() => this._onCloseEditorTab(editorTab)}
-                closable={editorTab.closable}
-              >
-                <div style={{ display: 'flex', flex: 1, height: '100%' }}>
-                  {editorTab.render()}
-                </div>
-              </Tab>
-            ))}
+            {getEditors(this.state.editorTabs).map((editorTab, id) => {
+              const isCurrentTab = getCurrentTabIndex(this.state.editorTabs) === id;
+              return (
+                <Tab
+                  label={editorTab.name}
+                  value={id}
+                  key={editorTab.key}
+                  onActive={() => this._onEditorTabActive(editorTab)}
+                  onClose={() => this._onCloseEditorTab(editorTab)}
+                  closable={editorTab.closable}
+                >
+                  <div style={{ display: 'flex', flex: 1, height: '100%' }}>
+                    <ErrorBoundary>{editorTab.render(isCurrentTab)}</ErrorBoundary>
+                  </div>
+                </Tab>
+              );
+            })}
           </Tabs>
           <LoaderModal show={showLoader} />
           <ConfirmCloseDialog
             ref={confirmCloseDialog =>
               (this.confirmCloseDialog = confirmCloseDialog)}
-          />
-          <PreferencesDialog
-            open={this.state.preferencesDialogOpen}
-            themeName={getThemeName(preferences)}
-            onChangeTheme={themeName =>
-              this.setState({
-                preferences: setThemeName(preferences, themeName),
-              })}
-            onClose={() => this.openPreferences(false)}
           />
           <Snackbar
             open={this.state.snackMessageOpen}
@@ -811,7 +973,12 @@ export default class MainFrame extends Component<*, State> {
             React.cloneElement(exportDialog, {
               open: this.state.exportDialogOpen,
               onClose: () => this.openExportDialog(false),
+              onChangeSubscription: () => {
+                this.openExportDialog(false);
+                this.openSubscription(true);
+              },
               project: this.state.currentProject,
+              authentification,
             })}
           {!!createDialog &&
             React.cloneElement(createDialog, {
@@ -841,18 +1008,66 @@ export default class MainFrame extends Component<*, State> {
               open: this.state.saveDialogOpen,
               onClose: () => this._openSaveDialog(false),
             })}
+          {!!this.state.currentProject && (
+            <PlatformSpecificAssetsDialog
+              project={this.state.currentProject}
+              open={this.state.platformSpecificAssetsDialogOpen}
+              onApply={() => this.openPlatformSpecificAssets(false)}
+              onClose={() => this.openPlatformSpecificAssets(false)}
+              resourceSources={resourceSources}
+              onChooseResource={this._onChooseResource}
+            />
+          )}
           {!!genericDialog &&
             React.cloneElement(genericDialog, {
               open: this.state.genericDialogOpen,
               onClose: () => this._openGenericDialog(false),
             })}
-          {resourceSources.map((resourceSource, index) =>
-            React.createElement(resourceSource.component, {
-              key: resourceSource.name,
-              ref: dialog =>
-                (this._resourceSourceDialogs[resourceSource.name] = dialog),
-            })
-          )}
+          {!!previewLauncher &&
+            React.cloneElement(previewLauncher, {
+              ref: (previewLauncher: ?PreviewLauncher) =>
+                (this._previewLauncher = previewLauncher),
+              onExport: () => this.openExportDialog(true),
+              onChangeSubscription: () => this.openSubscription(true),
+            })}
+          {resourceSources.map((resourceSource, index) => {
+            // $FlowFixMe
+            const Component = resourceSource.component;
+            return (
+              // $FlowFixMe
+              <Component
+                key={resourceSource.name}
+                ref={dialog =>
+                  (this._resourceSourceDialogs[resourceSource.name] = dialog)}
+              />
+            );
+          })}
+          <ProfileDialog
+            open={profileDialogOpen}
+            onClose={() => this.openProfile(false)}
+            onChangeSubscription={() => this.openSubscription(true)}
+          />
+          <SubscriptionDialog
+            onClose={() => {
+              this.openSubscription(false);
+            }}
+            open={subscriptionDialogOpen}
+          />
+          <PreferencesDialog
+            open={this.state.preferencesDialogOpen}
+            themeName={getThemeName(preferences)}
+            onChangeTheme={themeName =>
+              this.setState({
+                preferences: setThemeName(preferences, themeName),
+              })}
+            onClose={() => this.openPreferences(false)}
+          />
+          <AboutDialog
+            open={aboutDialogOpen}
+            onClose={() => this.openAboutDialog(false)}
+            updateStatus={updateStatus}
+          />
+          <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
         </div>
       </Providers>
     );

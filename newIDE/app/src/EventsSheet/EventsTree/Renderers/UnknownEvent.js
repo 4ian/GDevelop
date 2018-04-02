@@ -1,13 +1,10 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
+// @flow
+import * as React from 'react';
 import classNames from 'classnames';
 import { largeSelectedArea, largeSelectableArea } from '../ClassNames';
+import { type EventRendererProps } from './EventRenderer.flow';
 
-export default class UnknownEvent extends Component {
-  static propTypes = {
-    event: PropTypes.object.isRequired,
-  };
-
+export default class UnknownEvent extends React.Component<EventRendererProps, *> {
   render() {
     return (
       <p

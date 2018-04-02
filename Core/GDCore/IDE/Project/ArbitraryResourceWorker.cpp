@@ -51,7 +51,7 @@ void ArbitraryResourceWorker::ExposeResources(gd::ResourcesManager * resourcesMa
 
     resourcesManagers.push_back(resourcesManager);
 
-    std::vector<gd::String> resources = resourcesManager->GetAllResourcesList();
+    std::vector<gd::String> resources = resourcesManager->GetAllResourceNames();
     for ( std::size_t i = 0;i < resources.size() ;i++ )
     {
         if ( resourcesManager->GetResource(resources[i]).UseFile() )

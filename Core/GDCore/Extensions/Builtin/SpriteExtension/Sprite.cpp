@@ -103,6 +103,7 @@ bool Sprite::SetDefaultCenterPoint(bool enabled)
 
 std::vector<Polygon2d> Sprite::GetCollisionMask() const
 {
+    //TODO(perf): Cache to avoid re-creating a mask at every call
 #if !defined(EMSCRIPTEN)
     if ( automaticCollisionMask )
     {

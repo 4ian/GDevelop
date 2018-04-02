@@ -17,13 +17,21 @@ var gdjs = gdjs || {
 };
 
 /**
- * Convert a rgb color value to a hex value.
+ * Convert a rgb color value to a hex string.
  * @note No "#" or "0x" are added.
  * @static
  */
 gdjs.rgbToHex = function(r, g, b) {
     return "" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
 };
+
+/**
+ * Convert a rgb color value to a hex value.
+ * @static
+ */
+gdjs.rgbToHexNumber = function(r, g, b) {
+    return (r << 16) + (g << 8) + b;
+}
 
 /**
  * Get a random integer between 0 and max.

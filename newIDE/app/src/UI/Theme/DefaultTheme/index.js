@@ -23,6 +23,9 @@ const theme = {
   avatar: {
     backgroundColor: 'transparent',
   },
+  tabs: {
+    backgroundColor: gdevelopLightBlue,
+  },
   toolbar: {
     backgroundColor: backgroundColor,
     separatorColor: '#cecece',
@@ -46,6 +49,7 @@ const theme = {
   snackbar: {
     actionColor: gdevelopLightBlue,
   },
+  stepper: {},
 
   // GDevelop specific variables:
   closableTabs: {
@@ -71,13 +75,10 @@ const theme = {
     selectedTextColor: '#ffffff',
   },
   emptyMessage: {
-    shadowColor: '#FFFFFF'
+    shadowColor: '#FFFFFF',
   },
   logo: {
-    src: "res/GD-logo-big.png",
-  },
-  startPage: {
-    backgroundColor,
+    src: 'res/GD-logo-big.png',
   },
   mosaicRootClassName: 'mosaic-gd-default-theme',
   eventsSheetRootClassName: 'gd-events-sheet-default-theme',

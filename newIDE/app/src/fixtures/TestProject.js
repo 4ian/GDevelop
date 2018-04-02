@@ -128,6 +128,10 @@ export const makeTestProject = gd => {
   testLayoutInstance1.setX(10);
   testLayoutInstance1.setY(15);
 
+  // Add layers
+  testLayout.insertNewLayer("GUI", 0);
+  testLayout.insertNewLayer("OtherLayer", 1);
+
   //Add a few variables
   const testLayoutVariables = testLayout.getVariables();
   testLayoutVariables
@@ -176,7 +180,7 @@ export const makeTestProject = gd => {
   groupEvent.setName('Group #1');
 
   const jsCodeEvent = gd.asJsCodeEvent(evt8);
-  jsCodeEvent.setInlineCode('console.log("Hello, World!");')
+  jsCodeEvent.setInlineCode('console.log("Hello, World!");');
   jsCodeEvent.setParameterObjects('MyObject');
 
   const makeKeyPressedCondition = () => {
@@ -233,6 +237,29 @@ export const makeTestProject = gd => {
     standardEvt.getActions().push_back(makeDeleteAction('OtherObject' + i));
   }
 
+  // Add a disabled event with a sub event
+  {
+    const disabledEvent = testLayout
+      .getEvents()
+      .insertNewEvent(
+        project,
+        'BuiltinCommonInstructions::Standard',
+        testLayout.getEvents().getEventsCount()
+      );
+    const disabledStandardEvt = gd.asStandardEvent(disabledEvent);
+    disabledStandardEvt.setDisabled(true);
+    disabledStandardEvt.getConditions().push_back(makeKeyPressedCondition());
+    disabledStandardEvt.getActions().push_back(makeDeleteAction('YetAnotherObject'));
+
+    const subEvent = disabledStandardEvt
+      .getSubEvents()
+      .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+    const subStandardEvt = gd.asStandardEvent(subEvent);
+    subStandardEvt.getConditions().push_back(makeKeyPressedCondition());
+    subStandardEvt.getActions().push_back(makeDeleteAction('MyCharacter1'));
+    subStandardEvt.getActions().push_back(makeDeleteAction('MyCharacter2'));
+  }
+
   const testInstruction = makeKeyPressedCondition();
 
   // Global objects
@@ -253,6 +280,9 @@ export const makeTestProject = gd => {
     1
   );
 
+  // Empty layout
+  const emptyLayout = project.insertNewLayout('EmptyLayout', 1);
+
   return {
     project,
     shapePainterObject,
@@ -269,5 +299,6 @@ export const makeTestProject = gd => {
     testInstruction,
     testExternalEvents1,
     testExternalEvents2,
+    emptyLayout,
   };
 };

@@ -1,7 +1,9 @@
+// @flow
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
-import { mapFor } from '../../../Utils/MapFor';
+import { enumerateVariables } from './EnumerateVariables';
+import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
 const styles = {
   container: {
@@ -20,11 +22,25 @@ const fuzzyFilterOrEmpty = (searchText, key) => {
   return !key || AutoComplete.fuzzyFilter(searchText, key);
 };
 
-export default class VariableField extends Component {
-  constructor(props) {
-    super(props);
+type Props = ParameterFieldProps & {
+  variablesContainer: ?gdVariablesContainer,
+  onOpenDialog: () => void,
+};
 
-    this.state = { errorText: null };
+type State = {|
+  focused: boolean,
+  text: ?string,
+|};
+
+export default class VariableField extends Component<Props, State> {
+  state = { focused: false, text: null };
+
+  _description: ?string;
+  _field: ?AutoComplete;
+  _variableNames: Array<string> = [];
+
+  constructor(props: Props) {
+    super(props);
 
     const { parameterMetadata } = this.props;
     this._description = parameterMetadata
@@ -34,26 +50,22 @@ export default class VariableField extends Component {
     this._loadNamesFrom(props);
   }
 
+  forceUpdateVariables() {
+    this._loadNamesFrom(this.props);
+  }
+
   focus() {
     if (this._field) this._field.focus();
   }
 
-  componentWillReceiveProps(newProps) {
+  componentWillReceiveProps(newProps: Props) {
     if (newProps.variablesContainer !== this.props.variablesContainer) {
       this._loadNamesFrom(newProps);
     }
   }
 
-  _loadNamesFrom(props) {
-    if (!props.variablesContainer) {
-      this._variableNames = [];
-      return;
-    }
-
-    this._variableNames = mapFor(0, props.variablesContainer.count(), i => {
-      const variableAndName = props.variablesContainer.getAt(i);
-      return variableAndName.getName();
-    });
+  _loadNamesFrom(props: Props) {
+    this._variableNames = enumerateVariables(props.variablesContainer);
   }
 
   render() {
@@ -66,10 +78,25 @@ export default class VariableField extends Component {
           menuProps={{
             maxHeight: 250,
           }}
-          searchText={this.props.value}
+          searchText={this.state.focused ? this.state.text : this.props.value}
+          onFocus={() => {
+            this.setState({
+              focused: true,
+              text: this.props.value,
+            });
+          }}
           onUpdateInput={value => {
-            this.setState({ errorText: null });
-            this.props.onChange(value);
+            this.setState({
+              focused: true,
+              text: value,
+            });
+          }}
+          onBlur={event => {
+            this.props.onChange(event.target.value);
+            this.setState({
+              focused: false,
+              text: null,
+            });
           }}
           onNewRequest={data => {
             // Note that data may be a string or a {text, value} object.

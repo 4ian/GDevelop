@@ -1,5 +1,6 @@
+// @flow
 import React, { Component } from 'react';
-import { translate } from 'react-i18next';
+import { translate, type TranslatorProps } from 'react-i18next';
 import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
@@ -14,17 +15,27 @@ const styles = {
   },
 };
 
-export class MainFrameToolbar extends Component {
-  constructor() {
-    super();
-    this.isDev = Window.isDev();
+type Props = {
+  showProjectIcons: boolean,
+  hasProject: boolean,
+  toggleProjectManager: boolean,
+  requestUpdate: ?() => void,
+  simulateUpdateDownloaded: ?() => void,
+  exportProject: Function,
+} & TranslatorProps;
 
-    this.state = {
-      editorToolbar: null,
-    };
-  }
+type State = {
+  editorToolbar: any,
+};
 
-  setEditorToolbar(editorToolbar) {
+export class MainFrameToolbar extends Component<Props, State> {
+  state = {
+    editorToolbar: null,
+  };
+
+  isDev = Window.isDev();
+
+  setEditorToolbar(editorToolbar: any) {
     this.setState({
       editorToolbar,
     });
@@ -44,14 +55,14 @@ export class MainFrameToolbar extends Component {
               tooltip={t('Project manager')}
             />
           )}
-          {this.props.showProjectIcons &&
-            this.props.canOpenProject && (
-              <ToolbarIcon
-                onClick={this.props.openProject}
-                src="res/ribbon_default/open32.png"
-                tooltip={t('Open a project')}
-              />
-            )}
+          {this.props.showProjectIcons && (
+            <ToolbarIcon
+              onClick={this.props.exportProject}
+              src="res/ribbon_default/export32.png"
+              disabled={!this.props.hasProject}
+              tooltip={t('Export the game (Web, Android, iOS...)')}
+            />
+          )}
           {this.isDev && (
             <IconMenu
               iconButtonElement={
@@ -60,7 +71,16 @@ export class MainFrameToolbar extends Component {
               buildMenuTemplate={() => [
                 {
                   label: 'Request update from external editor',
-                  click: () => this.props.requestUpdate(),
+                  disabled: !this.props.requestUpdate,
+                  click: () =>
+                    this.props.requestUpdate && this.props.requestUpdate(),
+                },
+                {
+                  label: 'Simulate update downloaded',
+                  disabled: !this.props.simulateUpdateDownloaded,
+                  click: () =>
+                    this.props.simulateUpdateDownloaded &&
+                    this.props.simulateUpdateDownloaded(),
                 },
               ]}
             />

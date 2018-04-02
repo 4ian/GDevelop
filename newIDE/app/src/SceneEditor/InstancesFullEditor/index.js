@@ -98,7 +98,9 @@ export default class InstancesFullEditor extends Component {
     this.props.setToolbar(
       <Toolbar
         showPreviewButton={this.props.showPreviewButton}
-        onPreview={this.props.onPreview}
+        onPreview={() => this.props.onPreview({})}
+        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+        onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
         showObjectsList={this.props.showObjectsList}
         instancesSelection={this.instancesSelection}
         openObjectsList={this.openObjectsList}
@@ -279,9 +281,12 @@ export default class InstancesFullEditor extends Component {
   };
 
   _onInstancesMoved = instances => {
-    this.setState({
-      history: saveToHistory(this.state.history, this.props.initialInstances),
-    }, () => this.forceUpdatePropertiesEditor());
+    this.setState(
+      {
+        history: saveToHistory(this.state.history, this.props.initialInstances),
+      },
+      () => this.forceUpdatePropertiesEditor()
+    );
   };
 
   _onInstancesModified = instances => {
@@ -476,6 +481,11 @@ export default class InstancesFullEditor extends Component {
       });
   };
 
+  updateBehaviorsSharedData = () => {
+    const { layout, project } = this.props;
+    layout.updateBehaviorsSharedData(project);
+  };
+
   forceUpdateObjectsList = () => {
     if (this._objectsList) this._objectsList.forceUpdateList();
   };
@@ -491,6 +501,7 @@ export default class InstancesFullEditor extends Component {
       initialInstances,
       resourceSources,
       onChooseResource,
+      isActive,
     } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
 
@@ -529,6 +540,7 @@ export default class InstancesFullEditor extends Component {
           onZoomOut={this.zoomOut}
           onZoomIn={this.zoomIn}
           wrappedEditorRef={editor => (this.editor = editor)}
+          pauseRendering={!isActive}
         />
       ),
       'objects-list': (
@@ -544,6 +556,7 @@ export default class InstancesFullEditor extends Component {
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             onRenameObject={this._onRenameObject}
+            onObjectPasted={() => this.updateBehaviorsSharedData()}
             ref={objectsList => (this._objectsList = objectsList)}
           />
         </MosaicWindow>
@@ -581,6 +594,7 @@ export default class InstancesFullEditor extends Component {
           onCancel={() => this.editObject(null)}
           onApply={() => {
             this.editObject(null);
+            this.updateBehaviorsSharedData();
             this.forceUpdateObjectsList();
           }}
         />
@@ -672,6 +686,7 @@ export default class InstancesFullEditor extends Component {
         />
         <ScenePropertiesDialog
           open={!!this.state.scenePropertiesDialogOpen}
+          project={project}
           layout={layout}
           onClose={() => this.openSceneProperties(false)}
           onApply={() => this.openSceneProperties(false)}

@@ -1,3 +1,4 @@
+// @flow
 import DefaultField from './ParameterFields/DefaultField';
 import RelationalOperatorField from './ParameterFields/RelationalOperatorField';
 import OperatorField from './ParameterFields/OperatorField';
@@ -15,35 +16,37 @@ import ObjectVariableField from './ParameterFields/ObjectVariableField';
 import LayerField from './ParameterFields/LayerField';
 const gd = global.gd;
 
+const components = {
+  default: DefaultField,
+  mouse: MouseField,
+  object: ObjectField,
+  relationalOperator: RelationalOperatorField,
+  operator: OperatorField,
+  yesorno: YesNoField,
+  trueorfalse: TrueFalseField,
+  expression: ExpressionField,
+  string: StringField,
+  behavior: BehaviorField,
+  scenevar: SceneVariableField,
+  globalvar: GlobalVariableField,
+  objectvar: ObjectVariableField,
+  layer: LayerField,
+  key: KeyField,
+  file: DefaultField, //TODO
+  musicfile: DefaultField, //TODO
+  soundfile: DefaultField, //TODO
+  color: DefaultField, //TODO
+  police: DefaultField, //TODO
+  joyaxis: DefaultField, //TODO
+};
+
 export default {
-  components: {
-    default: DefaultField,
-    mouse: MouseField,
-    object: ObjectField,
-    relationalOperator: RelationalOperatorField,
-    operator: OperatorField,
-    yesorno: YesNoField,
-    trueorfalse: TrueFalseField,
-    expression: ExpressionField,
-    string: StringField,
-    behavior: BehaviorField,
-    scenevar: SceneVariableField,
-    globalvar: GlobalVariableField,
-    objectvar: ObjectVariableField,
-    layer: LayerField,
-    key: KeyField,
-    file: DefaultField, //TODO
-    musicfile: DefaultField, //TODO
-    soundfile: DefaultField, //TODO
-    color: DefaultField, //TODO
-    police: DefaultField, //TODO
-    joyaxis: DefaultField, //TODO
-  },
-  getParameterComponent: function(type) {
+  components,
+  getParameterComponent: (type: string) =>  {
     const fieldType = gd.ParameterMetadata.isObject(type) ? 'object' : type;
 
-    if (this.components.hasOwnProperty(fieldType))
-      return this.components[fieldType];
-    else return this.components.default;
+    if (components.hasOwnProperty(fieldType))
+      return components[fieldType];
+    else return components.default;
   },
 };

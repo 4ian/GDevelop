@@ -26,14 +26,24 @@ public:
     mutable std::vector<sf::Vector2f> edges; ///< Edges. Can be computed from vertices using ComputeEdges()
 
     /**
-     * Moves each vertices from the given amount.
+     * \brief Get the vertices composing the polygon.
+     */
+    std::vector<sf::Vector2f> & GetVertices() { return vertices; }
+
+    /**
+     * \brief Get the vertices composing the polygon.
+     */
+    const std::vector<sf::Vector2f> & GetVertices() const { return vertices; }
+
+    /**
+     * \brief Moves each vertices from the given amount.
      *
      * \note Edges are updated, there is no need to call ComputeEdges after calling Move.
      */
     void Move(float x, float y);
 
     /**
-     * Rotate the polygon.
+     * \brief Rotate the polygon.
      * \param angle Angle in radians
      *
      * \warning Rotation is made clockwise
@@ -42,18 +52,18 @@ public:
     void Rotate(float angle);
 
     /**
-     * Automatically fill edges vector using vertices.
+     * \brief Automatically fill edges vector using vertices.
      */
     void ComputeEdges() const;
 
     /**
-     * Check if the polygon is convex.
+     * \brief Check if the polygon is convex.
      * \return true if the polygon is convex
      */
     bool IsConvex() const;
 
     /**
-     * Return the position of the center of the polygon
+     * \brief Return the position of the center of the polygon
      */
     sf::Vector2f ComputeCenter() const;
 
@@ -62,7 +72,7 @@ public:
      */
     ///@{
     /**
-     * Create a rectangle
+     * \brief Create a rectangle
      */
     static Polygon2d CreateRectangle(float width, float height);
     ///@}

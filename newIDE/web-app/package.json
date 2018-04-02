@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "GDevelop IDE running on browsers",
   "author": "Florian Rival",
-  "homepage": "http://compilgames.net",
+  "homepage": "http://gdevelop-app.com",
   "private": true,
   "license": "MIT",
   "scripts": {

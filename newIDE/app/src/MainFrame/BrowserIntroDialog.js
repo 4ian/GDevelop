@@ -4,7 +4,7 @@ import FlatButton from 'material-ui/FlatButton';
 
 export default class BetaIntroDialog extends Component {
   _onOpenWebsite() {
-    window.open('http://compilgames.net', '_blank');
+    window.open('http://gdevelop-app.com', '_blank');
   }
 
   render() {

@@ -3,10 +3,11 @@
 import React, { Component } from 'react';
 import SelectField from 'material-ui/SelectField';
 import FlatButton from 'material-ui/FlatButton';
+import MenuItem from 'material-ui/MenuItem';
 import Dialog from '../../UI/Dialog';
 import { Column, Line } from '../../UI/Grid';
 import { themes } from '../../UI/Theme';
-import MenuItem from 'material-ui/MenuItem';
+import Window from '../../Utils/Window';
 
 type Props = {|
   open: boolean,
@@ -18,6 +19,10 @@ type Props = {|
 type State = {||};
 
 export default class PreferencesDialog extends Component<Props, State> {
+  createTheme() {
+    Window.openExternalURL('https://github.com/4ian/GD/tree/master/newIDE#theming');
+  }
+
   render() {
     const { open, onClose } = this.props;
     const actions = [
@@ -31,8 +36,8 @@ export default class PreferencesDialog extends Component<Props, State> {
         open={open}
         title="GDevelop preferences"
       >
-        <Column noMargin>
-          <Line noMargin>
+        <Line noMargin>
+          <Column noMargin>
             <SelectField
               floatingLabelText={'UI Theme'}
               value={this.props.themeName}
@@ -46,8 +51,9 @@ export default class PreferencesDialog extends Component<Props, State> {
                 />
               ))}
             </SelectField>
-          </Line>
-        </Column>
+            <p>You can contribute and create your own themes: <FlatButton label="Learn more" onClick={this.createTheme} /> </p>
+          </Column>
+        </Line>
       </Dialog>
     );
   }

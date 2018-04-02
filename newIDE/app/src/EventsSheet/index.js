@@ -35,6 +35,7 @@ import {
   getSelectedInstructionsListsContexts,
   selectInstructionsList,
 } from './SelectionHandler';
+import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -101,7 +102,9 @@ export default class EventsSheet extends Component {
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
         showPreviewButton={this.props.showPreviewButton}
-        onPreview={this.props.onPreview}
+        showNetworkPreviewButton={this.props.showNetworkPreviewButton}
+        onPreview={() => this.props.onPreview({})}
+        onNetworkPreview={() => this.props.onPreview({networkPreview: true})}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}
@@ -295,6 +298,13 @@ export default class EventsSheet extends Component {
     });
   };
 
+  toggleDisabled = () => {
+    getSelectedEvents(this.state.selection).forEach(event =>
+      event.setDisabled(!event.isDisabled())
+    );
+    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
+  }
+
   deleteSelection = () => {
     const { events } = this.props;
     const eventsRemover = new gd.EventsRemover();
@@ -455,7 +465,13 @@ export default class EventsSheet extends Component {
   };
 
   render() {
-    const { project, layout, events, onOpenExternalEvents, onOpenLayout } = this.props;
+    const {
+      project,
+      layout,
+      events,
+      onOpenExternalEvents,
+      onOpenLayout,
+    } = this.props;
     if (!project) return null;
 
     return (
@@ -485,6 +501,7 @@ export default class EventsSheet extends Component {
           onOpenExternalEvents={onOpenExternalEvents}
           onOpenLayout={onOpenLayout}
         />
+        {events && events.getEventsCount() === 0 && <EmptyEventsPlaceholder />}
         <InlineParameterEditor
           open={this.state.inlineEditing}
           anchorEl={this.state.inlineEditingAnchorEl}
@@ -520,6 +537,10 @@ export default class EventsSheet extends Component {
               accelerator: 'CmdOrCtrl+V',
             },
             { type: 'separator' },
+            {
+              label: 'Toggle disabled',
+              click: () => this.toggleDisabled(),
+            },
             {
               label: 'Delete',
               click: () => this.deleteSelection(),

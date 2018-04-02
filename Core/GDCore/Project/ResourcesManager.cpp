@@ -5,6 +5,7 @@
  */
 
 #include <iostream>
+#include <map>
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include <wx/filedlg.h>
@@ -20,6 +21,7 @@
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 
 namespace gd
 {
@@ -105,7 +107,7 @@ bool ResourcesManager::HasResource(const gd::String & name) const
     return false;
 }
 
-std::vector<gd::String> ResourcesManager::GetAllResourcesList()
+std::vector<gd::String> ResourcesManager::GetAllResourceNames()
 {
     std::vector<gd::String> allResources;
     for (std::size_t i = 0;i<resources.size();++i)
@@ -114,8 +116,30 @@ std::vector<gd::String> ResourcesManager::GetAllResourcesList()
     return allResources;
 }
 
-
 #if defined(GD_IDE_ONLY)
+std::map<gd::String, gd::PropertyDescriptor> Resource::GetProperties(gd::Project & project) const
+{
+    std::map<gd::String, gd::PropertyDescriptor> nothing;
+    return nothing;
+}
+
+std::map<gd::String, gd::PropertyDescriptor> ImageResource::GetProperties(gd::Project & project) const
+{
+    std::map<gd::String, gd::PropertyDescriptor> properties;
+    properties[_("Smooth the image")].SetValue(smooth ? "true" : "false").SetType("Boolean");
+    properties[_("Always loaded in memory")].SetValue(alwaysLoaded ? "true" : "false").SetType("Boolean");
+
+    return properties;
+}
+
+bool ImageResource::UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project)
+{
+    if (name == _("Smooth the image")) smooth = value == "1";
+    else if (name == _("Always loaded in memory")) alwaysLoaded = value == "1";
+
+    return true;
+}
+
 bool ResourcesManager::AddResource(const gd::Resource & resource)
 {
     if ( HasResource(resource.GetName()) ) return false;
@@ -146,68 +170,13 @@ bool ResourcesManager::AddResource(const gd::String & name, const gd::String & f
     return true;
 }
 
-std::vector<gd::String> ResourceFolder::GetAllResourcesList()
+std::vector<gd::String> ResourceFolder::GetAllResourceNames()
 {
     std::vector<gd::String> allResources;
     for (std::size_t i = 0;i<resources.size();++i)
         allResources.push_back(resources[i]->GetName());
 
     return allResources;
-}
-
-bool ImageResource::EditProperty(gd::Project & project, const gd::String & property)
-{
-    return false;
-}
-
-bool ImageResource::ChangeProperty(gd::Project & project, const gd::String & property, const gd::String & newValue)
-{
-    if ( property == "smooth" )
-        smooth = (newValue == _("Yes"));
-    else if ( property == "alwaysLoaded" )
-        alwaysLoaded = (newValue == _("Yes"));
-
-    return true;
-}
-
-void ImageResource::GetPropertyInformation(gd::Project & project, const gd::String & property, gd::String & userFriendlyName, gd::String & description) const
-{
-    if ( property == "smooth" )
-    {
-        userFriendlyName = _("Smooth the image");
-        description = _("Set this to \"Yes\" to set a smooth filter on the image");
-    }
-    else if ( property == "alwaysLoaded" )
-    {
-        userFriendlyName = _("Always loaded in memory");
-        description = _("Set this to \"Yes\" to let the image always loaded in memory.\nUseful when the image is used by actions.");
-    }
-}
-
-gd::String ImageResource::GetProperty(gd::Project & project, const gd::String & property)
-{
-    if ( property == "smooth" )
-    {
-        return smooth ? _("Yes") : _("No");
-    }
-    else if ( property == "alwaysLoaded" )
-    {
-        return alwaysLoaded ? _("Yes") : _("No");
-    }
-
-    return "";
-}
-
-/**
- * Return a vector containing the name of all the properties of the resource
- */
-std::vector<gd::String> ImageResource::GetAllProperties(gd::Project & project) const
-{
-    std::vector<gd::String> allProperties;
-    allProperties.push_back("smooth");
-    allProperties.push_back("alwaysLoaded");
-
-    return allProperties;
 }
 
 #if !defined(GD_NO_WX_GUI)
@@ -349,6 +318,25 @@ bool ResourcesManager::MoveResourceUpInList(const gd::String & name)
 bool ResourcesManager::MoveResourceDownInList(const gd::String & name)
 {
     return gd::MoveResourceDownInList(resources, name);
+}
+
+std::size_t ResourcesManager::GetResourcePosition(const gd::String & name) const
+{
+    for (std::size_t i = 0;i<resources.size();++i)
+    {
+        if (resources[i]->GetName() == name) return i;
+    }
+    return gd::String::npos;
+}
+
+void ResourcesManager::MoveResource(std::size_t oldIndex, std::size_t newIndex)
+{
+    if ( oldIndex >= resources.size() || newIndex >= resources.size() )
+        return;
+
+    auto resource = resources[oldIndex];
+    resources.erase(resources.begin() + oldIndex);
+    resources.insert(resources.begin() + newIndex, resource);
 }
 
 bool ResourcesManager::MoveFolderUpInList(const gd::String & name)

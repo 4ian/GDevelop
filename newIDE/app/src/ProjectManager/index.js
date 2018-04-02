@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import { List, ListItem } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 import SearchBar from 'material-ui-search-bar';
@@ -65,7 +66,10 @@ const ThemableProjectStructureItem = ({ muiTheme, ...otherProps }) => (
 
 const ProjectStructureItem = muiThemeable()(ThemableProjectStructureItem);
 
-class ThemableItem extends Component {
+class ThemableItem extends React.Component<*, *> {
+  textField: ?Object;
+  _iconMenu: ?Object;
+
   componentDidUpdate(prevProps) {
     if (!prevProps.editingName && this.props.editingName) {
       setTimeout(() => {
@@ -126,7 +130,7 @@ class ThemableItem extends Component {
         onKeyPress={event => {
           if (event.charCode === 13) {
             // enter key pressed
-            this.textField.blur();
+            if (this.textField) this.textField.blur();
             this.props.onRename(event.target.value);
           }
         }}
@@ -157,33 +161,66 @@ const Item = muiThemeable()(ThemableItem);
 
 const AddItem = makeAddItem(ListItem);
 
-export default class ProjectManager extends React.Component {
+type Props = {|
+  project: gdProject,
+  onDeleteLayout: gdLayout => void,
+  onDeleteExternalEvents: gdExternalEvents => void,
+  onDeleteExternalLayout: gdExternalLayout => void,
+  onRenameLayout: (string, string) => void,
+  onRenameExternalEvents: (string, string) => void,
+  onRenameExternalLayout: (string, string) => void,
+  onOpenLayout: string => void,
+  onOpenExternalEvents: string => void,
+  onOpenExternalLayout: string => void,
+  onSaveProject: () => void,
+  onCloseProject: () => void,
+  onExportProject: () => void,
+  onOpenPreferences: () => void,
+  onOpenResources: () => void,
+  onAddLayout: () => void,
+  onAddExternalEvents: () => void,
+  onAddExternalLayout: () => void,
+  onOpenPlatformSpecificAssets: () => void,
+  onChangeSubscription: () => void,
+|};
+
+type State = {|
+  renamedItemKind: ?string,
+  renamedItemName: string,
+  searchText: string,
+  projectPropertiesDialogOpen: boolean,
+  variablesEditorOpen: boolean,
+|};
+
+export default class ProjectManager extends React.Component<Props, State> {
   state = {
     renamedItemKind: null,
     renamedItemName: '',
     searchText: '',
+    projectPropertiesDialogOpen: false,
+    variablesEditorOpen: false,
   };
 
-  _onEditName = (kind, name) => {
+  _onEditName = (kind: ?string, name: string) => {
     this.setState({
       renamedItemKind: kind,
       renamedItemName: name,
     });
   };
 
-  _copyLayout = layout => {
+  _copyLayout = (layout: gdLayout) => {
     Clipboard.set(LAYOUT_CLIPBOARD_KIND, {
       layout: serializeToJSObject(layout),
       name: layout.getName(),
     });
   };
 
-  _cutLayout = layout => {
+  _cutLayout = (layout: gdLayout) => {
     this._copyLayout(layout);
     this.props.onDeleteLayout(layout);
   };
 
-  _pasteLayout = index => {
+  _pasteLayout = (index: number) => {
     if (!Clipboard.has(LAYOUT_CLIPBOARD_KIND)) return;
 
     const { layout: copiedLayout, name } = Clipboard.get(LAYOUT_CLIPBOARD_KIND);
@@ -202,23 +239,24 @@ export default class ProjectManager extends React.Component {
       project
     );
     newLayout.setName(newName);
+    newLayout.updateBehaviorsSharedData(project);
 
     this.forceUpdate();
   };
 
-  _copyExternalEvents = externalEvents => {
+  _copyExternalEvents = (externalEvents: gdExternalEvents) => {
     Clipboard.set(EXTERNAL_EVENTS_CLIPBOARD_KIND, {
       externalEvents: serializeToJSObject(externalEvents),
       name: externalEvents.getName(),
     });
   };
 
-  _cutExternalEvents = externalEvents => {
+  _cutExternalEvents = (externalEvents: gdExternalEvents) => {
     this._copyExternalEvents(externalEvents);
     this.props.onDeleteExternalEvents(externalEvents);
   };
 
-  _pasteExternalEvents = index => {
+  _pasteExternalEvents = (index: number) => {
     if (!Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)) return;
 
     const { externalEvents: copiedExternalEvents, name } = Clipboard.get(
@@ -243,19 +281,19 @@ export default class ProjectManager extends React.Component {
     this.forceUpdate();
   };
 
-  _copyExternalLayout = externalLayout => {
+  _copyExternalLayout = (externalLayout: gdExternalLayout) => {
     Clipboard.set(EXTERNAL_LAYOUT_CLIPBOARD_KIND, {
       externalLayout: serializeToJSObject(externalLayout),
       name: externalLayout.getName(),
     });
   };
 
-  _cutExternalLayout = externalLayout => {
+  _cutExternalLayout = (externalLayout: gdExternalLayout) => {
     this._copyExternalLayout(externalLayout);
     this.props.onDeleteExternalLayout(externalLayout);
   };
 
-  _pasteExternalLayout = index => {
+  _pasteExternalLayout = (index: number) => {
     if (!Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)) return;
 
     const { externalLayout: copiedExternalLayout, name } = Clipboard.get(
@@ -327,10 +365,6 @@ export default class ProjectManager extends React.Component {
       <div style={styles.container}>
         <List style={styles.list}>
           {this._renderMenu()}
-          {/* <ProjectStructureItem
-            primaryText="Resources"
-            leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
-          /> */}
           <ProjectStructureItem
             primaryText="Game settings"
             leftIcon={
@@ -353,6 +387,18 @@ export default class ProjectManager extends React.Component {
                 leftIcon={<ListIcon src="res/ribbon_default/editname32.png" />}
                 onClick={() => this.setState({ variablesEditorOpen: true })}
               />,
+              <ListItem
+                key="icons"
+                primaryText="Icons"
+                leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
+                onClick={() => this.props.onOpenPlatformSpecificAssets()}
+              />,
+              <ListItem
+                key="resources"
+                primaryText="Resources"
+                leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
+                onClick={() => this.props.onOpenResources()}
+              />,
             ]}
           />
           <ProjectStructureItem
@@ -366,7 +412,7 @@ export default class ProjectManager extends React.Component {
               enumerateLayouts(project),
               searchText
             )
-              .map((layout, i) => {
+              .map((layout: gdLayout, i: number) => {
                 const name = layout.getName();
                 return (
                   <Item
@@ -518,6 +564,7 @@ export default class ProjectManager extends React.Component {
               this.setState({ projectPropertiesDialogOpen: false })}
             onApply={() =>
               this.setState({ projectPropertiesDialogOpen: false })}
+            onChangeSubscription={this.props.onChangeSubscription}
           />
         )}
       </div>

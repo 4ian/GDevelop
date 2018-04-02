@@ -11,6 +11,11 @@ const styles = {
 };
 
 export default class ObjectSelector extends Component {
+  state = {
+    focused: false,
+    text: null,
+  }
+
   constructor(props) {
     super(props);
 
@@ -38,6 +43,12 @@ export default class ObjectSelector extends Component {
     this.fullList = [...objects, { text: '', value: <Divider /> }, ...groups];
   }
 
+  componentWillUnmount() {
+    if (this.state.focused) {
+      this.props.onChange(this.state.text);
+    }
+  }
+
   focus() {
     if (this._field) this._field.focus();
   }
@@ -58,6 +69,7 @@ export default class ObjectSelector extends Component {
       layout,
       allowedObjectType,
       noGroups,
+      onBlur,
       ...rest
     } = this.props;
 
@@ -68,9 +80,26 @@ export default class ObjectSelector extends Component {
         menuProps={{
           maxHeight: 250,
         }}
-        searchText={value}
+        searchText={this.state.focused ? this.state.text : value}
+        onFocus={() => {
+          this.setState({
+            focused: true,
+            text: value,
+          });
+        }}
         onUpdateInput={value => {
-          onChange(value);
+          this.setState({
+            text: value,
+          });
+        }}
+        onBlur={event => {
+          onChange(event.target.value);
+          this.setState({
+            focused: false,
+            text: null,
+          });
+
+          if (onBlur) onBlur(event);
         }}
         onNewRequest={data => {
           // Note that data may be a string or a {text, value} object.

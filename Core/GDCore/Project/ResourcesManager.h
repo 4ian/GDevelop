@@ -6,11 +6,12 @@
 #ifndef GDCORE_RESOURCESMANAGER_H
 #define GDCORE_RESOURCESMANAGER_H
 #include <memory>
-#include "GDCore/String.h"
 #include <vector>
+#include "GDCore/String.h"
 namespace gd { class Project; }
 namespace gd { class ResourceFolder; }
 namespace gd { class SerializerElement; }
+namespace gd { class PropertyDescriptor; }
 class wxPaintDC;
 class wxPanel;
 
@@ -83,42 +84,41 @@ public:
      */
     gd::String GetAbsoluteFile(const gd::Project & game) const;
 
-    /**
-     * \brief Called when a property must be edited (i.e: it was double clicked in a property grid)
-     *
-     * \return true if the resource was changed
-     */
-    virtual bool EditProperty(gd::Project & project, const gd::String & property) { return true; };
-
-    /**
-     * \brief Called when a property must be changed (i.e: its value was changed in a property grid)
-     *
-     * \return true if the resource was changed
-     */
-    virtual bool ChangeProperty(gd::Project & project, const gd::String & property, const gd::String & newValue) { return true; };
-
-    /**
-     * \brief Must return a description of the main property provided by the resource (example : "Image file")
-     */
-    virtual void GetPropertyInformation(gd::Project & project, const gd::String & property, gd::String & userFriendlyName, gd::String & description) const { return; };
-
-    /**
-     * \brief Called when a property must be changed ( i.e: its value was changed in the property grid )
-     *
-     * \return the value of the property
-     */
-    virtual gd::String GetProperty(gd::Project & project, const gd::String & property) { return ""; };
-
-    /**
-     * \brief Return a description of the main property provided by the resource ( Example : "Image file" )
-     */
-    virtual std::vector<gd::String> GetAllProperties(gd::Project & project) const { std::vector<gd::String> noProperties; return noProperties; };
-
     #if !defined(GD_NO_WX_GUI)
     /**
      * \brief Called when the resource must be rendered in a preview panel.
      */
     virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & game) {};
+    #endif
+
+    #if defined(GD_IDE_ONLY)
+    /** \name Resources properties
+     * Reading and updating resources properties
+     */
+    ///@{
+    /**
+     * \brief Called when the IDE wants to know about the custom properties of the resource.
+     *
+     * Usage example:
+     \code
+        std::map<gd::String, gd::PropertyDescriptor> properties;
+        properties[ToString(_("Text"))].SetValue("Hello world!");
+
+        return properties;
+     \endcode
+     *
+     * \return a std::map with properties names as key.
+     * \see gd::PropertyDescriptor
+     */
+    virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const;
+
+    /**
+     * \brief Called when the IDE wants to update a custom property of the resource
+     *
+     * \return false if the new value cannot be set
+     */
+    virtual bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project) {return false;};
+    ///@}
     #endif
 
     /**
@@ -150,69 +150,41 @@ class GD_CORE_API ImageResource : public Resource
 public:
     ImageResource() : Resource(), smooth(true), alwaysLoaded(false) { SetKind("image"); };
     virtual ~ImageResource() {};
-    virtual ImageResource* Clone() const { return new ImageResource(*this);}
+    virtual ImageResource* Clone() const override { return new ImageResource(*this);}
 
     /**
      * Return the file used by the resource.
      */
-    virtual const gd::String & GetFile() const {return file;};
+    virtual const gd::String & GetFile() const override {return file;};
 
     /**
      * Change the file of the resource.
      */
-    virtual void SetFile(const gd::String & newFile);
+    virtual void SetFile(const gd::String & newFile) override;
 
     #if defined(GD_IDE_ONLY)
-    virtual bool UseFile() { return true; }
+    virtual bool UseFile() override { return true; }
 
     #if !defined(GD_NO_WX_GUI)
     /**
      * Called when the resource must be rendered in a preview panel.
      */
-    virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & game);
+    virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & game) override;
     #endif
 
-    /**
-     * Called when a property must be edited ( i.e: it was double clicked )
-     *
-     * \return true if the resource was changed
-     */
-    virtual bool EditProperty(gd::Project & project, const gd::String & property);
-
-    /**
-     * Called when a property must be changed ( i.e: its value was changed in the property grid )
-     *
-     * \return true if the resource was changed
-     */
-    virtual bool ChangeProperty(gd::Project & project, const gd::String & property, const gd::String & newValue);
-
-    /**
-     * Called when a property must be changed ( i.e: its value was changed in the property grid )
-     *
-     * \return the value of the property
-     */
-    virtual gd::String GetProperty(gd::Project & project, const gd::String & property);
-
-    /**
-     * Return a description of the main property provided by the resource ( Example : "Image file" )
-     */
-    virtual void GetPropertyInformation(gd::Project & project, const gd::String & property, gd::String & userFriendlyName, gd::String & description) const;
-
-    /**
-     * Return a vector containing the name of all the properties of the resource
-     */
-    virtual std::vector<gd::String> GetAllProperties(gd::Project & project) const;
+    std::map<gd::String, gd::PropertyDescriptor> GetProperties(gd::Project & project) const override;
+    bool UpdateProperty(const gd::String & name, const gd::String & value, gd::Project & project) override;
 
     /**
      * \brief Serialize the object
      */
-    void SerializeTo(SerializerElement & element) const;
+    void SerializeTo(SerializerElement & element) const override;
     #endif
 
     /**
      * \brief Unserialize the objectt.
      */
-    void UnserializeFrom(const SerializerElement & element);
+    void UnserializeFrom(const SerializerElement & element) override;
 
     /**
      * \brief Return true if the image should be smoothed.
@@ -242,17 +214,17 @@ class GD_CORE_API AudioResource : public Resource
 public:
     AudioResource() : Resource() { SetKind("audio"); };
     virtual ~AudioResource() {};
-    virtual AudioResource* Clone() const { return new AudioResource(*this);}
+    virtual AudioResource* Clone() const override { return new AudioResource(*this);}
 
-    virtual const gd::String & GetFile() const {return file;};
-    virtual void SetFile(const gd::String & newFile);
+    virtual const gd::String & GetFile() const override {return file;};
+    virtual void SetFile(const gd::String & newFile) override;
 
     #if defined(GD_IDE_ONLY)
-    virtual bool UseFile() { return true; }
-    void SerializeTo(SerializerElement & element) const;
+    virtual bool UseFile() override { return true; }
+    void SerializeTo(SerializerElement & element) const override;
     #endif
 
-    void UnserializeFrom(const SerializerElement & element);
+    void UnserializeFrom(const SerializerElement & element) override;
 
 private:
     gd::String file;
@@ -293,9 +265,9 @@ public:
     std::shared_ptr<Resource> CreateResource(const gd::String & kind);
 
     /**
-     * \brief Get a list containing the name of all of the resources.
+     * \brief Get a list containing the names of all resources.
      */
-    std::vector<gd::String> GetAllResourcesList();
+    std::vector<gd::String> GetAllResourceNames();
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -325,6 +297,11 @@ public:
     void RenameResource(const gd::String & oldName, const gd::String & newName);
 
     /**
+     * \brief Return the position of the layer called "name" in the layers list
+     */
+    std::size_t GetResourcePosition(const gd::String & name) const;
+
+    /**
      * \brief Move a resource up in the list
      */
     bool MoveResourceUpInList(const gd::String & name);
@@ -333,6 +310,11 @@ public:
      * \brief Move a resource down in the list
      */
     bool MoveResourceDownInList(const gd::String & name);
+
+    /**
+     * Change the position of the specified resource.
+     */
+    void MoveResource(std::size_t oldIndex, std::size_t newIndex);
 
     /**
      * \brief Return true if the folder exists.
@@ -445,7 +427,7 @@ public:
     /**
      * Get a list containing the name of all of the resources.
      */
-    virtual std::vector<gd::String> GetAllResourcesList();
+    virtual std::vector<gd::String> GetAllResourceNames();
 
     /**
      * Move a resource up in the list

@@ -1,24 +1,29 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import InstancesFullEditor from '../../SceneEditor/InstancesFullEditor';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import BaseEditor from './BaseEditor';
+import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 
 export default class SceneEditor extends BaseEditor {
+  editor: ?typeof InstancesFullEditor;
+
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
   }
 
   getSerializedElements() {
     const layout = this.getLayout();
+    if (!layout) return {};
 
     return {
       ...BaseEditor.getLayoutSerializedElements(layout),
       instances: serializeToJSObject(layout.getInitialInstances()),
-      uiSettings: this.editor.getUiSettings(),
+      uiSettings: this.editor ? this.editor.getUiSettings() : {},
     };
   }
 
-  getLayout() {
+  getLayout(): ?gdLayout {
     const { project, layoutName } = this.props;
     if (!project || !project.hasLayoutNamed(layoutName)) return null;
 
@@ -26,7 +31,7 @@ export default class SceneEditor extends BaseEditor {
   }
 
   render() {
-    const { project, layoutName } = this.props;
+    const { project, layoutName, isActive } = this.props;
     const layout = this.getLayout();
     if (!layout) {
       //TODO: Error component
@@ -41,7 +46,9 @@ export default class SceneEditor extends BaseEditor {
         layout={layout}
         initialInstances={layout.getInitialInstances()}
         initialUiSettings={serializeToJSObject(layout.getAssociatedSettings())}
-        onPreview={() => this.props.onPreview(project, layout)}
+        onPreview={(options: PreviewOptions) =>
+          this.props.onPreview(project, layout, options)}
+        isActive={isActive}
       />
     );
   }

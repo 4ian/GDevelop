@@ -118,6 +118,85 @@ export const allSpritesHaveSamePointsAs = (originalSprite, animation) => {
   );
 };
 
+export const copySpritePolygons = (originalSprite, destinationSprite) => {
+  if (originalSprite.ptr === destinationSprite.ptr) return;
+
+  destinationSprite.setCollisionMaskAutomatic(
+    originalSprite.isCollisionMaskAutomatic()
+  );
+
+  destinationSprite.getCustomCollisionMask().clear();
+  mapVector(originalSprite.getCustomCollisionMask(), originalPolygon => {
+    destinationSprite.getCustomCollisionMask().push_back(originalPolygon);
+  });
+};
+
+export const copyAnimationsSpriteCollisionMasks = (originalSprite, animation) => {
+  mapFor(0, animation.getDirectionsCount(), i => {
+    const direction = animation.getDirection(i);
+
+    mapFor(0, direction.getSpritesCount(), j => {
+      const sprite = direction.getSprite(j);
+      copySpritePolygons(originalSprite, sprite);
+    });
+  });
+};
+
+export const isSamePolygon = (polygon1, polygon2) => {
+  const polygon1Vertices = polygon1.getVertices();
+  const polygon2Vertices = polygon2.getVertices();
+
+  if (polygon1Vertices.size() !== polygon2Vertices.size()) return false;
+
+  return every(
+    mapVector(polygon1Vertices, (point1, index) => {
+      const point2 = polygon2Vertices.at(index);
+      return point1.get_x() === point2.get_x() && point1.get_y() === point2.get_y();
+    })
+  );
+};
+
+export const haveSameCollisionMasks = (sprite1, sprite2) => {
+  if (sprite1.isCollisionMaskAutomatic() !== sprite2.isCollisionMaskAutomatic())
+    return false;
+
+  if (
+    sprite1.isCollisionMaskAutomatic() &&
+    sprite2.isCollisionMaskAutomatic()
+  )
+    return true;
+
+  const sprite1CollisionMask = sprite1.getCustomCollisionMask();
+  const sprite2CollisionMask = sprite2.getCustomCollisionMask();
+
+  if (sprite1CollisionMask.size() !== sprite2CollisionMask.size()) return false;
+
+  return every(
+    mapVector(sprite1CollisionMask, (sprite1Polygon, index) => {
+      return isSamePolygon(sprite1Polygon, sprite2CollisionMask.at(index));
+    })
+  );
+};
+
+export const allSpritesHaveSameCollisionMasksAs = (
+  originalSprite,
+  animation
+) => {
+  return every(
+    mapFor(0, animation.getDirectionsCount(), i => {
+      const direction = animation.getDirection(i);
+
+      return every(
+        mapFor(0, direction.getSpritesCount(), j => {
+          const sprite = direction.getSprite(j);
+
+          return haveSameCollisionMasks(sprite, originalSprite);
+        })
+      );
+    })
+  );
+};
+
 export const deleteSpritesFromAnimation = (animation, spritePtrs) => {
   mapFor(0, animation.getDirectionsCount(), i => {
     const direction = animation.getDirection(i);

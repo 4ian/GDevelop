@@ -9,10 +9,18 @@ const generateUUID = a => {
 const localStorageKey = 'gd-user-uuid';
 
 export const getUserUUID = () => {
-  const existingUserUUID = localStorage.getItem(localStorageKey);
-  if (existingUserUUID) return existingUserUUID;
+  try {
+    const existingUserUUID = localStorage.getItem(localStorageKey);
+    if (existingUserUUID) return existingUserUUID;
+  } catch (e) {
+    console.warn('Unable to load stored user UUID', e);
+  }
 
   const newUserUUID = generateUUID();
-  localStorage.setItem(localStorageKey, newUserUUID);
+  try {
+    localStorage.setItem(localStorageKey, newUserUUID);
+  } catch (e) {
+    console.warn('Unable to save user UUID', e);
+  }
   return newUserUUID;
 };

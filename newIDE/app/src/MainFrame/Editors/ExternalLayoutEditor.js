@@ -1,4 +1,5 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import InstancesFullEditor from '../../SceneEditor/InstancesFullEditor';
 import { serializeToJSObject } from '../../Utils/Serializer';
@@ -14,12 +15,10 @@ const styles = {
 };
 
 export default class ExternalLayoutEditor extends BaseEditor {
-  constructor(props) {
-    super(props);
-    this.state = {
-      layoutChooserOpen: false,
-    };
-  }
+  editor: ?typeof InstancesFullEditor;
+  state = {
+    layoutChooserOpen: false,
+  };
 
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
@@ -28,15 +27,16 @@ export default class ExternalLayoutEditor extends BaseEditor {
   getSerializedElements() {
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
+    if (!externalLayout || !layout) return {};
 
     return {
       ...BaseEditor.getLayoutSerializedElements(layout),
       instances: serializeToJSObject(externalLayout.getInitialInstances()),
-      uiSettings: this.editor.getUiSettings(),
+      uiSettings: this.editor ? this.editor.getUiSettings() : {},
     };
   }
 
-  getExternalLayout() {
+  getExternalLayout(): ?gdExternalLayout {
     const { project, externalLayoutName } = this.props;
     if (!project.hasExternalLayoutNamed(externalLayoutName)) {
       return null;
@@ -44,7 +44,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
     return project.getExternalLayout(externalLayoutName);
   }
 
-  getLayout() {
+  getLayout(): ?gdLayout {
     const { project } = this.props;
 
     const externalLayout = this.getExternalLayout();
@@ -57,7 +57,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
     return project.getLayout(layoutName);
   }
 
-  setAssociatedLayout = layoutName => {
+  setAssociatedLayout = (layoutName: string) => {
     const externalLayout = this.getExternalLayout();
     if (!externalLayout) return;
 
@@ -77,7 +77,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
   };
 
   render() {
-    const { project, externalLayoutName } = this.props;
+    const { project, externalLayoutName, isActive } = this.props;
     const externalLayout = this.getExternalLayout();
     const layout = this.getLayout();
 
@@ -98,9 +98,10 @@ export default class ExternalLayoutEditor extends BaseEditor {
             initialUiSettings={serializeToJSObject(
               externalLayout.getAssociatedSettings()
             )}
-            onPreview={() =>
-              this.props.onPreview(project, layout, externalLayout)}
+            onPreview={options =>
+              this.props.onPreview(project, layout, externalLayout, options)}
             onOpenMoreSettings={this.openLayoutChooser}
+            isActive={isActive}
           />
         )}
         {!layout && (

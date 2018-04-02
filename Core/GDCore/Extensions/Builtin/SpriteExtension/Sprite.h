@@ -57,6 +57,16 @@ public:
     std::vector<Polygon2d> GetCollisionMask() const;
 
     /**
+     * \brief Get the custom collision mask.
+     */
+    std::vector<Polygon2d> & GetCustomCollisionMask() { return customCollisionMask; };
+
+    /**
+     * \brief Get the custom collision mask.
+     */
+    const std::vector<Polygon2d> & GetCustomCollisionMask() const { return customCollisionMask; };
+
+    /**
      * \brief Set the custom collision mask.
      * Call then `SetCollisionMaskAutomatic(false)` to use it.
      */

@@ -337,7 +337,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(gd::Plat
     extension.AddCondition("GlobalVolume",
                    _("Global volume"),
                    _("Test the global sound level. The volume is between 0 and 100."),
-                   _("The global game volume is _PARAM2_ to _PARAM1_"),
+                   _("The global game volume is _PARAM1__PARAM2_"),
                    _("Audio"),
                    "res/conditions/volume24.png",
                    "res/conditions/volume.png")

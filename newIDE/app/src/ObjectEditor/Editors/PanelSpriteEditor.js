@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import { Line, Column } from '../../UI/Grid';
-import ResourcesLoader from '../../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../../ResourcesLoader';
 import ResourceSelectorWithThumbnail from '../ResourceSelectorWithThumbnail';
 const gd = global.gd;
 

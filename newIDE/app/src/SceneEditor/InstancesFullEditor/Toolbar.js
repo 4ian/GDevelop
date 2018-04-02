@@ -18,6 +18,13 @@ export class Toolbar extends PureComponent {
             tooltip={t('Launch a preview of the scene')}
           />
         )}
+        {this.props.showNetworkPreviewButton && (
+          <ToolbarIcon
+            onClick={this.props.onNetworkPreview}
+            src="res/ribbon_default/networkpreview32.png"
+            tooltip={t('Preview the scene on a mobile or tablet connected to your wifi')}
+          />
+        )}
         {this.props.showPreviewButton && <ToolbarSeparator />}
         {this.props.showObjectsList && (
           <ToolbarIcon

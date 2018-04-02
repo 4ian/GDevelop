@@ -138,6 +138,11 @@ Object {
         "fullGroupName": "Common conditions for all objects/Collision",
         "type": "CollisionPoint",
       },
+      "Raycast": Object {
+        "displayedName": "Raycast",
+        "fullGroupName": "Common conditions for all objects/Collision",
+        "type": "Raycast",
+      },
     },
     "Layer": Object {
       "Compare layer": Object {
@@ -422,6 +427,156 @@ Object {
         "displayedName": "Width",
         "fullGroupName": "Panel Sprite (9-patch) Object/Size and angle",
         "type": "PanelSpriteObject::Width",
+      },
+    },
+  },
+  "Pathfinding behavior": Object {
+    "Destination reached": Object {
+      "displayedName": "Destination reached",
+      "fullGroupName": "Pathfinding behavior/",
+      "type": "PathfindingBehavior::DestinationReached",
+    },
+    "Obstacles": Object {
+      "Cost": Object {
+        "displayedName": "Cost",
+        "fullGroupName": "Pathfinding behavior/Obstacles",
+        "type": "PathfindingBehavior::Cost",
+      },
+      "Is object impassable?": Object {
+        "displayedName": "Is object impassable?",
+        "fullGroupName": "Pathfinding behavior/Obstacles",
+        "type": "PathfindingBehavior::IsImpassable",
+      },
+    },
+    "Path": Object {
+      "Acceleration": Object {
+        "displayedName": "Acceleration",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::Acceleration",
+      },
+      "Angular maximum speed": Object {
+        "displayedName": "Angular maximum speed",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::AngularMaxSpeed",
+      },
+      "Diagonals moves": Object {
+        "displayedName": "Diagonals moves",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::DiagonalsAllowed",
+      },
+      "Extra border": Object {
+        "displayedName": "Extra border",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::ExtraBorder",
+      },
+      "Maximum speed": Object {
+        "displayedName": "Maximum speed",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::MaxSpeed",
+      },
+      "Object rotated": Object {
+        "displayedName": "Object rotated",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::ObjectRotated",
+      },
+      "Rotation offset": Object {
+        "displayedName": "Rotation offset",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::AngleOffset",
+      },
+      "Speed": Object {
+        "displayedName": "Speed",
+        "fullGroupName": "Pathfinding behavior/Path",
+        "type": "PathfindingBehavior::Speed",
+      },
+    },
+    "Path found": Object {
+      "displayedName": "Path found",
+      "fullGroupName": "Pathfinding behavior/",
+      "type": "PathfindingBehavior::PathFound",
+    },
+    "Virtual grid": Object {
+      "Height of the virtual grid": Object {
+        "displayedName": "Height of the virtual grid",
+        "fullGroupName": "Pathfinding behavior/Virtual grid",
+        "type": "PathfindingBehavior::CellHeight",
+      },
+      "Width of the virtual grid": Object {
+        "displayedName": "Width of the virtual grid",
+        "fullGroupName": "Pathfinding behavior/Virtual grid",
+        "type": "PathfindingBehavior::CellWidth",
+      },
+    },
+  },
+  "Physics behavior": Object {
+    "Collision": Object {
+      "displayedName": "Collision",
+      "fullGroupName": "Physics behavior/",
+      "type": "PhysicsBehavior::CollisionWith",
+    },
+    "Collision polygon": Object {
+      "Collision polygon X scale": Object {
+        "displayedName": "Collision polygon X scale",
+        "fullGroupName": "Physics behavior/Collision polygon",
+        "type": "PhysicsBehavior::GetPolygonScaleX",
+      },
+      "Collision polygon Y scale": Object {
+        "displayedName": "Collision polygon Y scale",
+        "fullGroupName": "Physics behavior/Collision polygon",
+        "type": "PhysicsBehavior::GetPolygonScaleY",
+      },
+    },
+    "Displacement": Object {
+      "Angular damping": Object {
+        "displayedName": "Angular damping",
+        "fullGroupName": "Physics behavior/Displacement",
+        "type": "PhysicsBehavior::AngularDamping",
+      },
+      "Linear damping": Object {
+        "displayedName": "Linear damping",
+        "fullGroupName": "Physics behavior/Displacement",
+        "type": "PhysicsBehavior::LinearDamping",
+      },
+      "Linear speed": Object {
+        "displayedName": "Linear speed",
+        "fullGroupName": "Physics behavior/Displacement",
+        "type": "PhysicsBehavior::LinearVelocity",
+      },
+      "X component": Object {
+        "displayedName": "X component",
+        "fullGroupName": "Physics behavior/Displacement",
+        "type": "PhysicsBehavior::LinearVelocityX",
+      },
+      "Y component": Object {
+        "displayedName": "Y component",
+        "fullGroupName": "Physics behavior/Displacement",
+        "type": "PhysicsBehavior::LinearVelocityY",
+      },
+    },
+    "Movement": Object {
+      "The object is dynamic": Object {
+        "displayedName": "The object is dynamic",
+        "fullGroupName": "Physics behavior/Movement",
+        "type": "PhysicsBehavior::IsDynamic",
+      },
+    },
+    "Other": Object {
+      "Object is treated like a bullet": Object {
+        "displayedName": "Object is treated like a bullet",
+        "fullGroupName": "Physics behavior/Other",
+        "type": "PhysicsBehavior::IsBullet",
+      },
+    },
+    "Rotation": Object {
+      "Angular speed": Object {
+        "displayedName": "Angular speed",
+        "fullGroupName": "Physics behavior/Rotation",
+        "type": "PhysicsBehavior::AngularVelocity",
+      },
+      "Fixed rotation": Object {
+        "displayedName": "Fixed rotation",
+        "fullGroupName": "Physics behavior/Rotation",
+        "type": "PhysicsBehavior::IsFixedRotation",
       },
     },
   },
@@ -1703,6 +1858,186 @@ Array [
     "fullGroupName": "Shopify",
     "type": "Shopify::GetCheckoutUrlForProduct",
   },
+  Object {
+    "displayedName": "Acceleration",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::Acceleration",
+  },
+  Object {
+    "displayedName": "Diagonals moves",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::AllowDiagonals",
+  },
+  Object {
+    "displayedName": "Rotation offset",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::AngleOffset",
+  },
+  Object {
+    "displayedName": "Angular maximum speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::AngularMaxSpeed",
+  },
+  Object {
+    "displayedName": "Height of the cells",
+    "fullGroupName": "Pathfinding behavior/Virtual grid",
+    "type": "PathfindingBehavior::CellHeight",
+  },
+  Object {
+    "displayedName": "Width of the cells",
+    "fullGroupName": "Pathfinding behavior/Virtual grid",
+    "type": "PathfindingBehavior::CellWidth",
+  },
+  Object {
+    "displayedName": "Extra border",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::ExtraBorder",
+  },
+  Object {
+    "displayedName": "Maximum speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::MaxSpeed",
+  },
+  Object {
+    "displayedName": "Rotate the object",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::RotateObject",
+  },
+  Object {
+    "displayedName": "Move to a position",
+    "fullGroupName": "Pathfinding behavior/",
+    "type": "PathfindingBehavior::SetDestination",
+  },
+  Object {
+    "displayedName": "Speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::Speed",
+  },
+  Object {
+    "displayedName": "Cost",
+    "fullGroupName": "Pathfinding behavior/Obstacles",
+    "type": "PathfindingBehavior::Cost",
+  },
+  Object {
+    "displayedName": "Should object be impassable?",
+    "fullGroupName": "Pathfinding behavior/Obstacles",
+    "type": "PathfindingBehavior::SetImpassable",
+  },
+  Object {
+    "displayedName": "Add a gear between two objects",
+    "fullGroupName": "Physics behavior/Joints",
+    "type": "PhysicsBehavior::ActAddGearJointBetweenObjects",
+  },
+  Object {
+    "displayedName": "Add a hinge",
+    "fullGroupName": "Physics behavior/Joints",
+    "type": "PhysicsBehavior::AddRevoluteJoint",
+  },
+  Object {
+    "displayedName": "Add a hinge between two objects",
+    "fullGroupName": "Physics behavior/Joints",
+    "type": "PhysicsBehavior::AddRevoluteJointBetweenObjects",
+  },
+  Object {
+    "displayedName": "Add a force",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyForce",
+  },
+  Object {
+    "displayedName": "Apply a force toward a position",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyForceTowardPosition",
+  },
+  Object {
+    "displayedName": "Apply a force ( angle )",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyForceUsingPolarCoordinates",
+  },
+  Object {
+    "displayedName": "Apply an impulse",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyImpulse",
+  },
+  Object {
+    "displayedName": "Apply an impulse toward a position",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyImpulseTowardPosition",
+  },
+  Object {
+    "displayedName": "Apply an impulse (angle)",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::ApplyImpulseUsingPolarCoordinates",
+  },
+  Object {
+    "displayedName": "Add a torque (a rotation)",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::ApplyTorque",
+  },
+  Object {
+    "displayedName": "Do not treat object like a bullet",
+    "fullGroupName": "Physics behavior/Other",
+    "type": "PhysicsBehavior::DontSetAsBullet",
+  },
+  Object {
+    "displayedName": "Angular damping",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::SetAngularDamping",
+  },
+  Object {
+    "displayedName": "Angular speed",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::SetAngularVelocity",
+  },
+  Object {
+    "displayedName": "Treat object like a bullet.",
+    "fullGroupName": "Physics behavior/Other",
+    "type": "PhysicsBehavior::SetAsBullet",
+  },
+  Object {
+    "displayedName": "Make the object dynamic",
+    "fullGroupName": "Physics behavior/Movement",
+    "type": "PhysicsBehavior::SetDynamic",
+  },
+  Object {
+    "displayedName": "Fix rotation",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::SetFixedRotation",
+  },
+  Object {
+    "displayedName": "Make object's rotation free",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::SetFreeRotation",
+  },
+  Object {
+    "displayedName": "Gravity",
+    "fullGroupName": "Physics behavior/Global options",
+    "type": "PhysicsBehavior::SetGravity",
+  },
+  Object {
+    "displayedName": "Linear damping",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::SetLinearDamping",
+  },
+  Object {
+    "displayedName": "Linear velocity",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::SetLinearVelocity",
+  },
+  Object {
+    "displayedName": "Change the X scale of a collision polygon",
+    "fullGroupName": "Physics behavior/Collision polygon",
+    "type": "PhysicsBehavior::SetPolygonScaleX",
+  },
+  Object {
+    "displayedName": "Change the Y scale of a collision polygon",
+    "fullGroupName": "Physics behavior/Collision polygon",
+    "type": "PhysicsBehavior::SetPolygonScaleY",
+  },
+  Object {
+    "displayedName": "Make the object static",
+    "fullGroupName": "Physics behavior/Movement",
+    "type": "PhysicsBehavior::SetStatic",
+  },
 ]
 `;
 
@@ -1742,6 +2077,11 @@ Array [
     "displayedName": "Pick nearest object",
     "fullGroupName": "Common conditions for all objects/Objects",
     "type": "PickNearest",
+  },
+  Object {
+    "displayedName": "Raycast",
+    "fullGroupName": "Common conditions for all objects/Collision",
+    "type": "Raycast",
   },
   Object {
     "displayedName": "An object is moving toward another",
@@ -2377,6 +2717,136 @@ Array [
     "displayedName": "Is a mobile device",
     "fullGroupName": "System information",
     "type": "SystemInfo::IsMobile",
+  },
+  Object {
+    "displayedName": "Acceleration",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::Acceleration",
+  },
+  Object {
+    "displayedName": "Rotation offset",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::AngleOffset",
+  },
+  Object {
+    "displayedName": "Angular maximum speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::AngularMaxSpeed",
+  },
+  Object {
+    "displayedName": "Height of the virtual grid",
+    "fullGroupName": "Pathfinding behavior/Virtual grid",
+    "type": "PathfindingBehavior::CellHeight",
+  },
+  Object {
+    "displayedName": "Width of the virtual grid",
+    "fullGroupName": "Pathfinding behavior/Virtual grid",
+    "type": "PathfindingBehavior::CellWidth",
+  },
+  Object {
+    "displayedName": "Destination reached",
+    "fullGroupName": "Pathfinding behavior/",
+    "type": "PathfindingBehavior::DestinationReached",
+  },
+  Object {
+    "displayedName": "Diagonals moves",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::DiagonalsAllowed",
+  },
+  Object {
+    "displayedName": "Extra border",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::ExtraBorder",
+  },
+  Object {
+    "displayedName": "Maximum speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::MaxSpeed",
+  },
+  Object {
+    "displayedName": "Object rotated",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::ObjectRotated",
+  },
+  Object {
+    "displayedName": "Path found",
+    "fullGroupName": "Pathfinding behavior/",
+    "type": "PathfindingBehavior::PathFound",
+  },
+  Object {
+    "displayedName": "Speed",
+    "fullGroupName": "Pathfinding behavior/Path",
+    "type": "PathfindingBehavior::Speed",
+  },
+  Object {
+    "displayedName": "Cost",
+    "fullGroupName": "Pathfinding behavior/Obstacles",
+    "type": "PathfindingBehavior::Cost",
+  },
+  Object {
+    "displayedName": "Is object impassable?",
+    "fullGroupName": "Pathfinding behavior/Obstacles",
+    "type": "PathfindingBehavior::IsImpassable",
+  },
+  Object {
+    "displayedName": "Angular damping",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::AngularDamping",
+  },
+  Object {
+    "displayedName": "Angular speed",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::AngularVelocity",
+  },
+  Object {
+    "displayedName": "Collision",
+    "fullGroupName": "Physics behavior/",
+    "type": "PhysicsBehavior::CollisionWith",
+  },
+  Object {
+    "displayedName": "Collision polygon X scale",
+    "fullGroupName": "Physics behavior/Collision polygon",
+    "type": "PhysicsBehavior::GetPolygonScaleX",
+  },
+  Object {
+    "displayedName": "Collision polygon Y scale",
+    "fullGroupName": "Physics behavior/Collision polygon",
+    "type": "PhysicsBehavior::GetPolygonScaleY",
+  },
+  Object {
+    "displayedName": "Object is treated like a bullet",
+    "fullGroupName": "Physics behavior/Other",
+    "type": "PhysicsBehavior::IsBullet",
+  },
+  Object {
+    "displayedName": "The object is dynamic",
+    "fullGroupName": "Physics behavior/Movement",
+    "type": "PhysicsBehavior::IsDynamic",
+  },
+  Object {
+    "displayedName": "Fixed rotation",
+    "fullGroupName": "Physics behavior/Rotation",
+    "type": "PhysicsBehavior::IsFixedRotation",
+  },
+  Object {
+    "displayedName": "Linear damping",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::LinearDamping",
+  },
+  Object {
+    "displayedName": "Linear speed",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::LinearVelocity",
+  },
+  Object {
+    "displayedName": "X component",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::LinearVelocityX",
+  },
+  Object {
+    "displayedName": "Y component",
+    "fullGroupName": "Physics behavior/Displacement",
+    "type": "PhysicsBehavior::LinearVelocityY",
   },
 ]
 `;

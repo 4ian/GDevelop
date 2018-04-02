@@ -84,7 +84,7 @@ TEST_CASE( "Resources", "[common][resources]" ) {
 
                 gd::ProjectResourcesAdder::RemoveAllUselessImages(project);
                 std::vector<gd::String> remainingResources =
-                    project.GetResourcesManager().GetAllResourcesList();
+                    project.GetResourcesManager().GetAllResourceNames();
                 REQUIRE(remainingResources.size() == 2);
                 REQUIRE(remainingResources[0] == "res1");
                 REQUIRE(remainingResources[1] == "res4");

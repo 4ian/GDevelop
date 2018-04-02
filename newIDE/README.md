@@ -23,7 +23,8 @@ yarn start #or npm start
 
 This will open the app in your web browser.
 
-Images resources, GDJS Runtime, extensions will be copied in resources, and [libGD.js](https://github.com/4ian/GDevelop.js) will be downloaded automatically.
+Images resources, GDJS Runtime, extensions will be copied in resources, and [libGD.js](https://github.com/4ian/GDevelop.js) will be downloaded automatically. If you wish, you can
+[build libGD.js by yourself](https://github.com/4ian/GDevelop.js) (useful if you modified GDevelop native code like extensions).
 
 ### Development of the standalone app
 
@@ -61,19 +62,29 @@ cd newIDE/app
 yarn test #or npm run test
 ```
 
+### Theming
+
+It's possible to create new themes for the UI. See [this file](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/index.js) to declare a new theme. You can take a look at the [default theme](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/index.js), including the [styling of the Events Sheets](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/EventsSheet.css).
+
 ## Building and deploying the standalone app
 
 ### Desktop version
 
-Update version number which is read in `newIDE/electron-app/app/package.json`.
+First, update version number which is read in `newIDE/electron-app/app/package.json`.
 
 ```bash
 cd newIDE/electron-app
 yarn build #or npm run build
 ```
 
-This will build and package the Electron app for Windows, macOS and Linux (according to your OS).
-The output are stored inside `newIDE/electron-app/dist` and copied to `Binaries/Output/Release_XXX`.
+This will build and package the Electron app for Windows, macOS and Linux (according to your OS). The output are stored inside `newIDE/electron-app/dist`.
+
+To build artifacts for all platforms and publish to a draft GitHub release:
+
+```
+GH_TOKEN=xxx yarn build --mac --win --linux tar.gz --publish always
+```
+
 
 ### Webapp version
 
@@ -87,8 +98,6 @@ yarn deploy #or npm run deploy
 This new editor is still in development and is missing some features:
 
 - [ ] Support for translations (See an [example of a component that can be translated](https://github.com/4ian/GD/blob/master/newIDE/app/src/MainFrame/Toolbar.js#L44))
-- [ ] [Autocompletion of expressions and parameters in Events editor](https://trello.com/c/mAROBTR8/46-expression-editor-auto-complete-for-the-new-ide).
-- [ ] [Collision mask editor](https://trello.com/c/2Kzwj61r/47-collision-masks-editors-for-sprite-objects-in-the-new-ide)
 - [ ] Support for native games
 - [ ] More [documentation](http://wiki.compilgames.net/doku.php/gdevelop5/start) about how to package for iOS/Android with Cordova/PhoneGap Build or Cocos2d-JS.
 - [ ] Search in events
@@ -98,6 +107,8 @@ This new editor is still in development and is missing some features:
 - [ ] Make drawers movable/draggable like the properties panel and the objects editor
 
 You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
+
+See also [the roadmap for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
 
 ## Additional help
 

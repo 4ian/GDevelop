@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
 import InlinePopover from '../../InlinePopover';
@@ -7,9 +8,11 @@ import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
+  disabledText,
 } from '../ClassNames';
 import { getHelpLink } from '../../../Utils/HelpLink';
 import Window from '../../../Utils/Window';
+import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
@@ -54,29 +57,45 @@ const styles = {
   },
 };
 
-export default class JsCodeEvent extends Component {
+export default class JsCodeEvent extends React.Component<
+  EventRendererProps,
+  *
+> {
   state = {
     editing: false,
+    editingObject: false,
     anchorEl: null,
   };
 
+  _input: ?any;
+  _container: ?any;
+
   edit = () => {
+    if (!this._container) return;
+
     this.setState(
       {
         editing: true,
         height: this._container.offsetHeight,
       },
       () => {
-        const input = ReactDOM.findDOMNode(this._input);
-        input.focus();
-        input.value = gd.asJsCodeEvent(this.props.event).getInlineCode();
+        // $FlowFixMe
+        const input: ?HTMLInputElement = ReactDOM.findDOMNode(this._input);
+        if (input) {
+          input.focus();
+          input.value = gd.asJsCodeEvent(this.props.event).getInlineCode();
+        }
       }
     );
   };
 
   endEditing = () => {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
-    jsCodeEvent.setInlineCode(ReactDOM.findDOMNode(this._input).value);
+
+    // $FlowFixMe
+    const input: ?HTMLInputElement = ReactDOM.findDOMNode(this._input);
+    if (input) jsCodeEvent.setInlineCode(input.value);
+
     this.setState(
       {
         editing: false,
@@ -85,7 +104,7 @@ export default class JsCodeEvent extends Component {
     );
   };
 
-  editObject = domEvent => {
+  editObject = (domEvent: any) => {
     this.setState({
       editingObject: true,
       anchorEl: domEvent.currentTarget,
@@ -153,6 +172,7 @@ export default class JsCodeEvent extends Component {
           <p
             className={classNames({
               [selectableArea]: true,
+              [disabledText]: this.props.disabled,
             })}
             onClick={this.edit}
             key="p"

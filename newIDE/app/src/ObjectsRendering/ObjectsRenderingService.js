@@ -7,7 +7,7 @@ import RenderedTextInstance from './Renderers/RenderedTextInstance';
 import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstance';
 import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
 import PixiResourcesLoader from './PixiResourcesLoader';
-import ResourcesLoader from './ResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
 
 /**
  * A service containing functions that are called to render instances

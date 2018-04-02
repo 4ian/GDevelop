@@ -1,3 +1,4 @@
+// @flow
 import React from 'react';
 
 import { storiesOf } from '@storybook/react';
@@ -12,18 +13,25 @@ import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
-import LocalExport from '../Export/LocalExport';
-import LocalCordovaExport from '../Export/LocalCordovaExport';
-import LocalS3Export from '../Export/LocalS3Export';
+import LocalExport from '../Export/LocalExporters/LocalExport';
+import LocalCordovaExport from '../Export/LocalExporters/LocalCordovaExport';
+import Progress from '../Export/LocalExporters/LocalOnlineCordovaExport/Progress';
+import LocalS3Export from '../Export/LocalExporters/LocalS3Export';
+import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
 import TiledSpriteEditor from '../ObjectEditor/Editors/TiledSpriteEditor';
 import PanelSpriteEditor from '../ObjectEditor/Editors/PanelSpriteEditor';
 import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
 import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
+import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ImageThumbnail from '../ObjectEditor/ImageThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterFields/ExternalEventsField';
+import LayerField from '../EventsSheet/InstructionEditor/ParameterFields/LayerField';
+import MouseField from '../EventsSheet/InstructionEditor/ParameterFields/MouseField';
+import SceneVariableField from '../EventsSheet/InstructionEditor/ParameterFields/SceneVariableField';
+import KeyField from '../EventsSheet/InstructionEditor/ParameterFields/KeyField';
 import ExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/InstructionEditor/ParameterFields/StringField';
 import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
@@ -41,13 +49,36 @@ import ObjectsGroupsList from '../ObjectsGroupsList';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
+import RefGetter from './RefGetter';
 import DragDropContextProvider from '../Utils/DragDropHelpers/DragDropContextProvider';
-import ResourcesLoader from '../ObjectsRendering/ResourcesLoader';
+import ResourcesLoader from '../ResourcesLoader';
 import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
 import ParameterRenderingService from '../EventsSheet/InstructionEditor/ParameterRenderingService';
+import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import { makeTestProject } from '../fixtures/TestProject';
+import CreateProfile from '../Profile/CreateProfile';
+import ProfileDetails from '../Profile/ProfileDetails';
+import LimitDisplayer from '../Profile/LimitDisplayer';
+import {
+  subscriptionForIndieUser,
+  limitsForIndieUser,
+  limitsReached,
+  noSubscription,
+  usagesForIndieUser,
+  profileForIndieUser,
+  fakeNoSubscriptionUserProfile,
+  fakeIndieUserProfile,
+  fakeNotAuthenticatedUserProfile,
+  fakeAuthenticatedButLoadingUserProfile,
+} from '../fixtures/GDevelopServicesTestData';
+import SubscriptionDetails from '../Profile/SubscriptionDetails';
+import UsagesDetails from '../Profile/UsagesDetails';
+import SubscriptionDialog from '../Profile/SubscriptionDialog';
+import LoginDialog from '../Profile/LoginDialog';
+import UserProfileContext from '../Profile/UserProfileContext';
+import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 
 const gd = global.gd;
 const {
@@ -63,6 +94,7 @@ const {
   testInstruction,
   spriteObjectWithBehaviors,
   group2,
+  emptyLayout,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -117,24 +149,86 @@ storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('ExpressionField', () => (
-    <ValueStateHolder initialValue={'MySpriteObject.X() + MouseX("", 0)'}>
-      <ExpressionField
-        project={project}
-        layout={testLayout}
-        parameterRenderingService={ParameterRenderingService}
-      />
-    </ValueStateHolder>
+    <ValueStateHolder
+      initialValue={'MySpriteObject.X() + MouseX("", 0)'}
+      render={(value, onChange) => (
+        <ExpressionField
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+          parameterRenderingService={ParameterRenderingService}
+        />
+      )}
+    />
   ))
   .add('StringField', () => (
     <ValueStateHolder
       initialValue={'ToString(0) + "Test" + NewLine() + VariableString(MyVar)'}
-    >
-      <StringField
-        project={project}
-        layout={testLayout}
-        parameterRenderingService={ParameterRenderingService}
-      />
-    </ValueStateHolder>
+      render={(value, onChange) => (
+        <StringField
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+          parameterRenderingService={ParameterRenderingService}
+        />
+      )}
+    />
+  ))
+  .add('ExternalEventsField', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <ExternalEventsField
+          project={project}
+          value={value}
+          onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('LayerField', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <LayerField
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('KeyField', () => (
+    <ValueStateHolder
+      initialValue={'Space'}
+      render={(value, onChange) => (
+        <KeyField project={project} value={value} onChange={onChange} />
+      )}
+    />
+  ))
+  .add('MouseField', () => (
+    <ValueStateHolder
+      initialValue={'Left'}
+      render={(value, onChange) => (
+        <MouseField project={project} value={value} onChange={onChange} />
+      )}
+    />
+  ))
+  .add('SceneVariableField', () => (
+    <ValueStateHolder
+      initialValue={'Variable1'}
+      render={(value, onChange) => (
+        <SceneVariableField
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+        />
+      )}
+    />
   ));
 
 storiesOf('LocalExport', module)
@@ -142,15 +236,6 @@ storiesOf('LocalExport', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <LocalExport open project={project} onClose={action('close')} />
-  ));
-
-storiesOf('ParameterFields', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('ExternalEventsField', () => (
-    <ValueStateHolder initialValue={'Test'}>
-      <ExternalEventsField project={project} />
-    </ValueStateHolder>
   ));
 
 storiesOf('LocalS3Export', module)
@@ -164,6 +249,25 @@ storiesOf('LocalCordovaExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <LocalCordovaExport project={project} />);
+
+storiesOf('LocalOnlineCordovaExport', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('Progress (not started)', () => <Progress exportStep={''} />)
+  .add('Progress (export)', () => <Progress exportStep={'export'} />)
+  .add('Progress (compress)', () => <Progress exportStep={'compress'} />)
+  .add('Progress (upload)', () => <Progress exportStep={'upload'} />)
+  .add('Progress (upload) (errored)', () => (
+    <Progress exportStep={'upload'} errored />
+  ))
+  .add('Progress (waiting-for-build)', () => (
+    <Progress exportStep={'waiting-for-build'} />
+  ))
+  .add('Progress (build)', () => <Progress exportStep={'build'} />)
+  .add('Progress (build) (errored)', () => (
+    <Progress exportStep={'build'} errored />
+  ))
+  .add('Progress (done)', () => <Progress exportStep={'done'} />);
 
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)
@@ -179,7 +283,13 @@ storiesOf('StartPage', module)
 
 storiesOf('AboutDialog', module)
   .addDecorator(muiDecorator)
-  .add('default', () => <AboutDialog open />);
+  .add('default', () => (
+    <AboutDialog
+      open
+      onClose={action('close')}
+      updateStatus={{ message: '', status: 'unknown' }}
+    />
+  ));
 
 storiesOf('CreateProjectDialog', module)
   .addDecorator(muiDecorator)
@@ -221,6 +331,16 @@ storiesOf('EventsSheet', module)
         onOpenExternalEvents={action('Open external events')}
       />
     </DragDropContextProvider>
+  ))
+  .add('empty (no events)', () => (
+    <DragDropContextProvider>
+      <EventsSheet
+        project={project}
+        layout={emptyLayout}
+        events={emptyLayout.getEvents()}
+        onOpenExternalEvents={action('Open external events')}
+      />
+    </DragDropContextProvider>
   ));
 
 storiesOf('ExpressionSelector', module)
@@ -246,6 +366,7 @@ storiesOf('InstructionSelector', module)
     <InstructionSelector
       selectedType=""
       onChoose={action('Instruction chosen')}
+      isCondition
     />
   ));
 
@@ -299,6 +420,15 @@ storiesOf('SpriteEditor and related editors', module)
   .add('PointsEditor', () => (
     <SerializedObjectDisplay object={spriteObject}>
       <PointsEditor
+        object={spriteObject}
+        project={project}
+        resourcesLoader={ResourcesLoader}
+      />
+    </SerializedObjectDisplay>
+  ))
+  .add('CollisionMasksEditor', () => (
+    <SerializedObjectDisplay object={spriteObject}>
+      <CollisionMasksEditor
         object={spriteObject}
         project={project}
         resourcesLoader={ResourcesLoader}
@@ -442,4 +572,248 @@ storiesOf('VariablesList', module)
     <SerializedObjectDisplay object={testLayout}>
       <VariablesList variablesContainer={testLayout.getVariables()} />
     </SerializedObjectDisplay>
+  ));
+
+const fakeError = new Error('Fake error for storybook');
+storiesOf('ErrorBoundary', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ErrorFallbackComponent componentStack="Fake stack" error={fakeError} />
+  ));
+
+storiesOf('CreateProfile', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <CreateProfile onLogin={action('login')} />);
+
+storiesOf('LimitDisplayer', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LimitDisplayer
+      subscription={subscriptionForIndieUser}
+      limit={limitsForIndieUser['cordova-build']}
+      onChangeSubscription={action('change subscription')}
+    />
+  ))
+  .add('limit reached', () => (
+    <LimitDisplayer
+      subscription={subscriptionForIndieUser}
+      limit={limitsReached['cordova-build']}
+      onChangeSubscription={action('change subscription')}
+    />
+  ))
+  .add('limit reached without subscription', () => (
+    <LimitDisplayer
+      subscription={noSubscription}
+      limit={limitsReached['cordova-build']}
+      onChangeSubscription={action('change subscription')}
+    />
+  ));
+
+storiesOf('ProfileDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('profile', () => <ProfileDetails profile={profileForIndieUser} />)
+  .add('loading', () => <ProfileDetails profile={null} />);
+
+storiesOf('SubscriptionDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <SubscriptionDetails
+      subscription={subscriptionForIndieUser}
+      onChangeSubscription={action('change subscription')}
+    />
+  ))
+  .add('limit reached', () => (
+    <SubscriptionDetails
+      subscription={noSubscription}
+      onChangeSubscription={action('change subscription')}
+    />
+  ));
+
+storiesOf('UsagesDetails', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <UsagesDetails usages={usagesForIndieUser} />)
+  .add('empty', () => <UsagesDetails usages={[]} />);
+
+storiesOf('SubscriptionDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('not authenticated', () => (
+    <UserProfileContext.Provider value={fakeNotAuthenticatedUserProfile}>
+      <SubscriptionDialog open onClose={action('on close')} />
+    </UserProfileContext.Provider>
+  ))
+  .add('authenticated but loading', () => (
+    <UserProfileContext.Provider value={fakeAuthenticatedButLoadingUserProfile}>
+      <SubscriptionDialog open onClose={action('on close')} />
+    </UserProfileContext.Provider>
+  ))
+  .add('authenticated user with subscription', () => (
+    <UserProfileContext.Provider value={fakeIndieUserProfile}>
+      <SubscriptionDialog open onClose={action('on close')} />
+    </UserProfileContext.Provider>
+  ))
+  .add('authenticated user with no subscription', () => (
+    <UserProfileContext.Provider value={fakeNoSubscriptionUserProfile}>
+      <SubscriptionDialog open onClose={action('on close')} />
+    </UserProfileContext.Provider>
+  ));
+
+storiesOf('LoginDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      resetPasswordDialogOpen={false}
+      forgotPasswordInProgress={false}
+      error={null}
+    />
+  ))
+  .add('login in progress', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress
+      createAccountInProgress={false}
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      resetPasswordDialogOpen={false}
+      forgotPasswordInProgress={false}
+      error={null}
+    />
+  ))
+  .add('create account in progress', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      resetPasswordDialogOpen={false}
+      forgotPasswordInProgress={false}
+      error={null}
+    />
+  ))
+  .add('weak-password error', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      resetPasswordDialogOpen={false}
+      forgotPasswordInProgress={false}
+      error={{
+        code: 'auth/weak-password',
+      }}
+    />
+  ))
+  .add('invalid-email error', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      resetPasswordDialogOpen={false}
+      forgotPasswordInProgress={false}
+      error={{
+        code: 'auth/invalid-email',
+      }}
+    />
+  ))
+  .add('Reset password', () => (
+    <LoginDialog
+      open
+      onClose={action('on close')}
+      loginInProgress={false}
+      createAccountInProgress={false}
+      onCreateAccount={action('on create account')}
+      onLogin={action('on login')}
+      onForgotPassword={action('on forgot password')}
+      onCloseResetPasswordDialog={action('on close reset password dialog')}
+      forgotPasswordInProgress={false}
+      resetPasswordDialogOpen
+      error={null}
+    />
+  ));
+
+storiesOf('LocalNetworkPreviewDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <LocalNetworkPreviewDialog
+      open
+      url="192.168.0.1:2929"
+      error={null}
+      onRunPreviewLocally={action('on run preview locally')}
+      onExport={action('on export')}
+      onClose={action('on close')}
+    />
+  ))
+  .add('waiting for url', () => (
+    <LocalNetworkPreviewDialog
+      open
+      url=""
+      error={null}
+      onRunPreviewLocally={action('on run preview locally')}
+      onExport={action('on export')}
+      onClose={action('on close')}
+    />
+  ))
+  .add('error', () => (
+    <LocalNetworkPreviewDialog
+      open
+      url="192.168.0.1:2929"
+      error={{ message: 'Oops' }}
+      onRunPreviewLocally={action('on run preview locally')}
+      onExport={action('on export')}
+      onClose={action('on close')}
+    />
+  ));
+
+storiesOf('SubscriptionCheckDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default (try mode)', () => (
+    <RefGetter onRef={ref => ref.checkHasSubscription()}>
+      <SubscriptionCheckDialog
+        title="Preview over wifi"
+        userProfile={fakeNoSubscriptionUserProfile}
+        onChangeSubscription={action('change subscription')}
+        mode="try"
+      />
+    </RefGetter>
+  ))
+  .add('default (mandatory mode)', () => (
+    <RefGetter onRef={ref => ref.checkHasSubscription()}>
+      <SubscriptionCheckDialog
+        title="Preview over wifi"
+        userProfile={fakeNoSubscriptionUserProfile}
+        onChangeSubscription={action('change subscription')}
+        mode="mandatory"
+      />
+    </RefGetter>
   ));

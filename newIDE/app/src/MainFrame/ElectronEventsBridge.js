@@ -19,7 +19,7 @@ class ElectronEventsBridge extends Component {
     );
     ipcRenderer.on(
       'main-menu-close',
-      event => this.editor && this.editor.closeProject()
+      event => this.editor && this.editor.closeProject(() => {})
     );
     ipcRenderer.on(
       'main-menu-export',
@@ -34,8 +34,20 @@ class ElectronEventsBridge extends Component {
       event => this.editor && this.editor.openStartPage()
     );
     ipcRenderer.on(
+      'main-menu-open-about',
+      event => this.editor && this.editor.openAboutDialog()
+    );
+    ipcRenderer.on(
       'main-menu-open-preferences',
       event => this.editor && this.editor.openPreferences()
+    );
+    ipcRenderer.on(
+      'main-menu-open-profile',
+      event => this.editor && this.editor.openProfile()
+    );
+    ipcRenderer.on(
+      'update-status',
+      (event, status) => this.editor && this.editor.setUpdateStatus(status)
     );
   }
 

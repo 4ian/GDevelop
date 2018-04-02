@@ -95,6 +95,7 @@ class ObjectsList extends Component<*, *> {
               key={objectWithContext.object.ptr}
               project={project}
               object={objectWithContext.object}
+              isGlobalObject={objectWithContext.global}
               style={style}
               onEdit={
                 this.props.onEditObject
@@ -110,6 +111,11 @@ class ObjectsList extends Component<*, *> {
               onPaste={() => this.props.onPaste(objectWithContext)}
               onRename={newName =>
                 this.props.onRename(objectWithContext, newName)}
+              onSetAsGlobalObject={
+                objectWithContext.global
+                  ? undefined
+                  : () => this.props.onSetAsGlobalObject(objectWithContext)
+              }
               onAddNewObject={this.props.onAddNewObject}
               editingName={nameBeingEdited}
               getThumbnail={this.props.getThumbnail}
@@ -257,7 +263,7 @@ export default class ObjectsListContainer extends React.Component<
 
     const { object: pasteObject, global } = objectWithContext;
     const { object: copiedObject, type, name } = Clipboard.get(CLIPBOARD_KIND);
-    const { project, objectsContainer } = this.props;
+    const { project, objectsContainer, onObjectPasted } = this.props;
 
     const newName = newNameGenerator(
       'CopyOf' + name,
@@ -287,6 +293,7 @@ export default class ObjectsListContainer extends React.Component<
     );
 
     this.forceUpdate();
+    if (onObjectPasted) onObjectPasted(newObject);
   };
 
   _editName = (objectWithContext: ?ObjectWithContext) => {
@@ -353,6 +360,35 @@ export default class ObjectsListContainer extends React.Component<
     this.forceUpdateList();
   };
 
+  _setAsGlobalObject = (objectWithContext: ObjectWithContext) => {
+    const { object } = objectWithContext;
+    const { project, objectsContainer } = this.props;
+
+    const objectName = object.getName();
+    if (!objectsContainer.hasObjectNamed(objectName)) return;
+
+    if (project.hasObjectNamed(objectName)) {
+      showWarningBox(
+        'A global object with this name already exists. Please change the object name before setting it as a global object'
+      );
+      return;
+    }
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      "This object will be loaded and available in all the scenes. This is only recommended for objects that you reuse a lot and can't be undone. Make this object global?"
+    );
+    if (!answer) return;
+
+    project.insertObject(
+      objectsContainer.getObject(objectName),
+      project.getObjectsCount()
+    );
+    objectsContainer.removeObject(objectName);
+
+    this.forceUpdateList();
+  };
+
   forceUpdateList = () => {
     this.forceUpdate();
     this.sortableList.getWrappedInstance().forceUpdateGrid();
@@ -401,6 +437,7 @@ export default class ObjectsListContainer extends React.Component<
                 onEditObject={this.props.onEditObject}
                 onCopyObject={this._copyObject}
                 onCutObject={this._cutObject}
+                onSetAsGlobalObject={this._setAsGlobalObject}
                 onPaste={this._paste}
                 onAddNewObject={() =>
                   this.setState({ newObjectDialogOpen: true })}

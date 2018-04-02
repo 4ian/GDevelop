@@ -16,6 +16,8 @@ class TiXmlElement;
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/Project/ResourcesManager.h"
+#include "GDCore/Project/PlatformSpecificAssets.h"
+#include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
@@ -86,6 +88,18 @@ public:
     const gd::String & GetPackageName() const { return packageName; }
 
     /**
+     * \brief Change the project orientation (in particular when exported with Cordova).
+     * This has no effect on desktop and web browsers.
+     * \param orientation The orientation to use ("default", "landscape", "portrait").
+     */
+    void SetOrientation(const gd::String & orientation_) { orientation = orientation_; };
+
+    /**
+     * \brief Get project orientation ("default", "landscape", "portrait").
+     */
+    const gd::String & GetOrientation() const { return orientation; }
+
+    /**
      * Called when project file has changed.
      */
     void SetProjectFile(const gd::String & file) { gameFile = file; }
@@ -118,6 +132,26 @@ public:
      * \see gd::Project::SetLastCompilationDirectory
      */
     const gd::String & GetLastCompilationDirectory() const {return latestCompilationDirectory;}
+
+    /**
+     * \brief Return a reference to platform assets of the project (icons, splashscreen...).
+     */
+    gd::PlatformSpecificAssets & GetPlatformSpecificAssets() { return platformSpecificAssets; }
+
+    /**
+     * \brief Return a reference to platform assets of the project (icons, splashscreen...).
+     */
+    const gd::PlatformSpecificAssets & GetPlatformSpecificAssets() const { return platformSpecificAssets; }
+
+    /**
+     * \brief Return a reference to loading screen setup for the project
+     */
+    gd::LoadingScreen & GetLoadingScreen() { return loadingScreen; }
+
+    /**
+     * \brief Return a reference to loading screen setup for the project
+     */
+    const gd::LoadingScreen & GetLoadingScreen() const { return loadingScreen; }
 #endif
 
     /**
@@ -737,10 +771,13 @@ private:
     gd::ObjectGroupsContainer                            objectGroups; ///< Global objects groups
     gd::String                                         author; ///< Game author name
     gd::String                                         packageName; ///< Game package name
+    gd::String                                         orientation; ///< Lock game orientation (on mobile devices). "default", "landscape" or "portrait".
     bool                                                folderProject; ///< True if folder project, false if single file project.
     gd::String                                         gameFile; ///< File of the game
     gd::String                                         latestCompilationDirectory; ///< File of the game
     gd::Platform*                                       currentPlatform; ///< The platform being used to edit the project.
+    gd::PlatformSpecificAssets                          platformSpecificAssets;
+    gd::LoadingScreen                                   loadingScreen;
     std::vector < std::unique_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
     mutable unsigned int                                GDMajorVersion; ///< The GD major version used the last time the project was saved.
     mutable unsigned int                                GDMinorVersion; ///< The GD minor version used the last time the project was saved.

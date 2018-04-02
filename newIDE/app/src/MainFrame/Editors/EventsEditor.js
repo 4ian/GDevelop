@@ -1,15 +1,19 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import EventsSheet from '../../EventsSheet';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import BaseEditor from './BaseEditor';
 
 export default class EventsEditor extends BaseEditor {
+  editor: ?typeof EventsSheet;
+
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
   }
 
   getSerializedElements() {
     const layout = this.getLayout();
+    if (!layout) return {};
 
     return {
       ...BaseEditor.getLayoutSerializedElements(layout),
@@ -17,7 +21,7 @@ export default class EventsEditor extends BaseEditor {
     };
   }
 
-  getLayout() {
+  getLayout(): ?gdLayout {
     const { project, layoutName } = this.props;
     if (!project || !project.hasLayoutNamed(layoutName)) return null;
 
@@ -39,7 +43,7 @@ export default class EventsEditor extends BaseEditor {
         project={project}
         layout={layout}
         events={layout.getEvents()}
-        onPreview={() => this.props.onPreview(project, layout)}
+        onPreview={(options) => this.props.onPreview(project, layout, options)}
         onOpenExternalEvents={this.props.onOpenExternalEvents}
       />
     );

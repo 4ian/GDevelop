@@ -1,7 +1,14 @@
-import React, { Component } from 'react';
-import TextField from 'material-ui/TextField';
+// @flow
+import * as React from 'react';
+import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
-export default class DefaultField extends Component {
+export default class DefaultField extends React.Component<
+  ParameterFieldProps,
+  void
+> {
+  _field: ?any = null;
+
   focus() {
     if (this._field) this._field.focus();
   }
@@ -13,10 +20,11 @@ export default class DefaultField extends Component {
       : undefined;
 
     return (
-      <TextField
+      <SemiControlledTextField
+        commitOnBlur
         value={this.props.value}
         floatingLabelText={description}
-        onChange={(e, text) => this.props.onChange(text)}
+        onChange={(text: string) => this.props.onChange(text)}
         ref={field => (this._field = field)}
         fullWidth
       />

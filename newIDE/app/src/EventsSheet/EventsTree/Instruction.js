@@ -1,9 +1,19 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import PropTypes from 'prop-types';
 import { mapFor } from '../../Utils/MapFor';
 import classNames from 'classnames';
-import { selectedArea, selectableArea } from './ClassNames';
-import InstructionsList from './InstructionsList';
+import {
+  selectedArea,
+  selectableArea,
+  subInstructionsContainer,
+  instructionParameter,
+  disabledText,
+} from './ClassNames';
+import InstructionsList, {
+  type InstructionsListContext,
+  type InstructionContext,
+} from './InstructionsList';
 const gd = global.gd;
 const instrFormatter = gd.InstructionSentenceFormatter.get();
 instrFormatter.loadTypesFormattingFromConfig();
@@ -20,36 +30,44 @@ const styles = {
     paddingLeft: 2,
     paddingRight: 2,
   },
-  subInstructionsList: {
-    marginLeft: 9,
-    marginTop: 1,
-    borderRight: 'none',
-    borderLeft: '1px solid #d3d3d3',
-  },
 };
 
-export default class Instruction extends Component {
-  static propTypes = {
-    instruction: PropTypes.object.isRequired,
-    isCondition: PropTypes.bool.isRequired,
-    onClick: PropTypes.func.isRequired,
+type Props = {
+  instruction: gdInstruction,
+  isCondition: boolean,
+  onClick: Function,
+  selected: boolean,
+  disabled: boolean,
+  onDoubleClick: () => void,
+  onContextMenu: (x: number, y: number) => void,
 
-    // For potential sub-instructions list:
-    selection: PropTypes.object,
-    onAddNewSubInstruction: PropTypes.func,
-    onSubInstructionClick: PropTypes.func,
-    onSubInstructionDoubleClick: PropTypes.func,
-    onSubInstructionsListContextMenu: PropTypes.func,
-    onSubParameterClick: PropTypes.func,
-  };
+  // For potential sub-instructions list:
+  selection: PropTypes.object,
+  onAddNewSubInstruction: Function,
+  onSubInstructionClick: Function,
+  onSubInstructionDoubleClick: Function,
+  onSubInstructionsListContextMenu: (
+    x: number,
+    y: number,
+    instructionsListContext: InstructionsListContext
+  ) => void,
+  onSubParameterClick: Function,
+  onSubInstructionContextMenu: (
+    x: number,
+    y: number,
+    instructionContext: InstructionContext
+  ) => void,
+  onParameterClick: (event: any, parameterIndex: number) => void,
+};
 
+export default class Instruction extends React.Component<Props, *> {
   /**
    * Render the different parts of the text of the instruction.
    * Parameter can have formatting, be hovered and clicked. The rest
    * has not particular styling.
    */
-  _renderInstructionText = metadata => {
-    const { instruction } = this.props;
+  _renderInstructionText = (metadata: gdInstructionMetadata) => {
+    const { instruction, disabled } = this.props;
     const formattedTexts = instrFormatter.getAsFormattedText(
       instruction,
       metadata
@@ -57,33 +75,28 @@ export default class Instruction extends Component {
     const parametersCount = metadata.getParametersCount();
 
     return (
-      <span>
+      <span
+        className={classNames({
+          [disabledText]: disabled,
+        })}
+      >
         {mapFor(0, formattedTexts.size(), i => {
           const formatting = formattedTexts.getTextFormatting(i);
           const parameterIndex = formatting.getUserData();
-
           const isParameter =
             parameterIndex >= 0 && parameterIndex < parametersCount;
+
           if (!isParameter)
             return <span key={i}>{formattedTexts.getString(i)}</span>;
 
+          const parameterType = metadata.getParameter(parameterIndex).getType();
           return (
             <span
               key={i}
-              style={{
-                color:
-                  'rgb(' +
-                  formatting.getColorRed() +
-                  ',' +
-                  formatting.getColorGreen() +
-                  ',' +
-                  formatting.getColorBlue() +
-                  ')',
-                fontWeight: formatting.isBold() ? 'bold' : 'normal',
-                fontStyle: formatting.isItalic() ? 'italic' : 'normal',
-              }}
               className={classNames({
                 [selectableArea]: true,
+                [instructionParameter]: true,
+                [parameterType]: true,
               })}
               onClick={domEvent =>
                 this.props.onParameterClick(domEvent, parameterIndex)}
@@ -149,7 +162,7 @@ export default class Instruction extends Component {
         {this._renderInstructionText(metadata)}
         {metadata.canHaveSubInstructions() && (
           <InstructionsList
-            style={styles.subInstructionsList}
+            extraClassName={subInstructionsContainer}
             instrsList={instruction.getSubInstructions()}
             areConditions={this.props.isCondition}
             selection={this.props.selection}
@@ -162,6 +175,7 @@ export default class Instruction extends Component {
             }
             onParameterClick={this.props.onSubParameterClick}
             addButtonLabel="Add a sub-condition"
+            disabled={this.props.disabled}
           />
         )}
       </div>

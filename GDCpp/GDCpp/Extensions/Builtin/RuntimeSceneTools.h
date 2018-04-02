@@ -97,6 +97,11 @@ bool GD_API PickNearestObject(std::map <gd::String, std::vector<RuntimeObject*> 
 /**
  * Only used internally by GD events generated code.
  */
+bool GD_API RaycastObject(std::map <gd::String, std::vector<RuntimeObject*> *> pickedObjectLists, float x, float y, float angle, float dist, gd::Variable & varX, gd::Variable & varY, bool inverted);
+
+/**
+ * Only used internally by GD events generated code.
+ */
 void GD_API ChangeSceneBackground(RuntimeScene & scene, gd::String newColor);
 
 /**

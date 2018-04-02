@@ -1,10 +1,5 @@
 /* This overwrite the default react-sortable-tree css to display events list */
 
-.gd-events-sheet .events-tree {
-    font-family: -apple-system, ".SFNSText-Regular", "San Francisco", Roboto, "Segoe UI", "Helvetica Neue", "Lucida Grande", sans-serif;
-    font-size: 14px;
-}
-
 /**
  * Draggable handle on the left of an event
  */
@@ -14,6 +9,10 @@
     border: 1px solid #49AFE4;
     box-shadow: none;
     border-radius: 0;
+}
+
+.gd-events-sheet .events-tree {
+    height: 100%;
 }
 
 /**
@@ -125,4 +124,12 @@
 .gd-events-sheet .large-selectable {
     box-sizing: border-box;
     border: 1px transparent solid;
+}
+
+/**
+ * Disabled text
+ */
+.gd-events-sheet .disabled-text {
+    text-decoration: line-through;
+    opacity: 0.6;
 }

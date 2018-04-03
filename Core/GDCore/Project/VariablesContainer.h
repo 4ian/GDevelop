@@ -8,6 +8,7 @@
 #define GDCORE_VARIABLESCONTAINER_H
 #include "GDCore/String.h"
 #include <vector>
+#include <memory>
 #include "GDCore/Project/Variable.h"
 namespace gd { class SerializerElement; }
 class TiXmlElement;

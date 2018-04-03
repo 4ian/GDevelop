@@ -11,7 +11,7 @@ IF NOT EXIST "%INNOSETUP_EXE%" set INNOSETUP_EXE=C:\Program Files\Inno Setup 5\I
 IF EXIST "%INNOSETUP_EXE%" (
 	echo "Note: InnoSetup found at %INNOSETUP_EXE%"
 ) ELSE (
-	echo Warning: InnoSetup not found! Skipping installer creation.
+	echo Warning: InnoSetup Unicode not found! Skipping installer creation.
 	SET SKIPINSTALLER=1
 )
 

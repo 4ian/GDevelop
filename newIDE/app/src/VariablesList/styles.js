@@ -1,6 +1,10 @@
 export default {
+  toolColumnHeader: {
+    textAlign: 'right',
+    paddingRight: 8,
+  },
   toolColumn: {
-    minWidth: 72,
+    minWidth: 48,
     flex: 0,
     justifyContent: 'flex-end',
   },

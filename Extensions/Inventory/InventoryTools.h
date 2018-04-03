@@ -66,11 +66,11 @@ public:
 		for(auto & child : variable.GetAllChildren())
 		{
 			const gd::String & name = child.first;
-			const gd::Variable & serializedItem = child.second;
-			inventory.SetMaximum(name, serializedItem.GetChild("maxCount").GetValue());
-			inventory.SetUnlimited(name, serializedItem.GetChild("unlimited").GetString() == "true");
-			inventory.SetCount(name, serializedItem.GetChild("count").GetValue());
-			inventory.Equip(name, serializedItem.GetChild("equipped").GetString() == "true");
+			const auto & serializedItem = child.second;
+			inventory.SetMaximum(name, serializedItem->GetChild("maxCount").GetValue());
+			inventory.SetUnlimited(name, serializedItem->GetChild("unlimited").GetString() == "true");
+			inventory.SetCount(name, serializedItem->GetChild("count").GetValue());
+			inventory.Equip(name, serializedItem->GetChild("equipped").GetString() == "true");
 		}
 	}
 

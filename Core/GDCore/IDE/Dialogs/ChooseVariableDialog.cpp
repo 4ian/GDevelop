@@ -225,13 +225,13 @@ void ChooseVariableDialog::RefreshVariable(wxTreeListItem item, const gd::String
         variablesList->SetItemText(item, 1, "(Structure)");
 
         //Add/update children
-        const std::map<gd::String, gd::Variable> & children = variable.GetAllChildren();
+        const auto & children = variable.GetAllChildren();
         wxTreeListItem currentChildItem = variablesList->GetFirstChild(item);
         wxTreeListItem lastChildItem;
-        for(std::map<gd::String, gd::Variable>::const_iterator it = children.begin();it != children.end();++it)
+        for(auto it = children.begin();it != children.end();++it)
         {
             if ( !currentChildItem.IsOk() ) currentChildItem = variablesList->AppendItem(item, it->first);
-            RefreshVariable(currentChildItem, it->first, it->second);
+            RefreshVariable(currentChildItem, it->first, *it->second);
             lastChildItem = currentChildItem;
 
             currentChildItem = variablesList->GetNextSibling(currentChildItem);
@@ -255,10 +255,11 @@ void ChooseVariableDialog::RefreshAll()
 
     for (std::size_t i = 0;i<temporaryContainer->Count();++i)
     {
-        const std::pair<gd::String, gd::Variable> & variable = temporaryContainer->Get(i);
+        const gd::String & name = temporaryContainer->GetNameAt(i);
+        const auto & variable = temporaryContainer->Get(i);
 
-    	wxTreeListItem item = variablesList->AppendItem(variablesList->GetRootItem(), variable.first);
-        RefreshVariable(item, variable.first, variable.second);
+    	wxTreeListItem item = variablesList->AppendItem(variablesList->GetRootItem(), name);
+        RefreshVariable(item, name, variable);
         variablesList->Expand(item);
     }
 
@@ -330,20 +331,11 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
 void ChooseVariableDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 {
     UpdateSelectedAndParentVariable();
-    for (std::size_t i = 1;i<temporaryContainer->Count();++i)
-    {
-        const std::pair<gd::String, gd::Variable> & currentVar = temporaryContainer->Get(i);
-        if ( currentVar.first == selectedVariableName)
-        {
-            const std::pair<gd::String, gd::Variable> & prevVar = temporaryContainer->Get(i-1);
-            temporaryContainer->Swap(i, i-1);
-            RefreshAll();
+    auto position = temporaryContainer->GetPosition(selectedVariableName);
+    temporaryContainer->Move(position, position-1);
+    RefreshAll();
 
-            modificationCount++;
-            return;
-        }
-    }
-
+    modificationCount++;
 }
 
 /**
@@ -352,21 +344,11 @@ void ChooseVariableDialog::OnMoveUpVarSelected(wxCommandEvent& event)
 void ChooseVariableDialog::OnMoveDownVarSelected(wxCommandEvent& event)
 {
     UpdateSelectedAndParentVariable();
-    for (std::size_t i = 0;i<temporaryContainer->Count()-1;++i)
-    {
-        const std::pair<gd::String, gd::Variable> & currentVar = temporaryContainer->Get(i);
-        if ( currentVar.first == selectedVariableName)
-        {
-            const std::pair<gd::String, gd::Variable> & nextVar = temporaryContainer->Get(i+1);
+    auto position = temporaryContainer->GetPosition(selectedVariableName);
+    temporaryContainer->Move(position, position+1);
+    RefreshAll();
 
-            temporaryContainer->Swap(i, i+1);
-            RefreshAll();
-
-            modificationCount++;
-            return;
-        }
-    }
-
+    modificationCount++;
 }
 
 /**

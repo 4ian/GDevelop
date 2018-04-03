@@ -1,11 +1,15 @@
+// @flow
 import React, { Component } from 'react';
 import {
   Table,
   TableHeader,
   TableHeaderColumn,
   TableRow,
-  TableRowColumn,
 } from 'material-ui/Table';
+import IconButton from 'material-ui/IconButton';
+import ContentCopy from 'material-ui/svg-icons/content/content-copy';
+import ContentPaste from 'material-ui/svg-icons/content/content-paste';
+import Delete from 'material-ui/svg-icons/action/delete';
 import flatten from 'lodash/flatten';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../Utils/MapFor';
@@ -14,12 +18,21 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import VariableRow from './VariableRow';
 import AddVariableRow from './AddVariableRow';
 import styles from './styles';
+import {
+  getInitialSelection,
+  hasSelection,
+  addToSelection,
+  getSelection,
+} from '../Utils/SelectionHandler';
+import { CLIPBOARD_KIND } from './ClipboardKind';
+import Clipboard from '../Utils/Clipboard';
+import { serializeToJSObject, unserializeFromJSObject } from '../Utils/Serializer';
 const gd = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
 const SortableAddVariableRow = SortableElement(AddVariableRow);
 
-class VariablesListBody extends Component {
+class VariablesListBody extends Component<*, *> {
   render() {
     return <div>{this.props.children}</div>;
   }
@@ -28,22 +41,97 @@ class VariablesListBody extends Component {
 const SortableVariablesListBody = SortableContainer(VariablesListBody);
 SortableVariablesListBody.muiName = 'TableBody';
 
-export default class VariablesList extends Component {
-  constructor() {
-    super();
+type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
 
-    this.state = {
-      nameErrors: {},
-    };
-  }
+type Props = {|
+  variablesContainer: gdVariablesContainer,
+  emptyExplanationMessage?: string,
+  emptyExplanationSecondMessage?: string,
+|};
+type State = {|
+  nameErrors: { [string]: string },
+  selectedVariables: { [number]: ?VariableAndName },
+  mode: 'select' | 'move',
+|};
 
-  _renderVariableChildren(name, parentVariable, depth) {
-    const children = parentVariable.getAllChildren();
-    const names = children.keys().toJSArray();
+export default class VariablesList extends Component<Props, State> {
+  state = {
+    nameErrors: {},
+    selectedVariables: getInitialSelection(),
+    mode: 'select',
+  };
+
+  _selectVariable = (variableAndName: VariableAndName, select: boolean) => {
+    this.setState({
+      selectedVariables: addToSelection(
+        this.state.selectedVariables,
+        variableAndName,
+        select
+      ),
+    });
+  };
+
+  copySelection = () => {
+    Clipboard.set(
+      CLIPBOARD_KIND,
+      getSelection(this.state.selectedVariables).map(({ name, variable }) => ({
+        name,
+        serializedVariable: serializeToJSObject(variable),
+      }))
+    );
+  };
+
+  paste = () => {
+    const { variablesContainer } = this.props;
+    if (!Clipboard.has(CLIPBOARD_KIND)) return;
+
+    const variables = Clipboard.get(CLIPBOARD_KIND);
+    variables.forEach(({ name, serializedVariable }) => {
+      const newName = newNameGenerator(name, (name) => variablesContainer.has(name), 'CopyOf');
+      const newVariable = new gd.Variable();
+      unserializeFromJSObject(newVariable, serializedVariable);
+      variablesContainer.insert(newName, newVariable, variablesContainer.count())
+      newVariable.delete();
+    });
+    this.forceUpdate();
+  };
+
+  deleteSelection = () => {
+    const { variablesContainer } = this.props;
+    const selection: Array<VariableAndName> = getSelection(
+      this.state.selectedVariables
+    );
+
+    // Only delete ancestor variables, as selection can be composed of variables
+    // that are contained inside others.
+    const ancestorOnlyVariables = selection.filter(({ variable }) => {
+      return selection.filter(
+        otherVariableAndName =>
+          variable !== otherVariableAndName &&
+          otherVariableAndName.variable.contains(variable)
+      );
+    });
+
+    // We don't want to ever manipulate/access to variables that have been deleted (by removeRecursively):
+    // that's why it's important to only delete ancestor variables.
+    ancestorOnlyVariables.forEach(({ variable }: VariableAndName) =>
+      variablesContainer.removeRecursively(variable)
+    );
+    this.setState({
+      selectedVariables: getInitialSelection(),
+    });
+  };
+
+  _renderVariableChildren(
+    name: string,
+    parentVariable: gdVariable,
+    depth: number
+  ) {
+    const names = parentVariable.getAllChildrenNames().toJSArray();
 
     return flatten(
       names.map((name, index) => {
-        const variable = children.get(name);
+        const variable = parentVariable.getChild(name);
         return this._renderVariableAndChildrenRows(
           name,
           variable,
@@ -55,7 +143,13 @@ export default class VariablesList extends Component {
     );
   }
 
-  _renderVariableAndChildrenRows(name, variable, depth, index, parentVariable) {
+  _renderVariableAndChildrenRows(
+    name: string,
+    variable: gdVariable,
+    depth: number,
+    index: number,
+    parentVariable: ?gdVariable
+  ) {
     const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
 
@@ -119,6 +213,11 @@ export default class VariablesList extends Component {
             ? this._renderVariableChildren(name, variable, depth)
             : null
         }
+        showHandle={this.state.mode === 'move'}
+        showSelectionCheckbox={this.state.mode === 'select'}
+        isSelected={!!this.state.selectedVariables[variable.ptr]}
+        onSelect={select =>
+          this._selectVariable({ name, ptr: variable.ptr, variable }, select)}
       />
     );
   }
@@ -150,9 +249,8 @@ export default class VariablesList extends Component {
       0,
       variablesContainer.count(),
       index => {
-        const nameAndVariable = variablesContainer.getAt(index);
-        const variable = nameAndVariable.getVariable();
-        const name = nameAndVariable.getName();
+        const variable = variablesContainer.getAt(index);
+        const name = variablesContainer.getNameAt(index);
 
         return this._renderVariableAndChildrenRows(
           name,
@@ -190,7 +288,26 @@ export default class VariablesList extends Component {
             <TableRow>
               <TableHeaderColumn>Name</TableHeaderColumn>
               <TableHeaderColumn>Value</TableHeaderColumn>
-              <TableRowColumn />
+              <TableHeaderColumn style={styles.toolColumnHeader}>
+                <IconButton
+                  onClick={this.copySelection}
+                  disabled={!hasSelection(this.state.selectedVariables)}
+                >
+                  <ContentCopy />
+                </IconButton>
+                <IconButton
+                  onClick={this.paste}
+                  disabled={!Clipboard.has(CLIPBOARD_KIND)}
+                >
+                  <ContentPaste />
+                </IconButton>
+                <IconButton
+                  onClick={this.deleteSelection}
+                  disabled={!hasSelection(this.state.selectedVariables)}
+                >
+                  <Delete />
+                </IconButton>
+              </TableHeaderColumn>
             </TableRow>
           </TableHeader>
         </Table>

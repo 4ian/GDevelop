@@ -38,15 +38,16 @@ void RuntimeVariablesContainer::Merge(const gd::VariablesContainer & container)
 {
     for ( std::size_t i = 0; i<container.Count();++i)
     {
-        const std::pair<gd::String, gd::Variable> & variable = container.Get(i);
+        const gd::String & name = container.GetNameAt(i);
+        const gd::Variable & variable = container.Get(i);
 
-        if ( Has(variable.first) )
-            Get(variable.first) = variable.second;
+        if ( Has(name) )
+            Get(name) = variable;
         else
         {
-            gd::Variable * newVariable = new gd::Variable(variable.second);
+            gd::Variable * newVariable = new gd::Variable(variable);
             variablesArray.push_back(newVariable);
-            variables[variable.first] = newVariable;
+            variables[name] = newVariable;
         }
     }
 }

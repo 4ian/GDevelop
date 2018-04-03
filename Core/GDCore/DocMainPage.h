@@ -78,6 +78,7 @@
  * The installation is fairly simple :<br>
  * <br>
  * - Launch the installer.<br>
+ * - Uncheck "Check for updated files on the TDM-GCC server" (otherwise you won't get TDM-GCC 4.9.2 but a more recent version that won't be compatible with wxWidgets pre-compiled binaries)
  * - Choose Create.<br>
 
  \image html compilerInstall1.png

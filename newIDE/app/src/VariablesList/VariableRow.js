@@ -1,8 +1,9 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import DragHandle from '../UI/DragHandle';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import Delete from 'material-ui/svg-icons/action/delete';
+import Checkbox from 'material-ui/Checkbox';
 import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirectory-arrow-right';
 import TextField from 'material-ui/TextField';
@@ -16,6 +17,25 @@ const Indent = ({ width }) => (
   </div>
 );
 
+const InlineCheckbox = props => <Checkbox {...props} style={{ width: 32 }} />;
+
+type Props = {|
+  name: string,
+  variable: gdVariable,
+  depth: number,
+  errorText?: ?string,
+  onBlur: () => void,
+  onRemove: () => void,
+  onAddChild: () => void,
+  onChangeValue: string => void,
+  children?: React.Node,
+  muiTheme: Object,
+  showHandle: boolean,
+  showSelectionCheckbox: boolean,
+  isSelected: boolean,
+  onSelect: boolean => void,
+|};
+
 const ThemableVariableRow = ({
   name,
   variable,
@@ -27,7 +47,11 @@ const ThemableVariableRow = ({
   onChangeValue,
   children,
   muiTheme,
-}) => {
+  showHandle,
+  showSelectionCheckbox,
+  isSelected,
+  onSelect,
+}: Props) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
 
@@ -36,7 +60,13 @@ const ThemableVariableRow = ({
       {depth > 0 && (
         <Indent width={(depth + 1) * styles.tableChildIndentation} />
       )}
-      {depth === 0 && <DragHandle />}
+      {depth === 0 && showHandle && <DragHandle />}
+      {showSelectionCheckbox && (
+        <InlineCheckbox
+          checked={isSelected}
+          onCheck={(e, checked) => onSelect(checked)}
+        />
+      )}
       <TextField
         fullWidth
         name={key + 'name'}
@@ -64,9 +94,6 @@ const ThemableVariableRow = ({
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>
-      <IconButton onClick={onRemove}>
-        <Delete />
-      </IconButton>
       <IconButton onClick={onAddChild}>
         <AddCircle />
       </IconButton>

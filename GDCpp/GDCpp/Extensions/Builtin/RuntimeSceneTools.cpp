@@ -287,7 +287,7 @@ unsigned int GD_API GetVariableChildCount(gd::Variable & variable)
 {
     if (variable.IsStructure() == false) return 0;
 
-    return variable.GetAllChildren().size();
+    return variable.GetChildrenCount();
 }
 
 double GD_API GetVariableValue(const gd::Variable & variable)

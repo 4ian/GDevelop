@@ -52,18 +52,14 @@ public:
     const Variable & Get(const gd::String & name) const;
 
     /**
-     * \brief Return a pair containing the name and the variable at position \index in the container.
-     *
-     * \note If index is invalid, an empty variable is returned.
+     * \brief Return a reference to the variable at the specified position in the list.
      */
-    std::pair<gd::String, gd::Variable> & Get(std::size_t index);
+    Variable & Get(std::size_t index);
 
     /**
-     * \brief Return a pair containing the name and the variable at position \index in the container.
-     *
-     * \note If index is invalid, an empty variable is returned.
+     * \brief Return a reference to the variable at the specified position in the list.
      */
-    const std::pair<gd::String, gd::Variable> & Get(std::size_t index) const;
+    const Variable & Get(std::size_t index) const;
 
     /**
      * Must add a new variable constructed from the variable passed as parameter.
@@ -78,6 +74,11 @@ public:
      * \brief Return the number of variables.
      */
     std::size_t Count() const { return variables.size(); };
+
+    /**
+     * \brief Return the name of the variable at a position
+     */
+    const gd::String & GetNameAt(std::size_t index) const;
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -94,9 +95,15 @@ public:
     Variable & InsertNew(const gd::String & name, std::size_t position = -1);
 
     /**
-     * \brief Remove the specified variable from the container.
+     * \brief Remove the variable with the specified name from the container.
+     * \note This operation is not recursive on variable children
      */
     void Remove(const gd::String & name);
+
+    /**
+     * \brief Remove the specified variable from the container.
+     */
+    void RemoveRecursively(const gd::Variable & variable);
 
     /**
      * \brief Rename a variable.
@@ -138,8 +145,9 @@ public:
 
 private:
 
-    std::vector < std::pair<gd::String, gd::Variable> > variables;
-    static std::pair<gd::String, Variable> badVariable;
+    std::vector < std::pair<gd::String, std::shared_ptr<gd::Variable>> > variables;
+    static gd::Variable badVariable;
+    static gd::String badName;
 };
 
 }

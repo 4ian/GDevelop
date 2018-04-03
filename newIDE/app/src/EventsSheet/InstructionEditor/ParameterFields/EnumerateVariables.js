@@ -17,8 +17,7 @@ export const enumerateVariables = (
     if (!variable.isStructure()) return names;
 
     variable
-      .getAllChildren()
-      .keys()
+      .getAllChildrenNames()
       .toJSArray()
       .forEach(childName => {
         enumerateVariableAndChildrenNames(
@@ -36,10 +35,9 @@ export const enumerateVariables = (
     mapFor(0, variablesContainer.count(), i => {
       if (!variablesContainer) return [];
 
-      const variableAndName = variablesContainer.getAt(i);
       return enumerateVariableAndChildrenNames(
-        variableAndName.getName(),
-        variableAndName.getVariable()
+        variablesContainer.getNameAt(i),
+        variablesContainer.getAt(i)
       );
     })
   );

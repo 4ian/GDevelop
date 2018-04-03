@@ -3,177 +3,192 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
  * This project is released under the MIT License.
  */
-#include <iostream>
-#include "GDCore/String.h"
-#include <algorithm>
-#include "GDCore/Project/Variable.h"
-#include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/Project/Variable.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/String.h"
+#include "GDCore/TinyXml/tinyxml.h"
+#include <algorithm>
+#include <iostream>
 
-namespace gd
-{
+namespace gd {
 
-std::pair<gd::String, Variable> VariablesContainer::badVariable;
+gd::Variable VariablesContainer::badVariable;
+gd::String VariablesContainer::badName;
 
 namespace {
 
-//Tool functor used below
-class VariableHasName
-{
-public:
-    VariableHasName(gd::String const& name_) : name(name_) { }
+    //Tool functor used below
+    class VariableHasName {
+    public:
+        VariableHasName(gd::String const& name_)
+            : name(name_)
+        {
+        }
 
-    bool operator () (const std::pair<gd::String, gd::Variable> & p)
-    {
-        return (p.first == name);
-    }
+        bool operator()(const std::pair<gd::String, std::shared_ptr<gd::Variable>>& p)
+        {
+            return (p.first == name);
+        }
 
-    gd::String name;
-};
-
+        gd::String name;
+    };
 }
 
 VariablesContainer::VariablesContainer()
 {
 }
 
-bool VariablesContainer::Has(const gd::String & name) const
+bool VariablesContainer::Has(const gd::String& name) const
 {
-    std::vector < std::pair<gd::String, gd::Variable> >::const_iterator i =
-        std::find_if(variables.begin(), variables.end(), VariableHasName(name));
+    auto i = std::find_if(variables.begin(), variables.end(), VariableHasName(name));
     return (i != variables.end());
 }
 
-std::pair<gd::String, gd::Variable> & VariablesContainer::Get(std::size_t index)
+Variable& VariablesContainer::Get(const gd::String& name)
 {
-    if ( index < variables.size() )
-        return variables[index];
+    auto i = std::find_if(variables.begin(), variables.end(), VariableHasName(name));
+    if (i != variables.end())
+        return *i->second;
 
     return badVariable;
 }
 
-const std::pair<gd::String, gd::Variable> & VariablesContainer::Get(std::size_t index) const
+const Variable& VariablesContainer::Get(const gd::String& name) const
 {
-    if ( index < variables.size() )
-        return variables[index];
+    auto i = std::find_if(variables.begin(), variables.end(), VariableHasName(name));
+    if (i != variables.end())
+        return *i->second;
 
     return badVariable;
 }
 
-Variable & VariablesContainer::Get(const gd::String & name)
+Variable & VariablesContainer::Get(std::size_t index)
 {
-    std::vector < std::pair<gd::String, gd::Variable> >::iterator i =
-        std::find_if(variables.begin(), variables.end(), VariableHasName(name));
-    if (i != variables.end())
-        return i->second;
+    if (index < variables.size())
+        return *variables[index].second;
 
-    return badVariable.second;
+    return badVariable;
 }
 
-const Variable & VariablesContainer::Get(const gd::String & name) const
+const Variable & VariablesContainer::Get(std::size_t index) const
 {
-    std::vector < std::pair<gd::String, gd::Variable> >::const_iterator i =
-        std::find_if(variables.begin(), variables.end(), VariableHasName(name));
-    if (i != variables.end())
-        return i->second;
+    if (index < variables.size())
+        return *variables[index].second;
 
-    return badVariable.second;
+    return badVariable;
 }
 
-Variable & VariablesContainer::Insert(const gd::String & name, const gd::Variable & variable, std::size_t position)
+const gd::String & VariablesContainer::GetNameAt(std::size_t index) const
 {
-    if (position<variables.size())
-    {
-        variables.insert(variables.begin()+position, std::make_pair(name, variable));
-        return variables[position].second;
-    }
-    else
-    {
-        variables.push_back(std::make_pair(name, variable));
-        return variables.back().second;
+    if (index < variables.size())
+        return variables[index].first;
+
+    return badName;
+}
+
+Variable& VariablesContainer::Insert(const gd::String& name, const gd::Variable& variable, std::size_t position)
+{
+    auto newVariable = std::make_shared<gd::Variable>(variable);
+    if (position < variables.size()) {
+        variables.insert(variables.begin() + position, std::make_pair(name, newVariable));
+        return *variables[position].second;
+    } else {
+        variables.push_back(std::make_pair(name, newVariable));
+        return *variables.back().second;
     }
 }
 
 #if defined(GD_IDE_ONLY)
-void VariablesContainer::Remove(const gd::String & varName)
+void VariablesContainer::Remove(const gd::String& varName)
 {
     variables.erase(std::remove_if(variables.begin(), variables.end(),
-        VariableHasName(varName)), variables.end() );
+                        VariableHasName(varName)),
+        variables.end());
 }
 
-std::size_t VariablesContainer::GetPosition(const gd::String & name) const
+void VariablesContainer::RemoveRecursively(const gd::Variable& variableToRemove)
 {
-    for(std::size_t i = 0;i<variables.size();++i)
-    {
-        if ( variables[i].first == name )
+    variables.erase(std::remove_if(variables.begin(), variables.end(),
+                        [&variableToRemove](const std::pair<gd::String, std::shared_ptr<gd::Variable>>& nameAndVariable) {
+                            return &variableToRemove == nameAndVariable.second.get();
+                        }),
+        variables.end());
+
+    for (auto& it : variables) {
+        it.second->RemoveRecursively(variableToRemove);
+    }
+}
+
+std::size_t VariablesContainer::GetPosition(const gd::String& name) const
+{
+    for (std::size_t i = 0; i < variables.size(); ++i) {
+        if (variables[i].first == name)
             return i;
     }
 
     return gd::String::npos;
 }
 
-Variable & VariablesContainer::InsertNew(const gd::String & name, std::size_t position)
+Variable& VariablesContainer::InsertNew(const gd::String& name, std::size_t position)
 {
     Variable newVariable;
     return Insert(name, newVariable, position);
 }
 
-bool VariablesContainer::Rename(const gd::String & oldName, const gd::String & newName)
+bool VariablesContainer::Rename(const gd::String& oldName, const gd::String& newName)
 {
-    if (Has(newName)) return false;
+    if (Has(newName))
+        return false;
 
-    std::vector < std::pair<gd::String, gd::Variable> >::iterator i =
-        std::find_if(variables.begin(), variables.end(), VariableHasName(oldName));
-    if (i != variables.end()) i->first = newName;
+    auto i = std::find_if(variables.begin(), variables.end(), VariableHasName(oldName));
+    if (i != variables.end())
+        i->first = newName;
 
     return true;
 }
 
 void VariablesContainer::Swap(std::size_t firstVariableIndex, std::size_t secondVariableIndex)
 {
-    if ( firstVariableIndex >= variables.size() || secondVariableIndex >= variables.size() )
+    if (firstVariableIndex >= variables.size() || secondVariableIndex >= variables.size())
         return;
 
-    std::pair<gd::String, gd::Variable> temp = variables[firstVariableIndex];
+    auto temp = variables[firstVariableIndex];
     variables[firstVariableIndex] = variables[secondVariableIndex];
     variables[secondVariableIndex] = temp;
 }
 
 void VariablesContainer::Move(std::size_t oldIndex, std::size_t newIndex)
 {
-    if ( oldIndex >= variables.size() || newIndex >= variables.size() )
+    if (oldIndex >= variables.size() || newIndex >= variables.size())
         return;
 
     auto nameAndVariable = variables[oldIndex];
     variables.erase(variables.begin() + oldIndex);
-    Insert(nameAndVariable.first, nameAndVariable.second, newIndex);
+    variables.insert(variables.begin() + newIndex, nameAndVariable);
 }
 #endif
 
-void VariablesContainer::SerializeTo(SerializerElement & element) const
+void VariablesContainer::SerializeTo(SerializerElement& element) const
 {
     element.ConsiderAsArrayOf("variable");
-    for ( std::size_t j = 0;j < variables.size();j++ )
-    {
-        SerializerElement & variableElement = element.AddChild("variable");
+    for (std::size_t j = 0; j < variables.size(); j++) {
+        SerializerElement& variableElement = element.AddChild("variable");
         variableElement.SetAttribute("name", variables[j].first);
-        variables[j].second.SerializeTo(variableElement);
+        variables[j].second->SerializeTo(variableElement);
     }
 }
 
-void VariablesContainer::UnserializeFrom(const SerializerElement & element)
+void VariablesContainer::UnserializeFrom(const SerializerElement& element)
 {
     Clear();
     element.ConsiderAsArrayOf("variable", "Variable");
-    for ( std::size_t j = 0;j < element.GetChildrenCount();j++ )
-    {
-        const SerializerElement & variableElement = element.GetChild(j);
+    for (std::size_t j = 0; j < element.GetChildrenCount(); j++) {
+        const SerializerElement& variableElement = element.GetChild(j);
 
         Variable variable;
         variable.UnserializeFrom(variableElement);
-        Insert(variableElement.GetStringAttribute("name", "", "Name" ), variable, -1);
+        Insert(variableElement.GetStringAttribute("name", "", "Name"), variable, -1);
     }
 }
-
 }

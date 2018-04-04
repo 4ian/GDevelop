@@ -11,4 +11,5 @@ export type EditorProps = {|
   project: gdProject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+  onSizeUpdated: () => void,
 |};

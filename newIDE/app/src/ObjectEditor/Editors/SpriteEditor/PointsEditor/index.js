@@ -4,7 +4,7 @@ import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PointsList from './PointsList';
 import PointsPreview from './PointsPreview';
-import ImagePreview from '../../../ImagePreview';
+import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
   allSpritesHaveSamePointsAs,

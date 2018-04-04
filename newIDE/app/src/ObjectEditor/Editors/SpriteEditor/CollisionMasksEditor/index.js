@@ -5,7 +5,7 @@ import { Line, Column } from '../../../../UI/Grid';
 import { mapFor } from '../../../../Utils/MapFor';
 import PolygonsList from './PolygonsList';
 import CollisionMasksPreview from './CollisionMasksPreview';
-import ImagePreview from '../../../ImagePreview';
+import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import {
   getCurrentElements,
   allSpritesHaveSameCollisionMasksAs,
@@ -204,7 +204,7 @@ export default class CollisionMasksEditor extends Component {
           resourceName={hasValidSprite ? sprite.getImageName() : ''}
           resourcesLoader={resourcesLoader}
           project={project}
-          onImageLoaded={this._setCurrentSpriteSize}
+          onSize={this._setCurrentSpriteSize}
         >
           {hasValidSprite && (
             <CollisionMasksPreview

@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import { Line, Column } from '../../../../UI/Grid';
-import ImagePreview from '../../../ImagePreview';
+import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from 'material-ui/svg-icons/av/replay';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 import Pause from 'material-ui/svg-icons/av/pause';

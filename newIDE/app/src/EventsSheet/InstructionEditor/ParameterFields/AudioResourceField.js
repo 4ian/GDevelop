@@ -13,7 +13,9 @@ export default class AudioResourceField extends Component<
 
   render() {
     if (!this.props.resourceSources || !this.props.onChooseResource) {
-      console.error("Missing resourceSources or onChooseResource for AudioResourceField");
+      console.error(
+        'Missing resourceSources or onChooseResource for AudioResourceField'
+      );
       return null;
     }
 

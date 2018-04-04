@@ -167,7 +167,7 @@ private:
 
     /**
      * Initialize from another list of events, copying events. Used by copy-ctor and assign-op.
-     * Don't forget to update me if members were changed !
+     * Don't forget to update me if members were changed!
      */
     void Init(const gd::EventsList & other);
 };

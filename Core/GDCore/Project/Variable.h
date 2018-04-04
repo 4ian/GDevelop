@@ -30,7 +30,10 @@ public:
      * \brief Default constructor creating a variable with 0 as value.
      */
     Variable() : value(0), isNumber(true), isStructure(false) {};
+    Variable(const Variable&);
     virtual ~Variable() {};
+
+    Variable& operator=(const Variable & rhs);
 
     /** \name Number or string
      * Methods and operators used when the variable is considered as a number or a string.
@@ -207,6 +210,11 @@ private:
     mutable bool isNumber; ///< True if the type of the variable is a number.
     mutable bool isStructure; ///< False when the variable is a primitive ( i.e: Number or String ), true when it is a structure and has may have children.
     mutable std::map<gd::String, std::shared_ptr<Variable>> children; ///<Children, when the variable is considered as a structure.
+
+    /**
+     * Initialize children by copying them from another variable.  Used by copy-ctor and assign-op.
+     */
+    void CopyChildren(const Variable & other);
 };
 
 }

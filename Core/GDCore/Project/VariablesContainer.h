@@ -30,7 +30,10 @@ class GD_CORE_API VariablesContainer
 {
 public:
     VariablesContainer();
+    VariablesContainer(const VariablesContainer&);
     virtual ~VariablesContainer() {};
+
+    VariablesContainer& operator=(const VariablesContainer & rhs);
 
     /** \name Variables management
      * Members functions related to variables management.
@@ -149,6 +152,12 @@ private:
     std::vector < std::pair<gd::String, std::shared_ptr<gd::Variable>> > variables;
     static gd::Variable badVariable;
     static gd::String badName;
+
+    /**
+     * Initialize from another variables container, copying elements. Used by copy-ctor and assign-op.
+     * Don't forget to update me if members were changed!
+     */
+    void Init(const VariablesContainer & other);
 };
 
 }

@@ -210,4 +210,34 @@ void Variable::RemoveRecursively(const gd::Variable& variableToRemove)
         }
     }
 }
+
+Variable::Variable(const Variable& other) :
+    value(other.value),
+    str(other.str),
+    isNumber(other.isNumber),
+    isStructure(other.isStructure)
+{
+    CopyChildren(other);
+}
+
+Variable& Variable::operator=(const Variable& other)
+{
+    if (this != &other) {
+        value = other.value;
+        str = other.str;
+        isNumber = other.isNumber;
+        isStructure = other.isStructure;
+        CopyChildren(other);
+    }
+
+    return *this;
+}
+
+void Variable::CopyChildren(const gd::Variable& other)
+{
+    children.clear();
+    for (auto& it : other.children) {
+        children[it.first] = std::make_shared<gd::Variable>(*it.second);
+    }
+}
 }

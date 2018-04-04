@@ -63,7 +63,7 @@ const Variable& VariablesContainer::Get(const gd::String& name) const
     return badVariable;
 }
 
-Variable & VariablesContainer::Get(std::size_t index)
+Variable& VariablesContainer::Get(std::size_t index)
 {
     if (index < variables.size())
         return *variables[index].second;
@@ -71,7 +71,7 @@ Variable & VariablesContainer::Get(std::size_t index)
     return badVariable;
 }
 
-const Variable & VariablesContainer::Get(std::size_t index) const
+const Variable& VariablesContainer::Get(std::size_t index) const
 {
     if (index < variables.size())
         return *variables[index].second;
@@ -79,7 +79,7 @@ const Variable & VariablesContainer::Get(std::size_t index) const
     return badVariable;
 }
 
-const gd::String & VariablesContainer::GetNameAt(std::size_t index) const
+const gd::String& VariablesContainer::GetNameAt(std::size_t index) const
 {
     if (index < variables.size())
         return variables[index].first;
@@ -189,6 +189,29 @@ void VariablesContainer::UnserializeFrom(const SerializerElement& element)
         Variable variable;
         variable.UnserializeFrom(variableElement);
         Insert(variableElement.GetStringAttribute("name", "", "Name"), variable, -1);
+    }
+}
+
+VariablesContainer::VariablesContainer(const VariablesContainer& other)
+{
+    Init(other);
+}
+
+VariablesContainer& VariablesContainer::operator=(const VariablesContainer& other)
+{
+    if (this != &other)
+        Init(other);
+
+    return *this;
+}
+
+void VariablesContainer::Init(const gd::VariablesContainer& other)
+{
+    variables.clear();
+    for (auto& it : other.variables) {
+        variables.push_back(std::make_pair(
+            it.first,
+            std::make_shared<gd::Variable>(*it.second)));
     }
 }
 }

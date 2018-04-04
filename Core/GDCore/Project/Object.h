@@ -321,7 +321,7 @@ protected:
 
     /**
      * Initialize object using another object. Used by copy-ctor and assign-op.
-     * Don't forget to update me if members were changed !
+     * Don't forget to update me if members were changed!
      */
     void Init(const gd::Object & object);
 };

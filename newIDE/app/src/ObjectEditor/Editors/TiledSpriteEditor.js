@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import TextField from 'material-ui/TextField';
 import { Line, Column } from '../../UI/Grid';
-import ResourcesLoader from '../../ResourcesLoader';
-import ResourceSelectorWithThumbnail from '../ResourceSelectorWithThumbnail';
+import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
+import { type EditorProps } from './EditorProps.flow';
 const gd = global.gd;
 
-export default class TiledSpriteEditor extends Component {
+export default class TiledSpriteEditor extends React.Component<EditorProps, void> {
   render() {
     const { object, project, resourceSources, onChooseResource } = this.props;
     const tiledSpriteObject = gd.asTiledSpriteObject(object);
@@ -19,7 +20,6 @@ export default class TiledSpriteEditor extends Component {
             onChooseResource={onChooseResource}
             resourceKind="image"
             resourceName={tiledSpriteObject.getTexture()}
-            resourcesLoader={ResourcesLoader}
             onChange={resourceName => {
               tiledSpriteObject.setTexture(resourceName);
               this.forceUpdate();

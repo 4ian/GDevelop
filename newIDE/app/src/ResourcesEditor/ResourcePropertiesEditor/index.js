@@ -3,7 +3,7 @@ import * as React from 'react';
 import Paper from 'material-ui/Paper';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
-import ImagePreview from '../../ObjectEditor/ImagePreview'; //TODO: Move ImagePreview out of ObjectEditor
+import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 
@@ -90,7 +90,7 @@ export default class ResourcePropertiesEditor extends React.Component<
     if (!resources || !resources.length) return;
 
     return (
-      <ImagePreview
+      <ResourcePreview
         style={styles.imagePreview}
         resourceName={resources[0].getName()}
         resourcesLoader={resourcesLoader}

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import ResourcesLoader from '../ResourcesLoader';
+import ResourcesLoader from '../../ResourcesLoader';
 
 const MARGIN = 50;
 
@@ -37,7 +37,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   children?: any,
   style?: Object,
-  onImageLoaded?: (number, number) => void,
+  onSize?: (number, number) => void,
 |};
 
 type State = {|
@@ -47,6 +47,9 @@ type State = {|
   imageSource: ?string,
 |};
 
+/**
+ * Display the preview for a resource of a project with kind "image".
+ */
 export default class ImagePreview extends React.Component<Props, State> {
   _container: ?HTMLDivElement = null;
 
@@ -98,8 +101,8 @@ export default class ImagePreview extends React.Component<Props, State> {
       imageWidth,
       imageHeight,
     });
-    if (this.props.onImageLoaded)
-      this.props.onImageLoaded(imageWidth, imageHeight);
+    if (this.props.onSize)
+      this.props.onSize(imageWidth, imageHeight);
   };
 
   render() {

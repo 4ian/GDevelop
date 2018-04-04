@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import { GridList, GridTile } from 'material-ui/GridList';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import SpritesList from './SpritesList';
@@ -19,6 +20,11 @@ import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
 import CollisionMasksEditor from './CollisionMasksEditor';
 import { deleteSpritesFromAnimation } from './Utils/SpriteObjectHelper';
+import { type EditorProps } from '../EditorProps.flow';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../../../ResourcesList/ResourceSource.flow';
 
 const gd = global.gd;
 
@@ -59,7 +65,7 @@ const AddAnimationLine = ({ onAdd, extraTools }) => (
   </div>
 );
 
-class Animation extends Component {
+class Animation extends React.Component<*, void> {
   render() {
     const {
       animation,
@@ -168,10 +174,30 @@ const SortableAnimationsList = SortableContainer(
   }
 );
 
-class AnimationsListContainer extends Component {
+type AnimationsListContainerProps = {|
+  spriteObject: gdSpriteObject,
+  project: gdProject,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourcesLoader: typeof ResourcesLoader,
+  extraBottomTools: React.Node,
+  onSizeUpdated: () => void,
+|};
+
+type AnimationsListContainerState = {|
+  selectedSprites: {
+    [number]: boolean,
+  },
+|};
+
+class AnimationsListContainer extends React.Component<
+  AnimationsListContainerProps,
+  AnimationsListContainerState
+> {
   state = {
     selectedSprites: {},
   };
+  spriteContextMenu: ?ContextMenu;
 
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.props.spriteObject.moveAnimation(oldIndex, newIndex);
@@ -232,7 +258,7 @@ class AnimationsListContainer extends Component {
 
   openSpriteContextMenu = (x, y, sprite, index) => {
     this.selectSprite(sprite, true);
-    this.spriteContextMenu.open(x, y);
+    if (this.spriteContextMenu) this.spriteContextMenu.open(x, y);
   };
 
   selectSprite = (sprite, selected) => {
@@ -281,25 +307,32 @@ class AnimationsListContainer extends Component {
   }
 }
 
-export default class SpriteEditor extends Component {
+type State = {|
+  pointsEditorOpen: boolean,
+  collisionMasksEditorOpen: boolean,
+|};
+
+export default class SpriteEditor extends React.Component<EditorProps, State> {
   state = {
     pointsEditorOpen: false,
     collisionMasksEditorOpen: false,
   };
 
-  constructor(props) {
+  resourcesLoader: typeof ResourcesLoader;
+
+  constructor(props: EditorProps) {
     super(props);
 
     this.resourcesLoader = ResourcesLoader;
   }
 
-  openPointsEditor = (open = true) => {
+  openPointsEditor = (open: boolean = true) => {
     this.setState({
       pointsEditorOpen: open,
     });
   };
 
-  openCollisionMasksEditor = (open = true) => {
+  openCollisionMasksEditor = (open: boolean = true) => {
     this.setState({
       collisionMasksEditorOpen: open,
     });

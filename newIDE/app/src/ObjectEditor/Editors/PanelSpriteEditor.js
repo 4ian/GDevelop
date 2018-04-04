@@ -1,12 +1,13 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import { Line, Column } from '../../UI/Grid';
-import ResourcesLoader from '../../ResourcesLoader';
-import ResourceSelectorWithThumbnail from '../ResourceSelectorWithThumbnail';
+import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
+import { type EditorProps } from './EditorProps.flow';
 const gd = global.gd;
 
-export default class PanelSpriteEditor extends Component {
+export default class PanelSpriteEditor extends React.Component<EditorProps, void> {
   render() {
     const { object, project, resourceSources, onChooseResource } = this.props;
     const panelSpriteObject = gd.asPanelSpriteObject(object);
@@ -20,7 +21,6 @@ export default class PanelSpriteEditor extends Component {
             onChooseResource={onChooseResource}
             resourceKind="image"
             resourceName={panelSpriteObject.getTexture()}
-            resourcesLoader={ResourcesLoader}
             onChange={resourceName => {
               panelSpriteObject.setTexture(resourceName);
               this.forceUpdate();

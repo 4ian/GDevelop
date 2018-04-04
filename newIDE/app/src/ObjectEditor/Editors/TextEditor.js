@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import Checkbox from 'material-ui/Checkbox';
 import TextField from 'material-ui/TextField';
 import { Line, Column } from '../../UI/Grid';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import MiniToolbar from '../../UI/MiniToolbar';
+import { type EditorProps } from './EditorProps.flow';
 const gd = global.gd;
 
 const toolbarItemStyle = {
@@ -25,7 +27,7 @@ const styles = {
   },
 };
 
-export default class TextEditor extends Component {
+export default class TextEditor extends React.Component<EditorProps, void> {
   render() {
     const { object } = this.props;
     const textObject = gd.asTextObject(object);

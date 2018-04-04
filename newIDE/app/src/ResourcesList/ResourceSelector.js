@@ -1,12 +1,40 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
 import Add from 'material-ui/svg-icons/content/add';
 import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+  type ResourceKind,
+} from '../ResourcesList/ResourceSource.flow';
 
-export default class ResourceSelector extends Component {
-  constructor(props) {
+type Props = {|
+  project: gdProject,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceKind: ResourceKind,
+  fullWidth?: boolean,
+  initialResourceName: string,
+  onChange: (string) => void,
+  floatingLabelText?: string,
+|};
+
+type State ={|
+  notExistingError: boolean,
+  resourceName: string,
+|};
+
+type AutoCompleteItem = {|
+  text: string,
+  value: React.Node,
+  onClick?: () => void,
+|} | string;
+
+export default class ResourceSelector extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
@@ -20,7 +48,11 @@ export default class ResourceSelector extends Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  allResourcesNames: Array<string>;
+  defaultItems: Array<AutoCompleteItem>;
+  autoCompleteData: ?Array<AutoCompleteItem>;
+
+  componentWillReceiveProps(nextProps: Props) {
     if (nextProps.initialResourceName !== this.props.initialResourceName) {
       this.setState({
         resourceName: nextProps.initialResourceName || '',
@@ -28,7 +60,7 @@ export default class ResourceSelector extends Component {
     }
   }
 
-  _getDefaultItems() {
+  _getDefaultItems(): Array<AutoCompleteItem> {
     const sources = this.props.resourceSources || [];
     return [
       ...sources
@@ -47,7 +79,7 @@ export default class ResourceSelector extends Component {
     ];
   }
 
-  _loadFrom(resourcesManager) {
+  _loadFrom(resourcesManager: gdResourcesManager) {
     this.allResourcesNames = resourcesManager.getAllResourceNames().toJSArray();
     if (this.props.resourceKind) {
       this.allResourcesNames = this.allResourcesNames.filter(resourceName => {
@@ -61,7 +93,7 @@ export default class ResourceSelector extends Component {
     this.autoCompleteData = [...this.defaultItems, ...this.allResourcesNames];
   }
 
-  _addFrom = source => {
+  _addFrom = (source: ResourceSource) => {
     if (!source) return;
 
     const { project, onChooseResource } = this.props;
@@ -70,6 +102,8 @@ export default class ResourceSelector extends Component {
         if (!resources.length) return;
         const resource = resources[0];
 
+        // addResource will check if a resource with the same name exists, and if it is
+        // the case, no new resource will be added.
         project.getResourcesManager().addResource(resource);
 
         this._loadFrom(project.getResourcesManager());
@@ -81,7 +115,7 @@ export default class ResourceSelector extends Component {
       });
   };
 
-  _onUpdate = searchText => {
+  _onUpdate = (searchText: string) => {
     this.setState(
       {
         resourceName: searchText,
@@ -99,7 +133,11 @@ export default class ResourceSelector extends Component {
     if (index === -1 || index >= this.defaultItems.length)
       return this._onUpdate(text);
 
-    this.defaultItems[index].onClick();
+    // We're now sure that onClick is defined
+    // $FlowFixMe
+    const onClick = this.defaultItems[index].onClick;
+    if (onClick)
+      onClick();
   };
 
   render() {

@@ -1,8 +1,10 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
+import { type EditorProps } from './EditorProps.flow';
 import { Line, Column } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
 
-export default class EmptyEditor extends Component {
+export default class EmptyEditor extends React.Component<EditorProps, void> {
   render() {
     return (
       <Column>

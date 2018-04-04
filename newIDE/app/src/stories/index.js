@@ -25,7 +25,7 @@ import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
 import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
-import ImageThumbnail from '../ObjectEditor/ImageThumbnail';
+import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterFields/ExternalEventsField';
 import LayerField from '../EventsSheet/InstructionEditor/ParameterFields/LayerField';
@@ -61,6 +61,8 @@ import { makeTestProject } from '../fixtures/TestProject';
 import CreateProfile from '../Profile/CreateProfile';
 import ProfileDetails from '../Profile/ProfileDetails';
 import LimitDisplayer from '../Profile/LimitDisplayer';
+import ResourcePreview from '../ResourcesList/ResourcePreview';
+import ResourcesList from '../ResourcesList';
 import {
   subscriptionForIndieUser,
   limitsForIndieUser,
@@ -329,6 +331,9 @@ storiesOf('EventsSheet', module)
         layout={testLayout}
         events={testLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)}
       />
     </DragDropContextProvider>
   ))
@@ -339,6 +344,9 @@ storiesOf('EventsSheet', module)
         layout={emptyLayout}
         events={emptyLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)}
       />
     </DragDropContextProvider>
   ));
@@ -816,4 +824,47 @@ storiesOf('SubscriptionCheckDialog', module)
         mode="mandatory"
       />
     </RefGetter>
+  ));
+
+storiesOf('ResourcePreview', module)
+  .addDecorator(muiDecorator)
+  .add('not existing/missing resource', () => (
+    <ResourcePreview
+      project={project}
+      resourceName="resource-that-does-not-exists-in-the-project"
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('image resource', () => (
+    <ResourcePreview
+      project={project}
+      resourceName="icon128.png"
+      resourcesLoader={ResourcesLoader}
+    />
+  ))
+  .add('audio resource', () => (
+    <ResourcePreview
+      project={project}
+      resourceName="fake-audio1.mp3"
+      resourcesLoader={ResourcesLoader}
+    />
+  ));
+
+storiesOf('ResourcesList', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <div style={{ height: 200 }}>
+      <ValueStateHolder
+        initialValue={null}
+        render={(value, onChange) => (
+          <ResourcesList
+            onSelectResource={onChange}
+            selectedResource={value}
+            onDeleteResource={() => {}}
+            onRenameResource={() => {}}
+            project={project}
+          />
+        )}
+      />
+    </div>
   ));

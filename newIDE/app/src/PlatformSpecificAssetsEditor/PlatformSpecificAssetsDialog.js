@@ -6,7 +6,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from '../UI/Dialog';
 import { Line } from '../UI/Grid';
 import ResourcesLoader from '../ResourcesLoader';
-import ResourceSelectorWithThumbnail from '../ObjectEditor/ResourceSelectorWithThumbnail';
+import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -219,7 +219,6 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             onChooseResource={onChooseResource}
             resourceKind="image"
             resourceName={androidIconResourceNames[index]}
-            resourcesLoader={ResourcesLoader}
             onChange={resourceName => {
               const newIcons = [...androidIconResourceNames];
               newIcons[index] = resourceName;
@@ -239,7 +238,6 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             onChooseResource={onChooseResource}
             resourceKind="image"
             resourceName={iosIconResourceNames[index]}
-            resourcesLoader={ResourcesLoader}
             onChange={resourceName => {
               const newIcons = [...iosIconResourceNames];
               newIcons[index] = resourceName;

@@ -74,119 +74,171 @@ const publicImageUrls = [
   'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserRed11.png',
 ];
 
+const publicAudioUrls = [
+  // Platformer audio (see platformer.json in fixtures)
+  'https://df5lqcdudryde.cloudfront.net/examples/platformer/jump.wav',
+  'https://df5lqcdudryde.cloudfront.net/examples/platformer/coin.wav',
+
+  // Space shooter audio (see space-shooter.json in fixtures)
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/sfx_laser1.ogg',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/sfx_twoTone.ogg',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/sfx_shieldDown.ogg',
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/sfx_lose.ogg',
+];
+
 const nameFromUrl = (url: string): string => {
   const urlParts = url.split('/');
-  return urlParts[urlParts.length - 1].replace('.png', '');
+  return urlParts[urlParts.length - 1]
+    .replace('.png', '')
+    .replace('.wav', '')
+    .replace('.ogg', '');
 };
+
+class GenericResourcesChooser extends Component {
+  state = {
+    open: false,
+    resolveWithResources: null,
+    chosenResourceUrl: null,
+  };
+
+  constructor(props) {
+    super(props);
+
+    // Cache rendered public images list to avoid doing this each time
+    // a rendering is done.
+    this.listItems = props.urls.map((url: string) => {
+      return (
+        <ListItem
+          value={url}
+          key={url}
+          primaryText={nameFromUrl(url)}
+          leftAvatar={props.urlsAreImages && <ListIcon src={url} />}
+        />
+      );
+    });
+  }
+
+  chooseResources = (project, multiSelections = true): Promise<Array<any>> => {
+    return new Promise(resolve => {
+      this.setState({
+        open: true,
+        resolveWithResources: resolve,
+      });
+    });
+  };
+
+  _onChoose = () => {
+    const { resolveWithResources, chosenResourceUrl } = this.state;
+    if (!resolveWithResources) return;
+
+    const newResource = this.props.createNewResource();
+    newResource.setFile(chosenResourceUrl);
+    newResource.setName(chosenResourceUrl);
+
+    resolveWithResources([newResource]);
+    this.setState({
+      open: false,
+      resolveWithResources: null,
+    });
+  };
+
+  _onClose = () => {
+    const { resolveWithResources } = this.state;
+    if (!resolveWithResources) return;
+
+    resolveWithResources([]);
+    this.setState({
+      open: false,
+      resolveWithResources: null,
+    });
+  };
+
+  _handleChangeResource = (e, chosenResourceUrl) => {
+    this.setState({
+      chosenResourceUrl,
+    });
+  };
+
+  render() {
+    // Avoid rendering the dialog if it's not opened.
+    if (!this.state.open) return null;
+
+    const actions = [
+      <FlatButton label="Close" primary={false} onClick={this._onClose} />,
+      <FlatButton
+        label="Choose"
+        primary={false}
+        disabled={!this.state.chosenResourceUrl}
+        onClick={this._onChoose}
+      />,
+    ];
+
+    return (
+      <Dialog
+        title={this.props.title}
+        actions={actions}
+        open={this.state.open}
+        noMargin
+        autoScrollBodyContent
+      >
+        <div style={styles.explanations}>
+          <p>
+            Adding resources from Dropbox, Google Drive... is coming soon!
+            Download GDevelop desktop version to use your own assets.
+          </p>
+        </div>
+        <SelectableList
+          value={this.state.chosenResourceUrl}
+          onChange={this._handleChangeResource}
+        >
+          {this.listItems}
+        </SelectableList>
+      </Dialog>
+    );
+  }
+}
 
 export default [
   {
-    name: 'gdResourcesChooser',
+    name: 'publicAudioUrlChooser',
+    displayName: 'Choose an audio file from library',
+    kind: 'audio',
+    component: class AudioResourceChooser extends React.Component {
+      chooseResources = () => {
+        if (this._chooser) return this._chooser.chooseResources();
+      };
+      render() {
+        return (
+          <GenericResourcesChooser
+            {...this.props}
+            urls={publicAudioUrls}
+            urlsAreImages={false}
+            createNewResource={() => new gd.AudioResource()}
+            title="Choose an audio file from the library"
+            ref={chooser => (this._chooser = chooser)}
+          />
+        );
+      }
+    },
+  },
+  {
+    name: 'publicImageUrlChooser',
     displayName: 'Choose an image from library',
     kind: 'image',
-    component: class GdResourcesChooser extends Component {
-      state = {
-        open: false,
-        resolveWithResources: null,
-        chosenImageUrl: null,
+    component: class AudioResourceChooser extends React.Component {
+      chooseResources = () => {
+        if (this._chooser) return this._chooser.chooseResources();
       };
-
-      constructor(props) {
-        super(props);
-
-        // Cache rendered public images list to avoid doing this each time
-        // a rendering is done.
-        this.listItems = publicImageUrls.map((url: string) => {
-          return (
-            <ListItem
-              value={url}
-              key={url}
-              primaryText={nameFromUrl(url)}
-              leftAvatar={<ListIcon src={url} />}
-            />
-          );
-        });
-      }
-
-      chooseResources = (
-        project,
-        multiSelections = true
-      ): Promise<Array<any>> => {
-        return new Promise(resolve => {
-          this.setState({
-            open: true,
-            resolveWithResources: resolve,
-          });
-        });
-      };
-
-      _onChoose = () => {
-        const { resolveWithResources, chosenImageUrl } = this.state;
-        if (!resolveWithResources) return;
-
-        const imageResource = new gd.ImageResource();
-        imageResource.setFile(chosenImageUrl);
-        imageResource.setName(chosenImageUrl);
-
-        resolveWithResources([imageResource]);
-        this.setState({
-          open: false,
-          resolveWithResources: null,
-        });
-      };
-
-      _onClose = () => {
-        const { resolveWithResources } = this.state;
-        if (!resolveWithResources) return;
-
-        resolveWithResources([]);
-        this.setState({
-          open: false,
-          resolveWithResources: null,
-        });
-      };
-
-      _handleChangeImage = (e, chosenImageUrl) => {
-        this.setState({
-          chosenImageUrl,
-        });
-      };
-
       render() {
-        // Avoid rendering the dialog if it's not opened.
-        if (!this.state.open) return null;
-
-        const actions = [
-          <FlatButton label="Close" primary={false} onClick={this._onClose} />,
-          <FlatButton
-            label="Choose"
-            primary={false}
-            disabled={!this.state.chosenImageUrl}
-            onClick={this._onChoose}
-          />,
-        ];
-
         return (
-          <Dialog
+          <GenericResourcesChooser
+            {...this.props}
+            urls={publicImageUrls}
+            urlsAreImages
+            createNewResource={() => new gd.ImageResource()}
             title="Choose an image from the library"
-            actions={actions}
-            open={this.state.open}
-            noMargin
-            autoScrollBodyContent
-          >
-            <div style={styles.explanations}>
-              <p>
-                Adding images from Dropbox, Google Drive... is coming soon!
-                Download GDevelop desktop version to use your own assets.
-              </p>
-            </div>
-            <SelectableList
-              value={this.state.chosenImageUrl}
-              onChange={this._handleChangeImage}
-            >
-              {this.listItems}
-            </SelectableList>
-          </Dialog>
+            ref={chooser => (this._chooser = chooser)}
+          />
         );
       }
     },

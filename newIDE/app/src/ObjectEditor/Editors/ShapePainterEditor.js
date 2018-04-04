@@ -1,11 +1,13 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import { Line, Column, Spacer } from '../../UI/Grid';
 import ColorField from '../../UI/ColorField';
+import { type EditorProps } from './EditorProps.flow';
 const gd = global.gd;
 
-export default class PanelSpriteEditor extends Component {
+export default class PanelSpriteEditor extends React.Component<EditorProps, void> {
   render() {
     const { object } = this.props;
     const shapePainterObject = gd.asShapePainterObject(object);

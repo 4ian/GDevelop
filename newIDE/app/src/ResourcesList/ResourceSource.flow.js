@@ -1,10 +1,12 @@
 // @flow
 import * as React from 'react';
 
+export type ResourceKind = 'image' | 'audio';
+
 export type ResourceSource = {
   name: string,
   displayName: string,
-  kind: 'image' | 'audio',
+  kind: ResourceKind,
   component: React.Component<*, *>,
 };
 

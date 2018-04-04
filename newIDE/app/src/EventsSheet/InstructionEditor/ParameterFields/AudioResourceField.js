@@ -1,0 +1,35 @@
+// @flow
+import React, { Component } from 'react';
+import ResourceSelector from '../../../ResourcesList/ResourceSelector';
+import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+
+export default class AudioResourceField extends Component<
+  ParameterFieldProps,
+  void
+> {
+  focus() {
+    // TODO
+  }
+
+  render() {
+    if (!this.props.resourceSources || !this.props.onChooseResource) {
+      console.error(
+        'Missing resourceSources or onChooseResource for AudioResourceField'
+      );
+      return null;
+    }
+
+    return (
+      <ResourceSelector
+        project={this.props.project}
+        resourceSources={this.props.resourceSources}
+        onChooseResource={this.props.onChooseResource}
+        resourceKind="audio"
+        fullWidth
+        initialResourceName={this.props.value}
+        onChange={this.props.onChange}
+        floatingLabelText="Choose the audio file to use"
+      />
+    );
+  }
+}

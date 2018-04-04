@@ -1,9 +1,25 @@
+// @flow
 import React from 'react';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+  type ResourceKind,
+} from '../ResourcesList/ResourceSource.flow';
 import ImageThumbnail from './ImageThumbnail';
 
-export default ({
+type Props = {|
+  project: gdProject,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceKind: ResourceKind,
+  resourceName: string,
+  onChange: (string) => void,
+  floatingLabelText?: string,
+|};
+
+const ResourceSelectorWithThumbnail = ({
   project,
   resourceSources,
   onChooseResource,
@@ -11,7 +27,7 @@ export default ({
   resourceName,
   onChange,
   floatingLabelText,
-}) => {
+}: Props) => {
   return (
     <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end' }}>
       <div style={{ flex: 1 }}>
@@ -35,3 +51,5 @@ export default ({
     </div>
   );
 };
+
+export default ResourceSelectorWithThumbnail;

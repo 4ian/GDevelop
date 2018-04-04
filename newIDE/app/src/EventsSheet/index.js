@@ -654,6 +654,8 @@ export default class EventsSheet extends Component {
               this.closeInstructionEditor(true);
               this._eventsTree.forceEventsUpdate();
             }}
+            resourceSources={this.props.resourceSources}
+            onChooseResource={this.props.onChooseResource}
           />
         )}
       </div>

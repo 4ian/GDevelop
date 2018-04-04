@@ -527,8 +527,10 @@ export default class MainFrame extends React.Component<Props, State> {
               openEventsEditor: true,
               openSceneEditor: false,
             })}
-            isActive={isActive}
-            ref={editorRef}
+          resourceSources={this.props.resourceSources}
+          onChooseResource={this._onChooseResource}
+          isActive={isActive}
+          ref={editorRef}
         />
       ),
       key: 'layout events ' + name,
@@ -563,8 +565,8 @@ export default class MainFrame extends React.Component<Props, State> {
                   openEventsEditor: true,
                   openSceneEditor: false,
                 })}
-                isActive={isActive}
-                ref={editorRef}
+              isActive={isActive}
+              ref={editorRef}
             />
           ),
           key: 'external events ' + name,
@@ -941,7 +943,8 @@ export default class MainFrame extends React.Component<Props, State> {
             hideLabels={!!this.props.integratedEditor}
           >
             {getEditors(this.state.editorTabs).map((editorTab, id) => {
-              const isCurrentTab = getCurrentTabIndex(this.state.editorTabs) === id;
+              const isCurrentTab =
+                getCurrentTabIndex(this.state.editorTabs) === id;
               return (
                 <Tab
                   label={editorTab.name}
@@ -952,7 +955,9 @@ export default class MainFrame extends React.Component<Props, State> {
                   closable={editorTab.closable}
                 >
                   <div style={{ display: 'flex', flex: 1, height: '100%' }}>
-                    <ErrorBoundary>{editorTab.render(isCurrentTab)}</ErrorBoundary>
+                    <ErrorBoundary>
+                      {editorTab.render(isCurrentTab)}
+                    </ErrorBoundary>
                   </div>
                 </Tab>
               );

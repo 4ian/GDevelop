@@ -111,9 +111,12 @@ export default class SpritesList extends Component {
       project,
       direction,
     } = this.props;
-    if (!resourceSources || !resourceSources.length) return;
+    if (!resourceSources) return;
 
-    onChooseResource(resourceSources[0].name).then(resources => {
+    const sources = resourceSources.filter(source => source.kind === 'image');
+    if (!sources.length) return;
+
+    onChooseResource(sources[0].name).then(resources => {
       resources.forEach(resource => {
         project.getResourcesManager().addResource(resource);
 

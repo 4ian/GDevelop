@@ -14,6 +14,7 @@ import SceneVariableField from './ParameterFields/SceneVariableField';
 import GlobalVariableField from './ParameterFields/GlobalVariableField';
 import ObjectVariableField from './ParameterFields/ObjectVariableField';
 import LayerField from './ParameterFields/LayerField';
+import AudioResourceField from './ParameterFields/AudioResourceField';
 const gd = global.gd;
 
 const components = {
@@ -33,8 +34,8 @@ const components = {
   layer: LayerField,
   key: KeyField,
   file: DefaultField, //TODO
-  musicfile: DefaultField, //TODO
-  soundfile: DefaultField, //TODO
+  musicfile: AudioResourceField,
+  soundfile: AudioResourceField,
   color: DefaultField, //TODO
   police: DefaultField, //TODO
   joyaxis: DefaultField, //TODO

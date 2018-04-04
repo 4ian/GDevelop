@@ -15,6 +15,7 @@ declare type gdInitialInstance = EmscriptenObject;
 declare type gdBaseEvent = EmscriptenObject;
 declare type gdResource = EmscriptenObject;
 declare type gdObject = EmscriptenObject;
+declare type gdResourcesManager = EmscriptenObject;
 
 declare type gdInstruction = EmscriptenObject;
 declare type gdInstructionMetadata = EmscriptenObject;

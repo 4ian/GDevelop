@@ -329,6 +329,9 @@ storiesOf('EventsSheet', module)
         layout={testLayout}
         events={testLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)}
       />
     </DragDropContextProvider>
   ))
@@ -339,6 +342,9 @@ storiesOf('EventsSheet', module)
         layout={emptyLayout}
         events={emptyLayout.getEvents()}
         onOpenExternalEvents={action('Open external events')}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)}
       />
     </DragDropContextProvider>
   ));

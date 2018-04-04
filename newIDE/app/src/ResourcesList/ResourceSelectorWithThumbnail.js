@@ -7,7 +7,7 @@ import {
   type ChooseResourceFunction,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
-import ImageThumbnail from './ImageThumbnail';
+import ResourceThumbnail from './ResourceThumbnail';
 
 type Props = {|
   project: gdProject,
@@ -42,7 +42,7 @@ const ResourceSelectorWithThumbnail = ({
           floatingLabelText={floatingLabelText}
         />
       </div>
-      <ImageThumbnail
+      <ResourceThumbnail
         resourceName={resourceName}
         resourcesLoader={ResourcesLoader}
         project={project}

@@ -6,7 +6,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from '../UI/Dialog';
 import { Line } from '../UI/Grid';
 import ResourcesLoader from '../ResourcesLoader';
-import ResourceSelectorWithThumbnail from '../ObjectEditor/ResourceSelectorWithThumbnail';
+import ResourceSelectorWithThumbnail from '../ResourcesList/ResourceSelectorWithThumbnail';
 import {
   type ResourceSource,
   type ChooseResourceFunction,

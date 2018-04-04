@@ -5,7 +5,9 @@ import Add from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
 import DirectionTools from './DirectionTools';
 import MiniToolbar from '../../../UI/MiniToolbar';
-import ImageThumbnail, { thumbnailContainerStyle } from '../../ImageThumbnail';
+import ImageThumbnail, {
+  thumbnailContainerStyle,
+} from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
 const gd = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail

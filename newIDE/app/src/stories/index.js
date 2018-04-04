@@ -25,7 +25,7 @@ import SpriteEditor from '../ObjectEditor/Editors/SpriteEditor';
 import PointsEditor from '../ObjectEditor/Editors/SpriteEditor/PointsEditor';
 import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/CollisionMasksEditor';
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
-import ImageThumbnail from '../ObjectEditor/ImageThumbnail';
+import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
 import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterFields/ExternalEventsField';
 import LayerField from '../EventsSheet/InstructionEditor/ParameterFields/LayerField';

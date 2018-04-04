@@ -1,9 +1,11 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
+import { type EditorProps } from './EditorProps.flow';
 import { Line, Column } from '../../UI/Grid';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 
-export default class AdMobEditor extends Component {
+export default class AdMobEditor extends React.Component<EditorProps, void> {
   render() {
     const { object, project } = this.props;
 

@@ -1,15 +1,49 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import InlinePopover from './InlinePopover';
 import ParameterRenderingService from './InstructionEditor/ParameterRenderingService';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
 const gd = global.gd;
 
-export default class InlineParameterEditor extends Component {
+type Props = {|
+  project: gdProject,
+  layout: gdLayout,
+
+  open: boolean,
+  onRequestClose: () => void,
+  onChange: (string) => void,
+
+  instruction: gdInstruction,
+  isCondition: boolean,
+  parameterIndex: number,
+
+  anchorEl: ?any,
+
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+|};
+
+type State = {|
+  isValid: boolean,
+  parameterMetadata: ?gdParameterMetadata,
+  instruction: ?gdInstruction,
+  ParameterComponent: ?any,
+|};
+
+export default class InlineParameterEditor extends React.Component<Props, State> {
   state = {
     isValid: false,
     parameterMetadata: null,
+    ParameterComponent: null,
+    instruction: null,
   };
 
-  componentWillReceiveProps(newProps) {
+  _field: ?any;
+
+  componentWillReceiveProps(newProps: Props) {
     if (
       (newProps.open && !this.props.open) ||
       newProps.instruction !== this.props.instruction
@@ -26,7 +60,7 @@ export default class InlineParameterEditor extends Component {
     });
   }
 
-  _loadComponentFromInstruction(props) {
+  _loadComponentFromInstruction(props: Props) {
     const { project, isCondition, instruction, parameterIndex } = props;
     if (!instruction) return this._unload();
 
@@ -81,6 +115,8 @@ export default class InlineParameterEditor extends Component {
           ref={field => (this._field = field)}
           parameterRenderingService={ParameterRenderingService}
           isInline
+          resourceSources={this.props.resourceSources}
+          onChooseResource={this.props.onChooseResource}
         />
       </InlinePopover>
     );

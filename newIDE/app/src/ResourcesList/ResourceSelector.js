@@ -18,20 +18,26 @@ type Props = {|
   resourceKind: ResourceKind,
   fullWidth?: boolean,
   initialResourceName: string,
-  onChange: (string) => void,
+  onChange: string => void,
   floatingLabelText?: string,
 |};
 
-type State ={|
+type State = {|
   notExistingError: boolean,
   resourceName: string,
 |};
 
-type AutoCompleteItem = {|
-  text: string,
-  value: React.Node,
-  onClick?: () => void,
-|} | string;
+type AutoCompleteItem =
+  | {|
+      text: string,
+      value: React.Node,
+      onClick?: () => void,
+    |}
+  | string;
+
+const styles = {
+  autoComplete: { minWidth: 300 },
+};
 
 export default class ResourceSelector extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -136,8 +142,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
     // We're now sure that onClick is defined
     // $FlowFixMe
     const onClick = this.defaultItems[index].onClick;
-    if (onClick)
-      onClick();
+    if (onClick) onClick();
   };
 
   render() {
@@ -156,6 +161,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         errorText={errorText}
         searchText={this.state.resourceName}
         fullWidth={this.props.fullWidth}
+        style={styles.autoComplete}
         menuProps={{
           maxHeight: 250,
         }}

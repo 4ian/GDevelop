@@ -20,6 +20,7 @@ export default [
 
           const properties = ['openFile'];
           if (multiSelections) properties.push('multiSelections');
+          const projectPath = path.dirname(project.getProjectFile());
 
           const browserWindow = electron.remote.getCurrentWindow();
           dialog.showOpenDialog(
@@ -28,6 +29,7 @@ export default [
               title: 'Choose an audio file',
               properties,
               filters: [{ name: 'Audio files', extensions: ['wav', 'mp3', 'ogg'] }],
+              defaultPath: projectPath,
             },
             paths => {
               if (!paths) return resolve([]);
@@ -65,6 +67,7 @@ export default [
 
           const properties = ['openFile'];
           if (multiSelections) properties.push('multiSelections');
+          const projectPath = path.dirname(project.getProjectFile());
 
           const browserWindow = electron.remote.getCurrentWindow();
           dialog.showOpenDialog(
@@ -73,6 +76,7 @@ export default [
               title: 'Choose an image',
               properties,
               filters: [{ name: 'Image files', extensions: ['png', 'jpg'] }],
+              defaultPath: projectPath,
             },
             paths => {
               if (!paths) return resolve([]);

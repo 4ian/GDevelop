@@ -516,6 +516,8 @@ export default class EventsSheet extends Component {
               inlineEditingChangesMade: true,
             });
           }}
+          resourceSources={this.props.resourceSources}
+          onChooseResource={this.props.onChooseResource}
         />
         <ContextMenu
           ref={eventContextMenu => (this.eventContextMenu = eventContextMenu)}

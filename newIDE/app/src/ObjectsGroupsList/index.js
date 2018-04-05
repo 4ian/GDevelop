@@ -99,6 +99,7 @@ class GroupsList extends Component<*, *> {
               onRename={newName =>
                 this.props.onRename(groupWithContext, newName)}
               editingName={nameBeingEdited}
+              isGlobalGroup={groupWithContext.global}
             />
           );
         }}

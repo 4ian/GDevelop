@@ -60,7 +60,7 @@ class ThemableGroupRow extends React.Component {
   };
 
   render() {
-    const { group, style, muiTheme } = this.props;
+    const { group, style, muiTheme, isGlobalGroup } = this.props;
 
     const groupName = group.getName();
     const label = this.props.editingName ? (
@@ -79,7 +79,14 @@ class ThemableGroupRow extends React.Component {
         style={styles.textField}
       />
     ) : (
-      <div style={styles.groupName}>{groupName}</div>
+      <div
+        style={{
+          ...styles.groupName,
+          fontStyle: isGlobalGroup ? 'italic' : undefined,
+        }}
+      >
+        {groupName}
+      </div>
     );
 
     const itemStyle = {

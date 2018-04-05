@@ -12,6 +12,7 @@ import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
+import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalExport from '../Export/LocalExporters/LocalExport';
 import LocalCordovaExport from '../Export/LocalExporters/LocalCordovaExport';
@@ -146,6 +147,10 @@ storiesOf('Tabs', module)
 storiesOf('HelpButton', module)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpButton helpPagePath="/test" />);
+
+storiesOf('HelpFinder', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => <HelpFinder open onClose={action('close')} />);
 
 storiesOf('ParameterFields', module)
   .addDecorator(paperDecorator)

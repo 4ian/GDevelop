@@ -5,7 +5,7 @@ import { serializeToJSObject } from '../../Utils/Serializer';
 import BaseEditor from './BaseEditor';
 
 export default class EventsEditor extends BaseEditor {
-  editor: ?typeof EventsSheet;
+  editor: ?EventsSheet;
 
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();

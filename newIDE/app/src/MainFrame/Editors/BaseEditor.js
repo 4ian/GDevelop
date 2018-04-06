@@ -3,6 +3,7 @@ import * as React from 'react';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import { rgbToHexNumber } from '../../Utils/ColorTransformer';
 
+//TODO: try BaseEditor<Props,State>
 export default class BaseEditor extends React.Component<*,*> {
   static defaultProps = {
     setToolbar: () => {},

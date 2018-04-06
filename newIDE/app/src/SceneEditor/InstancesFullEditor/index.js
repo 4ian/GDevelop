@@ -121,6 +121,7 @@ export default class InstancesFullEditor extends Component {
         zoomIn={this.zoomIn}
         zoomOut={this.zoomOut}
         onOpenSettings={this.openSceneProperties}
+        onOpenDebugger={() => this.props.onOpenDebugger()}
       />
     );
   }

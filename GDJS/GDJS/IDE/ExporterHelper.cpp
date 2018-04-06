@@ -87,7 +87,7 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project & project, gd::Layou
     ExportResources(fs, exportedProject, exportDir);
 
     //Export engine libraries
-    AddLibsInclude(true, false, includesFiles);
+    AddLibsInclude(true, false, true, includesFiles);
 
     //Generate events code
     if ( !ExportEventsCode(exportedProject, codeOutputDir, includesFiles) )
@@ -314,7 +314,7 @@ bool ExporterHelper::CompleteIndexFile(gd::String & str, gd::String customCss, g
     return true;
 }
 
-void ExporterHelper::AddLibsInclude(bool pixiRenderers, bool cocosRenderers, std::vector<gd::String> & includesFiles)
+void ExporterHelper::AddLibsInclude(bool pixiRenderers, bool cocosRenderers, bool websocketDebuggerClient, std::vector<gd::String> & includesFiles)
 {
     //First, do not forget common includes (they must be included before events generated code files).
     InsertUnique(includesFiles, "libs/jshashtable.js");
@@ -350,6 +350,11 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers, bool cocosRenderers, std
     InsertUnique(includesFiles, "events-tools/stringtools.js");
     InsertUnique(includesFiles, "events-tools/windowtools.js");
     InsertUnique(includesFiles, "events-tools/networktools.js");
+
+    if (websocketDebuggerClient)
+    {
+        InsertUnique(includesFiles, "websocket-debugger-client/websocket-debugger-client.js");
+    }
 
     if (pixiRenderers)
     {

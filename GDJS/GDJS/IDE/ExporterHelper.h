@@ -67,7 +67,7 @@ public:
     /**
      * \brief Add libraries files from Pixi.js or Cocos2d to the list of includes.
      */
-    void AddLibsInclude(bool pixiRenderers, bool cocosRenderers, std::vector<gd::String> & includesFiles);
+    void AddLibsInclude(bool pixiRenderers, bool cocosRenderers, bool websocketDebuggerClient, std::vector<gd::String> & includesFiles);
 
     /**
      * \brief Remove include files that are Pixi or Cocos2d renderers.

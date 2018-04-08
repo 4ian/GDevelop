@@ -85,6 +85,8 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project & project, gd::Layou
 
     //Export resources (*before* generating events as some resources filenames may be updated)
     ExportResources(fs, exportedProject, exportDir);
+
+    AddMainLibsInclude(true, false, includesFiles);
     //Generate events code
     if ( !ExportEventsCode(exportedProject, codeOutputDir, includesFiles) )
         return false;
@@ -312,11 +314,18 @@ bool ExporterHelper::CompleteIndexFile(gd::String & str, gd::String customCss, g
     return true;
 }
 
-void ExporterHelper::AddLibsInclude(bool pixiRenderers, bool cocosRenderers, std::vector<gd::String> & includesFiles)
+void ExporterHelper::AddMainLibsInclude(bool pixiRenderers, bool cocosRenderers, std::vector<gd::String> & includesFiles)
 {
     if (pixiRenderers)
     {
         InsertUnique(includesFiles, "pixi-renderers/pixi.js");
+    }
+}
+
+void ExporterHelper::AddLibsInclude(bool pixiRenderers, bool cocosRenderers, std::vector<gd::String> & includesFiles)
+{
+    if (pixiRenderers)
+    {
         InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");
         InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
         InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");

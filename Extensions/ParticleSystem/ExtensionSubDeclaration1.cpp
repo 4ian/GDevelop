@@ -9,12 +9,11 @@ This project is released under the MIT License.
 
 #include "Extension.h"
 #include "ParticleEmitterObject.h"
-#include "ParticleEmitterObject.h"
 
 /**
  * Declare some actions and conditions of the particle emitter
  */
-void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
+void ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
 {
     #if defined(GD_IDE_ONLY)
     obj.AddAction("EmitterForceMin",
@@ -27,8 +26,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetEmitterForceMin").SetManipulatedType("number").SetGetter("GetEmitterForceMin").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddAction("EmitterForceMax",
                    _("Emission maximal force"),
@@ -40,8 +38,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetEmitterForceMax").SetManipulatedType("number").SetGetter("GetEmitterForceMax").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddAction("EmitterXDirection",
                    _("Emission X direction"),
@@ -53,8 +50,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetEmitterXDirection").SetManipulatedType("number").SetGetter("GetEmitterXDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddCondition("EmitterXDirection",
                    _("Emission X direction"),
@@ -66,8 +62,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetEmitterXDirection").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddAction("EmitterYDirection",
@@ -80,8 +75,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetEmitterYDirection").SetManipulatedType("number").SetGetter("GetEmitterYDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddCondition("EmitterYDirection",
                    _("Emission Y direction"),
@@ -93,8 +87,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetEmitterYDirection").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddAction("EmitterZDirection",
@@ -107,8 +100,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetEmitterZDirection").SetManipulatedType("number").SetGetter("GetEmitterZDirection").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddCondition("EmitterZDirection",
@@ -121,8 +113,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetEmitterZDirection").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddAction("EmitterAngle",
@@ -135,7 +126,6 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
         .SetFunctionName("SetAngle").SetManipulatedType("number").SetGetter("GetAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
 
@@ -149,8 +139,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddAction("EmitterAngleA",
                    _("Emission angle 1"),
@@ -162,8 +151,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetEmitterAngleA").SetManipulatedType("number").SetGetter("GetEmitterAngleA").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddCondition("EmitterAngleA",
@@ -176,8 +164,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetEmitterAngleA").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddAction("EmitterAngleB",
@@ -190,8 +177,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetEmitterAngleB").SetManipulatedType("number").SetGetter("GetEmitterAngleB").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddCondition("EmitterAngleB",
@@ -204,8 +190,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetEmitterAngleB").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ConeSprayAngle",
@@ -218,8 +203,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetConeSprayAngle").SetManipulatedType("number").SetGetter("GetConeSprayAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddCondition("ConeSprayAngle",
                    _("Angle of the spray cone"),
@@ -231,8 +215,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetConeSprayAngle").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddAction("Friction",
                    _("Friction"),
@@ -244,8 +227,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetFriction").SetManipulatedType("number").SetGetter("GetFriction").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number").SetGetter("GetFriction");
 
 
     obj.AddCondition("Friction",
@@ -259,8 +241,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetFriction").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ZoneRadius",
@@ -273,8 +254,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetZoneRadius").SetManipulatedType("number").SetGetter("GetZoneRadius").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddCondition("ZoneRadius",
@@ -287,8 +267,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetZoneRadius").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ParticleLifeTimeMin",
@@ -301,8 +280,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetParticleLifeTimeMin").SetManipulatedType("number").SetGetter("GetParticleLifeTimeMin").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddCondition("ParticleLifeTimeMin",
                    _("Minimum lifetime"),
@@ -314,8 +292,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetParticleLifeTimeMin").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddAction("ParticleLifeTimeMax",
                    _("Maximum lifetime"),
@@ -327,8 +304,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetParticleLifeTimeMax").SetManipulatedType("number").SetGetter("GetParticleLifeTimeMax").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddCondition("ParticleLifeTimeMax",
@@ -341,8 +317,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetParticleLifeTimeMax").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ParticleGravityX",
@@ -355,8 +330,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetParticleGravityX").SetManipulatedType("number").SetGetter("GetParticleGravityX").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddCondition("ParticleGravityX",
@@ -369,8 +343,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetParticleGravityX").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ParticleGravityY",
@@ -383,8 +356,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetParticleGravityY").SetManipulatedType("number").SetGetter("GetParticleGravityY").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddCondition("ParticleGravityY",
@@ -397,8 +369,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetParticleGravityY").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddAction("ParticleGravityZ",
@@ -411,8 +382,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetParticleGravityZ").SetManipulatedType("number").SetGetter("GetParticleGravityZ").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
 
     obj.AddCondition("ParticleGravityZ",
@@ -425,8 +395,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetParticleGravityZ").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddAction("ParticleGravityAngle",
                    _("Gravity angle"),
@@ -438,8 +407,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetParticleGravityAngle").SetManipulatedType("number").SetGetter("GetParticleGravityAngle").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddCondition("ParticleGravityAngle",
                    _("Gravity angle"),
@@ -451,8 +419,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetParticleGravityAngle").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddAction("ParticleGravityLength",
                    _("Gravity"),
@@ -464,8 +431,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("operator", _("Modification's sign"))
         .AddParameter("expression", _("Value"))
-
-        .SetFunctionName("SetParticleGravityLength").SetManipulatedType("number").SetGetter("GetParticleGravityLength").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
 
     obj.AddCondition("ParticleGravityLength",
                    _("Gravity"),
@@ -477,8 +443,7 @@ void Extension::ExtensionSubDeclaration1(gd::ObjectMetadata & obj)
         .AddParameter("object", _("Object"), "ParticleEmitter")
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddParameter("expression", _("Value to test"))
-
-        .SetFunctionName("GetParticleGravityLength").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
+        .SetManipulatedType("number");
     #endif
 }
 

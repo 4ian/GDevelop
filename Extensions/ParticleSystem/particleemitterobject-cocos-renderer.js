@@ -65,7 +65,7 @@ gdjs.ParticleEmitterObjectCocosRenderer = function(runtimeScene, runtimeObject, 
 
         tangentialAccelVariance: 0.0,
         tangentialAcceleration: 1,
-        
+
         // We are forced to use a texture name / base64 string, it's a one-pixel base64 image
         textureImageData: "H4sIAAAAAAAAA+sM8HPn5ZLiYmBg4PX0cAkC0owgzMEEJCeUB98DUpwFHpHFDAzcwiDMyDBrjgRQkL3E09eV/RELu4CFwaX8heVAIdnMkIgS5/zc3NS8EgYQcC5KTSxJTVEozyzJUHD39A1I0UtlB4rzeLo4hnBcT/7x/789A+s/pn93zkQ+B2nwdPVzWeeU0AQAwMwOBZYAAAA="
     };
@@ -292,5 +292,5 @@ gdjs.ParticleEmitterObjectCocosRenderer.prototype.destroy = function(){
 };
 
 gdjs.ParticleEmitterObjectCocosRenderer.prototype.hasStarted = function(){
-    this.started;
+    return this.started;
 };

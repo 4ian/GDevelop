@@ -127,7 +127,7 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
                         isStepped: false};
     }
 
-    
+
     if(objectData.emissionEditionSimpleMode){
         config.startRotation = {min:-objectData.emitterAngleB/2.0,
                                 max: objectData.emitterAngleB/2.0};
@@ -265,5 +265,5 @@ gdjs.ParticleEmitterObjectPixiRenderer.prototype.destroy = function(){
 };
 
 gdjs.ParticleEmitterObjectPixiRenderer.prototype.hasStarted = function(){
-    this.started;
+    return this.started;
 };

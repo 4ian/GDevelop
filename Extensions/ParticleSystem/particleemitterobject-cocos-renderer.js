@@ -1,4 +1,9 @@
+/**
 
+GDevelop - Particle System Extension
+Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
+This project is released under the MIT License.
+*/
 
 
 gdjs.ParticleEmitterObjectCocosRenderer = function(runtimeScene, runtimeObject, objectData){
@@ -256,7 +261,7 @@ gdjs.ParticleEmitterObjectCocosRenderer.prototype.setFlow = function(flow){
     this.renderer.setEmissionRate(flow);
 };
 
-gdjs.ParticleEmitterObjectCocosRenderer.prototype.validTexture = function(texture, runtimeScene){
+gdjs.ParticleEmitterObjectCocosRenderer.prototype.isTextureValid = function(texture, runtimeScene){
     return runtimeScene.getGame().getImageManager().getTexture(texture)._textureLoaded;
 };
 

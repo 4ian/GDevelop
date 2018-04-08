@@ -1,4 +1,9 @@
+/**
 
+GDevelop - Particle System Extension
+Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
+This project is released under the MIT License.
+*/
 
 
 gdjs.ParticleEmitterObject = function(runtimeScene, objectData){
@@ -455,16 +460,9 @@ gdjs.ParticleEmitterObject.prototype.getTexture = function(){
 
 gdjs.ParticleEmitterObject.prototype.setTexture = function(texture, runtimeScene){
     if(this.texture !== texture){
-        if(this.renderer.validTexture(texture, runtimeScene)){
+        if(this.renderer.isTextureValid(texture, runtimeScene)){
             this.texture = texture;
             this._textureDirty = true;
         }
     }
-};
-
-gdjs.ParticleEmitterObject.prototype.setEmitterXDirection = function(x){
-    return;
-};
-gdjs.ParticleEmitterObject.prototype.getEmitterXDirection = function(){
-    return 0;
 };

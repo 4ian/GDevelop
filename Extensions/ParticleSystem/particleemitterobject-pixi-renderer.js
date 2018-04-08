@@ -1,4 +1,9 @@
+/**
 
+GDevelop - Particle System Extension
+Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
+This project is released under the MIT License.
+*/
 
 
 gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, objectData){
@@ -81,8 +86,8 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
         }
     };
 
-    // Small fix because different uses, instead random min and max speeds,
-    // it uses initial and final speeds
+    // We need to adapt a bit the configuration of the speed of particles, instead of random minimum and maximum speed,
+    // pixi-particles uses initial and final speed, this behavior can lead to a non-working particle system without this patch
     if(config.acceleration.x === 0 && config.acceleration.y === 0 &&
        config.speed.list[0].value === 0 && config.speed.list[1].value !== 0){
         config.speed.list[0].value = 0.00001;
@@ -177,8 +182,8 @@ gdjs.ParticleEmitterObjectPixiRenderer.prototype.setAngle = function(angle1, ang
 };
 
 gdjs.ParticleEmitterObjectPixiRenderer.prototype.setForce = function(min, max){
-    // Small fix because different uses, instead random min and max speeds,
-    // it uses initial and final speeds
+    // We need to adapt a bit the configuration of the speed of particles, instead of random minimum and maximum speed,
+    // pixi-particles uses initial and final speed, this behavior can lead to a non-working particle system without this patch
     if(this.emitter.acceleration.x === 0 && this.emitter.acceleration.y === 0 && min === 0 && max !== 0){
         min = 0.00001;
     }
@@ -228,7 +233,7 @@ gdjs.ParticleEmitterObjectPixiRenderer.prototype.setFlow = function(flow){
     this.emitter.frequency = 1.0/flow;
 };
 
-gdjs.ParticleEmitterObjectPixiRenderer.prototype.validTexture = function(texture, runtimeScene){
+gdjs.ParticleEmitterObjectPixiRenderer.prototype.isTextureValid = function(texture, runtimeScene){
     return runtimeScene.getGame().getImageManager().getPIXITexture(texture).valid;
 };
 

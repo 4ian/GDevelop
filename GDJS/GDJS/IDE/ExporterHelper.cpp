@@ -86,12 +86,12 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project & project, gd::Layou
     //Export resources (*before* generating events as some resources filenames may be updated)
     ExportResources(fs, exportedProject, exportDir);
 
-    AddMainLibsInclude(true, false, includesFiles);
+    //Export engine libraries
+    AddLibsInclude(true, false, includesFiles);
+
     //Generate events code
     if ( !ExportEventsCode(exportedProject, codeOutputDir, includesFiles) )
         return false;
-
-    AddLibsInclude(true, false, includesFiles);
 
     //Export source files
     if ( !ExportExternalSourceFiles(exportedProject, codeOutputDir, includesFiles) )
@@ -314,18 +314,46 @@ bool ExporterHelper::CompleteIndexFile(gd::String & str, gd::String customCss, g
     return true;
 }
 
-void ExporterHelper::AddMainLibsInclude(bool pixiRenderers, bool cocosRenderers, std::vector<gd::String> & includesFiles)
+void ExporterHelper::AddLibsInclude(bool pixiRenderers, bool cocosRenderers, std::vector<gd::String> & includesFiles)
 {
+    //First, do not forget common includes (they must be included before events generated code files).
+    InsertUnique(includesFiles, "libs/jshashtable.js");
+    InsertUnique(includesFiles, "gd.js");
+    InsertUnique(includesFiles, "gd-splash-image.js");
+    InsertUnique(includesFiles, "libs/hshg.js");
+    InsertUnique(includesFiles, "libs/rbush.js");
+    InsertUnique(includesFiles, "inputmanager.js");
+    InsertUnique(includesFiles, "timemanager.js");
+    InsertUnique(includesFiles, "runtimeobject.js");
+    InsertUnique(includesFiles, "profiler.js");
+    InsertUnique(includesFiles, "runtimescene.js");
+    InsertUnique(includesFiles, "scenestack.js");
+    InsertUnique(includesFiles, "polygon.js");
+    InsertUnique(includesFiles, "force.js");
+    InsertUnique(includesFiles, "layer.js");
+    InsertUnique(includesFiles, "timer.js");
+    InsertUnique(includesFiles, "runtimegame.js");
+    InsertUnique(includesFiles, "variable.js");
+    InsertUnique(includesFiles, "variablescontainer.js");
+    InsertUnique(includesFiles, "eventscontext.js");
+    InsertUnique(includesFiles, "runtimebehavior.js");
+    InsertUnique(includesFiles, "spriteruntimeobject.js");
+
+    //Common includes for events only.
+    InsertUnique(includesFiles, "events-tools/commontools.js");
+    InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
+    InsertUnique(includesFiles, "events-tools/inputtools.js");
+    InsertUnique(includesFiles, "events-tools/objecttools.js");
+    InsertUnique(includesFiles, "events-tools/cameratools.js");
+    InsertUnique(includesFiles, "events-tools/soundtools.js");
+    InsertUnique(includesFiles, "events-tools/storagetools.js");
+    InsertUnique(includesFiles, "events-tools/stringtools.js");
+    InsertUnique(includesFiles, "events-tools/windowtools.js");
+    InsertUnique(includesFiles, "events-tools/networktools.js");
+
     if (pixiRenderers)
     {
         InsertUnique(includesFiles, "pixi-renderers/pixi.js");
-    }
-}
-
-void ExporterHelper::AddLibsInclude(bool pixiRenderers, bool cocosRenderers, std::vector<gd::String> & includesFiles)
-{
-    if (pixiRenderers)
-    {
         InsertUnique(includesFiles, "pixi-renderers/pixi-filters-tools.js");
         InsertUnique(includesFiles, "pixi-renderers/runtimegame-pixi-renderer.js");
         InsertUnique(includesFiles, "pixi-renderers/runtimescene-pixi-renderer.js");
@@ -378,41 +406,6 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers, bool cocosRenderers, std
 bool ExporterHelper::ExportEventsCode(gd::Project & project, gd::String outputDir, std::vector<gd::String> & includesFiles)
 {
     fs.MkDir(outputDir);
-
-    //First, do not forget common includes (they must be included before events generated code files).
-    InsertUnique(includesFiles, "libs/jshashtable.js");
-    InsertUnique(includesFiles, "gd.js");
-    InsertUnique(includesFiles, "gd-splash-image.js");
-    InsertUnique(includesFiles, "libs/hshg.js");
-    InsertUnique(includesFiles, "libs/rbush.js");
-    InsertUnique(includesFiles, "inputmanager.js");
-    InsertUnique(includesFiles, "timemanager.js");
-    InsertUnique(includesFiles, "runtimeobject.js");
-    InsertUnique(includesFiles, "profiler.js");
-    InsertUnique(includesFiles, "runtimescene.js");
-    InsertUnique(includesFiles, "scenestack.js");
-    InsertUnique(includesFiles, "polygon.js");
-    InsertUnique(includesFiles, "force.js");
-    InsertUnique(includesFiles, "layer.js");
-    InsertUnique(includesFiles, "timer.js");
-    InsertUnique(includesFiles, "runtimegame.js");
-    InsertUnique(includesFiles, "variable.js");
-    InsertUnique(includesFiles, "variablescontainer.js");
-    InsertUnique(includesFiles, "eventscontext.js");
-    InsertUnique(includesFiles, "runtimebehavior.js");
-    InsertUnique(includesFiles, "spriteruntimeobject.js");
-
-    //Common includes for events only.
-    InsertUnique(includesFiles, "events-tools/commontools.js");
-    InsertUnique(includesFiles, "events-tools/runtimescenetools.js");
-    InsertUnique(includesFiles, "events-tools/inputtools.js");
-    InsertUnique(includesFiles, "events-tools/objecttools.js");
-    InsertUnique(includesFiles, "events-tools/cameratools.js");
-    InsertUnique(includesFiles, "events-tools/soundtools.js");
-    InsertUnique(includesFiles, "events-tools/storagetools.js");
-    InsertUnique(includesFiles, "events-tools/stringtools.js");
-    InsertUnique(includesFiles, "events-tools/windowtools.js");
-    InsertUnique(includesFiles, "events-tools/networktools.js");
 
     for (std::size_t i = 0;i<project.GetLayoutsCount();++i)
     {

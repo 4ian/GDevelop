@@ -65,10 +65,6 @@ public:
         wxProgressDialog * progressDlg = NULL);
 
     /**
-     * \brief Add main libraries needed by other files to the list of includes.
-     */
-    void AddMainLibsInclude(bool pixiRenderers, bool cocosRenderers, std::vector<gd::String> & includesFiles);
-    /**
      * \brief Add libraries files from Pixi.js or Cocos2d to the list of includes.
      */
     void AddLibsInclude(bool pixiRenderers, bool cocosRenderers, std::vector<gd::String> & includesFiles);

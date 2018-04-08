@@ -438,8 +438,6 @@ gdjs.ParticleEmitterObject.prototype.getFlow = function(){
 };
 
 gdjs.ParticleEmitterObject.prototype.setFlow = function(flow){
-    if(flow < 0) flow = 0;
-
     if(this.flow !== flow){
         this.flow = flow;
         this._flowDirty = true;

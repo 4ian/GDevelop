@@ -68,11 +68,17 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
             min: objectData.particleLifeTimeMin,
             max: objectData.particleLifeTimeMax
         },
-        frequency: 1.0/objectData.flow,
+        // A negative flow is "infinite flow" (all particles burst)
+        frequency: objectData.flow < 0 ? 0.0001 : 1.0/objectData.flow,
         spawnChance: 1,
-        particlesPerWave: 1,
+        particlesPerWave: objectData.flow < 0 ? objectData.maxParticleNb : 1,
         maxParticles: objectData.maxParticleNb,
-        emitterLifetime: -1,
+
+        // Lifetime can be computed from the tank (the number of particles available)
+        // and the flow (number of particles emitted per seconds)
+        emitterLifetime:
+            objectData.tank < 0 ? -1 :
+            (objectData.flow < 0 ? 0.001 : objectData.tank / objectData.flow),
         pos: {
             x: 0,
             y: 0
@@ -230,7 +236,8 @@ gdjs.ParticleEmitterObjectPixiRenderer.prototype.setAlpha = function(alpha1, alp
 };
 
 gdjs.ParticleEmitterObjectPixiRenderer.prototype.setFlow = function(flow){
-    this.emitter.frequency = 1.0/flow;
+    this.emitter.frequency = flow < 0 ? 0.0001 : 1.0/flow;
+    // TODO: This should also affect emitter lifetime.
 };
 
 gdjs.ParticleEmitterObjectPixiRenderer.prototype.isTextureValid = function(texture, runtimeScene){

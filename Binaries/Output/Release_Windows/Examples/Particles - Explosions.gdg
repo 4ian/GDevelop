@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="84" major="3" minor="6" revision="0" />
-    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+    <gdVersion build="97" major="4" minor="0" revision="0" />
+    <properties folderProject="false" linuxExecutableFilename="" macExecutableFilename="" orientation="default" packageName="" projectFile="/Users/florian/Projects/F/GD/Binaries/Output/Release_Windows/Examples/Particles - Explosions.gdg" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Explosions</name>
         <author></author>
         <windowWidth>800</windowWidth>
         <windowHeight>600</windowHeight>
-        <latestCompilationDirectory></latestCompilationDirectory>
+        <latestCompilationDirectory>/Users/florian/Explosions</latestCompilationDirectory>
         <maxFPS>60</maxFPS>
         <minFPS>10</minFPS>
         <verticalSync>false</verticalSync>
+        <platformSpecificAssets />
+        <loadingScreen showGDevelopSplash="true" />
         <extensions>
             <extension name="BuiltinObject" />
             <extension name="BuiltinAudio" />
@@ -34,6 +36,7 @@
         </extensions>
         <platforms>
             <platform name="GDevelop C++ platform" />
+            <platform name="GDevelop JS platform" />
         </platforms>
         <currentPlatform>GDevelop C++ platform</currentPlatform>
     </properties>
@@ -48,40 +51,40 @@
     <variables />
     <layouts>
         <layout b="0" disableInputWhenNotFocused="true" mangledName="New_32scene" name="New scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="0" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="0">
-            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+            <uiSettings grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
             <objectsGroups />
             <variables />
             <instances />
             <objects>
-                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Mutable" destroyWhenNoParticles="true" emissionEditionSimpleMode="false" emitterAngleA="180.000000" emitterAngleB="160.000000" emitterForceMax="40.000000" emitterForceMin="5.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="-1.000000" friction="2.000000" gravityEditionSimpleMode="false" greenParam="Mutable" maxParticleNb="5000" name="Explosion" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="25.000000" particleBlue2="50.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="20.000000" particleGreen1="128.000000" particleGreen2="50.000000" particleLifeTimeMax="1.500000" particleLifeTimeMin="0.700000" particleRed1="255.000000" particleRed2="50.000000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Mutable" rendererParam1="20.000000" rendererParam2="20.000000" rendererType="Quad" sizeParam="Random" tank="1000.000000" textureParticleName="ExplosionTexture.png" type="ParticleSystem::ParticleEmitter" zoneRadius="2.000000">
+                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Mutable" destroyWhenNoParticles="true" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="360.000000" emitterForceMax="40.000000" emitterForceMin="10.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="-1.000000" friction="2.000000" gravityEditionSimpleMode="false" greenParam="Mutable" maxParticleNb="100" name="Explosion" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="25.000000" particleBlue2="50.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="20.000000" particleGreen1="128.000000" particleGreen2="50.000000" particleLifeTimeMax="1.500000" particleLifeTimeMin="0.700000" particleRed1="255.000000" particleRed2="50.000000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Mutable" rendererParam1="20.000000" rendererParam2="20.000000" rendererType="Quad" sizeParam="Random" tank="100.000000" textureParticleName="ExplosionTexture.png" type="ParticleSystem::ParticleEmitter" zoneRadius="2.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
-                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Mutable" destroyWhenNoParticles="true" emissionEditionSimpleMode="false" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="130.000000" emitterForceMin="50.000000" emitterXDirection="1.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="-1.000000" friction="2.000000" gravityEditionSimpleMode="false" greenParam="Mutable" maxParticleNb="5000" name="Explosion2" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="25.000000" particleBlue2="75.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="30.000000" particleGreen1="76.000000" particleGreen2="180.000000" particleLifeTimeMax="1.500000" particleLifeTimeMin="0.700000" particleRed1="153.000000" particleRed2="1.000000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="0.050000" rendererParam2="1.000000" rendererType="Line" sizeParam="Random" tank="350.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="2.000000">
+                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Mutable" destroyWhenNoParticles="true" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="360.000000" emitterForceMax="130.000000" emitterForceMin="50.000000" emitterXDirection="1.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="-1.000000" friction="2.000000" gravityEditionSimpleMode="false" greenParam="Mutable" maxParticleNb="40" name="Explosion2" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="25.000000" particleBlue2="75.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="30.000000" particleGreen1="76.000000" particleGreen2="180.000000" particleLifeTimeMax="1.500000" particleLifeTimeMin="0.700000" particleRed1="153.000000" particleRed2="1.000000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="3.000000" rendererParam2="6.000000" rendererType="Line" sizeParam="Random" tank="40.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="2.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
-                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Enabled" destroyWhenNoParticles="true" emissionEditionSimpleMode="false" emitterAngleA="45.000000" emitterAngleB="180.000000" emitterForceMax="10.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="400.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Enabled" maxParticleNb="5000" name="ExplosionSmoke" particleAlpha1="153.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="25.000000" particleBlue2="0.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="30.000000" particleGreen1="25.000000" particleGreen2="0.800000" particleLifeTimeMax="1.200000" particleLifeTimeMin="0.700000" particleRed1="25.000000" particleRed2="0.100000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="20.000000" rendererParam2="20.000000" rendererType="Quad" sizeParam="Random" tank="500.000000" textureParticleName="ExplosionTexture.png" type="ParticleSystem::ParticleEmitter" zoneRadius="20.000000">
+                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Enabled" destroyWhenNoParticles="true" emissionEditionSimpleMode="false" emitterAngleA="45.000000" emitterAngleB="180.000000" emitterForceMax="10.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="400.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Enabled" maxParticleNb="50" name="ExplosionSmoke" particleAlpha1="153.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="25.000000" particleBlue2="0.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="30.000000" particleGreen1="25.000000" particleGreen2="0.800000" particleLifeTimeMax="1.200000" particleLifeTimeMin="0.700000" particleRed1="25.000000" particleRed2="0.100000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="20.000000" rendererParam2="20.000000" rendererType="Quad" sizeParam="Random" tank="50.000000" textureParticleName="ExplosionTexture.png" type="ParticleSystem::ParticleEmitter" zoneRadius="20.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
             </objects>
             <events>
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
+                        <instruction>
                             <type inverted="false" value="Timer" />
                             <parameters>
                                 <parameter></parameter>
                                 <parameter>Random(0.3)+0.2</parameter>
                                 <parameter>&quot;Creating&quot;</parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
+                        <instruction>
                             <type inverted="false" value="Create" />
                             <parameters>
                                 <parameter></parameter>
@@ -90,9 +93,9 @@
                                 <parameter>Random(600)</parameter>
                                 <parameter></parameter>
                             </parameters>
-                            <subActions />
-                        </action>
-                        <action>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
                             <type inverted="false" value="Create" />
                             <parameters>
                                 <parameter></parameter>
@@ -101,9 +104,9 @@
                                 <parameter>Explosion.Y()</parameter>
                                 <parameter></parameter>
                             </parameters>
-                            <subActions />
-                        </action>
-                        <action>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
                             <type inverted="false" value="Create" />
                             <parameters>
                                 <parameter></parameter>
@@ -112,16 +115,16 @@
                                 <parameter>Explosion.Y()</parameter>
                                 <parameter></parameter>
                             </parameters>
-                            <subActions />
-                        </action>
-                        <action>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
                             <type inverted="false" value="ResetTimer" />
                             <parameters>
                                 <parameter></parameter>
                                 <parameter>&quot;Creating&quot;</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events />
                 </event>
@@ -131,9 +134,10 @@
                     <cameras>
                         <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
                     </cameras>
+                    <effects />
                 </layer>
             </layers>
-            <automatismsSharedData />
+            <behaviorsSharedData />
         </layout>
     </layouts>
     <externalEvents />

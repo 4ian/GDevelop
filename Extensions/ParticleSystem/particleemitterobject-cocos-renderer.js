@@ -182,6 +182,8 @@ gdjs.ParticleEmitterObjectCocosRenderer = function(runtimeScene, runtimeObject, 
 
     this.renderer.setTotalParticles(objectData.maxParticleNb);
     this.renderer.setEmissionRate(objectData.flow);
+    this.renderer.setDuration(objectData.tank < 0 ? -1 :
+        (objectData.flow < 0 ? 0.001 : objectData.tank / objectData.flow));
 
     this.totalParticles = 1;
     var that = this;

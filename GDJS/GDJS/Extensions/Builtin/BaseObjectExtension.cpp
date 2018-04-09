@@ -92,6 +92,7 @@ BaseObjectExtension::BaseObjectExtension()
     objectExpressions["Longueur"].SetFunctionName("getAverageForce().getLength"); //Deprecated
     objectExpressions["Distance"].SetFunctionName("getDistanceToObject");
     objectExpressions["SqDistance"].SetFunctionName("getSqDistanceToObject");
+    objectStrExpressions["ObjectName"].SetFunctionName("getName");
 
 
     GetAllActions()["Create"].SetFunctionName("gdjs.evtTools.object.createObjectOnScene");

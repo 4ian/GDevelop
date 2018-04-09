@@ -879,6 +879,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(gd:
 
     extension.AddExpression("Count", _("Number of objects"), _("Count the number of the specified objects currently picked"), _("Objects"), "res/conditions/nbObjet.png")
         .AddParameter("objectList", _("Object"));
+
+    obj.AddStrExpression("ObjectName", _("Object name"), _("Return the name of the object"), _("Objects"), "res/conditions/text.png")
+        .AddParameter("object", _("Object"));
     #endif
 }
 

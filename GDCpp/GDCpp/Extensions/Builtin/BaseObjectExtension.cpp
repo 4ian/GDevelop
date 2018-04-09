@@ -91,6 +91,7 @@ BaseObjectExtension::BaseObjectExtension()
     objectExpressions["Variable"].SetFunctionName("GetVariableValue").SetStatic();
     objectStrExpressions["VariableString"].SetFunctionName("GetVariableString").SetStatic();
     objectExpressions["VariableChildCount"].SetFunctionName("GetVariableChildCount");
+    objectStrExpressions["ObjectName"].SetFunctionName("GetName");
 
     GetAllActions()["Create"].SetFunctionName("CreateObjectOnScene").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");
     GetAllActions()["CreateByName"].SetFunctionName("CreateObjectFromGroupOnScene").SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");

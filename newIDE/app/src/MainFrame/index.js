@@ -565,6 +565,8 @@ export default class MainFrame extends React.Component<Props, State> {
                   openEventsEditor: true,
                   openSceneEditor: false,
                 })}
+              resourceSources={this.props.resourceSources}
+              onChooseResource={this._onChooseResource}
               isActive={isActive}
               ref={editorRef}
             />

@@ -29,6 +29,7 @@ gdjs.ParticleEmitterObject = function(runtimeScene, objectData){
     this.colorB2 = objectData.particleBlue2;
     this.size1 = objectData.particleSize1;
     this.size2 = objectData.particleSize2;
+    this.sizeParam = objectData.sizeParam;
     this.alpha1 = objectData.particleAlpha1;
     this.alpha2 = objectData.particleAlpha2;
     this.rendererType = objectData.rendererType;
@@ -97,7 +98,7 @@ gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){
         this.renderer.setColor(this.colorR1, this.colorG1, this.colorB1,
                                this.colorR2, this.colorG2, this.colorB2);
     }
-    if(this._sizeDirty){
+    if(this._sizeDirty && this.sizeParam === "Mutable"){
         this.renderer.setSize(this.size1, this.size2);
     }
     if(this._alphaDirty){

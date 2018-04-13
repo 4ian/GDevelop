@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react';
 import TextField from 'material-ui/TextField';
+import FlatButton from 'material-ui/FlatButton';
 import Window from '../Utils/Window';
 import './DocSearchOverrides.css';
 import { Column } from '../UI/Grid';
@@ -9,6 +10,10 @@ const styles = {
   dropdownMenuContainer: {
     maxHeight: 300,
     overflowY: 'scroll',
+  },
+  poweredByText: {
+    textAlign: 'right',
+    opacity: 0.8,
   },
 };
 
@@ -62,11 +67,21 @@ export default class DocSearchArea extends React.Component<*, *> {
           <React.Fragment>
             <p>Examples:</p>
             <Column expand>
-              <p>Coins in platformer</p>
-              <p>Export on Android</p>
-              <p>Add a score</p>
-              <p>Move enemies</p>
+              <p>
+                Coins in platformer<br />
+                Export on Android<br />
+                Add a score<br />
+                Move enemies<br />
+                ...<br />
+              </p>
             </Column>
+            <p style={styles.poweredByText}>
+              This search is powered by{' '}
+              <FlatButton
+                onClick={() => Window.openExternalURL('http://algolia.com/')}
+                label="Algolia"
+              />
+            </p>
           </React.Fragment>
         )}
       </div>

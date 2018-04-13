@@ -4,6 +4,11 @@ import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import Window from '../Utils/Window';
 import DocSearchArea from './DocSearchArea';
+import throttle from 'lodash/throttle';
+import {
+  sendHelpFinderOpened,
+  sendHelpSearch,
+} from '../Utils/Analytics/EventSender';
 
 type Props = {|
   open: boolean,
@@ -18,6 +23,23 @@ export default class HelpFinder extends React.Component<Props, State> {
   state = {
     searchText: '',
   };
+
+  componentWillReceiveProps(newProps: Props) {
+    if (newProps.open && !this.props.open) {
+      sendHelpFinderOpened();
+    }
+  }
+
+  _handleSearchTextChange = (searchText: string) => {
+    this.setState({
+      searchText,
+    });
+    this._sendHelpSearch();
+  };
+
+  _sendHelpSearch = throttle(() => {
+    if (this.state.searchText) sendHelpSearch(this.state.searchText.trim());
+  }, 1300);
 
   render() {
     const { open, onClose } = this.props;
@@ -39,7 +61,7 @@ export default class HelpFinder extends React.Component<Props, State> {
             key="forum"
             primary={false}
             onClick={() => {
-              Window.openExternalURL('http://forum.compilgames.net')
+              Window.openExternalURL('http://forum.compilgames.net');
             }}
             label="Community forum"
           />,
@@ -49,7 +71,7 @@ export default class HelpFinder extends React.Component<Props, State> {
             onClick={() => {
               Window.openExternalURL(
                 'http://wiki.compilgames.net/doku.php/gdevelop5/start'
-              )
+              );
             }}
             label="Wiki"
           />,
@@ -58,10 +80,7 @@ export default class HelpFinder extends React.Component<Props, State> {
       >
         <DocSearchArea
           value={this.state.searchText}
-          onChange={searchText =>
-            this.setState({
-              searchText,
-            })}
+          onChange={this._handleSearchTextChange}
         />
       </Dialog>
     );

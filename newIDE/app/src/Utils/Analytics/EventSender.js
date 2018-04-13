@@ -128,6 +128,21 @@ export const sendTutorialOpened = (tutorialName: string) => {
   });
 };
 
+export const sendHelpFinderOpened = () => {
+  if (isDev || !client) return;
+
+  client.recordEvent('help_finder_opened', {});
+};
+
+export const sendHelpSearch = (searchText: string) => {
+  console.log('sendHelpSearch', searchText);
+  if (isDev || !client) return;
+
+  client.recordEvent('help_search', {
+    searchText,
+  });
+};
+
 export const sendErrorMessage = (
   errorMessage: string,
   type: string,

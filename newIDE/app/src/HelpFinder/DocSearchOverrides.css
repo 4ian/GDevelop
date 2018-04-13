@@ -2,4 +2,5 @@
  of this container. */
 .algolia-autocomplete .ds-dropdown-menu {
     min-width: 0 !important;
+    max-width: initial !important;
 }

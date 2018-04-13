@@ -83,9 +83,6 @@ app.on('ready', function() {
   if (isDev) {
     // Development (server hosted by npm run start)
     mainWindow.loadURL('http://localhost:3000');
-    // Define an entry in your /etc/host and use it instead of localhost
-    // to work with Auth0 authentification during development.
-    // mainWindow.loadURL('http://gdevelop.local:3000');
     mainWindow.openDevTools();
   } else {
     // Production (with npm run build)
@@ -95,13 +92,20 @@ app.on('ready', function() {
 
   Menu.setApplicationMenu(buildMainMenuFor(mainWindow));
 
-  // Emitted when the window is closed.
   mainWindow.on('closed', function() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
     stopServer(() => {});
+  });
+
+  //Prevent any navigation inside the main window.
+  mainWindow.webContents.on('will-navigate', (e, url) => {
+    if (url !== mainWindow.webContents.getURL()) {
+      e.preventDefault();
+      electron.shell.openExternal(url);
+    }
   });
 
   ipcMain.on('s3-folder-upload', (event, localDir) => {
@@ -135,25 +139,20 @@ app.on('ready', function() {
   ipcMain.on('serve-folder', (event, options) => {
     log.info('Received event to server folder with options=', options);
 
-    serveFolder(
-      options,
-      (err, serverParams) => {
-        event.sender.send('serve-folder-done', err, serverParams);
-      }
-    );
+    serveFolder(options, (err, serverParams) => {
+      event.sender.send('serve-folder-done', err, serverParams);
+    });
   });
 
-  ipcMain.on('stop-server', (event) => {
+  ipcMain.on('stop-server', event => {
     log.info('Received event to stop server');
 
-    stopServer(
-      (err) => {
-        event.sender.send('stop-server-done', err);
-      }
-    );
+    stopServer(err => {
+      event.sender.send('stop-server-done', err);
+    });
   });
 
-  ipcMain.on('get-local-network-ips', (event) => {
+  ipcMain.on('get-local-network-ips', event => {
     event.sender.send('local-network-ips', getLocalNetworkIps());
   });
 

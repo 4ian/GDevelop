@@ -13,8 +13,12 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
     graphics.beginFill(gdjs.rgbToHexNumber(255,255,255), 1);
     if(objectData.rendererType === "Point")
         graphics.drawCircle(0, 0, objectData.rendererParam1);
-    else if(objectData.rendererType === "Line")
+    else if(objectData.rendererType === "Line"){
+        graphics.drawRect(objectData.rendererParam1, 0, objectData.rendererParam1, objectData.rendererParam2);
+        // Draw an almost-invisible rectangle in the left hand to force PIXI to take a full texture with our line at the right hand
+        graphics.beginFill(gdjs.rgbToHexNumber(255,255,255), 0.001);
         graphics.drawRect(0, 0, objectData.rendererParam1, objectData.rendererParam2);
+    }
     else{
         if(objectData.textureParticleName){
             var sprite = new PIXI.Sprite(runtimeScene.getGame().getImageManager().getPIXITexture(objectData.textureParticleName));
@@ -42,19 +46,6 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
                     value: gdjs.rgbToHexNumber(objectData.particleRed2,
                                                objectData.particleGreen2,
                                                objectData.particleBlue2).toString(16),
-                    time: 1
-                }
-            ],
-            isStepped: false
-        },
-        speed: {
-            list: [
-                {
-                    value: objectData.emitterForceMin,
-                    time: 0
-                },
-                {
-                    value: objectData.emitterForceMax,
                     time: 1
                 }
             ],
@@ -92,21 +83,19 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
         }
     };
 
-    // We need to adapt a bit the configuration of the speed of particles, instead of random minimum and maximum speed,
-    // pixi-particles uses initial and final speed, this behavior can lead to a non-working particle system without this patch
-    if(config.acceleration.x === 0 && config.acceleration.y === 0 &&
-       config.speed.list[0].value === 0 && config.speed.list[1].value !== 0){
-        config.speed.list[0].value = 0.00001;
-    }
+    config.speed = { list: [{time: 0, value: objectData.emitterForceMax}],
+                     minimumSpeedMultiplier: objectData.emitterForceMax !== 0 ?
+                                                 objectData.emitterForceMin / objectData.emitterForceMax : 1,
+                     isStepped: false };
 
     if(objectData.alphaParam === "Mutable"){
-        config.alpha = {list: [{time: 0, value: objectData.particleAlpha1/255.0},
-                               {time: 1, value: objectData.particleAlpha2/255.0}],
-                        isStepped: false};
+        config.alpha = { list: [{time: 0, value: objectData.particleAlpha1/255.0},
+                                {time: 1, value: objectData.particleAlpha2/255.0}],
+                         isStepped: false };
     }
     else{
-        config.alpha = {list: [{time: 0, value: objectData.particleAlpha1/255.0}],
-                        isStepped: false};
+        config.alpha = { list: [{time: 0, value: objectData.particleAlpha1/255.0}],
+                         isStepped: false };
     }
 
     if(objectData.sizeParam === "Mutable"){
@@ -115,10 +104,10 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
         var sizeRandom1 = objectData.particleSizeRandomness1/100;
         var sizeRandom2 = objectData.particleSizeRandomness2/100;
         var m = sizeRandom2 !== 0 ? (1 + sizeRandom1)/(1 + sizeRandom2) : 1;
-        config.scale = {list: [{time: 0, value: size1*(1+sizeRandom1)},
-                               {time: 1, value: size2*(1+sizeRandom2)}],
-                        minimumScaleMultiplier: m,
-                        isStepped: false};
+        config.scale = { list: [{time: 0, value: size1*(1 + sizeRandom1)},
+                                {time: 1, value: size2*(1 + sizeRandom2)}],
+                         minimumScaleMultiplier: m,
+                         isStepped: false };
     }
     else{
         var size1 = objectData.particleSize1/100;
@@ -128,19 +117,19 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
             mult = (1 + size2)/(1 + size1);
             size2 = size1;
         }
-        config.scale = {list: [{time: 0, value: size2}],
-                        minimumScaleMultiplier: mult,
-                        isStepped: false};
+        config.scale = { list: [{time: 0, value: size2}],
+                         minimumScaleMultiplier: mult,
+                         isStepped: false };
     }
 
 
     if(objectData.emissionEditionSimpleMode){
-        config.startRotation = {min:-objectData.emitterAngleB/2.0,
-                                max: objectData.emitterAngleB/2.0};
+        config.startRotation = { min:-objectData.emitterAngleB/2.0,
+                                 max: objectData.emitterAngleB/2.0 };
     }
     else{
-        config.startRotation = {min: objectData.emitterAngleA,
-                                max: objectData.emitterAngleB};
+        config.startRotation = { min: objectData.emitterAngleA,
+                                 max: objectData.emitterAngleB };
     }
 
     if(objectData.angleParam === "Mutable"){
@@ -188,14 +177,8 @@ gdjs.ParticleEmitterObjectPixiRenderer.prototype.setAngle = function(angle1, ang
 };
 
 gdjs.ParticleEmitterObjectPixiRenderer.prototype.setForce = function(min, max){
-    // We need to adapt a bit the configuration of the speed of particles, instead of random minimum and maximum speed,
-    // pixi-particles uses initial and final speed, this behavior can lead to a non-working particle system without this patch
-    if(this.emitter.acceleration.x === 0 && this.emitter.acceleration.y === 0 && min === 0 && max !== 0){
-        min = 0.00001;
-    }
-
-    this.emitter.startSpeed.value = min;
-    if(this.emitter.startSpeed.next) this.emitter.startSpeed.next.value = max;
+    this.emitter.startSpeed.value = max;
+    this.emitter.minimumSpeedMultiplier = max !== 0 ? min/max : 1;
 };
 
 gdjs.ParticleEmitterObjectPixiRenderer.prototype.setZoneRadius = function(radius){
@@ -235,9 +218,10 @@ gdjs.ParticleEmitterObjectPixiRenderer.prototype.setAlpha = function(alpha1, alp
     }
 };
 
-gdjs.ParticleEmitterObjectPixiRenderer.prototype.setFlow = function(flow){
+gdjs.ParticleEmitterObjectPixiRenderer.prototype.setFlow = function(flow, tank){
     this.emitter.frequency = flow < 0 ? 0.0001 : 1.0/flow;
-    // TODO: This should also affect emitter lifetime.
+    this.emitterLifetime = tank < 0 ? -1 :
+            (flow < 0 ? 0.001 : (tank - this.emitter.totalParticleCount) / flow);
 };
 
 gdjs.ParticleEmitterObjectPixiRenderer.prototype.isTextureValid = function(texture, runtimeScene){

@@ -17,11 +17,12 @@ gdjs.ParticleEmitterObjectCocosRenderer = function(runtimeScene, runtimeObject, 
         renderTexture = new cc.RenderTexture(this.originalSize, this.originalSize);
     }
     else if(objectData.rendererType === "Line"){
-        drawer.drawRect(cc.p((this.originalSize - objectData.rendererParam1)/2.0,
-                             (this.originalSize - objectData.rendererParam2)/2.0),
-                        cc.p((this.originalSize + objectData.rendererParam1)/2.0,
-                             (this.originalSize + objectData.rendererParam2)/2.0),
-                        cc.color(255,255,255,200), 1 , cc.color(255,255,255,255));
+        this.originalSize = Math.max(2*objectData.rendererParam1, objectData.rendererParam2);
+        drawer.drawRect(cc.p(this.originalSize/2.0,
+                            (this.originalSize - objectData.rendererParam2)/2.0),
+                        cc.p(this.originalSize/2.0 + objectData.rendererParam1,
+                            (this.originalSize + objectData.rendererParam2)/2.0),
+                        cc.color(255,255,255,255), 0.01 , cc.color(255,255,255,0));
         renderTexture = new cc.RenderTexture(this.originalSize, this.originalSize);
     }
     else{
@@ -38,7 +39,7 @@ gdjs.ParticleEmitterObjectCocosRenderer = function(runtimeScene, runtimeObject, 
                                  (this.originalSize - objectData.rendererParam2)/2.0),
                             cc.p((this.originalSize + objectData.rendererParam1)/2.0,
                                  (this.originalSize + objectData.rendererParam2)/2.0),
-                            cc.color(255,255,255,200), 1 , cc.color(255,255,255,255));
+                            cc.color(255,255,255,255), 0.01 , cc.color(255,255,255,255));
             renderTexture = new cc.RenderTexture(this.originalSize, this.originalSize);
         }
     }

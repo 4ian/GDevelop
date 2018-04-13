@@ -78,6 +78,7 @@ exports[`StartPage renders the start page with a project 1`] = `
           </p>
         </div>
         <div
+          className={undefined}
           style={
             Object {
               "WebkitTapHighlightColor": "rgba(0,0,0,0)",
@@ -87,10 +88,11 @@ exports[`StartPage renders the start page with a project 1`] = `
                      0 1px 4px rgba(0, 0, 0, 0.12)",
               "boxSizing": "border-box",
               "color": "rgba(0, 0, 0, 0.87)",
+              "display": "inline-block",
               "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "minWidth": "100%",
               "muiPrepared": true,
               "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
-              "width": "100%",
             }
           }
         >
@@ -101,17 +103,19 @@ exports[`StartPage renders the start page with a project 1`] = `
             onFocus={[Function]}
             onKeyDown={[Function]}
             onKeyUp={[Function]}
+            onMouseDown={[Function]}
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
             onTouchStart={[Function]}
             style={
               Object {
                 "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
-                "backgroundColor": "rgba(0, 0, 0, 0)",
+                "backgroundColor": "#4ab0e4",
                 "border": 10,
                 "borderRadius": 2,
                 "boxSizing": "border-box",
-                "color": "rgba(0, 0, 0, 0.87)",
                 "cursor": "pointer",
                 "display": "inline-block",
                 "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
@@ -120,17 +124,15 @@ exports[`StartPage renders the start page with a project 1`] = `
                 "height": 32,
                 "lineHeight": "32px",
                 "margin": 0,
-                "minWidth": "100%",
                 "muiPrepared": true,
                 "outline": "none",
-                "overflow": "hidden",
                 "padding": 0,
                 "position": "relative",
                 "textAlign": "center",
                 "textDecoration": "none",
                 "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
-                "userSelect": "none",
                 "verticalAlign": null,
+                "width": "100%",
               }
             }
             tabIndex={0}
@@ -143,94 +145,178 @@ exports[`StartPage renders the start page with a project 1`] = `
               onTouchEnd={[Function]}
               onTouchStart={[Function]}
             >
-              <span
+              <div
                 style={
                   Object {
-                    "fontSize": 14,
-                    "fontWeight": 500,
-                    "letterSpacing": 0,
+                    "backgroundColor": false,
+                    "borderRadius": 2,
+                    "height": 32,
                     "muiPrepared": true,
-                    "paddingLeft": 16,
-                    "paddingRight": 16,
-                    "position": "relative",
-                    "textTransform": "uppercase",
-                    "verticalAlign": "middle",
+                    "top": 0,
+                    "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
                   }
                 }
               >
-                Open Project Manager
-              </span>
-            </div>
-          </button>
-          <button
-            disabled={false}
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onKeyDown={[Function]}
-            onKeyUp={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            onTouchStart={[Function]}
-            style={
-              Object {
-                "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
-                "backgroundColor": "rgba(0, 0, 0, 0)",
-                "border": 10,
-                "borderRadius": 2,
-                "boxSizing": "border-box",
-                "color": "rgba(0, 0, 0, 0.87)",
-                "cursor": "pointer",
-                "display": "inline-block",
-                "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
-                "fontSize": "inherit",
-                "fontWeight": "inherit",
-                "height": 32,
-                "lineHeight": "32px",
-                "margin": 0,
-                "minWidth": "100%",
-                "muiPrepared": true,
-                "outline": "none",
-                "overflow": "hidden",
-                "padding": 0,
-                "position": "relative",
-                "textAlign": "center",
-                "textDecoration": "none",
-                "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
-                "userSelect": "none",
-                "verticalAlign": null,
-              }
-            }
-            tabIndex={0}
-            type="button"
-          >
-            <div
-              onMouseDown={[Function]}
-              onMouseLeave={[Function]}
-              onMouseUp={[Function]}
-              onTouchEnd={[Function]}
-              onTouchStart={[Function]}
-            >
-              <span
-                style={
-                  Object {
-                    "fontSize": 14,
-                    "fontWeight": 500,
-                    "letterSpacing": 0,
-                    "muiPrepared": true,
-                    "paddingLeft": 16,
-                    "paddingRight": 16,
-                    "position": "relative",
-                    "textTransform": "uppercase",
-                    "verticalAlign": "middle",
+                <span
+                  style={
+                    Object {
+                      "color": "#ffffff",
+                      "fontSize": 14,
+                      "fontWeight": 500,
+                      "letterSpacing": 0,
+                      "margin": 0,
+                      "muiPrepared": true,
+                      "opacity": 1,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "position": "relative",
+                      "textTransform": "uppercase",
+                      "userSelect": "none",
+                    }
                   }
-                }
-              >
-                Close project
-              </span>
+                >
+                  Open Project Manager
+                </span>
+              </div>
             </div>
           </button>
         </div>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": "100%",
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              Close project
+            </span>
+          </div>
+        </button>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": "100%",
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              Search the documentation
+            </span>
+          </div>
+        </button>
       </div>
     </div>
     <div
@@ -664,6 +750,7 @@ exports[`StartPage renders the start page with no project opened 1`] = `
           </p>
         </div>
         <div
+          className={undefined}
           style={
             Object {
               "WebkitTapHighlightColor": "rgba(0,0,0,0)",
@@ -673,10 +760,11 @@ exports[`StartPage renders the start page with no project opened 1`] = `
                      0 1px 4px rgba(0, 0, 0, 0.12)",
               "boxSizing": "border-box",
               "color": "rgba(0, 0, 0, 0.87)",
+              "display": "inline-block",
               "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "minWidth": "100%",
               "muiPrepared": true,
               "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
-              "width": "100%",
             }
           }
         >
@@ -687,17 +775,19 @@ exports[`StartPage renders the start page with no project opened 1`] = `
             onFocus={[Function]}
             onKeyDown={[Function]}
             onKeyUp={[Function]}
+            onMouseDown={[Function]}
             onMouseEnter={[Function]}
             onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
             onTouchStart={[Function]}
             style={
               Object {
                 "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
-                "backgroundColor": "rgba(0, 0, 0, 0)",
+                "backgroundColor": "#4ab0e4",
                 "border": 10,
                 "borderRadius": 2,
                 "boxSizing": "border-box",
-                "color": "rgba(0, 0, 0, 0.87)",
                 "cursor": "pointer",
                 "display": "inline-block",
                 "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
@@ -706,17 +796,15 @@ exports[`StartPage renders the start page with no project opened 1`] = `
                 "height": 32,
                 "lineHeight": "32px",
                 "margin": 0,
-                "minWidth": "100%",
                 "muiPrepared": true,
                 "outline": "none",
-                "overflow": "hidden",
                 "padding": 0,
                 "position": "relative",
                 "textAlign": "center",
                 "textDecoration": "none",
                 "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
-                "userSelect": "none",
                 "verticalAlign": null,
+                "width": "100%",
               }
             }
             tabIndex={0}
@@ -729,26 +817,110 @@ exports[`StartPage renders the start page with no project opened 1`] = `
               onTouchEnd={[Function]}
               onTouchStart={[Function]}
             >
-              <span
+              <div
                 style={
                   Object {
-                    "fontSize": 14,
-                    "fontWeight": 500,
-                    "letterSpacing": 0,
+                    "backgroundColor": false,
+                    "borderRadius": 2,
+                    "height": 32,
                     "muiPrepared": true,
-                    "paddingLeft": 16,
-                    "paddingRight": 16,
-                    "position": "relative",
-                    "textTransform": "uppercase",
-                    "verticalAlign": "middle",
+                    "top": 0,
+                    "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
                   }
                 }
               >
-                Create a new project
-              </span>
+                <span
+                  style={
+                    Object {
+                      "color": "#ffffff",
+                      "fontSize": 14,
+                      "fontWeight": 500,
+                      "letterSpacing": 0,
+                      "margin": 0,
+                      "muiPrepared": true,
+                      "opacity": 1,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "position": "relative",
+                      "textTransform": "uppercase",
+                      "userSelect": "none",
+                    }
+                  }
+                >
+                  Create a new project
+                </span>
+              </div>
             </div>
           </button>
         </div>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": "100%",
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              Search the documentation
+            </span>
+          </div>
+        </button>
       </div>
     </div>
     <div

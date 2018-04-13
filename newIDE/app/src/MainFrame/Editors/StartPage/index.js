@@ -8,6 +8,7 @@ import Window from '../../../Utils/Window';
 import { Line } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
 import ScrollBackground from './ScrollBackground';
+import RaisedButton from 'material-ui/RaisedButton';
 
 const styles = {
   innerContainer: {
@@ -60,6 +61,7 @@ class StartPage extends BaseEditor {
       onOpenProjectManager,
       onCloseProject,
       onOpenAboutDialog,
+      onOpenHelpFinder,
     } = this.props;
 
     return (
@@ -79,45 +81,50 @@ class StartPage extends BaseEditor {
                   language to learn.
                 </p>
               </Paper>
-              <Paper zDepth={1} style={styles.buttonsPaper}>
-                {!project &&
-                  canOpen && (
-                    <FlatButton
-                      label="Open a project"
-                      fullWidth
-                      onClick={onOpen}
-                    />
-                  )}
-                {!project && (
-                  <FlatButton
-                    label="Create a new project"
+              {!project &&
+                canOpen && (
+                  <RaisedButton
+                    label="Open a project"
                     fullWidth
-                    onClick={onCreate}
+                    onClick={onOpen}
+                    primary
                   />
                 )}
-                {!!project && (
-                  <FlatButton
-                    label="Open Project Manager"
-                    fullWidth
-                    onClick={onOpenProjectManager}
-                  />
-                )}
-                {!!project && (
-                  <FlatButton
-                    label="Close project"
-                    fullWidth
-                    onClick={onCloseProject}
-                  />
-                )}
-              </Paper>
+              {!project && (
+                <RaisedButton
+                  label="Create a new project"
+                  fullWidth
+                  onClick={onCreate}
+                  primary
+                />
+              )}
+              {!!project && (
+                <RaisedButton
+                  label="Open Project Manager"
+                  fullWidth
+                  onClick={onOpenProjectManager}
+                  primary
+                />
+              )}
+              {!!project && (
+                <FlatButton
+                  label="Close project"
+                  fullWidth
+                  onClick={onCloseProject}
+                />
+              )}
+              {
+                <FlatButton
+                  label="Search the documentation"
+                  fullWidth
+                  onClick={onOpenHelpFinder}
+                />
+              }
             </div>
           </Line>
           <Line alignItems="center" justifyContent="space-between">
             <div>
-              <FlatButton
-                label="About GDevelop"
-                onClick={onOpenAboutDialog}
-              />
+              <FlatButton label="About GDevelop" onClick={onOpenAboutDialog} />
               <FlatButton
                 label="Gdevelop Forums"
                 onClick={() =>

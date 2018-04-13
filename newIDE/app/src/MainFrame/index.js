@@ -42,6 +42,7 @@ import {
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { timeFunction } from '../Utils/TimeFunction';
 import newNameGenerator from '../Utils/NewNameGenerator';
+import HelpFinder from '../HelpFinder';
 
 // Editors:
 import EventsEditor from './Editors/EventsEditor';
@@ -97,6 +98,7 @@ type State = {|
   updateStatus: UpdateStatus,
   aboutDialogOpen: boolean,
   platformSpecificAssetsDialogOpen: boolean,
+  helpFinderDialogOpen: boolean,
 |};
 
 type Props = {
@@ -138,6 +140,7 @@ export default class MainFrame extends React.Component<Props, State> {
     updateStatus: { message: '', status: 'unknown' },
     aboutDialogOpen: false,
     platformSpecificAssetsDialogOpen: false,
+    helpFinderDialogOpen: false,
   };
   toolbar = null;
   confirmCloseDialog: any = null;
@@ -656,6 +659,7 @@ export default class MainFrame extends React.Component<Props, State> {
               onOpenProjectManager={() => this.openProjectManager()}
               onCloseProject={() => this.askToCloseProject()}
               onOpenAboutDialog={() => this.openAboutDialog()}
+              onOpenHelpFinder={() => this.openHelpFinderDialog()}
               isActive={isActive}
               ref={editorRef}
             />
@@ -833,6 +837,12 @@ export default class MainFrame extends React.Component<Props, State> {
     });
   };
 
+  openHelpFinderDialog = (open: boolean = true) => {
+    this.setState({
+      helpFinderDialogOpen: open,
+    });
+  }
+
   setUpdateStatus = (status: UpdateStatus) => {
     this.setState({
       updateStatus: status,
@@ -869,6 +879,7 @@ export default class MainFrame extends React.Component<Props, State> {
       subscriptionDialogOpen,
       updateStatus,
       aboutDialogOpen,
+      helpFinderDialogOpen,
     } = this.state;
     const {
       exportDialog,
@@ -966,6 +977,10 @@ export default class MainFrame extends React.Component<Props, State> {
             })}
           </Tabs>
           <LoaderModal show={showLoader} />
+          <HelpFinder
+            open={helpFinderDialogOpen}
+            onClose={() => this.openHelpFinderDialog(false)}
+          />
           <ConfirmCloseDialog
             ref={confirmCloseDialog =>
               (this.confirmCloseDialog = confirmCloseDialog)}

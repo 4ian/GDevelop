@@ -1,0 +1,6 @@
+/* The dropdown is inserted into a container and should always take the width
+ of this container. */
+.algolia-autocomplete .ds-dropdown-menu {
+    min-width: 0 !important;
+    max-width: initial !important;
+}

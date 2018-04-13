@@ -50,6 +50,9 @@ const theme = {
     actionColor: gdevelopLightBlue,
   },
   stepper: {},
+  raisedButton: {
+    primaryTextColor: 'white',
+  },
 
   // GDevelop specific variables:
   closableTabs: {

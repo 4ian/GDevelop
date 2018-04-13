@@ -65,6 +65,9 @@ const theme: Theme = {
   stepper: {
     textColor: lightWhite,
   },
+  raisedButton: {
+    primaryTextColor: notSoWhite,
+  },
 
   // GDevelop specific variables:
   closableTabs: {

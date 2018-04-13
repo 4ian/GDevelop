@@ -37,6 +37,7 @@ gdjs.ParticleEmitterObject = function(runtimeScene, objectData){
     this.rendererParam2 = objectData.rendererParam2;
     this.texture = objectData.textureParticleName;
     this.flow = objectData.flow;
+    this.tank = objectData.tank;
     this.destroyWhenNoParticles = objectData.destroyWhenNoParticles;
 
     this._posDirty = true;
@@ -105,7 +106,7 @@ gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){
         this.renderer.setAlpha(this.alpha1, this.alpha2);
     }
     if(this._flowDirty){
-        this.renderer.setFlow(this.flow);
+        this.renderer.setFlow(this.flow, this.tank);
     }
     if(this._textureDirty){
         this.renderer.setTexture(this.texture, runtimeScene);
@@ -117,7 +118,7 @@ gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){
 
     this.renderer.update(this.getElapsedTime(runtimeScene)/1000.0);
 
-    if(this.tank < 0 && this.renderer.getTotalParticleCount() > this.tank){
+    if(this.tank > 0 && this.renderer.getTotalParticleCount() > this.tank){
         this.renderer.stop();
     }
 

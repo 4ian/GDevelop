@@ -258,8 +258,8 @@ gdjs.ParticleEmitterObjectCocosRenderer.prototype.setAlpha = function(alpha1, al
 };
 
 gdjs.ParticleEmitterObjectCocosRenderer.prototype.setSize = function(size1, size2){
-    this.renderer.setStartSize(2*this.originalSize*size1/100.0);
-    this.renderer.setEndSize(2*this.originalSize*size2/100.0);
+    this.renderer.setStartSize(this.originalSize*size1/100.0);
+    this.renderer.setEndSize(this.originalSize*size2/100.0);
 };
 
 gdjs.ParticleEmitterObjectCocosRenderer.prototype.setFlow = function(flow){

@@ -26,6 +26,9 @@ This will open the app in your web browser.
 Images resources, GDJS Runtime, extensions will be copied in resources, and [libGD.js](https://github.com/4ian/GDevelop.js) will be downloaded automatically. If you wish, you can
 [build libGD.js by yourself](https://github.com/4ian/GDevelop.js) (useful if you modified GDevelop native code like extensions).
 
+Note for Linux: If you get an error message that looks like this:
+`Error: watch GD/newIDE/app/some/file ENOSPC` then follow the instructions [here](https://stackoverflow.com/questions/22475849/node-js-error-enospc) to fix.
+
 ### Development of the standalone app
 
 You can run the app with Electron. **Make sure that you've run `yarn start` in `app` folder before** (see above).

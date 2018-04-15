@@ -60,6 +60,7 @@ export default class LocalPreviewLauncher extends React.Component<
 
     const win = new BrowserWindow(this.state.previewBrowserWindowConfig);
     win.loadURL(`file://${this.state.previewGamePath}/index.html`);
+    win.setMenu(null);
   };
 
   _openPreviewWindow = (

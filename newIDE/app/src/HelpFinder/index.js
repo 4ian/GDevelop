@@ -4,7 +4,7 @@ import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import Window from '../Utils/Window';
 import DocSearchArea from './DocSearchArea';
-import throttle from 'lodash/throttle';
+import debounce from 'lodash/debounce';
 import {
   sendHelpFinderOpened,
   sendHelpSearch,
@@ -37,7 +37,7 @@ export default class HelpFinder extends React.Component<Props, State> {
     this._sendHelpSearch();
   };
 
-  _sendHelpSearch = throttle(() => {
+  _sendHelpSearch = debounce(() => {
     if (this.state.searchText) sendHelpSearch(this.state.searchText.trim());
   }, 1300);
 

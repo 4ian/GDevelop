@@ -193,6 +193,10 @@ gdjs.sk.Animation.prototype.updateBlending = function(delta){
     for(var i=0; i<this.blendSlots.length; i++){
         this.blendSlots[i].setFrame(frame);
     }
+    // Disable child armatures blending until properly tested
+    // for(var i=0; i<this.armatureAnimators.length; i++){
+    //     this.armatureAnimators[i].updateAnimation(delta);
+    // }
     for(var i=0; i<this.blendMeshes.length; i++){
         this.blendMeshes[i].setFrame(frame);
     }
@@ -797,6 +801,20 @@ gdjs.sk.ActionChannel.prototype.getKeys = function(currentFrame, frame){
     return actions;
 };
 
+gdjs.sk.ActionChannel.prototype.getFirstFrameAnimation = function(){
+    if(this.frames > 0 && this.frames[0] === 0){
+        for(var k=0; k<this.actionsLists[0].length; k++){
+            if(this.actionsLists[0][k].type === gdjs.sk.EVENT_PLAY ||
+               this.actionsLists[0][k].type === gdjs.sk.EVENT_PLAYSINGLE)
+            {
+                return this.actionsLists[0][k].value;
+            }
+        }
+    }
+
+    return "";
+};
+
 
 
 gdjs.sk.SharedBoneAnimator = function(){
@@ -1231,8 +1249,18 @@ gdjs.sk.ArmatureAnimator.prototype.reset = function(){
     this.currentFrame = -1;
 };
 
-gdjs.sk.ArmatureAnimator.prototype.updateAnimation = function(delta, smooth){
-    this.target.childArmature.updateAnimation(delta, smooth);
+gdjs.sk.ArmatureAnimator.prototype.updateAnimation = function(delta){
+    this.target.childArmature.updateAnimation(delta);
+};
+
+gdjs.sk.ArmatureAnimator.prototype.setFirstFrameAnimation = function(blendTime){
+    var firstFrameAnimation = this.shared.channelAction.getFirstFrameAnimation();
+    if(firstFrameAnimation === ""){
+        this.target.childArmature.currentAnimation = -1;
+    }
+    else{
+        this.target.childArmature.setAnimationName(firstFrameAnimation, blendTime, -1);
+    }
 };
 
 

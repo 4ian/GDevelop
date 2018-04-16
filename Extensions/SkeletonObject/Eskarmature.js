@@ -147,13 +147,6 @@ gdjs.sk.Armature.prototype.loadData = function(armatureData, skeletalData, debug
     this.setRenderers();
 };
 
-gdjs.sk.Armature.prototype.updateAnimation = function(delta){
-    var animation = this.getCurrentAnimation();
-    if(animation){
-        animation.update(delta);
-    }
-};
-
 gdjs.sk.Armature.prototype.getRenderer = function(){
     return this.renderer;
 };
@@ -188,13 +181,6 @@ gdjs.sk.Armature.prototype.setRenderers = function(){
     }
 };
 
-gdjs.sk.Armature.prototype.getCurrentAnimation = function(){
-    if(this.currentAnimation >= 0 && this.currentAnimation < this.animations.length){
-        return this.animations[this.currentAnimation];
-    }
-    return null;
-};
-
 gdjs.sk.Armature.prototype.getAABB = function(){
     return this.transformPolygon(this.shared.aabb);
 };
@@ -219,6 +205,29 @@ gdjs.sk.Armature.prototype.resetState = function(){
 
 gdjs.sk.Armature.prototype.updateZOrder = function(){
     this.renderer.sortRenderers();
+};
+
+gdjs.sk.Armature.prototype.update = function(){
+    gdjs.sk.Transform.prototype.update.call(this);
+
+    if(this.debugRenderer){
+        var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix);
+        this.debugRenderer.setTransform(transform);
+    }
+};
+
+gdjs.sk.Armature.prototype.getCurrentAnimation = function(){
+    if(this.currentAnimation >= 0 && this.currentAnimation < this.animations.length){
+        return this.animations[this.currentAnimation];
+    }
+    return null;
+};
+
+gdjs.sk.Armature.prototype.updateAnimation = function(delta){
+    var animation = this.getCurrentAnimation();
+    if(animation){
+        animation.update(delta);
+    }
 };
 
 gdjs.sk.Armature.prototype.isAnimationFinished = function(){
@@ -273,38 +282,10 @@ gdjs.sk.Armature.prototype.setAnimationIndex = function(newAnimation, blendTime,
         if(blendTime > 0 && oldAnimation >= 0 && oldAnimation < this.animations.length){
             this.animations[this.currentAnimation].blendFrom(this.animations[oldAnimation], blendTime);
         }
-        // TODO: Fix this mess, all this is just to set animations on child armatures (armature slots)
-        for(var i=0; i<this.slots.length; i++){
-            if(this.slots[i].type === gdjs.sk.SLOT_ARMATURE){
-                var childArmature = this.slots[i].childArmature;
-                if(blendTime > 0){
-                    var childAnimation = "";
-                    var animators = this.animations[this.currentAnimation].armatureAnimators;
-                    for(var j=0; j<animators.length; j++){
-                        if(animators[j].target === childArmature){
-                            if(animators[j].channelAction.frames.length > 0 &&
-                               animators[j].channelAction.frames[0] === 0)
-                            {
-                                for(var k=0; k<animators[j].actionsLists[0].length; k++)
-                                {
-                                    if(animators[j].actionsLists[0][k].type === gdjs.sk.EVENT_PLAY ||
-                                       animators[j].actionsLists[0][k].type === gdjs.sk.EVENT_PLAYSINGLE)
-                                    {
-                                        childAnimation = animators[j].actionsLists[0][k].value;
-                                    }
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    childArmature.setAnimationName(childAnimation, blendTime, -1);
-                }
-                else{
-                    childArmature.currentAnimation = -1;
-                }
-            }
+        var armatureAnimators = this.animations[this.currentAnimation].armatureAnimators;
+        for(var i=0; i<armatureAnimators.length; i++){
+            armatureAnimators[i].setFirstFrameAnimation(blendTime);
         }
-        // TODO ends
 
         this.animations[this.currentAnimation].update(0);
     }
@@ -325,14 +306,5 @@ gdjs.sk.Armature.prototype.resetAnimation = function(){
     var animation = this.getCurrentAnimation();
     if(animation){
         animation.reset();
-    }
-};
-
-gdjs.sk.Armature.prototype.update = function(){
-    gdjs.sk.Transform.prototype.update.call(this);
-
-    if(this.debugRenderer){
-        var transform = gdjs.sk.Transform.decomposeMatrix(this.worldMatrix);
-        this.debugRenderer.setTransform(transform);
     }
 };

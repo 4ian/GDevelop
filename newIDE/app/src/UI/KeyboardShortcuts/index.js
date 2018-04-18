@@ -16,6 +16,7 @@ const V_KEY = 86;
 const X_KEY = 88;
 const Y_KEY = 89;
 const Z_KEY = 90;
+const MID_MOUSE_BUTTON = 1;
 
 export default class KeyboardShortcuts {
   constructor({
@@ -81,7 +82,6 @@ export default class KeyboardShortcuts {
 
   _onKeyDown = evt => {
     if (!this.isFocused) return;
-
     if (evt.metaKey) this.metaPressed = true;
     if (evt.altKey) this.altPressed = true;
     if (evt.which === CTRL_KEY) this.rawCtrlPressed = true;
@@ -90,7 +90,7 @@ export default class KeyboardShortcuts {
 
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
     if (evt.target && evt.target.closest(textEditorSelectors)) {
-      return; // Something else is currently being edited.
+      return; // Something else is currently being edited. 
     }
 
     if (this.onMove) {
@@ -137,6 +137,7 @@ export default class KeyboardShortcuts {
     if (evt.which === NUMPAD_ADD) {
       this.onZoomIn();
     }
+
   };
 
   _onKeyUp = evt => {
@@ -149,6 +150,27 @@ export default class KeyboardShortcuts {
     if (evt.which === SPACE_KEY) this.spacePressed = false;
   };
 
+  _onMouseDown = evt => { 
+    if (evt.button == MID_MOUSE_BUTTON){
+      this.spacePressed = true;
+    };
+  };
+
+  _onMouseUp = evt => {
+    if (evt.button == MID_MOUSE_BUTTON){
+      this.spacePressed = false;
+    };
+  };
+
+  _onMouseScroll = evt => {
+    if (evt.deltaY > 0) {
+      this.onZoomOut();
+    }
+    else {
+      this.onZoomIn();
+    };
+  };
+  
   _onKeyPress = evt => {};
 
   _noop = () => {};
@@ -167,6 +189,9 @@ export default class KeyboardShortcuts {
     document.addEventListener('keydown', this._onKeyDown, true);
     document.addEventListener('keyup', this._onKeyUp, true);
     document.addEventListener('keypress', this._onKeyPress, true);
+    document.addEventListener('mousedown', this._onMouseDown, true);
+    document.addEventListener('mouseup', this._onMouseUp, true);
+    document.addEventListener('wheel', this._onMouseScroll, true);
   }
 
   unmount() {
@@ -175,5 +200,8 @@ export default class KeyboardShortcuts {
     document.removeEventListener('keydown', this._onKeyDown, true);
     document.removeEventListener('keyup', this._onKeyUp, true);
     document.removeEventListener('keypress', this._onKeyPress, true);
+    document.removeEventListener('mousedown', this._onMouseDown, true);
+    document.removeEventListener('mouseup', this._onMouseUp, true);
+    document.removeEventListener('wheel', this._onMouseScroll, true);
   }
 }

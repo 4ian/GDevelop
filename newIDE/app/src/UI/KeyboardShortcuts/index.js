@@ -151,18 +151,24 @@ export default class KeyboardShortcuts {
   };
 
   _onMouseDown = evt => { 
+    if (!this.isFocused) return;
+    
     if (evt.button == MID_MOUSE_BUTTON){
       this.spacePressed = true;
     };
   };
 
   _onMouseUp = evt => {
+    if (!this.isFocused) return;
+    
     if (evt.button == MID_MOUSE_BUTTON){
       this.spacePressed = false;
     };
   };
 
   _onMouseScroll = evt => {
+    if (!this.isFocused) return;
+    
     if (evt.deltaY > 0) {
       this.onZoomOut();
     }

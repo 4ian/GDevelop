@@ -95,15 +95,7 @@ gdjs.sk.SlotCocosRenderer.prototype.loadAsSprite = function(texture){
 };
 
 gdjs.sk.SlotCocosRenderer.prototype.loadAsMesh = function(texture, vertices, uvs, triangles){
-    // this.renderer = new PIXI.mesh.Mesh(texture,
-    //                                    new Float32Array(vertices),
-    //                                    new Float32Array(uvs),
-    //                                    new Uint16Array(triangles),
-    //                                    PIXI.mesh.Mesh.DRAW_MODES.TRIANGLES);
-
-    // this.renderer.uploadUvTransform = true;
-    // this.renderer.z = 0;
-
+    // Meshes not supported, load as sprites 
     this.loadAsSprite(texture);
 };
 
@@ -140,12 +132,8 @@ gdjs.sk.SlotCocosRenderer.prototype.setVisible = function(visible){
     this.renderer.setVisible(visible);
 };
 
-// // Mesh only
+// Meshes not supported
 gdjs.sk.SlotCocosRenderer.prototype.setVertices = function(vertices, updateList){
-    // for(var i=0; i<updateList.length; i++){
-    //     this.renderer.vertices[2*updateList[i]]     = vertices[i][0];
-    //     this.renderer.vertices[2*updateList[i] + 1] = vertices[i][1];
-    // }
 };
 
 

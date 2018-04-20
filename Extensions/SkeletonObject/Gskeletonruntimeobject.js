@@ -366,7 +366,8 @@ gdjs.SkeletonRuntimeObject.prototype.raycastSlot = function(slotPath, x, y, angl
     return result;
 };
 
-// Warning!, assuming that gdjs.evtTools.object.twoListsTest respect object parameters order
+// Warning!, assuming gdjs.evtTools.object.twoListsTest calls the predicate
+// respecting the given objects lists paramenters order
 gdjs.SkeletonRuntimeObject.slotObjectCollisionTest = function(skl, obj, slotPath){
     //First check if bounding circle are too far.
     var o1w = skl.getWidth();
@@ -396,7 +397,6 @@ gdjs.SkeletonRuntimeObject.slotObjectCollisionTest = function(skl, obj, slotPath
     return false;
 };
 
-// Warning!, assuming that gdjs.evtTools.object.twoListsTest respect object parameters order
 gdjs.SkeletonRuntimeObject.slotSlotCollisionTest = function(skl1, skl2, slotPaths){
     //First check if bounding circle are too far.
     var o1w = skl1.getWidth();

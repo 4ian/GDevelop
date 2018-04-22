@@ -1,9 +1,9 @@
 import React, { PureComponent } from 'react';
 import { translate } from 'react-i18next';
 import { ToolbarGroup } from 'material-ui/Toolbar';
-import ToolbarSeparator from '../../UI/ToolbarSeparator';
-import ToolbarIcon from '../../UI/ToolbarIcon';
-import IconMenu from '../../UI/Menu/IconMenu';
+import ToolbarSeparator from '../UI/ToolbarSeparator';
+import ToolbarIcon from '../UI/ToolbarIcon';
+import IconMenu from '../UI/Menu/IconMenu';
 
 export class Toolbar extends PureComponent {
   render() {

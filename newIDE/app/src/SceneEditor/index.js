@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 
-import ObjectsList from '../../ObjectsList';
-import ObjectsGroupsList from '../../ObjectsGroupsList';
-import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
-import InstancesEditor from '../../InstancesEditor';
-import InstancePropertiesEditor from '../../InstancesEditor/InstancePropertiesEditor';
-import InstancesList from '../../InstancesEditor/InstancesList';
-import LayersList from '../../LayersList';
-import LayerRemoveDialog from '../../LayersList/LayerRemoveDialog';
-import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
-import ObjectEditorDialog from '../../ObjectEditor/ObjectEditorDialog';
-import ObjectsGroupEditorDialog from '../../ObjectsGroupEditor/ObjectsGroupEditorDialog';
+import ObjectsList from '../ObjectsList';
+import ObjectsGroupsList from '../ObjectsGroupsList';
+import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
+import InstancesEditor from '../InstancesEditor';
+import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
+import InstancesList from '../InstancesEditor/InstancesList';
+import LayersList from '../LayersList';
+import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
+import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
+import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
+import ObjectsGroupEditorDialog from '../ObjectsGroupEditor/ObjectsGroupEditorDialog';
 import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
@@ -18,18 +18,18 @@ import Toolbar from './Toolbar';
 import {
   serializeToJSObject,
   unserializeFromJSObject,
-} from '../../Utils/Serializer';
-import Clipboard from '../../Utils/Clipboard';
-import { passFullSize } from '../../UI/FullSizeMeasurer';
-import { addScrollbars } from '../../InstancesEditor/ScrollbarContainer';
+} from '../Utils/Serializer';
+import Clipboard from '../Utils/Clipboard';
+import { passFullSize } from '../UI/FullSizeMeasurer';
+import { addScrollbars } from '../InstancesEditor/ScrollbarContainer';
 
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import EditorMosaic, { MosaicWindow } from '../../UI/EditorMosaic';
-import EditorBar from '../../UI/EditorBar';
-import InfoBar from '../../UI/Messages/InfoBar';
-import ContextMenu from '../../UI/Menu/ContextMenu';
+import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
+import EditorBar from '../UI/EditorBar';
+import InfoBar from '../UI/Messages/InfoBar';
+import ContextMenu from '../UI/Menu/ContextMenu';
 import {
   undo,
   redo,
@@ -37,7 +37,7 @@ import {
   canRedo,
   getHistoryInitialState,
   saveToHistory,
-} from '../../Utils/History';
+} from '../Utils/History';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -55,7 +55,7 @@ const styles = {
   },
 };
 
-export default class InstancesFullEditor extends Component {
+export default class SceneEditor extends Component {
   static defaultProps = {
     showObjectsList: true,
     setToolbar: () => {},

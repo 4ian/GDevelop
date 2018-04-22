@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react';
-import InstancesFullEditor from '../../SceneEditor/InstancesFullEditor';
+import SceneEditor from '../../SceneEditor';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import BaseEditor from './BaseEditor';
 import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 
-export default class SceneEditor extends BaseEditor {
-  editor: ?typeof InstancesFullEditor;
+export default class SceneEditorContainer extends BaseEditor {
+  editor: ?typeof SceneEditor;
 
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
@@ -39,7 +39,7 @@ export default class SceneEditor extends BaseEditor {
     }
 
     return (
-      <InstancesFullEditor
+      <SceneEditor
         {...this.props}
         ref={editor => (this.editor = editor)}
         project={project}

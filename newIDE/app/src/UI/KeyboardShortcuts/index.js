@@ -1,3 +1,5 @@
+import { isMacLike } from '../../Utils/Platform';
+
 const CTRL_KEY = 17;
 const SHIFT_KEY = 16;
 const LEFT_KEY = 37;
@@ -42,8 +44,7 @@ export default class KeyboardShortcuts {
     this.isFocused = false;
     this.shiftPressed = false;
     this.rawCtrlPressed = false;
-    this.metaPressed = false;
-
+    this.metaPressed = false;    
     this.mount();
   }
 
@@ -125,19 +126,22 @@ export default class KeyboardShortcuts {
     if (this._isControlPressed() && evt.which === Y_KEY) {
       this.onRedo();
     }
-    if (this._isControlPressed() && evt.which === MINUS_KEY) {
-      this.onZoomOut();
-    }
-    if (this._isControlPressed() && evt.which === EQUAL_KEY) {
-      this.onZoomIn();
-    }
-    if (evt.which === NUMPAD_SUBSTRACT) {
-      this.onZoomOut();
-    }
-    if (evt.which === NUMPAD_ADD) {
-      this.onZoomIn();
-    }
 
+    if (isMacLike() == true) //Mac specific shortcuts -- zooming done differently on windows and linux
+    {
+      if (this._isControlPressed() && evt.which === MINUS_KEY) {
+        this.onZoomOut();
+      }
+      if (this._isControlPressed() && evt.which === EQUAL_KEY) {
+        this.onZoomIn();
+      }
+      if (evt.which === NUMPAD_SUBSTRACT) {
+        this.onZoomOut();
+      }
+      if (evt.which === NUMPAD_ADD) {
+        this.onZoomIn();
+      }
+    }
   };
 
   _onKeyUp = evt => {
@@ -152,28 +156,34 @@ export default class KeyboardShortcuts {
 
   _onMouseDown = evt => { 
     if (!this.isFocused) return;
-    
-    if (evt.button == MID_MOUSE_BUTTON){
-      this.spacePressed = true;
+
+    if (isMacLike() == false) {
+      if (evt.button == MID_MOUSE_BUTTON) {
+        this.spacePressed = true;
+      };
     };
   };
 
   _onMouseUp = evt => {
     if (!this.isFocused) return;
-    
-    if (evt.button == MID_MOUSE_BUTTON){
-      this.spacePressed = false;
+
+    if (isMacLike() == false) {
+      if (evt.button == MID_MOUSE_BUTTON){
+        this.spacePressed = false;
+      };
     };
   };
 
   _onMouseScroll = evt => {
     if (!this.isFocused) return;
     
-    if (evt.deltaY > 0) {
-      this.onZoomOut();
-    }
-    else {
-      this.onZoomIn();
+    if (isMacLike() == false) {
+      if (evt.deltaY > 0) {
+        this.onZoomOut();
+      }
+      else {
+        this.onZoomIn();
+      };
     };
   };
   

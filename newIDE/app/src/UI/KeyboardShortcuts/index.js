@@ -44,7 +44,9 @@ export default class KeyboardShortcuts {
     this.isFocused = false;
     this.shiftPressed = false;
     this.rawCtrlPressed = false;
-    this.metaPressed = false;    
+    this.metaPressed = false;
+    this.spacePressed = false;
+    this.mouseMidButtonPressed = false;
     this.mount();
   }
 
@@ -73,7 +75,7 @@ export default class KeyboardShortcuts {
   }
 
   shouldMoveView() {
-    return this.spacePressed;
+    return this.spacePressed || this.mouseMidButtonPressed;
   }
 
   _isControlPressed = () => {
@@ -91,7 +93,7 @@ export default class KeyboardShortcuts {
 
     const textEditorSelectors = 'textarea, input, [contenteditable="true"]';
     if (evt.target && evt.target.closest(textEditorSelectors)) {
-      return; // Something else is currently being edited. 
+      return; // Something else is currently being edited.
     }
 
     if (this.onMove) {
@@ -154,12 +156,12 @@ export default class KeyboardShortcuts {
     if (evt.which === SPACE_KEY) this.spacePressed = false;
   };
 
-  _onMouseDown = evt => { 
+  _onMouseDown = evt => {
     if (!this.isFocused) return;
 
     if (isMacLike() == false) {
       if (evt.button == MID_MOUSE_BUTTON) {
-        this.spacePressed = true;
+        this.mouseMidButtonPressed = true;
       };
     };
   };
@@ -169,14 +171,14 @@ export default class KeyboardShortcuts {
 
     if (isMacLike() == false) {
       if (evt.button == MID_MOUSE_BUTTON){
-        this.spacePressed = false;
+        this.mouseMidButtonPressed = false;
       };
     };
   };
 
   _onMouseScroll = evt => {
     if (!this.isFocused) return;
-    
+
     if (isMacLike() == false) {
       if (evt.deltaY > 0) {
         this.onZoomOut();
@@ -186,7 +188,7 @@ export default class KeyboardShortcuts {
       };
     };
   };
-  
+
   _onKeyPress = evt => {};
 
   _noop = () => {};

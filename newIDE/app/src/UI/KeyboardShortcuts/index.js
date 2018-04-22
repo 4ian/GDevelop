@@ -129,8 +129,8 @@ export default class KeyboardShortcuts {
       this.onRedo();
     }
 
-    if (isMacLike() == true) //Mac specific shortcuts -- zooming done differently on windows and linux
-    {
+    if (isMacLike()) {
+      //Mac specific shortcuts -- zooming done differently on windows and linux
       if (this._isControlPressed() && evt.which === MINUS_KEY) {
         this.onZoomOut();
       }
@@ -159,34 +159,29 @@ export default class KeyboardShortcuts {
   _onMouseDown = evt => {
     if (!this.isFocused) return;
 
-    if (isMacLike() == false) {
-      if (evt.button == MID_MOUSE_BUTTON) {
-        this.mouseMidButtonPressed = true;
-      };
-    };
+    if (!isMacLike() && evt.button === MID_MOUSE_BUTTON) {
+      this.mouseMidButtonPressed = true;
+    }
   };
 
   _onMouseUp = evt => {
     if (!this.isFocused) return;
 
-    if (isMacLike() == false) {
-      if (evt.button == MID_MOUSE_BUTTON){
-        this.mouseMidButtonPressed = false;
-      };
-    };
+    if (!isMacLike() && evt.button === MID_MOUSE_BUTTON) {
+      this.mouseMidButtonPressed = false;
+    }
   };
 
   _onMouseScroll = evt => {
     if (!this.isFocused) return;
 
-    if (isMacLike() == false) {
+    if (!isMacLike()) {
       if (evt.deltaY > 0) {
         this.onZoomOut();
-      }
-      else {
+      } else {
         this.onZoomIn();
-      };
-    };
+      }
+    }
   };
 
   _onKeyPress = evt => {};

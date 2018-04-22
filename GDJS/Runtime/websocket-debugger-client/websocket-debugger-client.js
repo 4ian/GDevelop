@@ -1,3 +1,9 @@
+/**
+ * This DebuggerClient connects to a websocket server and can dump
+ * the data of the current game, and receive message to change a field or
+ * call a function on an object of the specified runtimeGame.
+ * @param {*} runtimegame
+ */
 gdjs.WebsocketDebuggerClient = function(runtimegame) {
   this._runtimegame = runtimegame;
 
@@ -31,6 +37,12 @@ gdjs.WebsocketDebuggerClient = function(runtimegame) {
         } else if (data.command === 'pause') {
           runtimegame.pause(true);
           that.sendRuntimeGameDump();
+        } else if (data.command === 'refresh') {
+          that.sendRuntimeGameDump();
+        } else if (data.command === 'set') {
+          that.set(data.path, data.newValue);
+        } else if (data.command === 'call') {
+          that.call(data.path, data.args);
         } else {
           console.info(
             'Unknown command "' + data.command + '" received by the debugger.'
@@ -46,6 +58,68 @@ gdjs.WebsocketDebuggerClient = function(runtimegame) {
 };
 
 gdjs.DebuggerClient = gdjs.WebsocketDebuggerClient; //Register the class to let the engine use it.
+
+gdjs.WebsocketDebuggerClient.prototype.set = function(path, newValue) {
+  if (!path || !path.length) {
+    console.warn('No path specified, set operation from debugger aborted');
+    return false;
+  }
+
+  var object = this._runtimegame;
+  var currentIndex = 0;
+  while (currentIndex < path.length - 1) {
+    var key = path[currentIndex];
+    if (!object || !object[key]) {
+      console.error('Incorrect path specified. No ' + key + ' in ', object);
+      return false;
+    }
+
+    object = object[key];
+    currentIndex++;
+  }
+
+  // Ensure the newValue is properly typed to avoid breaking anything in
+  // the game engine.
+  var currentValue = object[path[currentIndex]];
+  if (typeof currentValue === 'number') {
+    newValue = parseFloat(newValue);
+  } else if (typeof currentValue === 'string') {
+    newValue = '' + newValue;
+  }
+
+  console.log('Updating', path, 'to', newValue);
+  object[path[currentIndex]] = newValue;
+  return true;
+};
+
+gdjs.WebsocketDebuggerClient.prototype.call = function(path, args) {
+  if (!path || !path.length) {
+    console.warn('No path specified, call operation from debugger aborted');
+    return false;
+  }
+
+  var object = this._runtimegame;
+  var currentIndex = 0;
+  while (currentIndex < path.length - 1) {
+    var key = path[currentIndex];
+    if (!object || !object[key]) {
+      console.error('Incorrect path specified. No ' + key + ' in ', object);
+      return false;
+    }
+
+    object = object[key];
+    currentIndex++;
+  }
+
+  if (!object[path[currentIndex]]) {
+    console.error('Unable to call', path);
+    return false;
+  }
+
+  console.log('Calling', path, 'with', args);
+  object[path[currentIndex]].apply(object, args);
+  return true;
+};
 
 gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
   if (!this._ws) {
@@ -110,6 +184,16 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
     // Exclude circular references to parent runtimeGame or runtimeScene:
     '_runtimeGame',
     '_runtimeScene',
+
+    // Exclude some runtimeObject duplicated data:
+    '_behaviorsTable',
+
+    // Exclude some objects data:
+    '_animations',
+    '_animationFrame',
+
+    // Exclude some behaviors data:
+    '_platformRBush',
 
     // Exclude rendering related objects:
     '_renderer',

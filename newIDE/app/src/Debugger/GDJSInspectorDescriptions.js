@@ -1,8 +1,11 @@
 // @flow
 import * as React from 'react';
-import RawContentInspector from './RawContentInspector';
+import RuntimeObjectInspector from './Inspectors/RuntimeObjectInspector';
+import VariablesContainerInspector from './Inspectors/VariablesContainerInspector';
 
 export type GameData = any;
+export type EditFunction = (path: Array<string>, newValue: any) => boolean;
+export type CallFunction = (path: Array<string>, args: Array<any>) => boolean;
 
 export type InspectorDescriptionsGetter = (
   gameData: GameData
@@ -11,8 +14,15 @@ export type InspectorDescriptionsGetter = (
 export type InspectorDescription = {|
   label: string,
   key: string | Array<string>,
-  renderInspector: (gameData: GameData) => React.Node,
+  renderInspector: (
+    gameData: GameData,
+    {
+      onCall: CallFunction,
+      onEdit: EditFunction,
+    }
+  ) => React.Node,
   getSubInspectors?: InspectorDescriptionsGetter,
+  initiallyOpen?: boolean,
 |};
 
 /**
@@ -26,66 +36,82 @@ export const getInspectorDescriptions = (
     {
       label: 'Global variables',
       key: '_variables',
-      renderInspector: gameData => <RawContentInspector gameData={gameData} />,
+      renderInspector: (gameData, { onCall, onEdit }) => (
+        <VariablesContainerInspector
+          variablesContainer={gameData}
+          onCall={onCall}
+          onEdit={onEdit}
+        />
+      ),
     },
     {
       label: 'Scenes',
       key: ['_sceneStack', '_stack'],
-      renderInspector: gameData => null,
+      renderInspector: () => null,
+      initiallyOpen: true,
       getSubInspectors: gdjsStack => {
         if (!gdjsStack) return [];
 
         return gdjsStack.map((runtimeScene, index) => ({
           label: runtimeScene._name,
           key: index,
-          renderInspector: gameData => (
-            <RawContentInspector gameData={gameData} />
-          ),
+          renderInspector: () => null,
+          initiallyOpen: true,
           getSubInspectors: runtimeScene => [
-            {
-              label: 'Layers',
-              key: `_layers`,
-              renderInspector: gameData => (
-                <RawContentInspector gameData={gameData} />
-              ),
-            },
             {
               label: 'Scene variables',
               key: `_variables`,
-              renderInspector: gameData => (
-                <RawContentInspector gameData={gameData} />
+              renderInspector: (gameData, { onCall, onEdit }) => (
+                <VariablesContainerInspector
+                  variablesContainer={gameData}
+                  onCall={onCall}
+                  onEdit={onEdit}
+                />
               ),
             },
             {
               label: 'Instances',
               key: `_instances`,
-              renderInspector: gameData => (
-                <RawContentInspector gameData={gameData} />
-              ),
+              renderInspector: () => null,
+              initiallyOpen: true,
               getSubInspectors: instances => {
                 if (!instances || !instances.items) return [];
 
-                return Object.keys(instances.items).map(objectName => ({
-                  label: objectName,
-                  key: ['items', objectName],
-                  renderInspector: gameData => (
-                    <RawContentInspector gameData={gameData} />
-                  ),
-                  getSubInspectors: instancesList =>
-                    instancesList
-                      ? instancesList
-                          .filter(runtimeObject => !!runtimeObject)
-                          .map((runtimeObject, index) => {
-                            return {
-                              label: `#${runtimeObject.id}`,
-                              key: index,
-                              renderInspector: gameData => (
-                                <RawContentInspector gameData={gameData} />
-                              ),
-                            };
-                          })
-                      : [],
-                }));
+                return Object.keys(instances.items).map(objectName => {
+                  if (
+                    !instances.items[objectName] ||
+                    typeof instances.items[objectName].length === undefined
+                  )
+                    return null;
+
+                  return {
+                    label: `${objectName} (${instances.items[objectName]
+                      .length})`,
+                    key: ['items', objectName],
+                    renderInspector: () => null,
+                    getSubInspectors: instancesList =>
+                      instancesList
+                        ? instancesList
+                            .filter(runtimeObject => !!runtimeObject)
+                            .map((runtimeObject, index) => {
+                              return {
+                                label: `#${runtimeObject.id}`,
+                                key: index,
+                                renderInspector: (
+                                  gameData,
+                                  { onCall, onEdit }
+                                ) => (
+                                  <RuntimeObjectInspector
+                                    runtimeObject={gameData}
+                                    onCall={onCall}
+                                    onEdit={onEdit}
+                                  />
+                                ),
+                              };
+                            })
+                        : [],
+                  };
+                });
               },
             },
           ],

@@ -76,12 +76,14 @@ import {
   fakeNotAuthenticatedUserProfile,
   fakeAuthenticatedButLoadingUserProfile,
 } from '../fixtures/GDevelopServicesTestData';
+import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import LoginDialog from '../Profile/LoginDialog';
 import UserProfileContext from '../Profile/UserProfileContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
+import DebuggerContent from '../Debugger/DebuggerContent';
 
 const gd = global.gd;
 const {
@@ -287,6 +289,86 @@ storiesOf('LocalFolderPicker', module)
 storiesOf('StartPage', module)
   .addDecorator(muiDecorator)
   .add('default', () => <StartPage />);
+
+storiesOf('DebuggerContent', module)
+  .addDecorator(muiDecorator)
+  .add('debugger not started', () => (
+    <DebuggerContent
+      debuggerConnectionOpen={false}
+      debuggerServerError={null}
+      debuggerServerStarted={false}
+      gameData={null}
+      onPause={action('on pause')}
+      onPlay={action('on play')}
+      onRefresh={action('on refresh')}
+      onEdit={() => false}
+      onCall={() => false}
+    />
+  ))
+  .add('debugger server errored', () => (
+    <DebuggerContent
+      debuggerConnectionOpen={false}
+      debuggerServerError={{ message: 'Some error' }}
+      debuggerServerStarted={false}
+      gameData={null}
+      onPause={action('on pause')}
+      onPlay={action('on play')}
+      onRefresh={action('on refresh')}
+      onEdit={() => false}
+      onCall={() => false}
+    />
+  ))
+  .add('debugger server started, game connection not opened', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 550, display: 'flex' }}>
+        <DebuggerContent
+          debuggerConnectionOpen={false}
+          debuggerServerError={null}
+          debuggerServerStarted={true}
+          gameData={null}
+          onPause={action('on pause')}
+          onPlay={action('on play')}
+          onRefresh={action('on refresh')}
+          onEdit={() => false}
+          onCall={() => false}
+        />
+      </div>
+    </DragDropContextProvider>
+  ))
+  .add('debugger server started, game connection opened, with data', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 550, display: 'flex' }}>
+        <DebuggerContent
+          debuggerConnectionOpen={true}
+          debuggerServerError={null}
+          debuggerServerStarted={true}
+          gameData={debuggerGameDataDump}
+          onPause={action('on pause')}
+          onPlay={action('on play')}
+          onRefresh={action('on refresh')}
+          onEdit={() => false}
+          onCall={() => false}
+        />
+      </div>
+    </DragDropContextProvider>
+  ))
+  .add('debugger server started, game connection closed, with data', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 550, display: 'flex' }}>
+        <DebuggerContent
+          debuggerConnectionOpen={false}
+          debuggerServerError={null}
+          debuggerServerStarted={true}
+          gameData={debuggerGameDataDump}
+          onPause={action('on pause')}
+          onPlay={action('on play')}
+          onRefresh={action('on refresh')}
+          onEdit={() => false}
+          onCall={() => false}
+        />
+      </div>
+    </DragDropContextProvider>
+  ));
 
 storiesOf('AboutDialog', module)
   .addDecorator(muiDecorator)

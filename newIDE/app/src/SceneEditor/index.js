@@ -101,6 +101,10 @@ export default class SceneEditor extends Component {
         onPreview={() => this.props.onPreview({})}
         showNetworkPreviewButton={this.props.showNetworkPreviewButton}
         onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
+        onOpenDebugger={() => {
+          this.props.onOpenDebugger();
+          this.props.onPreview({});
+        }}
         showObjectsList={this.props.showObjectsList}
         instancesSelection={this.instancesSelection}
         openObjectsList={this.openObjectsList}
@@ -121,7 +125,6 @@ export default class SceneEditor extends Component {
         zoomIn={this.zoomIn}
         zoomOut={this.zoomOut}
         onOpenSettings={this.openSceneProperties}
-        onOpenDebugger={() => this.props.onOpenDebugger()}
       />
     );
   }

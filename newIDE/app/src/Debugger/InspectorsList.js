@@ -8,7 +8,6 @@ import {
   type InspectorDescriptionsGetter,
   type GameData,
 } from './GDJSInspectorDescriptions';
-import EmptyMessage from '../UI/EmptyMessage';
 
 type Props = {|
   gameData: GameData,
@@ -37,6 +36,7 @@ export default class InspectorsList extends React.Component<Props, void> {
     path: Array<string>
   ) {
     return getInspectorDescriptions(gameData).map(inspectorDescription => {
+      if (!inspectorDescription) return null;
       const fullInspectorPath = path.concat(inspectorDescription.key);
 
       const getSubInspectors = inspectorDescription.getSubInspectors;
@@ -52,6 +52,7 @@ export default class InspectorsList extends React.Component<Props, void> {
         <ListItem
           key={fullInspectorPath.join('.')}
           primaryText={inspectorDescription.label}
+          initiallyOpen={!!inspectorDescription.initiallyOpen}
           onClick={() =>
             this.props.onChooseInspector(
               inspectorDescription,
@@ -65,20 +66,14 @@ export default class InspectorsList extends React.Component<Props, void> {
   }
 
   render() {
-    return (
-      <Paper style={styles.container}>
-        {this.props.gameData ? (
-          <List style={styles.list}>
-            {this._renderInspectorList(
-              this.props.gameData,
-              this.props.getInspectorDescriptions,
-              []
-            )}
-          </List>
-        ) : (
-          <EmptyMessage>Pause the game to inspect its content</EmptyMessage>
+    return this.props.gameData ? (
+      <List style={styles.list}>
+        {this._renderInspectorList(
+          this.props.gameData,
+          this.props.getInspectorDescriptions,
+          []
         )}
-      </Paper>
-    );
+      </List>
+    ) : null;
   }
 }

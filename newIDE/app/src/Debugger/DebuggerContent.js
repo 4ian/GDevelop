@@ -11,37 +11,57 @@ import InspectorsList from './InspectorsList';
 import {
   getInspectorDescriptions,
   type InspectorDescription,
+  type EditFunction,
+  type CallFunction,
 } from './GDJSInspectorDescriptions';
+import RawContentInspector from './Inspectors/RawContentInspector';
 import EmptyMessage from '../UI/EmptyMessage';
+import Checkbox from 'material-ui/Checkbox';
+import Flash from 'material-ui/svg-icons/image/flash-on';
+import FlashOff from 'material-ui/svg-icons/image/flash-off';
 
 type Props = {|
   debuggerServerError: ?any,
   debuggerServerStarted: boolean,
   debuggerConnectionOpen: boolean,
   gameData: ?any,
+  onEdit: EditFunction,
+  onCall: CallFunction,
   onPlay: () => void,
   onPause: () => void,
+  onRefresh: () => void,
 |};
 
 type State = {|
   selectedInspector: ?InspectorDescription,
   selectedInspectorFullPath: Array<string>,
+  rawMode: boolean,
 |};
 
 const styles = {
   container: { flex: 1, display: 'flex' },
-  jsonContainer: { flex: 1, overflowY: 'scroll' },
 };
 
 export default class DebuggerContent extends React.Component<Props, State> {
   state = {
     selectedInspector: null,
     selectedInspectorFullPath: [],
+    rawMode: false,
   };
 
   _renderInspectors() {
-    const { gameData, onPlay, onPause } = this.props;
-    const { selectedInspector, selectedInspectorFullPath } = this.state;
+    const {
+      gameData,
+      onRefresh,
+      debuggerConnectionOpen,
+      onCall,
+      onEdit,
+    } = this.props;
+    const {
+      selectedInspector,
+      selectedInspectorFullPath,
+      rawMode,
+    } = this.state;
 
     return (
       <EditorMosaic
@@ -52,42 +72,93 @@ export default class DebuggerContent extends React.Component<Props, State> {
               toolbarControls={[]}
               gameData={gameData}
             >
-              <Column expand noMargin>
-                <Line>
-                  <RaisedButton label="Play" onClick={onPlay} primary />
-                  <RaisedButton label="Pause" onClick={onPause} primary />
-                </Line>
-                <Line expand noMargin>
-                  <InspectorsList
-                    gameData={gameData}
-                    getInspectorDescriptions={getInspectorDescriptions}
-                    onChooseInspector={(
-                      selectedInspector,
-                      selectedInspectorFullPath
-                    ) =>
-                      this.setState({
+              <Paper style={styles.container}>
+                <Column expand noMargin>
+                  <Line justifyContent="center">
+                    <RaisedButton label="Refresh" onClick={onRefresh} primary />
+                  </Line>
+                  <Line expand noMargin>
+                    <InspectorsList
+                      gameData={gameData}
+                      getInspectorDescriptions={getInspectorDescriptions}
+                      onChooseInspector={(
                         selectedInspector,
-                        selectedInspectorFullPath,
-                      })}
-                  />
-                </Line>
-              </Column>
+                        selectedInspectorFullPath
+                      ) =>
+                        this.setState({
+                          selectedInspector,
+                          selectedInspectorFullPath,
+                        })}
+                    />
+                  </Line>
+                </Column>
+              </Paper>
             </MosaicWindow>
           ),
-          'selected-inspector': selectedInspector ? (
-            selectedInspector.renderInspector(
-              get(gameData, selectedInspectorFullPath, null)
-            ) || (
-              <EmptyMessage>
-                Looks like there is nothing to show :/
-              </EmptyMessage>
-            )
-          ) : (
-            <EmptyMessage>
-              {!gameData
-                ? 'Pause the game, with the buttons on the left, to inspect the game.'
-                : 'Choose an element to inspect in the list'}
-            </EmptyMessage>
+          'selected-inspector': (
+            <Column expand noMargin>
+              {' '}
+              {selectedInspector ? (
+                rawMode ? (
+                  <RawContentInspector
+                    gameData={get(gameData, selectedInspectorFullPath, null)}
+                    onEdit={(path, newValue) =>
+                      onEdit(selectedInspectorFullPath.concat(path), newValue)}
+                  />
+                ) : (
+                  selectedInspector.renderInspector(
+                    get(gameData, selectedInspectorFullPath, null),
+                    {
+                      onCall: (path, args) =>
+                        onCall(selectedInspectorFullPath.concat(path), args),
+                      onEdit: (path, newValue) =>
+                        onEdit(
+                          selectedInspectorFullPath.concat(path),
+                          newValue
+                        ),
+                    }
+                  ) || (
+                    <EmptyMessage>
+                      No inspector, choose another element in the list or toggle
+                      the raw data view.
+                    </EmptyMessage>
+                  )
+                )
+              ) : (
+                <EmptyMessage>
+                  {gameData
+                    ? 'Choose an element to inspect in the list'
+                    : debuggerConnectionOpen
+                      ? 'Pause the game (from the toolbar) or hit refresh (on the left) to inspect the game'
+                      : 'Run a game to connect it to the debugger'}
+                </EmptyMessage>
+              )}
+              <Column>
+                <Line
+                  noMargin
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <p>
+                    Status:{' '}
+                    {debuggerConnectionOpen
+                      ? 'Connected'
+                      : 'Game not connected/not running'}
+                  </p>
+                  <div>
+                    <Checkbox
+                      checkedIcon={<Flash />}
+                      uncheckedIcon={<FlashOff />}
+                      checked={rawMode}
+                      onCheck={(e, enabled) =>
+                        this.setState({
+                          rawMode: enabled,
+                        })}
+                    />
+                  </div>
+                </Line>
+              </Column>
+            </Column>
           ),
         }}
         initialEditorNames={['inspectors', 'selected-inspector']}
@@ -96,11 +167,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      debuggerServerError,
-      debuggerServerStarted,
-      debuggerConnectionOpen,
-    } = this.props;
+    const { debuggerServerError, debuggerServerStarted } = this.props;
 
     return (
       <Paper style={styles.container}>
@@ -120,16 +187,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
               </p>
             </PlaceholderMessage>
           )}
-        {debuggerServerStarted &&
-          !debuggerConnectionOpen && (
-            <PlaceholderMessage>
-              <PlaceholderLoader />
-              <p>Waiting for a game to start and connect to the debugger...</p>
-            </PlaceholderMessage>
-          )}
-        {debuggerServerStarted &&
-          debuggerConnectionOpen &&
-          this._renderInspectors()}
+        {debuggerServerStarted && this._renderInspectors()}
       </Paper>
     );
   }

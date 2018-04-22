@@ -8,7 +8,7 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 type Props = {|
   project: gdProject,
-  setToolbar: (React.Node) => void,
+  setToolbar: React.Node => void,
   isActive: boolean,
 |};
 type State = {|
@@ -31,6 +31,8 @@ export default class Debugger extends React.Component<Props, State> {
       <Toolbar
         onPlay={this._play}
         onPause={this._pause}
+        canPlay={this.state.debuggerConnectionOpen}
+        canPause={this.state.debuggerConnectionOpen}
       />
     );
   }
@@ -47,44 +49,65 @@ export default class Debugger extends React.Component<Props, State> {
     }
   }
 
+  componentWillUnmount() {
+    this._removeServerListeners();
+  }
+
+  _removeServerListeners = () => {
+    if (!ipcRenderer) return;
+
+    ipcRenderer.removeAllListeners('debugger-send-message-done');
+    ipcRenderer.removeAllListeners('debugger-error-received');
+    ipcRenderer.removeAllListeners('debugger-connection-closed');
+    ipcRenderer.removeAllListeners('debugger-connection-opened');
+    ipcRenderer.removeAllListeners('debugger-start-server-done');
+    ipcRenderer.removeAllListeners('debugger-message-received');
+  };
+
   _startServer = () => {
     if (!ipcRenderer) return;
 
     this.setState({
       debuggerServerStarted: false,
     });
+    this._removeServerListeners();
 
-    ipcRenderer.removeAllListeners('debugger-send-message-done');
-
-    ipcRenderer.removeAllListeners('debugger-error-received');
     ipcRenderer.on('debugger-error-received', (event, err) => {
-      this.setState({
-        debuggerServerError: err,
-      });
+      this.setState(
+        {
+          debuggerServerError: err,
+        },
+        () => this.updateToolbar()
+      );
     });
 
-    ipcRenderer.removeAllListeners('debugger-connection-closed');
     ipcRenderer.on('debugger-connection-closed', event => {
-      this.setState({
-        debuggerConnectionOpen: false,
-      });
+      this.setState(
+        {
+          debuggerConnectionOpen: false,
+        },
+        () => this.updateToolbar()
+      );
     });
 
-    ipcRenderer.removeAllListeners('debugger-connection-opened');
     ipcRenderer.on('debugger-connection-opened', event => {
-      this.setState({
-        debuggerConnectionOpen: true,
-      });
+      this.setState(
+        {
+          debuggerConnectionOpen: true,
+        },
+        () => this.updateToolbar()
+      );
     });
 
-    ipcRenderer.removeAllListeners('debugger-start-server-done');
     ipcRenderer.on('debugger-start-server-done', event => {
-      this.setState({
-        debuggerServerStarted: true,
-      });
+      this.setState(
+        {
+          debuggerServerStarted: true,
+        },
+        () => this.updateToolbar()
+      );
     });
 
-    ipcRenderer.removeAllListeners('debugger-message-received');
     ipcRenderer.on('debugger-message-received', (event, message) => {
       console.log('Processing message received for debugger');
       try {
@@ -106,7 +129,10 @@ export default class Debugger extends React.Component<Props, State> {
         gameData: data.payload,
       });
     } else {
-      console.warn("Unknown command received from debugger client:", data.command);
+      console.warn(
+        'Unknown command received from debugger client:',
+        data.command
+      );
     }
   };
 
@@ -120,6 +146,42 @@ export default class Debugger extends React.Component<Props, State> {
     if (!ipcRenderer) return;
 
     ipcRenderer.send('debugger-send-message', '{"command": "pause"}');
+  };
+
+  _refresh = () => {
+    if (!ipcRenderer) return;
+
+    ipcRenderer.send('debugger-send-message', '{"command": "refresh"}');
+  };
+
+  _edit = (path: Array<string>, newValue: any) => {
+    if (!ipcRenderer) return false;
+
+    ipcRenderer.send(
+      'debugger-send-message',
+      JSON.stringify({
+        command: 'set',
+        path,
+        newValue,
+      })
+    );
+
+    return true;
+  };
+
+  _call = (path: Array<string>, args: Array<any>) => {
+    if (!ipcRenderer) return false;
+
+    ipcRenderer.send(
+      'debugger-send-message',
+      JSON.stringify({
+        command: 'call',
+        path,
+        args,
+      })
+    );
+
+    return true;
   };
 
   render() {
@@ -138,6 +200,9 @@ export default class Debugger extends React.Component<Props, State> {
         gameData={gameData}
         onPlay={this._play}
         onPause={this._pause}
+        onRefresh={this._refresh}
+        onEdit={this._edit}
+        onCall={this._call}
       />
     );
   }

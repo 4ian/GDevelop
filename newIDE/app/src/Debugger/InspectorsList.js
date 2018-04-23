@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react';
 import { List, ListItem } from 'material-ui/List';
-import Paper from 'material-ui/Paper';
 import get from 'lodash/get';
 import {
   type InspectorDescription,
@@ -29,6 +28,9 @@ const styles = {
   },
 };
 
+/**
+ * Generate a visual list of inspectors, using gameData and getInspectorDescriptions
+ */
 export default class InspectorsList extends React.Component<Props, void> {
   _renderInspectorList(
     gameData: GameData,

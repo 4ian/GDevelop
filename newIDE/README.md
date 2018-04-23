@@ -58,16 +58,23 @@ yarn storybook #or npm run storybook
 
 ### Tests
 
-Unit tests can be launched with this command:
+Unit tests and type checking can be launched with this command:
 
 ```bash
 cd newIDE/app
 yarn test #or npm run test
+yarn flow #or npm run flow
 ```
 
 ### Theming
 
 It's possible to create new themes for the UI. See [this file](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/index.js) to declare a new theme. You can take a look at the [default theme](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/index.js), including the [styling of the Events Sheets](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/EventsSheet.css).
+
+### Recommended tools for development
+
+Any text editor is fine, but it's a good idea to have one with *Prettier* (code formatting), *ESLint* (code linting) and *Flow* (type checking) integration.
+
+👉 You can use [Visual Studio Code](https://code.visualstudio.com) with these extensions: [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [Flow Language Support](https://github.com/flowtype/flow-for-vscode).
 
 ## Building and deploying the standalone app
 

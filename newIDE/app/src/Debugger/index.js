@@ -18,6 +18,10 @@ type State = {|
   gameData: ?any,
 |};
 
+/**
+ * Start the debugger server, listen to commands received and issue commands to it.
+ * The Debugger user interface is displayed by DebuggerContent.
+ */
 export default class Debugger extends React.Component<Props, State> {
   state = {
     debuggerServerStarted: false,

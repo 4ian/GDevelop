@@ -42,6 +42,10 @@ const styles = {
   container: { flex: 1, display: 'flex' },
 };
 
+/**
+ * The debugger interface: show the list of inspectors for a game, along with the 
+ * currently selected inspector.
+ */
 export default class DebuggerContent extends React.Component<Props, State> {
   state = {
     selectedInspector: null,

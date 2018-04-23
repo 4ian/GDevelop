@@ -160,7 +160,7 @@ exports[`StartPage renders the start page with a project 1`] = `
                 <span
                   style={
                     Object {
-                      "color": "white",
+                      "color": "#ffffff",
                       "fontSize": 14,
                       "fontWeight": 500,
                       "letterSpacing": 0,
@@ -832,7 +832,7 @@ exports[`StartPage renders the start page with no project opened 1`] = `
                 <span
                   style={
                     Object {
-                      "color": "white",
+                      "color": "#ffffff",
                       "fontSize": 14,
                       "fontWeight": 500,
                       "letterSpacing": 0,

@@ -51,7 +51,7 @@ const theme = {
   },
   stepper: {},
   raisedButton: {
-    primaryTextColor: 'white',
+    primaryTextColor: '#ffffff',
   },
 
   // GDevelop specific variables:

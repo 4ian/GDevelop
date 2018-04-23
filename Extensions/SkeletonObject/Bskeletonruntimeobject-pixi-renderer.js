@@ -12,12 +12,16 @@ gdjs.sk.PixiDataLoader = function()
 gdjs.sk.DataLoader = gdjs.sk.PixiDataLoader;
 
 gdjs.sk.PixiDataLoader.prototype.getData = function(dataName){
-    return PIXI.loader.resources[dataName].data;
+    if(PIXI.loader.resources[dataName]){
+        return PIXI.loader.resources[dataName].data;
+    }
+    return null;
 };
 
 gdjs.sk.PixiDataLoader.prototype.loadDragonBones = function(runtimeScene, objectData){
     var textureData = this.getData(objectData.textureDataFilename);
     var texture = runtimeScene.getGame().getImageManager().getPIXITexture(objectData.textureName);
+    if(!textureData || !texture.valid) return;
     
     for(var i=0; i<textureData.SubTexture.length; i++){
         var subTex = textureData.SubTexture[i];
@@ -28,6 +32,12 @@ gdjs.sk.PixiDataLoader.prototype.loadDragonBones = function(runtimeScene, object
         if (subTex.hasOwnProperty("frameHeight")){
             frame.height = subTex.frameHeight;
         }
+        // Fix the frame size, in case texture is not loaded
+        if(frame.x > texture.width) frame.x = 0;
+        if(frame.y > texture.height) frame.y = 0;
+        if(frame.x + frame.width > texture.width) frame.width = texture.width - frame.x;
+        if(frame.y + frame.height > texture.height) frame.height = texture.height - frame.y;
+        
         this.textures[subTex.name] = new PIXI.Texture(texture.baseTexture, frame=frame);
     }
 };

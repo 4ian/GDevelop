@@ -135,9 +135,9 @@ public:
         conditions["SkeletonObject::PointInsideSlot"].SetFunctionName("isPointInsideSlot");
 
         // Extension instructions
-        GetAllConditions()["SlotCollidesWithObject"].SetFunctionName("gdjs.sk.slotObjectCollision");
-        GetAllConditions()["SlotCollidesWithSlot"].SetFunctionName("gdjs.sk.slotSlotCollision");
-        GetAllConditions()["RaycastSlot"].SetFunctionName("gdjs.sk.raycastSlot");
+        GetAllConditions()["SkeletonObject::SlotCollidesWithObject"].SetFunctionName("gdjs.sk.slotObjectCollision");
+        GetAllConditions()["SkeletonObject::SlotCollidesWithSlot"].SetFunctionName("gdjs.sk.slotSlotCollision");
+        GetAllConditions()["SkeletonObject::RaycastSlot"].SetFunctionName("gdjs.sk.raycastSlot");
 
         GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
     };

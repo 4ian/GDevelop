@@ -32,6 +32,8 @@ gdjs.SkeletonObjectsManager.prototype.loadSkeleton = function(runtimeScene, obje
     var skeleton = {"loader": loader,
                     "armatures": [],
                     "rootArmature": 0};
+    
+    if(!skeletalData) return skeleton;
 
     if(objectData.apiName === "DragonBones"){
         // Load sub-textures

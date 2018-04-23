@@ -18,6 +18,7 @@ gdjs.sk.CocosDataLoader.prototype.getData = function(dataName){
 gdjs.sk.CocosDataLoader.prototype.loadDragonBones = function(runtimeScene, objectData){
     var textureData = this.getData(objectData.textureDataFilename);
     var texture = runtimeScene.getGame().getImageManager().getTexture(objectData.textureName);
+    if(!textureData || !texture._textureLoaded) return;
     
     for(var i=0; i<textureData.SubTexture.length; i++){
         var subTex = textureData.SubTexture[i];
@@ -28,9 +29,8 @@ gdjs.sk.CocosDataLoader.prototype.loadDragonBones = function(runtimeScene, objec
         if (subTex.hasOwnProperty("frameHeight")){
             frame.height = subTex.frameHeight;
         }
-
-        this.textures[subTex.name] = {"texture": texture,
-                                      "frame": frame};
+        
+        this.textures[subTex.name] = {"texture": texture, "frame": frame};
     }
 };
 
@@ -90,7 +90,10 @@ gdjs.sk.SlotCocosRenderer.prototype.getRendererObject = function(){
 };
 
 gdjs.sk.SlotCocosRenderer.prototype.loadAsSprite = function(texture){
-    this.renderer = new cc.Sprite.createWithTexture(texture.texture, texture.frame);
+    if(!texture)
+        this.renderer = new cc.Sprite();
+    else
+        this.renderer = new cc.Sprite.createWithTexture(texture.texture, texture.frame);
     this.renderer.z = 0;
 };
 

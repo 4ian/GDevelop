@@ -661,7 +661,7 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension & extension)
     extension.AddCondition("RaycastSlot",
         _("Raycast slot"),
         _("Same as Raycast, but intersects specific slots instead."),
-        _("Raycast _PARAM2_:_PARAM3_ from _PARAM1_;_PARAM2_"),
+        _("Raycast _PARAM0_:_PARAM1_ from _PARAM2_;_PARAM3_"),
         _("Collision"),
         "res/conditions/collision24.png",
         "res/conditions/collision.png")

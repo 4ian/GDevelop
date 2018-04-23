@@ -147,6 +147,13 @@ gdjs.sk.Armature.prototype.loadData = function(armatureData, skeletalData, debug
     this.setRenderers();
 };
 
+gdjs.sk.Armature.prototype.setAsRoot = function(){
+    this.isRoot = true;
+    // Create an empty shared data, in case nothing is loaded
+    this.shared = new gdjs.sk.SharedArmature();
+    this.shared.aabb = [[0,0], [0,0], [0,0], [0,0]];
+};
+
 gdjs.sk.Armature.prototype.getRenderer = function(){
     return this.renderer;
 };

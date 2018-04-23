@@ -18,7 +18,7 @@ gdjs.SkeletonRuntimeObject = function(runtimeScene, objectData){
 
     this.rootArmature = new gdjs.sk.Armature(this);
     this.rootArmature.getRenderer().putInScene(this, runtimeScene);
-    this.rootArmature.isRoot = true;
+    this.rootArmature.setAsRoot();
     this.animationPlaying = true;
     this.animationSmooth = true;
     this.timeScale = 1.0;
@@ -89,6 +89,13 @@ gdjs.SkeletonRuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeSc
 
 gdjs.SkeletonRuntimeObject.prototype.update = function(runtimeScene){
     this.rootArmature.update();
+};
+
+gdjs.SkeletonRuntimeObject.prototype.getDrawableX = function(){
+    return this.getX() - this.rootArmature.shared.aabb[0][0] * Math.abs(this.scaleX);
+};
+gdjs.SkeletonRuntimeObject.prototype.getDrawableY = function(){
+    return this.getY() - this.rootArmature.shared.aabb[0][1] * Math.abs(this.scaleY);
 };
 
 // Object instructions
@@ -322,6 +329,8 @@ gdjs.SkeletonRuntimeObject.prototype.setSlotZOrder = function(slotPath, z){
 
 gdjs.SkeletonRuntimeObject.prototype.isPointInsideSlot = function(slotPath, x, y){
     var hitBoxes = this.getPolygons(slotPath);
+    if(!hitBoxes) return false;
+    
     for(var i = 0; i < this.hitBoxes.length; ++i) {
        if ( gdjs.Polygon.isPointInside(hitBoxes[i], x, y) )
             return true;
@@ -332,24 +341,17 @@ gdjs.SkeletonRuntimeObject.prototype.isPointInsideSlot = function(slotPath, x, y
 
 // Extension instructions
 gdjs.SkeletonRuntimeObject.prototype.raycastSlot = function(slotPath, x, y, angle, dist, closest){
-    var objW = this.getWidth();
-    var objH = this.getHeight();
-    var diffX = this.getDrawableX()+this.getCenterX() - x;
-    var diffY = this.getDrawableY()+this.getCenterY() - y;
-    var boundingRadius = Math.sqrt(objW*objW + objH*objH)/2.0;
-
     var result = gdjs.Polygon.raycastTest._statics.result;
     result.collision = false;
-
-    if ( Math.sqrt(diffX*diffX + diffY*diffY) > boundingRadius + dist )
-        return result;
     
     var endX = x + dist*Math.cos(angle*Math.PI/180.0);
     var endY = y + dist*Math.sin(angle*Math.PI/180.0);
     var testSqDist = closest ? dist*dist : 0;
 
     var hitBoxes = this.getPolygons(slotPath);
-    for (var i=0; i<hitBoxes.length; i++) {
+    if(!hitBoxes) return result;
+
+    for(var i=0; i<hitBoxes.length; i++){
         var res =  gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
         if ( res.collision ) {
             if ( closest && (res.closeSqDist < testSqDist) ) {
@@ -369,26 +371,13 @@ gdjs.SkeletonRuntimeObject.prototype.raycastSlot = function(slotPath, x, y, angl
 // Warning!, assuming gdjs.evtTools.object.twoListsTest calls the predicate
 // respecting the given objects lists paramenters order
 gdjs.SkeletonRuntimeObject.slotObjectCollisionTest = function(skl, obj, slotPath){
-    //First check if bounding circle are too far.
-    var o1w = skl.getWidth();
-    var o1h = skl.getHeight();
-    var o2w = obj.getWidth();
-    var o2h = obj.getHeight();
-
-    var x = skl.getDrawableX()+skl.getCenterX()-(obj.getDrawableX()+obj.getCenterX());
-    var y = skl.getDrawableY()+skl.getCenterY()-(obj.getDrawableY()+obj.getCenterY());
-    var obj1BoundingRadius = Math.sqrt(o1w*o1w+o1h*o1h)/2.0;
-    var obj2BoundingRadius = Math.sqrt(o2w*o2w+o2h*o2h)/2.0;
-
-    if ( Math.sqrt(x*x+y*y) > obj1BoundingRadius + obj2BoundingRadius )
-        return false;
-
-    //Do a real check if necessary.
     var hitBoxes1 = skl.getPolygons(slotPath);
+    if(!hitBoxes1) return false;
+
     var hitBoxes2 = obj.getHitBoxes();
-    for(var k = 0, lenBoxes1 = hitBoxes1.length;k<lenBoxes1;++k) {
-        for(var l = 0, lenBoxes2 = hitBoxes2.length;l<lenBoxes2;++l) {
-            if ( gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l]).collision ) {
+    for(var k=0, lenBoxes1=hitBoxes1.length; k<lenBoxes1; ++k){
+        for(var l=0, lenBoxes2=hitBoxes2.length; l<lenBoxes2; ++l){
+            if (gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l]).collision){
                 return true;
             }
         }
@@ -398,26 +387,13 @@ gdjs.SkeletonRuntimeObject.slotObjectCollisionTest = function(skl, obj, slotPath
 };
 
 gdjs.SkeletonRuntimeObject.slotSlotCollisionTest = function(skl1, skl2, slotPaths){
-    //First check if bounding circle are too far.
-    var o1w = skl1.getWidth();
-    var o1h = skl1.getHeight();
-    var o2w = skl2.getWidth();
-    var o2h = skl2.getHeight();
-
-    var x = skl1.getDrawableX()+skl1.getCenterX()-(skl2.getDrawableX()+skl2.getCenterX());
-    var y = skl1.getDrawableY()+skl1.getCenterY()-(skl2.getDrawableY()+skl2.getCenterY());
-    var obj1BoundingRadius = Math.sqrt(o1w*o1w+o1h*o1h)/2.0;
-    var obj2BoundingRadius = Math.sqrt(o2w*o2w+o2h*o2h)/2.0;
-
-    if ( Math.sqrt(x*x+y*y) > obj1BoundingRadius + obj2BoundingRadius )
-        return false;
-
-    //Do a real check if necessary.
     var hitBoxes1 = skl1.getPolygons(slotPaths[0]);
     var hitBoxes2 = skl2.getPolygons(slotPaths[1]);
-    for(var k = 0, lenBoxes1 = hitBoxes1.length;k<lenBoxes1;++k) {
-        for(var l = 0, lenBoxes2 = hitBoxes2.length;l<lenBoxes2;++l) {
-            if ( gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l]).collision ) {
+    if(!hitBoxes1 || !hitBoxes2) return false;
+
+    for(var k=0, lenBoxes1=hitBoxes1.length; k<lenBoxes1; ++k){
+        for(var l=0, lenBoxes2=hitBoxes2.length; l<lenBoxes2; ++l){
+            if (gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l]).collision){
                 return true;
             }
         }

@@ -17,10 +17,7 @@ const {
   stopServer,
   getLocalNetworkIps,
 } = require('./ServeFolder');
-const {
-  startDebuggerServer,
-  sendMessage,
-} = require('./DebuggerServer');
+const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
 const { buildMainMenuFor } = require('./MainMenu');
 const throttle = require('lodash.throttle');
 
@@ -167,11 +164,13 @@ app.on('ready', function() {
     log.info('Received event to start debugger server with options=', options);
 
     startDebuggerServer({
-      onMessage: message =>
-        event.sender.send('debugger-message-received', message),
+      onMessage: ({ id, message }) =>
+        event.sender.send('debugger-message-received', { id, message }),
       onError: error => event.sender.send('debugger-error-received', error),
-      onConnectionClose: () => event.sender.send('debugger-connection-closed'),
-      onConnectionOpen: () => event.sender.send('debugger-connection-opened'),
+      onConnectionClose: ({ id }) =>
+        event.sender.send('debugger-connection-closed', { id }),
+      onConnectionOpen: ({ id }) =>
+        event.sender.send('debugger-connection-opened', { id }),
       onListening: () => event.sender.send('debugger-start-server-done'),
     });
   });

@@ -2,21 +2,36 @@
 import * as React from 'react';
 import Toolbar from './Toolbar';
 import DebuggerContent from './DebuggerContent';
+import DebuggerSelector from './DebuggerSelector';
+import { Column } from '../UI/Grid';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
+import PlaceholderMessage from '../UI/PlaceholderMessage';
+import Paper from 'material-ui/Paper';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
+
+//Each game connected to the debugger server is identified by a unique number
+export type DebuggerId = number;
 
 type Props = {|
   project: gdProject,
   setToolbar: React.Node => void,
   isActive: boolean,
 |};
+
 type State = {|
   debuggerServerStarted: boolean,
   debuggerServerError: ?any,
-  debuggerConnectionOpen: boolean,
-  gameData: ?any,
+
+  debuggerIds: Array<DebuggerId>,
+  debuggerGameData: { [number]: any },
+  selectedId: DebuggerId,
 |};
+
+const styles = {
+  container: { flex: 1, display: 'flex' },
+};
 
 /**
  * Start the debugger server, listen to commands received and issue commands to it.
@@ -26,17 +41,18 @@ export default class Debugger extends React.Component<Props, State> {
   state = {
     debuggerServerStarted: false,
     debuggerServerError: null,
-    debuggerConnectionOpen: false,
-    gameData: null,
+    debuggerIds: [],
+    debuggerGameData: {},
+    selectedId: 0,
   };
 
   updateToolbar() {
     this.props.setToolbar(
       <Toolbar
-        onPlay={this._play}
-        onPause={this._pause}
-        canPlay={this.state.debuggerConnectionOpen}
-        canPause={this.state.debuggerConnectionOpen}
+        onPlay={() => this._play(this.state.selectedId)}
+        onPause={() => this._pause(this.state.selectedId)}
+        canPlay={!!this.state.debuggerIds.length/*TODO: factor in function and use in render*/}
+        canPause={!!this.state.debuggerIds.length/*TODO: factor in function and use in render*/}
       />
     );
   }
@@ -85,19 +101,30 @@ export default class Debugger extends React.Component<Props, State> {
       );
     });
 
-    ipcRenderer.on('debugger-connection-closed', event => {
+    ipcRenderer.on('debugger-connection-closed', (event, { id }) => {
+      const { debuggerIds, selectedId } = this.state;
+      const remainingDebuggerIds = debuggerIds.filter(
+        debuggerId => debuggerId !== id
+      );
       this.setState(
         {
-          debuggerConnectionOpen: false,
+          debuggerIds: remainingDebuggerIds,
+          selectedId:
+            selectedId !== id
+              ? selectedId
+              : remainingDebuggerIds.length
+                ? remainingDebuggerIds[remainingDebuggerIds.length - 1]
+                : selectedId,
         },
         () => this.updateToolbar()
       );
     });
 
-    ipcRenderer.on('debugger-connection-opened', event => {
+    ipcRenderer.on('debugger-connection-opened', (event, { id }) => {
       this.setState(
         {
-          debuggerConnectionOpen: true,
+          debuggerIds: [...this.state.debuggerIds, id],
+          selectedId: id,
         },
         () => this.updateToolbar()
       );
@@ -112,11 +139,11 @@ export default class Debugger extends React.Component<Props, State> {
       );
     });
 
-    ipcRenderer.on('debugger-message-received', (event, message) => {
+    ipcRenderer.on('debugger-message-received', (event, { id, message }) => {
       console.log('Processing message received for debugger');
       try {
         const data = JSON.parse(message);
-        this._handleMessage(data);
+        this._handleMessage(id, data);
       } catch (e) {
         console.warn(
           'Error while parsing message received from debugger client:',
@@ -127,10 +154,13 @@ export default class Debugger extends React.Component<Props, State> {
     ipcRenderer.send('debugger-start-server');
   };
 
-  _handleMessage = (data: any) => {
+  _handleMessage = (id: DebuggerId, data: any) => {
     if (data.command === 'dump') {
       this.setState({
-        gameData: data.payload,
+        debuggerGameData: {
+          ...this.state.debuggerGameData,
+          [id]: data.payload,
+        },
       });
     } else {
       console.warn(
@@ -140,50 +170,59 @@ export default class Debugger extends React.Component<Props, State> {
     }
   };
 
-  _play = () => {
+  _play = (id: DebuggerId) => {
     if (!ipcRenderer) return;
 
-    ipcRenderer.send('debugger-send-message', '{"command": "play"}');
+    ipcRenderer.send('debugger-send-message', {
+      id,
+      message: '{"command": "play"}',
+    });
   };
 
-  _pause = () => {
+  _pause = (id: DebuggerId) => {
     if (!ipcRenderer) return;
 
-    ipcRenderer.send('debugger-send-message', '{"command": "pause"}');
+    ipcRenderer.send('debugger-send-message', {
+      id,
+      message: '{"command": "pause"}',
+    });
   };
 
-  _refresh = () => {
+  _refresh = (id: DebuggerId) => {
     if (!ipcRenderer) return;
 
-    ipcRenderer.send('debugger-send-message', '{"command": "refresh"}');
+    ipcRenderer.send('debugger-send-message', {
+      id,
+      message: '{"command": "refresh"}',
+    });
   };
 
-  _edit = (path: Array<string>, newValue: any) => {
+  _edit = (id: DebuggerId, path: Array<string>, newValue: any) => {
     if (!ipcRenderer) return false;
 
-    ipcRenderer.send(
-      'debugger-send-message',
-      JSON.stringify({
+    ipcRenderer.send('debugger-send-message', {
+      id,
+      message: JSON.stringify({
         command: 'set',
         path,
         newValue,
-      })
-    );
+      }),
+    });
 
     return true;
   };
 
-  _call = (path: Array<string>, args: Array<any>) => {
+  _call = (id: DebuggerId, path: Array<string>, args: Array<any>) => {
     if (!ipcRenderer) return false;
 
-    ipcRenderer.send(
-      'debugger-send-message',
-      JSON.stringify({
+    ipcRenderer.send('debugger-send-message', {
+      id,
+      message: JSON.stringify({
         command: 'call',
         path,
         args,
-      })
-    );
+      }),
+    });
 
     return true;
   };
@@ -192,22 +231,52 @@ export default class Debugger extends React.Component<Props, State> {
     const {
       debuggerServerError,
       debuggerServerStarted,
-      debuggerConnectionOpen,
-      gameData,
+      selectedId,
+      debuggerIds,
+      debuggerGameData,
     } = this.state;
 
     return (
-      <DebuggerContent
-        debuggerServerError={debuggerServerError}
-        debuggerServerStarted={debuggerServerStarted}
-        debuggerConnectionOpen={debuggerConnectionOpen}
-        gameData={gameData}
-        onPlay={this._play}
-        onPause={this._pause}
-        onRefresh={this._refresh}
-        onEdit={this._edit}
-        onCall={this._call}
-      />
+      <Paper style={styles.container}>
+        {!debuggerServerStarted &&
+          !debuggerServerError && (
+            <PlaceholderMessage>
+              <PlaceholderLoader />
+              <p>Debugger is starting...</p>
+            </PlaceholderMessage>
+          )}
+        {!debuggerServerStarted &&
+          debuggerServerError && (
+            <PlaceholderMessage>
+              <p>
+                Unable to start the debugger server! Make sure that you are
+                authorized to run servers on this computer.
+              </p>
+            </PlaceholderMessage>
+          )}
+        {debuggerServerStarted && (
+          <Column expand noMargin>
+            <DebuggerSelector
+              selectedId={selectedId}
+              debuggerIds={debuggerIds}
+              onChooseDebugger={id =>
+                this.setState({
+                  selectedId: id,
+                })}
+            />
+            {debuggerIds.indexOf(selectedId) !== -1 && (
+              <DebuggerContent
+                gameData={debuggerGameData[selectedId]}
+                onPlay={() => this._play(selectedId)}
+                onPause={() => this._pause(selectedId)}
+                onRefresh={() => this._refresh(selectedId)}
+                onEdit={(path, args) => this._edit(selectedId, path, args)}
+                onCall={(path, args) => this._call(selectedId, path, args)}
+              />
+            )}
+          </Column>
+        )}
+      </Paper>
     );
   }
 }

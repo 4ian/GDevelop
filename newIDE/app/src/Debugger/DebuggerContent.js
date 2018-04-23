@@ -1,11 +1,9 @@
 // @flow
 import * as React from 'react';
-import PlaceholderLoader from '../UI/PlaceholderLoader';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import Paper from 'material-ui/Paper';
 import get from 'lodash/get';
 import RaisedButton from 'material-ui/RaisedButton';
-import PlaceholderMessage from '../UI/PlaceholderMessage';
 import { Column, Line } from '../UI/Grid';
 import InspectorsList from './InspectorsList';
 import {
@@ -21,9 +19,6 @@ import Flash from 'material-ui/svg-icons/image/flash-on';
 import FlashOff from 'material-ui/svg-icons/image/flash-off';
 
 type Props = {|
-  debuggerServerError: ?any,
-  debuggerServerStarted: boolean,
-  debuggerConnectionOpen: boolean,
   gameData: ?any,
   onEdit: EditFunction,
   onCall: CallFunction,
@@ -43,7 +38,7 @@ const styles = {
 };
 
 /**
- * The debugger interface: show the list of inspectors for a game, along with the 
+ * The debugger interface: show the list of inspectors for a game, along with the
  * currently selected inspector.
  */
 export default class DebuggerContent extends React.Component<Props, State> {
@@ -53,14 +48,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
     rawMode: false,
   };
 
-  _renderInspectors() {
-    const {
-      gameData,
-      onRefresh,
-      debuggerConnectionOpen,
-      onCall,
-      onEdit,
-    } = this.props;
+  render() {
+    const { gameData, onRefresh, onCall, onEdit } = this.props;
     const {
       selectedInspector,
       selectedInspectorFullPath,
@@ -132,23 +121,11 @@ export default class DebuggerContent extends React.Component<Props, State> {
                 <EmptyMessage>
                   {gameData
                     ? 'Choose an element to inspect in the list'
-                    : debuggerConnectionOpen
-                      ? 'Pause the game (from the toolbar) or hit refresh (on the left) to inspect the game'
-                      : 'Run a game to connect it to the debugger'}
+                    : 'Pause the game (from the toolbar) or hit refresh (on the left) to inspect the game'}
                 </EmptyMessage>
               )}
               <Column>
-                <Line
-                  noMargin
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <p>
-                    Status:{' '}
-                    {debuggerConnectionOpen
-                      ? 'Connected'
-                      : 'Game not connected/not running'}
-                  </p>
+                <Line noMargin justifyContent="flex-end" alignItems="center">
                   <div>
                     <Checkbox
                       checkedIcon={<Flash />}
@@ -167,32 +144,6 @@ export default class DebuggerContent extends React.Component<Props, State> {
         }}
         initialEditorNames={['inspectors', 'selected-inspector']}
       />
-    );
-  }
-
-  render() {
-    const { debuggerServerError, debuggerServerStarted } = this.props;
-
-    return (
-      <Paper style={styles.container}>
-        {!debuggerServerStarted &&
-          !debuggerServerError && (
-            <PlaceholderMessage>
-              <PlaceholderLoader />
-              <p>Debugger is starting...</p>
-            </PlaceholderMessage>
-          )}
-        {!debuggerServerStarted &&
-          debuggerServerError && (
-            <PlaceholderMessage>
-              <p>
-                Unable to start the debugger server for the preview! Make sure
-                that you are authorized to run servers on this computer.
-              </p>
-            </PlaceholderMessage>
-          )}
-        {debuggerServerStarted && this._renderInspectors()}
-      </Paper>
     );
   }
 }

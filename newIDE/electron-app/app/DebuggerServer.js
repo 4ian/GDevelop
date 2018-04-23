@@ -2,12 +2,12 @@ const WebSocket = require('ws');
 const log = require('electron-log');
 
 let wsServer = null;
-let webSocket = null;
+let webSockets = [];
 
 const closeServer = () => {
   wsServer = null;
-  webSocket = null;
-}
+  webSockets = [];
+};
 
 /**
  * This module creates a WebSocket server listening for a connection
@@ -16,54 +16,49 @@ const closeServer = () => {
  * (in GDJS).
  */
 module.exports = {
-  startDebuggerServer: (options) => {
+  startDebuggerServer: options => {
     if (wsServer) {
       return options.onListening();
     }
 
     wsServer = new WebSocket.Server({ port: 3030 });
-    webSocket = null;
+    webSockets = [];
 
     wsServer.on('connection', function connection(newWebSocket) {
-      if (webSocket) {
-        log.warn(
-          'New connection to debugger was made while there is already one.'
-        );
-        log.info('Only one game is supported by the debugger server.');
-        return;
-      }
-      webSocket = newWebSocket;
+      const id = webSockets.length;
+      webSockets.push(newWebSocket);
+      log.info(`Debugger connection #${id} opened.`);
 
-      webSocket.on('message', message => {
-        log.info("Debugger received message");
-        options.onMessage(message);
+      newWebSocket.on('message', message => {
+        log.info(`Debugger connection #${id} received message.`);
+        options.onMessage({ id, message });
       });
 
-      webSocket.on('close', () => {
-        log.info('Debugger connection closed');
-        options.onConnectionClose();
-        webSocket = null;
+      newWebSocket.on('close', () => {
+        log.info(`Debugger connection #${id} closed.`);
+        webSockets[id] = null;
+        options.onConnectionClose({ id });
       });
 
-      options.onConnectionOpen();
+      options.onConnectionOpen({ id });
     });
 
     wsServer.on('listening', () => {
-      log.info('Debugger listening for connections');
+      log.info('Debugger listening for connections.');
       options.onListening();
     });
 
     wsServer.on('error', error => {
-      log.error('Debugger server errored');
+      log.error('Debugger server errored.');
       options.onError(error);
       closeServer();
     });
   },
   closeServer,
-  sendMessage: (message, cb) => {
-    if (!webSocket) return cb('Debugger server not started');
+  sendMessage: ({ id, message }, cb) => {
+    if (!webSockets[id]) return cb(`Debugger connection #${id} does not exist`);
 
-    webSocket.send(message, err => {
+    webSockets[id].send(message, err => {
       cb(err);
     });
   },

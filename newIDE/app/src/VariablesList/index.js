@@ -47,6 +47,7 @@ type Props = {|
   variablesContainer: gdVariablesContainer,
   emptyExplanationMessage?: string,
   emptyExplanationSecondMessage?: string,
+  onSizeUpdated?: () => void,
 |};
 type State = {|
   nameErrors: { [string]: string },

@@ -1,3 +1,5 @@
+import { isMacLike } from '../../Utils/Platform';
+
 const CTRL_KEY = 17;
 const SHIFT_KEY = 16;
 const LEFT_KEY = 37;
@@ -16,6 +18,7 @@ const V_KEY = 86;
 const X_KEY = 88;
 const Y_KEY = 89;
 const Z_KEY = 90;
+const MID_MOUSE_BUTTON = 1;
 
 export default class KeyboardShortcuts {
   constructor({
@@ -42,7 +45,8 @@ export default class KeyboardShortcuts {
     this.shiftPressed = false;
     this.rawCtrlPressed = false;
     this.metaPressed = false;
-
+    this.spacePressed = false;
+    this.mouseMidButtonPressed = false;
     this.mount();
   }
 
@@ -71,7 +75,7 @@ export default class KeyboardShortcuts {
   }
 
   shouldMoveView() {
-    return this.spacePressed;
+    return this.spacePressed || this.mouseMidButtonPressed;
   }
 
   _isControlPressed = () => {
@@ -81,7 +85,6 @@ export default class KeyboardShortcuts {
 
   _onKeyDown = evt => {
     if (!this.isFocused) return;
-
     if (evt.metaKey) this.metaPressed = true;
     if (evt.altKey) this.altPressed = true;
     if (evt.which === CTRL_KEY) this.rawCtrlPressed = true;
@@ -125,17 +128,21 @@ export default class KeyboardShortcuts {
     if (this._isControlPressed() && evt.which === Y_KEY) {
       this.onRedo();
     }
-    if (this._isControlPressed() && evt.which === MINUS_KEY) {
-      this.onZoomOut();
-    }
-    if (this._isControlPressed() && evt.which === EQUAL_KEY) {
-      this.onZoomIn();
-    }
-    if (evt.which === NUMPAD_SUBSTRACT) {
-      this.onZoomOut();
-    }
-    if (evt.which === NUMPAD_ADD) {
-      this.onZoomIn();
+
+    if (isMacLike()) {
+      //Mac specific shortcuts -- zooming done differently on windows and linux
+      if (this._isControlPressed() && evt.which === MINUS_KEY) {
+        this.onZoomOut();
+      }
+      if (this._isControlPressed() && evt.which === EQUAL_KEY) {
+        this.onZoomIn();
+      }
+      if (evt.which === NUMPAD_SUBSTRACT) {
+        this.onZoomOut();
+      }
+      if (evt.which === NUMPAD_ADD) {
+        this.onZoomIn();
+      }
     }
   };
 
@@ -147,6 +154,34 @@ export default class KeyboardShortcuts {
     if (evt.which === CTRL_KEY) this.rawCtrlPressed = false;
     if (evt.which === SHIFT_KEY) this.shiftPressed = false;
     if (evt.which === SPACE_KEY) this.spacePressed = false;
+  };
+
+  _onMouseDown = evt => {
+    if (!this.isFocused) return;
+
+    if (!isMacLike() && evt.button === MID_MOUSE_BUTTON) {
+      this.mouseMidButtonPressed = true;
+    }
+  };
+
+  _onMouseUp = evt => {
+    if (!this.isFocused) return;
+
+    if (!isMacLike() && evt.button === MID_MOUSE_BUTTON) {
+      this.mouseMidButtonPressed = false;
+    }
+  };
+
+  _onMouseScroll = evt => {
+    if (!this.isFocused) return;
+
+    if (!isMacLike()) {
+      if (evt.deltaY > 0) {
+        this.onZoomOut();
+      } else {
+        this.onZoomIn();
+      }
+    }
   };
 
   _onKeyPress = evt => {};
@@ -167,6 +202,9 @@ export default class KeyboardShortcuts {
     document.addEventListener('keydown', this._onKeyDown, true);
     document.addEventListener('keyup', this._onKeyUp, true);
     document.addEventListener('keypress', this._onKeyPress, true);
+    document.addEventListener('mousedown', this._onMouseDown, true);
+    document.addEventListener('mouseup', this._onMouseUp, true);
+    document.addEventListener('wheel', this._onMouseScroll, true);
   }
 
   unmount() {
@@ -175,5 +213,8 @@ export default class KeyboardShortcuts {
     document.removeEventListener('keydown', this._onKeyDown, true);
     document.removeEventListener('keyup', this._onKeyUp, true);
     document.removeEventListener('keypress', this._onKeyPress, true);
+    document.removeEventListener('mousedown', this._onMouseDown, true);
+    document.removeEventListener('mouseup', this._onMouseUp, true);
+    document.removeEventListener('wheel', this._onMouseScroll, true);
   }
 }

@@ -24,4 +24,7 @@ export default {
   emptyExplanationMessage: {
     textAlign: 'left',
   },
+  fadedButton: {
+    opacity: 0.7,
+  },
 };

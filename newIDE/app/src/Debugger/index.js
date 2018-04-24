@@ -36,7 +36,7 @@ const styles = {
 
 /**
  * Start the debugger server, listen to commands received and issue commands to it.
- * The Debugger user interface is displayed by DebuggerContent.
+ * This is only supported on Electron runtime for now.
  */
 export default class Debugger extends React.Component<Props, State> {
   state = {

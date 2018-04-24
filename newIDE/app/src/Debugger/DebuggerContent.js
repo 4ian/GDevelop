@@ -143,6 +143,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
           ),
         }}
         initialEditorNames={['inspectors', 'selected-inspector']}
+        initialSplitPercentage={32}
       />
     );
   }

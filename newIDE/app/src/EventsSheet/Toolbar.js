@@ -47,12 +47,26 @@ export class Toolbar extends PureComponent {
           />
         )}
         {this.props.showNetworkPreviewButton && (
-          <ToolbarIcon
-            onClick={this.props.onNetworkPreview}
-            src="res/ribbon_default/networkpreview32.png"
-            tooltip={t('Preview the scene on a mobile or tablet connected to your wifi')}
-          />
-        )}
+          <IconMenu
+            iconButtonElement={
+              <ToolbarIcon
+                src="res/ribbon_default/bug32.png"
+                tooltip={t('Advanced preview options (debugger, network preview...)')}
+              />
+            }
+            buildMenuTemplate={() => [
+              {
+                label: 'Network preview (Preview over WiFi/LAN)',
+                click: () => this.props.onNetworkPreview(),
+              },
+              { type: 'separator' },
+              {
+                label: 'Preview with debugger',
+                click: () => this.props.onOpenDebugger(),
+              },
+            ]}
+          />)
+        }
         {this.props.showPreviewButton && <ToolbarSeparator />}
         <ToolbarIcon
           onClick={this.props.onAddStandardEvent}

@@ -105,6 +105,10 @@ export default class EventsSheet extends Component {
         showNetworkPreviewButton={this.props.showNetworkPreviewButton}
         onPreview={() => this.props.onPreview({})}
         onNetworkPreview={() => this.props.onPreview({networkPreview: true})}
+        onOpenDebugger={() => {
+          this.props.onOpenDebugger();
+          this.props.onPreview({});
+        }}
         canUndo={canUndo(this.state.history)}
         canRedo={canRedo(this.state.history)}
         undo={this.undo}

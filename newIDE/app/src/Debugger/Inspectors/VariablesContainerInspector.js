@@ -21,6 +21,8 @@ const styles = {
 };
 
 const transformVariable = variable => {
+  if (!variable) return null;
+
   if (!variable._isStructure) {
     return variable._stringDirty ? variable._value : variable._str;
   } else {
@@ -38,7 +40,7 @@ const transformVariable = variable => {
 };
 
 const transform = variablesContainer => {
-  if (!variablesContainer._variables || !variablesContainer._variables.items)
+  if (!variablesContainer || !variablesContainer._variables || !variablesContainer._variables.items)
     return null;
 
   const content = {};

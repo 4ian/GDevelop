@@ -21,14 +21,17 @@ const styles = {
   },
 };
 
-const transform = runtimeObject => ({
-  'X position': runtimeObject.x,
-  'Y position': runtimeObject.y,
-  Angle: runtimeObject.angle,
-  Layer: runtimeObject.layer,
-  'Z order': runtimeObject.zOrder,
-  'Is hidden?': runtimeObject.hidden,
-});
+const transform = runtimeObject => {
+  if (!runtimeObject) return null;
+  return {
+    'X position': runtimeObject.x,
+    'Y position': runtimeObject.y,
+    Angle: runtimeObject.angle,
+    Layer: runtimeObject.layer,
+    'Z order': runtimeObject.zOrder,
+    'Is hidden?': runtimeObject.hidden,
+  };
+};
 
 const handleEdit = (edit, { onCall, onEdit }: Props) => {
   if (edit.name === 'X position') {
@@ -64,7 +67,7 @@ export default (props: Props) => (
     />
     <p>Instance variables:</p>
     <VariablesContainerInspector
-      variablesContainer={props.runtimeObject._variables}
+      variablesContainer={props.runtimeObject ? props.runtimeObject._variables : null}
       // TODO: onEdit and onCall could benefit from a "forward" utility function
       // (can also be applied in DebuggerContent.js)
       onEdit={(path, newValue) =>

@@ -101,6 +101,13 @@ const buildMainMenuFor = window => {
           window.webContents.send('main-menu-open-start-page');
         },
       },
+      {
+        label: 'Open Debugger',
+        click() {
+          window.webContents.send('main-menu-open-debugger');
+        },
+      },
+      { type: 'separator' },
       { role: 'toggledevtools' },
       { type: 'separator' },
       { role: 'togglefullscreen' },

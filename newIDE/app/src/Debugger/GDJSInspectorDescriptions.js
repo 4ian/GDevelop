@@ -2,6 +2,7 @@
 import * as React from 'react';
 import RuntimeObjectInspector from './Inspectors/RuntimeObjectInspector';
 import VariablesContainerInspector from './Inspectors/VariablesContainerInspector';
+import RuntimeSceneInspector from './Inspectors/RuntimeSceneInspector';
 
 export type GameData = any;
 export type EditFunction = (path: Array<string>, newValue: any) => boolean;
@@ -55,7 +56,13 @@ export const getInspectorDescriptions = (
         return gdjsStack.map((runtimeScene, index) => ({
           label: runtimeScene._name,
           key: index,
-          renderInspector: () => null,
+          renderInspector: (gameData, { onCall, onEdit }) => (
+            <RuntimeSceneInspector
+              runtimeScene={gameData}
+              onCall={onCall}
+              onEdit={onEdit}
+            />
+          ),
           initiallyOpen: true,
           getSubInspectors: runtimeScene => [
             {

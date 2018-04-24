@@ -686,6 +686,7 @@ export default class MainFrame extends React.Component<Props, State> {
               setToolbar={this.setEditorToolbar}
               isActive={isActive}
               ref={editorRef}
+              onChangeSubscription={() => this.openSubscription(true)}
             />
           ),
           key: 'debugger',

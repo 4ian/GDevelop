@@ -48,6 +48,8 @@ export default class Debugger extends React.Component<Props, State> {
   };
 
   updateToolbar() {
+    if (!this.props.isActive) return;
+
     this.props.setToolbar(
       <Toolbar
         onPlay={() => this._play(this.state.selectedId)}

@@ -15,25 +15,25 @@ export default class DebuggerSelector extends React.Component<Props, void> {
   render() {
     const hasDebuggers = !!this.props.debuggerIds.length;
     return (
-        <Column>
-      <SelectField
-        fullWidth
-        value={hasDebuggers ? this.props.selectedId : 0}
-        onChange={(e, i, value) => this.props.onChooseDebugger(value)}
-        disabled={!hasDebuggers}
-      >
-        {this.props.debuggerIds.map(id => (
-          <MenuItem value={id} primaryText={'Game preview #' + id} />
-        ))}
-        {!hasDebuggers && (
-          <MenuItem
-            value={0}
-            primaryText={
-              'Run a preview for a game and it will connect to this debugger'
-            }
-          />
-        )}
-      </SelectField>
+      <Column>
+        <SelectField
+          fullWidth
+          value={hasDebuggers ? this.props.selectedId : 0}
+          onChange={(e, i, value) => this.props.onChooseDebugger(value)}
+          disabled={!hasDebuggers}
+        >
+          {this.props.debuggerIds.map(id => (
+            <MenuItem value={id} primaryText={'Game preview #' + id} />
+          ))}
+          {!hasDebuggers && (
+            <MenuItem
+              value={0}
+              primaryText={
+                'No preview running. Run a preview and you will be able to inspect it with the debugger'
+              }
+            />
+          )}
+        </SelectField>
       </Column>
     );
   }

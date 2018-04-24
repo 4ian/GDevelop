@@ -8,6 +8,7 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import Paper from 'material-ui/Paper';
 import optionalRequire from '../Utils/OptionalRequire';
+import EmptyMessage from '../UI/EmptyMessage';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -51,8 +52,8 @@ export default class Debugger extends React.Component<Props, State> {
       <Toolbar
         onPlay={() => this._play(this.state.selectedId)}
         onPause={() => this._pause(this.state.selectedId)}
-        canPlay={!!this.state.debuggerIds.length/*TODO: factor in function and use in render*/}
-        canPause={!!this.state.debuggerIds.length/*TODO: factor in function and use in render*/}
+        canPlay={this._hasSelectedDebugger()}
+        canPause={this._hasSelectedDebugger()}
       />
     );
   }
@@ -227,6 +228,11 @@ export default class Debugger extends React.Component<Props, State> {
     return true;
   };
 
+  _hasSelectedDebugger = () => {
+    const { selectedId, debuggerIds } = this.state;
+    return debuggerIds.indexOf(selectedId) !== -1;
+  };
+
   render() {
     const {
       debuggerServerError,
@@ -264,7 +270,7 @@ export default class Debugger extends React.Component<Props, State> {
                   selectedId: id,
                 })}
             />
-            {debuggerIds.indexOf(selectedId) !== -1 && (
+            {this._hasSelectedDebugger() && (
               <DebuggerContent
                 gameData={debuggerGameData[selectedId]}
                 onPlay={() => this._play(selectedId)}
@@ -273,6 +279,12 @@ export default class Debugger extends React.Component<Props, State> {
                 onEdit={(path, args) => this._edit(selectedId, path, args)}
                 onCall={(path, args) => this._call(selectedId, path, args)}
               />
+            )}
+            {!this._hasSelectedDebugger() && (
+              <EmptyMessage>
+                Run a preview and you will be able to inspect it with the
+                debugger.
+              </EmptyMessage>
             )}
           </Column>
         )}

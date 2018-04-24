@@ -39,7 +39,7 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
   } else if (edit.name === 'Y position') {
     onCall(['setY'], [parseFloat(edit.new_value)]);
   } else if (edit.name === 'Angle') {
-    onCall(['setAngle'], [edit.new_value]);
+    onCall(['setAngle'], [parseFloat(edit.new_value)]);
   } else if (edit.name === 'Layer') {
     onCall(['setLayer'], [edit.new_value]);
   } else if (edit.name === 'Z order') {
@@ -67,7 +67,9 @@ export default (props: Props) => (
     />
     <p>Instance variables:</p>
     <VariablesContainerInspector
-      variablesContainer={props.runtimeObject ? props.runtimeObject._variables : null}
+      variablesContainer={
+        props.runtimeObject ? props.runtimeObject._variables : null
+      }
       // TODO: onEdit and onCall could benefit from a "forward" utility function
       // (can also be applied in DebuggerContent.js)
       onEdit={(path, newValue) =>

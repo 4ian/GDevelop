@@ -6,12 +6,19 @@ import {
   type EditFunction,
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
+import { Line } from '../../UI/Grid';
 import mapValues from 'lodash/mapValues';
+import AutoComplete from 'material-ui/AutoComplete';
+import RaisedButton from 'material-ui/RaisedButton';
 
 type Props = {|
   runtimeScene: GameData,
   onCall: CallFunction,
   onEdit: EditFunction,
+|};
+
+type State = {|
+  newObjectName: string,
 |};
 
 const styles = {
@@ -89,19 +96,76 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
   return true;
 };
 
-export default (props: Props) => (
-  <div style={styles.container}>
-    <p>Layers:</p>
-    <ReactJsonView
-      collapsed={false}
-      name={false}
-      src={transform(props.runtimeScene)}
-      enableClipboard={false}
-      displayDataTypes={false}
-      displayObjectSize={false}
-      onEdit={edit => handleEdit(edit, props)}
-      groupArraysAfterLength={50}
-      theme="monokai"
-    />
-  </div>
-);
+export default class RuntimeSceneInspector extends React.Component<
+  Props,
+  State
+> {
+  state = {
+    newObjectName: '',
+  };
+
+  render() {
+    const { runtimeScene, onCall } = this.props;
+    if (!runtimeScene) return null;
+
+    return (
+      <div style={styles.container}>
+        <p>Layers:</p>
+        <ReactJsonView
+          collapsed={false}
+          name={false}
+          src={transform(runtimeScene)}
+          enableClipboard={false}
+          displayDataTypes={false}
+          displayObjectSize={false}
+          onEdit={edit => handleEdit(edit, this.props)}
+          groupArraysAfterLength={50}
+          theme="monokai"
+        />
+        <p>Create a new instance on the scene (will be at position 0;0):</p>
+        {runtimeScene._objects &&
+          runtimeScene._objects.items && (
+            <Line noMargin>
+              <AutoComplete
+                hintText="Enter the name of the object"
+                fullWidth
+                menuProps={{
+                  maxHeight: 250,
+                }}
+                searchText={this.state.newObjectName}
+                onUpdateInput={value => {
+                  this.setState({
+                    newObjectName: value,
+                  });
+                }}
+                onNewRequest={data => {
+                  // Note that data may be a string or a {text, value} object.
+                  if (typeof data === 'string') {
+                    this.setState({
+                      newObjectName: data,
+                    });
+                  } else if (typeof data.value === 'string') {
+                    this.setState({
+                      newObjectName: data.value,
+                    });
+                  }
+                }}
+                dataSource={Object.keys(
+                  runtimeScene._objects.items
+                ).map(objectName => ({
+                  text: objectName,
+                  value: objectName,
+                }))}
+                filter={AutoComplete.fuzzyFilter}
+              />
+              <RaisedButton
+                label="Create"
+                onClick={() =>
+                  onCall(['createObject'], [this.state.newObjectName])}
+              />
+            </Line>
+          )}
+      </div>
+    );
+  }
+}

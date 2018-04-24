@@ -212,6 +212,7 @@ export default class Debugger extends React.Component<Props, State> {
       }),
     });
 
+    setTimeout(() => this._refresh(id), 100);
     return true;
   };
 
@@ -227,6 +228,7 @@ export default class Debugger extends React.Component<Props, State> {
       }),
     });
 
+    setTimeout(() => this._refresh(id), 100);
     return true;
   };
 

@@ -23,7 +23,7 @@ export default class DebuggerSelector extends React.Component<Props, void> {
           disabled={!hasDebuggers}
         >
           {this.props.debuggerIds.map(id => (
-            <MenuItem value={id} primaryText={'Game preview #' + id} />
+            <MenuItem value={id} key={id} primaryText={'Game preview #' + id} />
           ))}
           {!hasDebuggers && (
             <MenuItem

@@ -600,6 +600,7 @@ export default class MainFrame extends React.Component<Props, State> {
                 this._previewLauncher &&
                 this._previewLauncher.canDoNetworkPreview()
               }
+              onOpenDebugger={this.openDebugger}
               onEditObject={this.props.onEditObject}
               showObjectsList={!this.props.integratedEditor}
               resourceSources={this.props.resourceSources}

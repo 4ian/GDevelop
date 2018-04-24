@@ -6,6 +6,7 @@ import {
   type EditFunction,
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
+import mapValues from 'lodash/mapValues';
 
 type Props = {|
   variablesContainer: GameData,
@@ -28,14 +29,7 @@ const transformVariable = variable => {
   } else {
     if (!variable._children) return null;
 
-    const content = {};
-    Object.keys(variable._children).forEach(
-      variableName =>
-        (content[variableName] = transformVariable(
-          variable._children[variableName]
-        ))
-    );
-    return content;
+    return mapValues(variable._children, transformVariable);
   }
 };
 
@@ -43,14 +37,7 @@ const transform = variablesContainer => {
   if (!variablesContainer || !variablesContainer._variables || !variablesContainer._variables.items)
     return null;
 
-  const content = {};
-  Object.keys(variablesContainer._variables.items).forEach(
-    variableName =>
-      (content[variableName] = transformVariable(
-        variablesContainer._variables.items[variableName]
-      ))
-  );
-  return content;
+  return mapValues(variablesContainer._variables.items, transformVariable);
 };
 
 const handleEdit = (edit, { onCall, onEdit }: Props) => {

@@ -6,7 +6,7 @@ import {
   type EditFunction,
   type CallFunction,
 } from '../GDJSInspectorDescriptions';
-import { Line } from '../../UI/Grid';
+import mapValues from 'lodash/mapValues';
 
 type Props = {|
   runtimeScene: GameData,
@@ -36,18 +36,14 @@ const transformLayer = layer => {
 const transform = runtimeScene => {
   if (!runtimeScene) return null;
 
-  const layers = {};
-  if (runtimeScene._layers) { //TODO: Factor
-    Object.keys(runtimeScene._layers.items).forEach(layerName =>
-      layers[layerName] = transformLayer(runtimeScene._layers.items[layerName])
-    );
-  }
-
   return {
     'Time scale': runtimeScene._timeManager
       ? runtimeScene._timeManager._timeScale
       : null,
-    Layers: layers,
+    Layers:
+      runtimeScene._layers && runtimeScene._layers.items
+        ? mapValues(runtimeScene._layers.items, transformLayer)
+        : null,
   };
 };
 

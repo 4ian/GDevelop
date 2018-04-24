@@ -84,6 +84,7 @@ export default class ScenePropertiesDialog extends Component {
       return (
         !!propertiesSchema.length && (
           <PropertiesEditor
+            key={name}
             schema={propertiesSchema}
             instances={[sharedData]}
           />

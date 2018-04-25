@@ -17,7 +17,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import Checkbox from 'material-ui/Checkbox';
 import Flash from 'material-ui/svg-icons/image/flash-on';
 import FlashOff from 'material-ui/svg-icons/image/flash-off';
-
+import HelpButton from '../UI/HelpButton';
 type Props = {|
   gameData: ?any,
   onEdit: EditFunction,
@@ -125,7 +125,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
                 </EmptyMessage>
               )}
               <Column>
-                <Line noMargin justifyContent="flex-end" alignItems="center">
+                <Line justifyContent="space-between" alignItems="center">
+                <HelpButton helpPagePath="/interface/debugger" />
                   <div>
                     <Checkbox
                       checkedIcon={<Flash />}

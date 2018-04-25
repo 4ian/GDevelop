@@ -125,7 +125,7 @@ export default class RuntimeSceneInspector extends React.Component<
         <p>Create a new instance on the scene (will be at position 0;0):</p>
         {runtimeScene._objects &&
           runtimeScene._objects.items && (
-            <Line noMargin>
+            <Line noMargin alignItems="baseline">
               <AutoComplete
                 hintText="Enter the name of the object"
                 fullWidth
@@ -160,6 +160,7 @@ export default class RuntimeSceneInspector extends React.Component<
               />
               <RaisedButton
                 label="Create"
+                primary
                 onClick={() =>
                   onCall(['createObject'], [this.state.newObjectName])}
               />

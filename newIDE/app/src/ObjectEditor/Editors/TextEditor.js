@@ -99,6 +99,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 onChange={(e, value) => {
                   textObject.setString(value);
                   this.forceUpdate();
+                  this.props.onSizeUpdated();
                 }}
               />
             </Line>

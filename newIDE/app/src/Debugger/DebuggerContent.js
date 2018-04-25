@@ -126,7 +126,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
               )}
               <Column>
                 <Line justifyContent="space-between" alignItems="center">
-                <HelpButton helpPagePath="/interface/debugger" />
+                  <HelpButton helpPagePath="/interface/debugger" />
                   <div>
                     <Checkbox
                       checkedIcon={<Flash />}

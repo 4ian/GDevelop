@@ -17,6 +17,7 @@ const {
   stopServer,
   getLocalNetworkIps,
 } = require('./ServeFolder');
+const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
 const { buildMainMenuFor } = require('./MainMenu');
 const throttle = require('lodash.throttle');
 
@@ -108,6 +109,7 @@ app.on('ready', function() {
     }
   });
 
+  // S3Upload events:
   ipcMain.on('s3-folder-upload', (event, localDir) => {
     log.info('Received event s3-upload with localDir=', localDir);
 
@@ -136,6 +138,7 @@ app.on('ready', function() {
     );
   });
 
+  // ServeFolder events:
   ipcMain.on('serve-folder', (event, options) => {
     log.info('Received event to server folder with options=', options);
 
@@ -154,6 +157,28 @@ app.on('ready', function() {
 
   ipcMain.on('get-local-network-ips', event => {
     event.sender.send('local-network-ips', getLocalNetworkIps());
+  });
+
+  // DebuggerServer events:
+  ipcMain.on('debugger-start-server', (event, options) => {
+    log.info('Received event to start debugger server with options=', options);
+
+    startDebuggerServer({
+      onMessage: ({ id, message }) =>
+        event.sender.send('debugger-message-received', { id, message }),
+      onError: error => event.sender.send('debugger-error-received', error),
+      onConnectionClose: ({ id }) =>
+        event.sender.send('debugger-connection-closed', { id }),
+      onConnectionOpen: ({ id }) =>
+        event.sender.send('debugger-connection-opened', { id }),
+      onListening: () => event.sender.send('debugger-start-server-done'),
+    });
+  });
+
+  ipcMain.on('debugger-send-message', (event, message) => {
+    sendMessage(message, err =>
+      event.sender.send('debugger-send-message-done', err)
+    );
   });
 
   // This will immediately download an update, then install when the

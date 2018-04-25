@@ -40,12 +40,18 @@ gdjs.RuntimeGame = function(data, spec) {
   //Game loop management (see startGameLoop method)
   this._sceneStack = new gdjs.SceneStack(this);
   this._notifySceneForResize = false; //When set to true, the current scene is notified that canvas size changed.
+  this._paused = false;
 
   //Inputs :
   this._inputManager = new gdjs.InputManager();
 
   //Allow to specify an external layout to insert in the first scene:
   this._injectExternalLayout = spec.injectExternalLayout || '';
+
+  //Optional client to connect to a debugger:
+  this._debuggerClient = gdjs.DebuggerClient
+    ? new gdjs.DebuggerClient(this)
+    : null;
 };
 
 gdjs.RuntimeGame.prototype.getRenderer = function() {
@@ -240,6 +246,16 @@ gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
 };
 
 /**
+ * Set or unset the game as paused.
+ * When paused, the game won't step and will be freezed. Useful for debugging.
+ * @method pause
+ * @param enable {Boolean} true to pause the game, false to unpause
+ */
+gdjs.RuntimeGame.prototype.pause = function(enable) {
+  this._paused = enable;
+}
+
+/**
  * Load all assets, displaying progress in renderer.
  * @method loadAllAssets
  */
@@ -299,6 +315,8 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
   //The standard game loop
   var that = this;
   this._renderer.startGameLoop(function(elapsedTime) {
+    if (that._paused) return true;
+
     //Manage resize events.
     if (that._notifySceneForResize) {
       that._sceneStack.onRendererResized();

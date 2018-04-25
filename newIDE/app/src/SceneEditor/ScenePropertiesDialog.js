@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import RaisedButton from 'material-ui/RaisedButton';
-import Dialog from '../../UI/Dialog';
-import ColorField from '../../UI/ColorField';
-import EmptyMessage from '../../UI/EmptyMessage';
-import PropertiesEditor from '../../PropertiesEditor';
-import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import Dialog from '../UI/Dialog';
+import ColorField from '../UI/ColorField';
+import EmptyMessage from '../UI/EmptyMessage';
+import PropertiesEditor from '../PropertiesEditor';
+import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import some from 'lodash/some';
 
 export default class ScenePropertiesDialog extends Component {
@@ -84,6 +84,7 @@ export default class ScenePropertiesDialog extends Component {
       return (
         !!propertiesSchema.length && (
           <PropertiesEditor
+            key={name}
             schema={propertiesSchema}
             instances={[sharedData]}
           />

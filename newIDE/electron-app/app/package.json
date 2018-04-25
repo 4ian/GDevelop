@@ -21,6 +21,7 @@
     "live-server": "^1.2.0",
     "lodash.throttle": "^4.1.1",
     "minimist": "^1.2.0",
-    "recursive-readdir": "^2.2.1"
+    "recursive-readdir": "^2.2.1",
+    "ws": "^5.1.1"
   }
 }

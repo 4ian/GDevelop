@@ -45,6 +45,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import HelpFinder from '../HelpFinder';
 
 // Editors:
+import DebuggerEditor from './Editors/DebuggerEditor';
 import EventsEditor from './Editors/EventsEditor';
 import ExternalEventsEditor from './Editors/ExternalEventsEditor';
 import SceneEditor from './Editors/SceneEditor';
@@ -502,6 +503,7 @@ export default class MainFrame extends React.Component<Props, State> {
           showNetworkPreviewButton={
             this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
           }
+          onOpenDebugger={this.openDebugger}
           onEditObject={this.props.onEditObject}
           showObjectsList={!this.props.integratedEditor}
           resourceSources={this.props.resourceSources}
@@ -524,6 +526,7 @@ export default class MainFrame extends React.Component<Props, State> {
           showNetworkPreviewButton={
             this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
           }
+          onOpenDebugger={this.openDebugger}
           onOpenExternalEvents={this.openExternalEvents}
           onOpenLayout={name =>
             this.openLayout(name, {
@@ -597,6 +600,7 @@ export default class MainFrame extends React.Component<Props, State> {
                 this._previewLauncher &&
                 this._previewLauncher.canDoNetworkPreview()
               }
+              onOpenDebugger={this.openDebugger}
               onEditObject={this.props.onEditObject}
               showObjectsList={!this.props.integratedEditor}
               resourceSources={this.props.resourceSources}
@@ -666,6 +670,27 @@ export default class MainFrame extends React.Component<Props, State> {
           ),
           key: 'start page',
           closable: false,
+        }),
+      },
+      () => this.updateToolbar()
+    );
+  };
+
+  openDebugger = () => {
+    this.setState(
+      {
+        editorTabs: openEditorTab(this.state.editorTabs, {
+          name: 'Debugger',
+          renderEditor: ({ isActive, editorRef }) => (
+            <DebuggerEditor
+              project={this.state.currentProject}
+              setToolbar={this.setEditorToolbar}
+              isActive={isActive}
+              ref={editorRef}
+              onChangeSubscription={() => this.openSubscription(true)}
+            />
+          ),
+          key: 'debugger',
         }),
       },
       () => this.updateToolbar()

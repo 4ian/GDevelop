@@ -94,7 +94,7 @@ const ThemableVariableRow = ({
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>
-      <IconButton onClick={onAddChild}>
+      <IconButton onClick={onAddChild} style={isStructure ? undefined : styles.fadedButton}>
         <AddCircle />
       </IconButton>
     </TreeTableCell>

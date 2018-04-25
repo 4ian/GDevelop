@@ -76,12 +76,14 @@ import {
   fakeNotAuthenticatedUserProfile,
   fakeAuthenticatedButLoadingUserProfile,
 } from '../fixtures/GDevelopServicesTestData';
+import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import LoginDialog from '../Profile/LoginDialog';
 import UserProfileContext from '../Profile/UserProfileContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
+import DebuggerContent from '../Debugger/DebuggerContent';
 
 const gd = global.gd;
 const {
@@ -287,6 +289,37 @@ storiesOf('LocalFolderPicker', module)
 storiesOf('StartPage', module)
   .addDecorator(muiDecorator)
   .add('default', () => <StartPage />);
+
+storiesOf('DebuggerContent', module)
+  .addDecorator(muiDecorator)
+  .add('with data', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 550, display: 'flex' }}>
+        <DebuggerContent
+          gameData={debuggerGameDataDump}
+          onPause={action('on pause')}
+          onPlay={action('on play')}
+          onRefresh={action('on refresh')}
+          onEdit={() => false}
+          onCall={() => false}
+        />
+      </div>
+    </DragDropContextProvider>
+  ))
+  .add('without data', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 550, display: 'flex' }}>
+        <DebuggerContent
+          gameData={null}
+          onPause={action('on pause')}
+          onPlay={action('on play')}
+          onRefresh={action('on refresh')}
+          onEdit={() => false}
+          onCall={() => false}
+        />
+      </div>
+    </DragDropContextProvider>
+  ));
 
 storiesOf('AboutDialog', module)
   .addDecorator(muiDecorator)

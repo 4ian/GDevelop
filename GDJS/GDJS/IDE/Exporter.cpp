@@ -121,7 +121,7 @@ bool Exporter::ExportWholePixiProject(gd::Project & project, gd::String exportDi
         #endif
 
         //Export engine libraries
-        helper.AddLibsInclude(true, false, includesFiles);
+        helper.AddLibsInclude(true, false, false, includesFiles);
 
         //Export events
         if ( !helper.ExportEventsCode(exportedProject, codeOutputDir, includesFiles) )
@@ -225,8 +225,8 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project & project, bool debugMode, 
     #endif
 
     //Export engine libraries
-    helper.AddLibsInclude(false, true, includesFiles);
-    
+    helper.AddLibsInclude(false, true, false, includesFiles);
+
     //Export events
     if ( !helper.ExportEventsCode(exportedProject, codeOutputDir, includesFiles) )
     {

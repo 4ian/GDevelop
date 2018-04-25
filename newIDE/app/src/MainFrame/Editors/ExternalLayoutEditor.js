@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
-import InstancesFullEditor from '../../SceneEditor/InstancesFullEditor';
+import SceneEditor from '../../SceneEditor';
 import { serializeToJSObject } from '../../Utils/Serializer';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import BaseEditor from './BaseEditor';
@@ -15,7 +15,7 @@ const styles = {
 };
 
 export default class ExternalLayoutEditor extends BaseEditor {
-  editor: ?typeof InstancesFullEditor;
+  editor: ?typeof SceneEditor;
   state = {
     layoutChooserOpen: false,
   };
@@ -89,7 +89,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
     return (
       <div style={styles.container}>
         {layout && (
-          <InstancesFullEditor
+          <SceneEditor
             {...this.props}
             ref={editor => (this.editor = editor)}
             project={project}
@@ -100,6 +100,7 @@ export default class ExternalLayoutEditor extends BaseEditor {
             )}
             onPreview={options =>
               this.props.onPreview(project, layout, externalLayout, options)}
+            onOpenDebugger={this.props.onOpenDebugger}
             onOpenMoreSettings={this.openLayoutChooser}
             isActive={isActive}
           />

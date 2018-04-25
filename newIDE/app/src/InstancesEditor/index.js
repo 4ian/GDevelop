@@ -113,7 +113,7 @@ export default class InstancesEditorContainer extends Component {
     });
     this.pixiContainer.addChild(this.grid.getPixiObject());
 
-    // TODO: This should probably be moved up in the InstancesFullEditor component.
+    // TODO: This should probably be moved up in the SceneEditor component.
     this.keyboardShortcuts = new KeyboardShortcuts({
       onDelete: this.props.onDeleteSelection,
       onMove: this.moveSelection,

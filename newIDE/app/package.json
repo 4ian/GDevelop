@@ -40,6 +40,7 @@
     "react-dom": "^16.2.0",
     "react-error-boundary": "^1.2.0",
     "react-i18next": "6.2.0",
+    "react-json-view": "^1.16.1",
     "react-measure": "1.4.7",
     "react-mosaic-component": "1.0.3",
     "react-sortable-hoc": "0.6.8",

@@ -5,7 +5,7 @@ var fs = require('fs');
 var sourceFile = '../../../Binaries/Output/libGD.js/Release/libGD.js';
 var destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
 
-if (!shell.mkdir(destinationTestDirectory)) {
+if (!shell.mkdir('-p', destinationTestDirectory)) {
   shell.echo('❌ Error while creating node_modules folder for libGD.js');
 }
 

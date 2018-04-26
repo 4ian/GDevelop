@@ -69,6 +69,12 @@ export default class InstancesEditorContainer extends Component {
     this.pixiRenderer.view.addEventListener('blur', e => {
       this.keyboardShortcuts.blur();
     });
+    this.pixiRenderer.view.addEventListener('mouseover', e => {
+      this.keyboardShortcuts.focus();
+    });
+    this.pixiRenderer.view.addEventListener('mouseout', e => {
+      this.keyboardShortcuts.blur();
+    });
 
     this.pixiContainer = new PIXI.Container();
 
@@ -113,7 +119,6 @@ export default class InstancesEditorContainer extends Component {
     });
     this.pixiContainer.addChild(this.grid.getPixiObject());
 
-    // TODO: This should probably be moved up in the SceneEditor component.
     this.keyboardShortcuts = new KeyboardShortcuts({
       onDelete: this.props.onDeleteSelection,
       onMove: this.moveSelection,
@@ -506,12 +511,12 @@ export default class InstancesEditorContainer extends Component {
   pauseSceneRendering = () => {
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     this._renderingPaused = true;
-  }
+  };
 
   restartSceneRendering = () => {
     this._renderingPaused = false;
     this._renderScene();
-  }
+  };
 
   render() {
     if (!this.props.project) return null;

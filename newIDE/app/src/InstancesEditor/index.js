@@ -139,6 +139,7 @@ export default class InstancesEditorContainer extends Component {
     this._mountEditorComponents(this.props);
     this._renderScene();
   }
+  
   /**
    * Force the internal InstancesRenderer to be destroyed and recreated
    * (as well as other components holding references to instances). Call

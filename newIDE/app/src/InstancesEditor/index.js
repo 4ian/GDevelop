@@ -119,7 +119,6 @@ export default class InstancesEditorContainer extends Component {
     });
     this.pixiContainer.addChild(this.grid.getPixiObject());
 
-    // TODO: This should probably be moved up in the InstancesFullEditor component.
     this.keyboardShortcuts = new KeyboardShortcuts({
       onDelete: this.props.onDeleteSelection,
       onMove: this.moveSelection,
@@ -140,7 +139,6 @@ export default class InstancesEditorContainer extends Component {
     this._mountEditorComponents(this.props);
     this._renderScene();
   }
-
   /**
    * Force the internal InstancesRenderer to be destroyed and recreated
    * (as well as other components holding references to instances). Call

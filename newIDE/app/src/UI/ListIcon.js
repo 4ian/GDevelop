@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import IconButton from 'material-ui/IconButton';
 
 /**
  * An icon that can be used as the leftIcon of a material-ui ListItem.
  */
-export default class ListIcon extends Component {
+export default class ListIcon extends PureComponent {
   render() {
     return (
       <IconButton

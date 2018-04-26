@@ -39,6 +39,31 @@ import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 import LocalIntroDialog from './MainFrame/LocalIntroDialog';
 const electron = optionalRequire('electron');
 
+if (process.env.NODE_ENV !== 'production') {
+  const { whyDidYouUpdate } = require('why-did-you-update');
+  whyDidYouUpdate(React, {
+    exclude: [
+      /AutoLockScrolling/,
+      /Overlay/,
+      /FlatButtonLabel/,
+      /FlatButton/,
+      /InkBar/,
+      /Paper/,
+      /TouchRipple/,
+      /FontIcon/,
+      /RaisedButton/,
+      /AppBar/,
+      /ToolbarIcon/,
+      /ToolbarSeparator/,
+      /ToolbarGroup/,
+      /TextField/,
+      /EnhancedButton/,
+      /Dialog/,
+      /IconButton/,
+    ],
+  });
+}
+
 const authentification = new Authentification();
 installAnalyticsEvents(authentification);
 installRaven();
@@ -61,7 +86,7 @@ if (electron) {
         <MainFrame
           resourceSources={localResourceSources}
           authentification={authentification}
-          onReadFromPathOrURL={() => Promise.reject("Should never be called")}
+          onReadFromPathOrURL={() => Promise.reject('Should never be called')}
         />
       </ExternalEditor>
     );

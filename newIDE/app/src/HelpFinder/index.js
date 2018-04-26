@@ -19,7 +19,7 @@ type State = {|
   searchText: string,
 |};
 
-export default class HelpFinder extends React.Component<Props, State> {
+export default class HelpFinder extends React.PureComponent<Props, State> {
   state = {
     searchText: '',
   };

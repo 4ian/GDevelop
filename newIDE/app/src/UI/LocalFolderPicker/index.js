@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import TextField from 'material-ui/TextField';
 import FlatButton from 'material-ui/FlatButton';
 import optionalRequire from '../../Utils/OptionalRequire.js';
@@ -21,7 +21,7 @@ const styles = {
   },
 };
 
-export default class LocalFolderPicker extends Component<*, *> {
+export default class LocalFolderPicker extends PureComponent<*, *> {
   onChooseFolder = () => {
     if (!dialog || !electron) return;
 

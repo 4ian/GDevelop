@@ -1,15 +1,11 @@
-import React, { Component } from 'react';
+import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
-export default class ConfirmCloseDialog extends Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      open: false,
-    };
-  }
+export default class ConfirmCloseDialog extends React.PureComponent {
+  state = {
+    open: false,
+  };
 
   show(onHandleAnswer) {
     this.onHandleAnswer = onHandleAnswer;

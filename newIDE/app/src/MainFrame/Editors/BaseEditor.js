@@ -17,6 +17,16 @@ export default class BaseEditor extends React.Component<*,*> {
     return null;
   }
 
+  shouldComponentUpdate(nextProps: *) {
+    // Prevent any update to the editor if the editor is not active,
+    // and so not visible to the user
+    if (!nextProps.isActive) {
+      return false;
+    }
+
+    return true;
+  }
+
   updateToolbar() {
     console.warn('No toolbar defined for this editor');
 

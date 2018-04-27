@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import { Column, Line } from '../UI/Grid';
@@ -44,7 +44,7 @@ const getUpdateString = (status: string) => {
   return '';
 };
 
-export default class AboutDialog extends Component<Props, *> {
+export default class AboutDialog extends PureComponent<Props, *> {
   gdVersionString = '';
   appVersionString = '';
 

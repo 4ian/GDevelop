@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { translate, type TranslatorProps } from 'react-i18next';
 import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
@@ -28,7 +28,7 @@ type State = {
   editorToolbar: any,
 };
 
-export class MainFrameToolbar extends Component<Props, State> {
+export class MainFrameToolbar extends PureComponent<Props, State> {
   state = {
     editorToolbar: null,
   };

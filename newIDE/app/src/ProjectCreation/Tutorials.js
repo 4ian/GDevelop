@@ -1,11 +1,11 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import { Column, Line } from '../UI/Grid';
 import { sendTutorialOpened } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
 
-export default class Tutorials extends Component {
+export default class Tutorials extends PureComponent {
   render() {
     return (
       <Column noMargin>

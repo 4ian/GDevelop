@@ -1,7 +1,7 @@
-import { Component } from 'react';
+import { PureComponent } from 'react';
 import Window from '../Utils/Window';
 
-export default class ProjectTitlebar extends Component {
+export default class ProjectTitlebar extends PureComponent {
   render() {
     const { project } = this.props;
     const titleElements = ['GDevelop 5'];

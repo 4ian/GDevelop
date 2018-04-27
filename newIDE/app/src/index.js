@@ -37,6 +37,12 @@ import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 import LocalIntroDialog from './MainFrame/LocalIntroDialog';
+
+// Uncomment to enable logs in console when a component is potentially doing
+// an unnecessary update
+// import { profileUnnecessaryUpdates } from './Utils/DevTools/UpdatesProfiler';
+// profileUnnecessaryUpdates();
+
 const electron = optionalRequire('electron');
 
 const authentification = new Authentification();
@@ -61,7 +67,7 @@ if (electron) {
         <MainFrame
           resourceSources={localResourceSources}
           authentification={authentification}
-          onReadFromPathOrURL={() => Promise.reject("Should never be called")}
+          onReadFromPathOrURL={() => Promise.reject('Should never be called')}
         />
       </ExternalEditor>
     );

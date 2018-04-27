@@ -37,37 +37,13 @@ import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 import LocalIntroDialog from './MainFrame/LocalIntroDialog';
-const electron = optionalRequire('electron');
 
-if (process.env.NODE_ENV !== 'production') {
-  const { whyDidYouUpdate } = require('why-did-you-update');
-  whyDidYouUpdate(React, {
-    exclude: [
-      /AutoLockScrolling/,
-      /Overlay/,
-      /FlatButtonLabel/,
-      /FlatButton/,
-      /InkBar/,
-      /Paper/,
-      /TouchRipple/,
-      /FontIcon/,
-      /RaisedButton/,
-      /AppBar/,
-      /ToolbarIcon/,
-      /ToolbarSeparator/,
-      /ToolbarGroup/,
-      /TextField/,
-      /EnhancedButton/,
-      /Dialog/,
-      /IconButton/,
-      /EnhancedTextarea/,
-      /Checkbox/,
-      /ToggleCheckBox/,
-      /ToggleCheckBoxOutlineBlank/,
-      /ScaleIn/,
-    ],
-  });
-}
+// Uncomment to enable logs in console when a component is potentially doing
+// an unnecessary update
+// import { profileUnnecessaryUpdates } from './Utils/DevTools/UpdatesProfiler';
+// profileUnnecessaryUpdates();
+
+const electron = optionalRequire('electron');
 
 const authentification = new Authentification();
 installAnalyticsEvents(authentification);

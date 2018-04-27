@@ -60,6 +60,11 @@ if (process.env.NODE_ENV !== 'production') {
       /EnhancedButton/,
       /Dialog/,
       /IconButton/,
+      /EnhancedTextarea/,
+      /Checkbox/,
+      /ToggleCheckBox/,
+      /ToggleCheckBoxOutlineBlank/,
+      /ScaleIn/,
     ],
   });
 }

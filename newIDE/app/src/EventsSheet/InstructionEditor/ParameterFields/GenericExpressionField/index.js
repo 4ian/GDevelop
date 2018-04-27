@@ -199,6 +199,7 @@ export default class ExpressionField extends Component<*, State> {
             ref={field => (this._field = field)}
             onFocus={this._handleFocus}
             errorText={this.state.errorText}
+            multiLine
             fullWidth
           />
           {this._fieldElement && (

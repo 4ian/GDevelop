@@ -29,12 +29,14 @@ export default props => {
           height: loaderSize,
         }}
       >
-        <RefreshIndicator
-          size={loaderSize}
-          left={0}
-          top={0}
-          status={'loading'}
-        />
+        {props.show /* Don't render RefreshIndicator to avoid it to use a timeout that would wake regularly the CPU  */ && (
+          <RefreshIndicator
+            size={loaderSize}
+            left={0}
+            top={0}
+            status={'loading'}
+          />
+        )}
       </div>
     </div>
   );

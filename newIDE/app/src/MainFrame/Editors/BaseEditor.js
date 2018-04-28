@@ -19,7 +19,9 @@ export default class BaseEditor extends React.Component<*,*> {
 
   shouldComponentUpdate(nextProps: *) {
     // Prevent any update to the editor if the editor is not active,
-    // and so not visible to the user
+    // and so not visible to the user. For editors that do special work when isActive
+    // is set to false (for example to disable PIXI rendering), shouldComponentUpdate
+    // should be overriden with a proper implementation.
     if (!nextProps.isActive) {
       return false;
     }

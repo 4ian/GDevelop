@@ -12,6 +12,11 @@ const isDev = Window.isDev();
 let client = null;
 
 export const installAnalyticsEvents = (authentification: Authentification) => {
+  if (isDev) {
+    console.info("Development build - Analytics disabled");
+    return;
+  }
+
   const sessionCookie = Keen.utils.cookie('visitor-stats');
   const sessionTimer = Keen.utils.timer();
   sessionTimer.start();

@@ -16,6 +16,7 @@ import DropHandler from './DropHandler';
 import BackgroundColor from './BackgroundColor';
 import PIXI from 'pixi.js';
 import FpsLimiter from './FpsLimiter';
+import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 
 export default class InstancesEditorContainer extends Component {
   constructor() {
@@ -245,6 +246,7 @@ export default class InstancesEditorContainer extends Component {
     this.selectionRectangle.delete();
     this.instancesRenderer.delete();
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
+    stopPIXITicker();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -511,11 +513,15 @@ export default class InstancesEditorContainer extends Component {
   pauseSceneRendering = () => {
     if (this.nextFrame) cancelAnimationFrame(this.nextFrame);
     this._renderingPaused = true;
+
+    stopPIXITicker();
   };
 
   restartSceneRendering = () => {
     this._renderingPaused = false;
     this._renderScene();
+
+    startPIXITicker();
   };
 
   render() {

@@ -20,6 +20,18 @@ export default class ExternalLayoutEditor extends BaseEditor {
     layoutChooserOpen: false,
   };
 
+  shouldComponentUpdate(nextProps) {
+    // This optimization is a bit more cautious than the one is BaseEditor, to still allow
+    // children, and in particular SceneEditor and InstancesEditor, to be notified when isActive
+    // goes from true to false (in which case PIXI rendering is halted). If isActive was false
+    // and remains false, it's safe to stop update here (PIXI rendering is already halted).
+    if (!this.props.isActive && !nextProps.isActive) {
+      return false;
+    }
+
+    return true;
+  }
+
   updateToolbar() {
     if (this.editor) this.editor.updateToolbar();
   }

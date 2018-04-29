@@ -3,8 +3,10 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
 import Add from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
+import Brush from 'material-ui/svg-icons/image/brush';
 import DirectionTools from './DirectionTools';
 import MiniToolbar from '../../../UI/MiniToolbar';
+// import Piskel from '../../../External/Piskel';
 import ImageThumbnail, {
   thumbnailContainerStyle,
 } from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
@@ -31,11 +33,14 @@ const styles = {
   },
 };
 
-const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
+const AddSpriteButton = SortableElement(({ displayHint, onAdd, onEdit }) => {
   return (
     <div style={styles.addSpriteButton}>
       <IconButton onClick={onAdd} style={styles.spriteThumbnailImage}>
         <Add />
+      </IconButton>
+      <IconButton onClick={onEdit} style={styles.spriteThumbnailImage}>
+        <Brush />
       </IconButton>
     </div>
   );
@@ -64,6 +69,7 @@ const SortableList = SortableContainer(
     project,
     resourcesLoader,
     onAddSprite,
+    onEditSprites,
     selectedSprites,
     onSelectSprite,
     onSpriteContextMenu,
@@ -93,6 +99,7 @@ const SortableList = SortableContainer(
             disabled
             index={spritesCount}
             onAdd={onAddSprite}
+            onEdit={onEditSprites}
           />,
         ]}
       </div>
@@ -131,6 +138,11 @@ export default class SpritesList extends Component {
     });
   };
 
+  onEditSprites =() => {
+    console.log("Try to open Piskel!")
+    window.open('../../../External/Piskel/index.html','_blank') //fails to load it
+  };
+
   render() {
     return (
       <div>
@@ -147,6 +159,7 @@ export default class SpritesList extends Component {
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddSprite={this.onAddSprite}
+          onEditSprites={this.onEditSprites}
           selectedSprites={this.props.selectedSprites}
           onSelectSprite={this.props.onSelectSprite}
           onSpriteContextMenu={this.props.onSpriteContextMenu}

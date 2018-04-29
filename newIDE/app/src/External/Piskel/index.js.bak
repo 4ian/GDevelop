@@ -1,0 +1,25 @@
+import React, { Component } from 'react';
+// import ReactDOM from 'react-dom';
+/// bellow breaks
+// const Piskel = React.createClass({
+//     iframe: function () {
+//       return {
+//         __html: this.props.iframe
+//       }
+//     },
+  
+//     render: function() {
+//       return (
+//         <div>
+//           <div dangerouslySetInnerHTML={ this.iframe() } />
+//         </div>
+//       );
+//     }
+//   });
+  
+//   const iframe = '<iframe src=".index.html" width="540" height="450"></iframe>'; 
+  
+//   ReactDOM.render(
+//     <Piskel iframe={iframe} />,
+//     document.getElementById('container')
+//   );

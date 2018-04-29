@@ -139,8 +139,8 @@ export default class SpritesList extends Component {
   };
 
   onEditSprites =() => {
-    console.log("Try to open Piskel!")
-    window.open('../../../External/Piskel/index.html','_blank') //fails to load it
+    console.log("Trying to open Piskel!")
+    window.open('External/Piskel/index.html') //fails to load it
   };
 
   render() {

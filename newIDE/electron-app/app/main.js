@@ -56,6 +56,7 @@ app.on('ready', function() {
     x: args.x,
     y: args.y,
     webPreferences: {
+      //nativeWindowOpen: true,
       webSecurity: false, // Allow to access to local files
     },
     enableLargerThanScreen: true,

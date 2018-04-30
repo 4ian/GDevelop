@@ -30,10 +30,5 @@
     }
   };
 
-
-  var testCall = function (myVar){
-    console.log(myVar)
-  };
-
   init();
 })();

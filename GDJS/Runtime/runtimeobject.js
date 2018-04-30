@@ -981,8 +981,8 @@ gdjs.RuntimeObject.prototype.getDistanceToObject = function(otherObject) {
 gdjs.RuntimeObject.prototype.getSqDistanceToObject = function(otherObject) {
     if ( otherObject === null ) return 0;
 
-    var x = this.getX()+this.getCenterX() - (otherObject.getX()+otherObject.getCenterX());
-    var y = this.getY()+this.getCenterY() - (otherObject.getY()+otherObject.getCenterY());
+    var x = this.getDrawableX()+this.getCenterX() - (otherObject.getDrawableX()+otherObject.getCenterX());
+    var y = this.getDrawableY()+this.getCenterY() - (otherObject.getDrawableY()+otherObject.getCenterY());
 
     return x*x+y*y;
 };
@@ -994,8 +994,8 @@ gdjs.RuntimeObject.prototype.getSqDistanceToObject = function(otherObject) {
  * @param pointY {Number} Y position
  */
 gdjs.RuntimeObject.prototype.getSqDistanceTo = function(pointX, pointY) {
-    var x = this.getX()+this.getCenterX() - pointX;
-    var y = this.getY()+this.getCenterY() - pointY;
+    var x = this.getDrawableX()+this.getCenterX() - pointX;
+    var y = this.getDrawableY()+this.getCenterY() - pointY;
 
     return x*x+y*y;
 };

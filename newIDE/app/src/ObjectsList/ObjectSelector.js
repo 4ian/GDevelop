@@ -10,6 +10,10 @@ const styles = {
   },
 };
 
+const popoverProps = {
+  canAutoPosition: true,
+};
+
 export default class ObjectSelector extends Component {
   state = {
     focused: false,
@@ -112,6 +116,7 @@ export default class ObjectSelector extends Component {
         dataSource={this.fullList}
         filter={fuzzyOrEmptyFilter}
         ref={field => (this._field = field)}
+        popoverProps={popoverProps}
         {...rest}
       />
     );

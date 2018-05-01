@@ -4,7 +4,22 @@
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-    <iframe class="editor-frame" src="editor/index.html"></iframe>
+   <span id="label">Hello This Label Will be updated </span>
+  <script>
+  const electron = require('electron');
+  // const { ipcRenderer } = require('electron');
+  const ipcRenderer = electron.ipcRenderer ;
+
+    ipcRenderer.on('piskelOpenAnimation',(event,imageFrames) => {
+      let label = document.getElementById("label");
+      label.innerHTML = 'errrrrrrrr';
+      log.info("I GOT EM");
+      log.info(imageFrames);
+      alert("HALELUJAH");
+    });
+  </script>
+  <iframe class="editor-frame" src="editor/index.html"></iframe>
   <script type="text/javascript" src="script.js"></script>
+  
 </body>
 </html>

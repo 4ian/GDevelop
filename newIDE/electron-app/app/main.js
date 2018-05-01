@@ -32,6 +32,7 @@ log.info('GDevelop Electron app starting...');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
+let piskelWindow = null;
 
 const args = parseArgs(process.argv.slice(2));
 const isIntegrated = args.mode === 'integrated';
@@ -63,6 +64,18 @@ app.on('ready', function() {
     backgroundColor: '#f0f0f0',
   };
 
+  const piskelOptions ={
+    width: 800,
+    height: 600,  
+    show:false, 
+    parent: mainWindow,
+    modal: true,
+    webPreferences: {
+      webSecurity: false,
+      // nativeWindowOpen: true
+    }
+  };
+
   if (isIntegrated) {
     options.acceptFirstMouse = true;
     options.skipTaskbar = true;
@@ -76,6 +89,7 @@ app.on('ready', function() {
   }
 
   mainWindow = new BrowserWindow(options);
+  piskelWindow = new BrowserWindow(piskelOptions);
   if (!isIntegrated) mainWindow.maximize();
 
   //Expose program arguments
@@ -84,8 +98,11 @@ app.on('ready', function() {
   // Load the index.html of the app.
   if (isDev) {
     // Development (server hosted by npm run start)
-    mainWindow.loadURL('http://localhost:3000');
+    mainWindow.loadURL('http://localhost:3000'); 
     mainWindow.openDevTools();
+    piskelWindow.loadURL('http://localhost:3000/External/Piskel/index.html');
+    piskelWindow.openDevTools();
+
   } else {
     // Production (with npm run build)
     mainWindow.loadURL('file://' + __dirname + '/www/index.html');
@@ -99,15 +116,41 @@ app.on('ready', function() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
+    piskelWindow = null;
     stopServer(() => {});
   });
 
+  piskelWindow.on('close', (event) => {
+    event.preventDefault();
+    piskelWindow.hide()
+  });
+
+  piskelWindow.webContents.on('did-finish-load',() => {
+    // piskelWindow.show();
+
+  });
+  piskelWindow.webContents.on('dom-ready',() => {
+    piskelWindow.setMenu(null);
+    // piskelWindow.webContents.insertCSS('html,body{ overflow: hidden; }');
+  });
+
+  piskelWindow.webContents.on('new-window', function(event, urlToOpen) {
+    event.defaultPrevented = true;
+  });
   //Prevent any navigation inside the main window.
   mainWindow.webContents.on('will-navigate', (e, url) => {
     if (url !== mainWindow.webContents.getURL()) {
       e.preventDefault();
       electron.shell.openExternal(url);
     }
+  });
+
+  ipcMain.on('piskelOpenAnimation', (event, imageFrames) => {
+    log.info("RECEIVED FILES");
+    piskelWindow.show();
+    
+    // console.log(event);
+    console.log(imageFrames);
   });
 
   // S3Upload events:

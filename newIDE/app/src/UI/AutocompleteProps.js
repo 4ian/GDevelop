@@ -1,4 +1,5 @@
 // @flow
+import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 
 /**
  * Provides props for material-ui AutoComplete components that specify
@@ -10,10 +11,11 @@ export const defaultAutocompleteProps = {
     minWidth: 300,
   },
   menuProps: {
-    maxHeight: 250, //TODO: try put it in PopoverProps
+    maxHeight: 250,
   },
   popoverProps: {
     // Ensure that the Popover menu is always visible on screen
     canAutoPosition: true,
   },
+  filter: fuzzyOrEmptyFilter,
 };

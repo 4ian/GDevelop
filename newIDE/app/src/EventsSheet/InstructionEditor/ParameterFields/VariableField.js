@@ -16,10 +16,6 @@ const styles = {
   },
 };
 
-const fuzzyFilterOrEmpty = (searchText, key) => {
-  return !key || AutoComplete.fuzzyFilter(searchText, key);
-};
-
 type Props = ParameterFieldProps & {
   variablesContainer: ?gdVariablesContainer,
   onOpenDialog: () => void,
@@ -104,7 +100,6 @@ export default class VariableField extends Component<Props, State> {
             text: variableName,
             value: variableName,
           }))}
-          filter={fuzzyFilterOrEmpty}
           openOnFocus={!this.props.isInline}
           ref={field => (this._field = field)}
         />

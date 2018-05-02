@@ -4,10 +4,6 @@ import AutoComplete from 'material-ui/AutoComplete';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
 
-const fuzzyFilterOrEmpty = (searchText, key) => {
-  return !key || AutoComplete.fuzzyFilter(searchText, key);
-};
-
 type State = {|
   focused: boolean,
   text: ?string,
@@ -160,7 +156,6 @@ export default class KeyField extends Component<ParameterFieldProps, State> {
           text: keyName,
           value: keyName,
         }))}
-        filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}
         ref={field => (this._field = field)}
       />

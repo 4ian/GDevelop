@@ -4,7 +4,6 @@ import AutoComplete from 'material-ui/AutoComplete';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
 import Add from 'material-ui/svg-icons/content/add';
-import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -155,7 +154,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
       <AutoComplete
         {...defaultAutocompleteProps}
         floatingLabelText={this.props.floatingLabelText || 'Select an image'}
-        filter={fuzzyOrEmptyFilter}
         openOnFocus
         dataSource={this.autoCompleteData || []}
         onUpdateInput={this._onUpdate}

@@ -9,10 +9,6 @@ import {
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
 
-const fuzzyFilterOrEmpty = (searchText, key) => {
-  return !key || AutoComplete.fuzzyFilter(searchText, key);
-};
-
 type State = {|
   focused: boolean,
   text: ?string,
@@ -106,7 +102,6 @@ export default class ExternalEventsField extends Component<
           }
         }}
         dataSource={this._fullList}
-        filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}
         ref={field => (this._field = field)}
       />

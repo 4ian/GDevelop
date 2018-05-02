@@ -154,7 +154,6 @@ export default class RuntimeSceneInspector extends React.Component<
                   text: objectName,
                   value: objectName,
                 }))}
-                filter={AutoComplete.fuzzyFilter}
               />
               <RaisedButton
                 label="Create"

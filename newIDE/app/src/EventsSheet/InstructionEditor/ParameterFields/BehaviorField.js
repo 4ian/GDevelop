@@ -3,10 +3,6 @@ import AutoComplete from 'material-ui/AutoComplete';
 import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
 const gd = global.gd;
 
-const fuzzyFilterOrEmpty = (searchText, key) => {
-  return !key || AutoComplete.fuzzyFilter(searchText, key);
-};
-
 export default class BehaviorField extends Component {
   state = { errorText: null, focused: false, text: null };
 
@@ -139,7 +135,6 @@ export default class BehaviorField extends Component {
           text: behaviorName,
           value: behaviorName,
         }))}
-        filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}
         disabled={this._behaviorNames.length <= 1}
         ref={field => (this._field = field)}

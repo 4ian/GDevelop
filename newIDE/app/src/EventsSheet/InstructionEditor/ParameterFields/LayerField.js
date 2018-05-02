@@ -5,10 +5,6 @@ import { mapFor } from '../../../Utils/MapFor';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
 
-const fuzzyFilterOrEmpty = (searchText, key) => {
-  return !key || AutoComplete.fuzzyFilter(searchText, key);
-};
-
 type State = {|
   focused: boolean,
   text: ?string,
@@ -92,7 +88,6 @@ export default class LayerField extends Component<ParameterFieldProps, State> {
           text: layerName || '(Base layer)',
           value: `"${layerName}"`,
         }))}
-        filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}
         ref={field => (this._field = field)}
       />

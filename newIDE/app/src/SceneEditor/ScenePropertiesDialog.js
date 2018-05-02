@@ -36,7 +36,7 @@ type State = {|
 export default class ScenePropertiesDialog extends Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { ...this._loadFrom(props.layout) };
+    this.state = this._loadFrom(props.layout);
   }
 
   _loadFrom(layout: gdLayout): State {

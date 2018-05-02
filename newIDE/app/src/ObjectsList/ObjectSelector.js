@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
-import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 import { defaultAutocompleteProps } from '../UI/AutocompleteProps';
 
 export default class ObjectSelector extends Component {
@@ -101,7 +100,6 @@ export default class ObjectSelector extends Component {
           }
         }}
         dataSource={this.fullList}
-        filter={fuzzyOrEmptyFilter}
         ref={field => (this._field = field)}
         {...rest}
       />

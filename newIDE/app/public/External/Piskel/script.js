@@ -5,13 +5,13 @@
 
 
 (function () {
-const electron = require('electron');
-const ipcRenderer = electron ? electron.ipcRenderer : null;
+// const electron = require('electron');
+// const ipcRenderer = electron ? electron.ipcRenderer : null;
 
-  ipcRenderer.on('piskelOpenAnimation',(event,imageFrames) => {
-    log.info("I GOT EM");
-    log.info(imageFrames);
-  });
+//   ipcRenderer.on('piskelOpenAnimation',(event,imageFrames) => {
+//     log.info("I GOT EM");
+//     log.info(imageFrames);
+//   });
 
   // var sprites = {
   //   megaman : {"modelVersion":2,"piskel":{"name":"Megaman moving","description":"","fps":2,"height":28,"width":31,"layers":["{\"name\":\"Layer 1\",\"frameCount\":3,\"base64PNG\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAF0AAAAcCAYAAAADdbMKAAACi0lEQVRoQ+2Yu3HDMAyG6SoaI2XmSJE5MoY7253HyBwpMkdKj8FUzvEBCgTfEgn5EqnyWRR+8gMIAjyI/WEncGBX3AXFGuh3xG+NnSVu2Eq7i+4SWE748mV+nl61mSW2WoFvpd1VtxXUXRzlDOo6CUbwW2l3122B7osD+utEo7XFZm2kb6U9RLcFUHICLto/f4QwTmixWwN+K+0hurVw7grsSUGNPRDtKvX0h76V9jDdEnTvAAHo8v0sxPPZ4Z/sT3kWYpq6RXpaGzl++jDiak7Ty7XHLhu+5hR0LYwPSYh0DNwCFvL7qBcspewBPa+dSUYrobOtOQZdbyv66LLwKHVEQZRXQqfGcrurqG3BuumBwxM9Q612UbfnmikAfXBc3p7y0NVblF7EzTri5rb4/D0pMTMNVb12ItqpQ2h5m3QM85qj0GFyCr6KcK8Wt9Geizg6HjsR7EUaKq9SYNRm181C15WIrUgwSLWl6aOcQNMSpCRvLLJJSsugCWHSZteN5nS3LQGQohZ2nx7L3DngBvqN1CNpz+AZ1pyuXnAuJtBjKdWmC/pK2a89zODbsCFBDh+ozaabrSRwxMciGQAMuPDyIo9Rm0W3rjmyUZ+savq3/cqfZofwaw/XLUE3i6epBu/x/m0/tr6V9lDdEvTs/QOUdQMuuLSzc/c9A7WH61Z3h/Syi9bencF7HSKjNotutnqhORwqFHywOSD90ky0M2XQZtMNmyN0eKmfAJ5UKNHyamW0ewfYX9YG6MGCgy7Sr1DCLm7+oHRO0FL732mb5qWtOmkdn7ie0n+32mod/5DasY4xNlEcveG9b/hFbbS32modn4eee2veDVl3LZzy9PYR1QR26NWo+g38BXXvWDvG9IC5AAAAAElFTkSuQmCC\"}"]}},

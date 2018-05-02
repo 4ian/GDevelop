@@ -72,7 +72,6 @@ app.on('ready', function() {
     modal: true,
     webPreferences: {
       webSecurity: false,
-      // nativeWindowOpen: true
     }
   };
 
@@ -125,18 +124,24 @@ app.on('ready', function() {
     piskelWindow.hide()
   });
 
-  piskelWindow.webContents.on('did-finish-load',() => {
-    // piskelWindow.show();
+  // piskelWindow.webContents.on('did-finish-load',() => {
+  //   piskelWindow.show();
+  // });
 
-  });
   piskelWindow.webContents.on('dom-ready',() => {
     piskelWindow.setMenu(null);
     // piskelWindow.webContents.insertCSS('html,body{ overflow: hidden; }');
   });
 
-  piskelWindow.webContents.on('new-window', function(event, urlToOpen) {
-    event.defaultPrevented = true;
-  });
+  // piskelWindow.webContents.on('will-navigate', (e, url) => {
+  //   log.info('Piskel is navigating to');
+  //   log.info(url);
+  // });
+
+  // piskelWindow.webContents.on('new-window', function(event, urlToOpen) {
+  //   event.defaultPrevented = true;
+  // });
+
   //Prevent any navigation inside the main window.
   mainWindow.webContents.on('will-navigate', (e, url) => {
     if (url !== mainWindow.webContents.getURL()) {
@@ -146,11 +151,12 @@ app.on('ready', function() {
   });
 
   ipcMain.on('piskelOpenAnimation', (event, imageFrames) => {
-    log.info("RECEIVED FILES");
+    log.info("Piskel RECEIVED FILES");
     piskelWindow.show();
-    
-    // console.log(event);
-    console.log(imageFrames);
+    log.info(imageFrames);
+    // let contents = piskelWindow.webContents
+    // console.log(contents)
+    piskelWindow.webContents.send('piskelAnimation' , imageFrames);
   });
 
   // S3Upload events:

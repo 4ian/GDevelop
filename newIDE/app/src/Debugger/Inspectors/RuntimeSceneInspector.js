@@ -10,6 +10,7 @@ import { Line } from '../../UI/Grid';
 import mapValues from 'lodash/mapValues';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
+import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
 
 type Props = {|
   runtimeScene: GameData,
@@ -127,11 +128,8 @@ export default class RuntimeSceneInspector extends React.Component<
           runtimeScene._objects.items && (
             <Line noMargin alignItems="baseline">
               <AutoComplete
+                {...defaultAutocompleteProps}
                 hintText="Enter the name of the object"
-                fullWidth
-                menuProps={{
-                  maxHeight: 250,
-                }}
                 searchText={this.state.newObjectName}
                 onUpdateInput={value => {
                   this.setState({

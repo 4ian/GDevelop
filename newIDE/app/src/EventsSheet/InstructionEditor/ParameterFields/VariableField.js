@@ -4,6 +4,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
 
 const styles = {
   container: {
@@ -12,9 +13,6 @@ const styles = {
   },
   moreButton: {
     marginLeft: 10,
-  },
-  autoCompleteTextField: {
-    minWidth: 300,
   },
 };
 
@@ -72,12 +70,8 @@ export default class VariableField extends Component<Props, State> {
     return (
       <div style={styles.container}>
         <AutoComplete
+          {...defaultAutocompleteProps}
           floatingLabelText={this._description}
-          fullWidth
-          textFieldStyle={styles.autoCompleteTextField}
-          menuProps={{
-            maxHeight: 250,
-          }}
           searchText={this.state.focused ? this.state.text : this.props.value}
           onFocus={() => {
             this.setState({

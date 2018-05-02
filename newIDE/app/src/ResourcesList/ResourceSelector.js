@@ -10,6 +10,7 @@ import {
   type ChooseResourceFunction,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
+import { defaultAutocompleteProps } from '../UI/AutocompleteProps';
 
 type Props = {|
   project: gdProject,
@@ -152,6 +153,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
 
     return (
       <AutoComplete
+        {...defaultAutocompleteProps}
         floatingLabelText={this.props.floatingLabelText || 'Select an image'}
         filter={fuzzyOrEmptyFilter}
         openOnFocus
@@ -162,9 +164,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
         searchText={this.state.resourceName}
         fullWidth={this.props.fullWidth}
         style={styles.autoComplete}
-        menuProps={{
-          maxHeight: 250,
-        }}
       />
     );
   }

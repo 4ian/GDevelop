@@ -3,16 +3,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
 import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
-
-const styles = {
-  autoCompleteTextField: {
-    minWidth: 300,
-  },
-};
-
-const popoverProps = {
-  canAutoPosition: true,
-};
+import { defaultAutocompleteProps } from '../UI/AutocompleteProps';
 
 export default class ObjectSelector extends Component {
   state = {
@@ -79,11 +70,7 @@ export default class ObjectSelector extends Component {
 
     return (
       <AutoComplete
-        fullWidth
-        textFieldStyle={styles.autoCompleteTextField}
-        menuProps={{
-          maxHeight: 250,
-        }}
+        {...defaultAutocompleteProps}
         searchText={this.state.focused ? this.state.text : value}
         onFocus={() => {
           this.setState({
@@ -116,7 +103,6 @@ export default class ObjectSelector extends Component {
         dataSource={this.fullList}
         filter={fuzzyOrEmptyFilter}
         ref={field => (this._field = field)}
-        popoverProps={popoverProps}
         {...rest}
       />
     );

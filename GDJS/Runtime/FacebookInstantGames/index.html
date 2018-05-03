@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8"/>
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <meta name="theme-color" content="#000000" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background-color: #000000;
+            overflow: hidden;
+		}
+        #canvasArea {
+            margin-left: auto;
+            margin-right: auto;
+            overflow: hidden;
+        }
+
+        /* GDJS_CUSTOM_STYLE */
+    </style>
+    
+    <!-- Facebook Instant Games SDK (see https://developers.facebook.com/docs/games/instant-games/getting-started/quickstart) -->
+    <script src="https://connect.facebook.net/en_US/fbinstant.6.0.js"></script>
+
+    <!-- Libs and GDJS core files : -->
+	<!-- GDJS_CODE_FILES -->
+
+</head>
+<body>
+    <div id="canvasArea"></div>
+
+    <!-- GDJS_CUSTOM_HTML -->
+	<script>
+
+    (function() {
+        //Initialization
+        gdjs.registerObjects();
+        gdjs.registerBehaviors();
+        gdjs.registerGlobalCallbacks();
+
+        var game = new gdjs.RuntimeGame(gdjs.projectData, {}/*GDJS_ADDITIONAL_SPEC*/);
+
+        //Create a renderer
+        var canvasArea = document.getElementById("canvasArea");
+        game.getRenderer().createStandardCanvas(canvasArea);
+
+        //Bind keyboards/mouse/touch events
+        game.getRenderer().bindStandardEvents(game.getInputManager(), window, document);
+
+        FBInstant.initializeAsync()
+        .then(function() {        
+            //Load all assets and start the game
+            game.loadAllAssets(function() {
+                FBInstant.startGameAsync()
+                .then(function() {
+                    game.startGameLoop();
+                });
+            }, function(percent) {
+                FBInstant.setLoadingProgress(percent);
+            });
+        });
+    })();
+
+	</script>
+</body>
+</html>

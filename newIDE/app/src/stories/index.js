@@ -14,6 +14,7 @@ import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
 import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
+import LocalFilePicker from '../UI/LocalFilePicker';
 import LocalExport from '../Export/LocalExporters/LocalExport';
 import LocalCordovaExport from '../Export/LocalExporters/LocalCordovaExport';
 import Progress from '../Export/LocalExporters/LocalOnlineCordovaExport/Progress';
@@ -284,6 +285,31 @@ storiesOf('LocalFolderPicker', module)
   .add('default', () => <LocalFolderPicker floatingLabelText="Export folder" />)
   .add('full width', () => (
     <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
+  ));
+
+storiesOf('LocalFilePicker', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('full width', () => (
+    <ValueStateHolder
+      initialValue={'/test/myfile.txt'}
+      render={(value, onChange) => (
+        <LocalFilePicker
+          title="File picker title"
+          message="File picker message"
+          filters={[
+            {
+              name: 'Compressed file',
+              extensions: ['zip'],
+            },
+          ]}
+          value={value}
+          defaultPath={'/'}
+          onChange={onChange}
+          fullWidth
+        />
+      )}
+    />
   ));
 
 storiesOf('StartPage', module)

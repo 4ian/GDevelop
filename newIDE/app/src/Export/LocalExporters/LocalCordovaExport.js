@@ -68,14 +68,16 @@ class LocalCordovaExport extends Component {
 
     LocalCordovaExport.prepareExporter()
       .then(({ exporter }) => {
-        const exportForCordova = true;
+        const exportOptions = new gd.MapStringBoolean();
+        exportOptions.set('exportForCordova', true);
         exporter.exportWholePixiProject(
           project,
           outputDir,
-          false,
-          exportForCordova
+          exportOptions
         );
+        exportOptions.delete();
         exporter.delete();
+        
         this.setState({
           exportFinishedDialogOpen: true,
         });

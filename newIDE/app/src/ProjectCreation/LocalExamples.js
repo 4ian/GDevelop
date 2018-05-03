@@ -165,6 +165,8 @@ export default class LocalCreateDialog extends Component {
               fullWidth
               value={this.state.outputPath}
               onChange={this._handleChangePath}
+              title="Folder where to create the game"
+              message="Choose where to create the game"
             />
           </Column>
         </Line>

@@ -259,7 +259,7 @@ gdjs.RuntimeGame.prototype.pause = function(enable) {
  * Load all assets, displaying progress in renderer.
  * @method loadAllAssets
  */
-gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
+gdjs.RuntimeGame.prototype.loadAllAssets = function(callback, progressCallback) {
   var loadingScreen = new gdjs.LoadingScreenRenderer(
     this.getRenderer(),
     this._data.properties.loadingScreen
@@ -269,7 +269,9 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
   var that = this;
   this._imageManager.loadTextures(
     function(count, total) {
-      loadingScreen.render(Math.floor(count / allAssetsTotal * 100));
+      var percent = Math.floor(count / allAssetsTotal * 100);
+      loadingScreen.render(percent);
+      if (progressCallback) progressCallback(percent);
     },
     function() {
       that._soundManager.preloadAudio(

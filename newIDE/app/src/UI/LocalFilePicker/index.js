@@ -21,23 +21,35 @@ const styles = {
   },
 };
 
-export default class LocalFolderPicker extends PureComponent<*, *> {
+type Props = {|
+  value: string,
+  onChange: (string) => void,
+  title: string,
+  message: string,
+  defaultPath?: string,
+  fullWidth?: boolean,
+  floatingLabelText?: string,
+  filters: Array<{
+    name: string,
+    extensions: Array<string>,
+  }>,
+|};
+
+export default class LocalFilePicker extends PureComponent<Props, *> {
   onChooseFolder = () => {
     if (!dialog || !electron) return;
 
     const browserWindow = electron.remote.getCurrentWindow();
-    dialog.showOpenDialog(
+    dialog.showSaveDialog(
       browserWindow,
       {
-        title: this.props.title || 'Export folder',
-        properties: ['openDirectory', 'createDirectory'],
-        message: this.props.message || 'Choose where to export the game',
+        title: this.props.title,
+        filters: this.props.filters,
+        message: this.props.message,
         defaultPath: this.props.defaultPath,
       },
-      paths => {
-        if (!paths || !paths.length) return;
-
-        this.props.onChange(paths[0]);
+      filename => {
+        this.props.onChange(filename || '');
       }
     );
   };
@@ -60,7 +72,7 @@ export default class LocalFolderPicker extends PureComponent<*, *> {
           onChange={(event, value) => this.props.onChange(value)}
         />
         <FlatButton
-          label="Choose folder"
+          label="..."
           style={styles.button}
           onClick={this.onChooseFolder}
         />

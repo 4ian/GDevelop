@@ -17,7 +17,8 @@
       var bitmap = fs.readFileSync(file);
       console.log("64STRING::  "+bitmap.toString('base64'));
       // convert binary data to base64 encoded string
-      return bitmap.toString('base64');
+      // return bitmap.toString('base64');
+      return "data:image/png;base64," + bitmap.toString('base64');
       // return new Buffer(bitmap).toString('base64');
   }
 
@@ -29,7 +30,7 @@
     // if (pskl) {
  
     label.innerHTML = "count "+ String(imageFrames.length);
-    var imageData = [];      
+    var imageData = new Array();      
     async.each(imageFrames, function(file, callback) {
     // Perform operation on file here.
     console.log('Processing file ' + file);

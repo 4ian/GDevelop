@@ -154,8 +154,6 @@ app.on('ready', function() {
     log.info("Piskel RECEIVED FILES");
     piskelWindow.show();
     log.info(imageFrames);
-    // let contents = piskelWindow.webContents
-    // console.log(contents)
     piskelWindow.webContents.send('piskelAnimation' , imageFrames);
   });
 

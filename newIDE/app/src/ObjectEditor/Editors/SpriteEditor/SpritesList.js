@@ -148,13 +148,6 @@ export default class SpritesList extends Component {
     });
   };
 
- base64_encode = (file => {
-    // read binary data
-    var bitmap = fs.readFileSync(file);
-    // convert binary data to base64 encoded string
-    return new Buffer(bitmap).toString('base64');
-});
-
   onEditSprites =() => {
     const {
       project,
@@ -166,18 +159,11 @@ export default class SpritesList extends Component {
     var testImage  
     for (var i = 0; i < direction.getSpritesCount(); i++) {
       var spriteImagePath = resourcesLoader.getResourceFullUrl(project, direction.getSprite(i).getImageName());
-      console.log("Image prepared:"+spriteImagePath);
       var importedImage = new Image();
       importedImage.src = spriteImagePath; 
-      // testImage.src = spriteImagePath; 
-
       spriteImagePath = spriteImagePath.substring(7,spriteImagePath.lastIndexOf('?cache='));
-      // var imageFile = localFileSystem.readFile(spriteImagePath);
       imageFrames.push(spriteImagePath);
-      // testImage = imageFile;
     }
-
-    // ipcRenderer.send('piskelOpenAnimation',testImage);
     ipcRenderer.send('piskelOpenAnimation',imageFrames);
   };
 

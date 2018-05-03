@@ -10,11 +10,10 @@
   const ipcRenderer = electron.ipcRenderer ;
   const path = require('path');
   const fs = require('fs');
-
-  // function to encode file data to base64 encoded string
+  const async = require('async');
+ 
   function base64_encode(file) {
       // read binary data
-      console.log("loading:"+file);
       var bitmap = fs.readFileSync(file);
       console.log("64STRING::  "+bitmap.toString('base64'));
       // convert binary data to base64 encoded string
@@ -29,22 +28,27 @@
     label.innerHTML = 'errrrrrrrr ' 
     // if (pskl) {
  
-      label.innerHTML = "count "+ String(imageFrames.length);
-      var imageData = [];
-      for (var i = 0; i < imageFrames.length; i++) {
-        var imagePath = imageFrames[i];
-        label.innerHTML = "loop "+ String(i);
-        var image64 = new Image();
-        image64.onload = function () {
-          image64.src = base64_encode(imagePath);
-          console.log(image64.src);
-          imageData.push(image64);
-        }
-      };
+    label.innerHTML = "count "+ String(imageFrames.length);
+    var imageData = [];      
+    async.each(imageFrames, function(file, callback) {
+    // Perform operation on file here.
+    console.log('Processing file ' + file);
+    var image64 = new Image();
+    image64.src = base64_encode(file);
+    imageData.push(image64);
+    console.log(String(imageData.length));
+    callback();
+    }, function(err) {
+  // if any of the file processing produced an error, err would equal that error
+    if( err ) {
+      // One of the iterations produced an error.All processing will now stop.
+      console.log('A file failed to process');
+    } else {
+      console.log('All files have been processed successfully');
       console.log(imageData);
       pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, "foo",55, 55, false);
-      // console.log(imageFrames);
-    // };
+    }
+  });
     
   });
   </script>

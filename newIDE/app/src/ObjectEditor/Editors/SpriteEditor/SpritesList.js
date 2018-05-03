@@ -172,8 +172,8 @@ export default class SpritesList extends Component {
       // testImage.src = spriteImagePath; 
 
       spriteImagePath = spriteImagePath.substring(7,spriteImagePath.lastIndexOf('?cache='));
-      var imageFile = localFileSystem.readFile(spriteImagePath);
-      imageFrames.push(imageFile);
+      // var imageFile = localFileSystem.readFile(spriteImagePath);
+      imageFrames.push(spriteImagePath);
       // testImage = imageFile;
     }
 

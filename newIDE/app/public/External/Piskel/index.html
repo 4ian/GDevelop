@@ -11,33 +11,38 @@
   const path = require('path');
   const fs = require('fs');
 
-  // var editorFrameEl = document.querySelector(".editor-frame");
-  // const pskl = document.querySelector(".editor-frame").contentWindow.pskl;
+  // function to encode file data to base64 encoded string
+  function base64_encode(file) {
+      // read binary data
+      console.log("loading:"+file);
+      var bitmap = fs.readFileSync(file);
+      console.log("64STRING::  "+bitmap.toString('base64'));
+      // convert binary data to base64 encoded string
+      return bitmap.toString('base64');
+      // return new Buffer(bitmap).toString('base64');
+  }
 
   ipcRenderer.on('piskelAnimation',(event,imageFrames) => {
     var editorFrameEl = document.querySelector(".editor-frame");
     var pskl = editorFrameEl.contentWindow.pskl;
     let label = document.getElementById("label");
     label.innerHTML = 'errrrrrrrr ' 
-    // log.info("I GOT EM");
-    // log.info(imageFrames);
-    // alert("HALELUJAH");
     // if (pskl) {
  
       label.innerHTML = "count "+ String(imageFrames.length);
-
+      var imageData = [];
       for (var i = 0; i < imageFrames.length; i++) {
-        var image = imageFrames[i];
+        var imagePath = imageFrames[i];
         label.innerHTML = "loop "+ String(i);
-        // pskl.utils.FrameUtils.addImageToFrame(i, image, 5, 5);
-        // pskl.utils.FrameUtils.createFromImage(image, true);
-        // pskl.utils.PiskelFileUtils.readFile(image, ()=>{});
-        
-        // pskl.model.Frame.fromPixelGrid(framePixelGrid)
-        console.log("tried to load");
-        console.log(image);
+        var image64 = new Image();
+        image64.onload = function () {
+          image64.src = base64_encode(imagePath);
+          console.log(image64.src);
+          imageData.push(image64);
+        }
       };
-      pskl.service.ImportService.prototype.createPiskelFromImages_(imageFrames, "foo",55, 55, false);
+      console.log(imageData);
+      pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, "foo",55, 55, false);
       // console.log(imageFrames);
     // };
     

@@ -53,17 +53,18 @@ install:
   - cd ..
 
 script:
-#newIDE tests:
-  - cd newIDE/app
-  - npm test
-  - npm run flow
-  - cd ../..
-#GDJS game engine tests:
-  - cd GDJS/tests && npm test
-  - cd ../..
 #GDCore and GDCpp game engine tests:
   - cd .build-tests
   - Core/GDCore_tests
   - GDCpp/GDCpp_tests
   - Extensions/PathfindingBehavior/PathfindingBehavior_Runtime_tests
   - Extensions/LinkedObjects/LinkedObjects_Runtime_tests
+#newIDE tests:
+  - cd newIDE/app
+  - npm test
+  - npm run flow
+  - cd ../..
+#GDJS game engine tests, disabled on Travis CI because ChromeHeadless can't be started.
+#See them running on Semaphore-CI instead: https://semaphoreci.com/4ian/gd
+#  - cd GDJS/tests && npm test
+#  - cd ../..

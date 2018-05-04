@@ -5,7 +5,7 @@ compiler:
   - clang
 
 # Cache .npm folder for faster npm install
-  cache:
+cache:
   directories:
     - $HOME/.npm
 
@@ -64,6 +64,7 @@ script:
   - GDCpp/GDCpp_tests
   - Extensions/PathfindingBehavior/PathfindingBehavior_Runtime_tests
   - Extensions/LinkedObjects/LinkedObjects_Runtime_tests
+  - cd ..
 #newIDE tests:
   - cd newIDE/app
   - npm test

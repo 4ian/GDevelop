@@ -11,7 +11,8 @@ gd_add_extension_definitions(TiledSpriteObject)
 #The targets
 ###
 include_directories(.)
-file(GLOB_RECURSE source_files *)
+file(GLOB source_files *.cpp *.h)
+gd_add_clang_utils(TiledSpriteObject "${source_files}")
 
 gd_add_extension_target(TiledSpriteObject "${source_files}")
 gdcpp_add_runtime_extension_target(TiledSpriteObject_Runtime "${source_files}")

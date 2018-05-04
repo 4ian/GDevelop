@@ -11,7 +11,8 @@ gd_add_extension_definitions(SoundObject)
 #The targets
 ###
 include_directories(.)
-file(GLOB source_files *)
+file(GLOB source_files *.cpp *.h)
+gd_add_clang_utils(SoundObject "${source_files}")
 
 gd_add_extension_target(SoundObject "${source_files}")
 gdcpp_add_runtime_extension_target(SoundObject_Runtime "${source_files}")

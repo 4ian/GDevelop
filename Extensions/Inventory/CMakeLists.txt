@@ -11,7 +11,8 @@ gd_add_extension_definitions(Inventory)
 #The targets
 ###
 include_directories(.)
-file(GLOB source_files *)
+file(GLOB source_files *.cpp *.h)
+gd_add_clang_utils(Inventory "${source_files}")
 
 gd_add_extension_target(Inventory "${source_files}")
 gdcpp_add_runtime_extension_target(Inventory_Runtime "${source_files}")

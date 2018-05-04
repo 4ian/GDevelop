@@ -11,7 +11,8 @@ gd_add_extension_definitions(PrimitiveDrawing)
 #The targets
 ###
 include_directories(.)
-file(GLOB source_files *)
+file(GLOB source_files *.cpp *.h)
+gd_add_clang_utils(PrimitiveDrawing "${source_files}")
 
 gd_add_extension_target(PrimitiveDrawing "${source_files}")
 gdcpp_add_runtime_extension_target(PrimitiveDrawing_Runtime "${source_files}")

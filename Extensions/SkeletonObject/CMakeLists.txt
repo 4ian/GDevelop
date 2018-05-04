@@ -11,7 +11,8 @@ gd_add_extension_definitions(SkeletonObject)
 #The targets
 ###
 include_directories(.)
-file(GLOB source_files *)
+file(GLOB source_files *.cpp *.h)
+gd_add_clang_utils(SkeletonObject "${source_files}")
 
 gd_add_extension_target(SkeletonObject "${source_files}" "JsPlatform")
 

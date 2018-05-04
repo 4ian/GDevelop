@@ -12,7 +12,8 @@ gd_add_extension_definitions(SystemInfo)
 #The targets
 ###
 include_directories(.)
-file(GLOB_RECURSE source_files *)
+file(GLOB source_files *.cpp *.h)
+gd_add_clang_utils(SystemInfo "${source_files}")
 
 gd_add_extension_target(SystemInfo "${source_files}")
 gdcpp_add_runtime_extension_target(SystemInfo_Runtime "${source_files}")

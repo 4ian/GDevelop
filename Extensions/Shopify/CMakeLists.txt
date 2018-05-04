@@ -11,9 +11,10 @@ gd_add_extension_definitions(Shopify)
 #The targets
 ###
 include_directories(.)
-file(GLOB source_files *)
+file(GLOB source_files *.[ch]pp *.h)
 
 gd_add_extension_target(Shopify "${source_files}" "JsPlatform")
+gd_add_clang_utils(Shopify "${source_files}")
 
 #Linker files for the IDE extension
 ###

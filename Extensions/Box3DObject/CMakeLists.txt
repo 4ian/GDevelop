@@ -11,7 +11,8 @@ gd_add_extension_definitions(Box3DObject)
 #The targets
 ###
 include_directories(.)
-file(GLOB_RECURSE source_files *)
+file(GLOB_RECURSE source_files *.cpp *.h)
+gd_add_clang_utils(Box3DObject "${source_files}")
 
 
 gd_add_extension_target(Box3DObject "${source_files}")

@@ -11,7 +11,8 @@ gd_add_extension_definitions(AdvancedXML)
 #The targets
 ###
 include_directories(src)
-file(GLOB_RECURSE source_files src/*)
+file(GLOB_RECURSE source_files src/*.cpp src/*.h)
+gd_add_clang_utils(AdvancedXML "${source_files}")
 
 gd_add_extension_target(AdvancedXML "${source_files}")
 gdcpp_add_runtime_extension_target(AdvancedXML_Runtime "${source_files}")

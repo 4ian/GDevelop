@@ -11,7 +11,8 @@ gd_add_extension_definitions(TopDownMovementBehavior)
 #The targets
 ###
 include_directories(.)
-file(GLOB source_files *)
+file(GLOB source_files *.[ch]pp *.h)
+gd_add_clang_utils(TopDownMovementBehavior "${source_files}")
 
 gd_add_extension_target(TopDownMovementBehavior "${source_files}")
 gdcpp_add_runtime_extension_target(TopDownMovementBehavior_Runtime "${source_files}")

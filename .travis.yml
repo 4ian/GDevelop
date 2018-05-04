@@ -4,6 +4,11 @@ compiler:
   - gcc
   - clang
 
+# Cache .npm folder for faster npm install
+  cache:
+  directories:
+    - $HOME/.npm
+
 git:
   depth: 999999
 

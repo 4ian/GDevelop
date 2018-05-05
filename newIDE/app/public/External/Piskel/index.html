@@ -16,10 +16,7 @@
       // read binary data
       var bitmap = fs.readFileSync(file);
       console.log("64STRING::  "+bitmap.toString('base64'));
-      // convert binary data to base64 encoded string
-      // return bitmap.toString('base64');
       return "data:image/png;base64," + bitmap.toString('base64');
-      // return new Buffer(bitmap).toString('base64');
   }
 
   ipcRenderer.on('piskelAnimation',(event,imageFrames) => {
@@ -27,30 +24,24 @@
     var pskl = editorFrameEl.contentWindow.pskl;
     let label = document.getElementById("label");
     label.innerHTML = 'errrrrrrrr ' 
-    // if (pskl) {
+    if (pskl) {
  
     label.innerHTML = "count "+ String(imageFrames.length);
-    var imageData = new Array();      
-    async.each(imageFrames, function(file, callback) {
-    // Perform operation on file here.
-    console.log('Processing file ' + file);
-    var image64 = new Image();
-    image64.src = base64_encode(file);
-    imageData.push(image64);
-    console.log(String(imageData.length));
-    callback();
+    var imageData = [];      
+    async.each(imageFrames, function(imagePath, callback) {
+        var image64 = new Image();
+        image64.onload = function () {
+          imageData.push(image64);
+          callback();
+        }
+        // This is the important part! Set src, otherwise the `onload` will not fire
+        image64.src = base64_encode(imagePath);
+        console.log(image64.src);
     }, function(err) {
-  // if any of the file processing produced an error, err would equal that error
-    if( err ) {
-      // One of the iterations produced an error.All processing will now stop.
-      console.log('A file failed to process');
-    } else {
-      console.log('All files have been processed successfully');
-      console.log(imageData);
-      pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, "foo",55, 55, false);
+        console.log(imageData);
+        pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, "foo",55, 55, false);
+    });
     }
-  });
-    
   });
   </script>
   <iframe class="editor-frame" src="editor/index.html"></iframe>

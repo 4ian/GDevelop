@@ -76,6 +76,7 @@ SpriteExtension::SpriteExtension()
     objectExpressions["AnimationSpeedScale"].SetFunctionName("GetAnimationSpeedScale").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectExpressions["ScaleX"].SetFunctionName("GetScaleX").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
     objectExpressions["ScaleY"].SetFunctionName("GetScaleY").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
+    objectExpressions["Opacity"].SetFunctionName("GetOpacity").SetIncludeFile("GDCpp/Runtime/RuntimeSpriteObject.h");
 
     GetAllConditions()["Collision"].SetFunctionName("SpriteCollision").SetIncludeFile("GDCpp/Extensions/Builtin/SpriteTools.h");
     #endif

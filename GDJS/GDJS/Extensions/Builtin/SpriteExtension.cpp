@@ -75,6 +75,7 @@ SpriteExtension::SpriteExtension()
     spriteExpressions["AnimationSpeedScale"].SetFunctionName("getAnimationSpeedScale");
     spriteExpressions["ScaleX"].SetFunctionName("getScaleX");
     spriteExpressions["ScaleY"].SetFunctionName("getScaleY");
+    spriteExpressions["Opacity"].SetFunctionName("getOpacity");
 
 
     StripUnimplementedInstructionsAndExpressions(); //Unimplemented things are listed here:

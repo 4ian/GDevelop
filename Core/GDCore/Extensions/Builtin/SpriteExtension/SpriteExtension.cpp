@@ -483,6 +483,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(gd::Pla
     obj.AddExpression("ScaleY", _("Scale of the height of an object"), _("Scale of the height of an object"), _("Size"), "res/actions/scaleHeight.png")
         .AddParameter("object", _("Object"), "Sprite");
 
+    obj.AddExpression("Opacity", _("Opacity"), _("Opacity"), _("Opacity"), "res/actions/opacity.png")
+        .AddParameter("object", _("Object"), "Sprite");
+
     extension.AddCondition("Collision",
                       _("Collision (Pixel perfect)"),
                       _("The condition is true if there is a collision between the two objects.\nThe test is pixel-perfect."),

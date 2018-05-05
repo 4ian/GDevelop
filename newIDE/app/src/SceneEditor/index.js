@@ -212,6 +212,14 @@ export default class SceneEditor extends Component {
     this.setState({ editedObject: object });
   };
 
+  editObjectByName = objectName => {
+    const { project, layout } = this.props;
+    if (layout.hasObjectNamed(objectName))
+      this.editObject(layout.getObject(objectName));
+    else if (project.hasObjectNamed(objectName))
+      this.editObject(project.getObject(objectName));
+  };
+
   editGroup = group => {
     this.setState({ editedGroup: group });
   };
@@ -518,6 +526,7 @@ export default class SceneEditor extends Component {
             instances={selectedInstances}
             onInstancesModified={this._onInstancesModified}
             editInstanceVariables={this.editInstanceVariables}
+            onEditObjectByName={this.editObjectByName}
             ref={propertiesEditor =>
               (this._propertiesEditor = propertiesEditor)}
           />

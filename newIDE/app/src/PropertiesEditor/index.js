@@ -5,10 +5,32 @@ import Subheader from 'material-ui/Subheader';
 import FlatButton from 'material-ui/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import Edit from 'material-ui/svg-icons/image/edit';
+import IconButton from 'material-ui/IconButton';
 
 const styles = {
+  container: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
   checkbox: {
     marginTop: 10,
+  },
+  fieldContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'baseline',
+  },
+  field: {
+    flex: 1,
+    width: 'auto',
+  },
+  subPropertiesEditorContainer: {
+    marginLeft: 15,
+  },
+  subHeader: {
+    paddingLeft: 0,
   },
 };
 
@@ -66,31 +88,41 @@ export default class PropertiesEditor extends Component {
             this._onInstancesModified(this.props.instances);
           }}
           type="number"
-          fullWidth
+          style={styles.field}
           disabled={field.disabled}
         />
       );
     } else {
       return (
-        <SemiControlledTextField
-          value={this._getFieldValue(
-            this.props.instances,
-            field,
-            '(Multiple values)'
+        <div style={styles.fieldContainer}>
+          <SemiControlledTextField
+            value={this._getFieldValue(
+              this.props.instances,
+              field,
+              '(Multiple values)'
+            )}
+            key={field.name}
+            id={field.name}
+            floatingLabelText={field.name}
+            floatingLabelFixed
+            onChange={newValue => {
+              this.props.instances.forEach(i =>
+                field.setValue(i, newValue || '')
+              );
+              this._onInstancesModified(this.props.instances);
+            }}
+            style={styles.field}
+            disabled={field.disabled}
+          />
+          {field.onEditButtonClick && (
+            <IconButton
+              disabled={this.props.instances.length !== 1}
+              onClick={() => field.onEditButtonClick(this.props.instances[0])}
+            >
+              <Edit />
+            </IconButton>
           )}
-          key={field.name}
-          id={field.name}
-          floatingLabelText={field.name}
-          floatingLabelFixed
-          onChange={newValue => {
-            this.props.instances.forEach(i =>
-              field.setValue(i, newValue || '')
-            );
-            this._onInstancesModified(this.props.instances);
-          }}
-          fullWidth
-          disabled={field.disabled}
-        />
+        </div>
       );
     }
   };
@@ -115,7 +147,7 @@ export default class PropertiesEditor extends Component {
             );
             this._onInstancesModified(this.props.instances);
           }}
-          fullWidth
+          style={styles.field}
           disabled={field.disabled}
         >
           {children}
@@ -138,7 +170,7 @@ export default class PropertiesEditor extends Component {
             );
             this._onInstancesModified(this.props.instances);
           }}
-          fullWidth
+          style={styles.field}
           disabled={field.disabled}
         >
           {children}
@@ -162,7 +194,7 @@ export default class PropertiesEditor extends Component {
 
   render() {
     return (
-      <div>
+      <div style={styles.container}>
         {this.props.schema.map(field => {
           if (field.getChoices && field.getValue)
             return this._renderSelectField(field);
@@ -171,8 +203,8 @@ export default class PropertiesEditor extends Component {
           if (field.children) {
             return (
               <div key={field.name}>
-                <Subheader style={{ paddingLeft: 0 }}>{field.name}</Subheader>
-                <div style={{ marginLeft: 15 }}>
+                <Subheader style={styles.subHeader}>{field.name}</Subheader>
+                <div style={styles.subPropertiesEditorContainer}>
                   <PropertiesEditor
                     schema={field.children}
                     instances={this.props.instances}

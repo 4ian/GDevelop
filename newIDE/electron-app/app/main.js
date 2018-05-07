@@ -150,11 +150,11 @@ app.on('ready', function() {
     }
   });
 
-  ipcMain.on('piskelOpenAnimation', (event, imageFrames) => {
+  ipcMain.on('piskelOpenAnimation', (event, piskelData) => {
     log.info("Piskel RECEIVED FILES");
     piskelWindow.show();
-    log.info(imageFrames);
-    piskelWindow.webContents.send('piskelAnimation' , imageFrames);
+    log.info(piskelData);
+    piskelWindow.webContents.send('piskelAnimation' , piskelData);
   });
 
   // S3Upload events:

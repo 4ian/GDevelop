@@ -164,7 +164,14 @@ export default class SpritesList extends Component {
       spriteImagePath = spriteImagePath.substring(7,spriteImagePath.lastIndexOf('?cache='));
       imageFrames.push(spriteImagePath);
     }
-    ipcRenderer.send('piskelOpenAnimation',imageFrames);
+    console.log(direction);
+    const piskelData = {
+      imageFrames:imageFrames,
+      fps:Math.floor(direction.getTimeBetweenFrames()*480),
+      name:imageFrames[0].split("/").pop().split(".")[0]
+    };
+    console.log(piskelData);
+    ipcRenderer.send('piskelOpenAnimation',piskelData);
   };
 
   render() {

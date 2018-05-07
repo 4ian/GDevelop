@@ -1,13 +1,9 @@
 #include "PropertyDescriptor.h"
-#include "GDCore/String.h"
 #include <vector>
+#include "GDCore/String.h"
 
-namespace gd
-{
+namespace gd {
 
-PropertyDescriptor::~PropertyDescriptor()
-{
+PropertyDescriptor::~PropertyDescriptor() {}
 
-}
-
-}
+}  // namespace gd

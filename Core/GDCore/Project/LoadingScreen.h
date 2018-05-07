@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2018 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2018 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef GDCORE_LOADINGSCREEN_H
@@ -21,37 +21,38 @@ namespace gd {
  * \ingroup PlatformDefinition
  */
 class GD_CORE_API LoadingScreen {
-public:
-    LoadingScreen(){};
-    virtual ~LoadingScreen(){};
+ public:
+  LoadingScreen(){};
+  virtual ~LoadingScreen(){};
 
-    /**
-    * \brief Set if the GDevelop splash should be shown while loading assets.
-    */
-    void ShowGDevelopSplash(bool show) { showGDevelopSplash = show; };
+  /**
+   * \brief Set if the GDevelop splash should be shown while loading assets.
+   */
+  void ShowGDevelopSplash(bool show) { showGDevelopSplash = show; };
 
-    /**
-    * \brief Return true if the GDevelop splash should be shown while loading assets.
-    */
-    bool IsGDevelopSplashShown() const { return showGDevelopSplash; };
+  /**
+   * \brief Return true if the GDevelop splash should be shown while loading
+   * assets.
+   */
+  bool IsGDevelopSplashShown() const { return showGDevelopSplash; };
 
-    /** \name Saving and loading
-    */
-    ///@{
-    /**
-    * \brief Serialize objects groups container.
-    */
-    void SerializeTo(SerializerElement& element) const;
+  /** \name Saving and loading
+   */
+  ///@{
+  /**
+   * \brief Serialize objects groups container.
+   */
+  void SerializeTo(SerializerElement& element) const;
 
-    /**
-    * \brief Unserialize the objects groups container.
-    */
-    void UnserializeFrom(const SerializerElement& element);
-    ///@}
+  /**
+   * \brief Unserialize the objects groups container.
+   */
+  void UnserializeFrom(const SerializerElement& element);
+  ///@}
 
-private:
-    bool showGDevelopSplash;
+ private:
+  bool showGDevelopSplash;
 };
-}
+}  // namespace gd
 
-#endif // GDCORE_LOADINGSCREEN_H
+#endif  // GDCORE_LOADINGSCREEN_H

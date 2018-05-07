@@ -29,11 +29,11 @@
     label.innerHTML = "count "+ String(imageFrames.length);
     var imageData = []; 
     var piskelXsize = -1;
-    var piskelYsize = -1;    
+    var piskelYsize = -1;
     async.each(imageFrames, function(imagePath, callback) {
         var image64 = new Image();
         image64.onload = function () {
-          imageData.push(image64);
+          imageData.push(image64);  
           if (image64.width > piskelXsize)
           {
             piskelXsize = image64.width ;

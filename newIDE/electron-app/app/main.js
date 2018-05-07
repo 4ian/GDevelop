@@ -101,7 +101,6 @@ app.on('ready', function() {
     mainWindow.openDevTools();
     piskelWindow.loadURL('http://localhost:3000/External/Piskel/index.html');
     piskelWindow.openDevTools();
-
   } else {
     // Production (with npm run build)
     mainWindow.loadURL('file://' + __dirname + '/www/index.html');
@@ -138,10 +137,6 @@ app.on('ready', function() {
   //   log.info(url);
   // });
 
-  // piskelWindow.webContents.on('new-window', function(event, urlToOpen) {
-  //   event.defaultPrevented = true;
-  // });
-
   //Prevent any navigation inside the main window.
   mainWindow.webContents.on('will-navigate', (e, url) => {
     if (url !== mainWindow.webContents.getURL()) {
@@ -151,9 +146,11 @@ app.on('ready', function() {
   });
 
   ipcMain.on('piskelOpenAnimation', (event, piskelData) => {
-    log.info("Piskel RECEIVED FILES");
+    if (piskelData['imageFrames'].length === 0){
+      console.log('No Frames Provided, refresh Piskel');
+      piskelWindow.reload();
+    };
     piskelWindow.show();
-    log.info(piskelData);
     piskelWindow.webContents.send('piskelAnimation' , piskelData);
   });
 

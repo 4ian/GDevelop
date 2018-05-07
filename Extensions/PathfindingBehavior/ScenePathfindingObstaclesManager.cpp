@@ -5,26 +5,26 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 #include "ScenePathfindingObstaclesManager.h"
-#include "PathfindingObstacleBehavior.h"
 #include <iostream>
+#include "PathfindingObstacleBehavior.h"
 
-std::map<RuntimeScene*, ScenePathfindingObstaclesManager> ScenePathfindingObstaclesManager::managers;
+std::map<RuntimeScene*, ScenePathfindingObstaclesManager>
+    ScenePathfindingObstaclesManager::managers;
 
-ScenePathfindingObstaclesManager::~ScenePathfindingObstaclesManager()
-{
-	for (std::set<PathfindingObstacleBehavior*>::iterator it = allObstacles.begin();
-		 it != allObstacles.end();
-		 ++it)
-	{
-		(*it)->Activate(false);
-	}
+ScenePathfindingObstaclesManager::~ScenePathfindingObstaclesManager() {
+  for (std::set<PathfindingObstacleBehavior*>::iterator it =
+           allObstacles.begin();
+       it != allObstacles.end();
+       ++it) {
+    (*it)->Activate(false);
+  }
 }
 
-void ScenePathfindingObstaclesManager::AddObstacle(PathfindingObstacleBehavior * obstacle)
-{
-	allObstacles.insert(obstacle);
+void ScenePathfindingObstaclesManager::AddObstacle(
+    PathfindingObstacleBehavior* obstacle) {
+  allObstacles.insert(obstacle);
 }
-void ScenePathfindingObstaclesManager::RemoveObstacle(PathfindingObstacleBehavior * obstacle)
-{
-	allObstacles.erase(obstacle);
+void ScenePathfindingObstaclesManager::RemoveObstacle(
+    PathfindingObstacleBehavior* obstacle) {
+  allObstacles.erase(obstacle);
 }

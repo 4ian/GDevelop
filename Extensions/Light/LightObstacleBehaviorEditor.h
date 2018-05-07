@@ -13,47 +13,51 @@ This project is released under the MIT License.
 #include <wx/msw/winundef.h>
 #endif
 //(*Headers(LightObstacleBehaviorEditor)
-#include <wx/sizer.h>
 #include <wx/dialog.h>
+#include <wx/sizer.h>
 //*)
 #include <memory>
-namespace gd { class Project; }
-namespace gd { class MainFrameWrapper; }
+namespace gd {
+class Project;
+}
+namespace gd {
+class MainFrameWrapper;
+}
 class LightObstacleBehavior;
-namespace gd { class Layout; }
+namespace gd {
+class Layout;
+}
 class SceneLightObstacleDatas;
 
-class LightObstacleBehaviorEditor: public wxDialog
-{
-	public:
+class LightObstacleBehaviorEditor : public wxDialog {
+ public:
+  LightObstacleBehaviorEditor(wxWindow* parent,
+                              gd::Project& game_,
+                              gd::Layout* scene,
+                              LightObstacleBehavior& behavior_);
+  virtual ~LightObstacleBehaviorEditor();
 
-		LightObstacleBehaviorEditor(wxWindow* parent, gd::Project & game_, gd::Layout * scene, LightObstacleBehavior & behavior_ );
-		virtual ~LightObstacleBehaviorEditor();
+  //(*Declarations(LightObstacleBehaviorEditor)
+  //*)
 
-		//(*Declarations(LightObstacleBehaviorEditor)
-		//*)
+  LightObstacleBehavior& behavior;
 
-		LightObstacleBehavior & behavior;
+ protected:
+  //(*Identifiers(LightObstacleBehaviorEditor)
+  //*)
 
-	protected:
+ private:
+  //(*Handlers(LightObstacleBehaviorEditor)
+  void OncancelBtClick(wxCommandEvent& event);
+  void OnokBtClick(wxCommandEvent& event);
+  //*)
 
-		//(*Identifiers(LightObstacleBehaviorEditor)
-		//*)
+  gd::Project& game;
+  gd::Layout* scene;
+  std::shared_ptr<SceneLightObstacleDatas> sharedDatas;
 
-	private:
-
-		//(*Handlers(LightObstacleBehaviorEditor)
-		void OncancelBtClick(wxCommandEvent& event);
-		void OnokBtClick(wxCommandEvent& event);
-		//*)
-
-		gd::Project & game;
-        gd::Layout * scene;
-        std::shared_ptr<SceneLightObstacleDatas> sharedDatas;
-
-		DECLARE_EVENT_TABLE()
+  DECLARE_EVENT_TABLE()
 };
 
 #endif
 #endif
-

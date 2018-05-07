@@ -9,11 +9,12 @@ This project is released under the MIT License.
 #define TIMEDEVENTTOOLS_H
 #include <string>
 class RuntimeScene;
+namespace gd {
+class String;
+}
 
-namespace GDpriv
-{
-namespace TimedEvents
-{
+namespace GDpriv {
+namespace TimedEvents {
 
 /**
  * Update timed event and return its time, in microseconds.
@@ -21,18 +22,19 @@ namespace TimedEvents
  * \param mangledTimedEventName Mangled timed event name
  * \return Time elapsed, in microseconds, of the timed event
  */
-signed long long GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, gd::String mangledTimedEventName);
+signed long long GD_EXTENSION_API
+UpdateAndGetTimeOf(RuntimeScene& scene, gd::String mangledTimedEventName);
 
 /**
  * Reset a timed event.
  * \param scene Scene used
- * \param timedEventName Unmangled timed event name. The name will be mangled to "GDNamedTimedEvent_"+timedEventName.
+ * \param timedEventName Unmangled timed event name. The name will be mangled to
+ * "GDNamedTimedEvent_"+timedEventName.
  */
-void GD_EXTENSION_API Reset(RuntimeScene & scene, gd::String timedEventName);
+void GD_EXTENSION_API Reset(RuntimeScene& scene, gd::String timedEventName);
 
-}
+}  // namespace TimedEvents
 
-}
+}  // namespace GDpriv
 
-#endif // TIMEDEVENTTOOLS_H
-
+#endif  // TIMEDEVENTTOOLS_H

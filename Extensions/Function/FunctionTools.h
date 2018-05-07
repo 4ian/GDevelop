@@ -11,19 +11,17 @@ This project is released under the MIT License.
 #include <vector>
 #include "GDCpp/Runtime/String.h"
 
-namespace GDpriv
-{
-namespace FunctionTools
-{
+namespace GDpriv {
+namespace FunctionTools {
 
 /**
  * \brief Return list[index] unless index is out of range.
  * \return list[index] or empty string.
  */
-gd::String GD_EXTENSION_API GetSafelyStringFromVector(std::vector<gd::String> & list, std::size_t index );
+gd::String GD_EXTENSION_API
+GetSafelyStringFromVector(std::vector<gd::String>& list, std::size_t index);
 
-}
-}
+}  // namespace FunctionTools
+}  // namespace GDpriv
 
-
-#endif // FUNCTIONTOOLS_H
+#endif  // FUNCTIONTOOLS_H

@@ -10,17 +10,19 @@ This project is released under the MIT License.
 
 #include "GDCpp/Runtime/String.h"
 
-namespace GDpriv
-{
+namespace GDpriv {
 
-namespace AES
-{
+namespace AES {
 
-void GD_EXTENSION_API EncryptFile( const gd::String & srcFile, const gd::String & destFile, gd::String passwordWith24characters );
-void GD_EXTENSION_API DecryptFile( const gd::String & srcFile, const gd::String & destFile, gd::String passwordWith24characters );
+void GD_EXTENSION_API EncryptFile(const gd::String& srcFile,
+                                  const gd::String& destFile,
+                                  gd::String passwordWith24characters);
+void GD_EXTENSION_API DecryptFile(const gd::String& srcFile,
+                                  const gd::String& destFile,
+                                  gd::String passwordWith24characters);
 
-}
+}  // namespace AES
 
-}
+}  // namespace GDpriv
 
-#endif // AESACTIONS_H_INCLUDED
+#endif  // AESACTIONS_H_INCLUDED

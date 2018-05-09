@@ -123,6 +123,7 @@ app.on('ready', function() {
     piskelWindow.hide()
   });
 
+  
   // piskelWindow.webContents.on('did-finish-load',() => {
   //   piskelWindow.show();
   // });
@@ -152,6 +153,12 @@ app.on('ready', function() {
     };
     piskelWindow.show();
     piskelWindow.webContents.send('piskelAnimation' , piskelData);
+  });
+
+  ipcMain.on('piskelSavedChanges', ( event, piskelFramePaths) => {
+    console.log('receiving filepaths back from piskel!');
+    console.log(piskelFramePaths);
+    //TODO: RELOAD THE FRAMES INTO THE ANIMATION CLIP 
   });
 
   // S3Upload events:

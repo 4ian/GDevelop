@@ -4,29 +4,134 @@
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-   <span id="label">Status: null </span>
+   <div align="right" style="background-color:black">
+    <span id="label">Status: null </span>
+    <button id="cancelBut" onclick="cancelChanges()" style="margin-right: 10px;margin-top: 5px;">
+      Cancel Changes
+    </button>
+    <button id="saveBut" onclick="SaveToGD()" style="margin-right: 10px;margin-top: 5px;">
+      Save Back To Gdevelop
+    </button>
+   </div>
   <script>
   const electron = require('electron');
   const ipcRenderer = electron.ipcRenderer ;
   const path = require('path');
   const fs = require('fs');
   const async = require('async');
+  const remote = electron.remote;
  
-  function base64_encode(file) {
-      // read binary data
+  // document.addEventListener("onhide", function (e) {
+  //   SaveToGD();
+  //   var window = remote.getCurrentWindow();
+  //   window.close();
+  // }); 
+
+  function fileExists(path) {
+  try  {
+    return fs.statSync(path).isFile();
+  }
+  catch (e) { 
+    if (e.code == 'ENOENT') { // no such file or directory. File really does not exist
+      return false;
+    }
+    console.log("Exception fs.statSync (" + path + "): " + e);
+    throw e; // something else went wrong, we don't have rights, ...
+    }
+  }
+
+  function makeFileNameUnique(path,appendNumber) /// returns a path where a file doesnt already exist. Use to avoid unwanted file overwriting
+  {
+    if (fileExists(path))
+    {
+      console.log('This file path already exists- to avoid overwriting the file, I will rename it');
+      var folderPath = path.substring(0,path.lastIndexOf("/")+1);
+      var fileFormat = path.substring(path.lastIndexOf("."),path.length);
+      var oldFileName = path.substring(path.lastIndexOf("/")+1,path.lastIndexOf("."));
+      var newUniqueNamePath = folderPath + oldFileName + String(appendNumber) + fileFormat
+      if (fileExists(newUniqueNamePath))
+      {
+        appendNumber += 1;
+        makeFileNameUnique(path,appendNumber) ///TODO needs to be improved- breaks after the second iteration-- use while loop?
+        return
+      }
+      else
+      {
+        console.log('Made filename unique: '+newUniqueNamePath);
+        return newUniqueNamePath
+      }
+    }
+    else
+    {
+      console.log('filename is already unique: '+path);
+      return path
+    }
+  }
+
+  function base64_encode(file) { // read binary data
       var bitmap = fs.readFileSync(file);
-      // console.log("64STRING::  "+bitmap.toString('base64'));
       return "data:image/png;base64," + bitmap.toString('base64');
   }
 
+  function downloadAsFile (content, filename, filePath) { /// download individual frame to path
+  var reader = new FileReader()
+  reader.onload = function(){
+    var buffer = new Buffer(reader.result)
+    fs.writeFile(filePath, buffer, {}, (err, res) => {
+      if(err){
+        console.error(err)
+        return
+      }
+      console.log('file saved')
+    })
+  }
+  reader.readAsArrayBuffer(content)
+  }
+
+  function SaveToGD() { ///Determine paths to avoid any unwanted/unpredictable results
+    var editorFrameEl = document.querySelector(".editor-frame");
+    var pskl = editorFrameEl.contentWindow.pskl;
+    var layer = pskl.app.piskelController.getCurrentLayer();
+    var piskelFramePaths = [];
+    for (i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
+      // console.log(layer.getFrameAt(i));
+      var exportPath = layer.getFrameAt(i).originalPath    
+      if (exportPath == null){
+        exportPath = this.guessedExportPath + '-PSKL-' + (i + 1) + '.png';
+        exportPath = makeFileNameUnique(exportPath,0);
+        console.log("new undefined path:"+exportPath);
+      }
+      else
+      {
+        console.log("Original Path:"+exportPath);
+      };
+      //render and save
+      var canvas = pskl.app.piskelController.renderFrameAt(i, true);
+      pskl.utils.BlobUtils.canvasToBlob(canvas, function(blob) {
+        downloadAsFile(blob, exportPath, exportPath);
+        piskelFramePaths.push(exportPath);
+      });
+    }
+    //finally reload the frames in gdevelop
+    console.log("Saved!!");
+    ipcRenderer.send("piskelSavedChanges",piskelFramePaths);
+    remote.getCurrentWindow().close();
+  }
+
+  function cancelChanges()
+  {
+    remote.getCurrentWindow().close();
+  }
+
+  var guessedExportPath
   ipcRenderer.on('piskelAnimation',(event,piskelData) => {
+    this.guessedExportPath = null;
     var editorFrameEl = document.querySelector(".editor-frame");
     var pskl = editorFrameEl.contentWindow.pskl;
     let label = document.getElementById("label");
-    label.innerHTML = 'errrrrrrrr ' 
+    label.innerHTML = piskelData['name'];
     if (pskl) {
     var imageFrames = piskelData.imageFrames;
-    label.innerHTML = "count "+ String(imageFrames.length);
     var imageData = []; 
     var piskelXsize = -1;
     var piskelYsize = -1;
@@ -46,11 +151,22 @@
         }
         // This is the important part! Set src, otherwise the `onload` will not fire
         image64.src = base64_encode(imagePath);
+        if (this.guessedExportPath == null)//need this to guess new filenames later
+        {
+          this.guessedExportPath = imagePath.substring(0,imagePath.lastIndexOf("/")+1) + piskelData.name;
+        };
     }, function(err) {
+        /// Finally load the image objects into piskel
         var piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, piskelData.name, piskelXsize, piskelYsize, false);
-        console.log(pskl.app.piskelController);
         pskl.app.piskelController.setPiskel(piskelFile,{});
         pskl.app.piskelController.setFPS(piskelData.fps);
+
+        //// add original path variable to frame objects, so we can overwrite original frame files
+        var layer = pskl.app.piskelController.getCurrentLayer();
+        for (i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
+          layer.getFrameAt(i).originalPath = imageFrames[i] ;
+          console.log(layer.getFrameAt(i));
+        };
     });
     }
   });

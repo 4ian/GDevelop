@@ -11,7 +11,7 @@ class RuntimeScene;
 namespace gd {
 class Variable;
 class String;
-};
+};  // namespace gd
 
 bool GD_API FileExists(const gd::String& file);
 bool GD_API GroupExists(const gd::String& file, const gd::String& group);

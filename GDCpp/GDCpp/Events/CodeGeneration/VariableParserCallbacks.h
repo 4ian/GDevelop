@@ -14,7 +14,7 @@
 namespace gd {
 class EventsCodeGenerator;
 class EventsCodeGenerationContext;
-}
+}  // namespace gd
 
 /**
  * \brief Callbacks called to generate the code for getting a variable.

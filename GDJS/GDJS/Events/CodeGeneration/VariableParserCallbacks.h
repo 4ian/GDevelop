@@ -12,7 +12,7 @@
 namespace gd {
 class EventsCodeGenerator;
 class EventsCodeGenerationContext;
-}
+}  // namespace gd
 
 namespace gdjs {
 

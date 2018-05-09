@@ -40,32 +40,24 @@
     }
   }
 
-  function makeFileNameUnique(path,appendNumber) /// returns a path where a file doesnt already exist. Use to avoid unwanted file overwriting
+  function makeFileNameUnique(path) /// returns a path where a file doesnt already exist. Use to avoid unwanted file overwriting
   {
-    if (fileExists(path))
-    {
-      console.log('This file path already exists- to avoid overwriting the file, I will rename it');
+      if (!fileExists(path)) {
+        console.log("OK-doesnt exist: "+path);
+        return path
+      };
       var folderPath = path.substring(0,path.lastIndexOf("/")+1);
       var fileFormat = path.substring(path.lastIndexOf("."),path.length);
       var oldFileName = path.substring(path.lastIndexOf("/")+1,path.lastIndexOf("."));
-      var newUniqueNamePath = folderPath + oldFileName + String(appendNumber) + fileFormat
-      if (fileExists(newUniqueNamePath))
-      {
+      var newUniqueNamePath = folderPath + oldFileName + String(appendNumber) + fileFormat;
+      var appendNumber = 0;
+      while (fileExists(newUniqueNamePath))
+      { 
+        console.log("Try "+newUniqueNamePath);
         appendNumber += 1;
-        makeFileNameUnique(path,appendNumber) ///TODO needs to be improved- breaks after the second iteration-- use while loop?
-        return
+        newUniqueNamePath = folderPath + oldFileName + String(appendNumber) + fileFormat;
       }
-      else
-      {
-        console.log('Made filename unique: '+newUniqueNamePath);
-        return newUniqueNamePath
-      }
-    }
-    else
-    {
-      console.log('filename is already unique: '+path);
-      return path
-    }
+      return newUniqueNamePath
   }
 
   function base64_encode(file) { // read binary data
@@ -94,18 +86,17 @@
     var layer = pskl.app.piskelController.getCurrentLayer();
     var piskelFramePaths = [];
     for (i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
-      // console.log(layer.getFrameAt(i));
       var exportPath = layer.getFrameAt(i).originalPath    
-      if (exportPath == null){
+      if (exportPath == null) { //if frame was made in piskel, come up with a unique path, so as not to overwrite any existing files
         exportPath = this.guessedExportPath + '-PSKL-' + (i + 1) + '.png';
-        exportPath = makeFileNameUnique(exportPath,0);
+        exportPath = makeFileNameUnique(exportPath);
         console.log("new undefined path:"+exportPath);
       }
       else
-      {
+      { //if it came from gdevelop- overwrite the original file that it came from
         console.log("Original Path:"+exportPath);
       };
-      //render and save
+      //finally render and save
       var canvas = pskl.app.piskelController.renderFrameAt(i, true);
       pskl.utils.BlobUtils.canvasToBlob(canvas, function(blob) {
         downloadAsFile(blob, exportPath, exportPath);

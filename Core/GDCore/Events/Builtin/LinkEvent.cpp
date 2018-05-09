@@ -95,9 +95,9 @@ void LinkEvent::ReplaceLinkByLinkedEvents(
 
     // Insert an empty event to replace the link event ( we'll delete the link
     // event at the end ) ( If we just erase the link event without adding a
-    //blank event to replace it, the first event inserted by the link will not
-    // be preprocessed ( and it can be annoying if it require preprocessing, such
-    // as another link event ). )
+    // blank event to replace it, the first event inserted by the link will not
+    // be preprocessed ( and it can be annoying if it require preprocessing,
+    // such as another link event ). )
     gd::EmptyEvent emptyEvent;
     eventList.InsertEvent(emptyEvent, indexOfTheEventInThisList);
     eventList.InsertEvents(

@@ -360,7 +360,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddAction(
          "CreateMaskFromColorOnActualImage",  // Actual is indeed a mistake :
-                                              // Current should have been chosen.
+                                              // Current should have been
+                                              // chosen.
          _("Make a color of the image of an object transparent"),
          _("Make a color of the image of an object transparent."),
          _("Make color _PARAM1_ of the current image of _PARAM0_ transparent"),

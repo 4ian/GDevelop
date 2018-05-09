@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef ADVANCEDEXTENSION_H
@@ -14,12 +14,10 @@
  *
  * \ingroup BuiltinExtensions
  */
-class AdvancedExtension : public ExtensionBase
-{
-public:
-    AdvancedExtension();
-    virtual ~AdvancedExtension() {};
+class AdvancedExtension : public ExtensionBase {
+ public:
+  AdvancedExtension();
+  virtual ~AdvancedExtension(){};
 };
 
-#endif // ADVANCEDEXTENSION_H
-
+#endif  // ADVANCEDEXTENSION_H

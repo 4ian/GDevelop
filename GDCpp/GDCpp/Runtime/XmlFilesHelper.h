@@ -1,17 +1,17 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef XMLFILESHELPER_H
 #define XMLFILESHELPER_H
 
-#include "GDCpp/Runtime/TinyXml/tinyxml.h"
-#include <string>
-#include <memory>
 #include <map>
+#include <memory>
+#include <string>
 #include "GDCpp/Runtime/String.h"
+#include "GDCpp/Runtime/TinyXml/tinyxml.h"
 #include "GDCpp/Runtime/Tools/XmlLoader.h"
 
 /**
@@ -19,39 +19,41 @@
  *
  * \ingroup FileExtension
  */
-class XmlFile
-{
-    public :
+class XmlFile {
+ public:
+  /**
+   * Open file
+   */
+  XmlFile(gd::String filename) : doc(), filename(filename), modified(false) {
+    gd::LoadXmlFromFile(doc, filename);
+  };
 
-        /**
-         * Open file
-         */
-        XmlFile(gd::String filename) : doc(), filename(filename), modified(false) { gd::LoadXmlFromFile( doc, filename ); };
+  /**
+   * Save file is the document was marked as modified.
+   */
+  ~XmlFile() {
+    if (modified) gd::SaveXmlToFile(doc, filename);
+  }
 
-        /**
-         * Save file is the document was marked as modified.
-         */
-        ~XmlFile() { if (modified) gd::SaveXmlToFile( doc, filename ); }
+  /**
+   * Set the file to be saved when the object is destroyed.
+   */
+  void MarkAsModified() { modified = true; }
 
-        /**
-         * Set the file to be saved when the object is destroyed.
-         */
-        void MarkAsModified() { modified = true; }
+  /**
+   * Access to the tinyxml representation of the file
+   */
+  TiXmlDocument& GetTinyXmlDocument() { return doc; };
 
-        /**
-         * Access to the tinyxml representation of the file
-         */
-        TiXmlDocument & GetTinyXmlDocument() { return doc; };
+  /**
+   * Access to the tinyxml representation of the file
+   */
+  const TiXmlDocument& GetTinyXmlDocument() const { return doc; };
 
-        /**
-         * Access to the tinyxml representation of the file
-         */
-        const TiXmlDocument & GetTinyXmlDocument() const { return doc; };
-
-    private :
-        TiXmlDocument doc;
-        gd::String filename;
-        bool modified;
+ private:
+  TiXmlDocument doc;
+  gd::String filename;
+  bool modified;
 };
 
 /**
@@ -59,44 +61,44 @@ class XmlFile
  *
  * \ingroup FileExtension
  */
-class XmlFilesManager
-{
-    static std::map<gd::String, std::shared_ptr<XmlFile> > openedFiles;
+class XmlFilesManager {
+  static std::map<gd::String, std::shared_ptr<XmlFile> > openedFiles;
 
-    public:
+ public:
+  /**
+   * Load a file and keep it in memory
+   */
+  static void LoadFile(gd::String filename) {
+    if (openedFiles.find(filename) == openedFiles.end())
+      openedFiles[filename] = std::make_shared<XmlFile>(filename);
+  }
 
-    /**
-     * Load a file and keep it in memory
-     */
-    static void LoadFile(gd::String filename)
-    {
-        if ( openedFiles.find(filename) == openedFiles.end() )
-            openedFiles[filename] = std::make_shared<XmlFile>(filename);
-    }
+  /**
+   * Unload a file kept in memory
+   */
+  static void UnloadFile(gd::String filename) {
+    if (openedFiles.find(filename) != openedFiles.end())
+      openedFiles.erase(filename);
+  }
 
-    /**
-     * Unload a file kept in memory
-     */
-    static void UnloadFile(gd::String filename)
-    {
-        if ( openedFiles.find(filename) != openedFiles.end() )
-            openedFiles.erase(filename);
-    }
+  /**
+   * Get access to a file. If the file has not been loaded with LoadFile,
+   * it will be loaded now, and unload as soon as it is not used anymore.
+   */
+  static std::shared_ptr<XmlFile> GetFile(gd::String filename,
+                                          bool isGoingToModifyFile = true) {
+    std::shared_ptr<XmlFile> file =
+        openedFiles.find(filename) != openedFiles.end()
+            ? openedFiles[filename]
+            : std::make_shared<XmlFile>(filename);
+    if (isGoingToModifyFile) file->MarkAsModified();
 
-    /**
-     * Get access to a file. If the file has not been loaded with LoadFile,
-     * it will be loaded now, and unload as soon as it is not used anymore.
-     */
-    static std::shared_ptr<XmlFile> GetFile(gd::String filename, bool isGoingToModifyFile = true)
-    {
-        std::shared_ptr<XmlFile> file = openedFiles.find(filename) != openedFiles.end() ? openedFiles[filename] : std::make_shared<XmlFile>(filename);
-        if ( isGoingToModifyFile ) file->MarkAsModified();
+    return file;
+  }
 
-        return file;
-    }
-
-
-    static std::map<gd::String, std::shared_ptr<XmlFile> > GetOpenedFilesList() { return openedFiles; }
+  static std::map<gd::String, std::shared_ptr<XmlFile> > GetOpenedFilesList() {
+    return openedFiles;
+  }
 };
 
-#endif // XMLFILESHELPER_H
+#endif  // XMLFILESHELPER_H

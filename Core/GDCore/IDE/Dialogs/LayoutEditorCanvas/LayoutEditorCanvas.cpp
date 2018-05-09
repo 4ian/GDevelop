@@ -725,7 +725,7 @@ void LayoutEditorCanvas::LaunchPreview() {
   if (!currentPreviewer->LaunchPreview()) {
     // Do not go into preview state if LaunchPreview returned false
     //( Some platforms can launch a program and do not display the preview in
-    //the editor. )
+    // the editor. )
     editing = true;
     wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
     return;

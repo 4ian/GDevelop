@@ -166,7 +166,8 @@ void ExtensionsLoader::ExtensionsLoadingDone(const gd::String &directory) {
   // LLVM/Clang. We couldn't mark them as global when loading them as every
   // extension use the same "CreateGDExtension" symbol. SetLibraryGlobal is also
   // setting RTLD_NOW to ensure that all symbols are resolved: Otherwise, we can
-  // get weird "symbol lookup error" even if the symbols exist in the extensions!
+  // get weird "symbol lookup error" even if the symbols exist in the
+  // extensions!
   for (std::size_t i = 0; i < librariesLoaded.size(); ++i)
     SetLibraryGlobal(librariesLoaded[i].c_str());
 #else

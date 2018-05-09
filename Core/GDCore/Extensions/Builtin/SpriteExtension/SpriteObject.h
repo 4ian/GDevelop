@@ -178,7 +178,7 @@ class GD_CORE_API SpriteObject : public gd::Object {
                             ///< screen.
 
   static Animation badAnimation;  //< Bad animation when an out of bound
-                                  //animation is requested.
+                                  // animation is requested.
 };
 
 }  // namespace gd

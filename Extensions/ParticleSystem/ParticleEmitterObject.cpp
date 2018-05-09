@@ -8,8 +8,6 @@ This project is released under the MIT License.
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/wx.h>  //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
 #endif
-#include <SPK.h>
-#include <SPK_GL.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "GDCore/Tools/Localization.h"
@@ -32,6 +30,11 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/CommonTools.h"
 #include "ParticleEmitterObjectEditor.h"
 #endif
+
+// clang-format off
+#include <SPK.h>
+#include <SPK_GL.h>
+// clang-format on
 
 using namespace std;
 

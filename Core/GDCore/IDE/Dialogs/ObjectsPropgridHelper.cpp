@@ -67,7 +67,7 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object* object,
       properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") !=
           properties.end()) {
     //"Click to edit" is not shown if properties are not empty, except if the
-    //magic property is set.
+    // magic property is set.
     grid->Append(
         new wxStringProperty(_("Edit"), wxPG_LABEL, _("Click to edit...")));
     grid->SetPropertyCell(_("Edit"),
@@ -128,7 +128,7 @@ void ObjectsPropgridHelper::RefreshFrom(const gd::Object* object,
         properties.find("PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS") !=
             properties.end()) {
       //"Click to edit" is not shown if properties are not empty, except if the
-      //magic property is set.
+      // magic property is set.
       grid->Append(new wxStringProperty(
           _("Edit"), wxString("AUTO:" + behaviors[i]), _("Click to edit...")));
       grid->SetPropertyCell(wxString("AUTO:" + behaviors[i]),

@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef JOYSTICKEXTENSION_H
@@ -14,14 +14,13 @@
  *
  * \ingroup BuiltinExtensions
  */
-class JoystickExtension : public ExtensionBase
-{
-    public:
-        JoystickExtension();
-        virtual ~JoystickExtension() {};
-    protected:
-    private:
+class JoystickExtension : public ExtensionBase {
+ public:
+  JoystickExtension();
+  virtual ~JoystickExtension(){};
+
+ protected:
+ private:
 };
 
-#endif // JOYSTICKEXTENSION_H
-
+#endif  // JOYSTICKEXTENSION_H

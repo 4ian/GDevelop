@@ -771,8 +771,9 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
     // Each event has its own context : Objects picked in an event are totally
     // different than the one picked in another.
     gd::EventsCodeGenerationContext newContext;
-    newContext.InheritsFrom(parentContext);  // Events in the same "level" share
-                                             // the same context as their parent.
+    newContext.InheritsFrom(
+        parentContext);  // Events in the same "level" share
+                         // the same context as their parent.
 
     //*Optimization*: when the event is the last of a list, we can use the
     // same lists of objects as the parent (as they will be discarded just

@@ -8,12 +8,10 @@
  *
  * \ingroup BuiltinExtensions
  */
-class GD_API BaseObjectExtension : public ExtensionBase
-{
-public:
-    BaseObjectExtension();
-    virtual ~BaseObjectExtension() {};
+class GD_API BaseObjectExtension : public ExtensionBase {
+ public:
+  BaseObjectExtension();
+  virtual ~BaseObjectExtension(){};
 };
 
-#endif // BUILTINEXTENSION_H
-
+#endif  // BUILTINEXTENSION_H

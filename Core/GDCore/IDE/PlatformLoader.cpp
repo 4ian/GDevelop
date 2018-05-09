@@ -123,8 +123,9 @@ std::shared_ptr<gd::Platform> PlatformLoader::LoadPlatformInManager(
     } else {
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
       gd::LocaleManager::Get()->AddCatalog(
-          wxFileName(fullpath).GetName());  // In editor, load catalog
-                                            // associated with extension, if any.
+          wxFileName(fullpath)
+              .GetName());  // In editor, load catalog
+                            // associated with extension, if any.
 #endif
 
       std::shared_ptr<gd::Platform> platform(createFunPtr(), destroyFunPtr);

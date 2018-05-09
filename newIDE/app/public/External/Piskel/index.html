@@ -49,13 +49,13 @@
       var folderPath = path.substring(0,path.lastIndexOf("/")+1);
       var fileFormat = path.substring(path.lastIndexOf("."),path.length);
       var oldFileName = path.substring(path.lastIndexOf("/")+1,path.lastIndexOf("."));
-      var newUniqueNamePath = folderPath + oldFileName + String(appendNumber) + fileFormat;
       var appendNumber = 0;
+      var newUniqueNamePath = folderPath + oldFileName + "-" + String(appendNumber) + fileFormat;
       while (fileExists(newUniqueNamePath))
       { 
         console.log("Try "+newUniqueNamePath);
         appendNumber += 1;
-        newUniqueNamePath = folderPath + oldFileName + String(appendNumber) + fileFormat;
+        newUniqueNamePath = folderPath + oldFileName + "-" + String(appendNumber) + fileFormat;
       }
       return newUniqueNamePath
   }

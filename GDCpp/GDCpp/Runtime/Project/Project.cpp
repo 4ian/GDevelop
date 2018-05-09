@@ -1,10 +1,12 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #if !defined(GD_IDE_ONLY)
+// clang-format off
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCore/Project/Project.cpp"
+// clang-format on
 #endif

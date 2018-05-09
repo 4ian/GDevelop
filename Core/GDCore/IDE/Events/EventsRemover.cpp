@@ -1,15 +1,12 @@
 /*
  * GDevelop Core
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 #include "GDCore/IDE/Events/EventsRemover.h"
 
-namespace gd
-{
+namespace gd {
 
-EventsRemover::~EventsRemover()
-{
-}
+EventsRemover::~EventsRemover() {}
 
-}
+}  // namespace gd

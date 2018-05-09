@@ -7,20 +7,22 @@ This project is released under the MIT License.
 
 #ifndef EXTENSION_H_INCLUDED
 #define EXTENSION_H_INCLUDED
-namespace gd { class ObjectMetadata; }
-namespace gd { class PlatformExtension; }
+namespace gd {
+class ObjectMetadata;
+}
+namespace gd {
+class PlatformExtension;
+}
 
-void DeclareParticleSystemExtension(gd::PlatformExtension & extension);
+void DeclareParticleSystemExtension(gd::PlatformExtension& extension);
 
 /**
  * \brief This class declares information about the extension.
  */
-class ParticleSystemCppExtension : public ExtensionBase
-{
-public:
-    ParticleSystemCppExtension();
-    virtual ~ParticleSystemCppExtension() {};
+class ParticleSystemCppExtension : public ExtensionBase {
+ public:
+  ParticleSystemCppExtension();
+  virtual ~ParticleSystemCppExtension(){};
 };
 
-#endif // EXTENSION_H_INCLUDED
-
+#endif  // EXTENSION_H_INCLUDED

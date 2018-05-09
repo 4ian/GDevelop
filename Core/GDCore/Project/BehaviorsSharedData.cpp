@@ -1,7 +1,7 @@
 /*
  * GDevelop Core
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #include "GDCore/Project/BehaviorsSharedData.h"
@@ -10,19 +10,16 @@
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #endif
 
-namespace gd
-{
+namespace gd {
 
-BehaviorsSharedData::~BehaviorsSharedData()
-{
-};
+BehaviorsSharedData::~BehaviorsSharedData(){};
 
 #if defined(GD_IDE_ONLY)
-std::map<gd::String, gd::PropertyDescriptor> BehaviorsSharedData::GetProperties(gd::Project & project) const
-{
-	std::map<gd::String, gd::PropertyDescriptor> nothing;
-	return nothing;
+std::map<gd::String, gd::PropertyDescriptor> BehaviorsSharedData::GetProperties(
+    gd::Project& project) const {
+  std::map<gd::String, gd::PropertyDescriptor> nothing;
+  return nothing;
 }
 #endif
 
-}
+}  // namespace gd

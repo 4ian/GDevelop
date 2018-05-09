@@ -7,5 +7,4 @@ This project is released under the MIT License.
 
 #include "ReceivedDataManager.h"
 
-ReceivedDataManager * ReceivedDataManager::_singleton = 0;
-
+ReceivedDataManager* ReceivedDataManager::_singleton = 0;

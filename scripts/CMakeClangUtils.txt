@@ -1,0 +1,20 @@
+# Add clang-format for each target to automatically format C++ source files
+function(gd_add_clang_utils target_name source_files)
+	find_program(CLANG_FORMAT "clang-format")
+	if(CLANG_FORMAT)
+		add_custom_target(
+			${target_name}_clang-format
+			COMMAND ${CLANG_FORMAT}
+			-i 
+			-style=\"{BasedOnStyle: Google, BinPackParameters: false, BinPackArguments: false}\"
+			${source_files}
+			)
+
+		add_dependencies(clang-format ${target_name}_clang-format)
+	endif()
+
+	# TODO: Add support for clang-tidy
+endfunction()
+
+# Add a clang-format target to run all clang-format targets
+add_custom_target(clang-format)

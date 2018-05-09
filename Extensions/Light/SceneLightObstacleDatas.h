@@ -14,24 +14,27 @@ This project is released under the MIT License.
 /**
  * \brief Data common to all light obstacles behaviors of a scene.
  */
-class GD_EXTENSION_API SceneLightObstacleDatas : public gd::BehaviorsSharedData
-{
-public:
-    SceneLightObstacleDatas() {};
-    virtual ~SceneLightObstacleDatas() {};
-    virtual std::shared_ptr<gd::BehaviorsSharedData> Clone() const { return std::shared_ptr<gd::BehaviorsSharedData>(new SceneLightObstacleDatas(*this));}
+class GD_EXTENSION_API SceneLightObstacleDatas
+    : public gd::BehaviorsSharedData {
+ public:
+  SceneLightObstacleDatas(){};
+  virtual ~SceneLightObstacleDatas(){};
+  virtual std::shared_ptr<gd::BehaviorsSharedData> Clone() const {
+    return std::shared_ptr<gd::BehaviorsSharedData>(
+        new SceneLightObstacleDatas(*this));
+  }
 
-    virtual std::shared_ptr<BehaviorsRuntimeSharedData> CreateRuntimeSharedDatas()
-    {
-        return std::shared_ptr<BehaviorsRuntimeSharedData>(new RuntimeSceneLightObstacleDatas(*this));
-    }
+  virtual std::shared_ptr<BehaviorsRuntimeSharedData>
+  CreateRuntimeSharedDatas() {
+    return std::shared_ptr<BehaviorsRuntimeSharedData>(
+        new RuntimeSceneLightObstacleDatas(*this));
+  }
 
-    #if defined(GD_IDE_ONLY)
-    virtual void SerializeTo(gd::SerializerElement & element) const;
-    #endif
+#if defined(GD_IDE_ONLY)
+  virtual void SerializeTo(gd::SerializerElement& element) const;
+#endif
 
-    virtual void UnserializeFrom(const gd::SerializerElement & element);
+  virtual void UnserializeFrom(const gd::SerializerElement& element);
 };
 
-#endif // SCENELIGHTOBSTACLEPHYSICSDATAS_H
-
+#endif  // SCENELIGHTOBSTACLEPHYSICSDATAS_H

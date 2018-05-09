@@ -1,17 +1,17 @@
 /*
  * GDevelop Core
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY)
 #ifndef IMAGESUSEDINVENTORIZER_H
 #define IMAGESUSEDINVENTORIZER_H
 
-#include "GDCore/String.h"
-#include <vector>
 #include <set>
+#include <vector>
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
+#include "GDCore/String.h"
 
 namespace gd {
 
@@ -20,32 +20,33 @@ namespace gd {
  *
  * Usage example:
 \code
-	gd::ImagesUsedInventorizer inventorizer;
-	project.ExposeResources(inventorizer);
+        gd::ImagesUsedInventorizer inventorizer;
+        project.ExposeResources(inventorizer);
 
-	//Get a set with the name of all images in the project:
+        //Get a set with the name of all images in the project:
     std::set<gd::String> & usedImages = inventorizer.GetAllUsedImages();
 \endcode
  *
  * \ingroup IDE
  */
-class ImagesUsedInventorizer : public gd::ArbitraryResourceWorker
-{
-public:
+class ImagesUsedInventorizer : public gd::ArbitraryResourceWorker {
+ public:
+  ImagesUsedInventorizer() : gd::ArbitraryResourceWorker(){};
+  virtual ~ImagesUsedInventorizer(){};
 
-    ImagesUsedInventorizer() : gd::ArbitraryResourceWorker() {};
-    virtual ~ImagesUsedInventorizer() {};
+  std::set<gd::String>& GetAllUsedImages() { return allUsedImages; };
 
-    std::set<gd::String> & GetAllUsedImages() { return allUsedImages; };
+  virtual void ExposeFile(gd::String& resource){
+      /*Don't care, we just list images*/};
+  virtual void ExposeImage(gd::String& imageName) {
+    allUsedImages.insert(imageName);
+  };
 
-    virtual void ExposeFile(gd::String & resource) { /*Don't care, we just list images*/ };
-    virtual void ExposeImage(gd::String & imageName) {allUsedImages.insert(imageName);};
-
-protected:
-    std::set<gd::String> allUsedImages;
+ protected:
+  std::set<gd::String> allUsedImages;
 };
 
-}
+}  // namespace gd
 
-#endif // IMAGESUSEDINVENTORIZER_H
+#endif  // IMAGESUSEDINVENTORIZER_H
 #endif

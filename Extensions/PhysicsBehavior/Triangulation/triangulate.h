@@ -17,40 +17,37 @@
 /** whatever your own Vector implementation might be.           **/
 /*****************************************************************/
 
+#include <vector>  // Include STL vector class.
 #include "SFML/Config.hpp"
 #include "SFML/System/Vector2.hpp"
-#include <vector>  // Include STL vector class.
 
 // Typedef an STL vector of vertices which are used to represent
 // a polygon/contour and a series of triangles.
-typedef std::vector< sf::Vector2f > Vector2fVector;
+typedef std::vector<sf::Vector2f> Vector2fVector;
 
-
-class Triangulate
-{
-public:
-
+class Triangulate {
+ public:
   // triangulate a contour/polygon, places results in STL vector
   // as series of triangles.
-  static bool Process(const Vector2fVector &contour,
-                      Vector2fVector &result);
+  static bool Process(const Vector2fVector &contour, Vector2fVector &result);
 
   // compute area of a contour/polygon
   static float Area(const Vector2fVector &contour);
 
   // decide if point Px/Py is inside triangle defined by
   // (Ax,Ay) (Bx,By) (Cx,Cy)
-  static bool InsideTriangle(float Ax, float Ay,
-                      float Bx, float By,
-                      float Cx, float Cy,
-                      float Px, float Py);
+  static bool InsideTriangle(float Ax,
+                             float Ay,
+                             float Bx,
+                             float By,
+                             float Cx,
+                             float Cy,
+                             float Px,
+                             float Py);
 
-
-private:
-  static bool Snip(const Vector2fVector &contour,int u,int v,int w,int n,int *V);
-
+ private:
+  static bool Snip(
+      const Vector2fVector &contour, int u, int v, int w, int n, int *V);
 };
 
-
 #endif
-

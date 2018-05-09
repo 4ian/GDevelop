@@ -1,13 +1,9 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include "LayoutEditorPreviewer.h"
 
-namespace gd
-{
+namespace gd {
 
-LayoutEditorPreviewer::~LayoutEditorPreviewer()
-{
-}
+LayoutEditorPreviewer::~LayoutEditorPreviewer() {}
 
-
-}
+}  // namespace gd
 #endif

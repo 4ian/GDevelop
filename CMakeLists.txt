@@ -4,6 +4,9 @@
 cmake_minimum_required(VERSION 2.6)
 cmake_policy(SET CMP0011 NEW)
 
+# Add utility functions
+include(scripts/CMakeClangUtils.txt) # To add clang-format and clang-tidy support to a target
+
 # Macro for defining an option
 macro(gd_set_option var default type docstring)
     if(NOT DEFINED ${var})

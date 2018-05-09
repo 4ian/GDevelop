@@ -12,68 +12,79 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/RuntimeObject.h"
 class RuntimeScene;
 class ImageManager;
-namespace gd { class InitialInstance; }
-namespace gd { class ImageManager; }
+namespace gd {
+class InitialInstance;
+}
+namespace gd {
+class ImageManager;
+}
 #if defined(GD_IDE_ONLY)
-namespace sf
-{
-    class Texture;
-    class Sprite;
-};
-namespace gd { class Project; }
+namespace sf {
+class Texture;
+class Sprite;
+};  // namespace sf
+namespace gd {
+class Project;
+}
 class wxBitmap;
 #endif
 
 /**
  * \brief Simple object which stores user keyboard input.
  */
-class GD_EXTENSION_API TextEntryObject : public gd::Object
-{
-public :
-    TextEntryObject(gd::String name_);
-    virtual ~TextEntryObject() {};
-    virtual std::unique_ptr<gd::Object> Clone() const { return gd::make_unique<TextEntryObject>(*this); }
+class GD_EXTENSION_API TextEntryObject : public gd::Object {
+ public:
+  TextEntryObject(gd::String name_);
+  virtual ~TextEntryObject(){};
+  virtual std::unique_ptr<gd::Object> Clone() const {
+    return gd::make_unique<TextEntryObject>(*this);
+  }
 
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
-    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) const;
-    static void LoadEdittimeIcon();
-    #endif
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+  virtual void DrawInitialInstance(gd::InitialInstance& instance,
+                                   sf::RenderTarget& renderTarget,
+                                   gd::Project& project,
+                                   gd::Layout& layout);
+  virtual bool GenerateThumbnail(const gd::Project& project,
+                                 wxBitmap& thumbnail) const;
+  static void LoadEdittimeIcon();
+#endif
 
-private:
-    #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    static sf::Texture edittimeIconImage;
-    static sf::Sprite edittimeIcon;
-    #endif
+ private:
+#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+  static sf::Texture edittimeIconImage;
+  static sf::Sprite edittimeIcon;
+#endif
 };
 
+class GD_EXTENSION_API RuntimeTextEntryObject : public RuntimeObject {
+ public:
+  RuntimeTextEntryObject(RuntimeScene& scene,
+                         const TextEntryObject& textEntryObject);
+  virtual ~RuntimeTextEntryObject(){};
+  virtual std::unique_ptr<RuntimeObject> Clone() const {
+    return gd::make_unique<RuntimeTextEntryObject>(*this);
+  }
 
-class GD_EXTENSION_API RuntimeTextEntryObject : public RuntimeObject
-{
-public :
+#if defined(GD_IDE_ONLY)
+  virtual void GetPropertyForDebugger(std::size_t propertyNb,
+                                      gd::String& name,
+                                      gd::String& value) const;
+  virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
+  virtual std::size_t GetNumberOfProperties() const;
+#endif
 
-    RuntimeTextEntryObject(RuntimeScene & scene, const TextEntryObject & textEntryObject);
-    virtual ~RuntimeTextEntryObject() {};
-    virtual std::unique_ptr<RuntimeObject> Clone() const { return gd::make_unique<RuntimeTextEntryObject>(*this);}
+  virtual void Update(const RuntimeScene& scene);
 
-    #if defined(GD_IDE_ONLY)
-    virtual void GetPropertyForDebugger (std::size_t propertyNb, gd::String & name, gd::String & value) const;
-    virtual bool ChangeProperty(std::size_t propertyNb, gd::String newValue);
-    virtual std::size_t GetNumberOfProperties() const;
-    #endif
+  inline void SetString(gd::String str) { text = str; };
+  const gd::String& GetString() const { return text; };
 
-    virtual void Update(const RuntimeScene & scene);
+  void Activate(bool activate = true) { activated = activate; };
+  bool IsActivated() const { return activated; };
 
-    inline void SetString(gd::String str) { text = str; };
-    const gd::String & GetString() const { return text; };
-
-    void Activate( bool activate = true ) { activated = activate; };
-    bool IsActivated() const { return activated; };
-
-private:
-
-    gd::String text;
-    bool activated;
+ private:
+  gd::String text;
+  bool activated;
 };
 
-#endif // TEXTENTRYOBJECT_H
+#endif  // TEXTENTRYOBJECT_H

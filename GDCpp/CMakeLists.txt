@@ -82,6 +82,12 @@ IF (NOT NO_GUI)
 	list(APPEND ide_source_files ${source_gdcpp_ide_dialogs})
 ENDIF()
 
+file(GLOB_RECURSE formatted_gdcpp_source_files tests/*.cpp GDCpp/Events/* GDCpp/Extensions/* GDCpp/IDE/*.cpp)
+list(REMOVE_ITEM formatted_gdcpp_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs.h" "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs_dialogs_bitmaps.cpp")
+file(GLOB formatted_gdcpp_runtime_source_files GDCpp/Runtime/*.cpp GDCpp/Runtime/*.h GDCpp/Runtime/Tools/*.cpp GDCpp/Runtime/Tools/*.h GDCpp/Runtime/Serialization/*.cpp GDCpp/Runtime/Serialization/*.h GDCpp/Runtime/Project/*.cpp GDCpp/Runtime/Project/*.h)
+set(formatted_source_files ${formatted_gdcpp_source_files} ${formatted_gdcpp_runtime_source_files})
+gd_add_clang_utils(GDCpp "${formatted_source_files}")
+
 file(GLOB exe_source_files Runtime/*)
 
 add_library(GDCpp SHARED ${ide_source_files})

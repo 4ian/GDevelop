@@ -94,7 +94,15 @@
       }
       else
       { //if it came from gdevelop- overwrite the original file that it came from
-        console.log("Original Path:"+exportPath);
+        if (piskelFramePaths.includes(exportPath)) // Prevent overwriting frames that were created via duplication of imported frames
+        {
+          console.log("Do not overwrite:"+exportPath);
+          exportPath = makeFileNameUnique(exportPath);
+        }
+        else
+        {
+          console.log("Overwriting file:"+exportPath);
+        } 
       };
       //finally render and save
       var canvas = pskl.app.piskelController.renderFrameAt(i, true);
@@ -103,8 +111,7 @@
         piskelFramePaths.push(exportPath);
       });
     }
-    //finally reload the frames in gdevelop
-    console.log("Saved!!");
+    //finally reload the frames in gdevelop and close the window
     ipcRenderer.send("piskelSavedChanges",piskelFramePaths);
     remote.getCurrentWindow().close();
   }

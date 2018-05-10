@@ -80,6 +80,7 @@
     reader.readAsArrayBuffer(content)
   }
 
+  var guessedExportPath
   function SaveToGD() {
     var editorFrameEl = document.querySelector(".editor-frame");
     var pskl = editorFrameEl.contentWindow.pskl;
@@ -113,9 +114,8 @@
     remote.getCurrentWindow().close();
   }
 
-  var guessedExportPath
   ipcRenderer.on('piskelMakeNewAnimation',(event,piskelData) => {
-    guessedExportPath = piskelData["projectFolder"];
+    this.guessedExportPath = piskelData["projectFolder"];
     var editorFrameEl = document.querySelector(".editor-frame");
     var pskl = editorFrameEl.contentWindow.pskl;
     var sprite = {"modelVersion":2,"piskel":{"name":"New Animation","description":"","fps":12,"height":64,"width":64,"layers":["{\"name\":\"Layer 1\",\"frameCount\":1,\"base64PNG\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAOUlEQVR42u3OIQEAAAACIP1/2hkWWEBzVgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAYF3YDicAEE8VTiYAAAAAElFTkSuQmCC\"}"]}};

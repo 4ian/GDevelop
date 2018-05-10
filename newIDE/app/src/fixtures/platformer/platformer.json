@@ -1020,7 +1020,7 @@
                     "width": 0,
                     "x": 2181.78,
                     "y": 59.0157,
-                    "zOrder": 1,
+                    "zOrder": -5,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1040,7 +1040,7 @@
                     "width": 0,
                     "x": 151.785,
                     "y": 182.016,
-                    "zOrder": 1,
+                    "zOrder": -5,
                     "numberProperties": [],
                     "stringProperties": [],
                     "initialVariables": []
@@ -1055,7 +1055,7 @@
                     "width": 0,
                     "x": 530.784,
                     "y": 312.015,
-                    "zOrder": 1,
+                    "zOrder": -5,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1075,7 +1075,7 @@
                     "width": 0,
                     "x": 1480.78,
                     "y": 134.016,
-                    "zOrder": 1,
+                    "zOrder": -5,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1095,7 +1095,7 @@
                     "width": 0,
                     "x": 2078.78,
                     "y": 385.016,
-                    "zOrder": 1,
+                    "zOrder": -5,
                     "numberProperties": [],
                     "stringProperties": [],
                     "initialVariables": []
@@ -1110,7 +1110,7 @@
                     "width": 0,
                     "x": 1847.78,
                     "y": 164.016,
-                    "zOrder": 1,
+                    "zOrder": -5,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1130,7 +1130,7 @@
                     "width": 0,
                     "x": 1258.78,
                     "y": 357.015,
-                    "zOrder": 1,
+                    "zOrder": -5,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1150,7 +1150,7 @@
                     "width": 0,
                     "x": 664.784,
                     "y": 170.016,
-                    "zOrder": 1,
+                    "zOrder": -5,
                     "numberProperties": [],
                     "stringProperties": [],
                     "initialVariables": []
@@ -1165,7 +1165,7 @@
                     "width": 0,
                     "x": 2078.57,
                     "y": 503.108,
-                    "zOrder": 1,
+                    "zOrder": -2,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1185,7 +1185,7 @@
                     "width": 66,
                     "x": 1736.78,
                     "y": 298.016,
-                    "zOrder": 1,
+                    "zOrder": -2,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1220,7 +1220,7 @@
                     "width": 94,
                     "x": 1249.78,
                     "y": 500.015,
-                    "zOrder": 1,
+                    "zOrder": -2,
                     "numberProperties": [],
                     "stringProperties": [],
                     "initialVariables": []
@@ -1232,7 +1232,7 @@
                     "layer": "",
                     "locked": false,
                     "name": "BackgroundObjects",
-                    "width": 0,
+                    "width": -2,
                     "x": 536.785,
                     "y": 503.015,
                     "zOrder": -2,
@@ -1247,10 +1247,10 @@
                     "layer": "",
                     "locked": false,
                     "name": "BackgroundObjects",
-                    "width": 0,
+                    "width": -2,
                     "x": 925.784,
                     "y": 505.015,
-                    "zOrder": 1,
+                    "zOrder": -2,
                     "numberProperties": [],
                     "stringProperties": [],
                     "initialVariables": []
@@ -1262,10 +1262,10 @@
                     "layer": "",
                     "locked": false,
                     "name": "BackgroundObjects",
-                    "width": 0,
+                    "width": -2,
                     "x": 1413.78,
                     "y": 502.015,
-                    "zOrder": 1,
+                    "zOrder": -2,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1285,7 +1285,7 @@
                     "width": 58,
                     "x": 1371.78,
                     "y": 524.016,
-                    "zOrder": 1,
+                    "zOrder": -2,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1305,7 +1305,7 @@
                     "width": 58,
                     "x": 1435.78,
                     "y": 525.016,
-                    "zOrder": 1,
+                    "zOrder": -2,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1325,7 +1325,7 @@
                     "width": 58,
                     "x": 1756.78,
                     "y": 314.016,
-                    "zOrder": 1,
+                    "zOrder": -2,
                     "numberProperties": [
                         {
                             "name": "animation",
@@ -1345,7 +1345,7 @@
                     "width": 0,
                     "x": -62.2151,
                     "y": 472.015,
-                    "zOrder": 1,
+                    "zOrder": -2,
                     "numberProperties": [
                         {
                             "name": "animation",

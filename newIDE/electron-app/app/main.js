@@ -105,6 +105,7 @@ app.on('ready', function() {
     // Production (with npm run build)
     mainWindow.loadURL('file://' + __dirname + '/www/index.html');
     if (devTools) mainWindow.openDevTools();
+    piskelWindow.loadURL('file://' + __dirname + '/www/External/Piskel/index.html');
   }
 
   Menu.setApplicationMenu(buildMainMenuFor(mainWindow));
@@ -123,14 +124,8 @@ app.on('ready', function() {
     piskelWindow.hide()
   });
 
-  
-  // piskelWindow.webContents.on('did-finish-load',() => {
-  //   piskelWindow.show();
-  // });
-
   piskelWindow.webContents.on('dom-ready',() => {
     piskelWindow.setMenu(null);
-    // piskelWindow.webContents.insertCSS('html,body{ overflow: hidden; }');
   });
 
   // piskelWindow.webContents.on('will-navigate', (e, url) => {
@@ -147,18 +142,17 @@ app.on('ready', function() {
   });
 
   ipcMain.on('piskelOpenAnimation', (event, piskelData) => {
-    if (piskelData['imageFrames'].length === 0){
-      console.log('No Frames Provided, refresh Piskel');
-      piskelWindow.reload();
-    };
     piskelWindow.show();
-    piskelWindow.webContents.send('piskelAnimation' , piskelData);
+    piskelWindow.webContents.send('piskelOpenGDAnimation' , piskelData);
+  });
+
+  ipcMain.on('piskelNewAnimation', (event, piskelData) => {
+    piskelWindow.show();
+    piskelWindow.webContents.send('piskelMakeNewAnimation' , piskelData);
   });
 
   ipcMain.on('piskelSavedChanges', ( event, piskelFramePaths) => {
-    console.log('receiving filepaths back from piskel!');
-    console.log(piskelFramePaths);
-    //TODO: RELOAD THE FRAMES INTO THE ANIMATION CLIP 
+    mainWindow.webContents.send('piskelSavedChanges', piskelFramePaths);
   });
 
   // S3Upload events:

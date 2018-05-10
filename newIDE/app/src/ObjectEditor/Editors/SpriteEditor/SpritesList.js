@@ -24,6 +24,8 @@ const gd = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
 
+var editedAnimationProp = null; // need this for piskel edits
+
 const styles = {
   spritesList: {
     whiteSpace: 'nowrap',
@@ -118,6 +120,30 @@ const SortableList = SortableContainer(
 );
 
 export default class SpritesList extends Component {
+
+  componentDidMount(){
+
+    ipcRenderer.on('piskelSavedChanges',( event, piskelFramePaths) => {
+      const {
+        direction,
+      } = editedAnimationProp.props;
+
+      direction.removeAllSprites(); /// clear the old sprite list
+      var i = 0 ; /// ...We need to recreate it in order to account for any new/removal/reorder frame changes made in piskel
+      for (i = 0; i < piskelFramePaths.length; i++) { 
+        var imagePath = piskelFramePaths[i];
+        const imageResource = new gd.ImageResource();
+        imageResource.setName(imagePath);
+        imageResource.setFile(imagePath);
+        const sprite = new gd.Sprite();
+        sprite.setImageName(imageResource.getName());
+        direction.addSprite(sprite);
+      };
+      editedAnimationProp.forceUpdate();
+
+    });
+  };
+
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.props.direction.moveSprite(oldIndex, newIndex);
     this.forceUpdate();
@@ -131,7 +157,6 @@ export default class SpritesList extends Component {
       direction,
     } = this.props;
     if (!resourceSources) return;
-
     const sources = resourceSources.filter(source => source.kind === 'image');
     if (!sources.length) return;
 
@@ -154,9 +179,9 @@ export default class SpritesList extends Component {
       direction,
       resourcesLoader,
     } = this.props;
-   
+    editedAnimationProp = this ;
+    console.log(editedAnimationProp);
     var imageFrames = []; /// first collect the images to edit
-    var testImage  
     for (var i = 0; i < direction.getSpritesCount(); i++) {
       var spriteImagePath = resourcesLoader.getResourceFullUrl(project, direction.getSprite(i).getImageName());
       var importedImage = new Image();
@@ -171,12 +196,20 @@ export default class SpritesList extends Component {
       name:"New Animation",
       isLooping:direction.isLooping()
     };
-    if (!direction.hasNoSprites()){
+    if (direction.hasNoSprites()){
+      piskelData['name'] = 'New Animation';
+      var projectFolderPath = String(project.getProjectFile());
+      projectFolderPath = projectFolderPath.substring(0,projectFolderPath.lastIndexOf("\\")+1);
+      projectFolderPath = projectFolderPath.replace(/[\\]/g,"/");
+      piskelData['projectFolder'] = projectFolderPath;
+      ipcRenderer.send('piskelNewAnimation',piskelData);
+    }
+    else
+    {
       piskelData['name'] = imageFrames[0].split("/").pop().split(".")[0];
-      };
-    console.log(piskelData);
-    ipcRenderer.send('piskelOpenAnimation',piskelData);
-  };
+      ipcRenderer.send('piskelOpenAnimation',piskelData);    
+    }
+  }
 
   render() {
     return (

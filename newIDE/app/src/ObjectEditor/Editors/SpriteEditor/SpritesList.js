@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import localFileSystem from '../../../Export/LocalExporters/LocalFileSystem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
 import Add from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
 import Brush from 'material-ui/svg-icons/image/brush';
-import ResourcesLoader from '../../../ResourcesLoader';
 import DirectionTools from './DirectionTools';
 import MiniToolbar from '../../../UI/MiniToolbar';
 import ImageThumbnail, {
@@ -15,10 +13,6 @@ import ImageThumbnail, {
 import optionalRequire from '../../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-const path = optionalRequire('path');
-const fs = optionalRequire('fs');
-
-const BrowserWindow = electron ? electron.remote.BrowserWindow : null;
 
 const gd = global.gd;
 
@@ -180,7 +174,6 @@ export default class SpritesList extends Component {
       resourcesLoader,
     } = this.props;
     editedAnimationProp = this ;
-    console.log(editedAnimationProp);
     var imageFrames = []; /// first collect the images to edit
     for (var i = 0; i < direction.getSpritesCount(); i++) {
       var spriteImagePath = resourcesLoader.getResourceFullUrl(project, direction.getSprite(i).getImageName());
@@ -189,7 +182,6 @@ export default class SpritesList extends Component {
       spriteImagePath = spriteImagePath.substring(7,spriteImagePath.lastIndexOf('?cache='));
       imageFrames.push(spriteImagePath);
     }
-    console.log(this.props);
     const piskelData = {
       imageFrames:imageFrames,
       fps:Math.floor(direction.getTimeBetweenFrames()*480),

@@ -57,7 +57,6 @@ app.on('ready', function () {
     x: args.x,
     y: args.y,
     webPreferences: {
-      //nativeWindowOpen: true,
       webSecurity: false, // Allow to access to local files
     },
     enableLargerThanScreen: true,
@@ -122,7 +121,7 @@ app.on('ready', function () {
 
   piskelWindow.on('close', (event) => {
     event.preventDefault();
-    piskelWindow.hide()
+    piskelWindow.hide();
   });
 
   piskelWindow.webContents.on('dom-ready', () => {

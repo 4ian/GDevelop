@@ -6,6 +6,7 @@ import IconButton from 'material-ui/IconButton';
 import Brush from 'material-ui/svg-icons/image/brush';
 import DirectionTools from './DirectionTools';
 import MiniToolbar from '../../../UI/MiniToolbar';
+import Window from "../../../Utils/Window";
 import ImageThumbnail, {
   thumbnailContainerStyle,
 } from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
@@ -121,9 +122,8 @@ export default class SpritesList extends Component {
       const { direction, project } = editedAnimationProp.props;
       const resourcesManager = project.getResourcesManager();
       direction.removeAllSprites(); /// clear the old sprite list
-      var i = 0; /// ...We need to recreate it in order to account for any new/removal/reorder frame changes made in piskel
-      for (i = 0; i < piskelFramePaths.length; i++) {
-        var imagePath = piskelFramePaths[i];
+      /// ...We need to recreate it in order to account for any new/removal/reorder frame changes made in piskel
+      piskelFramePaths.forEach(imagePath => {
         const imageResource = new gd.ImageResource();
         imageResource.setFile(imagePath);
         imageResource.setName(imagePath);
@@ -133,7 +133,7 @@ export default class SpritesList extends Component {
         direction.addSprite(sprite);
         imageResource.delete();
         sprite.delete();
-      }
+      });
 
       editedAnimationProp.forceUpdate();
     });
@@ -170,14 +170,14 @@ export default class SpritesList extends Component {
 
   onEditSprites = () => {
     if(!electron){
-      alert("This feature is only supported in the Desktop version for now!\nYou can Download it from Gdevelop's website...");
+      Window.showMessageBox("This feature is only supported in the Desktop version for now!\nYou can Download it from Gdevelop's website...");
       return
     };
     const { project, direction, resourcesLoader } = this.props;
     editedAnimationProp = this;
 
     var imageFrames = []; /// first collect the images to edit
-    for (var i = 0; i < direction.getSpritesCount(); i++) {
+    for (let i = 0; i < direction.getSpritesCount(); i++) {
       var spriteImagePath = resourcesLoader.getResourceFullUrl(
         project,
         direction.getSprite(i).getImageName()
@@ -192,21 +192,21 @@ export default class SpritesList extends Component {
     }
     const piskelData = {
       imageFrames: imageFrames,
-      fps: Math.floor(direction.getTimeBetweenFrames() * 480),
+      fps: direction.getTimeBetweenFrames() > 0 ? 1 / direction.getTimeBetweenFrames():1,
       name: 'New Animation',
       isLooping: direction.isLooping(),
       projectFolder: path.dirname(project.getProjectFile()),
     };
     if (direction.hasNoSprites()) {
-      piskelData['name'] = 'New Animation';
+      piskelData.name = 'New Animation';
       ipcRenderer.send('piskelNewAnimation', piskelData);
     } else {
-      piskelData['name'] = imageFrames[0]
+      piskelData.name = imageFrames[0]
         .split('/')
         .pop()
         .split('.')[0];
-      ipcRenderer.send('piskelOpenAnimation', piskelData);
-    }
+        ipcRenderer.send('piskelOpenAnimation', piskelData);
+    };
   };
 
   render() {

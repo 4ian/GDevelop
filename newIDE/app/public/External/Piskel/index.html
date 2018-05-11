@@ -87,7 +87,7 @@
       var pskl = editorFrameEl.contentWindow.pskl;
       var layer = pskl.app.piskelController.getCurrentLayer();
       var piskelFramePaths = [];
-      for (i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
+      for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
         var exportPath = layer.getFrameAt(i).originalPath; /// Would be nice to nullify this on duplicated frames though
         if (exportPath == null) { /// If a frame was made in piskel, come up with a unique path, so as not to overwrite any existing files
           exportPath = this.guessedExportPath + 'PSKL-' + String(i + 1) + '.png';
@@ -162,7 +162,7 @@
           
           /// Add original path variable to imported frame objects, so we can overwrite them later when saving changes
           var layer = pskl.app.piskelController.getCurrentLayer();
-          for (i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
+          for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
             layer.getFrameAt(i).originalPath = imageFrames[i];
           };
         });

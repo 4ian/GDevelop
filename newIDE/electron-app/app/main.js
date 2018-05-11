@@ -39,13 +39,13 @@ const isIntegrated = args.mode === 'integrated';
 const devTools = !!args['dev-tools'];
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
   app.quit();
 });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function() {
+app.on('ready', function () {
   if (isIntegrated && app.dock) {
     app.dock.hide();
   }
@@ -64,10 +64,10 @@ app.on('ready', function() {
     backgroundColor: '#f0f0f0',
   };
 
-  const piskelOptions ={
+  const piskelOptions = {
     width: 800,
-    height: 600,  
-    show:false, 
+    height: 600,
+    show: false,
     parent: mainWindow,
     modal: true,
     webPreferences: {
@@ -97,7 +97,7 @@ app.on('ready', function() {
   // Load the index.html of the app.
   if (isDev) {
     // Development (server hosted by npm run start)
-    mainWindow.loadURL('http://localhost:3000'); 
+    mainWindow.loadURL('http://localhost:3000');
     mainWindow.openDevTools();
     piskelWindow.loadURL('http://localhost:3000/External/Piskel/index.html');
     piskelWindow.openDevTools();
@@ -106,17 +106,18 @@ app.on('ready', function() {
     mainWindow.loadURL('file://' + __dirname + '/www/index.html');
     if (devTools) mainWindow.openDevTools();
     piskelWindow.loadURL('file://' + __dirname + '/www/External/Piskel/index.html');
+    if (devTools) piskelWindow.openDevTools();
   }
 
   Menu.setApplicationMenu(buildMainMenuFor(mainWindow));
 
-  mainWindow.on('closed', function() {
+  mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
     piskelWindow = null;
-    stopServer(() => {});
+    stopServer(() => { });
   });
 
   piskelWindow.on('close', (event) => {
@@ -124,14 +125,9 @@ app.on('ready', function() {
     piskelWindow.hide()
   });
 
-  piskelWindow.webContents.on('dom-ready',() => {
+  piskelWindow.webContents.on('dom-ready', () => {
     piskelWindow.setMenu(null);
   });
-
-  // piskelWindow.webContents.on('will-navigate', (e, url) => {
-  //   log.info('Piskel is navigating to');
-  //   log.info(url);
-  // });
 
   //Prevent any navigation inside the main window.
   mainWindow.webContents.on('will-navigate', (e, url) => {
@@ -143,15 +139,15 @@ app.on('ready', function() {
 
   ipcMain.on('piskelOpenAnimation', (event, piskelData) => {
     piskelWindow.show();
-    piskelWindow.webContents.send('piskelOpenGDAnimation' , piskelData);
+    piskelWindow.webContents.send('piskelOpenGDAnimation', piskelData);
   });
 
   ipcMain.on('piskelNewAnimation', (event, piskelData) => {
     piskelWindow.show();
-    piskelWindow.webContents.send('piskelMakeNewAnimation' , piskelData);
+    piskelWindow.webContents.send('piskelMakeNewAnimation', piskelData);
   });
 
-  ipcMain.on('piskelSavedChanges', ( event, piskelFramePaths) => {
+  ipcMain.on('piskelSavedChanges', (event, piskelFramePaths) => {
     mainWindow.webContents.send('piskelSavedChanges', piskelFramePaths);
   });
 

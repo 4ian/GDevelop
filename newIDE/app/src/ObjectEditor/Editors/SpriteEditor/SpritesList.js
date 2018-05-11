@@ -13,6 +13,7 @@ import ImageThumbnail, {
 import optionalRequire from '../../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
+const path = optionalRequire('path');
 
 const gd = global.gd;
 
@@ -114,27 +115,27 @@ const SortableList = SortableContainer(
 );
 
 export default class SpritesList extends Component {
-
-  componentDidMount(){
-
-    ipcRenderer.on('piskelSavedChanges',( event, piskelFramePaths) => {
-      const {
-        direction,
-      } = editedAnimationProp.props;
-
+  componentDidMount() {
+    if(!ipcRenderer){return};
+    ipcRenderer.on('piskelSavedChanges', (event, piskelFramePaths) => {
+      const { direction, project } = editedAnimationProp.props;
+      const resourcesManager = project.getResourcesManager();
       direction.removeAllSprites(); /// clear the old sprite list
-      var i = 0 ; /// ...We need to recreate it in order to account for any new/removal/reorder frame changes made in piskel
-      for (i = 0; i < piskelFramePaths.length; i++) { 
+      var i = 0; /// ...We need to recreate it in order to account for any new/removal/reorder frame changes made in piskel
+      for (i = 0; i < piskelFramePaths.length; i++) {
         var imagePath = piskelFramePaths[i];
         const imageResource = new gd.ImageResource();
-        imageResource.setName(imagePath);
         imageResource.setFile(imagePath);
+        imageResource.setName(imagePath);
+        resourcesManager.addResource(imageResource);
         const sprite = new gd.Sprite();
         sprite.setImageName(imageResource.getName());
         direction.addSprite(sprite);
-      };
-      editedAnimationProp.forceUpdate();
+        imageResource.delete();
+        sprite.delete();
+      }
 
+      editedAnimationProp.forceUpdate();
     });
   };
 
@@ -167,41 +168,46 @@ export default class SpritesList extends Component {
     });
   };
 
-  onEditSprites =() => {
-    const {
-      project,
-      direction,
-      resourcesLoader,
-    } = this.props;
-    editedAnimationProp = this ;
+  onEditSprites = () => {
+    if(!electron){
+      alert("This feature is only supported in the Desktop version for now!\nYou can Download it from Gdevelop's website...");
+      return
+    };
+    const { project, direction, resourcesLoader } = this.props;
+    editedAnimationProp = this;
+
     var imageFrames = []; /// first collect the images to edit
     for (var i = 0; i < direction.getSpritesCount(); i++) {
-      var spriteImagePath = resourcesLoader.getResourceFullUrl(project, direction.getSprite(i).getImageName());
+      var spriteImagePath = resourcesLoader.getResourceFullUrl(
+        project,
+        direction.getSprite(i).getImageName()
+      );
       var importedImage = new Image();
-      importedImage.src = spriteImagePath; 
-      spriteImagePath = spriteImagePath.substring(7,spriteImagePath.lastIndexOf('?cache='));
+      importedImage.src = spriteImagePath;
+      spriteImagePath = spriteImagePath.substring(
+        7,
+        spriteImagePath.lastIndexOf('?cache=')
+      );
       imageFrames.push(spriteImagePath);
     }
     const piskelData = {
-      imageFrames:imageFrames,
-      fps:Math.floor(direction.getTimeBetweenFrames()*480),
-      name:"New Animation",
-      isLooping:direction.isLooping()
+      imageFrames: imageFrames,
+      fps: Math.floor(direction.getTimeBetweenFrames() * 480),
+      name: 'New Animation',
+      isLooping: direction.isLooping(),
+      projectFolder: path.dirname(project.getProjectFile()),
     };
-    if (direction.hasNoSprites()){
+    if (direction.hasNoSprites()) {
       piskelData['name'] = 'New Animation';
-      var projectFolderPath = String(project.getProjectFile());
-      projectFolderPath = projectFolderPath.substring(0,projectFolderPath.lastIndexOf("\\")+1);
-      projectFolderPath = projectFolderPath.replace(/[\\]/g,"/");
-      piskelData['projectFolder'] = projectFolderPath;
-      ipcRenderer.send('piskelNewAnimation',piskelData);
+      ipcRenderer.send('piskelNewAnimation', piskelData);
+    } else {
+      piskelData['name'] = imageFrames[0]
+        .split('/')
+        .pop()
+        .split('.')[0];
+      ipcRenderer.send('piskelOpenAnimation', piskelData);
     }
-    else
-    {
-      piskelData['name'] = imageFrames[0].split("/").pop().split(".")[0];
-      ipcRenderer.send('piskelOpenAnimation',piskelData);    
-    }
-  }
+  };
 
   render() {
     return (

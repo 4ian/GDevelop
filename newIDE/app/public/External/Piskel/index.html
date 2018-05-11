@@ -1,178 +1,175 @@
 <html>
+
 <head>
   <title>Gdevelop Piskel Editor</title>
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
-<iframe class="editor-frame" id='editor' src="editor/index.html" ></iframe>
-<script>
+  <iframe class="editor-frame" id='editor' src="editor/index.html"></iframe>
+  <script>
 
-  const electron = require('electron');
-  const ipcRenderer = electron.ipcRenderer ;
-  const path = require('path');
-  const fs = require('fs');
-  const async = require('async');
-  const remote = electron.remote;
+    const electron = require('electron');
+    const ipcRenderer = electron.ipcRenderer;
+    const path = require('path');
+    const fs = require('fs');
+    const async = require('async');
+    const remote = electron.remote;
 
-  document.getElementById('editor').onload = function() { /// Inject custom buttons in Piskel's header, get rid of the new file button, make animation name editable later
-    document.getElementById('editor').contentDocument.getElementsByClassName('new-piskel-desktop button button-primary')[0].style.display = 'none';
-    document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].align="right";
-    var SaveButton = document.getElementById('editor').contentDocument.createElement("button");
-    SaveButton.innerHTML = " Save to Gdevelop ";
-    SaveButton.style = "margin-left: 20px; margin-right: 10px; margin-top: 5px;";
-    document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].appendChild(SaveButton);
-    SaveButton.addEventListener ("click", function() { SaveToGD(); });
-    var CancelButton = document.getElementById('editor').contentDocument.createElement("button");
-    CancelButton.innerHTML = " Cancel ";
-    CancelButton.style = "margin-right: 5px; margin-top: 5px;";
-    document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].appendChild(CancelButton);
-    CancelButton.addEventListener ("click", function() { cancelChanges(); });
-  }
-
-  function fileExists(path) {
-    try  {
-      return fs.statSync(path).isFile();
+    document.getElementById('editor').onload = function () { /// Inject custom buttons in Piskel's header, get rid of the new file button, make animation name editable later
+      document.getElementById('editor').contentDocument.getElementsByClassName('new-piskel-desktop button button-primary')[0].style.display = 'none';
+      document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].align = "right";
+      var SaveButton = document.getElementById('editor').contentDocument.createElement("button");
+      SaveButton.innerHTML = " Save to Gdevelop ";
+      SaveButton.style = "margin-left: 20px; margin-right: 10px; margin-top: 5px;";
+      document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].appendChild(SaveButton);
+      SaveButton.addEventListener("click", function () { SaveToGD(); });
+      var CancelButton = document.getElementById('editor').contentDocument.createElement("button");
+      CancelButton.innerHTML = " Cancel ";
+      CancelButton.style = "margin-right: 5px; margin-top: 5px;";
+      document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].appendChild(CancelButton);
+      CancelButton.addEventListener("click", function () { cancelChanges(); });
     }
-    catch (e) { 
-      if (e.code == 'ENOENT') { // no such file or directory. File really does not exist
-        return false;
+
+    function fileExists(path) {
+      try {
+        return fs.statSync(path).isFile();
       }
-      console.log("Exception fs.statSync (" + path + "): " + e);
-      throw e; // something else went wrong, we don't have rights, ...
-      }
-  }
-
-  function makeFileNameUnique(path) { /// returns a path where a file doesnt already exist. Use to avoid unwanted file overwriting
-    if (!fileExists(path)) {
-      return path
-    };
-    var folderPath = path.substring(0,path.lastIndexOf("/")+1);
-    var fileFormat = path.substring(path.lastIndexOf("."),path.length);
-    var oldFileName = path.substring(path.lastIndexOf("/")+1,path.lastIndexOf("."));
-    var appendNumber = 0;
-    var newUniqueNamePath = folderPath + oldFileName + "-" + String(appendNumber) + fileFormat;
-    while (fileExists(newUniqueNamePath))
-    { 
-      console.log("Try new path:"+newUniqueNamePath);
-      appendNumber += 1;
-      newUniqueNamePath = folderPath + oldFileName + "-" + String(appendNumber) + fileFormat;
-    }
-    return newUniqueNamePath
-  }
-
-  function base64_encode(file) { /// read binary data
-    var bitmap = fs.readFileSync(file);
-    return "data:image/png;base64," + bitmap.toString('base64');
-  }
-
-  function downloadAsFile (content, filename, filePath) { /// download individual frame to path
-    var reader = new FileReader();
-    reader.onload = function(){
-      var buffer = new Buffer(reader.result)
-      fs.writeFile(filePath, buffer, {}, (err, res) => {
-        if(err){
-          console.error(err)
-          return
+      catch (e) {
+        if (e.code == 'ENOENT') { // no such file or directory. File really does not exist
+          return false;
         }
-        console.log('file saved')
-      })
-    };
-    reader.readAsArrayBuffer(content)
-  }
-
-  var guessedExportPath
-  function SaveToGD() {
-    var editorFrameEl = document.querySelector(".editor-frame");
-    var pskl = editorFrameEl.contentWindow.pskl;
-    var layer = pskl.app.piskelController.getCurrentLayer();
-    var piskelFramePaths = [];
-    for (i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
-      var exportPath = layer.getFrameAt(i).originalPath; /// Would be nice to nullify this on duplicated frames though
-      if (exportPath == null) { /// If a frame was made in piskel, come up with a unique path, so as not to overwrite any existing files
-        exportPath = this.guessedExportPath + '-PSKL-' + (i + 1) + '.png';
-        exportPath = makeFileNameUnique(exportPath);
+        console.log("Exception fs.statSync (" + path + "): " + e);
+        throw e; // something else went wrong, we don't have rights, ...
       }
-      if (piskelFramePaths.includes(exportPath)) /// Prevent overwriting frames that were created via duplication of imported frames
-      {
-        console.log("Do not overwrite:" + exportPath);
-        exportPath = this.guessedExportPath + '-PSKL-c-' + (i + 1) + '.png';
-        exportPath = makeFileNameUnique(exportPath);
+    }
+
+    function makeFileNameUnique(path) { /// returns a path where a file doesnt already exist. Use to avoid unwanted file overwriting
+      if (!fileExists(path)) {
+        return path
       };
-      /// Render and save to paths
-      var canvas = pskl.app.piskelController.renderFrameAt(i, true);
-      pskl.utils.BlobUtils.canvasToBlob(canvas, function(blob) {
-        downloadAsFile(blob, exportPath, exportPath);
-        piskelFramePaths.push(exportPath);
-      });
-    }
-    /// Finally reload the frames in gdevelop and close the window
-    ipcRenderer.send("piskelSavedChanges",piskelFramePaths);
-    remote.getCurrentWindow().close();
-  }
-
-  function cancelChanges() {
-    remote.getCurrentWindow().close();
-  }
-
-  ipcRenderer.on('piskelMakeNewAnimation',(event,piskelData) => {
-    this.guessedExportPath = piskelData["projectFolder"];
-    var editorFrameEl = document.querySelector(".editor-frame");
-    var pskl = editorFrameEl.contentWindow.pskl;
-    var sprite = {"modelVersion":2,"piskel":{"name":"New Animation","description":"","fps":12,"height":64,"width":64,"layers":["{\"name\":\"Layer 1\",\"frameCount\":1,\"base64PNG\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAOUlEQVR42u3OIQEAAAACIP1/2hkWWEBzVgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAYF3YDicAEE8VTiYAAAAAElFTkSuQmCC\"}"]}};
-    if (pskl) {
-      var piskel = sprite.piskel;
-      var descriptor = new pskl.model.piskel.Descriptor(piskel.name, piskel.description, true);
-      pskl.utils.serialization.Deserializer.deserialize(sprite, function (piskel) {
-        piskel.setDescriptor(descriptor);
-        pskl.app.piskelController.setPiskel(piskel);
-        pskl.app.piskelController.setFPS(sprite.fps);
-      });
-    }
-  })
-
-  ipcRenderer.on('piskelOpenGDAnimation',(event,piskelData) => {
-    this.guessedExportPath = null;
-    var editorFrameEl = document.querySelector(".editor-frame");
-    var pskl = editorFrameEl.contentWindow.pskl;
-    if (pskl) {
-    var imageFrames = piskelData.imageFrames;
-    var imageData = []; 
-    var piskelXsize = -1;
-    var piskelYsize = -1;
-    async.each(imageFrames, function(imagePath, callback) {
-      var image64 = new Image();
-      image64.onload = function () {
-        imageData.push(image64);  
-        if (image64.width > piskelXsize)
-        {
-          piskelXsize = image64.width ;
-        };
-        if (image64.height > piskelYsize)
-        {
-          piskelYsize = image64.height ;
-        };
-        callback();
+      var folderPath = path.substring(0, path.lastIndexOf("/") + 1);
+      var fileFormat = path.substring(path.lastIndexOf("."), path.length);
+      var oldFileName = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("."));
+      var appendNumber = 0;
+      var newUniqueNamePath = folderPath + oldFileName + "-" + String(appendNumber) + fileFormat;
+      while (fileExists(newUniqueNamePath)) {
+        console.log("Try new path:" + newUniqueNamePath);
+        appendNumber += 1;
+        newUniqueNamePath = folderPath + oldFileName + "-" + String(appendNumber) + fileFormat;
       }
-      /// This is the important part! Set src, otherwise the `onload` will not fire
-      image64.src = base64_encode(imagePath);
-      if (this.guessedExportPath == null) { //need this to guess new filenames later
-        this.guessedExportPath = imagePath.substring(0,imagePath.lastIndexOf("/")+1) + piskelData.name;
-      };
-    }, function(err) {
-      /// Finally load the image objects into piskel
-      var piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, piskelData.name, piskelXsize, piskelYsize, false);
-      pskl.app.piskelController.setPiskel(piskelFile,{});
-      pskl.app.piskelController.setFPS(piskelData.fps);
+      return newUniqueNamePath
+    }
 
-      /// Add original path variable to imported frame objects, so we can overwrite them later when saving changes
+    function base64_encode(file) { /// read binary data
+      var bitmap = fs.readFileSync(file);
+      return "data:image/png;base64," + bitmap.toString('base64');
+    }
+
+    function downloadAsFile(content, filename, filePath) { /// download individual frame to path
+      var reader = new FileReader();
+      reader.onload = function () {
+        var buffer = new Buffer(reader.result)
+        fs.writeFile(filePath, buffer, {}, (err, res) => {
+          if (err) {
+            console.error(err)
+            return
+          }
+          //('file saved')
+        })
+      };
+      reader.readAsArrayBuffer(content)
+    }
+
+    var guessedExportPath
+    function SaveToGD() {
+      var editorFrameEl = document.querySelector(".editor-frame");
+      var pskl = editorFrameEl.contentWindow.pskl;
       var layer = pskl.app.piskelController.getCurrentLayer();
+      var piskelFramePaths = [];
       for (i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
-        layer.getFrameAt(i).originalPath = imageFrames[i] ;
+        var exportPath = layer.getFrameAt(i).originalPath; /// Would be nice to nullify this on duplicated frames though
+        if (exportPath == null) { /// If a frame was made in piskel, come up with a unique path, so as not to overwrite any existing files
+          exportPath = this.guessedExportPath + 'PSKL-' + String(i + 1) + '.png';
+          exportPath = makeFileNameUnique(exportPath);
+        }
+        if (piskelFramePaths.includes(exportPath)) /// Prevent overwriting frames that were created via duplication of imported frames
+        {
+          console.log("Do not overwrite:" + exportPath);
+          exportPath = this.guessedExportPath + 'PSKL-c-' + String(i + 1) + '.png';
+          exportPath = makeFileNameUnique(exportPath);
         };
-      });
+        /// Render and save to paths
+        var canvas = pskl.app.piskelController.renderFrameAt(i, true);
+        pskl.utils.BlobUtils.canvasToBlob(canvas, function (blob) {
+          downloadAsFile(blob, exportPath, exportPath);
+          piskelFramePaths.push(exportPath);
+        });
+      }
+      /// Finally reload the frames in gdevelop and close the window
+      ipcRenderer.send("piskelSavedChanges", piskelFramePaths);
+      remote.getCurrentWindow().close();
     }
-  });
-</script>
+
+    function cancelChanges() {
+      remote.getCurrentWindow().close();
+    }
+
+    ipcRenderer.on('piskelMakeNewAnimation', (event, piskelData) => {
+      this.guessedExportPath = piskelData["projectFolder"];
+      var editorFrameEl = document.querySelector(".editor-frame");
+      var pskl = editorFrameEl.contentWindow.pskl;
+      var sprite = { "modelVersion": 2, "piskel": { "name": "New Animation", "description": "", "fps": 12, "height": 64, "width": 64, "layers": ["{\"name\":\"Layer 1\",\"frameCount\":1,\"base64PNG\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAOUlEQVR42u3OIQEAAAACIP1/2hkWWEBzVgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAYF3YDicAEE8VTiYAAAAAElFTkSuQmCC\"}"] } };
+      if (pskl) {
+        var piskel = sprite.piskel;
+        var descriptor = new pskl.model.piskel.Descriptor(piskel.name, piskel.description, true);
+        pskl.utils.serialization.Deserializer.deserialize(sprite, function (piskel) {
+          piskel.setDescriptor(descriptor);
+          pskl.app.piskelController.setPiskel(piskel);
+          pskl.app.piskelController.setFPS(sprite.fps);
+        });
+      }
+    })
+
+    ipcRenderer.on('piskelOpenGDAnimation', (event, piskelData) => {
+      this.guessedExportPath = piskelData['projectFolder'];
+      var editorFrameEl = document.querySelector(".editor-frame");
+      var pskl = editorFrameEl.contentWindow.pskl;
+      if (pskl) {
+        var imageFrames = piskelData.imageFrames;
+        var imageData = [];
+        var piskelXsize = -1;
+        var piskelYsize = -1;
+        async.each(imageFrames, function (imagePath, callback) {
+          var image64 = new Image();
+          image64.onload = function () {
+            imageData.push(image64);
+            if (image64.width > piskelXsize) {
+              piskelXsize = image64.width;
+            };
+            if (image64.height > piskelYsize) {
+              piskelYsize = image64.height;
+            };
+            callback();
+          }
+          /// This is the important part! Set src, otherwise the `onload` will not fire
+          image64.src = base64_encode(imagePath);
+        }, function (err) {
+          /// Finally load the image objects into piskel
+          var piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, piskelData.name, piskelXsize, piskelYsize, false);
+          pskl.app.piskelController.setPiskel(piskelFile, {});
+          pskl.app.piskelController.setFPS(piskelData.fps);
+          
+          /// Add original path variable to imported frame objects, so we can overwrite them later when saving changes
+          var layer = pskl.app.piskelController.getCurrentLayer();
+          for (i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
+            layer.getFrameAt(i).originalPath = imageFrames[i];
+          };
+        });
+      }
+    });
+  </script>
 
 </body>
+
 </html>

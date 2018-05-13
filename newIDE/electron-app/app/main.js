@@ -136,17 +136,17 @@ app.on('ready', function () {
     }
   });
 
-  ipcMain.on('piskelOpenAnimation', (event, piskelData,editedAnimationComponent) => {
+  ipcMain.on('piskelOpenAnimation', (event, piskelData) => {
     piskelWindow.show();
     piskelWindow.webContents.send('piskelOpenGDAnimation', piskelData);
   });
 
-  ipcMain.on('piskelNewAnimation', (event, piskelData,editedAnimationComponent) => {
+  ipcMain.on('piskelNewAnimation', (event, piskelData) => {
     piskelWindow.show();
     piskelWindow.webContents.send('piskelMakeNewAnimation', piskelData);
   });
 
-  ipcMain.on('piskelSavedChanges', (event, piskelFramePaths,editedAnimationComponent) => {
+  ipcMain.on('piskelSavedChanges', (event, piskelFramePaths) => {
     mainWindow.webContents.send('piskelSavedChanges', piskelFramePaths);
   });
 

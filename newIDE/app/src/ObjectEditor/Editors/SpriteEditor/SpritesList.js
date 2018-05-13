@@ -134,10 +134,12 @@ export default class SpritesList extends Component {
           imageResource.delete();
           sprite.delete();
         });
-        this.animationEdited = false;
       };
       this.forceUpdate();
     });
+    ipcRenderer.on('piskelReset',() => {
+      this.animationEdited = false;
+    })
   };
 
   onSortEnd = ({ oldIndex, newIndex }) => {

@@ -64,14 +64,13 @@ app.on('ready', function () {
   };
 
   const piskelOptions = {
-    width: 800,
-    height: 600,
-    show: false,
     parent: mainWindow,
     modal: true,
+    show: false,
+    center: true,
     webPreferences: {
       webSecurity: false,
-    }
+    },
   };
 
   if (isIntegrated) {
@@ -124,6 +123,11 @@ app.on('ready', function () {
     piskelWindow.hide();
   });
 
+  piskelWindow.on('hide', (event) => {
+    mainWindow.setIgnoreMouseEvents(false, {});
+    mainWindow.webContents.send('piskelReset');
+  });
+
   piskelWindow.webContents.on('dom-ready', () => {
     piskelWindow.setMenu(null);
   });
@@ -138,11 +142,13 @@ app.on('ready', function () {
 
   ipcMain.on('piskelOpenAnimation', (event, piskelData) => {
     piskelWindow.show();
+    mainWindow.setIgnoreMouseEvents(true, {});///need to do this, since modal:true is not supported on windows
     piskelWindow.webContents.send('piskelOpenGDAnimation', piskelData);
   });
 
   ipcMain.on('piskelNewAnimation', (event, piskelData) => {
     piskelWindow.show();
+    mainWindow.setIgnoreMouseEvents(true, {});
     piskelWindow.webContents.send('piskelMakeNewAnimation', piskelData);
   });
 

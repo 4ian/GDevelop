@@ -134,6 +134,10 @@ app.on('ready', function () {
 
   piskelWindow.webContents.on('dom-ready', () => {
     piskelWindow.setMenu(null);
+    let piskelWindowWidth = Math.floor(mainWindow.getSize()[0] * 0.7);
+    let piskelWindowHeight = Math.floor(mainWindow.getSize()[1] * 0.9);
+    piskelWindow.setSize(piskelWindowWidth, piskelWindowHeight);
+    piskelWindow.center();
   });
 
   //Prevent any navigation inside the main window.

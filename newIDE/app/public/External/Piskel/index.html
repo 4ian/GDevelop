@@ -159,7 +159,7 @@
           var piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, piskelData.name, piskelXsize, piskelYsize, false);
           pskl.app.piskelController.setPiskel(piskelFile, {});
           pskl.app.piskelController.setFPS(piskelData.fps);
-          
+
           /// Add original path variable to imported frame objects, so we can overwrite them later when saving changes
           var layer = pskl.app.piskelController.getCurrentLayer();
           for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {

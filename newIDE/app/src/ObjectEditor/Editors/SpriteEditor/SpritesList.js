@@ -116,7 +116,7 @@ const SortableList = SortableContainer(
 
 export default class SpritesList extends Component {
   componentDidMount() {
-    if(!ipcRenderer){return};
+    if (!ipcRenderer) { return };
     ipcRenderer.on('piskelSavedChanges', (event, piskelFramePaths) => {
       if (this.animationEdited) {
         const { direction, project } = this.props;
@@ -137,7 +137,7 @@ export default class SpritesList extends Component {
       };
       this.forceUpdate();
     });
-    ipcRenderer.on('piskelReset',() => {
+    ipcRenderer.on('piskelReset', () => {
       this.animationEdited = false;
     })
   };
@@ -172,7 +172,7 @@ export default class SpritesList extends Component {
   };
 
   onEditSprites = () => {
-    if(!electron){
+    if (!electron) {
       Window.showMessageBox("This feature is only supported in the Desktop version for now!\nYou can Download it from Gdevelop's website...");
       return
     };
@@ -194,7 +194,7 @@ export default class SpritesList extends Component {
     }
     const piskelData = {
       imageFrames: imageFrames,
-      fps: direction.getTimeBetweenFrames() > 0 ? 1 / direction.getTimeBetweenFrames():1,
+      fps: direction.getTimeBetweenFrames() > 0 ? 1 / direction.getTimeBetweenFrames() : 1,
       name: 'New Animation',
       isLooping: direction.isLooping(),
       projectFolder: path.dirname(project.getProjectFile()),
@@ -207,7 +207,7 @@ export default class SpritesList extends Component {
         .split('/')
         .pop()
         .split('.')[0];
-        ipcRenderer.send('piskelOpenAnimation', piskelData);
+      ipcRenderer.send('piskelOpenAnimation', piskelData);
     };
   };
 

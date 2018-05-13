@@ -128,6 +128,10 @@ app.on('ready', function () {
     mainWindow.webContents.send('piskelReset');
   });
 
+  piskelWindow.on('show', (event) => {
+    mainWindow.setIgnoreMouseEvents(true, {});///need to do this, since modal:true is not supported on windows
+  });
+
   piskelWindow.webContents.on('dom-ready', () => {
     piskelWindow.setMenu(null);
   });
@@ -142,13 +146,11 @@ app.on('ready', function () {
 
   ipcMain.on('piskelOpenAnimation', (event, piskelData) => {
     piskelWindow.show();
-    mainWindow.setIgnoreMouseEvents(true, {});///need to do this, since modal:true is not supported on windows
     piskelWindow.webContents.send('piskelOpenGDAnimation', piskelData);
   });
 
   ipcMain.on('piskelNewAnimation', (event, piskelData) => {
     piskelWindow.show();
-    mainWindow.setIgnoreMouseEvents(true, {});
     piskelWindow.webContents.send('piskelMakeNewAnimation', piskelData);
   });
 

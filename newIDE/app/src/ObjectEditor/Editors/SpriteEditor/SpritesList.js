@@ -20,8 +20,6 @@ const gd = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
 
-var editedAnimationProp = null; // need this for piskel edits
-
 const styles = {
   spritesList: {
     whiteSpace: 'nowrap',
@@ -78,6 +76,7 @@ const SortableList = SortableContainer(
     resourcesLoader,
     onAddSprite,
     onEditSprites,
+    animationEdited = false,
     selectedSprites,
     onSelectSprite,
     onSpriteContextMenu,
@@ -119,23 +118,25 @@ export default class SpritesList extends Component {
   componentDidMount() {
     if(!ipcRenderer){return};
     ipcRenderer.on('piskelSavedChanges', (event, piskelFramePaths) => {
-      const { direction, project } = editedAnimationProp.props;
-      const resourcesManager = project.getResourcesManager();
-      direction.removeAllSprites(); /// clear the old sprite list
-      /// ...We need to recreate it in order to account for any new/removal/reorder frame changes made in piskel
-      piskelFramePaths.forEach(imagePath => {
-        const imageResource = new gd.ImageResource();
-        imageResource.setFile(imagePath);
-        imageResource.setName(imagePath);
-        resourcesManager.addResource(imageResource);
-        const sprite = new gd.Sprite();
-        sprite.setImageName(imageResource.getName());
-        direction.addSprite(sprite);
-        imageResource.delete();
-        sprite.delete();
-      });
-
-      editedAnimationProp.forceUpdate();
+      if (this.animationEdited) {
+        const { direction, project } = this.props;
+        const resourcesManager = project.getResourcesManager();
+        direction.removeAllSprites(); /// clear the old sprite list
+        /// ...We need to recreate it in order to account for any new/removal/reorder frame changes made in piskel
+        piskelFramePaths.forEach(imagePath => {
+          const imageResource = new gd.ImageResource();
+          imageResource.setFile(imagePath);
+          imageResource.setName(imagePath);
+          resourcesManager.addResource(imageResource);
+          const sprite = new gd.Sprite();
+          sprite.setImageName(imageResource.getName());
+          direction.addSprite(sprite);
+          imageResource.delete();
+          sprite.delete();
+        });
+        this.animationEdited = false;
+      };
+      this.forceUpdate();
     });
   };
 
@@ -174,8 +175,7 @@ export default class SpritesList extends Component {
       return
     };
     const { project, direction, resourcesLoader } = this.props;
-    editedAnimationProp = this;
-
+    this.animationEdited = true;
     var imageFrames = []; /// first collect the images to edit
     for (let i = 0; i < direction.getSpritesCount(); i++) {
       var spriteImagePath = resourcesLoader.getResourceFullUrl(

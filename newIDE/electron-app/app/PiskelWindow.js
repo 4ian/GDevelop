@@ -48,10 +48,17 @@ const loadPiskelWindow = ({ onReady, devTools, parentWindow }) => {
     if (devTools) piskelWindow.openDevTools();
   }
 
-  piskelWindow.on('closed', event => {
+  piskelWindow.on('closed', event => { // Does not work on windows
     piskelWindow = null;
 
     //TODO: Rename to piskel-closed
+    parentWindow.webContents.send('piskelReset');
+  });
+
+  piskelWindow.on('close', event => { // Works on Windows
+    piskelWindow.destroy();
+    piskelWindow = null;
+
     parentWindow.webContents.send('piskelReset');
   });
 };

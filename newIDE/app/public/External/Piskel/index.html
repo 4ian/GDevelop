@@ -22,18 +22,25 @@
      * make animation name editable later
      */
     document.getElementById('editor').onload = function () {
-      document.getElementById('editor').contentDocument.getElementsByClassName('new-piskel-desktop button button-primary')[0].style.display = 'none';
-      document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].align = "right";
-      var SaveButton = document.getElementById('editor').contentDocument.createElement("button");
-      SaveButton.innerHTML = " Save to GDevelop ";
-      SaveButton.style = "margin-left: 20px; margin-right: 10px; margin-top: 5px;";
-      document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].appendChild(SaveButton);
-      SaveButton.addEventListener("click", function () { saveToGD(); });
-      var CancelButton = document.getElementById('editor').contentDocument.createElement("button");
-      CancelButton.innerHTML = " Cancel ";
-      CancelButton.style = "margin-right: 5px; margin-top: 5px;";
-      document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].appendChild(CancelButton);
-      CancelButton.addEventListener("click", function () { cancelChanges(); });
+      const editorContentDocument = document.getElementById('editor').contentDocument;
+
+      const newButton = editorContentDocument.getElementsByClassName('new-piskel-desktop button button-primary')[0];
+      newButton.style.display = 'none';
+
+      const piskelAppHeader = editorContentDocument.getElementsByClassName('fake-piskelapp-header')[0];
+      piskelAppHeader.align = "right";
+
+      const saveButton = editorContentDocument.createElement("button");
+      saveButton.innerHTML = "Save to GDevelop";
+      saveButton.style = "margin-left: 20px; margin-right: 10px; margin-top: 5px;";
+      piskelAppHeader.appendChild(saveButton);
+      saveButton.addEventListener("click", saveToGD);
+
+      const cancelButton = editorContentDocument.createElement("button");
+      cancelButton.innerHTML = "Cancel";
+      cancelButton.style = "margin-right: 5px; margin-top: 5px;";
+      piskelAppHeader.appendChild(cancelButton);
+      cancelButton.addEventListener("click", cancelChanges);
     }
 
     function fileExists(path) {

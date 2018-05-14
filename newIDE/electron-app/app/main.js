@@ -110,28 +110,27 @@ app.on('ready', function() {
     }
   });
 
-  //TODO: Normalize all piskel* events to kebab-case
-  ipcMain.on('piskelOpenAnimation', (event, piskelData) => {
+  ipcMain.on('piskel-open-then-load-animation', (event, piskelData) => {
     loadPiskelWindow({
       parentWindow: mainWindow,
       devTools,
       onReady: piskelWindow =>
-        piskelWindow.webContents.send('piskelOpenGDAnimation', piskelData),
+        piskelWindow.webContents.send('piskel-load-animation', piskelData),
     });
   });
 
-  ipcMain.on('piskelNewAnimation', (event, piskelData) => {
+  ipcMain.on('piskel-open-then-create-animation', (event, piskelData) => {
     loadPiskelWindow({
       parentWindow: mainWindow,
       devTools,
       onReady: piskelWindow =>
-        piskelWindow.webContents.send('piskelMakeNewAnimation', piskelData),
+        piskelWindow.webContents.send('piskel-create-animation', piskelData),
     });
   });
 
   //TODO: Move in PiskelWindow? And use a callback like onReady
-  ipcMain.on('piskelSavedChanges', (event, piskelFramePaths) => {
-    mainWindow.webContents.send('piskelSavedChanges', piskelFramePaths);
+  ipcMain.on('piskel-changes-saved', (event, piskelFramePaths) => {
+    mainWindow.webContents.send('piskel-changes-saved', piskelFramePaths);
   });
 
   // S3Upload events:

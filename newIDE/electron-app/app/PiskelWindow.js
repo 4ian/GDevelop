@@ -57,8 +57,7 @@ const loadPiskelWindow = ({ onReady, devTools, parentWindow }) => {
     piskelWindow.destroy();
     piskelWindow = null;
 
-    //TODO: Rename to piskel-closed
-    parentWindow.webContents.send('piskelReset');
+    parentWindow.webContents.send('piskel-reset');
   });
 };
 

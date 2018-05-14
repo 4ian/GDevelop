@@ -117,7 +117,7 @@ const SortableList = SortableContainer(
 export default class SpritesList extends Component {
   componentDidMount() {
     if (!ipcRenderer) { return };
-    ipcRenderer.on('piskelSavedChanges', (event, piskelFramePaths) => {
+    ipcRenderer.on('piskel-changes-saved', (event, piskelFramePaths) => {
       if (this.animationEdited) { //TODO: animationEdited could be entirely removed?
         const { direction, project } = this.props;
         const resourcesManager = project.getResourcesManager();
@@ -139,7 +139,7 @@ export default class SpritesList extends Component {
     });
 
     //TODO: animationEdited could be entirely removed?
-    ipcRenderer.on('piskelReset', () => {
+    ipcRenderer.on('piskel-reset', () => {
       this.animationEdited = false;
     })
   };
@@ -203,13 +203,13 @@ export default class SpritesList extends Component {
     };
     if (direction.hasNoSprites()) {
       piskelData.name = 'New Animation';
-      ipcRenderer.send('piskelNewAnimation', piskelData);
+      ipcRenderer.send('piskel-open-then-create-animation', piskelData);
     } else {
       piskelData.name = imageFrames[0]
         .split('/')
         .pop()
         .split('.')[0];
-      ipcRenderer.send('piskelOpenAnimation', piskelData);
+      ipcRenderer.send('piskel-open-then-load-animation', piskelData);
     };
   };
 

@@ -135,7 +135,7 @@
           saveToFile(blob, path, callback);
         })
       }, function (err) {
-        ipcRenderer.send("piskelSavedChanges", piskelFramePaths);
+        ipcRenderer.send("piskel-changes-saved", piskelFramePaths);
         remote.getCurrentWindow().close();
       });
     }
@@ -144,7 +144,7 @@
       remote.getCurrentWindow().close();
     }
 
-    ipcRenderer.on('piskelMakeNewAnimation', (event, piskelData) => {
+    ipcRenderer.on('piskel-create-animation', (event, piskelData) => {
       baseExportPath = piskelData.projectFolder + "/";
       const editorFrameEl = document.querySelector(".editor-frame");
       const pskl = editorFrameEl.contentWindow.pskl;
@@ -161,7 +161,7 @@
       });
     })
 
-    ipcRenderer.on('piskelOpenGDAnimation', (event, piskelData) => {
+    ipcRenderer.on('piskel-load-animation', (event, piskelData) => {
       baseExportPath = piskelData.projectFolder + "/" + piskelData.name;
       const editorFrameEl = document.querySelector(".editor-frame");
       const pskl = editorFrameEl.contentWindow.pskl;

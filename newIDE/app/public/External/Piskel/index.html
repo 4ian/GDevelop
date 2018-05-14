@@ -28,7 +28,7 @@
       SaveButton.innerHTML = " Save to GDevelop ";
       SaveButton.style = "margin-left: 20px; margin-right: 10px; margin-top: 5px;";
       document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].appendChild(SaveButton);
-      SaveButton.addEventListener("click", function () { SaveToGD(); });
+      SaveButton.addEventListener("click", function () { saveToGD(); });
       var CancelButton = document.getElementById('editor').contentDocument.createElement("button");
       CancelButton.innerHTML = " Cancel ";
       CancelButton.style = "margin-right: 5px; margin-top: 5px;";
@@ -69,7 +69,7 @@
       return newUniqueNamePath
     }
 
-    function base64_encode(file) {
+    function readBase64ImageFile(file) {
       var bitmap = fs.readFileSync(file);
       return "data:image/png;base64," + bitmap.toString('base64');
     }
@@ -77,7 +77,7 @@
     /**
      * Save the content to the specified file
      */
-    function downloadAsFile(content, filename, filePath) {
+    function saveToFile(content, filename, filePath) {
       var reader = new FileReader();
       reader.onload = function () {
         var buffer = new Buffer(reader.result)
@@ -92,7 +92,7 @@
     }
 
     var guessedExportPath
-    function SaveToGD() {
+    function saveToGD() {
       var editorFrameEl = document.querySelector(".editor-frame");
       var pskl = editorFrameEl.contentWindow.pskl;
       var layer = pskl.app.piskelController.getCurrentLayer();
@@ -112,7 +112,7 @@
         // Render and save to paths
         var canvas = pskl.app.piskelController.renderFrameAt(i, true);
         pskl.utils.BlobUtils.canvasToBlob(canvas, function (blob) {
-          downloadAsFile(blob, exportPath, exportPath);
+          saveToFile(blob, exportPath, exportPath);
           piskelFramePaths.push(exportPath);
         });
       }
@@ -163,7 +163,7 @@
             callback();
           }
           // This is the important part! Set src, otherwise the `onload` will not fire
-          image64.src = base64_encode(imagePath);
+          image64.src = readBase64ImageFile(imagePath);
         }, function (err) {
           // Finally load the image objects into piskel
           var piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, piskelData.name, piskelXsize, piskelYsize, false);

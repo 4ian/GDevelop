@@ -121,8 +121,10 @@ app.on('ready', function() {
   });
 
   piskelWindow.on('close', event => {
-    event.preventDefault();
-    piskelWindow.hide();
+    if (mainWindow) {
+      event.preventDefault();
+    }
+    if (piskelWindow) piskelWindow.hide();
   });
 
   piskelWindow.on('hide', event => {

@@ -98,7 +98,7 @@
       reader.readAsArrayBuffer(content)
     }
 
-    var guessedExportPath
+    let exportPath;
     function saveToGD() {
       const editorFrameEl = document.querySelector(".editor-frame");
       const pskl = editorFrameEl.contentWindow.pskl;
@@ -108,14 +108,14 @@
       for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
         let exportPath = layer.getFrameAt(i).originalPath; // Would be nice to nullify this on duplicated frames though
         if (exportPath == null) { // If a frame was made in piskel, come up with a unique path, so as not to overwrite any existing files
-          exportPath = this.guessedExportPath + 'PSKL-' + String(i + 1) + '.png';
+          exportPath = exportPath + 'PSKL-' + String(i + 1) + '.png';
           exportPath = makeFileNameUnique(exportPath);
         }
 
         if (piskelFramePaths.includes(exportPath)) // Prevent overwriting frames that were created via duplication of imported frames
         {
           console.log("Do not overwrite:" + exportPath);
-          exportPath = this.guessedExportPath + 'PSKL-c-' + String(i + 1) + '.png';
+          exportPath = exportPath + 'PSKL-c-' + String(i + 1) + '.png';
           exportPath = makeFileNameUnique(exportPath);
         };
 
@@ -136,7 +136,7 @@
     }
 
     ipcRenderer.on('piskelMakeNewAnimation', (event, piskelData) => {
-      this.guessedExportPath = piskelData.projectFolder + "/";
+      exportPath = piskelData.projectFolder + "/";
       const editorFrameEl = document.querySelector(".editor-frame");
       const pskl = editorFrameEl.contentWindow.pskl;
       if (!pskl) return;
@@ -153,7 +153,7 @@
     })
 
     ipcRenderer.on('piskelOpenGDAnimation', (event, piskelData) => {
-      this.guessedExportPath = piskelData.projectFolder + "/" + piskelData.name;
+      exportPath = piskelData.projectFolder + "/" + piskelData.name;
       const editorFrameEl = document.querySelector(".editor-frame");
       const pskl = editorFrameEl.contentWindow.pskl;
       if (!pskl) return;

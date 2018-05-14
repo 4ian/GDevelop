@@ -39,13 +39,13 @@ const isIntegrated = args.mode === 'integrated';
 const devTools = !!args['dev-tools'];
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function () {
+app.on('window-all-closed', function() {
   app.quit();
 });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function () {
+app.on('ready', function() {
   if (isIntegrated && app.dock) {
     app.dock.hide();
   }
@@ -103,33 +103,35 @@ app.on('ready', function () {
     // Production (with npm run build)
     mainWindow.loadURL('file://' + __dirname + '/www/index.html');
     if (devTools) mainWindow.openDevTools();
-    piskelWindow.loadURL('file://' + __dirname + '/www/External/Piskel/index.html');
+    piskelWindow.loadURL(
+      'file://' + __dirname + '/www/External/Piskel/index.html'
+    );
     if (devTools) piskelWindow.openDevTools();
   }
 
   Menu.setApplicationMenu(buildMainMenuFor(mainWindow));
 
-  mainWindow.on('closed', function () {
+  mainWindow.on('closed', function() {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
     piskelWindow = null;
-    stopServer(() => { });
+    stopServer(() => {});
   });
 
-  piskelWindow.on('close', (event) => {
+  piskelWindow.on('close', event => {
     event.preventDefault();
     piskelWindow.hide();
   });
 
-  piskelWindow.on('hide', (event) => {
+  piskelWindow.on('hide', event => {
     mainWindow.setIgnoreMouseEvents(false, {});
     mainWindow.webContents.send('piskelReset');
   });
 
-  piskelWindow.on('show', (event) => {
-    mainWindow.setIgnoreMouseEvents(true, {});///need to do this, since modal:true is not supported on windows
+  piskelWindow.on('show', event => {
+    mainWindow.setIgnoreMouseEvents(true, {}); ///need to do this, since modal:true is not supported on windows
   });
 
   piskelWindow.webContents.on('dom-ready', () => {

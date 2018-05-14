@@ -48,11 +48,12 @@ const loadPiskelWindow = ({ onReady, devTools, parentWindow }) => {
     if (devTools) piskelWindow.openDevTools();
   }
 
-  piskelWindow.on('closed', event => { // Does not fire on windows
+  piskelWindow.on('closed', event => {
     piskelWindow = null;
   });
 
-  piskelWindow.on('close', event => { // Workaround to get it to close on Windows 10
+  piskelWindow.on('close', event => {
+    // use destroy as a wordaround to force window closing, which is not done properly otherwise on Windows
     piskelWindow.destroy();
     piskelWindow = null;
 

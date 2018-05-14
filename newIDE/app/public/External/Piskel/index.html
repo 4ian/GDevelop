@@ -1,7 +1,7 @@
 <html>
 
 <head>
-  <title>Gdevelop Piskel Editor</title>
+  <title>GDevelop Piskel Editor</title>
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 
@@ -20,7 +20,7 @@
       document.getElementById('editor').contentDocument.getElementsByClassName('new-piskel-desktop button button-primary')[0].style.display = 'none';
       document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].align = "right";
       var SaveButton = document.getElementById('editor').contentDocument.createElement("button");
-      SaveButton.innerHTML = " Save to Gdevelop ";
+      SaveButton.innerHTML = " Save to GDevelop ";
       SaveButton.style = "margin-left: 20px; margin-right: 10px; margin-top: 5px;";
       document.getElementById('editor').contentDocument.getElementsByClassName('fake-piskelapp-header')[0].appendChild(SaveButton);
       SaveButton.addEventListener("click", function () { SaveToGD(); });

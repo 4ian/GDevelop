@@ -173,7 +173,7 @@ export default class SpritesList extends Component {
 
   onEditSprites = () => {
     if (!electron) {
-      Window.showMessageBox("This feature is only supported in the Desktop version for now!\nYou can Download it from Gdevelop's website...");
+      Window.showMessageBox("This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.");
       return
     };
     const { project, direction, resourcesLoader } = this.props;

@@ -117,6 +117,9 @@ const SortableList = SortableContainer(
 export default class SpritesList extends Component {
   componentDidMount() {
     if (!ipcRenderer) { return };
+
+    // TODO: ipcRenderer.removeAllListeners should be used in componentWillUnmount
+    // to avoid disconnect the event and avoid bugs
     ipcRenderer.on('piskel-changes-saved', (event, piskelFramePaths) => {
       if (this.animationEdited) { //TODO: animationEdited could be entirely removed?
         const { direction, project } = this.props;

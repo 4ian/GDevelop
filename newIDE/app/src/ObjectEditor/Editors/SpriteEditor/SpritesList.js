@@ -76,7 +76,7 @@ const SortableList = SortableContainer(
     resourcesLoader,
     onAddSprite,
     onEditSprites,
-    animationEdited = false,
+    animationEdited = false, //TODO: Remove this useless variable?
     selectedSprites,
     onSelectSprite,
     onSpriteContextMenu,
@@ -118,7 +118,7 @@ export default class SpritesList extends Component {
   componentDidMount() {
     if (!ipcRenderer) { return };
     ipcRenderer.on('piskelSavedChanges', (event, piskelFramePaths) => {
-      if (this.animationEdited) {
+      if (this.animationEdited) { //TODO: animationEdited could be entirely removed?
         const { direction, project } = this.props;
         const resourcesManager = project.getResourcesManager();
         direction.removeAllSprites(); /// clear the old sprite list
@@ -137,6 +137,8 @@ export default class SpritesList extends Component {
       };
       this.forceUpdate();
     });
+
+    //TODO: animationEdited could be entirely removed?
     ipcRenderer.on('piskelReset', () => {
       this.animationEdited = false;
     })

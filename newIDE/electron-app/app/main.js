@@ -19,6 +19,7 @@ const {
 } = require('./ServeFolder');
 const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
 const { buildMainMenuFor } = require('./MainMenu');
+const { loadPiskelWindow } = require('./PiskelWindow');
 const throttle = require('lodash.throttle');
 
 // Logs made with electron-logs can be found
@@ -32,7 +33,6 @@ log.info('GDevelop Electron app starting...');
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow = null;
-let piskelWindow = null;
 
 const args = parseArgs(process.argv.slice(2));
 const isIntegrated = args.mode === 'integrated';
@@ -63,16 +63,6 @@ app.on('ready', function() {
     backgroundColor: '#f0f0f0',
   };
 
-  const piskelOptions = {
-    parent: mainWindow,
-    modal: true,
-    show: false,
-    center: true,
-    webPreferences: {
-      webSecurity: false,
-    },
-  };
-
   if (isIntegrated) {
     options.acceptFirstMouse = true;
     options.skipTaskbar = true;
@@ -86,7 +76,6 @@ app.on('ready', function() {
   }
 
   mainWindow = new BrowserWindow(options);
-  piskelWindow = new BrowserWindow(piskelOptions);
   if (!isIntegrated) mainWindow.maximize();
 
   //Expose program arguments
@@ -97,16 +86,10 @@ app.on('ready', function() {
     // Development (server hosted by npm run start)
     mainWindow.loadURL('http://localhost:3000');
     mainWindow.openDevTools();
-    piskelWindow.loadURL('http://localhost:3000/External/Piskel/index.html');
-    piskelWindow.openDevTools();
   } else {
     // Production (with npm run build)
     mainWindow.loadURL('file://' + __dirname + '/www/index.html');
     if (devTools) mainWindow.openDevTools();
-    piskelWindow.loadURL(
-      'file://' + __dirname + '/www/External/Piskel/index.html'
-    );
-    if (devTools) piskelWindow.openDevTools();
   }
 
   Menu.setApplicationMenu(buildMainMenuFor(mainWindow));
@@ -116,32 +99,7 @@ app.on('ready', function() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
-    piskelWindow = null;
     stopServer(() => {});
-  });
-
-  piskelWindow.on('close', event => {
-    if (mainWindow) {
-      event.preventDefault();
-    }
-    if (piskelWindow) piskelWindow.hide();
-  });
-
-  piskelWindow.on('hide', event => {
-    mainWindow.setIgnoreMouseEvents(false, {});
-    mainWindow.webContents.send('piskelReset');
-  });
-
-  piskelWindow.on('show', event => {
-    mainWindow.setIgnoreMouseEvents(true, {}); ///need to do this, since modal:true is not supported on windows
-  });
-
-  piskelWindow.webContents.on('dom-ready', () => {
-    piskelWindow.setMenu(null);
-    let piskelWindowWidth = Math.floor(mainWindow.getSize()[0] * 0.7);
-    let piskelWindowHeight = Math.floor(mainWindow.getSize()[1] * 0.9);
-    piskelWindow.setSize(piskelWindowWidth, piskelWindowHeight);
-    piskelWindow.center();
   });
 
   //Prevent any navigation inside the main window.
@@ -152,16 +110,26 @@ app.on('ready', function() {
     }
   });
 
+  //TODO: Normalize all piskel* events to kebab-case
   ipcMain.on('piskelOpenAnimation', (event, piskelData) => {
-    piskelWindow.show();
-    piskelWindow.webContents.send('piskelOpenGDAnimation', piskelData);
+    loadPiskelWindow({
+      parentWindow: mainWindow,
+      devTools,
+      onReady: piskelWindow =>
+        piskelWindow.webContents.send('piskelOpenGDAnimation', piskelData),
+    });
   });
 
   ipcMain.on('piskelNewAnimation', (event, piskelData) => {
-    piskelWindow.show();
-    piskelWindow.webContents.send('piskelMakeNewAnimation', piskelData);
+    loadPiskelWindow({
+      parentWindow: mainWindow,
+      devTools,
+      onReady: piskelWindow =>
+        piskelWindow.webContents.send('piskelMakeNewAnimation', piskelData),
+    });
   });
 
+  //TODO: Move in PiskelWindow? And use a callback like onReady
   ipcMain.on('piskelSavedChanges', (event, piskelFramePaths) => {
     mainWindow.webContents.send('piskelSavedChanges', piskelFramePaths);
   });

@@ -6,15 +6,24 @@
 </head>
 
 <body>
+  <!-- TODO: No need to use both a class and an id. An id is ok there -->
   <iframe class="editor-frame" id='editor' src="editor/index.html"></iframe>
   <script>
-
     const electron = require('electron');
     const ipcRenderer = electron.ipcRenderer;
     const path = require('path');
     const fs = require('fs');
     const async = require('async');
     const remote = electron.remote;
+
+    const editorContentWindow = document.getElementById('editor').contentWindow;
+
+    if (!editorContentWindow.piskelReadyCallbacks) {
+      editorContentWindow.piskelReadyCallbacks = [];
+    }
+    editorContentWindow.piskelReadyCallbacks.push(function () {
+      ipcRenderer.send("piskel-ready");
+    });
 
     /**
      * Inject custom buttons in Piskel's header,
@@ -23,7 +32,6 @@
      */
     document.getElementById('editor').onload = function () {
       const editorContentDocument = document.getElementById('editor').contentDocument;
-
       const newButton = editorContentDocument.getElementsByClassName('new-piskel-desktop button button-primary')[0];
       newButton.style.display = 'none';
 
@@ -84,16 +92,11 @@
     /**
      * Save the content to the specified file
      */
-    function saveToFile(content, filename, filePath) {
+    function saveToFile(content, filePath, callback) {
       const reader = new FileReader();
       reader.onload = function () {
-        const buffer = new Buffer(reader.result)
-        fs.writeFile(filePath, buffer, {}, (err, res) => {
-          if (err) {
-            console.error(err)
-            return
-          }
-        })
+        const buffer = new Buffer(reader.result);
+        fs.writeFile(filePath, buffer, {}, callback);
       };
       reader.readAsArrayBuffer(content)
     }
@@ -104,6 +107,7 @@
       const pskl = editorFrameEl.contentWindow.pskl;
       const layer = pskl.app.piskelController.getCurrentLayer();
 
+      // Generate the path of the files that will be written
       const piskelFramePaths = [];
       for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
         let exportPath = layer.getFrameAt(i).originalPath; // Would be nice to nullify this on duplicated frames though
@@ -115,20 +119,25 @@
         if (piskelFramePaths.includes(exportPath)) // Prevent overwriting frames that were created via duplication of imported frames
         {
           console.log("Do not overwrite:" + exportPath);
+
+          //TODO: There should be a way to merge these two lines with the two similar lines
           exportPath = baseExportPath + 'PSKL-c-' + String(i + 1) + '.png';
           exportPath = makeFileNameUnique(exportPath);
         };
 
-        // Render and save to paths
-        const canvas = pskl.app.piskelController.renderFrameAt(i, true);
-        pskl.utils.BlobUtils.canvasToBlob(canvas, function (blob) {
-          saveToFile(blob, exportPath, exportPath);
-          piskelFramePaths.push(exportPath);
-        });
+        piskelFramePaths.push(exportPath);
       }
-      // Finally reload the frames in gdevelop and close the window
-      ipcRenderer.send("piskelSavedChanges", piskelFramePaths);
-      remote.getCurrentWindow().close();
+
+      // Save, asynchronously, the content of each images
+      async.eachOf(piskelFramePaths, function (path, index, callback) {
+        const canvas = pskl.app.piskelController.renderFrameAt(index, true);
+        pskl.utils.BlobUtils.canvasToBlob(canvas, function (blob) {
+          saveToFile(blob, path, callback);
+        })
+      }, function (err) {
+        ipcRenderer.send("piskelSavedChanges", piskelFramePaths);
+        remote.getCurrentWindow().close();
+      });
     }
 
     function cancelChanges() {
@@ -179,7 +188,7 @@
         // onload will fire after `src` is set
         try {
           image64.src = readBase64ImageFile(imagePath);
-        } catch(error) {
+        } catch (error) {
           // Unable to load the image, ignore it.
           console.error("Unable to load image at " + imagePath, error)
           callback();

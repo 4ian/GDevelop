@@ -67,7 +67,7 @@
       const folderPath = path.substring(0, path.lastIndexOf("/") + 1);
       const fileFormat = path.substring(path.lastIndexOf("."), path.length);
       const oldFileName = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("."));
-      const appendNumber = 0;
+      let appendNumber = 0;
       let newUniqueNamePath = folderPath + oldFileName + "-" + String(appendNumber) + fileFormat;
       while (fileExists(newUniqueNamePath)) {
         appendNumber += 1;

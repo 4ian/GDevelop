@@ -189,8 +189,7 @@ export default class SpritesList extends Component {
         project,
         direction.getSprite(i).getImageName()
       );
-      var importedImage = new Image();
-      importedImage.src = spriteImagePath;
+
       spriteImagePath = spriteImagePath.substring(
         7,
         spriteImagePath.lastIndexOf('?cache=')

@@ -3,19 +3,12 @@ import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
 import Add from 'material-ui/svg-icons/content/add';
 import IconButton from 'material-ui/IconButton';
-import Brush from 'material-ui/svg-icons/image/brush';
 import DirectionTools from './DirectionTools';
 import MiniToolbar from '../../../UI/MiniToolbar';
-import Window from "../../../Utils/Window";
 import ImageThumbnail, {
   thumbnailContainerStyle,
 } from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
-
-import optionalRequire from '../../../Utils/OptionalRequire';
-const electron = optionalRequire('electron');
-const ipcRenderer = electron ? electron.ipcRenderer : null;
-const path = optionalRequire('path');
-
+import { openPiskel } from '../../../Utils/PiskelBridge';
 const gd = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -45,9 +38,6 @@ const AddSpriteButton = SortableElement(({ displayHint, onAdd, onEdit }) => {
       <IconButton onClick={onAdd} style={styles.spriteThumbnailImage}>
         <Add />
       </IconButton>
-      <IconButton onClick={onEdit} style={styles.spriteThumbnailImage}>
-        <Brush />
-      </IconButton>
     </div>
   );
 });
@@ -75,8 +65,6 @@ const SortableList = SortableContainer(
     project,
     resourcesLoader,
     onAddSprite,
-    onEditSprites,
-    animationEdited = false, //TODO: Remove this useless variable?
     selectedSprites,
     onSelectSprite,
     onSpriteContextMenu,
@@ -106,7 +94,6 @@ const SortableList = SortableContainer(
             disabled
             index={spritesCount}
             onAdd={onAddSprite}
-            onEdit={onEditSprites}
           />,
         ]}
       </div>
@@ -115,38 +102,6 @@ const SortableList = SortableContainer(
 );
 
 export default class SpritesList extends Component {
-  componentDidMount() {
-    if (!ipcRenderer) { return };
-
-    // TODO: ipcRenderer.removeAllListeners should be used in componentWillUnmount
-    // to avoid disconnect the event and avoid bugs
-    ipcRenderer.on('piskel-changes-saved', (event, piskelFramePaths) => {
-      if (this.animationEdited) { //TODO: animationEdited could be entirely removed?
-        const { direction, project } = this.props;
-        const resourcesManager = project.getResourcesManager();
-        direction.removeAllSprites(); /// clear the old sprite list
-        /// ...We need to recreate it in order to account for any new/removal/reorder frame changes made in piskel
-        piskelFramePaths.forEach(imagePath => {
-          const imageResource = new gd.ImageResource();
-          imageResource.setFile(imagePath);
-          imageResource.setName(imagePath);
-          resourcesManager.addResource(imageResource);
-          const sprite = new gd.Sprite();
-          sprite.setImageName(imageResource.getName());
-          direction.addSprite(sprite);
-          imageResource.delete();
-          sprite.delete();
-        });
-      };
-      this.forceUpdate();
-    });
-
-    //TODO: animationEdited could be entirely removed?
-    ipcRenderer.on('piskel-reset', () => {
-      this.animationEdited = false;
-    })
-  };
-
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.props.direction.moveSprite(oldIndex, newIndex);
     this.forceUpdate();
@@ -176,43 +131,38 @@ export default class SpritesList extends Component {
     });
   };
 
-  onEditSprites = () => {
-    if (!electron) {
-      Window.showMessageBox("This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.");
-      return
-    };
+  editWithPiskel = () => {
     const { project, direction, resourcesLoader } = this.props;
-    this.animationEdited = true;
-    var imageFrames = []; /// first collect the images to edit
-    for (let i = 0; i < direction.getSpritesCount(); i++) {
-      var spriteImagePath = resourcesLoader.getResourceFullUrl(
-        project,
-        direction.getSprite(i).getImageName()
-      );
+    const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
+      return direction.getSprite(i).getImageName();
+    });
 
-      spriteImagePath = spriteImagePath.substring(
-        7,
-        spriteImagePath.lastIndexOf('?cache=')
-      );
-      imageFrames.push(spriteImagePath);
-    }
-    const piskelData = {
-      imageFrames: imageFrames,
-      fps: direction.getTimeBetweenFrames() > 0 ? 1 / direction.getTimeBetweenFrames() : 1,
-      name: 'New Animation',
-      isLooping: direction.isLooping(),
-      projectFolder: path.dirname(project.getProjectFile()),
-    };
-    if (direction.hasNoSprites()) {
-      piskelData.name = 'New Animation';
-      ipcRenderer.send('piskel-open-then-create-animation', piskelData);
-    } else {
-      piskelData.name = imageFrames[0]
-        .split('/')
-        .pop()
-        .split('.')[0];
-      ipcRenderer.send('piskel-open-then-load-animation', piskelData);
-    };
+    openPiskel({
+      project,
+      resourcesLoader,
+      resourceNames,
+      piskelOptions: {
+        fps:
+          direction.getTimeBetweenFrames() > 0
+            ? 1 / direction.getTimeBetweenFrames()
+            : 1,
+        name: 'Animation', //TODO
+        isLooping: direction.isLooping(),
+      },
+      onChangesSaved: resourceNames => {
+        // TODO: this erase any point and collision mask. Should find another way to update sprites
+        // without losing this.
+        direction.removeAllSprites();
+        resourceNames.forEach(resourceName => {
+          const sprite = new gd.Sprite();
+          sprite.setImageName(resourceName);
+          direction.addSprite(sprite);
+          sprite.delete();
+        });
+
+        this.forceUpdate();
+      },
+    });
   };
 
   render() {
@@ -223,6 +173,7 @@ export default class SpritesList extends Component {
             direction={this.props.direction}
             resourcesLoader={this.props.resourcesLoader}
             project={this.props.project}
+            editWithPiskel={this.editWithPiskel}
           />
         </MiniToolbar>
         <SortableList

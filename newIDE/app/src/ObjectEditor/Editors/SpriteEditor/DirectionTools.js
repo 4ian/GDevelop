@@ -3,6 +3,7 @@ import Timer from 'material-ui/svg-icons/image/timer';
 import FlatButton from 'material-ui/FlatButton';
 import Checkbox from 'material-ui/Checkbox';
 import Repeat from 'material-ui/svg-icons/av/repeat';
+import Brush from 'material-ui/svg-icons/image/brush';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 import TextField from 'material-ui/TextField';
 import Dialog from '../../../UI/Dialog';
@@ -79,10 +80,20 @@ export default class DirectionTools extends Component {
   };
 
   render() {
-    const { direction, resourcesLoader, project } = this.props;
+    const {
+      direction,
+      resourcesLoader,
+      project,
+      editWithPiskel,
+    } = this.props;
 
     return (
       <div style={styles.container}>
+        <FlatButton
+          label="Edit with Piskel"
+          icon={<Brush />}
+          onClick={editWithPiskel}
+        />
         <FlatButton
           label="Preview"
           icon={<PlayArrow />}

@@ -56,8 +56,6 @@ const loadPiskelWindow = ({ onReady, devTools, parentWindow }) => {
     // use destroy as a wordaround to force window closing, which is not done properly otherwise on Windows
     piskelWindow.destroy();
     piskelWindow = null;
-
-    parentWindow.webContents.send('piskel-reset');
   });
 };
 

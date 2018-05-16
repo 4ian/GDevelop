@@ -9,14 +9,14 @@ const gd = global.gd;
 
 type OpenOptions = {|
   project: gdProject,
-  resourcesLoader: typeof ResourcesLoader,
-  resourceNames: Array<string>,
-  onChangesSaved: (Array<string>) => void,
-  onChangesCanceled: () => void,
-  piskelOptions: {
-    name: string,
+    resourcesLoader: typeof ResourcesLoader,
+      resourceNames: Array < string >,
+        onChangesSaved: (Array<string>) => void,
+          onChangesCanceled: () => void,
+            piskelOptions: {
+  name: string,
     isLooping: boolean,
-    fps: number,
+      fps: number,
   },
 |};
 
@@ -78,12 +78,5 @@ export const openPiskel = ({
   });
 
   // Issue the event to open piskel
-  if (!resourceFullUrls.length) {
-    ipcRenderer.send(
-      'piskel-open-then-create-animation',
-      completePiskelOptions
-    );
-  } else {
-    ipcRenderer.send('piskel-open-then-load-animation', completePiskelOptions);
-  }
+  ipcRenderer.send('piskel-open-then-load-animation', completePiskelOptions);
 };

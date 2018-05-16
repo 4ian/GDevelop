@@ -144,11 +144,8 @@
       remote.getCurrentWindow().close();
     }
 
-    ipcRenderer.on('piskel-create-animation', (event, piskelData) => {
+    function piskelCreateAnimation(pskl, piskelData) {
       baseExportPath = piskelData.projectFolder + "/";
-      const editorFrameEl = document.querySelector(".editor-frame");
-      const pskl = editorFrameEl.contentWindow.pskl;
-      if (!pskl) return;
 
       const sprite = { "modelVersion": 2, "piskel": { "name": "New Animation", "description": "", "fps": 12, "height": 64, "width": 64, "layers": ["{\"name\":\"Layer 1\",\"frameCount\":1,\"base64PNG\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAOUlEQVR42u3OIQEAAAACIP1/2hkWWEBzVgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAYF3YDicAEE8VTiYAAAAAElFTkSuQmCC\"}"] } };
 
@@ -159,14 +156,18 @@
         pskl.app.piskelController.setPiskel(piskel);
         pskl.app.piskelController.setFPS(sprite.fps);
       });
-    })
+    }
 
     ipcRenderer.on('piskel-load-animation', (event, piskelData) => {
-      baseExportPath = piskelData.projectFolder + "/" + piskelData.name;
+
       const editorFrameEl = document.querySelector(".editor-frame");
       const pskl = editorFrameEl.contentWindow.pskl;
       if (!pskl) return;
-
+      if (piskelData.imageFrames.length == 0) {
+        piskelCreateAnimation(pskl, piskelData);
+        return
+      };
+      baseExportPath = piskelData.projectFolder + "/" + piskelData.name;
       const imageFrames = piskelData.imageFrames;
       const imageData = [];
       let piskelXsize = -1;

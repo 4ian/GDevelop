@@ -32,7 +32,7 @@ const styles = {
   },
 };
 
-const AddSpriteButton = SortableElement(({ displayHint, onAdd, onEdit }) => {
+const AddSpriteButton = SortableElement(({ displayHint, onAdd }) => {
   return (
     <div style={styles.addSpriteButton}>
       <IconButton onClick={onAdd} style={styles.spriteThumbnailImage}>

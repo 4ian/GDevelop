@@ -119,15 +119,6 @@ app.on('ready', function() {
     });
   });
 
-  ipcMain.on('piskel-open-then-create-animation', (event, piskelData) => {
-    loadPiskelWindow({
-      parentWindow: mainWindow,
-      devTools,
-      onReady: piskelWindow =>
-        piskelWindow.webContents.send('piskel-create-animation', piskelData),
-    });
-  });
-
   //TODO: Move in PiskelWindow? And use a callback like onReady
   ipcMain.on('piskel-changes-saved', (event, piskelFramePaths) => {
     mainWindow.webContents.send('piskel-changes-saved', piskelFramePaths);

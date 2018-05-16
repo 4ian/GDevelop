@@ -160,6 +160,9 @@ export default class SpritesList extends Component {
           sprite.delete();
         });
 
+        // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
+        // TODO: A more fine-grained cache bursting for specific resources could be done.
+        resourcesLoader.burstUrlsCache();
         this.forceUpdate();
       },
     });

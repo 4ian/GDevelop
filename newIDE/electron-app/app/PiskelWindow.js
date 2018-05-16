@@ -31,6 +31,7 @@ const loadPiskelWindow = ({ onReady, devTools, parentWindow }) => {
   piskelWindow = new BrowserWindow(piskelOptions);
   piskelWindow.setMenu(null);
 
+  ipcMain.removeAllListeners('piskel-ready');
   ipcMain.on('piskel-ready', (event) => {
     onReady(piskelWindow);
   });

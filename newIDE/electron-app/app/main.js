@@ -39,13 +39,13 @@ const isIntegrated = args.mode === 'integrated';
 const devTools = !!args['dev-tools'];
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
   app.quit();
 });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function() {
+app.on('ready', function () {
   if (isIntegrated && app.dock) {
     app.dock.hide();
   }
@@ -94,12 +94,12 @@ app.on('ready', function() {
 
   Menu.setApplicationMenu(buildMainMenuFor(mainWindow));
 
-  mainWindow.on('closed', function() {
+  mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
-    stopServer(() => {});
+    stopServer(() => { });
   });
 
   //Prevent any navigation inside the main window.
@@ -120,8 +120,8 @@ app.on('ready', function() {
   });
 
   //TODO: Move in PiskelWindow? And use a callback like onReady
-  ipcMain.on('piskel-changes-saved', (event, piskelFramePaths) => {
-    mainWindow.webContents.send('piskel-changes-saved', piskelFramePaths);
+  ipcMain.on('piskel-changes-saved', (event, imageResources) => {
+    mainWindow.webContents.send('piskel-changes-saved', imageResources);
   });
 
   // S3Upload events:

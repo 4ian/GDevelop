@@ -108,34 +108,38 @@
       const layer = pskl.app.piskelController.getCurrentLayer();
 
       // Generate the path of the files that will be written
-      const piskelFramePaths = [];
+      const imageResources = [];
       for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
         let exportPath = layer.getFrameAt(i).originalPath; // Would be nice to nullify this on duplicated frames though
+        let exportName = layer.getFrameAt(i).originalName; // Would be nice to nullify this on duplicated frames though
         if (!exportPath) { // If a frame was made in piskel, come up with a unique path, so as not to overwrite any existing files
           exportPath = baseExportPath + 'PSKL-' + String(i + 1) + '.png';
           exportPath = makeFileNameUnique(exportPath);
         }
 
-        if (piskelFramePaths.includes(exportPath)) // Prevent overwriting frames that were created via duplication of imported frames
+        if (imageResources.includes(exportPath)) // Prevent overwriting frames that were created via duplication of imported frames
         {
           console.log("Do not overwrite:" + exportPath);
-
           //TODO: There should be a way to merge these two lines with the two similar lines
           exportPath = baseExportPath + 'PSKL-c-' + String(i + 1) + '.png';
           exportPath = makeFileNameUnique(exportPath);
         };
 
-        piskelFramePaths.push(exportPath);
+        if (!exportName) {
+          exportName = exportPath.substring(exportPath.lastIndexOf("/") + 1, exportPath.length)
+        };
+
+        imageResources.push({ path: exportPath, name: exportName });
       }
 
       // Save, asynchronously, the content of each images
-      async.eachOf(piskelFramePaths, function (path, index, callback) {
+      async.eachOf(imageResources, function (path, index, callback) {
         const canvas = pskl.app.piskelController.renderFrameAt(index, true);
         pskl.utils.BlobUtils.canvasToBlob(canvas, function (blob) {
-          saveToFile(blob, path, callback);
+          saveToFile(blob, path.path, callback);
         })
       }, function (err) {
-        ipcRenderer.send("piskel-changes-saved", piskelFramePaths);
+        ipcRenderer.send("piskel-changes-saved", imageResources);
         remote.getCurrentWindow().close();
       });
     }
@@ -169,6 +173,7 @@
       };
       baseExportPath = piskelData.projectFolder + "/" + piskelData.name;
       const imageFrames = piskelData.imageFrames;
+      const imageNames = piskelData.imageNames;
       const imageData = [];
       let piskelXsize = -1;
       let piskelYsize = -1;
@@ -204,6 +209,7 @@
         const layer = pskl.app.piskelController.getCurrentLayer();
         for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
           layer.getFrameAt(i).originalPath = imageFrames[i];
+          layer.getFrameAt(i).originalName = imageNames[i];
         };
       });
     });

@@ -9,15 +9,15 @@ const gd = global.gd;
 
 type OpenOptions = {|
   project: gdProject,
-    resourcesLoader: typeof ResourcesLoader,
-      resourceNames: Array < string >,
-        onChangesSaved: (Array<string>) => void,
-          onChangesCanceled: () => void,
-            piskelOptions: {
-  name: string,
-    isLooping: boolean,
+  resourcesLoader: typeof ResourcesLoader,
+  resourceNames: Array < string >,
+  onChangesSaved: (Array<string>) => void,
+  onChangesCanceled: () => void,
+    piskelOptions: {
+      name: string,
+      isLooping: boolean,
       fps: number,
-  },
+    },
 |};
 
 /**
@@ -57,21 +57,23 @@ export const openPiskel = ({
   const completePiskelOptions = {
     ...piskelOptions,
     imageFrames: resourceFullUrls,
+    imageNames: resourceNames,
     projectFolder: path.dirname(project.getProjectFile()),
   };
 
   // Listen to events meaning that edition in Piskel is finished
   ipcRenderer.removeAllListeners('piskel-changes-saved');
-  ipcRenderer.on('piskel-changes-saved', (event, imagePaths) => {
+  ipcRenderer.on('piskel-changes-saved', (event, imageResources) => {
     const resourcesManager = project.getResourcesManager();
-    const outputResourceNames = imagePaths.map(imagePath => {
+
+    const outputResourceNames = imageResources.map(image => {
       const imageResource = new gd.ImageResource();
-      imageResource.setFile(imagePath); // TODO: should be made relative to project folder.
-      imageResource.setName(imagePath); // TODO: name should be filename only.
+      imageResource.setFile(image.path); // TODO: should be made relative to project folder.
+      imageResource.setName(image.name);
       resourcesManager.addResource(imageResource);
       imageResource.delete();
 
-      return imagePath;
+      return image;
     });
 
     onChangesSaved(outputResourceNames);

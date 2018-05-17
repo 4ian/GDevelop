@@ -136,6 +136,7 @@ export default class SpritesList extends Component {
     const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
       return direction.getSprite(i).getImageName();
     });
+    const preResourceNames = resourceNames;
 
     openPiskel({
       project,
@@ -150,16 +151,44 @@ export default class SpritesList extends Component {
         isLooping: direction.isLooping(),
       },
       onChangesSaved: resourceNames => {
-        // TODO: this erase any point and collision mask. Should find another way to update sprites
-        // without losing this.
-        direction.removeAllSprites();
-        resourceNames.forEach(resourceName => {
+        var numberOfNewSpites = resourceNames.length - preResourceNames.length;
+        for (let i = 0; i < numberOfNewSpites; i++) { // new slots were made in piskel, we need to add them here
           const sprite = new gd.Sprite();
-          sprite.setImageName(resourceName);
+          sprite.setImageName(null);
           direction.addSprite(sprite);
           sprite.delete();
+        }
+        let idx = 0;
+        resourceNames.forEach(resource => {
+          if (!preResourceNames.includes(resource.name)) { // set any sprites that were newly created in piskel
+            direction.getSprite(idx).setImageName(resource.name);
+          }
+          idx += 1
         });
 
+        let resourceIndex = 0;
+        let moved = [];
+        resourceNames.forEach(resource => { // Deal with any sprites that were imported to piskel - this is BUGGY atm
+          if (preResourceNames.includes(resource.name)) {
+            let oldIndex = preResourceNames.indexOf(resource.name);
+            if (oldIndex !== resourceIndex) // Sprite was moved from its previous slot
+            {
+              if (!moved.includes(resourceIndex) && !moved.includes(oldIndex)) {
+                direction.moveSprite(oldIndex, resourceIndex); ///<-- bug cause?
+                moved.push(oldIndex); // to this to avoid swapping it back to its previous place
+                moved.push(resourceIndex);
+                console.log("move: "+oldIndex +"--->"+ resourceIndex); 
+              }
+            }
+          }
+          resourceIndex += 1
+        });
+        
+        if (numberOfNewSpites < 0) { // sprites were removed in piskel. We need to get rid of some slots
+          for (let i = 0; i < Math.abs(numberOfNewSpites); i++) {
+            direction.removeSprite(resourceNames.length - i);
+          }
+        };
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         // TODO: A more fine-grained cache bursting for specific resources could be done.
         resourcesLoader.burstUrlsCache();

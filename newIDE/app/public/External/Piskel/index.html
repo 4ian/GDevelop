@@ -108,18 +108,21 @@
       const layer = pskl.app.piskelController.getCurrentLayer();
 
       // Generate the path of the files that will be written
-      const imageResources = [];
+      const outputResources = [];
       for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
-        let exportPath = layer.getFrameAt(i).originalPath; // Would be nice to nullify this on duplicated frames though
-        let exportName = layer.getFrameAt(i).originalName; // Would be nice to nullify this on duplicated frames though
+        const frame = layer.getFrameAt(i);
+        let exportPath = frame.originalPath; // Would be nice to nullify this on duplicated frames though
+        let exportName = frame.originalName; // Would be nice to nullify this on duplicated frames though
+        const originalIndex = frame.originalIndex;
         if (!exportPath) { // If a frame was made in piskel, come up with a unique path, so as not to overwrite any existing files
           exportPath = baseExportPath + 'PSKL-' + String(i + 1) + '.png';
           exportPath = makeFileNameUnique(exportPath);
         }
 
-        if (imageResources.includes(exportPath)) // Prevent overwriting frames that were created via duplication of imported frames
+        // Prevent overwriting frames that were created via duplication of imported frames
+        const pathAlreadyUsed = outputResources.filter(resource => resource.path === exportPath).length;
+        if (pathAlreadyUsed) 
         {
-          console.log("Do not overwrite:" + exportPath);
           //TODO: There should be a way to merge these two lines with the two similar lines
           exportPath = baseExportPath + 'PSKL-c-' + String(i + 1) + '.png';
           exportPath = makeFileNameUnique(exportPath);
@@ -129,17 +132,17 @@
           exportName = exportPath.substring(exportPath.lastIndexOf("/") + 1, exportPath.length)
         };
 
-        imageResources.push({ path: exportPath, name: exportName });
+        outputResources.push({ path: exportPath, name: exportName, originalIndex });
       }
 
       // Save, asynchronously, the content of each images
-      async.eachOf(imageResources, function (path, index, callback) {
+      async.eachOf(outputResources, function (path, index, callback) {
         const canvas = pskl.app.piskelController.renderFrameAt(index, true);
         pskl.utils.BlobUtils.canvasToBlob(canvas, function (blob) {
           saveToFile(blob, path.path, callback);
         })
       }, function (err) {
-        ipcRenderer.send("piskel-changes-saved", imageResources);
+        ipcRenderer.send("piskel-changes-saved", outputResources);
         remote.getCurrentWindow().close();
       });
     }
@@ -167,49 +170,43 @@
       const editorFrameEl = document.querySelector(".editor-frame");
       const pskl = editorFrameEl.contentWindow.pskl;
       if (!pskl) return;
-      if (piskelData.imageFrames.length == 0) {
+      if (piskelData.resources.length == 0) {
         piskelCreateAnimation(pskl, piskelData);
         return
       };
       baseExportPath = piskelData.projectFolder + "/" + piskelData.name;
-      const imageFrames = piskelData.imageFrames;
-      const imageNames = piskelData.imageNames;
       const imageData = [];
-      let piskelXsize = -1;
-      let piskelYsize = -1;
-      async.each(imageFrames, function (imagePath, callback) {
-        const image64 = new Image();
-
-        image64.onload = function () {
-          imageData.push(image64);
-          if (image64.width > piskelXsize) {
-            piskelXsize = image64.width;
-          };
-          if (image64.height > piskelYsize) {
-            piskelYsize = image64.height;
-          };
+      let maxWidth = -1;
+      let maxHeight = -1;
+      async.each(piskelData.resources, function (resource, callback) {
+        const image = new Image();
+        image.onload = function () {
+          imageData.push(image);
+          maxWidth = Math.max(image.width, maxWidth);
+          maxHeight = Math.max(image.height, maxHeight);
           callback();
         }
 
         // onload will fire after `src` is set
         try {
-          image64.src = readBase64ImageFile(imagePath);
+          image.src = readBase64ImageFile(resource.resourcePath);
         } catch (error) {
           // Unable to load the image, ignore it.
-          console.error("Unable to load image at " + imagePath, error)
+          console.error("Unable to load ", resource, error)
           callback();
         }
       }, function (err) {
         // Finally load the image objects into piskel
-        const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, piskelData.name, piskelXsize, piskelYsize, false);
+        const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(imageData, piskelData.name, maxWidth, maxHeight, false);
         pskl.app.piskelController.setPiskel(piskelFile, {});
         pskl.app.piskelController.setFPS(piskelData.fps);
 
         // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
         const layer = pskl.app.piskelController.getCurrentLayer();
         for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
-          layer.getFrameAt(i).originalPath = imageFrames[i];
-          layer.getFrameAt(i).originalName = imageNames[i];
+          layer.getFrameAt(i).originalPath = piskelData.resources[i].resourcePath;
+          layer.getFrameAt(i).originalName = piskelData.resources[i].resourceName;
+          layer.getFrameAt(i).originalIndex = i;
         };
       });
     });

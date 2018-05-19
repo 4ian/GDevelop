@@ -40,43 +40,39 @@ export const openPiskel = ({
     return;
   }
 
-  const resourceFullUrls = resourceNames.map(resourceName => {
-    let resourceFullUrl = resourcesLoader.getResourceFullUrl(
+  const resources = resourceNames.map((resourceName, originalIndex) => {
+    let resourcePath = resourcesLoader.getResourceFullUrl(
       project,
       resourceName
     );
 
     //TODO: check if this is necessary or if resourcesLoader should be updated.
-    resourceFullUrl = resourceFullUrl.substring(
+    resourcePath = resourcePath.substring(
       7,
-      resourceFullUrl.lastIndexOf('?cache=')
+      resourcePath.lastIndexOf('?cache=')
     );
-    return resourceFullUrl;
+    return {resourcePath, resourceName, originalIndex};
   });
 
   const completePiskelOptions = {
     ...piskelOptions,
-    imageFrames: resourceFullUrls,
-    imageNames: resourceNames,
+    resources,
     projectFolder: path.dirname(project.getProjectFile()),
   };
 
   // Listen to events meaning that edition in Piskel is finished
   ipcRenderer.removeAllListeners('piskel-changes-saved');
-  ipcRenderer.on('piskel-changes-saved', (event, imageResources) => {
+  ipcRenderer.on('piskel-changes-saved', (event, outputResources) => {
     const resourcesManager = project.getResourcesManager();
-
-    const outputResourceNames = imageResources.map(image => {
+    outputResources.forEach(resource => {
       const imageResource = new gd.ImageResource();
-      imageResource.setFile(image.path); // TODO: should be made relative to project folder.
-      imageResource.setName(image.name);
+      imageResource.setFile(resource.path); // TODO: should be made relative to project folder.
+      imageResource.setName(resource.name);
       resourcesManager.addResource(imageResource);
       imageResource.delete();
-
-      return image;
     });
 
-    onChangesSaved(outputResourceNames);
+    onChangesSaved(outputResources);
   });
 
   // Issue the event to open piskel

@@ -78,6 +78,7 @@ class Animation extends React.Component<*, void> {
       onSpriteContextMenu,
       selectedSprites,
       onSelectSprite,
+      onReplaceDirection
     } = this.props;
 
     return (
@@ -113,6 +114,7 @@ class Animation extends React.Component<*, void> {
               onSpriteContextMenu={onSpriteContextMenu}
               selectedSprites={selectedSprites}
               onSelectSprite={onSelectSprite}
+              onReplaceByDirection={(newDirection) => onReplaceDirection(i, newDirection)}
             />
           );
         })}
@@ -137,6 +139,7 @@ const SortableAnimationsList = SortableContainer(
     onSpriteContextMenu,
     selectedSprites,
     onSelectSprite,
+    onReplaceDirection,
   }) => {
     return (
       <GridList style={styles.gridList} cellHeight="auto" cols={1}>
@@ -158,6 +161,7 @@ const SortableAnimationsList = SortableContainer(
                 onSpriteContextMenu={onSpriteContextMenu}
                 selectedSprites={selectedSprites}
                 onSelectSprite={onSelectSprite}
+                onReplaceDirection={(directionId, newDirection) => onReplaceDirection(i, directionId, newDirection)}
               />
             );
           }),
@@ -270,6 +274,11 @@ class AnimationsListContainer extends React.Component<
     });
   };
 
+  replaceDirection = (animationId, directionId, newDirection) => {
+    this.props.spriteObject.getAnimation(animationId).setDirection(newDirection, directionId);
+    this.forceUpdate();
+  }
+
   render() {
     return (
       <div>
@@ -281,6 +290,7 @@ class AnimationsListContainer extends React.Component<
           onAddAnimation={this.addAnimation}
           onChangeAnimationName={this.changeAnimationName}
           onRemoveAnimation={this.removeAnimation}
+          onReplaceDirection={this.replaceDirection}
           onSpriteContextMenu={this.openSpriteContextMenu}
           selectedSprites={this.state.selectedSprites}
           onSelectSprite={this.selectSprite}

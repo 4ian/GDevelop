@@ -9,6 +9,12 @@ import ImageThumbnail, {
   thumbnailContainerStyle,
 } from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
 import { openPiskel } from '../../../Utils/PiskelBridge';
+import {
+  copySpritePoints,
+  copySpritePolygons,
+  allDirectionSpritesHaveSamePointsAs,
+  allDirectionSpritesHaveSameCollisionMasksAs,
+} from './Utils/SpriteObjectHelper';
 const gd = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -132,11 +138,28 @@ export default class SpritesList extends Component {
   };
 
   editWithPiskel = () => {
-    const { project, direction, resourcesLoader } = this.props;
+    const {
+      project,
+      direction,
+      resourcesLoader,
+      onReplaceByDirection,
+    } = this.props;
     const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
       return direction.getSprite(i).getImageName();
     });
-    const preResourceNames = resourceNames;
+
+    let allDirectionSpritesHaveSamePoints = false;
+    let allDirectionSpritesHaveSameCollisionMasks = false;
+    if (direction.getSpritesCount() !== 0) {
+      allDirectionSpritesHaveSamePoints = allDirectionSpritesHaveSamePointsAs(
+        direction.getSprite(0),
+        direction
+      );
+      allDirectionSpritesHaveSameCollisionMasks = allDirectionSpritesHaveSameCollisionMasksAs(
+        direction.getSprite(0),
+        direction
+      );
+    }
 
     openPiskel({
       project,
@@ -147,52 +170,38 @@ export default class SpritesList extends Component {
           direction.getTimeBetweenFrames() > 0
             ? 1 / direction.getTimeBetweenFrames()
             : 1,
-        name: 'Animation', //TODO
+        name: 'Animation',
         isLooping: direction.isLooping(),
       },
-      onChangesSaved: resourceNames => {
-        var numberOfNewSpites = resourceNames.length - preResourceNames.length;
-        for (let i = 0; i < numberOfNewSpites; i++) { // new slots were made in piskel, we need to add them here
+      onChangesSaved: resources => {
+        const newDirection = new gd.Direction();
+        resources.forEach(resource => {
           const sprite = new gd.Sprite();
-          sprite.setImageName(null);
-          direction.addSprite(sprite);
-          sprite.delete();
-        }
-        let idx = 0;
-        resourceNames.forEach(resource => {
-          if (!preResourceNames.includes(resource.name)) { // set any sprites that were newly created in piskel
-            direction.getSprite(idx).setImageName(resource.name);
-          }
-          idx += 1
-        });
+          sprite.setImageName(resource.name);
 
-        let resourceIndex = 0;
-        let moved = [];
-        resourceNames.forEach(resource => { // Deal with any sprites that were imported to piskel - this is BUGGY atm
-          if (preResourceNames.includes(resource.name)) {
-            let oldIndex = preResourceNames.indexOf(resource.name);
-            if (oldIndex !== resourceIndex) // Sprite was moved from its previous slot
-            {
-              if (!moved.includes(resourceIndex) && !moved.includes(oldIndex)) {
-                direction.moveSprite(oldIndex, resourceIndex); ///<-- bug cause?
-                moved.push(oldIndex); // to this to avoid swapping it back to its previous place
-                moved.push(resourceIndex);
-                console.log("move: "+oldIndex +"--->"+ resourceIndex); 
-              }
+          // Restore collision masks and points
+          if (resource.originalIndex !== undefined) {
+            const originalSprite = direction.getSprite(resource.originalIndex);
+            copySpritePoints(originalSprite, sprite);
+            copySpritePolygons(originalSprite, sprite);
+          } else {
+            if (allDirectionSpritesHaveSamePoints) {
+              copySpritePoints(direction.getSprite(0), sprite);
+            }
+            if (allDirectionSpritesHaveSameCollisionMasks) {
+              copySpritePolygons(direction.getSprite(0), sprite);
             }
           }
-          resourceIndex += 1
+
+          newDirection.addSprite(sprite);
+          sprite.delete();
         });
-        
-        if (numberOfNewSpites < 0) { // sprites were removed in piskel. We need to get rid of some slots
-          for (let i = 0; i < Math.abs(numberOfNewSpites); i++) {
-            direction.removeSprite(resourceNames.length - i);
-          }
-        };
+
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         // TODO: A more fine-grained cache bursting for specific resources could be done.
         resourcesLoader.burstUrlsCache();
-        this.forceUpdate();
+        onReplaceByDirection(newDirection);
+        newDirection.delete();
       },
     });
   };

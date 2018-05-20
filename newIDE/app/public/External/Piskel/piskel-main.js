@@ -130,10 +130,7 @@ function saveToGD() {
     }
 
     if (!exportName) {
-      exportName = exportPath.substring(
-        exportPath.lastIndexOf('/') + 1,
-        exportPath.length
-      );
+      exportName = path.basename(exportPath);
     }
 
     outputResources.push({ path: exportPath, name: exportName, originalIndex });

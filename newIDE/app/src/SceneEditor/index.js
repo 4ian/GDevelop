@@ -505,6 +505,7 @@ export default class SceneEditor extends Component {
       initialInstances,
       resourceSources,
       onChooseResource,
+      resourceExternalEditors,
       isActive,
     } = this.props;
     const selectedInstances = this.instancesSelection.getSelectedInstances();
@@ -594,6 +595,7 @@ export default class SceneEditor extends Component {
           object={this.state.editedObject}
           project={project}
           resourceSources={resourceSources}
+          resourceExternalEditors={resourceExternalEditors}
           onChooseResource={onChooseResource}
           onCancel={() => this.editObject(null)}
           onApply={() => {

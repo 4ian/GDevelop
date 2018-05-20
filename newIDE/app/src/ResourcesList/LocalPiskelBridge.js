@@ -1,25 +1,10 @@
 // @flow
-import Window from './Window.js';
-import optionalRequire from './OptionalRequire.js';
-import ResourcesLoader from '../ResourcesLoader/index.js';
+import optionalRequire from '../Utils/OptionalRequire.js';
+import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const gd = global.gd;
-
-type OpenOptions = {|
-  project: gdProject,
-  resourcesLoader: typeof ResourcesLoader,
-  resourceNames: Array<string>,
-  onChangesSaved: (
-    Array<{ path: string, name: string, originalIndex: ?number }>
-  ) => void,
-  piskelOptions: {
-    name: string,
-    isLooping: boolean,
-    fps: number,
-  },
-|};
 
 /**
  * Open Piskel editor for the specified resources.
@@ -31,14 +16,9 @@ export const openPiskel = ({
   resourcesLoader,
   resourceNames,
   onChangesSaved,
-  piskelOptions,
-}: OpenOptions) => {
-  if (!electron || !ipcRenderer) {
-    Window.showMessageBox(
-      'This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.'
-    );
-    return;
-  }
+  extraOptions,
+}: ExternalEditorOpenOptions) => {
+  if (!electron || !ipcRenderer) return;
 
   const resources = resourceNames.map((resourceName, originalIndex) => {
     let resourcePath = resourcesLoader.getResourceFullUrl(
@@ -56,7 +36,7 @@ export const openPiskel = ({
 
   const projectPath = path.dirname(project.getProjectFile());
   const completePiskelOptions = {
-    ...piskelOptions,
+    ...extraOptions,
     resources,
     projectPath,
   };

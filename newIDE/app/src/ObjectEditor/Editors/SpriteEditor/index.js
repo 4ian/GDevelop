@@ -25,6 +25,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../../../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 
 const gd = global.gd;
 
@@ -70,8 +71,9 @@ type AnimationProps = {|
   id: number,
   project: gdProject,
   resourceSources: Array<ResourceSource>,
-  onRemove: () => void,
   onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  onRemove: () => void,
   resourcesLoader: typeof ResourcesLoader,
   onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
   selectedSprites: {
@@ -95,6 +97,7 @@ class Animation extends React.Component<AnimationProps, void> {
       resourceSources,
       onRemove,
       onChooseResource,
+      resourceExternalEditors,
       resourcesLoader,
       onSpriteContextMenu,
       selectedSprites,
@@ -135,6 +138,7 @@ class Animation extends React.Component<AnimationProps, void> {
               resourcesLoader={resourcesLoader}
               resourceSources={resourceSources}
               onChooseResource={onChooseResource}
+              resourceExternalEditors={resourceExternalEditors}
               onSpriteContextMenu={onSpriteContextMenu}
               selectedSprites={selectedSprites}
               onSelectSprite={onSelectSprite}
@@ -163,6 +167,7 @@ const SortableAnimationsList = SortableContainer(
     resourcesLoader,
     resourceSources,
     onChooseResource,
+    resourceExternalEditors,
     extraBottomTools,
     onSpriteContextMenu,
     selectedSprites,
@@ -184,6 +189,7 @@ const SortableAnimationsList = SortableContainer(
                 resourcesLoader={resourcesLoader}
                 resourceSources={resourceSources}
                 onChooseResource={onChooseResource}
+                resourceExternalEditors={resourceExternalEditors}
                 onRemove={() => onRemoveAnimation(i)}
                 onChangeName={newName => onChangeAnimationName(i, newName)}
                 onSpriteContextMenu={onSpriteContextMenu}
@@ -213,6 +219,7 @@ type AnimationsListContainerProps = {|
   project: gdProject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
   resourcesLoader: typeof ResourcesLoader,
   extraBottomTools: React.Node,
   onSizeUpdated: () => void,
@@ -330,6 +337,7 @@ class AnimationsListContainer extends React.Component<
           onSelectSprite={this.selectSprite}
           resourcesLoader={this.props.resourcesLoader}
           resourceSources={this.props.resourceSources}
+          resourceExternalEditors={this.props.resourceExternalEditors}
           onChooseResource={this.props.onChooseResource}
           extraBottomTools={this.props.extraBottomTools}
           useDragHandle
@@ -388,6 +396,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
       project,
       resourceSources,
       onChooseResource,
+      resourceExternalEditors,
       onSizeUpdated,
       objectName,
     } = this.props;
@@ -400,6 +409,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           resourcesLoader={this.resourcesLoader}
           resourceSources={resourceSources}
           onChooseResource={onChooseResource}
+          resourceExternalEditors={resourceExternalEditors}
           project={project}
           objectName={objectName}
           onSizeUpdated={onSizeUpdated}

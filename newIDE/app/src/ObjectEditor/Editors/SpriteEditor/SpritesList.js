@@ -9,7 +9,6 @@ import MiniToolbar from '../../../UI/MiniToolbar';
 import ImageThumbnail, {
   thumbnailContainerStyle,
 } from '../../../ResourcesList/ResourceThumbnail/ImageThumbnail';
-import { openPiskel } from '../../../Utils/PiskelBridge';
 import {
   copySpritePoints,
   copySpritePolygons,
@@ -21,6 +20,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../../../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 const gd = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -141,6 +141,7 @@ type Props = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   resourceSources: Array<ResourceSource>,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
   onChooseResource: ChooseResourceFunction,
   onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
   selectedSprites: {
@@ -199,7 +200,7 @@ export default class SpritesList extends Component<Props, void> {
     });
   };
 
-  editWithPiskel = () => {
+  editWith = (externalEditor: ResourceExternalEditor) => {
     const {
       project,
       direction,
@@ -217,11 +218,11 @@ export default class SpritesList extends Component<Props, void> {
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
-    openPiskel({
+    externalEditor.edit({
       project,
       resourcesLoader,
       resourceNames,
-      piskelOptions: {
+      extraOptions: {
         fps:
           direction.getTimeBetweenFrames() > 0
             ? 1 / direction.getTimeBetweenFrames()
@@ -270,7 +271,8 @@ export default class SpritesList extends Component<Props, void> {
             direction={this.props.direction}
             resourcesLoader={this.props.resourcesLoader}
             project={this.props.project}
-            editWithPiskel={this.editWithPiskel}
+            resourceExternalEditors={this.props.resourceExternalEditors}
+            onEditWith={this.editWith}
           />
         </MiniToolbar>
         <SortableList

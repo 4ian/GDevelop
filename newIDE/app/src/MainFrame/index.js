@@ -67,6 +67,7 @@ import {
   type PreviewOptions,
 } from '../Export/PreviewLauncher.flow';
 import { type ResourceSource } from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 
 const gd = global.gd;
 
@@ -109,6 +110,7 @@ type Props = {
   previewLauncher?: React.Element<PreviewLauncher>,
   onEditObject?: gdObject => void,
   resourceSources: Array<ResourceSource>,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
   onChooseProject?: () => Promise<string>,
   saveDialog?: React.Element<*>,
   onSaveProject?: gdProject => Promise<any>,
@@ -508,6 +510,7 @@ export default class MainFrame extends React.Component<Props, State> {
           showObjectsList={!this.props.integratedEditor}
           resourceSources={this.props.resourceSources}
           onChooseResource={this._onChooseResource}
+          resourceExternalEditors={this.props.resourceExternalEditors}
           isActive={isActive}
           ref={editorRef}
         />
@@ -535,6 +538,7 @@ export default class MainFrame extends React.Component<Props, State> {
             })}
           resourceSources={this.props.resourceSources}
           onChooseResource={this._onChooseResource}
+          resourceExternalEditors={this.props.resourceExternalEditors}
           isActive={isActive}
           ref={editorRef}
         />
@@ -573,6 +577,7 @@ export default class MainFrame extends React.Component<Props, State> {
                 })}
               resourceSources={this.props.resourceSources}
               onChooseResource={this._onChooseResource}
+              resourceExternalEditors={this.props.resourceExternalEditors}
               isActive={isActive}
               ref={editorRef}
             />
@@ -605,6 +610,7 @@ export default class MainFrame extends React.Component<Props, State> {
               showObjectsList={!this.props.integratedEditor}
               resourceSources={this.props.resourceSources}
               onChooseResource={this._onChooseResource}
+              resourceExternalEditors={this.props.resourceExternalEditors}
               isActive={isActive}
               ref={editorRef}
             />

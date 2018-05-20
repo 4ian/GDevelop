@@ -23,6 +23,7 @@ import BrowserProjectOpener from './ProjectsStorage/BrowserProjectOpener';
 import BrowserSaveDialog from './ProjectsStorage/BrowserSaveDialog';
 import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
 import browserResourceSources from './ResourcesList/BrowserResourceSources';
+import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
 import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
 import { getBrowserExporters } from './Export/BrowserExporters';
 
@@ -31,6 +32,7 @@ import ExternalEditor from './ExternalEditor';
 import optionalRequire from './Utils/OptionalRequire.js';
 import LocalExamples from './ProjectCreation/LocalExamples';
 import localResourceSources from './ResourcesList/LocalResourceSources';
+import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
 import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
 import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
@@ -85,6 +87,7 @@ if (electron) {
           onChooseProject={LocalProjectOpener.chooseProjectFile}
           onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
           resourceSources={localResourceSources}
+          resourceExternalEditors={localResourceExternalEditors}
           authentification={authentification}
         />
       </ElectronEventsBridge>
@@ -100,6 +103,7 @@ if (electron) {
       saveDialog={<BrowserSaveDialog />}
       onReadFromPathOrURL={BrowserProjectOpener.readInternalFile}
       resourceSources={browserResourceSources}
+      resourceExternalEditors={browserResourceExternalEditors}
       authentification={authentification}
     />
   );

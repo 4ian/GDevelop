@@ -10,14 +10,14 @@ const gd = global.gd;
 type OpenOptions = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
-  resourceNames: Array < string >,
-  onChangesSaved: (Array<string>) => void,
+  resourceNames: Array<string>,
+  onChangesSaved: (Array<{ path: string, originalIndex: ?number }>) => void,
   onChangesCanceled: () => void,
-    piskelOptions: {
-      name: string,
-      isLooping: boolean,
-      fps: number,
-    },
+  piskelOptions: {
+    name: string,
+    isLooping: boolean,
+    fps: number,
+  },
 |};
 
 /**
@@ -51,13 +51,14 @@ export const openPiskel = ({
       7,
       resourcePath.lastIndexOf('?cache=')
     );
-    return {resourcePath, resourceName, originalIndex};
+    return { resourcePath, resourceName, originalIndex };
   });
 
+  const projectPath = path.dirname(project.getProjectFile());
   const completePiskelOptions = {
     ...piskelOptions,
     resources,
-    projectFolder: path.dirname(project.getProjectFile()),
+    projectPath,
   };
 
   // Listen to events meaning that edition in Piskel is finished
@@ -66,7 +67,7 @@ export const openPiskel = ({
     const resourcesManager = project.getResourcesManager();
     outputResources.forEach(resource => {
       const imageResource = new gd.ImageResource();
-      imageResource.setFile(resource.path); // TODO: should be made relative to project folder.
+      imageResource.setFile(path.relative(projectPath, resource.path));
       imageResource.setName(resource.name);
       resourcesManager.addResource(imageResource);
       imageResource.delete();

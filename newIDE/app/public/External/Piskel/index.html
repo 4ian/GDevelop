@@ -152,7 +152,7 @@
     }
 
     function piskelCreateAnimation(pskl, piskelData) {
-      baseExportPath = piskelData.projectFolder + "/";
+      baseExportPath = piskelData.projectPath + "/";
 
       const sprite = { "modelVersion": 2, "piskel": { "name": "New Animation", "description": "", "fps": 12, "height": 64, "width": 64, "layers": ["{\"name\":\"Layer 1\",\"frameCount\":1,\"base64PNG\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAAAOUlEQVR42u3OIQEAAAACIP1/2hkWWEBzVgEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAYF3YDicAEE8VTiYAAAAAElFTkSuQmCC\"}"] } };
 
@@ -174,7 +174,7 @@
         piskelCreateAnimation(pskl, piskelData);
         return
       };
-      baseExportPath = piskelData.projectFolder + "/" + piskelData.name;
+      baseExportPath = piskelData.projectPath + "/" + piskelData.name;
       const imageData = [];
       let maxWidth = -1;
       let maxHeight = -1;

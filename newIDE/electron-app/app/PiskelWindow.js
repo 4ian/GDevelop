@@ -39,12 +39,12 @@ const loadPiskelWindow = ({ onReady, devTools, parentWindow }) => {
   // Load the index.html of the Piskel app.
   if (isDev) {
     // Development (server hosted by npm run start)
-    piskelWindow.loadURL('http://localhost:3000/External/Piskel/index.html');
+    piskelWindow.loadURL('http://localhost:3000/External/Piskel/piskel-index.html');
     piskelWindow.openDevTools();
   } else {
     // Production (with npm run build)
     piskelWindow.loadURL(
-      'file://' + __dirname + '/www/External/Piskel/index.html'
+      'file://' + __dirname + '/www/External/Piskel/piskel-index.html'
     );
     if (devTools) piskelWindow.openDevTools();
   }

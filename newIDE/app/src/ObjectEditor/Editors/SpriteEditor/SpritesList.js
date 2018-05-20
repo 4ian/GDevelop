@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../../../Utils/MapFor';
@@ -15,6 +16,11 @@ import {
   allDirectionSpritesHaveSamePointsAs,
   allDirectionSpritesHaveSameCollisionMasksAs,
 } from './Utils/SpriteObjectHelper';
+import ResourcesLoader from '../../../ResourcesLoader';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../../../ResourcesList/ResourceSource.flow';
 const gd = global.gd;
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
@@ -130,8 +136,30 @@ const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
   };
 };
 
-export default class SpritesList extends Component {
-  onSortEnd = ({ oldIndex, newIndex }) => {
+type Props = {|
+  direction: gdDirection,
+  project: gdProject,
+  resourcesLoader: typeof ResourcesLoader,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
+  selectedSprites: {
+    [number]: boolean,
+  },
+  onSelectSprite: (sprite: gdSprite, selected: boolean) => void,
+  onReplaceByDirection: (newDirection: gdDirection) => void,
+  objectName: string, // This is used for the default name of images created with Piskel.
+  animationName: string, // This is used for the default name of images created with Piskel.
+|};
+
+export default class SpritesList extends Component<Props, void> {
+  onSortEnd = ({
+    oldIndex,
+    newIndex,
+  }: {
+    oldIndex: number,
+    newIndex: number,
+  }) => {
     this.props.direction.moveSprite(oldIndex, newIndex);
     this.forceUpdate();
   };
@@ -177,6 +205,8 @@ export default class SpritesList extends Component {
       direction,
       resourcesLoader,
       onReplaceByDirection,
+      objectName,
+      animationName,
     } = this.props;
     const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
       return direction.getSprite(i).getImageName();
@@ -196,7 +226,7 @@ export default class SpritesList extends Component {
           direction.getTimeBetweenFrames() > 0
             ? 1 / direction.getTimeBetweenFrames()
             : 1,
-        name: 'Animation',
+        name: animationName ? `${objectName}-${animationName}` : `${objectName}`,
         isLooping: direction.isLooping(),
       },
       onChangesSaved: resources => {
@@ -249,7 +279,6 @@ export default class SpritesList extends Component {
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddSprite={this.onAddSprite}
-          onEditSprites={this.onEditSprites}
           selectedSprites={this.props.selectedSprites}
           onSelectSprite={this.props.onSelectSprite}
           onSpriteContextMenu={this.props.onSpriteContextMenu}

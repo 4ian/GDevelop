@@ -11,8 +11,9 @@ type OpenOptions = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   resourceNames: Array<string>,
-  onChangesSaved: (Array<{ path: string, originalIndex: ?number }>) => void,
-  onChangesCanceled: () => void,
+  onChangesSaved: (
+    Array<{ path: string, name: string, originalIndex: ?number }>
+  ) => void,
   piskelOptions: {
     name: string,
     isLooping: boolean,
@@ -30,7 +31,6 @@ export const openPiskel = ({
   resourcesLoader,
   resourceNames,
   onChangesSaved,
-  onChangesCanceled,
   piskelOptions,
 }: OpenOptions) => {
   if (!electron || !ipcRenderer) {

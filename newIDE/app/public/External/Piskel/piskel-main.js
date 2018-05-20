@@ -5,7 +5,8 @@ const fs = require('fs');
 const async = require('async');
 const remote = electron.remote;
 
-const editorContentWindow = document.getElementById('piskel-frame').contentWindow;
+const editorContentWindow = document.getElementById('piskel-frame')
+  .contentWindow;
 
 if (!editorContentWindow.piskelReadyCallbacks) {
   editorContentWindow.piskelReadyCallbacks = [];
@@ -67,18 +68,18 @@ function makeFileNameUnique(path) {
     return path;
   }
   const folderPath = path.substring(0, path.lastIndexOf('/') + 1);
-  const fileFormat = path.substring(path.lastIndexOf('.'), path.length);
+  const extension = path.substring(path.lastIndexOf('.'), path.length);
   const oldFileName = path.substring(
     path.lastIndexOf('/') + 1,
     path.lastIndexOf('.')
   );
   let appendNumber = 0;
   let newUniqueNamePath =
-    folderPath + oldFileName + '-' + String(appendNumber) + fileFormat;
+    folderPath + oldFileName + '-' + String(appendNumber) + extension;
   while (fileExists(newUniqueNamePath)) {
     appendNumber += 1;
     newUniqueNamePath =
-      folderPath + oldFileName + '-' + String(appendNumber) + fileFormat;
+      folderPath + oldFileName + '-' + String(appendNumber) + extension;
   }
   return newUniqueNamePath;
 }
@@ -110,30 +111,26 @@ function saveToGD() {
   const outputResources = [];
   for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
     const frame = layer.getFrameAt(i);
-    let exportPath = frame.originalPath; // Would be nice to nullify this on duplicated frames though
-    let exportName = frame.originalName; // Would be nice to nullify this on duplicated frames though
+    let exportPath = frame.originalPath;
+    let resourceName = frame.originalName;
     const originalIndex = frame.originalIndex;
-    if (!exportPath) {
-      // If a frame was made in piskel, come up with a unique path, so as not to overwrite any existing files
-      exportPath = baseExportPath + 'PSKL-' + String(i + 1) + '.png';
-      exportPath = makeFileNameUnique(exportPath);
-    }
-
-    // Prevent overwriting frames that were created via duplication of imported frames
     const pathAlreadyUsed = outputResources.filter(
       resource => resource.path === exportPath
     ).length;
-    if (pathAlreadyUsed) {
-      //TODO: There should be a way to merge these two lines with the two similar lines
-      exportPath = baseExportPath + 'PSKL-c-' + String(i + 1) + '.png';
+
+    // If a frame was made in piskel (exportPath and resourceName will be null) come up with a unique path, so as not to overwrite any existing files
+    // Also prevent overwriting frames that were created via duplication of imported frames or frames with same resources
+    if (!exportPath || !resourceName || pathAlreadyUsed) {
+      exportPath = baseExportPath + '-' + String(i + 1) + '.png';
       exportPath = makeFileNameUnique(exportPath);
+      resourceName = path.basename(exportPath);
     }
 
-    if (!exportName) {
-      exportName = path.basename(exportPath);
-    }
-
-    outputResources.push({ path: exportPath, name: exportName, originalIndex });
+    outputResources.push({
+      path: exportPath,
+      name: resourceName,
+      originalIndex,
+    });
   }
 
   // Save, asynchronously, the content of each images
@@ -157,7 +154,7 @@ function cancelChanges() {
 }
 
 function piskelCreateAnimation(pskl, piskelData) {
-  baseExportPath = piskelData.projectPath + '/';
+  baseExportPath = piskelData.projectPath + '/' + piskelData.name;
 
   const sprite = {
     modelVersion: 2,
@@ -190,7 +187,7 @@ ipcRenderer.on('piskel-load-animation', (event, piskelData) => {
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   if (!pskl) return;
-  if (piskelData.resources.length == 0) {
+  if (piskelData.resources.length === 0) {
     piskelCreateAnimation(pskl, piskelData);
     return;
   }

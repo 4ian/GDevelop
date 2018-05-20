@@ -107,6 +107,29 @@ const SortableList = SortableContainer(
   }
 );
 
+/**
+ * Check if all sprites of the given direction have the same points and collision masks
+ */
+const checkDirectionPointsAndCollisionsMasks = (direction: gdDirection) => {
+  let allDirectionSpritesHaveSamePoints = false;
+  let allDirectionSpritesHaveSameCollisionMasks = false;
+  if (direction.getSpritesCount() !== 0) {
+    allDirectionSpritesHaveSamePoints = allDirectionSpritesHaveSamePointsAs(
+      direction.getSprite(0),
+      direction
+    );
+    allDirectionSpritesHaveSameCollisionMasks = allDirectionSpritesHaveSameCollisionMasksAs(
+      direction.getSprite(0),
+      direction
+    );
+  }
+
+  return {
+    allDirectionSpritesHaveSamePoints,
+    allDirectionSpritesHaveSameCollisionMasks,
+  };
+};
+
 export default class SpritesList extends Component {
   onSortEnd = ({ oldIndex, newIndex }) => {
     this.props.direction.moveSprite(oldIndex, newIndex);
@@ -124,12 +147,23 @@ export default class SpritesList extends Component {
     const sources = resourceSources.filter(source => source.kind === 'image');
     if (!sources.length) return;
 
+    const {
+      allDirectionSpritesHaveSameCollisionMasks,
+      allDirectionSpritesHaveSamePoints,
+    } = checkDirectionPointsAndCollisionsMasks(direction);
+
     onChooseResource(sources[0].name).then(resources => {
       resources.forEach(resource => {
         project.getResourcesManager().addResource(resource);
 
         const sprite = new gd.Sprite();
         sprite.setImageName(resource.getName());
+        if (allDirectionSpritesHaveSamePoints) {
+          copySpritePoints(direction.getSprite(0), sprite);
+        }
+        if (allDirectionSpritesHaveSameCollisionMasks) {
+          copySpritePolygons(direction.getSprite(0), sprite);
+        }
         direction.addSprite(sprite);
       });
 
@@ -148,18 +182,10 @@ export default class SpritesList extends Component {
       return direction.getSprite(i).getImageName();
     });
 
-    let allDirectionSpritesHaveSamePoints = false;
-    let allDirectionSpritesHaveSameCollisionMasks = false;
-    if (direction.getSpritesCount() !== 0) {
-      allDirectionSpritesHaveSamePoints = allDirectionSpritesHaveSamePointsAs(
-        direction.getSprite(0),
-        direction
-      );
-      allDirectionSpritesHaveSameCollisionMasks = allDirectionSpritesHaveSameCollisionMasksAs(
-        direction.getSprite(0),
-        direction
-      );
-    }
+    const {
+      allDirectionSpritesHaveSameCollisionMasks,
+      allDirectionSpritesHaveSamePoints,
+    } = checkDirectionPointsAndCollisionsMasks(direction);
 
     openPiskel({
       project,

@@ -116,6 +116,7 @@ export default class InstructionParametersEditor extends Component {
                 parameterRenderingService={ParameterRenderingService}
                 resourceSources={this.props.resourceSources}
                 onChooseResource={this.props.onChooseResource}
+                resourceExternalEditors={this.props.resourceExternalEditors}
               />
             );
           })}

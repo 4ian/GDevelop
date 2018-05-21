@@ -28,6 +28,9 @@ declare type gdVariablesContainer = EmscriptenObject;
 declare type gdVectorPolygon2d = EmscriptenObject;
 
 declare type gdSpriteObject = EmscriptenObject;
+declare type gdSprite = EmscriptenObject;
+declare type gdDirection = EmscriptenObject;
+declare type gdAnimation = EmscriptenObject;
 
 //Represents all objects that have serializeTo and unserializeFrom methods.
 declare type gdSerializable = EmscriptenObject;

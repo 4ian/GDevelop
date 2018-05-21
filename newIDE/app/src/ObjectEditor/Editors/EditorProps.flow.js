@@ -12,4 +12,5 @@ export type EditorProps = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   onSizeUpdated: () => void,
+  objectName: string,
 |};

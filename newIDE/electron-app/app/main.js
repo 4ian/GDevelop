@@ -19,6 +19,7 @@ const {
 } = require('./ServeFolder');
 const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
 const { buildMainMenuFor } = require('./MainMenu');
+const { loadPiskelWindow } = require('./PiskelWindow');
 const throttle = require('lodash.throttle');
 
 // Logs made with electron-logs can be found
@@ -38,13 +39,13 @@ const isIntegrated = args.mode === 'integrated';
 const devTools = !!args['dev-tools'];
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function() {
+app.on('window-all-closed', function () {
   app.quit();
 });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
-app.on('ready', function() {
+app.on('ready', function () {
   if (isIntegrated && app.dock) {
     app.dock.hide();
   }
@@ -93,7 +94,7 @@ app.on('ready', function() {
 
   Menu.setApplicationMenu(buildMainMenuFor(mainWindow));
 
-  mainWindow.on('closed', function() {
+  mainWindow.on('closed', function () {
     // Dereference the window object, usually you would store windows
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
@@ -107,6 +108,20 @@ app.on('ready', function() {
       e.preventDefault();
       electron.shell.openExternal(url);
     }
+  });
+
+  ipcMain.on('piskel-open-then-load-animation', (event, piskelData) => {
+    loadPiskelWindow({
+      parentWindow: mainWindow,
+      devTools,
+      onReady: piskelWindow =>
+        piskelWindow.webContents.send('piskel-load-animation', piskelData),
+    });
+  });
+
+  //TODO: Move in PiskelWindow? And use a callback like onReady
+  ipcMain.on('piskel-changes-saved', (event, imageResources) => {
+    mainWindow.webContents.send('piskel-changes-saved', imageResources);
   });
 
   // S3Upload events:

@@ -44,6 +44,7 @@ export default class InstructionEditor extends Component {
             instruction={instruction}
             resourceSources={this.props.resourceSources}
             onChooseResource={this.props.onChooseResource}
+            resourceExternalEditors={this.props.resourceExternalEditors}
           />
         </Paper>
       </div>

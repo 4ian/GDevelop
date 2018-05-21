@@ -372,6 +372,7 @@ storiesOf('EventsSheet', module)
         resourceSources={[]}
         onChooseResource={source =>
           action('Choose resource from source', source)}
+        resourceExternalEditors={[]}
       />
     </DragDropContextProvider>
   ))
@@ -385,6 +386,7 @@ storiesOf('EventsSheet', module)
         resourceSources={[]}
         onChooseResource={source =>
           action('Choose resource from source', source)}
+        resourceExternalEditors={[]}
       />
     </DragDropContextProvider>
   ));

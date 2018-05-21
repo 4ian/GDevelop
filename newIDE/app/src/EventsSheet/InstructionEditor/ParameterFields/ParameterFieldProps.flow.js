@@ -3,7 +3,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../../../ResourcesList/ResourceSource.flow';
-
+import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 
 export type ParameterFieldProps = {|
   parameterMetadata?: gdParameterMetadata,
@@ -18,4 +18,5 @@ export type ParameterFieldProps = {|
   },
   resourceSources?: Array<ResourceSource>,
   onChooseResource?: ChooseResourceFunction,
+  resourceExternalEditors?: Array<ResourceExternalEditor>,
 |};

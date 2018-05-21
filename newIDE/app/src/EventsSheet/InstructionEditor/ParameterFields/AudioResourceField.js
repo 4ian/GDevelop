@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import ResourceSelector from '../../../ResourcesList/ResourceSelector';
+import ResourcesLoader from '../../../ResourcesLoader';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
 export default class AudioResourceField extends Component<
@@ -12,9 +13,13 @@ export default class AudioResourceField extends Component<
   }
 
   render() {
-    if (!this.props.resourceSources || !this.props.onChooseResource) {
+    if (
+      !this.props.resourceSources ||
+      !this.props.onChooseResource ||
+      !this.props.resourceExternalEditors
+    ) {
       console.error(
-        'Missing resourceSources or onChooseResource for AudioResourceField'
+        'Missing resourceSources, onChooseResource or resourceExternalEditors for AudioResourceField'
       );
       return null;
     }
@@ -24,6 +29,8 @@ export default class AudioResourceField extends Component<
         project={this.props.project}
         resourceSources={this.props.resourceSources}
         onChooseResource={this.props.onChooseResource}
+        resourceExternalEditors={this.props.resourceExternalEditors}
+        resourcesLoader={ResourcesLoader}
         resourceKind="audio"
         fullWidth
         initialResourceName={this.props.value}

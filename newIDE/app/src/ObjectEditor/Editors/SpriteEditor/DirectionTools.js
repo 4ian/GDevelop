@@ -1,12 +1,16 @@
+// @flow
 import React, { Component } from 'react';
 import Timer from 'material-ui/svg-icons/image/timer';
 import FlatButton from 'material-ui/FlatButton';
 import Checkbox from 'material-ui/Checkbox';
 import Repeat from 'material-ui/svg-icons/av/repeat';
+import Brush from 'material-ui/svg-icons/image/brush';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 import TextField from 'material-ui/TextField';
 import Dialog from '../../../UI/Dialog';
 import AnimationPreview from './AnimationPreview';
+import ResourcesLoader from '../../../ResourcesLoader';
+import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 
 const styles = {
   container: {
@@ -35,13 +39,28 @@ const styles = {
 
 const formatTime = time => Number(time.toFixed(6));
 
-export default class DirectionTools extends Component {
+type Props = {|
+  direction: gdDirection,
+  resourcesLoader: typeof ResourcesLoader,
+  project: gdProject,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  onEditWith: ResourceExternalEditor => void,
+|};
+
+type State = {|
+  timeBetweenFrames: number,
+  timeError: boolean,
+  previewOpen: boolean,
+|};
+
+export default class DirectionTools extends Component<Props, State> {
   state = {
     timeBetweenFrames: formatTime(this.props.direction.getTimeBetweenFrames()),
     timeError: false,
+    previewOpen: false,
   };
 
-  componentWillReceiveProps(newProps) {
+  componentWillReceiveProps(newProps: Props) {
     this.setState({
       timeBetweenFrames: formatTime(
         this.props.direction.getTimeBetweenFrames()
@@ -65,24 +84,37 @@ export default class DirectionTools extends Component {
     });
   };
 
-  setLooping = check => {
+  setLooping = (check: boolean) => {
     const { direction } = this.props;
 
     direction.setLoop(!!check);
     this.forceUpdate();
   };
 
-  openPreview = open => {
+  openPreview = (open: boolean) => {
     this.setState({
       previewOpen: open,
     });
   };
 
   render() {
-    const { direction, resourcesLoader, project } = this.props;
+    const {
+      direction,
+      resourcesLoader,
+      project,
+      resourceExternalEditors,
+      onEditWith,
+    } = this.props;
 
     return (
       <div style={styles.container}>
+        {!!resourceExternalEditors.length && (
+          <FlatButton
+            label={resourceExternalEditors[0].displayName}
+            icon={<Brush />}
+            onClick={() => onEditWith(resourceExternalEditors[0])}
+          />
+        )}
         <FlatButton
           label="Preview"
           icon={<PlayArrow />}

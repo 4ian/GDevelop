@@ -12,5 +12,5 @@ export type ResourceSource = {
 
 export type ChooseResourceFunction = (
   sourceName: string,
-  multiSelection: boolean
+  multiSelection?: boolean
 ) => Promise<Array<gdResource>>;

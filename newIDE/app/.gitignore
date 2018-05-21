@@ -18,6 +18,8 @@ npm-debug.log
 
 # GD library
 public/libGD.js
+public/External/Piskel/piskel-editor
+public/External/Piskel/piskel-editor.zip
 
 # Resources
 public/res

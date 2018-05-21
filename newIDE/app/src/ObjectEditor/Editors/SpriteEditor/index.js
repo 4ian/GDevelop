@@ -25,6 +25,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../../../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 
 const gd = global.gd;
 
@@ -65,7 +66,29 @@ const AddAnimationLine = ({ onAdd, extraTools }) => (
   </div>
 );
 
-class Animation extends React.Component<*, void> {
+type AnimationProps = {|
+  animation: gdAnimation,
+  id: number,
+  project: gdProject,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  onRemove: () => void,
+  resourcesLoader: typeof ResourcesLoader,
+  onSpriteContextMenu: (x: number, y: number, sprite: gdSprite) => void,
+  selectedSprites: {
+    [number]: boolean,
+  },
+  onSelectSprite: (sprite: gdSprite, selected: boolean) => void,
+  onReplaceDirection: (
+    directionIndex: number,
+    newDirection: gdDirection
+  ) => void,
+  objectName: string,
+  onChangeName: string => void,
+|};
+
+class Animation extends React.Component<AnimationProps, void> {
   render() {
     const {
       animation,
@@ -74,12 +97,17 @@ class Animation extends React.Component<*, void> {
       resourceSources,
       onRemove,
       onChooseResource,
+      resourceExternalEditors,
       resourcesLoader,
       onSpriteContextMenu,
       selectedSprites,
       onSelectSprite,
+      onReplaceDirection,
+      objectName,
+      onChangeName,
     } = this.props;
 
+    const animationName = animation.getName();
     return (
       <GridTile>
         <MiniToolbar smallest>
@@ -91,7 +119,7 @@ class Animation extends React.Component<*, void> {
               commitOnBlur
               value={animation.getName()}
               hintText="Optional animation name"
-              onChange={text => this.props.onChangeName(text)}
+              onChange={text => onChangeName(text)}
             />
           </span>
           <span style={styles.animationTools}>
@@ -110,9 +138,14 @@ class Animation extends React.Component<*, void> {
               resourcesLoader={resourcesLoader}
               resourceSources={resourceSources}
               onChooseResource={onChooseResource}
+              resourceExternalEditors={resourceExternalEditors}
               onSpriteContextMenu={onSpriteContextMenu}
               selectedSprites={selectedSprites}
               onSelectSprite={onSelectSprite}
+              onReplaceByDirection={newDirection =>
+                onReplaceDirection(i, newDirection)}
+              objectName={objectName}
+              animationName={animationName}
             />
           );
         })}
@@ -126,6 +159,7 @@ const SortableAnimation = SortableElement(Animation);
 const SortableAnimationsList = SortableContainer(
   ({
     spriteObject,
+    objectName,
     onAddAnimation,
     onRemoveAnimation,
     onChangeAnimationName,
@@ -133,10 +167,12 @@ const SortableAnimationsList = SortableContainer(
     resourcesLoader,
     resourceSources,
     onChooseResource,
+    resourceExternalEditors,
     extraBottomTools,
     onSpriteContextMenu,
     selectedSprites,
     onSelectSprite,
+    onReplaceDirection,
   }) => {
     return (
       <GridList style={styles.gridList} cellHeight="auto" cols={1}>
@@ -153,11 +189,15 @@ const SortableAnimationsList = SortableContainer(
                 resourcesLoader={resourcesLoader}
                 resourceSources={resourceSources}
                 onChooseResource={onChooseResource}
+                resourceExternalEditors={resourceExternalEditors}
                 onRemove={() => onRemoveAnimation(i)}
                 onChangeName={newName => onChangeAnimationName(i, newName)}
                 onSpriteContextMenu={onSpriteContextMenu}
                 selectedSprites={selectedSprites}
                 onSelectSprite={onSelectSprite}
+                onReplaceDirection={(directionId, newDirection) =>
+                  onReplaceDirection(i, directionId, newDirection)}
+                objectName={objectName}
               />
             );
           }),
@@ -179,9 +219,11 @@ type AnimationsListContainerProps = {|
   project: gdProject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
   resourcesLoader: typeof ResourcesLoader,
   extraBottomTools: React.Node,
   onSizeUpdated: () => void,
+  objectName: string,
 |};
 
 type AnimationsListContainerState = {|
@@ -270,22 +312,32 @@ class AnimationsListContainer extends React.Component<
     });
   };
 
+  replaceDirection = (animationId, directionId, newDirection) => {
+    this.props.spriteObject
+      .getAnimation(animationId)
+      .setDirection(newDirection, directionId);
+    this.forceUpdate();
+  };
+
   render() {
     return (
       <div>
         <SortableAnimationsList
           spriteObject={this.props.spriteObject}
+          objectName={this.props.objectName}
           helperClass="sortable-helper"
           project={this.props.project}
           onSortEnd={this.onSortEnd}
           onAddAnimation={this.addAnimation}
           onChangeAnimationName={this.changeAnimationName}
           onRemoveAnimation={this.removeAnimation}
+          onReplaceDirection={this.replaceDirection}
           onSpriteContextMenu={this.openSpriteContextMenu}
           selectedSprites={this.state.selectedSprites}
           onSelectSprite={this.selectSprite}
           resourcesLoader={this.props.resourcesLoader}
           resourceSources={this.props.resourceSources}
+          resourceExternalEditors={this.props.resourceExternalEditors}
           onChooseResource={this.props.onChooseResource}
           extraBottomTools={this.props.extraBottomTools}
           useDragHandle
@@ -344,7 +396,9 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
       project,
       resourceSources,
       onChooseResource,
+      resourceExternalEditors,
       onSizeUpdated,
+      objectName,
     } = this.props;
     const spriteObject = gd.asSpriteObject(object);
 
@@ -355,7 +409,9 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           resourcesLoader={this.resourcesLoader}
           resourceSources={resourceSources}
           onChooseResource={onChooseResource}
+          resourceExternalEditors={resourceExternalEditors}
           project={project}
+          objectName={objectName}
           onSizeUpdated={onSizeUpdated}
           extraBottomTools={
             <div>

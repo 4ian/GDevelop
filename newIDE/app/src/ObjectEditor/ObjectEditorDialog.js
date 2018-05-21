@@ -75,8 +75,10 @@ export class ObjectEditorDialog extends Component<*, StateType> {
               project={this.props.project}
               resourceSources={this.props.resourceSources}
               onChooseResource={this.props.onChooseResource}
+              resourceExternalEditors={this.props.resourceExternalEditors}
               onSizeUpdated={() =>
                 this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+              objectName={this.props.objectName}
             />
           )}
         {currentTab === 'behaviors' && (
@@ -97,6 +99,7 @@ type ContainerStateType = {|
   editorComponent: ?Class<*>,
   castToObjectType: ?Function,
   helpPagePath: ?string,
+  objectName: string,
 |};
 
 export default class ObjectEditorDialogContainer extends Component<*, *> {
@@ -105,6 +108,7 @@ export default class ObjectEditorDialogContainer extends Component<*, *> {
     editorComponent: null,
     castToObjectType: null,
     helpPagePath: null,
+    objectName: '',
   };
 
   componentWillMount() {
@@ -143,6 +147,7 @@ export default class ObjectEditorDialogContainer extends Component<*, *> {
       editorComponent: editorConfiguration.component,
       helpPagePath: editorConfiguration.helpPagePath,
       castToObjectType: editorConfiguration.castToObjectType,
+      objectName: object.getName(),
     });
   }
 
@@ -164,6 +169,7 @@ export default class ObjectEditorDialogContainer extends Component<*, *> {
         helpPagePath={helpPagePath}
         {...this.props}
         object={castToObjectType(this.props.object)}
+        objectName={this.state.objectName}
       />
     );
   }

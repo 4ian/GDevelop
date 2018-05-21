@@ -6,9 +6,18 @@ import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorW
 import { type EditorProps } from './EditorProps.flow';
 const gd = global.gd;
 
-export default class TiledSpriteEditor extends React.Component<EditorProps, void> {
+export default class TiledSpriteEditor extends React.Component<
+  EditorProps,
+  void
+> {
   render() {
-    const { object, project, resourceSources, onChooseResource } = this.props;
+    const {
+      object,
+      project,
+      resourceSources,
+      onChooseResource,
+      resourceExternalEditors,
+    } = this.props;
     const tiledSpriteObject = gd.asTiledSpriteObject(object);
 
     return (
@@ -20,6 +29,7 @@ export default class TiledSpriteEditor extends React.Component<EditorProps, void
             onChooseResource={onChooseResource}
             resourceKind="image"
             resourceName={tiledSpriteObject.getTexture()}
+            resourceExternalEditors={resourceExternalEditors}
             onChange={resourceName => {
               tiledSpriteObject.setTexture(resourceName);
               this.forceUpdate();

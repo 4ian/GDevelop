@@ -10,7 +10,8 @@
     "follow-redirects": "^1.2.3",
     "prettier": "1.7.0",
     "react-scripts": "1.0.17",
-    "shelljs": "^0.7.7"
+    "shelljs": "^0.7.7",
+    "unzip2": "^0.2.5"
   },
   "dependencies": {
     "@storybook/react": "3.2.19",
@@ -54,7 +55,7 @@
   },
   "scripts": {
     "postinstall": "npm run import-resources",
-    "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js",
+    "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js && node import-piskel-editor.js",
     "start": "npm run import-resources && react-scripts start",
     "build": "npm run import-resources && react-scripts build",
     "format": "prettier --write \"src/**/*.js\"",

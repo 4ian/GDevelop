@@ -221,6 +221,7 @@ export default class SpritesList extends Component<Props, void> {
     externalEditor.edit({
       project,
       resourcesLoader,
+      singleFrame: false,
       resourceNames,
       extraOptions: {
         fps:
@@ -232,6 +233,8 @@ export default class SpritesList extends Component<Props, void> {
       },
       onChangesSaved: resources => {
         const newDirection = new gd.Direction();
+        newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
+        newDirection.setLoop(direction.isLooping());
         resources.forEach(resource => {
           const sprite = new gd.Sprite();
           sprite.setImageName(resource.name);

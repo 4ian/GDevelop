@@ -3,18 +3,25 @@ import * as React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
+import IconButton from 'material-ui/IconButton';
 import Add from 'material-ui/svg-icons/content/add';
+import Brush from 'material-ui/svg-icons/image/brush';
 import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
   type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import IconMenu from '../UI/Menu/IconMenu';
+import ResourcesLoader from '../ResourcesLoader';
 
 type Props = {|
   project: gdProject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  resourcesLoader: typeof ResourcesLoader,
   resourceKind: ResourceKind,
   fullWidth?: boolean,
   initialResourceName: string,
@@ -37,6 +44,7 @@ type AutoCompleteItem =
 
 const styles = {
   autoComplete: { minWidth: 300 },
+  container: { display: 'flex', flex: 1, alignItems: 'baseline' },
 };
 
 export default class ResourceSelector extends React.Component<Props, State> {
@@ -145,27 +153,77 @@ export default class ResourceSelector extends React.Component<Props, State> {
     if (onClick) onClick();
   };
 
+  _editWith = (resourceExternalEditor: ResourceExternalEditor) => {
+    const { project, resourcesLoader } = this.props;
+    const { resourceName } = this.state;
+
+    const resourceNames = [];
+    if (project.getResourcesManager().hasResource(resourceName)) {
+      resourceNames.push(resourceName);
+    }
+
+    resourceExternalEditor.edit({
+      project,
+      resourcesLoader,
+      singleFrame: true,
+      resourceNames,
+      extraOptions: {
+        fps: 0,
+        name: 'Image',
+        isLooping: false,
+      },
+      onChangesSaved: resources => {
+        if (!resources.length) return;
+
+        // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
+        // TODO: A more fine-grained cache bursting for specific resources could be done.
+        resourcesLoader.burstUrlsCache();
+        this.props.onChange(resources[0].name);
+      },
+    });
+  };
+
   render() {
     const errorText = this.state.notExistingError
       ? 'This resource does not exist in the game'
       : null;
 
+    const externalEditors = this.props.resourceExternalEditors.filter(
+      externalEditor => externalEditor.kind === this.props.resourceKind
+    );
+
     return (
-      <AutoComplete
-        floatingLabelText={this.props.floatingLabelText || 'Select an image'}
-        filter={fuzzyOrEmptyFilter}
-        openOnFocus
-        dataSource={this.autoCompleteData || []}
-        onUpdateInput={this._onUpdate}
-        onNewRequest={this._onItemChosen}
-        errorText={errorText}
-        searchText={this.state.resourceName}
-        fullWidth={this.props.fullWidth}
-        style={styles.autoComplete}
-        menuProps={{
-          maxHeight: 250,
-        }}
-      />
+      <div style={styles.container}>
+        <AutoComplete
+          floatingLabelText={this.props.floatingLabelText || 'Select an image'}
+          filter={fuzzyOrEmptyFilter}
+          openOnFocus
+          dataSource={this.autoCompleteData || []}
+          onUpdateInput={this._onUpdate}
+          onNewRequest={this._onItemChosen}
+          errorText={errorText}
+          searchText={this.state.resourceName}
+          fullWidth={this.props.fullWidth}
+          style={styles.autoComplete}
+          menuProps={{
+            maxHeight: 250,
+          }}
+        />
+        {!!externalEditors.length && (
+          <IconMenu
+            iconButtonElement={
+              <IconButton>
+                <Brush />
+              </IconButton>
+            }
+            buildMenuTemplate={() =>
+              externalEditors.map(externalEditor => ({
+                label: externalEditor.displayName,
+                click: () => this._editWith(externalEditor),
+              }))}
+          />
+        )}
+      </div>
     );
   }
 }

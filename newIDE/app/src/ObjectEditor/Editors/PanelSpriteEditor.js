@@ -7,9 +7,18 @@ import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorW
 import { type EditorProps } from './EditorProps.flow';
 const gd = global.gd;
 
-export default class PanelSpriteEditor extends React.Component<EditorProps, void> {
+export default class PanelSpriteEditor extends React.Component<
+  EditorProps,
+  void
+> {
   render() {
-    const { object, project, resourceSources, onChooseResource } = this.props;
+    const {
+      object,
+      project,
+      resourceSources,
+      onChooseResource,
+      resourceExternalEditors,
+    } = this.props;
     const panelSpriteObject = gd.asPanelSpriteObject(object);
 
     return (
@@ -19,6 +28,7 @@ export default class PanelSpriteEditor extends React.Component<EditorProps, void
             project={project}
             resourceSources={resourceSources}
             onChooseResource={onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
             resourceKind="image"
             resourceName={panelSpriteObject.getTexture()}
             onChange={resourceName => {

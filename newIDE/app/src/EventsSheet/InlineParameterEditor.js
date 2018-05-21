@@ -6,6 +6,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 const gd = global.gd;
 
 type Props = {|
@@ -14,7 +15,7 @@ type Props = {|
 
   open: boolean,
   onRequestClose: () => void,
-  onChange: (string) => void,
+  onChange: string => void,
 
   instruction: gdInstruction,
   isCondition: boolean,
@@ -24,6 +25,7 @@ type Props = {|
 
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 
 type State = {|
@@ -33,7 +35,10 @@ type State = {|
   ParameterComponent: ?any,
 |};
 
-export default class InlineParameterEditor extends React.Component<Props, State> {
+export default class InlineParameterEditor extends React.Component<
+  Props,
+  State
+> {
   state = {
     isValid: false,
     parameterMetadata: null,
@@ -117,6 +122,7 @@ export default class InlineParameterEditor extends React.Component<Props, State>
           isInline
           resourceSources={this.props.resourceSources}
           onChooseResource={this.props.onChooseResource}
+          resourceExternalEditors={this.props.resourceExternalEditors}
         />
       </InlinePopover>
     );

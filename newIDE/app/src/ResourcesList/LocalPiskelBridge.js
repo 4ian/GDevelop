@@ -15,6 +15,7 @@ export const openPiskel = ({
   project,
   resourcesLoader,
   resourceNames,
+  singleFrame,
   onChangesSaved,
   extraOptions,
 }: ExternalEditorOpenOptions) => {
@@ -38,6 +39,7 @@ export const openPiskel = ({
   const completePiskelOptions = {
     ...extraOptions,
     resources,
+    singleFrame,
     projectPath,
   };
 

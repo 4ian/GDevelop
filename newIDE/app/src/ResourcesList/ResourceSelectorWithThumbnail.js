@@ -8,11 +8,13 @@ import {
   type ResourceKind,
 } from '../ResourcesList/ResourceSource.flow';
 import ResourceThumbnail from './ResourceThumbnail';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 
 type Props = {|
   project: gdProject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
   resourceKind: ResourceKind,
   resourceName: string,
   onChange: (string) => void,
@@ -23,6 +25,7 @@ const ResourceSelectorWithThumbnail = ({
   project,
   resourceSources,
   onChooseResource,
+  resourceExternalEditors,
   resourceKind,
   resourceName,
   onChange,
@@ -35,6 +38,8 @@ const ResourceSelectorWithThumbnail = ({
           project={project}
           resourceSources={resourceSources}
           onChooseResource={onChooseResource}
+          resourceExternalEditors={resourceExternalEditors}
+          resourcesLoader={ResourcesLoader}
           resourceKind={resourceKind}
           fullWidth
           initialResourceName={resourceName}

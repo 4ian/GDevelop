@@ -7,7 +7,25 @@ const remote = electron.remote;
 
 const editorContentWindow = document.getElementById('piskel-frame')
   .contentWindow;
+let baseExportPath;
+let piskelOptions; // The options received from GDevelop
 
+const updateFrameElements = function() {
+  setTimeout(function() {
+    const editorContentDocument = document.getElementById('piskel-frame')
+      .contentDocument;
+    if (piskelOptions.singleFrame) {
+      editorContentDocument.getElementsByClassName(
+        'preview-list-wrapper'
+      )[0].style.display =
+        'none';
+    }
+
+    //TODO: Ideally, shortcuts for duplicating a frame should also be removed.
+  });
+};
+
+// Plug a callback to know when Piskel is ready
 if (!editorContentWindow.piskelReadyCallbacks) {
   editorContentWindow.piskelReadyCallbacks = [];
 }
@@ -101,7 +119,6 @@ function saveToFile(content, filePath, callback) {
   reader.readAsArrayBuffer(content);
 }
 
-let baseExportPath;
 function saveToGD() {
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
@@ -153,9 +170,7 @@ function cancelChanges() {
   remote.getCurrentWindow().close();
 }
 
-function piskelCreateAnimation(pskl, piskelData) {
-  baseExportPath = piskelData.projectPath + '/' + piskelData.name;
-
+function piskelCreateAnimation(pskl, piskelOptions) {
   const sprite = {
     modelVersion: 2,
     piskel: {
@@ -183,20 +198,23 @@ function piskelCreateAnimation(pskl, piskelData) {
   });
 }
 
-ipcRenderer.on('piskel-load-animation', (event, piskelData) => {
+ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
+  piskelOptions = receivedOptions;
+  baseExportPath = piskelOptions.projectPath + '/' + piskelOptions.name;
+
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   if (!pskl) return;
-  if (piskelData.resources.length === 0) {
-    piskelCreateAnimation(pskl, piskelData);
+
+  if (piskelOptions.resources.length === 0) {
+    piskelCreateAnimation(pskl, piskelOptions);
     return;
   }
-  baseExportPath = piskelData.projectPath + '/' + piskelData.name;
   const imageData = [];
   let maxWidth = -1;
   let maxHeight = -1;
   async.each(
-    piskelData.resources,
+    piskelOptions.resources,
     function(resource, callback) {
       const image = new Image();
       image.onload = function() {
@@ -219,21 +237,25 @@ ipcRenderer.on('piskel-load-animation', (event, piskelData) => {
       // Finally load the image objects into piskel
       const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(
         imageData,
-        piskelData.name,
+        piskelOptions.name,
         maxWidth,
         maxHeight,
         false
       );
       pskl.app.piskelController.setPiskel(piskelFile, {});
-      pskl.app.piskelController.setFPS(piskelData.fps);
+      pskl.app.piskelController.setFPS(piskelOptions.fps);
 
       // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
       const layer = pskl.app.piskelController.getCurrentLayer();
       for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
-        layer.getFrameAt(i).originalPath = piskelData.resources[i].resourcePath;
-        layer.getFrameAt(i).originalName = piskelData.resources[i].resourceName;
+        layer.getFrameAt(i).originalPath =
+          piskelOptions.resources[i].resourcePath;
+        layer.getFrameAt(i).originalName =
+          piskelOptions.resources[i].resourceName;
         layer.getFrameAt(i).originalIndex = i;
       }
+
+      updateFrameElements();
     }
   );
 });

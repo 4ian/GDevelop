@@ -11,6 +11,7 @@ import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { resizeImage, isResizeSupported } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 const gd = global.gd;
@@ -22,6 +23,7 @@ type Props = {|
   onApply: Function,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 
 type State = {|
@@ -185,7 +187,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         onClick={this._onApply}
       />,
     ];
-    const { project, resourceSources, onChooseResource } = this.props;
+    const { project, resourceSources, onChooseResource, resourceExternalEditors } = this.props;
     const { androidIconResourceNames, iosIconResourceNames } = this.state;
 
     return (
@@ -217,6 +219,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             project={project}
             resourceSources={resourceSources}
             onChooseResource={onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
             resourceKind="image"
             resourceName={androidIconResourceNames[index]}
             onChange={resourceName => {
@@ -238,6 +241,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             onChooseResource={onChooseResource}
             resourceKind="image"
             resourceName={iosIconResourceNames[index]}
+            resourceExternalEditors={resourceExternalEditors}
             onChange={resourceName => {
               const newIcons = [...iosIconResourceNames];
               newIcons[index] = resourceName;

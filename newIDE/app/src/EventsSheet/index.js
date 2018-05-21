@@ -522,6 +522,7 @@ export default class EventsSheet extends Component {
           }}
           resourceSources={this.props.resourceSources}
           onChooseResource={this.props.onChooseResource}
+          resourceExternalEditors={this.props.resourceExternalEditors}
         />
         <ContextMenu
           ref={eventContextMenu => (this.eventContextMenu = eventContextMenu)}
@@ -662,6 +663,7 @@ export default class EventsSheet extends Component {
             }}
             resourceSources={this.props.resourceSources}
             onChooseResource={this.props.onChooseResource}
+            resourceExternalEditors={this.props.resourceExternalEditors}
           />
         )}
       </div>

@@ -4,6 +4,8 @@
 
 html, body {
   font-family: Helvetica;
+  margin: 0;
+  overflow-y:hidden;
 }
 
 #piskel-frame {

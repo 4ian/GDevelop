@@ -7,7 +7,6 @@
 #ifndef GDCORE_FILEPROPERTY_H
 #define GDCORE_FILEPROPERTY_H
 #include <wx/control.h>
-#include <wx/propgrid/property.h>
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/props.h>
 

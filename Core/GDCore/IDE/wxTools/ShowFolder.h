@@ -1,18 +1,17 @@
 /*
  * GDevelop Core
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef GDCORE_SHOWFOLDER_H
 #define GDCORE_SHOWFOLDER_H
+#include <wx/log.h>
+#include <wx/utils.h>
 #include <iomanip>
 #include "GDCore/Tools/Localization.h"
-#include <wx/utils.h>
-#include <wx/log.h>
 
-namespace gd
-{
+namespace gd {
 
 /**
  * \brief Open a folder in the system file explorer.
@@ -26,7 +25,7 @@ namespace gd
  */
 void GD_CORE_API ShowFolder(wxString path);
 
-}
+}  // namespace gd
 
-#endif // GDCORE_SHOWFOLDER_H
+#endif  // GDCORE_SHOWFOLDER_H
 #endif

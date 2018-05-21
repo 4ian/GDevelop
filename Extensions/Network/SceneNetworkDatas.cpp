@@ -9,11 +9,7 @@ This project is released under the MIT License.
 #include "GDCore/Serialization/SerializerElement.h"
 
 #if defined(GD_IDE_ONLY)
-void SceneNetworkDatas::SerializeTo(gd::SerializerElement & element) const
-{
-}
+void SceneNetworkDatas::SerializeTo(gd::SerializerElement& element) const {}
 #endif
 
-void SceneNetworkDatas::UnserializeFrom(const gd::SerializerElement & element)
-{
-}
+void SceneNetworkDatas::UnserializeFrom(const gd::SerializerElement& element) {}

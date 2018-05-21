@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 #ifndef COMMONINSTRUCTIONS_H
 #define COMMONINSTRUCTIONS_H
@@ -9,11 +9,9 @@
 #include <string>
 #include "GDCpp/Runtime/String.h"
 
-namespace GDpriv
-{
+namespace GDpriv {
 
-namespace CommonInstructions
-{
+namespace CommonInstructions {
 
 /**
  * Generate a random number between 0 and max
@@ -30,33 +28,33 @@ bool GD_API LogicalNegation(bool param);
  * Convert the string to a double.
  * \warning This function is meant to be used only in GD events generated code.
  */
-double GD_API ToDouble( const gd::String & str );
+double GD_API ToDouble(const gd::String& str);
 
 /**
  * Convert the double to a string.
  * \warning This function is meant to be used only in GD events generated code.
  */
-gd::String GD_API ToString( double number );
+gd::String GD_API ToString(double number);
 
 /**
  * Convert the double to a string, disabling scientific notation.
  * \warning This function is meant to be used only in GD events generated code.
  */
-gd::String GD_API LargeNumberToString( double number );
+gd::String GD_API LargeNumberToString(double number);
 
 /**
  * Convert the angle from degrees to radians
  * \warning This function is meant to be used only in GD events generated code.
  */
-double GD_API ToRad( double angle );
+double GD_API ToRad(double angle);
 
 /**
  * Convert the angle from radians to degrees.
  * \warning This function is meant to be used only in GD events generated code.
  */
-double GD_API ToDeg( double angle );
+double GD_API ToDeg(double angle);
 
-}
+}  // namespace CommonInstructions
 
-}
-#endif // COMMONINSTRUCTIONS_H
+}  // namespace GDpriv
+#endif  // COMMONINSTRUCTIONS_H

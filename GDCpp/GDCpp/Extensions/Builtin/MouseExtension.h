@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef MOUSEEXTENSION_H
@@ -14,14 +14,13 @@
  *
  * \ingroup BuiltinExtensions
  */
-class MouseExtension : public ExtensionBase
-{
-    public:
-        MouseExtension();
-        virtual ~MouseExtension() {};
-    protected:
-    private:
+class MouseExtension : public ExtensionBase {
+ public:
+  MouseExtension();
+  virtual ~MouseExtension(){};
+
+ protected:
+ private:
 };
 
-#endif // MOUSEEXTENSION_H
-
+#endif  // MOUSEEXTENSION_H

@@ -7,5 +7,5 @@ This project is released under the MIT License.
 
 #include "TimedEventsManager.h"
 
-std::map < RuntimeScene* , TimedEventsManager > TimedEventsManager::managers; //List of managers associated with scenes.
-
+std::map<RuntimeScene*, TimedEventsManager>
+    TimedEventsManager::managers;  // List of managers associated with scenes.

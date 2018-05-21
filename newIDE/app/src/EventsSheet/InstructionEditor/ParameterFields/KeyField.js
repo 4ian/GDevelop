@@ -2,16 +2,7 @@
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
-
-const styles = {
-  autoCompleteTextField: {
-    minWidth: 300,
-  },
-};
-
-const fuzzyFilterOrEmpty = (searchText, key) => {
-  return !key || AutoComplete.fuzzyFilter(searchText, key);
-};
+import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
 
 type State = {|
   focused: boolean,
@@ -131,12 +122,8 @@ export default class KeyField extends Component<ParameterFieldProps, State> {
   render() {
     return (
       <AutoComplete
+        {...defaultAutocompleteProps}
         floatingLabelText={this._description}
-        fullWidth
-        textFieldStyle={styles.autoCompleteTextField}
-        menuProps={{
-          maxHeight: 250,
-        }}
         searchText={this.state.focused ? this.state.text : this.props.value}
         onFocus={() => {
           this.setState({
@@ -169,7 +156,6 @@ export default class KeyField extends Component<ParameterFieldProps, State> {
           text: keyName,
           value: keyName,
         }))}
-        filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}
         ref={field => (this._field = field)}
       />

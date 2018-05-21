@@ -6,14 +6,10 @@ This project is released under the MIT License.
 */
 
 #include "RuntimeSceneNetworkDatas.h"
-#include "SceneNetworkDatas.h"
 #include <iostream>
+#include "SceneNetworkDatas.h"
 
-RuntimeSceneNetworkDatas::RuntimeSceneNetworkDatas(const SceneNetworkDatas & behaviorSharedDatas)
-{
-}
+RuntimeSceneNetworkDatas::RuntimeSceneNetworkDatas(
+    const SceneNetworkDatas& behaviorSharedDatas) {}
 
-RuntimeSceneNetworkDatas::~RuntimeSceneNetworkDatas()
-{
-}
-
+RuntimeSceneNetworkDatas::~RuntimeSceneNetworkDatas() {}

@@ -6,9 +6,12 @@
 
 class RuntimeScene;
 
-namespace ExternalLayoutsTools
-{
-    void GD_API CreateObjectsFromExternalLayout(RuntimeScene & scene, const gd::String & externalLayoutName, float xOffset, float yOffset);
+namespace ExternalLayoutsTools {
+void GD_API
+CreateObjectsFromExternalLayout(RuntimeScene& scene,
+                                const gd::String& externalLayoutName,
+                                float xOffset,
+                                float yOffset);
 };
 
-#endif // EXTERNALLAYOUTSTOOLS_H
+#endif  // EXTERNALLAYOUTSTOOLS_H

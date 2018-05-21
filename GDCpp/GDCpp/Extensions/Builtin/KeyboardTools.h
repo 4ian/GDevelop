@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 #ifndef KEYBOARDTOOLS_H
 #define KEYBOARDTOOLS_H
@@ -12,9 +12,9 @@
 
 class RuntimeScene;
 
-bool IsKeyPressed(RuntimeScene & scene, gd::String key);
-bool WasKeyReleased(RuntimeScene & scene, gd::String key);
-bool AnyKeyIsPressed(RuntimeScene & scene);
-gd::String LastPressedKey(RuntimeScene & scene);
+bool IsKeyPressed(RuntimeScene& scene, gd::String key);
+bool WasKeyReleased(RuntimeScene& scene, gd::String key);
+bool AnyKeyIsPressed(RuntimeScene& scene);
+gd::String LastPressedKey(RuntimeScene& scene);
 
-#endif // KEYBOARDTOOLS_H
+#endif  // KEYBOARDTOOLS_H

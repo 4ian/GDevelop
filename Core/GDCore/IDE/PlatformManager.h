@@ -1,18 +1,17 @@
 /*
  * GDevelop Core
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #if defined(GD_IDE_ONLY)
 #ifndef PLATFORMMANAGER_H
 #define PLATFORMMANAGER_H
-#include <vector>
 #include <memory>
+#include <vector>
 #include "GDCore/Extensions/Platform.h"
 
-namespace gd
-{
+namespace gd {
 
 /**
  * \brief Singleton class managing all the platforms available.
@@ -23,70 +22,67 @@ namespace gd
  *
  * \see gd::PlatformLoader
  */
-class GD_CORE_API PlatformManager
-{
-public:
+class GD_CORE_API PlatformManager {
+ public:
+  /**
+   * \brief Add a new platform to be used by the IDE
+   */
+  bool AddPlatform(std::shared_ptr<gd::Platform> newPlatform);
 
-    /**
-     * \brief Add a new platform to be used by the IDE
-     */
-    bool AddPlatform(std::shared_ptr<gd::Platform> newPlatform);
+  /**
+   * \brief Get a pointer to the platform called \a platformName.
+   * \note The PlatformManager is the owner of the platform, so the pointer
+   * should not be freed or deleted.
+   */
+  gd::Platform *GetPlatform(const gd::String &platformName) const;
 
-    /**
-     * \brief Get a pointer to the platform called \a platformName.
-     * \note The PlatformManager is the owner of the platform, so the pointer should not be freed or deleted.
-     */
-    gd::Platform* GetPlatform(const gd::String & platformName) const;
+  /**
+   * \brief Get a list of all platforms available.
+   */
+  const std::vector<std::shared_ptr<gd::Platform> > &GetAllPlatforms() const {
+    return platformsLoaded;
+  };
 
-    /**
-     * \brief Get a list of all platforms available.
-     */
-    const std::vector< std::shared_ptr<gd::Platform> > & GetAllPlatforms() const { return platformsLoaded; };
+  /**
+   * \brief Notify each platform that the IDE is ready, by calling their
+   * OnIDEInitialized member function.
+   */
+  void NotifyPlatformIDEInitialized() const;
 
-    /**
-     * \brief Notify each platform that the IDE is ready, by calling their OnIDEInitialized member function.
-     */
-    void NotifyPlatformIDEInitialized() const;
-
-    static PlatformManager *Get()
-    {
-        if ( NULL == _singleton )
-        {
-            _singleton = new PlatformManager;
-        }
-
-        return ( static_cast<PlatformManager*>( _singleton ) );
+  static PlatformManager *Get() {
+    if (NULL == _singleton) {
+      _singleton = new PlatformManager;
     }
 
-    /**
-     * \brief Destroy the global platform manager.
-     *
-     * This is called by the IDE before shutting down.
-     * ( Otherwise, platforms won't get notified that the IDE closed. )
-     */
-    static void DestroySingleton()
-    {
-        if ( NULL != _singleton )
-        {
-            for (std::size_t i = 0;i<_singleton->platformsLoaded.size();++i)
-            {
-                if ( _singleton->platformsLoaded[i] != std::shared_ptr<gd::Platform>() )
-                    _singleton->platformsLoaded[i]->OnIDEClosed();
-            }
+    return (static_cast<PlatformManager *>(_singleton));
+  }
 
-            delete _singleton;
-            _singleton = NULL;
-        }
+  /**
+   * \brief Destroy the global platform manager.
+   *
+   * This is called by the IDE before shutting down.
+   * ( Otherwise, platforms won't get notified that the IDE closed. )
+   */
+  static void DestroySingleton() {
+    if (NULL != _singleton) {
+      for (std::size_t i = 0; i < _singleton->platformsLoaded.size(); ++i) {
+        if (_singleton->platformsLoaded[i] != std::shared_ptr<gd::Platform>())
+          _singleton->platformsLoaded[i]->OnIDEClosed();
+      }
+
+      delete _singleton;
+      _singleton = NULL;
     }
+  }
 
-private:
-    std::vector< std::shared_ptr<gd::Platform> > platformsLoaded;
+ private:
+  std::vector<std::shared_ptr<gd::Platform> > platformsLoaded;
 
-    PlatformManager();
-    virtual ~PlatformManager();
-    static PlatformManager *_singleton;
+  PlatformManager();
+  virtual ~PlatformManager();
+  static PlatformManager *_singleton;
 };
 
-}
-#endif // PLATFORMMANAGER_H
+}  // namespace gd
+#endif  // PLATFORMMANAGER_H
 #endif

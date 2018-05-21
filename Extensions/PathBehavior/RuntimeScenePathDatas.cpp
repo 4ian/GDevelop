@@ -8,12 +8,9 @@ This project is released under the MIT License.
 #include "RuntimeScenePathDatas.h"
 #include "ScenePathDatas.h"
 
-RuntimeScenePathDatas::RuntimeScenePathDatas(const ScenePathDatas & behaviorSharedDatas)
-{
-    globalPaths = behaviorSharedDatas.globalPaths;
+RuntimeScenePathDatas::RuntimeScenePathDatas(
+    const ScenePathDatas& behaviorSharedDatas) {
+  globalPaths = behaviorSharedDatas.globalPaths;
 }
 
-RuntimeScenePathDatas::~RuntimeScenePathDatas()
-{
-}
-
+RuntimeScenePathDatas::~RuntimeScenePathDatas() {}

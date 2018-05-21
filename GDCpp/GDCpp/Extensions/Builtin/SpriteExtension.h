@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef SPRITEEXTENSION_H
@@ -15,13 +15,10 @@
  * \ingroup BuiltinExtensions
  * \ingroup SpriteObjectExtension
  */
-class SpriteExtension : public ExtensionBase
-{
-    public :
-
-    SpriteExtension();
-    virtual ~SpriteExtension() {};
+class SpriteExtension : public ExtensionBase {
+ public:
+  SpriteExtension();
+  virtual ~SpriteExtension(){};
 };
 
-#endif // SPRITEEXTENSION_H
-
+#endif  // SPRITEEXTENSION_H

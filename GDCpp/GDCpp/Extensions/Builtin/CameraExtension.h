@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef CAMERAEXTENSION_H
@@ -14,14 +14,13 @@
  *
  * \ingroup BuiltinExtensions
  */
-class CameraExtension : public ExtensionBase
-{
-    public:
-        CameraExtension();
-        virtual ~CameraExtension() {};
-    protected:
-    private:
+class CameraExtension : public ExtensionBase {
+ public:
+  CameraExtension();
+  virtual ~CameraExtension(){};
+
+ protected:
+ private:
 };
 
-#endif // CAMERAEXTENSION_H
-
+#endif  // CAMERAEXTENSION_H

@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef VARIABLESEXTENSION_H
@@ -14,13 +14,10 @@
  *
  * \ingroup BuiltinExtensions
  */
-class VariablesExtension : public ExtensionBase
-{
-public:
-    VariablesExtension();
-    virtual ~VariablesExtension() {};
-
+class VariablesExtension : public ExtensionBase {
+ public:
+  VariablesExtension();
+  virtual ~VariablesExtension(){};
 };
 
-#endif // VARIABLESEXTENSION_H
-
+#endif  // VARIABLESEXTENSION_H

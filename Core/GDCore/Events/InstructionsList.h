@@ -9,35 +9,43 @@
 #include <memory>
 #include <vector>
 #include "GDCore/Tools/SPtrList.h"
-namespace gd { class Instruction; }
-namespace gd { class Project; }
-namespace gd { class SerializerElement; }
+namespace gd {
+class Instruction;
+}
+namespace gd {
+class Project;
+}
+namespace gd {
+class SerializerElement;
+}
 
-namespace gd
-{
+namespace gd {
 
 class InstructionsList : public SPtrList<gd::Instruction> {
-public:
+ public:
+  void InsertInstructions(const InstructionsList& list,
+                          size_t begin,
+                          size_t end,
+                          size_t position = (size_t)-1);
 
-    void InsertInstructions(const InstructionsList & list, size_t begin, size_t end, size_t position = (size_t)-1);
+  /** \name Serialization
+   */
+  ///@{
+  /**
+   * \brief Serialize the instructions to the specified element
+   * \see EventsListSerialization
+   */
+  void SerializeTo(gd::SerializerElement& element) const;
 
-    /** \name Serialization
-     */
-    ///@{
-    /**
-     * \brief Serialize the instructions to the specified element
-     * \see EventsListSerialization
-     */
-    void SerializeTo(gd::SerializerElement & element) const;
-
-    /**
-     * \brief Load the instructions from the specified element
-     * \see EventsListSerialization
-     */
-    void UnserializeFrom(gd::Project & project, const gd::SerializerElement & element);
-    ///@}
+  /**
+   * \brief Load the instructions from the specified element
+   * \see EventsListSerialization
+   */
+  void UnserializeFrom(gd::Project& project,
+                       const gd::SerializerElement& element);
+  ///@}
 };
 
-}
+}  // namespace gd
 
 #endif

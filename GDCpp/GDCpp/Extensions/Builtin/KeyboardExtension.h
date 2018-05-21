@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef KEYBOARDEXTENSION_H
@@ -14,14 +14,13 @@
  *
  * \ingroup BuiltinExtensions
  */
-class KeyboardExtension : public ExtensionBase
-{
-    public:
-        KeyboardExtension();
-        virtual ~KeyboardExtension() {};
-    protected:
-    private:
+class KeyboardExtension : public ExtensionBase {
+ public:
+  KeyboardExtension();
+  virtual ~KeyboardExtension(){};
+
+ protected:
+ private:
 };
 
-#endif // KEYBOARDEXTENSION_H
-
+#endif  // KEYBOARDEXTENSION_H

@@ -20,6 +20,7 @@ export default class InstancePropertiesEditor extends Component {
         disabled: true,
         getValue: instance => instance.getObjectName(),
         setValue: (instance, newValue) => instance.setObjectName(newValue),
+        onEditButtonClick: (instance) => this.props.onEditObjectByName(instance.getObjectName()),
       },
       {
         name: 'X',

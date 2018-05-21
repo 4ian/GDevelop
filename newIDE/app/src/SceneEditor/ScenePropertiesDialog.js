@@ -1,3 +1,5 @@
+// @flow
+
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
@@ -8,16 +10,39 @@ import EmptyMessage from '../UI/EmptyMessage';
 import PropertiesEditor from '../PropertiesEditor';
 import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import some from 'lodash/some';
+import Checkbox from 'material-ui/Checkbox';
 
-export default class ScenePropertiesDialog extends Component {
-  constructor(props) {
+type Props = {|
+  open: boolean,
+  layout: gdLayout,
+  project: gdProject,
+  onApply?: () => void,
+  onClose: () => void,
+  onOpenMoreSettings: () => void,
+  onEditVariables: () => void,
+|};
+
+type State = {|
+  windowTitle: string,
+  shouldStopSoundsOnStartup: boolean,
+  backgroundColor: {
+    r: number,
+    g: number,
+    b: number,
+    a: number,
+  },
+|};
+
+export default class ScenePropertiesDialog extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
-    this.state = { ...this._loadFrom(props.layout) };
+    this.state = this._loadFrom(props.layout);
   }
 
-  _loadFrom(layout) {
+  _loadFrom(layout: gdLayout): State {
     return {
       windowTitle: layout.getWindowDefaultTitle(),
+      shouldStopSoundsOnStartup: layout.stopSoundsOnStartup(),
       backgroundColor: {
         r: layout.getBackgroundColorRed(),
         g: layout.getBackgroundColorGreen(),
@@ -27,7 +52,7 @@ export default class ScenePropertiesDialog extends Component {
     };
   }
 
-  componentWillReceiveProps(newProps) {
+  componentWillReceiveProps(newProps: Props) {
     if (
       (!this.props.open && newProps.open) ||
       (newProps.open && this.props.layout !== newProps.layout)
@@ -38,6 +63,9 @@ export default class ScenePropertiesDialog extends Component {
 
   _onApply = () => {
     this.props.layout.setWindowDefaultTitle(this.state.windowTitle);
+    this.props.layout.setStopSoundsOnStartup(
+      this.state.shouldStopSoundsOnStartup
+    );
     this.props.layout.setBackgroundColor(
       this.state.backgroundColor.r,
       this.state.backgroundColor.g,
@@ -114,6 +142,14 @@ export default class ScenePropertiesDialog extends Component {
           color={this.state.backgroundColor}
           onChangeComplete={color =>
             this.setState({ backgroundColor: color.rgb })}
+        />
+        <Checkbox
+          checked={this.state.shouldStopSoundsOnStartup}
+          label={'Stop musics and sounds on startup'}
+          onCheck={(e, check) =>
+            this.setState({
+              shouldStopSoundsOnStartup: check,
+            })}
         />
         <RaisedButton
           label="Edit scene variables"

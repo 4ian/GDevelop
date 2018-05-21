@@ -4,35 +4,30 @@
 
 #include <wx/dirdlg.h>
 
-#include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/Tools/Localization.h"
 
 AndroidExportDialog::AndroidExportDialog(wxWindow* parent)
-    : AndroidExportDialogBase(parent)
-{
-    Fit();
+    : AndroidExportDialogBase(parent) {
+  Fit();
 }
 
-AndroidExportDialog::~AndroidExportDialog()
-{
+AndroidExportDialog::~AndroidExportDialog() {}
 
+wxString AndroidExportDialog::GetExportPath() const {
+  return m_exportFolderTextCtrl->GetValue();
 }
 
-wxString AndroidExportDialog::GetExportPath() const
-{
-    return m_exportFolderTextCtrl->GetValue();
+void AndroidExportDialog::OnHelpButtonClicked(wxHyperlinkEvent& event) {
+  gd::HelpFileAccess::Get()->OpenPage(
+      "game_develop/documentation/manual/native_android_export");
 }
 
-void AndroidExportDialog::OnHelpButtonClicked(wxHyperlinkEvent& event)
-{
-    gd::HelpFileAccess::Get()->OpenPage("game_develop/documentation/manual/native_android_export");
-}
-
-void AndroidExportDialog::OnBrowseButtonClicked(wxCommandEvent& event)
-{
-    wxDirDialog dialog(this, _("Choose a folder, empty if possible, where create your game."));
-    if ( dialog.ShowModal() == wxID_OK )
-        m_exportFolderTextCtrl->SetValue(dialog.GetPath());
+void AndroidExportDialog::OnBrowseButtonClicked(wxCommandEvent& event) {
+  wxDirDialog dialog(
+      this, _("Choose a folder, empty if possible, where create your game."));
+  if (dialog.ShowModal() == wxID_OK)
+    m_exportFolderTextCtrl->SetValue(dialog.GetPath());
 }
 
 #endif

@@ -6,7 +6,6 @@ import Divider from 'material-ui/Divider';
 import IconButton from 'material-ui/IconButton';
 import Add from 'material-ui/svg-icons/content/add';
 import Brush from 'material-ui/svg-icons/image/brush';
-import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -15,6 +14,7 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import IconMenu from '../UI/Menu/IconMenu';
 import ResourcesLoader from '../ResourcesLoader';
+import { defaultAutocompleteProps } from '../UI/AutocompleteProps';
 
 type Props = {|
   project: gdProject,
@@ -195,8 +195,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
     return (
       <div style={styles.container}>
         <AutoComplete
+          {...defaultAutocompleteProps}
           floatingLabelText={this.props.floatingLabelText || 'Select an image'}
-          filter={fuzzyOrEmptyFilter}
           openOnFocus
           dataSource={this.autoCompleteData || []}
           onUpdateInput={this._onUpdate}
@@ -205,9 +205,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
           searchText={this.state.resourceName}
           fullWidth={this.props.fullWidth}
           style={styles.autoComplete}
-          menuProps={{
-            maxHeight: 250,
-          }}
         />
         {!!externalEditors.length && (
           <IconMenu

@@ -20,6 +20,7 @@ const styles = {
   },
   textFieldContainer: {
     flex: 1,
+    minWidth: 300,
   },
   expressionSelector: {
     maxHeight: 350,

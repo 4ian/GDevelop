@@ -15,15 +15,17 @@ class SceneNetworkDatas;
 /**
  * Datas shared by Network Behavior at runtime ( i.e. Nothing )
  */
-class GD_EXTENSION_API RuntimeSceneNetworkDatas : public BehaviorsRuntimeSharedData
-{
-    public:
-        RuntimeSceneNetworkDatas(const SceneNetworkDatas & behaviorSharedDatas);
-        virtual ~RuntimeSceneNetworkDatas();
-        virtual std::shared_ptr<BehaviorsRuntimeSharedData> Clone() const { return std::shared_ptr<BehaviorsRuntimeSharedData>(new RuntimeSceneNetworkDatas(*this));}
+class GD_EXTENSION_API RuntimeSceneNetworkDatas
+    : public BehaviorsRuntimeSharedData {
+ public:
+  RuntimeSceneNetworkDatas(const SceneNetworkDatas& behaviorSharedDatas);
+  virtual ~RuntimeSceneNetworkDatas();
+  virtual std::shared_ptr<BehaviorsRuntimeSharedData> Clone() const {
+    return std::shared_ptr<BehaviorsRuntimeSharedData>(
+        new RuntimeSceneNetworkDatas(*this));
+  }
 
-    private:
+ private:
 };
 
-#endif // RUNTIMESCENENETWORKDATAS_H
-
+#endif  // RUNTIMESCENENETWORKDATAS_H

@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 #ifndef COLLISIONS_H_INCLUDED
 #define COLLISIONS_H_INCLUDED
@@ -16,6 +16,7 @@
  * \ingroup GameEngine
  * \ingroup SpriteObjectExtension
  */
-bool GD_API CheckCollision( const RuntimeSpriteObject* const objet1, const RuntimeSpriteObject* const objet2);
+bool GD_API CheckCollision(const RuntimeSpriteObject* const objet1,
+                           const RuntimeSpriteObject* const objet2);
 
-#endif // COLLISIONS_H_INCLUDED
+#endif  // COLLISIONS_H_INCLUDED

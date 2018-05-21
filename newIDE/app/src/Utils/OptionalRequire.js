@@ -1,3 +1,10 @@
+/**
+ * Allow to require a Node.js/npm module without having it bundled by webpack.
+ * This means that this module will only be available when running on Electron.
+ * When running without Electron, `null` will be return.
+ *
+ * @param {string} moduleName The name of the module. For example: `fs`.
+ */
 export default function optionalRequire(moduleName) {
   try {
     // Avoid webpack trying to inject the module by using an expression

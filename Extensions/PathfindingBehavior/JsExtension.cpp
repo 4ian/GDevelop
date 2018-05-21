@@ -8,111 +8,160 @@ This project is released under the MIT License.
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
 
-void DeclarePathfindingBehaviorExtension(gd::PlatformExtension & extension);
+void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension);
 
 /**
  * \brief This class declares information about the JS extension.
  */
-class PathfindingBehaviorJsExtension : public gd::PlatformExtension
-{
-public:
+class PathfindingBehaviorJsExtension : public gd::PlatformExtension {
+ public:
+  /**
+   * \brief Constructor of an extension declares everything the extension
+   * contains: objects, actions, conditions and expressions.
+   */
+  PathfindingBehaviorJsExtension() {
+    DeclarePathfindingBehaviorExtension(*this);
 
-    /**
-     * \brief Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
-     */
-    PathfindingBehaviorJsExtension()
+    GetBehaviorMetadata("PathfindingBehavior::PathfindingBehavior")
+        .SetIncludeFile(
+            "Extensions/PathfindingBehavior/pathfindingruntimebehavior.js")
+        .AddIncludeFile(
+            "Extensions/PathfindingBehavior/"
+            "pathfindingobstacleruntimebehavior.js");
+
     {
-        DeclarePathfindingBehaviorExtension(*this);
+      std::map<gd::String, gd::InstructionMetadata>& autActions =
+          GetAllActionsForBehavior("PathfindingBehavior::PathfindingBehavior");
+      std::map<gd::String, gd::InstructionMetadata>& autConditions =
+          GetAllConditionsForBehavior(
+              "PathfindingBehavior::PathfindingBehavior");
+      std::map<gd::String, gd::ExpressionMetadata>& autExpressions =
+          GetAllExpressionsForBehavior(
+              "PathfindingBehavior::PathfindingBehavior");
 
-        GetBehaviorMetadata("PathfindingBehavior::PathfindingBehavior")
-            .SetIncludeFile("Extensions/PathfindingBehavior/pathfindingruntimebehavior.js")
-            .AddIncludeFile("Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js");
+      autConditions["PathfindingBehavior::PathFound"].SetFunctionName(
+          "pathFound");
+      autActions["PathfindingBehavior::SetDestination"].SetFunctionName(
+          "moveTo");
+      autConditions["PathfindingBehavior::DestinationReached"].SetFunctionName(
+          "destinationReached");
+      autActions["PathfindingBehavior::CellWidth"]
+          .SetFunctionName("setCellWidth")
+          .SetGetter("getCellWidth");
+      autConditions["PathfindingBehavior::CellWidth"].SetFunctionName(
+          "getCellWidth");
+      autActions["PathfindingBehavior::CellHeight"]
+          .SetFunctionName("setCellHeight")
+          .SetGetter("getCellHeight");
+      autConditions["PathfindingBehavior::CellHeight"].SetFunctionName(
+          "getCellHeight");
+      autActions["PathfindingBehavior::Acceleration"]
+          .SetFunctionName("setAcceleration")
+          .SetGetter("getAcceleration");
+      autConditions["PathfindingBehavior::Acceleration"].SetFunctionName(
+          "getAcceleration");
+      autActions["PathfindingBehavior::MaxSpeed"]
+          .SetFunctionName("setMaxSpeed")
+          .SetGetter("getMaxSpeed");
+      autConditions["PathfindingBehavior::MaxSpeed"].SetFunctionName(
+          "getMaxSpeed");
+      autActions["PathfindingBehavior::Speed"]
+          .SetFunctionName("setSpeed")
+          .SetGetter("getSpeed");
+      autConditions["PathfindingBehavior::Speed"].SetFunctionName("getSpeed");
+      autActions["PathfindingBehavior::AngularMaxSpeed"]
+          .SetFunctionName("setAngularMaxSpeed")
+          .SetGetter("getAngularMaxSpeed");
+      autConditions["PathfindingBehavior::AngularMaxSpeed"].SetFunctionName(
+          "getAngularMaxSpeed");
+      autActions["PathfindingBehavior::AngleOffset"]
+          .SetFunctionName("setAngleOffset")
+          .SetGetter("getAngleOffset");
+      autConditions["PathfindingBehavior::AngleOffset"].SetFunctionName(
+          "getAngleOffset");
+      autActions["PathfindingBehavior::ExtraBorder"]
+          .SetFunctionName("setExtraBorder")
+          .SetGetter("getExtraBorder");
+      autConditions["PathfindingBehavior::ExtraBorder"].SetFunctionName(
+          "getExtraBorder");
 
-        {
+      autActions["PathfindingBehavior::AllowDiagonals"].SetFunctionName(
+          "allowDiagonals");
+      autConditions["PathfindingBehavior::DiagonalsAllowed"].SetFunctionName(
+          "diagonalsAllowed");
+      autActions["PathfindingBehavior::RotateObject"].SetFunctionName(
+          "setRotateObject");
+      autConditions["PathfindingBehavior::ObjectRotated"].SetFunctionName(
+          "isObjectRotated");
 
-            std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForBehavior("PathfindingBehavior::PathfindingBehavior");
-            std::map<gd::String, gd::InstructionMetadata > & autConditions = GetAllConditionsForBehavior("PathfindingBehavior::PathfindingBehavior");
-            std::map<gd::String, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForBehavior("PathfindingBehavior::PathfindingBehavior");
+      autExpressions["GetNodeX"].SetFunctionName("getNodeX");
+      autExpressions["GetNodeY"].SetFunctionName("getNodeY");
+      autExpressions["NextNodeIndex"].SetFunctionName("getNextNodeIndex");
+      autExpressions["NodeCount"].SetFunctionName("getNodeCount");
+      autExpressions["NextNodeX"].SetFunctionName("getNextNodeX");
+      autExpressions["NextNodeY"].SetFunctionName("getNextNodeY");
+      autExpressions["LastNodeX"].SetFunctionName("getLastNodeX");
+      autExpressions["LastNodeY"].SetFunctionName("getLastNodeY");
+      autExpressions["DestinationX"].SetFunctionName("getDestinationX");
+      autExpressions["DestinationY"].SetFunctionName("getDestinationY");
 
-            autConditions["PathfindingBehavior::PathFound"].SetFunctionName("pathFound");
-            autActions["PathfindingBehavior::SetDestination"].SetFunctionName("moveTo");
-            autConditions["PathfindingBehavior::DestinationReached"].SetFunctionName("destinationReached");
-            autActions["PathfindingBehavior::CellWidth"].SetFunctionName("setCellWidth").SetGetter("getCellWidth");
-            autConditions["PathfindingBehavior::CellWidth"].SetFunctionName("getCellWidth");
-            autActions["PathfindingBehavior::CellHeight"].SetFunctionName("setCellHeight").SetGetter("getCellHeight");
-            autConditions["PathfindingBehavior::CellHeight"].SetFunctionName("getCellHeight");
-            autActions["PathfindingBehavior::Acceleration"].SetFunctionName("setAcceleration").SetGetter("getAcceleration");
-            autConditions["PathfindingBehavior::Acceleration"].SetFunctionName("getAcceleration");
-            autActions["PathfindingBehavior::MaxSpeed"].SetFunctionName("setMaxSpeed").SetGetter("getMaxSpeed");
-            autConditions["PathfindingBehavior::MaxSpeed"].SetFunctionName("getMaxSpeed");
-            autActions["PathfindingBehavior::Speed"].SetFunctionName("setSpeed").SetGetter("getSpeed");
-            autConditions["PathfindingBehavior::Speed"].SetFunctionName("getSpeed");
-            autActions["PathfindingBehavior::AngularMaxSpeed"].SetFunctionName("setAngularMaxSpeed").SetGetter("getAngularMaxSpeed");
-            autConditions["PathfindingBehavior::AngularMaxSpeed"].SetFunctionName("getAngularMaxSpeed");
-            autActions["PathfindingBehavior::AngleOffset"].SetFunctionName("setAngleOffset").SetGetter("getAngleOffset");
-            autConditions["PathfindingBehavior::AngleOffset"].SetFunctionName("getAngleOffset");
-            autActions["PathfindingBehavior::ExtraBorder"].SetFunctionName("setExtraBorder").SetGetter("getExtraBorder");
-            autConditions["PathfindingBehavior::ExtraBorder"].SetFunctionName("getExtraBorder");
+      autExpressions["Acceleration"].SetFunctionName("getAcceleration");
+      autExpressions["MaxSpeed"].SetFunctionName("getMaxSpeed");
+      autExpressions["Speed"].SetFunctionName("getSpeed");
+      autExpressions["AngularMaxSpeed"].SetFunctionName("getAngularMaxSpeed");
+      autExpressions["AngleOffset"].SetFunctionName("getAngleOffset");
+      autExpressions["ExtraBorder"].SetFunctionName("getExtraBorder");
+      autExpressions["CellWidth"].SetFunctionName("getCellWidth");
+      autExpressions["CellHeight"].SetFunctionName("getCellHeight");
+    }
 
-            autActions["PathfindingBehavior::AllowDiagonals"].SetFunctionName("allowDiagonals");
-            autConditions["PathfindingBehavior::DiagonalsAllowed"].SetFunctionName("diagonalsAllowed");
-            autActions["PathfindingBehavior::RotateObject"].SetFunctionName("setRotateObject");
-            autConditions["PathfindingBehavior::ObjectRotated"].SetFunctionName("isObjectRotated");
+    GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacleBehavior")
+        .SetIncludeFile(
+            "Extensions/PathfindingBehavior/pathfindingruntimebehavior.js")
+        .AddIncludeFile(
+            "Extensions/PathfindingBehavior/"
+            "pathfindingobstacleruntimebehavior.js");
 
-            autExpressions["GetNodeX"].SetFunctionName("getNodeX");
-            autExpressions["GetNodeY"].SetFunctionName("getNodeY");
-            autExpressions["NextNodeIndex"].SetFunctionName("getNextNodeIndex");
-            autExpressions["NodeCount"].SetFunctionName("getNodeCount");
-            autExpressions["NextNodeX"].SetFunctionName("getNextNodeX");
-            autExpressions["NextNodeY"].SetFunctionName("getNextNodeY");
-            autExpressions["LastNodeX"].SetFunctionName("getLastNodeX");
-            autExpressions["LastNodeY"].SetFunctionName("getLastNodeY");
-            autExpressions["DestinationX"].SetFunctionName("getDestinationX");
-            autExpressions["DestinationY"].SetFunctionName("getDestinationY");
+    {
+      std::map<gd::String, gd::InstructionMetadata>& autActions =
+          GetAllActionsForBehavior(
+              "PathfindingBehavior::PathfindingObstacleBehavior");
+      std::map<gd::String, gd::InstructionMetadata>& autConditions =
+          GetAllConditionsForBehavior(
+              "PathfindingBehavior::PathfindingObstacleBehavior");
+      std::map<gd::String, gd::ExpressionMetadata>& autExpressions =
+          GetAllExpressionsForBehavior(
+              "PathfindingBehavior::PathfindingObstacleBehavior");
 
-            autExpressions["Acceleration"].SetFunctionName("getAcceleration");
-            autExpressions["MaxSpeed"].SetFunctionName("getMaxSpeed");
-            autExpressions["Speed"].SetFunctionName("getSpeed");
-            autExpressions["AngularMaxSpeed"].SetFunctionName("getAngularMaxSpeed");
-            autExpressions["AngleOffset"].SetFunctionName("getAngleOffset");
-            autExpressions["ExtraBorder"].SetFunctionName("getExtraBorder");
-            autExpressions["CellWidth"].SetFunctionName("getCellWidth");
-            autExpressions["CellHeight"].SetFunctionName("getCellHeight");
-        }
+      autActions["PathfindingObstacleBehavior::Cost"]
+          .SetFunctionName("setCost")
+          .SetGetter("getCost");
+      autConditions["PathfindingObstacleBehavior::Cost"].SetFunctionName(
+          "getCost");
+      autActions["PathfindingObstacleBehavior::SetImpassable"].SetFunctionName(
+          "setImpassable");
+      autConditions["PathfindingObstacleBehavior::IsImpassable"]
+          .SetFunctionName("isImpassable");
 
-        GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacleBehavior")
-            .SetIncludeFile("Extensions/PathfindingBehavior/pathfindingruntimebehavior.js")
-            .AddIncludeFile("Extensions/PathfindingBehavior/pathfindingobstacleruntimebehavior.js");
+      autExpressions["Cost"].SetFunctionName("getCost");
+    }
 
-        {
-            std::map<gd::String, gd::InstructionMetadata > & autActions = GetAllActionsForBehavior("PathfindingBehavior::PathfindingObstacleBehavior");
-            std::map<gd::String, gd::InstructionMetadata > & autConditions = GetAllConditionsForBehavior("PathfindingBehavior::PathfindingObstacleBehavior");
-            std::map<gd::String, gd::ExpressionMetadata > & autExpressions = GetAllExpressionsForBehavior("PathfindingBehavior::PathfindingObstacleBehavior");
-
-            autActions["PathfindingObstacleBehavior::Cost"].SetFunctionName("setCost").SetGetter("getCost");
-            autConditions["PathfindingObstacleBehavior::Cost"].SetFunctionName("getCost");
-            autActions["PathfindingObstacleBehavior::SetImpassable"].SetFunctionName("setImpassable");
-            autConditions["PathfindingObstacleBehavior::IsImpassable"].SetFunctionName("isImpassable");
-
-            autExpressions["Cost"].SetFunctionName("getCost");
-        }
-
-        StripUnimplementedInstructionsAndExpressions();
-        GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
-    };
+    StripUnimplementedInstructionsAndExpressions();
+    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
+  };
 };
 
 #if defined(EMSCRIPTEN)
-extern "C" gd::PlatformExtension * CreateGDJSPathfindingBehaviorExtension() {
-    return new PathfindingBehaviorJsExtension;
+extern "C" gd::PlatformExtension* CreateGDJSPathfindingBehaviorExtension() {
+  return new PathfindingBehaviorJsExtension;
 }
 #else
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
-extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
-    return new PathfindingBehaviorJsExtension;
+extern "C" gd::PlatformExtension* GD_EXTENSION_API CreateGDJSExtension() {
+  return new PathfindingBehaviorJsExtension;
 }
 #endif
 #endif

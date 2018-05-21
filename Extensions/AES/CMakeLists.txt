@@ -12,7 +12,8 @@ gd_add_extension_definitions(AES)
 #The targets
 ###
 include_directories(.)
-file(GLOB_RECURSE source_files *)
+file(GLOB_RECURSE source_files *.cpp *.h)
+gd_add_clang_utils(AES "${source_files}")
 
 gd_add_extension_target(AES "${source_files}")
 gdcpp_add_runtime_extension_target(AES_Runtime "${source_files}")

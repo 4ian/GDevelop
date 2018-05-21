@@ -1,16 +1,7 @@
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
+import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
 const gd = global.gd;
-
-const styles = {
-  autoCompleteTextField: {
-    minWidth: 300,
-  },
-};
-
-const fuzzyFilterOrEmpty = (searchText, key) => {
-  return !key || AutoComplete.fuzzyFilter(searchText, key);
-};
 
 export default class BehaviorField extends Component {
   state = { errorText: null, focused: false, text: null };
@@ -104,12 +95,8 @@ export default class BehaviorField extends Component {
 
     return (
       <AutoComplete
+        {...defaultAutocompleteProps}
         floatingLabelText={this._description}
-        fullWidth
-        textFieldStyle={styles.autoCompleteTextField}
-        menuProps={{
-          maxHeight: 250,
-        }}
         errorText={
           !this._behaviorNames.length
             ? noBehaviorErrorText
@@ -148,7 +135,6 @@ export default class BehaviorField extends Component {
           text: behaviorName,
           value: behaviorName,
         }))}
-        filter={fuzzyFilterOrEmpty}
         openOnFocus={!this.props.isInline}
         disabled={this._behaviorNames.length <= 1}
         ref={field => (this._field = field)}

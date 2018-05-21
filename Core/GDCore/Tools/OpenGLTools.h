@@ -2,6 +2,8 @@
 
 namespace OpenGLTools {
 
-void GD_CORE_API PerspectiveGL( GLdouble fovY, GLdouble aspect, GLdouble zNear, GLdouble zFar );
-
+void GD_CORE_API PerspectiveGL(GLdouble fovY,
+                               GLdouble aspect,
+                               GLdouble zNear,
+                               GLdouble zFar);
 }

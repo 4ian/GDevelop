@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef STRINGINSTRUCTIONSEXTENSION_H
@@ -14,13 +14,10 @@
  *
  * \ingroup BuiltinExtensions
  */
-class StringInstructionsExtension : public ExtensionBase
-{
-    public:
-        StringInstructionsExtension();
-        virtual ~StringInstructionsExtension() {};
-
+class StringInstructionsExtension : public ExtensionBase {
+ public:
+  StringInstructionsExtension();
+  virtual ~StringInstructionsExtension(){};
 };
 
-#endif // STRINGINSTRUCTIONSEXTENSION_H
-
+#endif  // STRINGINSTRUCTIONSEXTENSION_H

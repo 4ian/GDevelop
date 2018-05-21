@@ -1,3 +1,4 @@
+// @flow
 import AutoComplete from 'material-ui/AutoComplete';
 
 /**
@@ -6,6 +7,6 @@ import AutoComplete from 'material-ui/AutoComplete';
  * @param {*} searchText
  * @param {*} key
  */
-export const fuzzyOrEmptyFilter = (searchText, key) => {
+export const fuzzyOrEmptyFilter = (searchText: string, key: string) => {
   return !key || AutoComplete.fuzzyFilter(searchText, key);
 };

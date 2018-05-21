@@ -85,6 +85,9 @@ function makeFileNameUnique(path) {
   if (!fileExists(path)) {
     return path;
   }
+
+  //TODO: refactor by using `path` module and properly handle the case
+  //where the file has no extension.
   const folderPath = path.substring(0, path.lastIndexOf('/') + 1);
   const extension = path.substring(path.lastIndexOf('.'), path.length);
   const oldFileName = path.substring(

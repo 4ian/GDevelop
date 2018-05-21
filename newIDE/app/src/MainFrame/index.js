@@ -920,6 +920,7 @@ export default class MainFrame extends React.Component<Props, State> {
       resourceSources,
       authentification,
       previewLauncher,
+      resourceExternalEditors,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1069,6 +1070,7 @@ export default class MainFrame extends React.Component<Props, State> {
               onClose={() => this.openPlatformSpecificAssets(false)}
               resourceSources={resourceSources}
               onChooseResource={this._onChooseResource}
+              resourceExternalEditors={resourceExternalEditors}
             />
           )}
           {!!genericDialog &&

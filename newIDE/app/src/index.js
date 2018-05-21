@@ -70,6 +70,7 @@ if (electron) {
           resourceSources={localResourceSources}
           authentification={authentification}
           onReadFromPathOrURL={() => Promise.reject('Should never be called')}
+          resourceExternalEditors={localResourceExternalEditors}
         />
       </ExternalEditor>
     );

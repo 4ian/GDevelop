@@ -94,14 +94,13 @@ export default class PropertiesEditor extends Component {
       );
     } else {
       return (
-        <div style={styles.fieldContainer}>
+        <div style={styles.fieldContainer} key={field.name}>
           <SemiControlledTextField
             value={this._getFieldValue(
               this.props.instances,
               field,
               '(Multiple values)'
             )}
-            key={field.name}
             id={field.name}
             floatingLabelText={field.name}
             floatingLabelFixed

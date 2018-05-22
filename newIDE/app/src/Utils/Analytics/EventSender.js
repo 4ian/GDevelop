@@ -202,3 +202,9 @@ export const sendChoosePlanClicked = (planId: string | null) => {
 
   client.recordEvent('choose-plan-click', { planId });
 };
+
+export const sendExternalEditorOpened = (editorName: string) => {
+  if (isDev || !client) return;
+
+  client.recordEvent('open_external_editor', { editorName });
+};

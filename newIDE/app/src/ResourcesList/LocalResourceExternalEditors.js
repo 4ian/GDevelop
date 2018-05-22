@@ -1,6 +1,7 @@
 // @flow
 import { openPiskel } from './LocalPiskelBridge';
 import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
+import { sendExternalEditorOpened } from '../Utils/Analytics/EventSender';
 
 /**
  * This is the list of editors that can be used to edit resources
@@ -11,7 +12,10 @@ const editors: Array<ResourceExternalEditor> = [
     name: 'piskel-app',
     displayName: 'Edit with Piskel',
     kind: 'image',
-    edit: openPiskel,
+    edit: (options) => {
+      sendExternalEditorOpened('piskel');
+      return openPiskel(options);
+    },
   },
 ];
 

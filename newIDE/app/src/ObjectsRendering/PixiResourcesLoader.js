@@ -9,6 +9,12 @@ const loadedFontFamilies = {};
 const loadedTextures = {};
 const invalidTexture = PIXI.Texture.fromImage('res/error48.png');
 
+/**
+ * Expose functions to load PIXI textures or fonts, given the names of
+ * resources and a gd.Project.
+ * 
+ * This internally uses ResourcesLoader to get the URL of the resources.
+ */
 export default class PixiResourcesLoader {
   static _initializeTexture(resource: gdResource, texture: any) {
     if (resource.getKind() !== 'image') return;
@@ -19,17 +25,22 @@ export default class PixiResourcesLoader {
     }
   }
 
+  /**
+   * (Re)load the PIXI texture represented by the given resources.
+   */
   static loadTextures(
     project: gdProject,
+    resourceNames: Array<string>,
     onProgress: (number, number) => void,
     onComplete: () => void
   ) {
     const resourcesManager = project.getResourcesManager();
     const loader = PIXI.loader;
+    loader.reset();
+    loader.removeAllListeners();
 
-    const resourcesList = resourcesManager.getAllResourceNames().toJSArray();
     const allResources = {};
-    resourcesList.forEach(resourceName => {
+    resourceNames.forEach(resourceName => {
       const resource = resourcesManager.getResource(resourceName);
       const filename = ResourcesLoader.getResourceFullUrl(
         project,
@@ -39,7 +50,7 @@ export default class PixiResourcesLoader {
       allResources[resourceName] = resource;
     });
 
-    const totalCount = resourcesList.length;
+    const totalCount = resourceNames.length;
     if (!totalCount) {
       onComplete();
       return;
@@ -72,7 +83,8 @@ export default class PixiResourcesLoader {
   }
 
   /**
-   * Load the PIXI texture represented by the given resource.
+   * Return the PIXI texture represented by the given resource. 
+   * If not loaded, it will load it.
    * @returns The PIXI.Texture to be used. It can be loading, so you
    * should listen to PIXI.Texture `update` event, and refresh your object
    * if this event is triggered.

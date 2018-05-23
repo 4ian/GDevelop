@@ -176,8 +176,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         if (!resources.length) return;
 
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-        // TODO: A more fine-grained cache bursting for specific resources could be done.
-        resourcesLoader.burstUrlsCache();
+        resourcesLoader.burstUrlsCacheForResources(project, [resources[0].name]);
         this.props.onChange(resources[0].name);
       },
     });

@@ -4,8 +4,6 @@
  *
  * @class RenderedInstance
  * @constructor
- * @param associatedObject The (layout or global) object that the instance is associated to.
- * @param pixiContainer The PIXI.DisplayObjectContainer where the instance must be rendered
  */
 function RenderedInstance(
   project,
@@ -44,6 +42,10 @@ RenderedInstance.prototype.update = function() {
 
 RenderedInstance.prototype.getPixiObject = function() {
   return this._pixiObject;
+};
+
+RenderedInstance.prototype.getInstance = function() {
+  return this._instance;
 };
 
 /**

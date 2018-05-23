@@ -293,6 +293,17 @@ export default class InstancesEditorContainer extends Component {
       this.restartSceneRendering();
   }
 
+  /**
+   * Delete instance renderers of the specified objects, which will then be recreated during
+   * the next render. Call this when an object resources may have changed (for example, a modified image),
+   * and you want the instances of objects to reflect the changes.
+   * See also ResourcesLoader and PixiResourcesLoader.
+   * @param {string} objectName The name of the object for which instance must be re-rendered.
+   */
+  resetRenderersFor(objectName) {
+    if (this.instancesRenderer) this.instancesRenderer.resetRenderersFor(objectName);
+  }
+
   zoomBy(value) {
     this.setZoomFactor(this.getZoomFactor() + value);
   }

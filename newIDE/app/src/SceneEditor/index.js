@@ -38,6 +38,7 @@ import {
   getHistoryInitialState,
   saveToHistory,
 } from '../Utils/History';
+import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -506,6 +507,24 @@ export default class SceneEditor extends Component {
     if (this._propertiesEditor) this._propertiesEditor.forceUpdate();
   };
 
+  reloadResourcesFor = (object: gdObject) => {
+    const { project } = this.props;
+
+    const imagesUsedInventorizer = new gd.ImagesUsedInventorizer();
+    object.exposeResources(imagesUsedInventorizer);
+    const objectResourceNames = imagesUsedInventorizer
+      .getAllUsedImages()
+      .toNewVectorString()
+      .toJSArray();
+
+    PixiResourcesLoader.loadTextures(
+      project,
+      objectResourceNames,
+      () => {},
+      () => this.editor.resetRenderersFor(object.getName())
+    );
+  };
+
   render() {
     const {
       project,
@@ -606,8 +625,12 @@ export default class SceneEditor extends Component {
           resourceSources={resourceSources}
           resourceExternalEditors={resourceExternalEditors}
           onChooseResource={onChooseResource}
-          onCancel={() => this.editObject(null)}
+          onCancel={() => {
+            this.reloadResourcesFor(this.state.editedObject);
+            this.editObject(null);
+          }}
           onApply={() => {
+            this.reloadResourcesFor(this.state.editedObject);
             this.editObject(null);
             this.updateBehaviorsSharedData();
             this.forceUpdateObjectsList();

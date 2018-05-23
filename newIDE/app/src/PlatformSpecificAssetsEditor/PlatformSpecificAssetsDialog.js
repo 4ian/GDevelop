@@ -122,27 +122,26 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
           return;
         }
 
-        const createOrUpdateResource = name => {
-          if (!resourcesManager.hasResource(name)) {
+        // Add resources to the game
+        const allResourcesNames = [
+          ...androidSizes.map(size => `android-icon-${size}.png`),
+          ...iosSizes.map(size => `ios-icon-${size}.png`),
+        ];
+        allResourcesNames.forEach(resourceName => {
+          if (!resourcesManager.hasResource(resourceName)) {
             const imageResource = new gd.ImageResource();
-            imageResource.setFile(name);
-            imageResource.setName(name);
+            imageResource.setFile(resourceName);
+            imageResource.setName(resourceName);
 
             resourcesManager.addResource(imageResource);
             imageResource.delete();
           } else {
-            resourcesManager.getResource(name).setFile(name);
+            resourcesManager.getResource(resourceName).setFile(resourceName);
           }
-        };
+        });
 
-        androidSizes.forEach(size =>
-          createOrUpdateResource(`android-icon-${size}.png`)
-        );
-        iosSizes.forEach(size =>
-          createOrUpdateResource(`ios-icon-${size}.png`)
-        );
-
-        ResourcesLoader.burstUrlsCache();
+        // Make sure the resources are (re)loaded.
+        ResourcesLoader.burstUrlsCacheForResources(project, allResourcesNames);
         setTimeout(() => {
           this.setState({
             androidIconResourceNames: androidSizes.map(
@@ -187,7 +186,12 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         onClick={this._onApply}
       />,
     ];
-    const { project, resourceSources, onChooseResource, resourceExternalEditors } = this.props;
+    const {
+      project,
+      resourceSources,
+      onChooseResource,
+      resourceExternalEditors,
+    } = this.props;
     const { androidIconResourceNames, iosIconResourceNames } = this.state;
 
     return (

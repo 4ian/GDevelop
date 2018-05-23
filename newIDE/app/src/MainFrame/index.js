@@ -176,7 +176,8 @@ export default class MainFrame extends React.Component<Props, State> {
       // Make sure that the ResourcesLoader cache is emptied, so that
       // the URL to a resource with a name in the old project is not re-used
       // for another resource with the same name in the new project.
-      ResourcesLoader.burstUrlsCache();
+      ResourcesLoader.burstAllUrlsCache();
+      // TODO: Pixi cache should also be burst
 
       this.setState(
         {

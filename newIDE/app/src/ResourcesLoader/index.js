@@ -25,6 +25,11 @@ class UrlsCache {
     return (cache[url] = url);
   }
 
+  burstUrl(project: gdProject, url: string) {
+    const cache = this._getProjectCache(project);
+    delete cache[url];
+  }
+
   cacheLocalFileUrl(
     project: gdProject,
     filename: string,
@@ -56,10 +61,29 @@ export default class ResourcesLoader {
   }
 
   /**
+   * Remove the specified resources resolved URLs from the cache. Useful if the
+   * file represented by these resources has changed. This force these local files to be loaded again.
+   */
+  static burstUrlsCacheForResources(
+    project: gdProject,
+    resourcesNames: Array<string>
+  ) {
+    const resourcesManager = project.getResourcesManager();
+    resourcesNames.forEach(resourceName => {
+      if (resourcesManager.hasResource(resourceName)) {
+        ResourcesLoader._cache.burstUrl(
+          project,
+          resourcesManager.getResource(resourceName).getFile()
+        );
+      }
+    });
+  }
+
+  /**
    * Re-create a new cache for URLs. Call this to force local
    * file to be loaded again.
    */
-  static burstUrlsCache() {
+  static burstAllUrlsCache() {
     ResourcesLoader._cache = new UrlsCache();
   }
 

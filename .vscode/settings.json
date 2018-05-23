@@ -71,7 +71,10 @@
         "atomic": "cpp",
         "locale": "cpp",
         "string_view": "cpp",
-        "__string": "cpp"
+        "__string": "cpp",
+        "cstring": "cpp",
+        "iomanip": "cpp",
+        "cstdint": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

@@ -127,6 +127,20 @@ export default class InstancesRenderer {
   }
 
   /**
+   * Delete instance renderers of the specified objects, which will then be recreated during
+   * the next render.
+   * @param {string} objectName The name of the object for which instance must be re-rendered.
+   */
+  resetRenderersFor(objectName) {
+    for (let i in this.layersRenderers) {
+      if (this.layersRenderers.hasOwnProperty(i)) {
+        const layerRenderer = this.layersRenderers[i];
+        layerRenderer.resetRenderersFor(objectName);
+      }
+    }
+  }
+
+  /**
    * Clean up rendered layers that are not existing anymore
    */
   _cleanRenderers() {

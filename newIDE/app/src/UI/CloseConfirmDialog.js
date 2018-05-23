@@ -40,8 +40,9 @@ export default class CloseConfirmDialog extends React.Component<Props, *> {
             }
           });
 
-          // First, prevents closing the window immediately
-          e.returnValue = true;
+          // Prevents closing the window immediately. See https://github.com/electron/electron/blob/master/docs/api/browser-window.md#event-close
+          e.returnValue = true; //"It is recommended to always set the event.returnValue explicitly, instead of only returning a value, as the former works more consistently within Electron.""
+          return false; //"In Electron, returning any value other than undefined would cancel the close"
         } else {
           // Returning undefined will let the window close
         }

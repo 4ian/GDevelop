@@ -42,7 +42,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
   _loadFrom(layout: gdLayout): State {
     return {
       windowTitle: layout.getWindowDefaultTitle(),
-      shouldStopSoundsOnStartup: layout.stopSoundsOnStartup(),
+      shouldStopSoundsOnStartup: layout.stopSoundsOnStartup,
       backgroundColor: {
         r: layout.getBackgroundColorRed(),
         g: layout.getBackgroundColorGreen(),

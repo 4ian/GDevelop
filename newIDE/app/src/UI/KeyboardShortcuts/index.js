@@ -1,4 +1,4 @@
-import {isMacLike} from '../../Utils/Platform';
+import { isMacLike } from '../../Utils/Platform';
 
 const CTRL_KEY = 17;
 const SHIFT_KEY = 16;
@@ -72,12 +72,12 @@ export default class KeyboardShortcuts {
 
   shouldZoom() {
     if (isMacLike()) {
-      return this._isControlPressed()
+      return this._isControlPressed();
     } else {
       if (!this._isControlPressed() && !this.altPressed && !this.shiftPressed) {
-        return true
+        return true;
       } else {
-        return false
+        return false;
       }
     }
   }

@@ -336,3 +336,11 @@ gdjs.RuntimeGamePixiRenderer.prototype.startGameLoop = function(fn) {
 gdjs.RuntimeGamePixiRenderer.prototype.getPIXIRenderer = function() {
     return this._pixiRenderer;
 }
+
+gdjs.RuntimeGamePixiRenderer.getScreenWidth = function() {
+    return (typeof window !== "undefined") ? window.innerWidth : 800;
+}
+
+gdjs.RuntimeGamePixiRenderer.getScreenHeight = function() {
+    return (typeof window !== "undefined") ? window.innerHeight : 800;
+}

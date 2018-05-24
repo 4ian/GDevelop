@@ -23,6 +23,7 @@ type State = {|
   author: string,
   packageName: string,
   orientation: string,
+  sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
 |};
 
@@ -45,6 +46,7 @@ export default class ProjectPropertiesDialog extends React.Component<
       author: project.getAuthor(),
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
+      sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
     };
   }
@@ -67,6 +69,7 @@ export default class ProjectPropertiesDialog extends React.Component<
       author,
       packageName,
       orientation,
+      sizeOnStartupMode,
       showGDevelopSplash,
     } = this.state;
     project.setDefaultWidth(windowDefaultWidth);
@@ -75,6 +78,7 @@ export default class ProjectPropertiesDialog extends React.Component<
     project.setAuthor(author);
     project.setPackageName(packageName);
     project.setOrientation(orientation);
+    project.setSizeOnStartupMode(sizeOnStartupMode);
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
 
     this.props.onApply();
@@ -101,6 +105,7 @@ export default class ProjectPropertiesDialog extends React.Component<
       author,
       packageName,
       orientation,
+      sizeOnStartupMode,
       showGDevelopSplash,
     } = this.state;
 
@@ -164,6 +169,23 @@ export default class ProjectPropertiesDialog extends React.Component<
             <MenuItem value="default" primaryText="Platform default" />
             <MenuItem value="landscape" primaryText="Landscape" />
             <MenuItem value="portrait" primaryText="Portrait" />
+          </SelectField>
+          <SelectField
+            fullWidth
+            floatingLabelText="Fullscreen/game size mode"
+            value={sizeOnStartupMode}
+            onChange={(e, i, value) =>
+              this.setState({ sizeOnStartupMode: value })}
+          >
+            <MenuItem value="" primaryText="No changes to the game size" />
+            <MenuItem
+              value="adaptWidth"
+              primaryText="Change width to fit the screen"
+            />
+            <MenuItem
+              value="adaptHeight"
+              primaryText="Change height to fit the screen"
+            />
           </SelectField>
           <Checkbox
             label="Display GDevelop splash at startup (in exported game)"

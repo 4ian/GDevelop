@@ -71,7 +71,15 @@ export default class KeyboardShortcuts {
   }
 
   shouldZoom() {
-    return this._isControlPressed();
+    if (isMacLike()) {
+      return this._isControlPressed();
+    } else {
+      if (!this._isControlPressed() && !this.altPressed && !this.shiftPressed) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   shouldMoveView() {
@@ -172,18 +180,6 @@ export default class KeyboardShortcuts {
     }
   };
 
-  _onMouseScroll = evt => {
-    if (!this.isFocused) return;
-
-    if (!isMacLike()) {
-      if (evt.deltaY > 0) {
-        this.onZoomOut();
-      } else {
-        this.onZoomIn();
-      }
-    }
-  };
-
   _onKeyPress = evt => {};
 
   _noop = () => {};
@@ -204,7 +200,6 @@ export default class KeyboardShortcuts {
     document.addEventListener('keypress', this._onKeyPress, true);
     document.addEventListener('mousedown', this._onMouseDown, true);
     document.addEventListener('mouseup', this._onMouseUp, true);
-    document.addEventListener('wheel', this._onMouseScroll, true);
   }
 
   unmount() {
@@ -215,6 +210,5 @@ export default class KeyboardShortcuts {
     document.removeEventListener('keypress', this._onKeyPress, true);
     document.removeEventListener('mousedown', this._onMouseDown, true);
     document.removeEventListener('mouseup', this._onMouseUp, true);
-    document.removeEventListener('wheel', this._onMouseScroll, true);
   }
 }

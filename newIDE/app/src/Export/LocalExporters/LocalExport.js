@@ -63,14 +63,15 @@ export default class LocalExport extends Component {
 
     LocalExport.prepareExporter()
       .then(({ exporter }) => {
-        const exportForCordova = false;
+        const exportOptions = new gd.MapStringBoolean();
         exporter.exportWholePixiProject(
           project,
           outputDir,
-          false,
-          exportForCordova
+          exportOptions
         );
+        exportOptions.delete();
         exporter.delete();
+        
         this.setState({
           exportFinishedDialogOpen: true,
         });
@@ -81,7 +82,7 @@ export default class LocalExport extends Component {
   };
 
   openExportFolder = () => {
-    shell.openItem(this.state.outputDir);
+    if (shell) shell.openItem(this.state.outputDir);
   };
 
   openItchioHelp = () => {

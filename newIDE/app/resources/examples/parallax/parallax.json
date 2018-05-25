@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 96,
+    "build": 97,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -10,8 +10,10 @@
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
+    "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florian/Desktop/parallax/parallax.json",
+    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/parallax/parallax.json",
+    "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "winExecutableFilename": "",
     "winExecutableIconFile": "",
@@ -23,6 +25,10 @@
     "maxFPS": 60,
     "minFPS": 10,
     "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
     "extensions": [
       {
         "name": "BuiltinObject"

@@ -105,13 +105,14 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
 
     return LocalOnlineCordovaExport.prepareExporter()
       .then(({ exporter, outputDir }) => {
-        const exportForCordova = true;
+        const exportOptions = new gd.MapStringBoolean();
+        exportOptions.set('exportForCordova', true);
         exporter.exportWholePixiProject(
           project,
           outputDir,
-          false,
-          exportForCordova
+          exportOptions
         );
+        exportOptions.delete();
         exporter.delete();
 
         return outputDir;

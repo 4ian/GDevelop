@@ -259,7 +259,7 @@ gdjs.RuntimeGame.prototype.pause = function(enable) {
  * Load all assets, displaying progress in renderer.
  * @method loadAllAssets
  */
-gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
+gdjs.RuntimeGame.prototype.loadAllAssets = function(callback, progressCallback) {
   var loadingScreen = new gdjs.LoadingScreenRenderer(
     this.getRenderer(),
     this._data.properties.loadingScreen
@@ -269,7 +269,9 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback) {
   var that = this;
   this._imageManager.loadTextures(
     function(count, total) {
-      loadingScreen.render(Math.floor(count / allAssetsTotal * 100));
+      var percent = Math.floor(count / allAssetsTotal * 100);
+      loadingScreen.render(percent);
+      if (progressCallback) progressCallback(percent);
     },
     function() {
       that._soundManager.preloadAudio(
@@ -293,8 +295,12 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
     return;
   }
 
+  if (this._data.properties.sizeOnStartupMode) {
+    this.adaptRendererSizeToFillScreen(this._data.properties.sizeOnStartupMode);
+  }
+
   //Load the first scene
-  var firstSceneName = gdjs.projectData.firstLayout;
+  var firstSceneName = this._data.properties.firstLayout;
   this._sceneStack.push(
     this.hasScene(firstSceneName) ? firstSceneName : this.getSceneData().name,
     this._injectExternalLayout
@@ -332,3 +338,32 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
     return false;
   });
 };
+
+/**
+ * Enlarge/reduce the width (or the height) of the game to fill the screen.
+ * @method adaptRendererSizeToFillScreen
+ * @param mode {string} "adaptWidth" to change the width, "adaptHeight" to change the height
+ */
+gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
+  if (!gdjs.RuntimeGameRenderer || !gdjs.RuntimeGameRenderer.getScreenWidth || !gdjs.RuntimeGameRenderer.getScreenHeight)
+    return;
+
+  var screenWidth = gdjs.RuntimeGameRenderer.getScreenWidth();
+  var screenHeight = gdjs.RuntimeGameRenderer.getScreenHeight();
+
+  // Enlarge either the width or the eight to fill the screen
+  var renderer = this.getRenderer();
+  var width = renderer.getCurrentWidth();
+  var height = renderer.getCurrentHeight();
+  if (mode === "adaptWidth") {
+    width = height * screenWidth / screenHeight;
+  } else if (mode === "adaptHeight") {
+    height = width * screenHeight / screenWidth;
+  }
+
+  // Update the renderer size, and also the default size of the game so that
+  // camera of scenes uses this size (otherwise, the rendering would be stretched)
+  renderer.setSize(width, height);
+  this.setDefaultWidth(width);
+  this.setDefaultHeight(height);
+}

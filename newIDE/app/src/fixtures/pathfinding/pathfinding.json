@@ -1,16 +1,23 @@
 {
   "firstLayout": "",
-  "gdVersion": { "build": 96, "major": 4, "minor": 0, "revision": 0 },
+  "gdVersion": {
+    "build": 97,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
   "properties": {
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
+    "orientation": "landscape",
     "packageName": "",
-    "projectFile": "/Users/florian/Desktop/GD5 examples/Pathfinding.json",
+    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/pathfinding/pathfinding.json",
+    "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "winExecutableFilename": "",
     "winExecutableIconFile": "",
-    "name": "Pathfinding Example",
+    "name": "Pathfinding example",
     "author": "",
     "windowWidth": 800,
     "windowHeight": 600,
@@ -18,33 +25,82 @@
     "maxFPS": 60,
     "minFPS": 10,
     "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
     "extensions": [
-      { "name": "BuiltinObject" },
-      { "name": "BuiltinAudio" },
-      { "name": "BuiltinVariables" },
-      { "name": "BuiltinTime" },
-      { "name": "BuiltinMouse" },
-      { "name": "BuiltinKeyboard" },
-      { "name": "BuiltinJoystick" },
-      { "name": "BuiltinCamera" },
-      { "name": "BuiltinWindow" },
-      { "name": "BuiltinFile" },
-      { "name": "BuiltinNetwork" },
-      { "name": "BuiltinScene" },
-      { "name": "BuiltinAdvanced" },
-      { "name": "Sprite" },
-      { "name": "BuiltinCommonInstructions" },
-      { "name": "BuiltinCommonConversions" },
-      { "name": "BuiltinStringInstructions" },
-      { "name": "BuiltinMathematicalTools" },
-      { "name": "BuiltinExternalLayouts" },
-      { "name": "ParticleSystem" },
-      { "name": "PathfindingBehavior" },
-      { "name": "TiledSpriteObject" }
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      },
+      {
+        "name": "ParticleSystem"
+      },
+      {
+        "name": "PathfindingBehavior"
+      },
+      {
+        "name": "TiledSpriteObject"
+      }
     ],
     "platforms": [
-      { "name": "GDevelop C++ platform" },
-      { "name": "GDevelop JS platform" }
+      {
+        "name": "GDevelop JS platform"
+      }
     ],
     "currentPlatform": "GDevelop JS platform"
   },
@@ -440,7 +496,12 @@
           "x": 710,
           "y": 366,
           "zOrder": 1,
-          "numberProperties": [{ "name": "animation", "value": 2.67491e6 }],
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 2674910
+            }
+          ],
           "stringProperties": [],
           "initialVariables": []
         },
@@ -455,7 +516,12 @@
           "x": 639,
           "y": 61,
           "zOrder": 10,
-          "numberProperties": [{ "name": "animation", "value": 2.67978e6 }],
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 2679780
+            }
+          ],
           "stringProperties": [],
           "initialVariables": []
         },
@@ -586,8 +652,8 @@
           "layer": "",
           "locked": true,
           "name": "Background",
-          "width": 1277.54,
-          "x": -213.115,
+          "width": 2677.54,
+          "x": -900,
           "y": -107.876,
           "zOrder": -10,
           "numberProperties": [],
@@ -705,7 +771,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "Pointer-Standard.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -714,22 +784,62 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
                   ]
                 },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] }
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
               ]
             }
           ]
@@ -760,7 +870,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "3DWall.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -769,22 +883,62 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
                   ]
                 },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] }
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
               ]
             }
           ]
@@ -808,7 +962,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "Flag-Pole.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 25, "y": 13 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 25,
+                        "y": 13
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -817,22 +975,62 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
                   ]
                 },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] }
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
               ]
             }
           ]
@@ -863,7 +1061,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "DestroyedTank.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -872,10 +1074,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -889,7 +1103,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "DestroyedTank.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -898,10 +1116,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -915,7 +1145,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "DestroyedTank.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -924,10 +1158,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -941,7 +1187,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "DestroyedTank.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -950,10 +1200,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -967,7 +1229,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "DestroyedTank.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -976,10 +1242,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -993,7 +1271,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "DestroyedTank.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1002,10 +1284,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1019,7 +1313,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "DestroyedTank.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1028,10 +1326,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1045,7 +1355,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "DestroyedTank.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1054,10 +1368,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1066,118 +1392,6 @@
               ]
             }
           ]
-        },
-        {
-          "additive": false,
-          "alphaParam": "Mutable",
-          "angleParam": "Random",
-          "blueParam": "Enabled",
-          "destroyWhenNoParticles": false,
-          "emissionEditionSimpleMode": true,
-          "emitterAngleA": 0,
-          "emitterAngleB": 180,
-          "emitterForceMax": 0,
-          "emitterForceMin": 0,
-          "emitterXDirection": 0,
-          "emitterYDirection": 1,
-          "emitterZDirection": 0,
-          "flow": 200,
-          "friction": 2,
-          "gravityEditionSimpleMode": true,
-          "greenParam": "Enabled",
-          "maxParticleNb": 5000,
-          "name": "Smoke",
-          "particleAlpha1": 160,
-          "particleAlpha2": 0,
-          "particleAlphaRandomness1": 0,
-          "particleAlphaRandomness2": 0,
-          "particleAngle1": 0,
-          "particleAngle2": 360,
-          "particleAngleRandomness1": 0,
-          "particleAngleRandomness2": 0,
-          "particleBlue1": 50,
-          "particleBlue2": 0,
-          "particleEditionSimpleMode": true,
-          "particleGravityX": 0,
-          "particleGravityY": -33,
-          "particleGravityZ": 0,
-          "particleGreen1": 50,
-          "particleGreen2": 0.8,
-          "particleLifeTimeMax": 2.5,
-          "particleLifeTimeMin": 0.5,
-          "particleRed1": 50,
-          "particleRed2": 1,
-          "particleSize1": 20,
-          "particleSize2": 100,
-          "particleSizeRandomness1": 0,
-          "particleSizeRandomness2": 0,
-          "redParam": "Enabled",
-          "rendererParam1": 15,
-          "rendererParam2": 15,
-          "rendererType": "Quad",
-          "sizeParam": "Mutable",
-          "tank": -1,
-          "textureParticleName": "Fire",
-          "type": "ParticleSystem::ParticleEmitter",
-          "zoneRadius": 3,
-          "variables": [],
-          "behaviors": []
-        },
-        {
-          "additive": true,
-          "alphaParam": "Mutable",
-          "angleParam": "Mutable",
-          "blueParam": "Random",
-          "destroyWhenNoParticles": false,
-          "emissionEditionSimpleMode": true,
-          "emitterAngleA": 0,
-          "emitterAngleB": 180,
-          "emitterForceMax": 5,
-          "emitterForceMin": 0,
-          "emitterXDirection": 0,
-          "emitterYDirection": 1,
-          "emitterZDirection": 0,
-          "flow": 300,
-          "friction": 2,
-          "gravityEditionSimpleMode": true,
-          "greenParam": "Random",
-          "maxParticleNb": 5000,
-          "name": "Fire",
-          "particleAlpha1": 204,
-          "particleAlpha2": 0,
-          "particleAlphaRandomness1": 0,
-          "particleAlphaRandomness2": 0,
-          "particleAngle1": 0,
-          "particleAngle2": 0,
-          "particleAngleRandomness1": 0,
-          "particleAngleRandomness2": 30,
-          "particleBlue1": 50,
-          "particleBlue2": 0,
-          "particleEditionSimpleMode": true,
-          "particleGravityX": 0,
-          "particleGravityY": -50,
-          "particleGravityZ": 0,
-          "particleGreen1": 50,
-          "particleGreen2": 204,
-          "particleLifeTimeMax": 1.5,
-          "particleLifeTimeMin": 0.25,
-          "particleRed1": 240,
-          "particleRed2": 1,
-          "particleSize1": 100,
-          "particleSize2": 0,
-          "particleSizeRandomness1": 0,
-          "particleSizeRandomness2": 0,
-          "redParam": "Enabled",
-          "rendererParam1": 5,
-          "rendererParam2": 10,
-          "rendererType": "Quad",
-          "sizeParam": "Mutable",
-          "tank": -1,
-          "textureParticleName": "Fire",
-          "type": "ParticleSystem::ParticleEmitter",
-          "zoneRadius": 2,
-          "variables": [],
-          "behaviors": []
         },
         {
           "name": "NodeMarker",
@@ -1198,7 +1412,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "NodeMarker.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1207,10 +1425,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1262,7 +1492,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame2-0004.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1271,10 +1505,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     },
@@ -1282,7 +1528,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame10004.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1291,10 +1541,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1308,7 +1570,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame2-0003.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1317,10 +1583,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     },
@@ -1328,7 +1606,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame10003.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1337,10 +1619,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1354,7 +1648,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame2-0002.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1363,10 +1661,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     },
@@ -1374,7 +1684,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame10002.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1383,10 +1697,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1400,7 +1726,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame2-0001.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1409,10 +1739,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     },
@@ -1420,7 +1762,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame10001.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1429,10 +1775,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1446,7 +1804,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame2-0008.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1455,10 +1817,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     },
@@ -1466,7 +1840,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame10008.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1475,10 +1853,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1492,7 +1882,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame2-0007.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1501,10 +1895,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     },
@@ -1512,7 +1918,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame10007.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1521,10 +1931,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1538,7 +1960,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame2-0006.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1547,10 +1973,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     },
@@ -1558,7 +1996,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame10006.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1567,10 +2009,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1584,7 +2038,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame2-0005.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1593,10 +2051,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     },
@@ -1604,7 +2074,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "tank_frame10005.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 41, "y": 32 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1613,10 +2087,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1636,7 +2122,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "Pea-Happy.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 18, "y": 18 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 18,
+                        "y": 18
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1645,22 +2135,62 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
                   ]
                 },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] },
-                { "looping": false, "timeBetweenFrames": 1, "sprites": [] }
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
               ]
             }
           ]
@@ -1691,7 +2221,11 @@
                       "hasCustomCollisionMask": false,
                       "image": "symbol.png",
                       "points": [],
-                      "originPoint": { "name": "origine", "x": 0, "y": 0 },
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
@@ -1700,10 +2234,22 @@
                       },
                       "customCollisionMask": [
                         [
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 },
-                          { "x": 0, "y": 0 }
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
                         ]
                       ]
                     }
@@ -1736,8 +2282,14 @@
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
-              "type": { "inverted": false, "value": "SourisBouton" },
-              "parameters": ["", "Left"],
+              "type": {
+                "inverted": false,
+                "value": "SourisBouton"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
               "subInstructions": []
             },
             {
@@ -1751,7 +2303,10 @@
           ],
           "actions": [
             {
-              "type": { "inverted": false, "value": "MettreXY" },
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
               "parameters": [
                 "Flag",
                 "=",
@@ -1784,13 +2339,26 @@
               "conditions": [],
               "actions": [
                 {
-                  "type": { "inverted": false, "value": "ModVarScene" },
-                  "parameters": ["i", "=", "0"],
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "i",
+                    "=",
+                    "0"
+                  ],
                   "subInstructions": []
                 },
                 {
-                  "type": { "inverted": false, "value": "Delete" },
-                  "parameters": ["NodeMarker", ""],
+                  "type": {
+                    "inverted": false,
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "NodeMarker",
+                    ""
+                  ],
                   "subInstructions": []
                 }
               ],
@@ -1803,15 +2371,25 @@
               "type": "BuiltinCommonInstructions::While",
               "whileConditions": [
                 {
-                  "type": { "inverted": false, "value": "VarScene" },
-                  "parameters": ["i", "<", "Tank.Pathfinding::NodeCount()"],
+                  "type": {
+                    "inverted": false,
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "i",
+                    "<",
+                    "Tank.Pathfinding::NodeCount()"
+                  ],
                   "subInstructions": []
                 }
               ],
               "conditions": [],
               "actions": [
                 {
-                  "type": { "inverted": false, "value": "Create" },
+                  "type": {
+                    "inverted": false,
+                    "value": "Create"
+                  },
                   "parameters": [
                     "",
                     "NodeMarker",
@@ -1822,8 +2400,15 @@
                   "subInstructions": []
                 },
                 {
-                  "type": { "inverted": false, "value": "ModVarScene" },
-                  "parameters": ["i", "+", "1"],
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "i",
+                    "+",
+                    "1"
+                  ],
                   "subInstructions": []
                 }
               ],
@@ -1843,10 +2428,8 @@
             "textG": 0,
             "textR": 0
           },
-          "comment":
-            "Moving is achivied using the automatism and by calling the action to move an object to a position",
-          "comment2":
-            "Le déplacement est créé en utilisant l'automatisme de recherche de chemin et en appelant l'action de déplacement."
+          "comment": "Moving is achivied using the automatism and by calling the action to move an object to a position",
+          "comment2": "Le déplacement est créé en utilisant l'automatisme de recherche de chemin et en appelant l'action de déplacement."
         },
         {
           "disabled": false,
@@ -1855,7 +2438,10 @@
           "conditions": [],
           "actions": [
             {
-              "type": { "inverted": false, "value": "MettreXY" },
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
               "parameters": [
                 "Cursor",
                 "=",
@@ -1894,7 +2480,12 @@
                 "inverted": false,
                 "value": "PathfindingBehavior::MaxSpeed"
               },
-              "parameters": ["Tank", "Pathfinding", "=", "400"],
+              "parameters": [
+                "Tank",
+                "Pathfinding",
+                "=",
+                "400"
+              ],
               "subInstructions": []
             }
           ],
@@ -1906,8 +2497,15 @@
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [
             {
-              "type": { "inverted": false, "value": "CollisionNP" },
-              "parameters": ["Tank", "Symbol", ""],
+              "type": {
+                "inverted": false,
+                "value": "CollisionNP"
+              },
+              "parameters": [
+                "Tank",
+                "Symbol",
+                ""
+              ],
               "subInstructions": []
             }
           ],
@@ -1917,7 +2515,12 @@
                 "inverted": false,
                 "value": "PathfindingBehavior::MaxSpeed"
               },
-              "parameters": ["Tank", "Pathfinding", "=", "200"],
+              "parameters": [
+                "Tank",
+                "Pathfinding",
+                "=",
+                "200"
+              ],
               "subInstructions": []
             }
           ],

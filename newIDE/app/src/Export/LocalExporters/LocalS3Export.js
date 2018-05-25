@@ -14,6 +14,7 @@ const os = optionalRequire('os');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const shell = electron ? electron.shell : null;
+const gd = global.gd;
 
 export default class LocalS3Export extends Component {
   constructor(props) {
@@ -86,13 +87,13 @@ export default class LocalS3Export extends Component {
     const outputDir = os.tmpdir() + '/GDS3Export-' + makeTimestampedId();
     LocalExport.prepareExporter()
       .then(({ exporter }) => {
-        const exportForCordova = false;
+        const exportOptions = new gd.MapStringBoolean();
         exporter.exportWholePixiProject(
           project,
           outputDir,
-          false,
-          exportForCordova
+          exportOptions
         );
+        exportOptions.delete();
         exporter.delete();
 
         this.setState({

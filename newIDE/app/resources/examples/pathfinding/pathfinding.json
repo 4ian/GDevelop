@@ -1,1 +1,2564 @@
-{"firstLayout": "","gdVersion": {"build": 96,"major": 4,"minor": 0,"revision": 0},"properties": {"folderProject": false,"linuxExecutableFilename": "","macExecutableFilename": "","packageName": "","projectFile": "/Users/florian/Desktop/GD5 examples/Pathfinding.json","useExternalSourceFiles": false,"winExecutableFilename": "","winExecutableIconFile": "","name": "Project","author": "","windowWidth": 800,"windowHeight": 600,"latestCompilationDirectory": "","maxFPS": 60,"minFPS": 10,"verticalSync": false,"extensions": [{"name": "BuiltinObject"},{"name": "BuiltinAudio"},{"name": "BuiltinVariables"},{"name": "BuiltinTime"},{"name": "BuiltinMouse"},{"name": "BuiltinKeyboard"},{"name": "BuiltinJoystick"},{"name": "BuiltinCamera"},{"name": "BuiltinWindow"},{"name": "BuiltinFile"},{"name": "BuiltinNetwork"},{"name": "BuiltinScene"},{"name": "BuiltinAdvanced"},{"name": "Sprite"},{"name": "BuiltinCommonInstructions"},{"name": "BuiltinCommonConversions"},{"name": "BuiltinStringInstructions"},{"name": "BuiltinMathematicalTools"},{"name": "BuiltinExternalLayouts"},{"name": "ParticleSystem"},{"name": "PathfindingBehavior"},{"name": "TiledSpriteObject"}],"platforms": [{"name": "GDevelop C++ platform"},{"name": "GDevelop JS platform"}],"currentPlatform": "GDevelop JS platform"},"resources": {"resources": [{"alwaysLoaded": false,"file": "Pointer-Standard.png","kind": "image","name": "Pointer-Standard.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "3DWall.png","kind": "image","name": "3DWall.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "Pea-Happy.png","kind": "image","name": "Pea-Happy.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "Target.png","kind": "image","name": "Flag-Pole.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "Pea-Standard.png","kind": "image","name": "Pea-Standard.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame2-0001.png","kind": "image","name": "tank_frame2-0001.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame2-0002.png","kind": "image","name": "tank_frame2-0002.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame2-0003.png","kind": "image","name": "tank_frame2-0003.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame2-0004.png","kind": "image","name": "tank_frame2-0004.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame2-0005.png","kind": "image","name": "tank_frame2-0005.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame2-0006.png","kind": "image","name": "tank_frame2-0006.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame2-0007.png","kind": "image","name": "tank_frame2-0007.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame2-0008.png","kind": "image","name": "tank_frame2-0008.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame10001.png","kind": "image","name": "tank_frame10001.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame10002.png","kind": "image","name": "tank_frame10002.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame10003.png","kind": "image","name": "tank_frame10003.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame10004.png","kind": "image","name": "tank_frame10004.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame10005.png","kind": "image","name": "tank_frame10005.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame10006.png","kind": "image","name": "tank_frame10006.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame10007.png","kind": "image","name": "tank_frame10007.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "tank_frame10008.png","kind": "image","name": "tank_frame10008.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "DestroyedTank.png","kind": "image","name": "DestroyedTank.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "ExplosionTexture.png","kind": "image","name": "Fire","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "GrassDead.png","kind": "image","name": "GrassDead.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "NodeMarker.png","kind": "image","name": "NodeMarker.png","smoothed": true,"userAdded": true},{"alwaysLoaded": false,"file": "symbol.png","kind": "image","name": "symbol.png","smoothed": true,"userAdded": true}],"resourceFolders": []},"objects": [],"objectsGroups": [],"variables": [],"layouts": [{"b": 0,"disableInputWhenNotFocused": true,"mangledName": "New_32scene","name": "New scene","oglFOV": 90,"oglZFar": 500,"oglZNear": 1,"r": 0,"standardSortMethod": true,"stopSoundsOnStartup": true,"title": "","v": 193,"uiSettings": {"grid": false,"gridB": 255,"gridG": 180,"gridHeight": 20,"gridOffsetX": 0,"gridOffsetY": 0,"gridR": 158,"gridWidth": 45,"snap": true,"windowMask": true,"zoomFactor": 1},"objectsGroups": [],"variables": [],"instances": [{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Block","width": 0,"x": 225,"y": 480,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": true,"height": 44,"layer": "","locked": false,"name": "Block","width": 85,"x": 294,"y": 120,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Block","width": 0,"x": 229,"y": 120,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Block","width": 0,"x": 315,"y": 480,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Block","width": 0,"x": 576,"y": 153,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Block","width": 0,"x": 360,"y": 121,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Block","width": 0,"x": 606,"y": 292,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Block","width": 0,"x": 639,"y": 427,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Block","width": 0,"x": 270,"y": 480,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Flag","width": 0,"x": 710,"y": 366,"zOrder": 1,"numberProperties": [{"name": "animation","value": 2.67491e+06}],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Cursor","width": 0,"x": 639,"y": 61,"zOrder": 10,"numberProperties": [{"name": "animation","value": 2.67978e+06}],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "DestroyedTank","width": 0,"x": 306,"y": 28,"zOrder": 1,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Fire","width": 0,"x": 342,"y": 54,"zOrder": 4,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Smoke","width": 0,"x": 353,"y": 40,"zOrder": 3,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "DestroyedTank","width": 0,"x": 575,"y": 213,"zOrder": 1,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Fire","width": 0,"x": 622,"y": 238,"zOrder": 4,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Smoke","width": 0,"x": 618,"y": 236,"zOrder": 3,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "DestroyedTank","width": 0,"x": 90,"y": 460,"zOrder": 1,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Smoke","width": 0,"x": 135,"y": 480,"zOrder": 4,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": true,"height": 777.002,"layer": "","locked": true,"name": "Background","width": 1277.54,"x": -213.115,"y": -107.876,"zOrder": -10,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Tank","width": 0,"x": 70.5,"y": 162.5,"zOrder": 2,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": true,"height": 95,"layer": "","locked": false,"name": "Symbol","width": 128,"x": 272,"y": 169,"zOrder": -2,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Block","width": 0,"x": 405,"y": 360,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": true,"height": 44,"layer": "","locked": false,"name": "Block","width": 85,"x": 228,"y": 268,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": true,"height": 44,"layer": "","locked": false,"name": "Block","width": 85,"x": 279,"y": 269,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []},{"angle": 0,"customSize": false,"height": 0,"layer": "","locked": false,"name": "Block","width": 0,"x": 43,"y": 309,"zOrder": 0,"numberProperties": [],"stringProperties": [],"initialVariables": []}],"objects": [{"name": "Cursor","type": "Sprite","updateIfNotVisible": true,"variables": [],"behaviors": [],"animations": [{"name": "","useMultipleDirections": true,"directions": [{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "Pointer-Standard.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []}]}]},{"name": "Block","type": "Sprite","updateIfNotVisible": true,"variables": [],"behaviors": [{"cost": 6,"impassable": true,"name": "PathfindingObstacle","type": "PathfindingBehavior::PathfindingObstacleBehavior"}],"animations": [{"name": "","useMultipleDirections": true,"directions": [{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "3DWall.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []}]}]},{"name": "Flag","type": "Sprite","updateIfNotVisible": true,"variables": [],"behaviors": [],"animations": [{"name": "","useMultipleDirections": true,"directions": [{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "Flag-Pole.png","points": [],"originPoint": {"name": "origine","x": 25,"y": 13},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []}]}]},{"name": "DestroyedTank","type": "Sprite","updateIfNotVisible": true,"variables": [],"behaviors": [{"cost": 2,"impassable": true,"name": "PathfindingObstacle","type": "PathfindingBehavior::PathfindingObstacleBehavior"}],"animations": [{"name": "","useMultipleDirections": false,"directions": [{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "DestroyedTank.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "DestroyedTank.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "DestroyedTank.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "DestroyedTank.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "DestroyedTank.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "DestroyedTank.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "DestroyedTank.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "DestroyedTank.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]}]}]},{"additive": false,"alphaParam": "Mutable","angleParam": "Random","blueParam": "Enabled","destroyWhenNoParticles": false,"emissionEditionSimpleMode": true,"emitterAngleA": 0,"emitterAngleB": 180,"emitterForceMax": 0,"emitterForceMin": 0,"emitterXDirection": 0,"emitterYDirection": 1,"emitterZDirection": 0,"flow": 200,"friction": 2,"gravityEditionSimpleMode": true,"greenParam": "Enabled","maxParticleNb": 5000,"name": "Smoke","particleAlpha1": 160,"particleAlpha2": 0,"particleAlphaRandomness1": 0,"particleAlphaRandomness2": 0,"particleAngle1": 0,"particleAngle2": 360,"particleAngleRandomness1": 0,"particleAngleRandomness2": 0,"particleBlue1": 50,"particleBlue2": 0,"particleEditionSimpleMode": true,"particleGravityX": 0,"particleGravityY": -33,"particleGravityZ": 0,"particleGreen1": 50,"particleGreen2": 0.8,"particleLifeTimeMax": 2.5,"particleLifeTimeMin": 0.5,"particleRed1": 50,"particleRed2": 1,"particleSize1": 20,"particleSize2": 100,"particleSizeRandomness1": 0,"particleSizeRandomness2": 0,"redParam": "Enabled","rendererParam1": 15,"rendererParam2": 15,"rendererType": "Quad","sizeParam": "Mutable","tank": -1,"textureParticleName": "Fire","type": "ParticleSystem::ParticleEmitter","zoneRadius": 3,"variables": [],"behaviors": []},{"additive": true,"alphaParam": "Mutable","angleParam": "Mutable","blueParam": "Random","destroyWhenNoParticles": false,"emissionEditionSimpleMode": true,"emitterAngleA": 0,"emitterAngleB": 180,"emitterForceMax": 5,"emitterForceMin": 0,"emitterXDirection": 0,"emitterYDirection": 1,"emitterZDirection": 0,"flow": 300,"friction": 2,"gravityEditionSimpleMode": true,"greenParam": "Random","maxParticleNb": 5000,"name": "Fire","particleAlpha1": 204,"particleAlpha2": 0,"particleAlphaRandomness1": 0,"particleAlphaRandomness2": 0,"particleAngle1": 0,"particleAngle2": 0,"particleAngleRandomness1": 0,"particleAngleRandomness2": 30,"particleBlue1": 50,"particleBlue2": 0,"particleEditionSimpleMode": true,"particleGravityX": 0,"particleGravityY": -50,"particleGravityZ": 0,"particleGreen1": 50,"particleGreen2": 204,"particleLifeTimeMax": 1.5,"particleLifeTimeMin": 0.25,"particleRed1": 240,"particleRed2": 1,"particleSize1": 100,"particleSize2": 0,"particleSizeRandomness1": 0,"particleSizeRandomness2": 0,"redParam": "Enabled","rendererParam1": 5,"rendererParam2": 10,"rendererType": "Quad","sizeParam": "Mutable","tank": -1,"textureParticleName": "Fire","type": "ParticleSystem::ParticleEmitter","zoneRadius": 2,"variables": [],"behaviors": []},{"name": "NodeMarker","type": "Sprite","updateIfNotVisible": true,"variables": [],"behaviors": [],"animations": [{"name": "","useMultipleDirections": false,"directions": [{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "NodeMarker.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]}]}]},{"height": 256,"name": "Background","texture": "GrassDead.png","type": "TiledSpriteObject::TiledSprite","width": 256,"variables": [],"behaviors": []},{"name": "Tank","type": "Sprite","updateIfNotVisible": true,"variables": [],"behaviors": [{"acceleration": 400,"allowDiagonals": true,"angleOffset": 0,"angularMaxSpeed": 180,"cellHeight": 20,"cellWidth": 20,"extraBorder": -20,"maxSpeed": 300,"name": "Pathfinding","rotateObject": true,"type": "PathfindingBehavior::PathfindingBehavior"}],"animations": [{"name": "","useMultipleDirections": true,"directions": [{"looping": true,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "tank_frame2-0004.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]},{"hasCustomCollisionMask": false,"image": "tank_frame10004.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": true,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "tank_frame2-0003.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]},{"hasCustomCollisionMask": false,"image": "tank_frame10003.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": true,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "tank_frame2-0002.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]},{"hasCustomCollisionMask": false,"image": "tank_frame10002.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": true,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "tank_frame2-0001.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]},{"hasCustomCollisionMask": false,"image": "tank_frame10001.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": true,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "tank_frame2-0008.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]},{"hasCustomCollisionMask": false,"image": "tank_frame10008.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": true,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "tank_frame2-0007.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]},{"hasCustomCollisionMask": false,"image": "tank_frame10007.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": true,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "tank_frame2-0006.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]},{"hasCustomCollisionMask": false,"image": "tank_frame10006.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": true,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "tank_frame2-0005.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]},{"hasCustomCollisionMask": false,"image": "tank_frame10005.png","points": [],"originPoint": {"name": "origine","x": 41,"y": 32},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]}]},{"name": "","useMultipleDirections": true,"directions": [{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "Pea-Happy.png","points": [],"originPoint": {"name": "origine","x": 18,"y": 18},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []},{"looping": false,"timeBetweenFrames": 1,"sprites": []}]}]},{"name": "Symbol","type": "Sprite","updateIfNotVisible": true,"variables": [],"behaviors": [{"cost": 2,"impassable": false,"name": "PathfindingObstacle","type": "PathfindingBehavior::PathfindingObstacleBehavior"}],"animations": [{"name": "","useMultipleDirections": false,"directions": [{"looping": false,"timeBetweenFrames": 1,"sprites": [{"hasCustomCollisionMask": false,"image": "symbol.png","points": [],"originPoint": {"name": "origine","x": 0,"y": 0},"centerPoint": {"automatic": true,"name": "centre","x": 0,"y": 0},"customCollisionMask": [[{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0},{"x": 0,"y": 0}]]}]}]}]}],"events": [{"disabled": false,"folded": false,"type": "BuiltinCommonInstructions::Comment","color": {"b": 109,"g": 230,"r": 255,"textB": 0,"textG": 0,"textR": 0},"comment": "Click to put the flag.","comment2": "Cliquez pour placer le drapeau."},{"disabled": false,"folded": false,"type": "BuiltinCommonInstructions::Standard","conditions": [{"type": {"inverted": false,"value": "SourisBouton"},"parameters": ["","Left"],"subInstructions": []},{"type": {"inverted": false,"value": "BuiltinCommonInstructions::Once"},"parameters": [],"subInstructions": []}],"actions": [{"type": {"inverted": false,"value": "MettreXY"},"parameters": ["Flag","=","MouseX(\"\",0)","=","MouseY(\"\",0)"],"subInstructions": []},{"type": {"inverted": false,"value": "PathfindingBehavior::SetDestination"},"parameters": ["Tank","Pathfinding","","MouseX(\"\",0)","MouseY(\"\",0)"],"subInstructions": []}],"events": [{"disabled": false,"folded": false,"type": "BuiltinCommonInstructions::Standard","conditions": [],"actions": [{"type": {"inverted": false,"value": "ModVarScene"},"parameters": ["i","=","0"],"subInstructions": []},{"type": {"inverted": false,"value": "Delete"},"parameters": ["NodeMarker",""],"subInstructions": []}],"events": []},{"disabled": false,"folded": false,"infiniteLoopWarning": true,"type": "BuiltinCommonInstructions::While","whileConditions": [{"type": {"inverted": false,"value": "VarScene"},"parameters": ["i","<","Tank.Pathfinding::NodeCount()"],"subInstructions": []}],"conditions": [],"actions": [{"type": {"inverted": false,"value": "Create"},"parameters": ["","NodeMarker","Tank.Pathfinding::GetNodeX(Variable(i))","Tank.Pathfinding::GetNodeY(Variable(i))",""],"subInstructions": []},{"type": {"inverted": false,"value": "ModVarScene"},"parameters": ["i","+","1"],"subInstructions": []}],"events": []}]},{"disabled": false,"folded": false,"type": "BuiltinCommonInstructions::Comment","color": {"b": 109,"g": 230,"r": 255,"textB": 0,"textG": 0,"textR": 0},"comment": "Moving is achivied using the automatism and by calling the action to move an object to a position","comment2": "Le déplacement est créé en utilisant l'automatisme de recherche de chemin et en appelant l'action de déplacement."},{"disabled": false,"folded": false,"type": "BuiltinCommonInstructions::Standard","conditions": [],"actions": [{"type": {"inverted": false,"value": "MettreXY"},"parameters": ["Cursor","=","MouseX(\"\",0)","=","MouseY(\"\",0)"],"subInstructions": []}],"events": []},{"disabled": false,"folded": false,"type": "BuiltinCommonInstructions::Comment","color": {"b": 109,"g": 230,"r": 255,"textB": 0,"textG": 0,"textR": 0},"comment": "Restrict the speed when moving on some objects","comment2": "Certains objets restreignent la vitesse."},{"disabled": false,"folded": false,"type": "BuiltinCommonInstructions::Standard","conditions": [],"actions": [{"type": {"inverted": false,"value": "PathfindingBehavior::MaxSpeed"},"parameters": ["Tank","Pathfinding","=","400"],"subInstructions": []}],"events": []},{"disabled": false,"folded": false,"type": "BuiltinCommonInstructions::Standard","conditions": [{"type": {"inverted": false,"value": "CollisionNP"},"parameters": ["Tank","Symbol",""],"subInstructions": []}],"actions": [{"type": {"inverted": false,"value": "PathfindingBehavior::MaxSpeed"},"parameters": ["Tank","Pathfinding","=","200"],"subInstructions": []}],"events": []}],"layers": [{"name": "","visibility": true,"cameras": [{"defaultSize": true,"defaultViewport": true,"height": 0,"viewportBottom": 1,"viewportLeft": 0,"viewportRight": 1,"viewportTop": 0,"width": 0}],"effects": []}],"behaviorsSharedData": [{"name": "Pathfinding","type": "PathfindingBehavior::PathfindingBehavior"},{"name": "PathfindingObstacle","type": "PathfindingBehavior::PathfindingObstacleBehavior"}]}],"externalEvents": [],"externalLayouts": [],"externalSourceFiles": []}
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 97,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "folderProject": false,
+    "linuxExecutableFilename": "",
+    "macExecutableFilename": "",
+    "orientation": "landscape",
+    "packageName": "",
+    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/pathfinding/pathfinding.json",
+    "sizeOnStartupMode": "adaptWidth",
+    "useExternalSourceFiles": false,
+    "winExecutableFilename": "",
+    "winExecutableIconFile": "",
+    "name": "Pathfinding example",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 10,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      },
+      {
+        "name": "ParticleSystem"
+      },
+      {
+        "name": "PathfindingBehavior"
+      },
+      {
+        "name": "TiledSpriteObject"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "Pointer-Standard.png",
+        "kind": "image",
+        "name": "Pointer-Standard.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "3DWall.png",
+        "kind": "image",
+        "name": "3DWall.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Pea-Happy.png",
+        "kind": "image",
+        "name": "Pea-Happy.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Target.png",
+        "kind": "image",
+        "name": "Flag-Pole.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Pea-Standard.png",
+        "kind": "image",
+        "name": "Pea-Standard.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame2-0001.png",
+        "kind": "image",
+        "name": "tank_frame2-0001.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame2-0002.png",
+        "kind": "image",
+        "name": "tank_frame2-0002.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame2-0003.png",
+        "kind": "image",
+        "name": "tank_frame2-0003.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame2-0004.png",
+        "kind": "image",
+        "name": "tank_frame2-0004.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame2-0005.png",
+        "kind": "image",
+        "name": "tank_frame2-0005.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame2-0006.png",
+        "kind": "image",
+        "name": "tank_frame2-0006.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame2-0007.png",
+        "kind": "image",
+        "name": "tank_frame2-0007.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame2-0008.png",
+        "kind": "image",
+        "name": "tank_frame2-0008.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame10001.png",
+        "kind": "image",
+        "name": "tank_frame10001.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame10002.png",
+        "kind": "image",
+        "name": "tank_frame10002.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame10003.png",
+        "kind": "image",
+        "name": "tank_frame10003.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame10004.png",
+        "kind": "image",
+        "name": "tank_frame10004.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame10005.png",
+        "kind": "image",
+        "name": "tank_frame10005.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame10006.png",
+        "kind": "image",
+        "name": "tank_frame10006.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame10007.png",
+        "kind": "image",
+        "name": "tank_frame10007.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank_frame10008.png",
+        "kind": "image",
+        "name": "tank_frame10008.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "DestroyedTank.png",
+        "kind": "image",
+        "name": "DestroyedTank.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "ExplosionTexture.png",
+        "kind": "image",
+        "name": "Fire",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GrassDead.png",
+        "kind": "image",
+        "name": "GrassDead.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "NodeMarker.png",
+        "kind": "image",
+        "name": "NodeMarker.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "symbol.png",
+        "kind": "image",
+        "name": "symbol.png",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 0,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "New_32scene",
+      "name": "New scene",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 0,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 193,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 20,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 45,
+        "snap": true,
+        "windowMask": true,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 0,
+          "x": 225,
+          "y": 480,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 44,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 85,
+          "x": 294,
+          "y": 120,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 0,
+          "x": 229,
+          "y": 120,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 0,
+          "x": 315,
+          "y": 480,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 0,
+          "x": 576,
+          "y": 153,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 0,
+          "x": 360,
+          "y": 121,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 0,
+          "x": 606,
+          "y": 292,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 0,
+          "x": 639,
+          "y": 427,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 0,
+          "x": 270,
+          "y": 480,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Flag",
+          "width": 0,
+          "x": 710,
+          "y": 366,
+          "zOrder": 1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 2674910
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Cursor",
+          "width": 0,
+          "x": 639,
+          "y": 61,
+          "zOrder": 10,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 2679780
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "DestroyedTank",
+          "width": 0,
+          "x": 306,
+          "y": 28,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Fire",
+          "width": 0,
+          "x": 342,
+          "y": 54,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Smoke",
+          "width": 0,
+          "x": 353,
+          "y": 40,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "DestroyedTank",
+          "width": 0,
+          "x": 575,
+          "y": 213,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Fire",
+          "width": 0,
+          "x": 622,
+          "y": 238,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Smoke",
+          "width": 0,
+          "x": 618,
+          "y": 236,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "DestroyedTank",
+          "width": 0,
+          "x": 90,
+          "y": 460,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Smoke",
+          "width": 0,
+          "x": 135,
+          "y": 480,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 777.002,
+          "layer": "",
+          "locked": true,
+          "name": "Background",
+          "width": 2677.54,
+          "x": -900,
+          "y": -107.876,
+          "zOrder": -10,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Tank",
+          "width": 0,
+          "x": 70.5,
+          "y": 162.5,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 95,
+          "layer": "",
+          "locked": false,
+          "name": "Symbol",
+          "width": 128,
+          "x": 272,
+          "y": 169,
+          "zOrder": -2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 0,
+          "x": 405,
+          "y": 360,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 44,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 85,
+          "x": 228,
+          "y": 268,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 44,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 85,
+          "x": 279,
+          "y": 269,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Block",
+          "width": 0,
+          "x": 43,
+          "y": 309,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "Cursor",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": true,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Pointer-Standard.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Block",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [
+            {
+              "cost": 6,
+              "impassable": true,
+              "name": "PathfindingObstacle",
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": true,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "3DWall.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Flag",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": true,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Flag-Pole.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 25,
+                        "y": 13
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "DestroyedTank",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [
+            {
+              "cost": 2,
+              "impassable": true,
+              "name": "PathfindingObstacle",
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "DestroyedTank.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "DestroyedTank.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "DestroyedTank.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "DestroyedTank.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "DestroyedTank.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "DestroyedTank.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "DestroyedTank.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "DestroyedTank.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "NodeMarker",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "NodeMarker.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "height": 256,
+          "name": "Background",
+          "texture": "GrassDead.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 256,
+          "variables": [],
+          "behaviors": []
+        },
+        {
+          "name": "Tank",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [
+            {
+              "acceleration": 400,
+              "allowDiagonals": true,
+              "angleOffset": 0,
+              "angularMaxSpeed": 180,
+              "cellHeight": 20,
+              "cellWidth": 20,
+              "extraBorder": -20,
+              "maxSpeed": 300,
+              "name": "Pathfinding",
+              "rotateObject": true,
+              "type": "PathfindingBehavior::PathfindingBehavior"
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": true,
+              "directions": [
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame2-0004.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame10004.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame2-0003.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame10003.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame2-0002.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame10002.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame2-0001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame10001.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame2-0008.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame10008.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame2-0007.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame10007.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame2-0006.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame10006.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": true,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame2-0005.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    },
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank_frame10005.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 41,
+                        "y": 32
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": true,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Pea-Happy.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 18,
+                        "y": 18
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                },
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Symbol",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [
+            {
+              "cost": 2,
+              "impassable": false,
+              "name": "PathfindingObstacle",
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "symbol.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 0,
+                            "y": 0
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Click to put the flag.",
+          "comment2": "Cliquez pour placer le drapeau."
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SourisBouton"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "Flag",
+                "=",
+                "MouseX(\"\",0)",
+                "=",
+                "MouseY(\"\",0)"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "PathfindingBehavior::SetDestination"
+              },
+              "parameters": [
+                "Tank",
+                "Pathfinding",
+                "",
+                "MouseX(\"\",0)",
+                "MouseY(\"\",0)"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "i",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Delete"
+                  },
+                  "parameters": [
+                    "NodeMarker",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "infiniteLoopWarning": true,
+              "type": "BuiltinCommonInstructions::While",
+              "whileConditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "i",
+                    "<",
+                    "Tank.Pathfinding::NodeCount()"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "NodeMarker",
+                    "Tank.Pathfinding::GetNodeX(Variable(i))",
+                    "Tank.Pathfinding::GetNodeY(Variable(i))",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "i",
+                    "+",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Moving is achivied using the automatism and by calling the action to move an object to a position",
+          "comment2": "Le déplacement est créé en utilisant l'automatisme de recherche de chemin et en appelant l'action de déplacement."
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "Cursor",
+                "=",
+                "MouseX(\"\",0)",
+                "=",
+                "MouseY(\"\",0)"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Restrict the speed when moving on some objects",
+          "comment2": "Certains objets restreignent la vitesse."
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "PathfindingBehavior::MaxSpeed"
+              },
+              "parameters": [
+                "Tank",
+                "Pathfinding",
+                "=",
+                "400"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "CollisionNP"
+              },
+              "parameters": [
+                "Tank",
+                "Symbol",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "PathfindingBehavior::MaxSpeed"
+              },
+              "parameters": [
+                "Tank",
+                "Pathfinding",
+                "=",
+                "200"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": [
+        {
+          "name": "Pathfinding",
+          "type": "PathfindingBehavior::PathfindingBehavior"
+        },
+        {
+          "name": "PathfindingObstacle",
+          "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+        }
+      ]
+    }
+  ],
+  "externalEvents": [],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

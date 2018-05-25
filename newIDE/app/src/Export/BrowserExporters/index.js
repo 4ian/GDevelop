@@ -4,6 +4,8 @@ import PhoneIphone from 'material-ui/svg-icons/hardware/phone-iphone';
 import LaptopMac from 'material-ui/svg-icons/hardware/laptop-mac';
 import Folder from 'material-ui/svg-icons/file/folder';
 import Devices from 'material-ui/svg-icons/device/devices';
+import Facebook from '../../UI/CustomSvgIcons/Facebook';
+import Cordova from '../../UI/CustomSvgIcons/Cordova';
 
 export const getBrowserExporters = () => [
   {
@@ -12,6 +14,14 @@ export const getBrowserExporters = () => [
     description:
       'Package your game for Android directly from GDevelop. iOS support is coming soon!',
     key: 'localonlinecordovaexport',
+    ExportComponent: BrowserExport,
+  },
+  {
+    name: 'Facebook Instant Games',
+    renderIcon: (props) => <Facebook {...props}/>,
+    helpPage: '/publishing/publishing-to-facebook-instant-games',
+    description: 'Package your game as a Facebook Instant Games that can be played on Facebook Messenger.',
+    key: 'localfacebookinstantgames',
     ExportComponent: BrowserExport,
   },
   {
@@ -33,7 +43,7 @@ export const getBrowserExporters = () => [
   },
   {
     name: 'iOS & Android (manual)',
-    renderIcon: props => <PhoneIphone {...props} />,
+    renderIcon: props => <Cordova {...props} />,
     description:
       'Build the game locally as a Cordova project, and export it manually then to iOS or Android with Cordova developers tools.',
     key: 'localcordovaexport',

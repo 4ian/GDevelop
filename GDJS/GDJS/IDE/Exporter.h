@@ -5,20 +5,15 @@
  */
 #ifndef EXPORTER_H
 #define EXPORTER_H
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
 #include "GDCore/IDE/ProjectExporter.h"
 namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class ExternalLayout;
-}
-namespace gd {
 class AbstractFileSystem;
 }
 
@@ -80,8 +75,7 @@ class Exporter : public gd::ProjectExporter {
    */
   bool ExportWholePixiProject(gd::Project& project,
                               gd::String exportDir,
-                              bool minify,
-                              bool exportForCordova);
+                              std::map<gd::String, bool> & exportOptions);
 
   /**
    * \brief Export the specified project, using Cocos2d.

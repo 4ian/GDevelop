@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 96,
+    "build": 97,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -12,7 +12,8 @@
     "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florian/GDevelop projects/My project482/zombie-laser.json",
+    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/zombie-laser/zombie-laser.json",
+    "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "winExecutableFilename": "",
     "winExecutableIconFile": "",

@@ -220,6 +220,17 @@ class GD_CORE_API Project : public ClassWithObjects {
   unsigned int GetMainWindowDefaultHeight() const { return windowHeight; }
 
   /**
+   * \brief Get how the game size should be adapted to the screen.
+   */
+  const gd::String & GetSizeOnStartupMode() const { return sizeOnStartupMode; }
+  
+  /**
+   * \brief Set how to adapt the game size to the screen. 
+   * \param mode The size to be used. Can be "adaptWidth", "adaptHeight" or empty fpr no changes to game size.
+   */
+  void SetSizeOnStartupMode(const gd::String & mode) { sizeOnStartupMode = mode; }
+
+  /**
    * Change the default maximum number of frames allowed to be rendered per
    * seconds
    */
@@ -869,6 +880,7 @@ class GD_CORE_API Project : public ClassWithObjects {
   unsigned int minFPS;  ///< Minimum Frame Per Seconds ( slow down game if FPS
                         ///< are below this number )
   bool verticalSync;    ///< If true, must activate vertical synchronization.
+  gd::String sizeOnStartupMode; ///< How to adapt the game size to the screen. Can be "adaptWidth", "adaptHeight" or empty
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
   std::vector<std::unique_ptr<gd::ExternalLayout> >

@@ -1927,7 +1927,7 @@
           "variables": [],
           "behaviors": [],
           "string": "GAME OVER",
-          "font": "kenvector_future.ttf",
+          "font": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/kenvector_future.ttf",
           "characterSize": 60,
           "color": {
             "b": 255,

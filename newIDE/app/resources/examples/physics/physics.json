@@ -10,7 +10,7 @@
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
-    "orientation": "default",
+    "orientation": "landscape",
     "packageName": "com.example.physics",
     "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/physics/physics.json",
     "sizeOnStartupMode": "adaptWidth",

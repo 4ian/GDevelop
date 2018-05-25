@@ -3226,7 +3226,7 @@
           "variables": [],
           "behaviors": [],
           "string": "x 0",
-          "font": "Bimbo_JVE.ttf",
+          "font": "https://df5lqcdudryde.cloudfront.net/examples/platformer/Bimbo_JVE.ttf",
           "characterSize": 40,
           "color": {
             "b": 0,

@@ -10,7 +10,7 @@
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
-    "orientation": "default",
+    "orientation": "landscape",
     "packageName": "com.example.platformer",
     "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/platformer/platformer.json",
     "sizeOnStartupMode": "adaptWidth",

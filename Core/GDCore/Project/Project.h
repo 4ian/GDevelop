@@ -880,6 +880,7 @@ class GD_CORE_API Project : public ClassWithObjects {
   unsigned int minFPS;  ///< Minimum Frame Per Seconds ( slow down game if FPS
                         ///< are below this number )
   bool verticalSync;    ///< If true, must activate vertical synchronization.
+  gd::String sizeOnStartupMode; ///< How to adapt the game size to the screen. Can be "adaptWidth", "adaptHeight" or empty
   std::vector<std::unique_ptr<gd::Layout> > scenes;  ///< List of all scenes
   gd::VariablesContainer variables;  ///< Initial global variables
   std::vector<std::unique_ptr<gd::ExternalLayout> >
@@ -902,7 +903,6 @@ class GD_CORE_API Project : public ClassWithObjects {
   gd::String packageName;                  ///< Game package name
   gd::String orientation;  ///< Lock game orientation (on mobile devices).
                            ///< "default", "landscape" or "portrait".
-  gd::String sizeOnStartupMode; ///< How to adapt the game size to the screen. Can be "adaptWidth", "adaptHeight" or empty
   bool
       folderProject;  ///< True if folder project, false if single file project.
   gd::String gameFile;                    ///< File of the game

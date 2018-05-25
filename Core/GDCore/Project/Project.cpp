@@ -63,7 +63,6 @@ Project::Project()
       name(_("Project")),
       packageName("com.example.gamename"),
       orientation("landscape"),
-      sizeOnStartupMode("adaptWidth"),
       folderProject(false),
 #endif
       windowWidth(800),
@@ -71,6 +70,7 @@ Project::Project()
       maxFPS(60),
       minFPS(10),
       verticalSync(false),
+      sizeOnStartupMode("adaptWidth"),
       imageManager(std::make_shared<ImageManager>())
 #if defined(GD_IDE_ONLY)
       ,
@@ -534,11 +534,11 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       propElement.GetChild("minFPS", 0, "FPSmin").GetValue().GetInt());
   SetVerticalSyncActivatedByDefault(
       propElement.GetChild("verticalSync").GetValue().GetBool());
+  SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
 #if defined(GD_IDE_ONLY)
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
-  SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetProjectFile(propElement.GetStringAttribute("projectFile"));
   SetLastCompilationDirectory(propElement
@@ -791,11 +791,11 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.AddChild("minFPS").SetValue(GetMinimumFPS());
   propElement.AddChild("verticalSync")
       .SetValue(IsVerticalSynchronizationEnabledByDefault());
+  propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
   propElement.SetAttribute("projectFile", gameFile);
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("orientation", orientation);
-  propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));
@@ -1105,12 +1105,12 @@ void Project::Init(const gd::Project& game) {
   maxFPS = game.maxFPS;
   minFPS = game.minFPS;
   verticalSync = game.verticalSync;
+  sizeOnStartupMode = game.sizeOnStartupMode;
 
 #if defined(GD_IDE_ONLY)
   author = game.author;
   packageName = game.packageName;
   orientation = game.orientation;
-  sizeOnStartupMode = game.sizeOnStartupMode;
   folderProject = game.folderProject;
   latestCompilationDirectory = game.latestCompilationDirectory;
   platformSpecificAssets = game.platformSpecificAssets;

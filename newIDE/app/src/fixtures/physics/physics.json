@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 96,
+    "build": 97,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -10,8 +10,10 @@
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
+    "orientation": "default",
     "packageName": "com.example.physics",
-    "projectFile": "/Users/florian/Desktop/physics/physics.json",
+    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/physics/physics.json",
+    "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "winExecutableFilename": "",
     "winExecutableIconFile": "",
@@ -23,6 +25,10 @@
     "maxFPS": -1,
     "minFPS": 10,
     "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
     "extensions": [
       {
         "name": "BuiltinObject"
@@ -195,13 +201,13 @@
         },
         {
           "angle": 0,
-          "customSize": false,
-          "height": 0,
+          "customSize": true,
+          "height": 815.122,
           "layer": "",
           "locked": false,
           "name": "Background",
-          "width": 0,
-          "x": 0,
+          "width": 1791.55,
+          "x": -211,
           "y": 0,
           "zOrder": -100,
           "numberProperties": [

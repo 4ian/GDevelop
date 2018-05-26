@@ -7,7 +7,7 @@ about: Create a bug report about GDevelop or the game engine
 ## Describe the bug
 A clear and concise description of what the bug is.
 
-Please double check that the bug is not already reported in the issue list.
+Please double check that the bug is not already reported in the issues list.
 
 ## To Reproduce
 Steps to reproduce the behavior:

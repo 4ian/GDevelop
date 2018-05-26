@@ -21,11 +21,9 @@ gd::ChangesNotifier Platform::defaultEmptyChangesNotifier;
 #endif
 
 Platform::Platform() {
-  // ctor
 }
 
 Platform::~Platform() {
-  // dtor
 }
 
 bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {

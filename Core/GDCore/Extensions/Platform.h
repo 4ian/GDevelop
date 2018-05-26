@@ -15,35 +15,15 @@
 
 namespace gd {
 class InstructionsMetadataHolder;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class Object;
-}
-namespace gd {
 class Behavior;
-}
-namespace gd {
 class BehaviorMetadata;
-}
-namespace gd {
 class ObjectMetadata;
-}
-namespace gd {
 class BaseEvent;
-}
-namespace gd {
 class BehaviorsSharedData;
-}
-namespace gd {
 class PlatformExtension;
-}
-namespace gd {
 class LayoutEditorCanvas;
-}
-namespace gd {
 class ProjectExporter;
 }
 

@@ -22,5 +22,5 @@ Add any other context or screenshots about the feature request here.
 
 Explain if you can help implementing the solution.
 
-## **Alternatives considered**
+## Alternatives considered
 A clear and concise description of any alternative solutions or features you've considered.

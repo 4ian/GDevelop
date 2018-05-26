@@ -211,6 +211,11 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
   };
 };
 
+#if defined(EMSCRIPTEN)
+extern "C" gd::PlatformExtension* CreateGDJSParticleSystemExtension() {
+  return new ParticleSystemJsExtension;
+}
+#else
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
@@ -218,4 +223,5 @@ class ParticleSystemJsExtension : public gd::PlatformExtension {
 extern "C" gd::PlatformExtension* GD_EXTENSION_API CreateGDJSExtension() {
   return new ParticleSystemJsExtension;
 }
+#endif
 #endif

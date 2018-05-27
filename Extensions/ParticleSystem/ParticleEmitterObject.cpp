@@ -100,7 +100,7 @@ ParticleEmitterObject::ParticleEmitterObject(gd::String name_)
 
 void ParticleEmitterObject::DoUnserializeFrom(
     gd::Project& project, const gd::SerializerElement& element) {
-  ParticleEmitterBase::UnserializeFrom(element);
+  ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(element);
 
 #if defined(GD_IDE_ONLY)
   particleEditionSimpleMode =
@@ -112,7 +112,7 @@ void ParticleEmitterObject::DoUnserializeFrom(
 #endif
 }
 
-void ParticleEmitterBase::UnserializeFrom(
+void ParticleEmitterBase::UnserializeParticleEmitterBaseFrom(
     const gd::SerializerElement& element) {
   tank = element.GetDoubleAttribute("tank");
   flow = element.GetDoubleAttribute("flow");
@@ -234,10 +234,10 @@ void ParticleEmitterObject::DoSerializeTo(
   element.SetAttribute("emissionEditionSimpleMode", emissionEditionSimpleMode);
   element.SetAttribute("gravityEditionSimpleMode", gravityEditionSimpleMode);
 
-  ParticleEmitterBase::SerializeTo(element);
+  ParticleEmitterBase::SerializeParticleEmitterBaseTo(element);
 }
 
-void ParticleEmitterBase::SerializeTo(gd::SerializerElement& element) const {
+void ParticleEmitterBase::SerializeParticleEmitterBaseTo(gd::SerializerElement& element) const {
   element.SetAttribute("tank", tank);
   element.SetAttribute("flow", flow);
   element.SetAttribute("emitterForceMin", emitterForceMin);

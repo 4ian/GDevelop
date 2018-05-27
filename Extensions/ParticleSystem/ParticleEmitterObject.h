@@ -48,11 +48,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
     return *this;
   }
 
-  virtual void UnserializeFrom(const gd::SerializerElement& element);
-#if defined(GD_IDE_ONLY)
-  virtual void SerializeTo(gd::SerializerElement& element) const;
-#endif
-
   /** Change texture at runtime
    */
   void SetTexture(RuntimeScene& scene, const gd::String& textureParticleName);
@@ -268,6 +263,12 @@ class GD_EXTENSION_API ParticleEmitterBase {
   bool IsRenderingAdditive() { return additive; };
   void SetRenderingAdditive() { additive = true; };
   void SetRenderingAlpha() { additive = false; };
+
+ protected:
+  virtual void UnserializeParticleEmitterBaseFrom(const gd::SerializerElement& element);
+#if defined(GD_IDE_ONLY)
+  virtual void SerializeParticleEmitterBaseTo(gd::SerializerElement& element) const;
+#endif
 
  private:
   void Init(const ParticleEmitterBase& other);

@@ -30,15 +30,18 @@ export default class CloseConfirmDialog extends React.Component<Props, *> {
     if (electron) {
       window.onbeforeunload = e => {
         if (this._delayElectronClose && shouldPrompt) {
-          //eslint-disable-next-line
-          const answer = confirm(message);
+          // Use setTimeout to avoiding blocking the thread with the "confirm" dialog,
+          // which would make Electron to close the window for some weird reason.
+          // See https://github.com/electron/electron/issues/7977
           setTimeout(() => {
+            //eslint-disable-next-line
+            const answer = confirm(message);
             if (answer) {
               // If answer is positive, re-trigger the close
               this._delayElectronClose = false;
               electron.remote.getCurrentWindow().close();
             }
-          });
+          }, 10);
 
           // Prevents closing the window immediately. See https://github.com/electron/electron/blob/master/docs/api/browser-window.md#event-close
           e.returnValue = true; //"It is recommended to always set the event.returnValue explicitly, instead of only returning a value, as the former works more consistently within Electron.""

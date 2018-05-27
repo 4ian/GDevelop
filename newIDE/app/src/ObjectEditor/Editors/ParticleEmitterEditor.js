@@ -1,11 +1,13 @@
 // @flow
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import { Line, Column } from '../../UI/Grid';
 import ColorField from '../../UI/ColorField';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { type EditorProps } from './EditorProps.flow';
+import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 const gd = global.gd;
 
 export default class ParticleEmitterEditor extends React.Component<
@@ -13,13 +15,224 @@ export default class ParticleEmitterEditor extends React.Component<
   void
 > {
   render() {
-    const { object } = this.props;
+    const {
+      object,
+      project,
+      resourceSources,
+      onChooseResource,
+      resourceExternalEditors,
+    } = this.props;
     const particleEmitterObject = gd.asParticleEmitterObject(object);
 
     return (
       <Column>
         <Line>
-          <Column expand>
+          <Column expand noMargin>
+            <SelectField
+              fullWidth
+              floatingLabelText="Particles kind"
+              value={particleEmitterObject.getRendererType()}
+              onChange={(e, i, value) => {
+                particleEmitterObject.setRendererType(value);
+                if (value !== gd.ParticleEmitterObject.Quad) {
+                  particleEmitterObject.setParticleTexture('');
+                }
+                this.forceUpdate();
+              }}
+            >
+              <MenuItem
+                value={gd.ParticleEmitterObject.Point}
+                primaryText="Point"
+              />
+              <MenuItem
+                value={gd.ParticleEmitterObject.Line}
+                primaryText="Line"
+              />
+              <MenuItem
+                value={gd.ParticleEmitterObject.Quad}
+                primaryText="Textured"
+              />
+            </SelectField>
+          </Column>
+        </Line>
+        {particleEmitterObject.getRendererType() ===
+          gd.ParticleEmitterObject.Point && (
+          <Line>
+            <Column expand noMargin>
+              <SemiControlledTextField
+                floatingLabelText="Size"
+                fullWidth
+                type="number"
+                value={particleEmitterObject.getRendererParam1()}
+                onChange={value => {
+                  particleEmitterObject.setRendererParam1(parseFloat(value));
+                  this.forceUpdate();
+                }}
+              />
+            </Column>
+          </Line>
+        )}
+        {particleEmitterObject.getRendererType() ===
+          gd.ParticleEmitterObject.Line && (
+          <Line>
+            <Column expand noMargin>
+              <SemiControlledTextField
+                floatingLabelText="Lines length"
+                fullWidth
+                type="number"
+                value={particleEmitterObject.getRendererParam1()}
+                onChange={value => {
+                  particleEmitterObject.setRendererParam1(parseFloat(value));
+                  this.forceUpdate();
+                }}
+              />
+            </Column>
+            <Column expand noMargin>
+              <SemiControlledTextField
+                floatingLabelText="Lines thickness"
+                fullWidth
+                type="number"
+                value={particleEmitterObject.getRendererParam2()}
+                onChange={value => {
+                  particleEmitterObject.setRendererParam2(parseFloat(value));
+                  this.forceUpdate();
+                }}
+              />
+            </Column>
+          </Line>
+        )}
+        {particleEmitterObject.getRendererType() ===
+          gd.ParticleEmitterObject.Quad && (
+          <React.Fragment>
+            <Line>
+              <ResourceSelectorWithThumbnail
+                project={project}
+                resourceSources={resourceSources}
+                onChooseResource={onChooseResource}
+                resourceKind="image"
+                resourceName={particleEmitterObject.getParticleTexture()}
+                resourceExternalEditors={resourceExternalEditors}
+                onChange={resourceName => {
+                  particleEmitterObject.setParticleTexture(resourceName);
+                  this.forceUpdate();
+                }}
+              />
+            </Line>
+            <Line>
+              <Column expand noMargin>
+                <SemiControlledTextField
+                  floatingLabelText="Particles start width"
+                  fullWidth
+                  type="number"
+                  value={particleEmitterObject.getRendererParam1()}
+                  onChange={value => {
+                    particleEmitterObject.setRendererParam1(
+                      Math.max(0, parseFloat(value))
+                    );
+                    this.forceUpdate();
+                  }}
+                />
+              </Column>
+              <Column expand noMargin>
+                <SemiControlledTextField
+                  floatingLabelText="Particles start height"
+                  fullWidth
+                  type="number"
+                  value={particleEmitterObject.getRendererParam2()}
+                  onChange={value => {
+                    particleEmitterObject.setRendererParam2(
+                      Math.max(0, parseFloat(value))
+                    );
+                    this.forceUpdate();
+                  }}
+                />
+              </Column>
+            </Line>
+          </React.Fragment>
+        )}
+        <Line>
+          <ColorField
+            floatingLabelText="Particles start color"
+            disableAlpha
+            fullWidth
+            color={{
+              r: particleEmitterObject.getParticleRed1(),
+              g: particleEmitterObject.getParticleGreen1(),
+              b: particleEmitterObject.getParticleBlue1(),
+              a: 255,
+            }}
+            onChangeComplete={color => {
+              particleEmitterObject.setParticleRed1(color.rgb.r);
+              particleEmitterObject.setParticleGreen1(color.rgb.g);
+              particleEmitterObject.setParticleBlue1(color.rgb.b);
+
+              this.forceUpdate();
+            }}
+          />
+          <SemiControlledTextField
+            floatingLabelText="Start opacity (0-255)"
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getParticleAlpha1()}
+            onChange={value => {
+              particleEmitterObject.setParticleAlpha1(parseInt(value, 10));
+              this.forceUpdate();
+            }}
+          />
+        </Line>
+        <Line>
+          <ColorField
+            floatingLabelText="Particles end color"
+            disableAlpha
+            fullWidth
+            color={{
+              r: particleEmitterObject.getParticleRed2(),
+              g: particleEmitterObject.getParticleGreen2(),
+              b: particleEmitterObject.getParticleBlue2(),
+              a: 255,
+            }}
+            onChangeComplete={color => {
+              particleEmitterObject.setParticleRed2(color.rgb.r);
+              particleEmitterObject.setParticleGreen2(color.rgb.g);
+              particleEmitterObject.setParticleBlue2(color.rgb.b);
+
+              this.forceUpdate();
+            }}
+          />
+          <SemiControlledTextField
+            floatingLabelText="Start end (0-255)"
+            fullWidth
+            type="number"
+            value={particleEmitterObject.getParticleAlpha2()}
+            onChange={value => {
+              particleEmitterObject.setParticleAlpha2(parseInt(value, 10));
+              this.forceUpdate();
+            }}
+          />
+        </Line>
+        <Line>
+          <Checkbox
+            label="Additive rendering"
+            checked={particleEmitterObject.isRenderingAdditive()}
+            onCheck={(e, checked) => {
+              if (checked) particleEmitterObject.setRenderingAdditive();
+              else particleEmitterObject.setRenderingAlpha();
+              this.forceUpdate();
+            }}
+          />
+        </Line>
+        <Line>
+          <Checkbox
+            label="Delete when out of particles"
+            checked={particleEmitterObject.getDestroyWhenNoParticles()}
+            onCheck={(e, checked) => {
+              particleEmitterObject.setDestroyWhenNoParticles(checked);
+              this.forceUpdate();
+            }}
+          />
+        </Line>
+        <Line>
+          <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText="Maximum number of particles displayed"
               fullWidth
@@ -31,19 +244,9 @@ export default class ParticleEmitterEditor extends React.Component<
               }}
             />
           </Column>
-          <Column expand>
-            <Checkbox
-              label="Delete when out of particles"
-              checked={!particleEmitterObject.getDestroyWhenNoParticles()}
-              onCheck={(e, checked) => {
-                particleEmitterObject.setDestroyWhenNoParticles(checked);
-                this.forceUpdate();
-              }}
-            />
-          </Column>
         </Line>
         <Line>
-          <Column expand>
+          <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText="Number of particles in tank (-1 for infinite)"
               fullWidth
@@ -55,7 +258,7 @@ export default class ParticleEmitterEditor extends React.Component<
               }}
             />
           </Column>
-          <Column expand>
+          <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText="Flow of particles (particles/seconds)"
               fullWidth
@@ -69,7 +272,7 @@ export default class ParticleEmitterEditor extends React.Component<
           </Column>
         </Line>
         <Line>
-          <Column expand>
+          <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText="Minimum emitter force applied on particles"
               fullWidth
@@ -81,7 +284,7 @@ export default class ParticleEmitterEditor extends React.Component<
               }}
             />
           </Column>
-          <Column expand>
+          <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText="Maximum emitter force applied on particles"
               fullWidth
@@ -95,7 +298,7 @@ export default class ParticleEmitterEditor extends React.Component<
           </Column>
         </Line>
         <Line>
-          <Column expand>
+          <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText="Spray cone angle (in degrees)"
               fullWidth
@@ -107,7 +310,7 @@ export default class ParticleEmitterEditor extends React.Component<
               }}
             />
           </Column>
-          <Column expand>
+          <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText="Radius of the emitter"
               fullWidth
@@ -121,7 +324,7 @@ export default class ParticleEmitterEditor extends React.Component<
           </Column>
         </Line>
         <Line>
-          <Column expand>
+          <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText="Gravity on particles on X axis"
               fullWidth
@@ -133,7 +336,7 @@ export default class ParticleEmitterEditor extends React.Component<
               }}
             />
           </Column>
-          <Column expand>
+          <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText="Gravity on particles on Y axis"
               fullWidth
@@ -147,7 +350,7 @@ export default class ParticleEmitterEditor extends React.Component<
           </Column>
         </Line>
         <Line>
-          <Column expand>
+          <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText="Friction on particles"
               fullWidth
@@ -160,79 +363,58 @@ export default class ParticleEmitterEditor extends React.Component<
             />
           </Column>
         </Line>
-        {/* <Line>
-          <ColorField
-            floatingLabelText="Outline color"
-            disableAlpha
-            fullWidth
-            color={{
-              r: particleEmitterObject.getOutlineColorR(),
-              g: particleEmitterObject.getOutlineColorG(),
-              b: particleEmitterObject.getOutlineColorB(),
-              a: 255,
-            }}
-            onChangeComplete={color => {
-              particleEmitterObject.setOutlineColor(
-                color.rgb.r,
-                color.rgb.g,
-                color.rgb.b
-              );
-              this.forceUpdate();
-            }}
-          />
-          <SemiControlledTextField
-            floatingLabelText="Outline opacity (0-255)"
-            fullWidth
-            type="number"
-            value={particleEmitterObject.getOutlineOpacity()}
-            onChange={(value) => {
-              particleEmitterObject.setOutlineOpacity(parseInt(value, 10));
-              this.forceUpdate();
-            }}
-          />
-          <SemiControlledTextField
-            floatingLabelText="Outline size (in pixels)"
-            fullWidth
-            type="number"
-            value={particleEmitterObject.getOutlineSize()}
-            onChange={(value) => {
-              particleEmitterObject.setOutlineSize(parseInt(value, 10));
-              this.forceUpdate();
-            }}
-          />
+        <Line>
+          <Column expand noMargin>
+            <SemiControlledTextField
+              floatingLabelText="Particle minimum lifetime (in seconds)"
+              fullWidth
+              type="number"
+              value={particleEmitterObject.getParticleLifeTimeMin()}
+              onChange={value => {
+                particleEmitterObject.setParticleLifeTimeMin(parseFloat(value));
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+          <Column expand noMargin>
+            <SemiControlledTextField
+              floatingLabelText="Particle maximum lifetime (in seconds)"
+              fullWidth
+              type="number"
+              value={particleEmitterObject.getParticleLifeTimeMax()}
+              onChange={value => {
+                particleEmitterObject.setParticleLifeTimeMax(parseFloat(value));
+                this.forceUpdate();
+              }}
+            />
+          </Column>
         </Line>
         <Line>
-          <ColorField
-            floatingLabelText="Fill color"
-            disableAlpha
-            fullWidth
-            color={{
-              r: particleEmitterObject.getFillColorR(),
-              g: particleEmitterObject.getFillColorG(),
-              b: particleEmitterObject.getFillColorB(),
-              a: 255,
-            }}
-            onChangeComplete={color => {
-              particleEmitterObject.setFillColor(
-                color.rgb.r,
-                color.rgb.g,
-                color.rgb.b
-              );
-              this.forceUpdate();
-            }}
-          />
-          <SemiControlledTextField
-            floatingLabelText="Fill opacity (0-255)"
-            fullWidth
-            type="number"
-            value={particleEmitterObject.getFillOpacity()}
-            onChange={(value) => {
-              particleEmitterObject.setFillOpacity(parseInt(value, 10));
-              this.forceUpdate();
-            }}
-          />
-          <Spacer expand />
-        </Line> */}
+          <Column expand noMargin>
+            <SemiControlledTextField
+              floatingLabelText="Particle start size (in percents)"
+              fullWidth
+              type="number"
+              value={particleEmitterObject.getParticleSize1()}
+              onChange={value => {
+                particleEmitterObject.setParticleSize1(parseFloat(value));
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+          <Column expand noMargin>
+            <SemiControlledTextField
+              floatingLabelText="Particle end size (in percents)"
+              fullWidth
+              type="number"
+              value={particleEmitterObject.getParticleSize2()}
+              onChange={value => {
+                particleEmitterObject.setParticleSize2(parseFloat(value));
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+        </Line>
       </Column>
     );
   }

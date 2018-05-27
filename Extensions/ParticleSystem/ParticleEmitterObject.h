@@ -48,11 +48,6 @@ class GD_EXTENSION_API ParticleEmitterBase {
     return *this;
   }
 
-  virtual void UnserializeFrom(const gd::SerializerElement& element);
-#if defined(GD_IDE_ONLY)
-  virtual void SerializeTo(gd::SerializerElement& element) const;
-#endif
-
   /** Change texture at runtime
    */
   void SetTexture(RuntimeScene& scene, const gd::String& textureParticleName);
@@ -95,7 +90,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetEmitterAngleA(float newValue);
   void SetEmitterAngleB(float newValue);
   void SetConeSprayAngle(float newValue) {
-    SetEmitterAngleB(newValue / 180.0f * 3.14159f);
+    SetEmitterAngleB(newValue);
   };
   void SetZoneRadius(float newValue);
   void SetParticleGravityX(float newValue);
@@ -213,7 +208,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float GetEmitterAngleA() const { return emitterAngleA; };
   float GetEmitterAngleB() const { return emitterAngleB; };
   float GetConeSprayAngle() const {
-    return GetEmitterAngleB() * 180.0f / 3.14159f;
+    return GetEmitterAngleB();
   };
   float GetZoneRadius() const { return zoneRadius; };
   float GetParticleGravityX() const { return particleGravityX; };
@@ -268,6 +263,12 @@ class GD_EXTENSION_API ParticleEmitterBase {
   bool IsRenderingAdditive() { return additive; };
   void SetRenderingAdditive() { additive = true; };
   void SetRenderingAlpha() { additive = false; };
+
+ protected:
+  virtual void UnserializeParticleEmitterBaseFrom(const gd::SerializerElement& element);
+#if defined(GD_IDE_ONLY)
+  virtual void SerializeParticleEmitterBaseTo(gd::SerializerElement& element) const;
+#endif
 
  private:
   void Init(const ParticleEmitterBase& other);

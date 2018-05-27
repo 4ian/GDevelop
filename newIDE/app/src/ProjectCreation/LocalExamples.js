@@ -122,6 +122,29 @@ export default class LocalCreateDialog extends Component {
                 onClick={() => this.createFromExample('physics')}
               />
               <ListItem
+                primaryText="Various particles effects"
+                secondaryText={
+                  <p>
+                    Example showing particles emitters used to create different
+                    kind of effects.
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() =>
+                  this.createFromExample('particles-various-effects')}
+              />
+              <ListItem
+                primaryText="Explosions with particles"
+                secondaryText={
+                  <p>
+                    See how to create realistic explosions effects with particles
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() =>
+                  this.createFromExample('particles-explosions')}
+              />
+              <ListItem
                 primaryText="Pathfinding"
                 secondaryText={
                   <p>

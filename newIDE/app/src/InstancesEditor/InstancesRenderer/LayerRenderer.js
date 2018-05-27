@@ -50,9 +50,10 @@ export default class LayerRenderer {
       if (pixiObject) pixiObject.interactive = !instance.isLocked();
 
       // "Culling" improves rendering performance of large levels
-      if (pixiObject) pixiObject.visible = this._isInstanceVisible(instance);
+      const isVisible = this._isInstanceVisible(instance);
+      if (pixiObject) pixiObject.visible = isVisible;
+      if (isVisible) renderedInstance.update();
 
-      renderedInstance.update();
       renderedInstance.wasUsed = true;
     };
   }

@@ -6,6 +6,7 @@ import RenderedAdMobInstance from './Renderers/RenderedAdMobInstance';
 import RenderedTextInstance from './Renderers/RenderedTextInstance';
 import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstance';
 import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
+import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitterInstance';
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 
@@ -23,6 +24,7 @@ export default {
     'TextObject::Text': RenderedTextInstance,
     'PrimitiveDrawing::Drawer': RenderedShapePainterInstance,
     'TextEntryObject::TextEntry': RenderedTextEntryInstance,
+    'ParticleSystem::ParticleEmitter': RenderedParticleEmitterInstance,
   },
   getThumbnail: function(project, object) {
     var objectType = object.getType();

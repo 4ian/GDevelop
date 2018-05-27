@@ -145,6 +145,7 @@ gd::PlatformExtension *CreateGDJSShopifyExtension();
 gd::PlatformExtension *CreateGDJSPathfindingBehaviorExtension();
 gd::PlatformExtension *CreateGDJSPhysicsBehaviorExtension();
 gd::PlatformExtension *CreateGDJSFacebookInstantGamesExtension();
+gd::PlatformExtension *CreateGDJSParticleSystemExtension();
 }
 #endif
 
@@ -219,8 +220,8 @@ JsPlatform::JsPlatform() : gd::Platform() {
   AddExtension(
       std::shared_ptr<gd::PlatformExtension>(CreateGDJSTextObjectExtension()));
   std::cout.flush();
-  AddExtension(
-      std::shared_ptr<gd::PlatformExtension>(CreateGDJSAdMobObjectExtension()));
+  AddExtension(std::shared_ptr<gd::PlatformExtension>(
+      CreateGDJSParticleSystemExtension()));
   std::cout.flush();
   AddExtension(std::shared_ptr<gd::PlatformExtension>(
       CreateGDJSPanelSpriteObjectExtension()));
@@ -254,6 +255,9 @@ JsPlatform::JsPlatform() : gd::Platform() {
   std::cout.flush();
   AddExtension(std::shared_ptr<gd::PlatformExtension>(
       CreateGDJSFacebookInstantGamesExtension()));
+  std::cout.flush();
+  AddExtension(
+      std::shared_ptr<gd::PlatformExtension>(CreateGDJSAdMobObjectExtension()));
   std::cout.flush();
 #endif
   std::cout << "done." << std::endl;

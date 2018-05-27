@@ -1,3 +1,5 @@
+// @flow
+
 /**
  * Convert a rgb color value to a string hex value.
  * @note No "#" or "0x" are added.

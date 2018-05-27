@@ -5,6 +5,7 @@ import SpriteEditor from './Editors/SpriteEditor';
 import EmptyEditor from './Editors/EmptyEditor';
 import ShapePainterEditor from './Editors/ShapePainterEditor';
 import AdMobEditor from './Editors/AdMobEditor';
+import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';
 const gd = global.gd;
 
 /**
@@ -54,6 +55,12 @@ export default {
       newObjectCreator: () => new gd.TextEntryObject(''),
       castToObjectType: object => gd.asTextEntryObject(object),
       helpPagePath: '/objects/text_entry',
+    },
+    'ParticleSystem::ParticleEmitter': {
+      component: ParticleEmitterEditor,
+      newObjectCreator: () => new gd.ParticleEmitterObject(''),
+      castToObjectType: object => gd.asParticleEmitterObject(object),
+      helpPagePath: '/objects/particles_emitter',
     },
   },
 };

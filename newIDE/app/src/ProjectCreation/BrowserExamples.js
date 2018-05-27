@@ -47,6 +47,33 @@ export default class LocalCreateDialog extends Component {
               />
               <Subheader>Examples</Subheader>
               <ListItem
+                primaryText="Various particles effects"
+                secondaryText={
+                  <p>
+                    Example showing particles emitters used to create different
+                    kind of effects.
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('particles-various-effects');
+                  this.props.onOpen('internal://particles-various-effects');
+                }}
+              />
+              <ListItem
+                primaryText="Explosions with particles"
+                secondaryText={
+                  <p>
+                    See how to create realistic explosions effects with particles
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('particles-explosions');
+                  this.props.onOpen('internal://particles-explosions');
+                }}
+              />
+              <ListItem
                 primaryText="Physics"
                 secondaryText={
                   <p>

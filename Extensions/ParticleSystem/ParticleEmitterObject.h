@@ -90,7 +90,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetEmitterAngleA(float newValue);
   void SetEmitterAngleB(float newValue);
   void SetConeSprayAngle(float newValue) {
-    SetEmitterAngleB(newValue / 180.0f * 3.14159f);
+    SetEmitterAngleB(newValue);
   };
   void SetZoneRadius(float newValue);
   void SetParticleGravityX(float newValue);
@@ -208,7 +208,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float GetEmitterAngleA() const { return emitterAngleA; };
   float GetEmitterAngleB() const { return emitterAngleB; };
   float GetConeSprayAngle() const {
-    return GetEmitterAngleB() * 180.0f / 3.14159f;
+    return GetEmitterAngleB();
   };
   float GetZoneRadius() const { return zoneRadius; };
   float GetParticleGravityX() const { return particleGravityX; };

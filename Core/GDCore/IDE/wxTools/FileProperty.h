@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef GDCORE_FILEPROPERTY_H
 #define GDCORE_FILEPROPERTY_H
-#include <wx/control.h>
+#include <wx/bitmap.h>
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/props.h>
 

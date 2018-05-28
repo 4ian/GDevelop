@@ -107,9 +107,9 @@ export class Toolbar extends PureComponent {
           buildMenuTemplate={() => [
             {
               type: 'checkbox',
-              label: 'Show grid',
-              checked: this.props.isGridShown(),
-              click: () => this.props.toggleWindowMask,
+              label: 'Show Mask',
+              checked: this.props.isWindowMaskShown(),
+              click: () => this.props.toggleWindowMask(),
             },
 			{
               type: 'checkbox',

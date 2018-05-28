@@ -92,11 +92,6 @@ export class Toolbar extends PureComponent {
           tooltip={t('Open the layers editor')}
         />
         <ToolbarSeparator />
-        <ToolbarIcon
-          onClick={this.props.toggleWindowMask}
-          src="res/ribbon_default/windowMask32.png"
-          tooltip={t('Toggle window mask')}
-        />
         <IconMenu
           iconButtonElement={
             <ToolbarIcon

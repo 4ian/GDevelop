@@ -109,6 +109,12 @@ export class Toolbar extends PureComponent {
               type: 'checkbox',
               label: 'Show grid',
               checked: this.props.isGridShown(),
+              click: () => this.props.toggleWindowMask,
+            },
+			{
+              type: 'checkbox',
+              label: 'Show grid',
+              checked: this.props.isGridShown(),
               click: () => this.props.toggleGrid(),
             },
             { type: 'separator' },

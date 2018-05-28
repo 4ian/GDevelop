@@ -430,6 +430,137 @@ Object {
       },
     },
   },
+  "Particle system": Object {
+    "Advanced": Object {
+      "Blue color, parameter 1": Object {
+        "displayedName": "Blue color, parameter 1",
+        "fullGroupName": "Particle system/Advanced",
+        "type": "ParticleSystem::ParticleBlue1",
+      },
+      "Blue color, parameter 2": Object {
+        "displayedName": "Blue color, parameter 2",
+        "fullGroupName": "Particle system/Advanced",
+        "type": "ParticleSystem::ParticleBlue2",
+      },
+      "Direction of gravity on X axis": Object {
+        "displayedName": "Direction of gravity on X axis",
+        "fullGroupName": "Particle system/Advanced",
+        "type": "ParticleSystem::ParticleGravityX",
+      },
+      "Direction of the gravity on Y axis": Object {
+        "displayedName": "Direction of the gravity on Y axis",
+        "fullGroupName": "Particle system/Advanced",
+        "type": "ParticleSystem::ParticleGravityY",
+      },
+      "Emission angle 1": Object {
+        "displayedName": "Emission angle 1",
+        "fullGroupName": "Particle system/Advanced",
+        "type": "ParticleSystem::EmitterAngleA",
+      },
+      "Emission angle 2": Object {
+        "displayedName": "Emission angle 2",
+        "fullGroupName": "Particle system/Advanced",
+        "type": "ParticleSystem::EmitterAngleB",
+      },
+      "Green color, parameter 1": Object {
+        "displayedName": "Green color, parameter 1",
+        "fullGroupName": "Particle system/Advanced",
+        "type": "ParticleSystem::ParticleGreen1",
+      },
+      "Green color, parameter 2": Object {
+        "displayedName": "Green color, parameter 2",
+        "fullGroupName": "Particle system/Advanced",
+        "type": "ParticleSystem::ParticleGreen2",
+      },
+      "Red color, parameter 1": Object {
+        "displayedName": "Red color, parameter 1",
+        "fullGroupName": "Particle system/Advanced",
+        "type": "ParticleSystem::ParticleRed1",
+      },
+      "Red color, parameter 2": Object {
+        "displayedName": "Red color, parameter 2",
+        "fullGroupName": "Particle system/Advanced",
+        "type": "ParticleSystem::ParticleRed2",
+      },
+    },
+    "Common": Object {
+      "Angle of the spray cone": Object {
+        "displayedName": "Angle of the spray cone",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::ConeSprayAngle",
+      },
+      "Capacity": Object {
+        "displayedName": "Capacity",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::Tank",
+      },
+      "Creation radius": Object {
+        "displayedName": "Creation radius",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::ZoneRadius",
+      },
+      "Emission angle": Object {
+        "displayedName": "Emission angle",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::EmitterAngle",
+      },
+      "Flow": Object {
+        "displayedName": "Flow",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::Flow",
+      },
+      "Gravity": Object {
+        "displayedName": "Gravity",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::ParticleGravityLength",
+      },
+      "Gravity angle": Object {
+        "displayedName": "Gravity angle",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::ParticleGravityAngle",
+      },
+      "Image": Object {
+        "displayedName": "Image",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::Texture",
+      },
+      "Maximum lifetime": Object {
+        "displayedName": "Maximum lifetime",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::ParticleLifeTimeMax",
+      },
+      "Minimum lifetime": Object {
+        "displayedName": "Minimum lifetime",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::ParticleLifeTimeMin",
+      },
+      "No more particles": Object {
+        "displayedName": "No more particles",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::NoMoreParticles",
+      },
+      "SIze, parameter 1": Object {
+        "displayedName": "SIze, parameter 1",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::ParticleSize1",
+      },
+      "Size, parameter 2": Object {
+        "displayedName": "Size, parameter 2",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::ParticleSize2",
+      },
+      "Transparency, parameter 1": Object {
+        "displayedName": "Transparency, parameter 1",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::ParticleAlpha1",
+      },
+      "Transparency, parameter 2": Object {
+        "displayedName": "Transparency, parameter 2",
+        "fullGroupName": "Particle system/Common",
+        "type": "ParticleSystem::ParticleAlpha2",
+      },
+    },
+  },
   "Pathfinding behavior": Object {
     "Destination reached": Object {
       "displayedName": "Destination reached",
@@ -1709,24 +1840,149 @@ Array [
     "type": "TextObject::String",
   },
   Object {
-    "displayedName": "Hide banner ad",
-    "fullGroupName": "AdMob banners and interstitial screens/Banner",
-    "type": "AdMobObject::HideBanner",
+    "displayedName": "Angle of the spray cone",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ConeSprayAngle",
   },
   Object {
-    "displayedName": "Preload interstitial screen",
-    "fullGroupName": "AdMob banners and interstitial screens/Interstitial screen",
-    "type": "AdMobObject::PreloadInterstitial",
+    "displayedName": "Emission angle",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::EmitterAngle",
   },
   Object {
-    "displayedName": "Show banner ad",
-    "fullGroupName": "AdMob banners and interstitial screens/Banner",
-    "type": "AdMobObject::ShowBanner",
+    "displayedName": "Emission angle 1",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::EmitterAngleA",
   },
   Object {
-    "displayedName": "Show interstitial screen",
-    "fullGroupName": "AdMob banners and interstitial screens/Interstitial screen",
-    "type": "AdMobObject::ShowInterstitial",
+    "displayedName": "Emission angle 2",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::EmitterAngleB",
+  },
+  Object {
+    "displayedName": "Emission maximal force",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::EmitterForceMax",
+  },
+  Object {
+    "displayedName": "Emission minimal force",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::EmitterForceMin",
+  },
+  Object {
+    "displayedName": "Flow",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::Flow",
+  },
+  Object {
+    "displayedName": "Transparency, parameter 1",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleAlpha1",
+  },
+  Object {
+    "displayedName": "Transparency, parameter 2",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleAlpha2",
+  },
+  Object {
+    "displayedName": "Blue color, parameter 1",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleBlue1",
+  },
+  Object {
+    "displayedName": "Blue color, parameter 2",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleBlue2",
+  },
+  Object {
+    "displayedName": "Initial color",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleColor1",
+  },
+  Object {
+    "displayedName": "Final color",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleColor2",
+  },
+  Object {
+    "displayedName": "Gravity angle",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleGravityAngle",
+  },
+  Object {
+    "displayedName": "Gravity",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleGravityLength",
+  },
+  Object {
+    "displayedName": "X Gravity",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleGravityX",
+  },
+  Object {
+    "displayedName": "Y Gravity",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleGravityY",
+  },
+  Object {
+    "displayedName": "Green color, parameter 1",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleGreen1",
+  },
+  Object {
+    "displayedName": "Green color, parameter 2",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleGreen2",
+  },
+  Object {
+    "displayedName": "Maximum lifetime",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleLifeTimeMax",
+  },
+  Object {
+    "displayedName": "Minimum lifetime",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleLifeTimeMin",
+  },
+  Object {
+    "displayedName": "Red color, parameter 1",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleRed1",
+  },
+  Object {
+    "displayedName": "Red color, parameter 2",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleRed2",
+  },
+  Object {
+    "displayedName": "SIze, parameter 1",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleSize1",
+  },
+  Object {
+    "displayedName": "Size, parameter 2",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleSize2",
+  },
+  Object {
+    "displayedName": "Recreate particles",
+    "fullGroupName": "Particle system/Setup",
+    "type": "ParticleSystem::RecreateParticleSystem",
+  },
+  Object {
+    "displayedName": "Capacity",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::Tank",
+  },
+  Object {
+    "displayedName": "Image",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::Texture",
+  },
+  Object {
+    "displayedName": "Creation radius",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ZoneRadius",
   },
   Object {
     "displayedName": "Height",
@@ -2037,6 +2293,26 @@ Array [
     "displayedName": "Make the object static",
     "fullGroupName": "Physics behavior/Movement",
     "type": "PhysicsBehavior::SetStatic",
+  },
+  Object {
+    "displayedName": "Hide banner ad",
+    "fullGroupName": "AdMob banners and interstitial screens/Banner",
+    "type": "AdMobObject::HideBanner",
+  },
+  Object {
+    "displayedName": "Preload interstitial screen",
+    "fullGroupName": "AdMob banners and interstitial screens/Interstitial screen",
+    "type": "AdMobObject::PreloadInterstitial",
+  },
+  Object {
+    "displayedName": "Show banner ad",
+    "fullGroupName": "AdMob banners and interstitial screens/Banner",
+    "type": "AdMobObject::ShowBanner",
+  },
+  Object {
+    "displayedName": "Show interstitial screen",
+    "fullGroupName": "AdMob banners and interstitial screens/Interstitial screen",
+    "type": "AdMobObject::ShowInterstitial",
   },
 ]
 `;
@@ -2644,14 +2920,129 @@ Array [
     "type": "TextObject::String",
   },
   Object {
-    "displayedName": "Banner is displayed",
-    "fullGroupName": "AdMob banners and interstitial screens/",
-    "type": "AdMobObject::BannerDisplayed",
+    "displayedName": "Angle of the spray cone",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ConeSprayAngle",
   },
   Object {
-    "displayedName": "Interstitial screen is ready",
-    "fullGroupName": "AdMob banners and interstitial screens/",
-    "type": "AdMobObject::InterstitialReady",
+    "displayedName": "Emission angle",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::EmitterAngle",
+  },
+  Object {
+    "displayedName": "Emission angle 1",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::EmitterAngleA",
+  },
+  Object {
+    "displayedName": "Emission angle 2",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::EmitterAngleB",
+  },
+  Object {
+    "displayedName": "Flow",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::Flow",
+  },
+  Object {
+    "displayedName": "No more particles",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::NoMoreParticles",
+  },
+  Object {
+    "displayedName": "Transparency, parameter 1",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleAlpha1",
+  },
+  Object {
+    "displayedName": "Transparency, parameter 2",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleAlpha2",
+  },
+  Object {
+    "displayedName": "Blue color, parameter 1",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleBlue1",
+  },
+  Object {
+    "displayedName": "Blue color, parameter 2",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleBlue2",
+  },
+  Object {
+    "displayedName": "Gravity angle",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleGravityAngle",
+  },
+  Object {
+    "displayedName": "Gravity",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleGravityLength",
+  },
+  Object {
+    "displayedName": "Direction of gravity on X axis",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleGravityX",
+  },
+  Object {
+    "displayedName": "Direction of the gravity on Y axis",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleGravityY",
+  },
+  Object {
+    "displayedName": "Green color, parameter 1",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleGreen1",
+  },
+  Object {
+    "displayedName": "Green color, parameter 2",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleGreen2",
+  },
+  Object {
+    "displayedName": "Maximum lifetime",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleLifeTimeMax",
+  },
+  Object {
+    "displayedName": "Minimum lifetime",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleLifeTimeMin",
+  },
+  Object {
+    "displayedName": "Red color, parameter 1",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleRed1",
+  },
+  Object {
+    "displayedName": "Red color, parameter 2",
+    "fullGroupName": "Particle system/Advanced",
+    "type": "ParticleSystem::ParticleRed2",
+  },
+  Object {
+    "displayedName": "SIze, parameter 1",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleSize1",
+  },
+  Object {
+    "displayedName": "Size, parameter 2",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ParticleSize2",
+  },
+  Object {
+    "displayedName": "Capacity",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::Tank",
+  },
+  Object {
+    "displayedName": "Image",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::Texture",
+  },
+  Object {
+    "displayedName": "Creation radius",
+    "fullGroupName": "Particle system/Common",
+    "type": "ParticleSystem::ZoneRadius",
   },
   Object {
     "displayedName": "Height",
@@ -2847,6 +3238,16 @@ Array [
     "displayedName": "Y component",
     "fullGroupName": "Physics behavior/Displacement",
     "type": "PhysicsBehavior::LinearVelocityY",
+  },
+  Object {
+    "displayedName": "Banner is displayed",
+    "fullGroupName": "AdMob banners and interstitial screens/",
+    "type": "AdMobObject::BannerDisplayed",
+  },
+  Object {
+    "displayedName": "Interstitial screen is ready",
+    "fullGroupName": "AdMob banners and interstitial screens/",
+    "type": "AdMobObject::InterstitialReady",
   },
 ]
 `;

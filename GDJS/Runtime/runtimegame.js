@@ -300,7 +300,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
   }
 
   //Load the first scene
-  var firstSceneName = this._data.properties.firstLayout;
+  var firstSceneName = this._data.firstLayout;
   this._sceneStack.push(
     this.hasScene(firstSceneName) ? firstSceneName : this.getSceneData().name,
     this._injectExternalLayout

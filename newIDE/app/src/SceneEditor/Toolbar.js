@@ -23,7 +23,9 @@ export class Toolbar extends PureComponent {
             iconButtonElement={
               <ToolbarIcon
                 src="res/ribbon_default/bug32.png"
-                tooltip={t('Advanced preview options (debugger, network preview...)')}
+                tooltip={t(
+                  'Advanced preview options (debugger, network preview...)'
+                )}
               />
             }
             buildMenuTemplate={() => [
@@ -37,8 +39,8 @@ export class Toolbar extends PureComponent {
                 click: () => this.props.onOpenDebugger(),
               },
             ]}
-          />)
-        }
+          />
+        )}
         {this.props.showPreviewButton && <ToolbarSeparator />}
         {this.props.showObjectsList && (
           <ToolbarIcon
@@ -92,11 +94,6 @@ export class Toolbar extends PureComponent {
           tooltip={t('Open the layers editor')}
         />
         <ToolbarSeparator />
-        <ToolbarIcon
-          onClick={this.props.toggleWindowMask}
-          src="res/ribbon_default/windowMask32.png"
-          tooltip={t('Toggle window mask')}
-        />
         <IconMenu
           iconButtonElement={
             <ToolbarIcon
@@ -105,6 +102,12 @@ export class Toolbar extends PureComponent {
             />
           }
           buildMenuTemplate={() => [
+            {
+              type: 'checkbox',
+              label: 'Show Mask',
+              checked: this.props.isWindowMaskShown(),
+              click: () => this.props.toggleWindowMask(),
+            },
             {
               type: 'checkbox',
               label: 'Show grid',

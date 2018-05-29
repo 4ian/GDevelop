@@ -36,6 +36,7 @@ import {
   selectInstructionsList,
 } from './SelectionHandler';
 import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
+import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -659,6 +660,7 @@ export default class EventsSheet extends Component {
               }
 
               this.closeInstructionEditor(true);
+              ensureSingleOnceInstructions(instrsList);
               this._eventsTree.forceEventsUpdate();
             }}
             resourceSources={this.props.resourceSources}

@@ -1,28 +1,26 @@
 GDevelop Javascript Platform (HTML5 game engine)
 ================================
 
-GDevelop Javascript Platform (GDJS) is a platform for developing
-*HTML5/Javascript* based games with GDevelop 3 (Free game development software
-available on http://www.compilgames.net).
+GDevelop Javascript Platform (GDJS) is the game engine for making
+*HTML5/Javascript* based games with GDevelop.
 
 Getting started
 ---------------
 
-First, take a look at the *Readme.md* at the root of the repository and the [developer documentation](http://4ian.github.io/GD-Documentation/).
+GDJS is composed of two parts: the C++ part exposing the GDJS to GDevelop IDE (*GDJS* folder), including the Exporter and classes doing transpilation from events to JavaScript, and the Javascript game engine (*Runtime* folder).
 
-The project is mainly composed of two parts: The C++ part exposing the platform to Game
-Develop ( Check the GDJS folder ) and the Javascript game engine ( Inside the Runtime folder ).
-
-The documentation of this specific platform is available [here](http://4ian.github.io/GD-Documentation/GDJS Documentation).
+  * First, take a look at the *Readme.md* at the root of the repository. For GDevelop 5, [follow the README](https://github.com/4ian/GD/blob/master/newIDE/README.md) to start the editor.
+  * If you then want to work on the game engine, take a look at the *Runtime* folder and at [the scripts](https://github.com/4ian/GD/tree/master/GDJS/scripts) that will be useful to have your changes reflected in GDevelop.
+  * For reference, you can look into the [developer documentation](http://4ian.github.io/GD-Documentation/) and the documentation of GDJS [here](http://4ian.github.io/GD-Documentation/GDJS Documentation).
 
 Contributing
 ------------
 
 Any contribution is welcome! Whether you want to submit a bug report, a feature request
-or any pull request so as to add a nice feature, do not hesitate to get in touch.
+or any pull request to add a feature, do not hesitate to get in touch.
 
 License
 -------
 
-GDevelop JS Platform is distributed under the MIT license: See license.txt for
+GDJS is distributed under the MIT license: See license.txt for
 more information.

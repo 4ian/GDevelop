@@ -117,6 +117,7 @@ export default class SceneEditor extends Component {
         toggleWindowMask={this.toggleWindowMask}
         toggleGrid={this.toggleGrid}
         isGridShown={() => !!this.state.uiSettings.grid}
+        isWindowMaskShown={() => !!this.state.uiSettings.windowMask}
         openSetupGrid={this.openSetupGrid}
         setZoomFactor={this.setZoomFactor}
         canUndo={canUndo(this.state.history)}

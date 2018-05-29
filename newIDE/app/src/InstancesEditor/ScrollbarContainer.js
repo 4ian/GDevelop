@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import Slider from 'material-ui/Slider';
 import ViewPosition from './ViewPosition';
+import throttle from 'lodash/throttle';
 
 const MATERIAL_UI_SLIDER_WIDTH = 18;
 
@@ -119,12 +120,16 @@ export const addScrollbars = (WrappedComponent: any) => {
       });
     };
 
-    _handleViewPositionChange = (viewPosition: ViewPosition) => {
-      this._setAndAdjust({
-        xValue: viewPosition.getViewX(),
-        yValue: viewPosition.getViewY(),
-      });
-    };
+    _handleViewPositionChange = throttle(
+      (viewPosition: ViewPosition) => {
+        this._setAndAdjust({
+          xValue: viewPosition.getViewX(),
+          yValue: viewPosition.getViewY(),
+        });
+      },
+      500, // Throttle the updates after a scroll to avoid make lots of updates in a row that would kill CPU
+      { leading: false, trailing: true }
+    );
 
     render() {
       const { wrappedEditorRef, ...otherProps } = this.props;

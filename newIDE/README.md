@@ -26,7 +26,7 @@ This will open the app in your web browser.
 Images resources, GDJS Runtime, extensions will be copied in resources, and [libGD.js](https://github.com/4ian/GDevelop.js) will be downloaded automatically. If you wish, you can
 [build libGD.js by yourself](https://github.com/4ian/GDevelop.js) (useful if you modified GDevelop native code like extensions).
 
-Note for Linux: If you get an error message that looks like this:
+> Note for Linux: If you get an error message that looks like this:
 `Error: watch GD/newIDE/app/some/file ENOSPC` then follow the instructions [here](https://stackoverflow.com/questions/22475849/node-js-error-enospc) to fix.
 
 ### Development of the standalone app
@@ -70,6 +70,22 @@ yarn flow #or npm run flow
 
 It's possible to create new themes for the UI. See [this file](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/index.js) to declare a new theme. You can take a look at the [default theme](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/index.js), including the [styling of the Events Sheets](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/EventsSheet.css).
 
+### Development of the game engine
+
+Make sure to have the standalone app running with Electron.
+
+The game engine ([GDJS](https://github.com/4ian/GD/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GD/tree/master/GDJS/Runtime). If you modify anything, run the `import-GDJS-Runtime.js` script:
+
+```bash
+cd newIDE/app
+cd scripts
+node import-GDJS-Runtime.js
+```
+
+You can then launch a preview in GDevelop (again, be sure to be using [the standalone app running with Electron](https://github.com/4ian/GD/blob/master/newIDE/README.md#development-of-the-standalone-app) to be sure to have your changes reflected immediately).
+
+> If you want to go further and create/modify an extension, check the sources in [Extensions folder](https://github.com/4ian/GD/tree/master/Extensions) and install [GDevelop.js](https://github.com/4ian/GDevelop.js). You'll then be able to make changes in C++ source files and have this reflected in the editor.
+
 ### Recommended tools for development
 
 Any text editor is fine, but it's a good idea to have one with *Prettier* (code formatting), *ESLint* (code linting) and *Flow* (type checking) integration.
@@ -77,6 +93,8 @@ Any text editor is fine, but it's a good idea to have one with *Prettier* (code 
 👉 You can use [Visual Studio Code](https://code.visualstudio.com) with these extensions: [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [Flow Language Support](https://github.com/flowtype/flow-for-vscode).
 
 ## Building and deploying the standalone app
+
+> This section is only for maintainers that want to deploy the "official app" on the GDevelop website. If you're working on contributions for GDevelop, you won't need it.
 
 ### Desktop version
 
@@ -119,7 +137,5 @@ This new editor is still in development and is missing some features:
 You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
 
 See also [the roadmap for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
-
-## Additional help
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app). Check out their documentation for common tasks or help about using it.

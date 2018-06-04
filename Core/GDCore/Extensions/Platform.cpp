@@ -20,11 +20,9 @@ namespace gd {
 gd::ChangesNotifier Platform::defaultEmptyChangesNotifier;
 #endif
 
-Platform::Platform() {
-}
+Platform::Platform() {}
 
-Platform::~Platform() {
-}
+Platform::~Platform() {}
 
 bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
   std::cout << extension->GetName();

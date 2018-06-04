@@ -9,25 +9,25 @@ This project is released under the MIT License.
 #include "GDCore/Tools/Localization.h"
 
 void DeclareFacebookInstantGamesExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "FacebookInstantGames",
-      _("Facebook Instant Games"),
-      _("Allow your game to send scores and interact with Facebook Instant Games"),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension.SetExtensionInformation("FacebookInstantGames",
+                                    _("Facebook Instant Games"),
+                                    _("Allow your game to send scores and "
+                                      "interact with Facebook Instant Games"),
+                                    "Florian Rival",
+                                    "Open source (MIT License)");
 
 #if defined(GD_IDE_ONLY)
   extension.AddStrExpression("PlayerId",
-                    _("Player identifier"),
-                    _("Get the player unique identifier"),
-                    _("Facebook Instant Games"),
-                    "JsPlatform/Extensions/Facebookicon16.png");
+                             _("Player identifier"),
+                             _("Get the player unique identifier"),
+                             _("Facebook Instant Games"),
+                             "JsPlatform/Extensions/Facebookicon16.png");
 
   extension.AddStrExpression("PlayerName",
-                    _("Player name"),
-                    _("Get the player name"),
-                    _("Facebook Instant Games"),
-                    "JsPlatform/Extensions/Facebookicon16.png");
+                             _("Player name"),
+                             _("Get the player name"),
+                             _("Facebook Instant Games"),
+                             "JsPlatform/Extensions/Facebookicon16.png");
 #endif
 }
 
@@ -45,12 +45,14 @@ class FacebookInstantGamesJsExtension : public gd::PlatformExtension {
 
     GetAllStrExpressions()["FacebookInstantGames::PlayerId"]
         .codeExtraInformation
-        .SetIncludeFile("Extensions/FacebookInstantGames/facebookinstantgamestools.js")
+        .SetIncludeFile(
+            "Extensions/FacebookInstantGames/facebookinstantgamestools.js")
         .SetFunctionName("gdjs.evtTools.facebookInstantGames.getPlayerId()");
-        
+
     GetAllStrExpressions()["FacebookInstantGames::PlayerName"]
         .codeExtraInformation
-        .SetIncludeFile("Extensions/FacebookInstantGames/facebookinstantgamestools.js")
+        .SetIncludeFile(
+            "Extensions/FacebookInstantGames/facebookinstantgamestools.js")
         .SetFunctionName("gdjs.evtTools.facebookInstantGames.getPlayerName()");
 
     StripUnimplementedInstructionsAndExpressions();

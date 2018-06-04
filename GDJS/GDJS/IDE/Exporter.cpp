@@ -77,10 +77,11 @@ void Exporter::ShowProjectExportDialog(gd::Project& project) {
     ExportWholeCocos2dProject(
         project, dialog.IsDebugMode(), dialog.GetExportDir());
   } else {
-        std::map<gd::String, bool> exportOptions;
-        exportOptions["exportForCordova"] = dialog.GetExportType() == ProjectExportDialog::PixiCordova;
-        exportOptions["minify"] = dialog.RequestMinify();
-        ExportWholePixiProject(project, dialog.GetExportDir(), exportOptions);
+    std::map<gd::String, bool> exportOptions;
+    exportOptions["exportForCordova"] =
+        dialog.GetExportType() == ProjectExportDialog::PixiCordova;
+    exportOptions["minify"] = dialog.RequestMinify();
+    ExportWholePixiProject(project, dialog.GetExportDir(), exportOptions);
   }
 
 #else
@@ -88,21 +89,23 @@ void Exporter::ShowProjectExportDialog(gd::Project& project) {
 #endif
 }
 
-bool Exporter::ExportWholePixiProject(gd::Project& project,
-                                      gd::String exportDir,
-                                      std::map<gd::String, bool> & exportOptions) {
+bool Exporter::ExportWholePixiProject(
+    gd::Project& project,
+    gd::String exportDir,
+    std::map<gd::String, bool>& exportOptions) {
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
   gd::Project exportedProject = project;
 
-    auto exportProject = [this, &exportedProject, &exportOptions, &helper](gd::String exportDir)
-    {
-        bool minify = exportOptions["minify"];
-        bool exportForCordova = exportOptions["exportForCordova"];
-        bool exportForFacebookInstantGames = exportOptions["exportForFacebookInstantGames"];
+  auto exportProject = [this, &exportedProject, &exportOptions, &helper](
+                           gd::String exportDir) {
+    bool minify = exportOptions["minify"];
+    bool exportForCordova = exportOptions["exportForCordova"];
+    bool exportForFacebookInstantGames =
+        exportOptions["exportForFacebookInstantGames"];
 
-        // Always disable the splash for Facebook Instant Games
-        if (exportForFacebookInstantGames)
-            exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
+    // Always disable the splash for Facebook Instant Games
+    if (exportForFacebookInstantGames)
+      exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
 
     wxProgressDialog* progressDialogPtr = NULL;
 #if !defined(GD_NO_WX_GUI)
@@ -163,9 +166,11 @@ bool Exporter::ExportWholePixiProject(gd::Project& project,
     helper.RemoveIncludes(false, true, includesFiles);
     helper.ExportIncludesAndLibs(includesFiles, exportDir, minify);
 
-        gd::String source = gdjsRoot + "/Runtime/index.html";
-        if (exportForCordova) source = gdjsRoot + "/Runtime/Cordova/www/index.html";
-        else if (exportForFacebookInstantGames) source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
+    gd::String source = gdjsRoot + "/Runtime/index.html";
+    if (exportForCordova)
+      source = gdjsRoot + "/Runtime/Cordova/www/index.html";
+    else if (exportForFacebookInstantGames)
+      source = gdjsRoot + "/Runtime/FacebookInstantGames/index.html";
 
     if (!helper.ExportPixiIndexFile(source, exportDir, includesFiles, "")) {
       gd::LogError(_("Error during export:\n") + lastError);

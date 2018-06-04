@@ -237,7 +237,8 @@ void ParticleEmitterObject::DoSerializeTo(
   ParticleEmitterBase::SerializeParticleEmitterBaseTo(element);
 }
 
-void ParticleEmitterBase::SerializeParticleEmitterBaseTo(gd::SerializerElement& element) const {
+void ParticleEmitterBase::SerializeParticleEmitterBaseTo(
+    gd::SerializerElement& element) const {
   element.SetAttribute("tank", tank);
   element.SetAttribute("flow", flow);
   element.SetAttribute("emitterForceMin", emitterForceMin);

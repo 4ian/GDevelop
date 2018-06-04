@@ -15,7 +15,7 @@ class Project;
 class Layout;
 class ExternalLayout;
 class AbstractFileSystem;
-}
+}  // namespace gd
 
 namespace gdjs {
 
@@ -75,7 +75,7 @@ class Exporter : public gd::ProjectExporter {
    */
   bool ExportWholePixiProject(gd::Project& project,
                               gd::String exportDir,
-                              std::map<gd::String, bool> & exportOptions);
+                              std::map<gd::String, bool>& exportOptions);
 
   /**
    * \brief Export the specified project, using Cocos2d.

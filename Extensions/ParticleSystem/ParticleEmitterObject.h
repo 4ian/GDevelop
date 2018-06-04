@@ -89,9 +89,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetEmitterZDirection(float newValue);
   void SetEmitterAngleA(float newValue);
   void SetEmitterAngleB(float newValue);
-  void SetConeSprayAngle(float newValue) {
-    SetEmitterAngleB(newValue);
-  };
+  void SetConeSprayAngle(float newValue) { SetEmitterAngleB(newValue); };
   void SetZoneRadius(float newValue);
   void SetParticleGravityX(float newValue);
   void SetParticleGravityY(float newValue);
@@ -207,9 +205,7 @@ class GD_EXTENSION_API ParticleEmitterBase {
   float GetEmitterZDirection() const { return emitterZDirection; };
   float GetEmitterAngleA() const { return emitterAngleA; };
   float GetEmitterAngleB() const { return emitterAngleB; };
-  float GetConeSprayAngle() const {
-    return GetEmitterAngleB();
-  };
+  float GetConeSprayAngle() const { return GetEmitterAngleB(); };
   float GetZoneRadius() const { return zoneRadius; };
   float GetParticleGravityX() const { return particleGravityX; };
   float GetParticleGravityY() const { return particleGravityY; };
@@ -265,9 +261,11 @@ class GD_EXTENSION_API ParticleEmitterBase {
   void SetRenderingAlpha() { additive = false; };
 
  protected:
-  virtual void UnserializeParticleEmitterBaseFrom(const gd::SerializerElement& element);
+  virtual void UnserializeParticleEmitterBaseFrom(
+      const gd::SerializerElement& element);
 #if defined(GD_IDE_ONLY)
-  virtual void SerializeParticleEmitterBaseTo(gd::SerializerElement& element) const;
+  virtual void SerializeParticleEmitterBaseTo(
+      gd::SerializerElement& element) const;
 #endif
 
  private:

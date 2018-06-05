@@ -306,6 +306,60 @@ bool ExporterHelper::ExportCocos2dFiles(
   return true;
 }
 
+bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
+                                         gd::String exportDir) {
+  {
+    gd::String str =
+        fs.ReadFile(gdjsRoot + "/Runtime/Electron/package.json")
+            .FindAndReplace("GDJS_GAME_NAME",
+                            project.GetName())  // TODO: JSON encode string
+            .FindAndReplace("GDJS_GAME_AUTHOR",
+                            project.GetAuthor())  // TODO: JSON encode string
+            .FindAndReplace(
+                "GDJS_GAME_MANGLED_NAME",
+                project.GetName().LowerCase());  // TODO: JSON encode string
+
+    if (!fs.WriteToFile(exportDir + "/package.json", str)) {
+      lastError = "Unable to write Electron package.json file.";
+      return false;
+    }
+  }
+
+  {
+    gd::String str =
+        fs.ReadFile(gdjsRoot + "/Runtime/Electron/main.js")
+            .FindAndReplace(
+                "800 /*GDJS_WINDOW_WIDTH*/",
+                gd::String::From<int>(project.GetMainWindowDefaultWidth()))
+            .FindAndReplace(
+                "600 /*GDJS_WINDOW_HEIGHT*/",
+                gd::String::From<int>(project.GetMainWindowDefaultHeight()))
+            .FindAndReplace("GDJS_GAME_NAME", project.GetName());
+
+    if (!fs.WriteToFile(exportDir + "/main.js", str)) {
+      lastError = "Unable to write Electron main.js file.";
+      return false;
+    }
+  }
+
+  auto &platformSpecificAssets = project.GetPlatformSpecificAssets();
+  auto &resourceManager = project.GetResourcesManager();
+
+  gd::String iconFilename =
+      resourceManager
+          .GetResource(platformSpecificAssets.Get("desktop", "icon-512"))
+          .GetFile();
+  auto projectDirectory = gd::AbstractFileSystem::NormalizeSeparator(
+      fs.DirNameFrom(project.GetProjectFile()));
+  fs.MakeAbsolute(iconFilename, projectDirectory);
+  fs.MkDir(exportDir + "/buildResources");
+  if (fs.FileExists(iconFilename)) {
+    fs.CopyFile(iconFilename, exportDir + "/buildResources/icon.png");
+  }
+
+  return true;
+}
+
 bool ExporterHelper::CompleteIndexFile(
     gd::String &str,
     gd::String customCss,

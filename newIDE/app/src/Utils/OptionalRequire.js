@@ -1,7 +1,7 @@
 /**
  * Allow to require a Node.js/npm module without having it bundled by webpack.
  * This means that this module will only be available when running on Electron.
- * When running without Electron, `null` will be return.
+ * When running without Electron, `null` will be returned.
  *
  * @param {string} moduleName The name of the module. For example: `fs`.
  */

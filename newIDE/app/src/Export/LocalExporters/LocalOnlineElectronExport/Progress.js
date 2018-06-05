@@ -5,12 +5,14 @@ import CircularProgress from 'material-ui/CircularProgress';
 import LinearProgress from 'material-ui/LinearProgress';
 import FlatButton from 'material-ui/FlatButton';
 import { Line, Spacer } from '../../../UI/Grid';
-import HelpButton from '../../../UI/HelpButton';
 
 export default ({
   exportStep,
   downloadUrl,
-  onDownload,
+  onDownloadWindowsZip,
+  onDownloadWindowsExe,
+  onDownloadMacOSZip,
+  onDownloadLinuxAppImage,
   onDownloadLogs,
   uploadMax,
   uploadProgress,
@@ -98,15 +100,27 @@ export default ({
       <StepLabel>Download</StepLabel>
       <StepContent>
         <Line>
-          <RaisedButton label="Download" primary onClick={onDownload} />
-          <HelpButton
-            label="Upload to Play Store"
-            helpPagePath="/publishing/android_and_ios/play-store"
+          <RaisedButton
+            label="Windows zip"
+            primary
+            onClick={onDownloadWindowsZip}
+          />
+          <RaisedButton
+            label="Windows"
+            primary
+            onClick={onDownloadWindowsExe}
+          />
+          <RaisedButton
+            label="macOS (zip)"
+            primary
+            onClick={onDownloadMacOSZip}
+          />
+          <RaisedButton
+            label="Linux (AppImage)"
+            primary
+            onClick={onDownloadLinuxAppImage}
           />
           <FlatButton label="See logs" onClick={onDownloadLogs} />
-        </Line>
-        <Line expand>
-          You can download it on your Android phone and install it.
         </Line>
       </StepContent>
     </Step>

@@ -1,0 +1,10 @@
+{
+    "name": "GDJS_GAME_MANGLED_NAME",
+    "main": "main.js",
+    "productName": "GDJS_GAME_NAME",
+    "description": "GDJS_GAME_NAME",
+    "author": "GDJS_GAME_AUTHOR",
+    "version": "1.0.0",
+    "dependencies": {}
+  }
+  

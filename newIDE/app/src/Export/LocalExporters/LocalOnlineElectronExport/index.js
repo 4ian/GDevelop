@@ -6,7 +6,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import {
   type Build,
-  buildCordovaAndroid,
+  buildElectron,
   getUrl,
   getBuild,
 } from '../../../Utils/GDevelopServices/Build';
@@ -35,7 +35,7 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 const gd = global.gd;
 
-export type LocalOnlineCordovaExportStep =
+export type LocalOnlineElectronExportStep =
   | ''
   | 'export'
   | 'compress'
@@ -45,7 +45,7 @@ export type LocalOnlineCordovaExportStep =
   | 'done';
 
 type State = {
-  exportStep: LocalOnlineCordovaExportStep,
+  exportStep: LocalOnlineElectronExportStep,
   build: ?Build,
   uploadProgress: number,
   uploadMax: number,
@@ -59,7 +59,7 @@ type Props = TranslatorProps & {
   onChangeSubscription: Function,
 };
 
-class LocalOnlineCordovaExport extends Component<Props, State> {
+class LocalOnlineElectronExport extends Component<Props, State> {
   state = {
     exportStep: '',
     build: null,
@@ -86,7 +86,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
         const exporter = new gd.Exporter(fileSystem, gdjsRoot);
         const outputDir = path.join(
           fileSystem.getTempDir(),
-          'OnlineCordovaExport'
+          'OnlineElectronExport'
         );
         fileSystem.mkDir(outputDir);
         fileSystem.clearDir(outputDir);
@@ -103,10 +103,10 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     const { project, t } = this.props;
     if (!project) return Promise.reject();
 
-    return LocalOnlineCordovaExport.prepareExporter()
+    return LocalOnlineElectronExport.prepareExporter()
       .then(({ exporter, outputDir }) => {
         const exportOptions = new gd.MapStringBoolean();
-        exportOptions.set('exportForCordova', true);
+        exportOptions.set('exportForElectron', true);
         exporter.exportWholePixiProject(
           project,
           outputDir,
@@ -162,7 +162,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     const { getAuthorizationHeader, profile } = userProfile;
     if (!profile) return Promise.reject(new Error('User is not authenticated'));
 
-    return buildCordovaAndroid(
+    return buildElectron(
       getAuthorizationHeader,
       profile.uid,
       uploadBucketKey
@@ -182,7 +182,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       let build = null;
       let tries = 0;
       const waitTime = 1000;
-      const maxWaitTime = 200000;
+      const maxWaitTime = 540000; //Wait up to 9 minutes
       do {
         await delay(waitTime);
         build = await getBuild(getAuthorizationHeader, profile.uid, buildId);
@@ -207,7 +207,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
 
   launchWholeExport = (userProfile: UserProfile) => {
     const { t, project } = this.props;
-    sendExportLaunched('local-online-cordova');
+    sendExportLaunched('local-online-electron');
 
     if (!displaySanityCheck(t, getSanityMessages(t, project))) return;
 
@@ -266,19 +266,40 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       }, handleError(t('Error while building the game.')));
   };
 
-  _download = () => {
-    const { build } = this.state;
-    if (!build || !build.apkKey) return;
-
-    Window.openExternalURL(getUrl(build.apkKey));
-  };
-
   _downloadLogs = () => {
     const { build } = this.state;
     if (!build || !build.logsKey) return;
 
     Window.openExternalURL(getUrl(build.logsKey));
   };
+
+  _downloadWindowsZip = () => {
+    const { build } = this.state;
+    if (!build || !build.windowsZipKey) return;
+
+    Window.openExternalURL(getUrl(build.windowsZipKey));
+  }
+
+  _downloadWindowsExe = () => {
+    const { build } = this.state;
+    if (!build || !build.windowsExeKey) return;
+
+    Window.openExternalURL(getUrl(build.windowsExeKey));
+  }
+
+  _downloadMacOSZip = () => {
+    const { build } = this.state;
+    if (!build || !build.macosZipKey) return;
+
+    Window.openExternalURL(getUrl(build.macosZipKey));
+  }
+
+  _downloadLinuxAppImage = () => {
+    const { build } = this.state;
+    if (!build || !build.linuxAppImageKey) return;
+
+    Window.openExternalURL(getUrl(build.linuxAppImageKey));
+  }
 
   render() {
     const {
@@ -294,7 +315,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
     if (!project) return null;
 
     const getBuildLimit = (userProfile: UserProfile): ?Limit =>
-      userProfile.limits ? userProfile.limits['cordova-build'] : null;
+      userProfile.limits ? userProfile.limits['electron-build'] : null;
     const canLaunchBuild = (userProfile: UserProfile) => {
       if (!errored && exportStep !== '' && exportStep !== 'done') return false;
 
@@ -310,13 +331,13 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
           <Column noMargin>
             <Line>
               {t(
-                'Packaging your game for Android will create an APK file that can be installed on Android phones, based on Cordova framework.'
+                'Your game will be exported and packaged online as an stand-alone game for Windows, Linux and macOS.'
               )}
             </Line>
             {userProfile.authenticated && (
               <Line justifyContent="center">
                 <RaisedButton
-                  label={t('Package for Android')}
+                  label={t('Export')}
                   primary
                   onClick={() => this.launchWholeExport(userProfile)}
                   disabled={!canLaunchBuild(userProfile)}
@@ -333,7 +354,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
             {!userProfile.authenticated && (
               <CreateProfile
                 message={t(
-                  'Create an account to build your game for Android in one-click:'
+                  'Create an account to build your game for Windows, Linux and macOS in one-click:'
                 )}
                 onLogin={userProfile.onLogin}
               />
@@ -345,7 +366,10 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
                   build && build.apkKey ? getUrl(build.apkKey) : null
                 }
                 logsUrl={build && build.logsKey ? getUrl(build.logsKey) : null}
-                onDownload={this._download}
+                onDownloadWindowsZip={this._downloadWindowsZip}
+                onDownloadWindowsExe={this._downloadWindowsExe}
+                onDownloadMacOSZip={this._downloadMacOSZip}
+                onDownloadLinuxAppImage={this._downloadLinuxAppImage}
                 onDownloadLogs={this._downloadLogs}
                 uploadMax={uploadMax}
                 uploadProgress={uploadProgress}
@@ -361,4 +385,4 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
   }
 }
 
-export default translate()(LocalOnlineCordovaExport);
+export default translate()(LocalOnlineElectronExport);

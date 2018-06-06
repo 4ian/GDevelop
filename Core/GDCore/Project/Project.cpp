@@ -61,6 +61,7 @@ Project::Project()
     :
 #if defined(GD_IDE_ONLY)
       name(_("Project")),
+      version("1.0.0"),
       packageName("com.example.gamename"),
       orientation("landscape"),
       folderProject(false),
@@ -524,6 +525,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   const SerializerElement& propElement =
       element.GetChild("properties", 0, "Info");
   SetName(propElement.GetChild("name", 0, "Nom").GetValue().GetString());
+  SetVersion(propElement.GetStringAttribute("version", "1.0.0"));
   SetDefaultWidth(
       propElement.GetChild("windowWidth", 0, "WindowW").GetValue().GetInt());
   SetDefaultHeight(
@@ -782,6 +784,7 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   SerializerElement& propElement = element.AddChild("properties");
   propElement.AddChild("name").SetValue(GetName());
+  propElement.SetAttribute("version", GetVersion());
   propElement.AddChild("author").SetValue(GetAuthor());
   propElement.AddChild("windowWidth").SetValue(GetMainWindowDefaultWidth());
   propElement.AddChild("windowHeight").SetValue(GetMainWindowDefaultHeight());
@@ -1100,6 +1103,7 @@ Project& Project::operator=(const Project& other) {
 void Project::Init(const gd::Project& game) {
   // Some properties
   name = game.name;
+  version = game.version;
   windowWidth = game.windowWidth;
   windowHeight = game.windowHeight;
   maxFPS = game.maxFPS;

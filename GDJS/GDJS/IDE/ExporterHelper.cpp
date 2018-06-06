@@ -315,6 +315,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                             project.GetName())  // TODO: JSON encode string
             .FindAndReplace("GDJS_GAME_AUTHOR",
                             project.GetAuthor())  // TODO: JSON encode string
+            .FindAndReplace("GDJS_GAME_VERSION", project.GetVersion())
             .FindAndReplace(
                 "GDJS_GAME_MANGLED_NAME",
                 project.GetName().LowerCase());  // TODO: JSON encode string

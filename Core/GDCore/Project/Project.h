@@ -21,44 +21,18 @@ class TiXmlElement;
 #include "GDCore/Project/VariablesContainer.h"
 namespace gd {
 class Platform;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class ExternalEvents;
-}
-namespace gd {
 class ResourcesManager;
-}
-namespace gd {
 class ExternalLayout;
-}
-namespace gd {
 class Object;
-}
-namespace gd {
 class VariablesContainer;
-}
-namespace gd {
 class ArbitraryResourceWorker;
-}
-namespace gd {
 class SourceFile;
-}
-namespace gd {
 class ImageManager;
-}
-namespace gd {
 class Behavior;
-}
-namespace gd {
 class BehaviorsSharedData;
-}
-namespace gd {
 class BaseEvent;
-}
-namespace gd {
 class SerializerElement;
 }
 #undef GetObject  // Disable an annoying macro
@@ -91,6 +65,17 @@ class GD_CORE_API Project : public ClassWithObjects {
    * \brief Get project name
    */
   const gd::String& GetName() const { return name; }
+
+  /**
+   * \brief Change the version of the project.
+   * This can be freely set, but should follow "X.Y.Z" format for compatibility with some exporters.
+   */
+  void SetVersion(const gd::String& version_) { version = version_; };
+
+  /**
+   * \brief Get project version.
+   */
+  const gd::String& GetVersion() const { return version; }
 
 #if defined(GD_IDE_ONLY)
   /**
@@ -877,6 +862,7 @@ class GD_CORE_API Project : public ClassWithObjects {
   void LoadProjectInformationFromXml(const TiXmlElement* elem);
 
   gd::String name;            ///< Game name
+  gd::String version;         ///< Game version number (used for some exports)
   unsigned int windowWidth;   ///< Window default width
   unsigned int windowHeight;  ///< Window default height
   int maxFPS;                 ///< Maximum Frame Per Seconds, -1 for unlimited

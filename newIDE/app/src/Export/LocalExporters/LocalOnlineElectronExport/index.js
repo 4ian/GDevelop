@@ -24,8 +24,7 @@ import Window from '../../../Utils/Window';
 import { delay } from '../../../Utils/Delay';
 import CreateProfile from '../../../Profile/CreateProfile';
 import LimitDisplayer from '../../../Profile/LimitDisplayer';
-import { displaySanityCheck } from '../../SanityChecker';
-import { getSanityMessages } from '../../SanityChecker/ProjectSanityChecker';
+import { displayProjectErrorsBox, getErrors } from '../../../ProjectManager/ProjectErrorsChecker';
 import { translate, type TranslatorProps } from 'react-i18next';
 import { type Limit } from '../../../Utils/GDevelopServices/Usage';
 const path = optionalRequire('path');
@@ -209,7 +208,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     const { t, project } = this.props;
     sendExportLaunched('local-online-electron');
 
-    if (!displaySanityCheck(t, getSanityMessages(t, project))) return;
+    if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
 
     const handleError = (message: string) => err => {
       if (!this.state.errored) {

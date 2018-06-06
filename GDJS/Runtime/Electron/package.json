@@ -4,7 +4,7 @@
     "productName": "GDJS_GAME_NAME",
     "description": "GDJS_GAME_NAME",
     "author": "GDJS_GAME_AUTHOR",
-    "version": "1.0.0",
+    "version": "GDJS_GAME_VERSION",
     "dependencies": {}
   }
   

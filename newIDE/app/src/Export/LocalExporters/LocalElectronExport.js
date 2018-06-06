@@ -1,3 +1,4 @@
+// @flow
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -9,9 +10,8 @@ import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import HelpButton from '../../UI/HelpButton';
-import { displaySanityCheck } from '../SanityChecker';
-import { getSanityMessages } from '../SanityChecker/ProjectSanityChecker';
-import { translate } from 'react-i18next';
+import { displayProjectErrorsBox, getErrors } from '../../ProjectManager/ProjectErrorsChecker';
+import { translate, type TranslatorProps } from 'react-i18next';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
@@ -19,7 +19,16 @@ const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
 
-class LocalElectronExport extends Component {
+type Props = TranslatorProps & {|
+  project: gdProject,
+|};
+
+type State = {|
+  outputDir: string,
+  exportFinishedDialogOpen: boolean,
+|};
+
+class LocalElectronExport extends Component<Props, State> {
   state = {
     exportFinishedDialogOpen: false,
     outputDir: '',
@@ -60,7 +69,7 @@ class LocalElectronExport extends Component {
 
     sendExportLaunched('local-electron');
 
-    if (!displaySanityCheck(t, getSanityMessages(t, project))) return;
+    if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
 
     const outputDir = this.state.outputDir;
     project.setLastCompilationDirectory(outputDir);
@@ -87,7 +96,7 @@ class LocalElectronExport extends Component {
   };
 
   openExportFolder = () => {
-    shell.openItem(this.state.outputDir);
+    if (shell) shell.openItem(this.state.outputDir);
   };
 
   render() {

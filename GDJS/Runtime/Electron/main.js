@@ -14,7 +14,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800 /*GDJS_WINDOW_WIDTH*/,
     height: 600 /*GDJS_WINDOW_HEIGHT*/,
-    title: "GDJS_GAME_NAME"
+    title: "GDJS_GAME_NAME",
+    backgroundColor: '#000000'
   });
 
   // Open external link in the OS default browser
@@ -24,7 +25,7 @@ function createWindow() {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadFile("file://" + __dirname + "/www/index.html");
+  mainWindow.loadFile("app/index.html");
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()

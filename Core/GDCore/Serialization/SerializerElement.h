@@ -23,6 +23,7 @@ namespace gd {
 class GD_CORE_API SerializerElement {
  public:
   SerializerElement();
+  SerializerElement(const SerializerValue & value);
   virtual ~SerializerElement();
 
   /** \name Value

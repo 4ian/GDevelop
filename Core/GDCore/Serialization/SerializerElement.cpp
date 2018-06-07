@@ -8,6 +8,9 @@ SerializerElement SerializerElement::nullElement;
 
 SerializerElement::SerializerElement() : valueUndefined(true) {}
 
+SerializerElement::SerializerElement(const SerializerValue& value)
+    : valueUndefined(false), elementValue(value) {}
+
 SerializerElement::~SerializerElement() {}
 
 const SerializerValue& SerializerElement::GetValue() const {

@@ -21,6 +21,7 @@
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
+#include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/IDE/wxTools/ShowFolder.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -308,17 +309,23 @@ bool ExporterHelper::ExportCocos2dFiles(
 
 bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                                          gd::String exportDir) {
+  gd::String jsonName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
+  gd::String jsonAuthor =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetAuthor()));
+  gd::String jsonVersion =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetVersion()));
+  gd::String jsonMangledName = gd::Serializer::ToJSON(gd::SerializerElement(
+      gd::SceneNameMangler::GetMangledSceneName(project.GetName())
+          .LowerCase().FindAndReplace(" ", "-")));
+
   {
     gd::String str =
         fs.ReadFile(gdjsRoot + "/Runtime/Electron/package.json")
-            .FindAndReplace("GDJS_GAME_NAME",
-                            project.GetName())  // TODO: JSON encode string
-            .FindAndReplace("GDJS_GAME_AUTHOR",
-                            project.GetAuthor())  // TODO: JSON encode string
-            .FindAndReplace("GDJS_GAME_VERSION", project.GetVersion())
-            .FindAndReplace(
-                "GDJS_GAME_MANGLED_NAME",
-                project.GetName().LowerCase());  // TODO: JSON encode string
+            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName)
+            .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
+            .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
+            .FindAndReplace("\"GDJS_GAME_MANGLED_NAME\"", jsonMangledName);
 
     if (!fs.WriteToFile(exportDir + "/package.json", str)) {
       lastError = "Unable to write Electron package.json file.";
@@ -335,7 +342,7 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
             .FindAndReplace(
                 "600 /*GDJS_WINDOW_HEIGHT*/",
                 gd::String::From<int>(project.GetMainWindowDefaultHeight()))
-            .FindAndReplace("GDJS_GAME_NAME", project.GetName());
+            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName);
 
     if (!fs.WriteToFile(exportDir + "/main.js", str)) {
       lastError = "Unable to write Electron main.js file.";

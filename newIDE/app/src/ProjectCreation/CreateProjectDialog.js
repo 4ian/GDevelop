@@ -1,16 +1,27 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import Tutorials from './Tutorials';
 
-export default class CreateProjectDialog extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      currentTab: 'examples',
-    };
-  }
+type State = {|
+  currentTab: 'starters' | 'examples' | 'tutorials',
+|};
+
+type Props = {|
+  startersComponent: React.Node,
+  examplesComponent: React.Node,
+  open: boolean,
+  onClose: () => void,
+  onOpen: (path: string) => void,
+  onCreate: (project: gdProject) => void,
+|};
+
+export default class CreateProjectDialog extends React.Component<Props, State> {
+  state = {
+    currentTab: 'starters',
+  };
 
   _onChangeTab = newTab => {
     this.setState({
@@ -18,30 +29,45 @@ export default class CreateProjectDialog extends Component {
     });
   };
 
+  _showExamples = () => this._onChangeTab('examples');
+
+  _onExamplesLoaded = () => {
+    // Force an update to ensure dialog is properly positioned.
+    this.forceUpdate();
+  };
+
   render() {
     const { open, onClose, onOpen, onCreate } = this.props;
     if (!open) return null;
 
-    const actions = [
-      <FlatButton label="Close" primary={false} onClick={onClose} />,
-    ];
-
     const ExamplesComponent = this.props.examplesComponent;
-    if (!ExamplesComponent)
-      throw new Error('examplesComponent is missing for CreateProjectDialog');
+    const StartersComponent = this.props.startersComponent;
 
     return (
       <Dialog
         title="Create a new game"
-        actions={actions}
+        actions={[
+          <FlatButton label="Close" primary={false} onClick={onClose} />,
+        ]}
         onRequestClose={onClose}
         open={open}
         noMargin
         autoScrollBodyContent
       >
-        <Tabs value={this.state.value} onChange={this._onChangeTab}>
+        <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
+          <Tab label="Starters" value="starters">
+            <StartersComponent
+              onOpen={onOpen}
+              onCreate={onCreate}
+              onShowExamples={this._showExamples}
+            />
+          </Tab>
           <Tab label="Examples" value="examples">
-            <ExamplesComponent onOpen={onOpen} onCreate={onCreate} />
+            <ExamplesComponent
+              onOpen={onOpen}
+              onCreate={onCreate}
+              onExamplesLoaded={this._onExamplesLoaded}
+            />
           </Tab>
           <Tab label="Tutorials" value="tutorials">
             <Tutorials />

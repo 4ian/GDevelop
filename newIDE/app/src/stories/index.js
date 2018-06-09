@@ -360,7 +360,11 @@ storiesOf('AboutDialog', module)
 storiesOf('CreateProjectDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <CreateProjectDialog open examplesComponent={Placeholder} />
+    <CreateProjectDialog
+      open
+      examplesComponent={Placeholder}
+      startersComponent={Placeholder}
+    />
   ));
 
 storiesOf('LayoutChooserDialog', module)

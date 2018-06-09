@@ -19,6 +19,7 @@ import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 
 // Import for browser only IDE
 import BrowserExamples from './ProjectCreation/BrowserExamples';
+import BrowserStarters from './ProjectCreation/BrowserStarters';
 import BrowserProjectOpener from './ProjectsStorage/BrowserProjectOpener';
 import BrowserSaveDialog from './ProjectsStorage/BrowserSaveDialog';
 import BrowserIntroDialog from './MainFrame/BrowserIntroDialog';
@@ -31,6 +32,7 @@ import { getBrowserExporters } from './Export/BrowserExporters';
 import ExternalEditor from './ExternalEditor';
 import optionalRequire from './Utils/OptionalRequire.js';
 import LocalExamples from './ProjectCreation/LocalExamples';
+import LocalStarters from './ProjectCreation/LocalStarters';
 import localResourceSources from './ResourcesList/LocalResourceSources';
 import localResourceExternalEditors from './ResourcesList/LocalResourceExternalEditors';
 import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
@@ -81,7 +83,10 @@ if (electron) {
           previewLauncher={<LocalPreviewLauncher />}
           exportDialog={<ExportDialog exporters={getLocalExporters()} />}
           createDialog={
-            <CreateProjectDialog examplesComponent={LocalExamples} />
+            <CreateProjectDialog
+              examplesComponent={LocalExamples}
+              startersComponent={LocalStarters}
+            />
           }
           introDialog={<LocalIntroDialog />}
           onSaveProject={LocalProjectWriter.saveProject}
@@ -99,7 +104,12 @@ if (electron) {
     <MainFrame
       previewLauncher={<BrowserS3PreviewLauncher />}
       exportDialog={<ExportDialog exporters={getBrowserExporters()} />}
-      createDialog={<CreateProjectDialog examplesComponent={BrowserExamples} />}
+      createDialog={
+        <CreateProjectDialog
+          examplesComponent={BrowserExamples}
+          startersComponent={BrowserStarters}
+        />
+      }
       introDialog={<BrowserIntroDialog />}
       saveDialog={<BrowserSaveDialog />}
       onReadFromPathOrURL={BrowserProjectOpener.readInternalFile}

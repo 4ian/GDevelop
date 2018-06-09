@@ -1,106 +1,104 @@
 import React, { Component } from 'react';
-import Subheader from 'material-ui/Subheader';
 import { List, ListItem } from 'material-ui/List';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
+import RaisedButton from 'material-ui/RaisedButton';
+import Window from '../Utils/Window';
 
-export default class LocalCreateDialog extends Component {
+const formatExampleName = (name: string) => {
+  if (!name.length) return '';
+
+  return name[0].toUpperCase() + name.substr(1).replace(/-/g, ' ');
+};
+
+// This is the list of available examples in src/fixtures folder.
+// To add a new example, add it first in resources/examples, using the desktop Electron version
+// of GDevelop, then use scripts/update-fixtures-from-resources-examples.js to have the web-app version
+// of the example generated. Finally, add it in this list and upload the example resources online.
+const exampleNames = [
+  'change-position-of-object',
+  'change-scale-of-sprites',
+  'change-sprite-animation',
+  'create-object-with-mouseclick',
+  'drag-camera-with-mouse',
+  'infinite-scrolling-background',
+  'instance-timer',
+  'inventory-system',
+  'keyboard-practice',
+  'manipulate-text-object',
+  'move-camera-to-position',
+  'move-object-toward-position',
+  'move-object-with-physics',
+  'parallax',
+  'parallax-scrolling',
+  'parse-json-from-api',
+  'particles-explosions',
+  'particles-various-effects',
+  'pathfinding',
+  'pathfinding-basics',
+  'physics',
+  'platformer',
+  'play-stop-sprite-animation',
+  'random-color-picker',
+  'rotate-toward-mouse',
+  'rotate-toward-position',
+  'rotate-with-keypress',
+  'save-load',
+  'shoot-bullets',
+  'space-shooter',
+  'splash-screen',
+  'toggle-music-play-sound',
+  'z-depth',
+  'zombie-laser',
+];
+
+export default class BrowserExamples extends Component {
+  _submitExample() {
+    const body = `Hi!
+
+I'd like to submit a new example to be added to GDevelop.
+Here is the link to download it: **INSERT the link to your game here, or add it as an attachment**.
+
+I confirm that any assets can be used freely by anybody, including for commercial usage.
+`;
+    Window.openExternalURL(
+      `https://github.com/4ian/GD/issues/new?body=${encodeURIComponent(
+        body
+      )}&title=New%20example`
+    );
+  }
+
   render() {
     return (
       <Column noMargin>
         <Line>
           <Column>
-            <p>Choose a game to use as a starter:</p>
+            <p>Choose an example to open:</p>
           </Column>
         </Line>
         <Line>
           <Column expand noMargin>
             <List>
-              <Subheader>Starters</Subheader>
-              <ListItem
-                primaryText="Platformer"
-                secondaryText={
-                  <p>
-                    A simple platform game, with coins to collect, moving
-                    platforms and enemies.
-                  </p>
-                }
-                secondaryTextLines={2}
-                onClick={() => {
-                  sendNewGameCreated('platformer');
-                  this.props.onOpen('internal://platformer');
-                }}
-              />
-              <ListItem
-                primaryText="Space Shooter"
-                secondaryText={
-                  <p>
-                    A side-scrolling shooter where you must defeat incoming
-                    enemies with your spaceship.
-                  </p>
-                }
-                secondaryTextLines={2}
-                onClick={() => {
-                  sendNewGameCreated('space-shooter');
-                  this.props.onOpen('internal://space-shooter');
-                }}
-              />
-              <Subheader>Examples</Subheader>
-              <ListItem
-                primaryText="Various particles effects"
-                secondaryText={
-                  <p>
-                    Example showing particles emitters used to create different
-                    kind of effects.
-                  </p>
-                }
-                secondaryTextLines={2}
-                onClick={() => {
-                  sendNewGameCreated('particles-various-effects');
-                  this.props.onOpen('internal://particles-various-effects');
-                }}
-              />
-              <ListItem
-                primaryText="Explosions with particles"
-                secondaryText={
-                  <p>
-                    See how to create realistic explosions effects with particles
-                  </p>
-                }
-                secondaryTextLines={2}
-                onClick={() => {
-                  sendNewGameCreated('particles-explosions');
-                  this.props.onOpen('internal://particles-explosions');
-                }}
-              />
-              <ListItem
-                primaryText="Physics"
-                secondaryText={
-                  <p>
-                    Example showing how to configure physics behavior on objects and use events to detect collisions.
-                  </p>
-                }
-                secondaryTextLines={2}
-                onClick={() => {
-                  sendNewGameCreated('physics');
-                  this.props.onOpen('internal://physics');
-                }}
-              />
-              <ListItem
-                primaryText="Pathfinding"
-                secondaryText={
-                  <p>
-                    Example showing how to move a tank avoiding obstacles on the
-                    battlefield.
-                  </p>
-                }
-                secondaryTextLines={2}
-                onClick={() => {
-                  sendNewGameCreated('pathfinding');
-                  this.props.onOpen('internal://pathfinding');
-                }}
-              />
+              {exampleNames.map(exampleName => (
+                <ListItem
+                  key={exampleName}
+                  primaryText={formatExampleName(exampleName)}
+                  onClick={() => {
+                    sendNewGameCreated(exampleName);
+                    this.props.onOpen(`internal://${exampleName}`);
+                  }}
+                />
+              ))}
             </List>
+            <Column expand>
+              <p>Want to contribute to the examples?</p>
+              <Line alignItems="center" justifyContent="center">
+                <RaisedButton
+                  label="Submit your example"
+                  onClick={this._submitExample}
+                />
+              </Line>
+            </Column>
           </Column>
         </Line>
       </Column>

@@ -54,7 +54,7 @@ export const getLocalExporters = () => [
     renderIcon: (props) => <Cordova {...props}/>,
     helpPage: '/publishing/android_and_ios_with_cordova',
     description:
-      'Build the game locally as a Cordova project, and export it manually then to iOS or Android with Cordova developers tools.',
+      'Build the game locally as a Cordova project, and export it manually to iOS or Android with Cordova developers tools.',
     key: 'localcordovaexport',
     ExportComponent: LocalCordovaExport,
     advanced: true,
@@ -62,14 +62,14 @@ export const getLocalExporters = () => [
   {
     name: 'Windows/macOS/Linux',
     renderIcon: (props) => <LaptopMac {...props}/>,
-    description: 'Package your game as an app for Windows, macOS or Linux.',
+    description: 'Package your game as an app for Windows, macOS or Linux directly from GDevelop.',
     key: 'localonlineelectronexport',
     ExportComponent: LocalOnlineElectronExport,
   },
   {
     name: 'Windows/macOS/Linux (manual)',
     renderIcon: (props) => <LaptopMac {...props}/>,
-    description: 'Build the game locally and export it manually to Windows, macOS or Linux with third-party tools.',
+    description: 'Build the game locally and export it manually to Windows, macOS or Linux with third-party developer tools.',
     key: 'localelectronexport',
     ExportComponent: LocalElectronExport,
     advanced: true,

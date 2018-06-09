@@ -16,7 +16,7 @@ export type Build = {
   macosZipKey?: string,
   linuxAppImageKey?: string,
   status: 'pending' | 'complete' | 'error',
-  type: 'cordova-build',
+  type: 'cordova-build' | 'electron-build',
   createdAt: number,
   updatedAt: number,
 };
@@ -75,6 +75,24 @@ export const getBuild = (
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.get(`${GDevelopBuildApi.baseUrl}/build/${buildId}`, {
+        params: {
+          userId,
+        },
+        headers: {
+          Authorization: authorizationHeader,
+        },
+      })
+    )
+    .then(response => response.data);
+};
+
+export const getBuilds = (
+  getAuthorizationHeader: () => Promise<string>,
+  userId: string
+): Promise<Array<Build>> => {
+  return getAuthorizationHeader()
+    .then(authorizationHeader =>
+      axios.get(`${GDevelopBuildApi.baseUrl}/build`, {
         params: {
           userId,
         },

@@ -85,6 +85,7 @@ import LoginDialog from '../Profile/LoginDialog';
 import UserProfileContext from '../Profile/UserProfileContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
+import BuildProgress from '../Export/Builds/BuildProgress';
 
 const gd = global.gd;
 const {
@@ -278,6 +279,76 @@ storiesOf('LocalOnlineCordovaExport', module)
     <Progress exportStep={'build'} errored />
   ))
   .add('Progress (done)', () => <Progress exportStep={'done'} />);
+
+storiesOf('BuildProgress', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('errored', () => (
+    <BuildProgress
+      build={{
+        status: 'error',
+        logsKey: '/fake-error.log',
+      }}
+      onDownload={action('download')}
+    />
+  ))
+  .add('pending (electron-build)', () => (
+    <BuildProgress
+      build={{
+        type: 'electron-build',
+        status: 'pending',
+        updatedAt: Date.now(),
+      }}
+      onDownload={action('download')}
+    />
+  ))
+  .add('pending (cordova-build)', () => (
+    <BuildProgress
+      build={{
+        type: 'cordova-build',
+        status: 'pending',
+        updatedAt: Date.now(),
+      }}
+      onDownload={action('download')}
+    />
+  ))
+  .add('pending and very old (cordova-build)', () => (
+    <BuildProgress
+      build={{
+        type: 'cordova-build',
+        status: 'pending',
+        updatedAt: Date.now() - 1000 * 3600 * 24,
+      }}
+      onDownload={action('download')}
+    />
+  ))
+  .add('complete (cordova-build)', () => (
+    <BuildProgress
+      build={{
+        type: 'cordova-build',
+        status: 'complete',
+        logsKey: '/fake-error.log',
+        apkKey: '/fake-game.apk',
+        updatedAt: Date.now(),
+      }}
+      onDownload={action('download')}
+    />
+  ))
+  .add('complete (electron-build)', () => (
+    <BuildProgress
+      build={{
+        type: 'electron-build',
+        status: 'complete',
+        logsKey: '/fake-error.log',
+        windowsExeKey: '/fake-windows-game.exe',
+        windowsZipKey: '/fake-windows-game.zip',
+        macosZipKey: '/fake-macos-game.zip',
+        linuxAppImageKey: '/fake-linux-game.AppImage',
+        updatedAt: Date.now(),
+      }}
+      onDownload={action('download')}
+    />
+  ));
 
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)

@@ -11,7 +11,7 @@ import {
 import { type Usages } from '../Utils/GDevelopServices/Usage';
 import { Column, Line } from '../UI/Grid';
 import EmptyMessage from '../UI/EmptyMessage';
-import format from 'date-fns/format'
+import format from 'date-fns/format';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 
 type Props = { usages: ?Usages };
@@ -36,7 +36,9 @@ export default ({ usages }: Props) => (
           <TableBody displayRowCheckbox={false}>
             {usages.map(usage => (
               <TableRow key={usage.id}>
-                <TableRowColumn>{format(usage.createdAt, 'YYYY-MM-DD HH:mm:ss')}</TableRowColumn>
+                <TableRowColumn>
+                  {format(usage.createdAt, 'YYYY-MM-DD HH:mm:ss')}
+                </TableRowColumn>
                 <TableRowColumn>{usage.type}</TableRowColumn>
               </TableRow>
             ))}

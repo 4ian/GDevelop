@@ -132,7 +132,7 @@ export default class AboutDialog extends PureComponent<Props, *> {
     Window.openExternalURL('https://gdevelop-app.com/contribute/');
   };
 
-  _openLink = (link: ?string) => {
+  _openLink = (link: string) => {
     if (!link) return;
 
     Window.openExternalURL(link);
@@ -194,7 +194,7 @@ export default class AboutDialog extends PureComponent<Props, *> {
                     rightIconButton={
                       contributor.link ? (
                         <IconButton
-                          onClick={() => this._openLink(contributor.link)}
+                          onClick={() => this._openLink(contributor.link || '')}
                         >
                           <OpenInNew />
                         </IconButton>
@@ -205,7 +205,9 @@ export default class AboutDialog extends PureComponent<Props, *> {
               </List>
               <Column expand>
                 <p>
-                  Thanks to all users of GDevelop! There must be missing tons of people, please send your name if you've contributed and you're not listed.
+                  Thanks to all users of GDevelop! There must be missing tons of
+                  people, please send your name if you've contributed and you're
+                  not listed.
                 </p>
                 <Line alignItems="center" justifyContent="center">
                   <FlatButton

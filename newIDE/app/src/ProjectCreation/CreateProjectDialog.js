@@ -10,12 +10,12 @@ type State = {|
 |};
 
 type Props = {|
-  startersComponent: React.Node,
-  examplesComponent: React.Node,
-  open: boolean,
-  onClose: () => void,
-  onOpen: (path: string) => void,
-  onCreate: (project: gdProject) => void,
+  startersComponent: any,
+  examplesComponent: any,
+  open?: boolean,
+  onClose?: () => void,
+  onOpen?: (path: string) => void,
+  onCreate?: (project: gdProject) => void,
 |};
 
 export default class CreateProjectDialog extends React.Component<Props, State> {
@@ -23,7 +23,7 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
     currentTab: 'starters',
   };
 
-  _onChangeTab = newTab => {
+  _onChangeTab = (newTab: 'starters' | 'examples' | 'tutorials') => {
     this.setState({
       currentTab: newTab,
     });

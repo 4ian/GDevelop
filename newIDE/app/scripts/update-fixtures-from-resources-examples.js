@@ -12,8 +12,11 @@ const baseUrl = 'https://df5lqcdudryde.cloudfront.net/examples';
 // This is the list of available examples in resources/examples folder.
 // To add a new example, add it first in resources/examples, saving it using the desktop Electron version
 // of GDevelop, then add it in this list and launch the script to have the web-app version
-// of the example generated. Finally, add it in BrowserExamples.js and upload the example resources online.
+// of the example generated. Finally, add it in BrowserExamples.js, BrowserProjectOpener.js
+// and upload the example resources online.
 const exampleNames = [
+  'asteroids',
+  'brakeout',
   'change-position-of-object',
   'change-scale-of-sprites',
   'change-sprite-animation',
@@ -46,6 +49,7 @@ const exampleNames = [
   'space-shooter',
   'splash-screen',
   'toggle-music-play-sound',
+  'type-on-text-effect',
   'z-depth',
   'zombie-laser',
 ];

@@ -1,3 +1,5 @@
+import asteroids from '../fixtures/asteroids/asteroids.json';
+import brakeout from '../fixtures/brakeout/brakeout.json';
 import changePositionOfObject from '../fixtures/change-position-of-object/change-position-of-object.json';
 import changeScaleOfSprites from '../fixtures/change-scale-of-sprites/change-scale-of-sprites.json';
 import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sprite-animation.json';
@@ -30,12 +32,19 @@ import shootBullets from '../fixtures/shoot-bullets/shoot-bullets.json';
 import spaceShooter from '../fixtures/space-shooter/space-shooter.json';
 import splashScreen from '../fixtures/splash-screen/splash-screen.json';
 import toggleMusicPlaySound from '../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
+import typeOnTextEffect from '../fixtures/type-on-text-effect/type-on-text-effect.json';
 import zDepth from '../fixtures/z-depth/z-depth.json';
 import zombieLaser from '../fixtures/zombie-laser/zombie-laser.json';
 
 export default class BrowserProjectOpener {
   static readInternalFile(url) {
-    if (url === 'internal://change-position-of-object') {
+    if (url === 'internal://asteroids') {
+      return Promise.resolve(asteroids);
+    }
+    else if (url === 'internal://brakeout') {
+      return Promise.resolve(brakeout);
+    }
+    else if (url === 'internal://change-position-of-object') {
       return Promise.resolve(changePositionOfObject);
     }
     else if (url === 'internal://change-scale-of-sprites') {
@@ -130,6 +139,9 @@ export default class BrowserProjectOpener {
     }
     else if (url === 'internal://toggle-music-play-sound') {
       return Promise.resolve(toggleMusicPlaySound);
+    }
+    else if (url === 'internal://type-on-text-effect') {
+      return Promise.resolve(typeOnTextEffect);
     }
     else if (url === 'internal://z-depth') {
       return Promise.resolve(zDepth);

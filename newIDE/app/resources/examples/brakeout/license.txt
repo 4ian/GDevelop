@@ -1,0 +1,5 @@
+Brakeout example originally from GDevelop 4.
+Free to use for any purposes
+
+Find more examples at https://gametemplates.itch.io/
+Have fun!

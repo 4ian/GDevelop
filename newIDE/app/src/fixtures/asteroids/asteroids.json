@@ -220,6 +220,38 @@
         "name": "ship_part_3.png",
         "smoothed": false,
         "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight22.png",
+        "kind": "image",
+        "name": "flatLight22.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight23.png",
+        "kind": "image",
+        "name": "flatLight23.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight34.png",
+        "kind": "image",
+        "name": "flatLight34.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight35.png",
+        "kind": "image",
+        "name": "flatLight35.png",
+        "smoothed": true,
+        "userAdded": false
       }
     ],
     "resourceFolders": [
@@ -678,7 +710,68 @@
         }
       ],
       "variables": [],
-      "instances": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "touch",
+          "locked": false,
+          "name": "btn_rotate_left",
+          "width": 0,
+          "x": 64,
+          "y": 480,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "touch",
+          "locked": false,
+          "name": "btn_rotate_right",
+          "width": 0,
+          "x": 160,
+          "y": 480,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "touch",
+          "locked": false,
+          "name": "btn_fire",
+          "width": 0,
+          "x": 608,
+          "y": 480,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "touch",
+          "locked": false,
+          "name": "btn_thruster",
+          "width": 0,
+          "x": 672,
+          "y": 416,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
       "objects": [
         {
           "name": "player",
@@ -1590,6 +1683,158 @@
             "g": 255,
             "r": 255
           }
+        },
+        {
+          "name": "btn_rotate_left",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "flatLight22.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "btn_rotate_right",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "flatLight23.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "btn_fire",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "flatLight34.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "btn_thruster",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "flatLight35.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ],
       "events": [
@@ -1759,6 +2004,50 @@
                       "parameters": [
                         "",
                         "\"player_shoot_timer\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Check if the game is running on mobile or PC, in case it is NOT mobile, hide the touch controls",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SystemInfo::IsMobile"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "HideLayer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"touch\""
                       ],
                       "subInstructions": []
                     }
@@ -4894,7 +5183,7 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "rotate player",
+                  "comment": "rotate player using the keyboard",
                   "comment2": ""
                 },
                 {
@@ -4975,7 +5264,7 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "move player",
+                  "comment": "rotate player using the on-screen buttons if the layer is visible (the layer is visible only if the game is running on a mobile device)",
                   "comment2": ""
                 },
                 {
@@ -4986,280 +5275,30 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "KeyFromTextReleased"
+                        "value": "LayerVisible"
                       },
                       "parameters": [
                         "",
-                        "GlobalVariableString(player_forward_key)"
+                        "\"touch\""
                       ],
                       "subInstructions": []
                     }
                   ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarObjet"
-                      },
-                      "parameters": [
-                        "player",
-                        "speed",
-                        "=",
-                        "Variable(player_max_speed)"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
+                  "actions": [],
                   "events": [
                     {
                       "disabled": false,
                       "folded": false,
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "stop thruster sound if played and after play thruster down sound once",
-                      "comment2": ""
-                    },
-                    {
-                      "disabled": false,
-                      "folded": false,
                       "type": "BuiltinCommonInstructions::Standard",
                       "conditions": [
                         {
                           "type": {
                             "inverted": false,
-                            "value": "SoundPlaying"
+                            "value": "SourisBouton"
                           },
                           "parameters": [
                             "",
-                            "3"
-                          ],
-                          "subInstructions": []
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "StopSoundCanal"
-                          },
-                          "parameters": [
-                            "",
-                            "3"
-                          ],
-                          "subInstructions": []
-                        }
-                      ],
-                      "events": []
-                    },
-                    {
-                      "disabled": false,
-                      "folded": false,
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "SoundPlaying"
-                          },
-                          "parameters": [
-                            "",
-                            "3"
-                          ],
-                          "subInstructions": []
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "PlaySoundCanal"
-                          },
-                          "parameters": [
-                            "",
-                            "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster_down.ogg",
-                            "3",
-                            "no",
-                            "GlobalVariable(sound_volume)",
-                            "1"
-                          ],
-                          "subInstructions": []
-                        }
-                      ],
-                      "events": []
-                    }
-                  ]
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "KeyFromTextPressed"
-                      },
-                      "parameters": [
-                        "",
-                        "GlobalVariableString(player_forward_key)"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "player_movement_angle",
-                        "=",
-                        "player.Angle()"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "ModVarScene"
-                      },
-                      "parameters": [
-                        "player_speed",
-                        "=",
-                        "Variable(player_acceleration)"
-                      ],
-                      "subInstructions": []
-                    }
-                  ],
-                  "events": [
-                    {
-                      "disabled": false,
-                      "folded": false,
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "play thruster sound",
-                      "comment2": ""
-                    },
-                    {
-                      "disabled": false,
-                      "folded": false,
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "SoundPlaying"
-                          },
-                          "parameters": [
-                            "",
-                            "3"
-                          ],
-                          "subInstructions": []
-                        },
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "BuiltinCommonInstructions::Once"
-                          },
-                          "parameters": [],
-                          "subInstructions": []
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "StopSoundCanal"
-                          },
-                          "parameters": [
-                            "",
-                            "3"
-                          ],
-                          "subInstructions": []
-                        }
-                      ],
-                      "events": []
-                    },
-                    {
-                      "disabled": false,
-                      "folded": false,
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "inverted": true,
-                            "value": "SoundPlaying"
-                          },
-                          "parameters": [
-                            "",
-                            "3"
-                          ],
-                          "subInstructions": []
-                        }
-                      ],
-                      "actions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "PlaySoundCanal"
-                          },
-                          "parameters": [
-                            "",
-                            "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster.ogg",
-                            "3",
-                            "yes",
-                            "GlobalVariable(sound_volume)",
-                            "1"
-                          ],
-                          "subInstructions": []
-                        }
-                      ],
-                      "events": []
-                    },
-                    {
-                      "disabled": false,
-                      "folded": false,
-                      "type": "BuiltinCommonInstructions::Comment",
-                      "color": {
-                        "b": 109,
-                        "g": 230,
-                        "r": 255,
-                        "textB": 0,
-                        "textG": 0,
-                        "textR": 0
-                      },
-                      "comment": "create engine particles",
-                      "comment2": ""
-                    },
-                    {
-                      "disabled": false,
-                      "folded": false,
-                      "type": "BuiltinCommonInstructions::Standard",
-                      "conditions": [
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "NbObjet"
-                          },
-                          "parameters": [
-                            "player",
-                            ">",
-                            "0"
+                            "Left"
                           ],
                           "subInstructions": []
                         }
@@ -5274,12 +5313,608 @@
                             {
                               "type": {
                                 "inverted": false,
-                                "value": "Timer"
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "btn_rotate_left",
+                                "",
+                                "yes",
+                                ""
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Rotate"
+                              },
+                              "parameters": [
+                                "player",
+                                "-Variable(player_rotation_speed)",
+                                ""
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "btn_rotate_right",
+                                "",
+                                "yes",
+                                ""
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Rotate"
+                              },
+                              "parameters": [
+                                "player",
+                                "Variable(player_rotation_speed)",
+                                ""
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "move player using the keyboard",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "KeyFromTextReleased"
+                          },
+                          "parameters": [
+                            "",
+                            "GlobalVariableString(player_forward_key)"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "player_speed",
+                            "=",
+                            "Variable(player_max_speed)"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "stop thruster sound if played and after play thruster down sound once",
+                          "comment2": ""
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SoundPlaying"
                               },
                               "parameters": [
                                 "",
-                                "0.1",
-                                "\"engine\""
+                                "3"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "StopSoundCanal"
+                              },
+                              "parameters": [
+                                "",
+                                "3"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "SoundPlaying"
+                              },
+                              "parameters": [
+                                "",
+                                "3"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "PlaySoundCanal"
+                              },
+                              "parameters": [
+                                "",
+                                "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster_down.ogg",
+                                "3",
+                                "no",
+                                "GlobalVariable(sound_volume)",
+                                "1"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        }
+                      ]
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "KeyFromTextPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "GlobalVariableString(player_forward_key)"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "player_movement_angle",
+                            "=",
+                            "player.Angle()"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "player_speed",
+                            "=",
+                            "Variable(player_acceleration)"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "play thruster sound",
+                          "comment2": ""
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SoundPlaying"
+                              },
+                              "parameters": [
+                                "",
+                                "3"
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "BuiltinCommonInstructions::Once"
+                              },
+                              "parameters": [],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "StopSoundCanal"
+                              },
+                              "parameters": [
+                                "",
+                                "3"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": true,
+                                "value": "SoundPlaying"
+                              },
+                              "parameters": [
+                                "",
+                                "3"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "PlaySoundCanal"
+                              },
+                              "parameters": [
+                                "",
+                                "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster.ogg",
+                                "3",
+                                "yes",
+                                "GlobalVariable(sound_volume)",
+                                "1"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "create engine particles",
+                          "comment2": ""
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "NbObjet"
+                              },
+                              "parameters": [
+                                "player",
+                                ">",
+                                "0"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "Timer"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "0.1",
+                                    "\"engine\""
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "engine_particle_angle",
+                                    "=",
+                                    "0"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "disabled": false,
+                                  "folded": false,
+                                  "type": "BuiltinCommonInstructions::Repeat",
+                                  "repeatExpression": "8",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "Create"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "engine_particle",
+                                        "player.PointX(engine)",
+                                        "player.PointY(engine) + Random(10)",
+                                        ""
+                                      ],
+                                      "subInstructions": []
+                                    },
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "ChangeColor"
+                                      },
+                                      "parameters": [
+                                        "engine_particle",
+                                        "\"255;43;43\""
+                                      ],
+                                      "subInstructions": []
+                                    },
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "ChangePlan"
+                                      },
+                                      "parameters": [
+                                        "engine_particle",
+                                        "=",
+                                        "1"
+                                      ],
+                                      "subInstructions": []
+                                    },
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "engine_particle",
+                                        "rotation",
+                                        "=",
+                                        "Random(1)"
+                                      ],
+                                      "subInstructions": []
+                                    },
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "engine_particle",
+                                        "opacity",
+                                        "=",
+                                        "255"
+                                      ],
+                                      "subInstructions": []
+                                    },
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "ModVarObjet"
+                                      },
+                                      "parameters": [
+                                        "engine_particle",
+                                        "movement_angle",
+                                        "=",
+                                        "engine_particle.Angle() + Variable(engine_particle_angle)"
+                                      ],
+                                      "subInstructions": []
+                                    },
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "ModVarScene"
+                                      },
+                                      "parameters": [
+                                        "engine_particle_angle",
+                                        "+",
+                                        "Random(20) + 40"
+                                      ],
+                                      "subInstructions": []
+                                    }
+                                  ],
+                                  "events": []
+                                },
+                                {
+                                  "disabled": false,
+                                  "folded": false,
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "ResetTimer"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "\"engine\""
+                                      ],
+                                      "subInstructions": []
+                                    }
+                                  ],
+                                  "events": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "move player using the touch controls, the touch controls are visible only if the game is running on a mobile device",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LayerVisible"
+                      },
+                      "parameters": [
+                        "",
+                        "\"touch\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "MouseButtonReleased"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "btn_thruster",
+                                "",
+                                "yes",
+                                ""
                               ],
                               "subInstructions": []
                             }
@@ -5291,9 +5926,9 @@
                                 "value": "ModVarScene"
                               },
                               "parameters": [
-                                "engine_particle_angle",
+                                "player_speed",
                                 "=",
-                                "0"
+                                "Variable(player_max_speed)"
                               ],
                               "subInstructions": []
                             }
@@ -5302,95 +5937,44 @@
                             {
                               "disabled": false,
                               "folded": false,
-                              "type": "BuiltinCommonInstructions::Repeat",
-                              "repeatExpression": "8",
-                              "conditions": [],
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "stop thruster sound if played and after play thruster down sound once",
+                              "comment2": ""
+                            },
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "SoundPlaying"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "3"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
                               "actions": [
                                 {
                                   "type": {
                                     "inverted": false,
-                                    "value": "Create"
+                                    "value": "StopSoundCanal"
                                   },
                                   "parameters": [
                                     "",
-                                    "engine_particle",
-                                    "player.PointX(engine)",
-                                    "player.PointY(engine) + Random(10)",
-                                    ""
-                                  ],
-                                  "subInstructions": []
-                                },
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "ChangeColor"
-                                  },
-                                  "parameters": [
-                                    "engine_particle",
-                                    "\"255;43;43\""
-                                  ],
-                                  "subInstructions": []
-                                },
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "ChangePlan"
-                                  },
-                                  "parameters": [
-                                    "engine_particle",
-                                    "=",
-                                    "1"
-                                  ],
-                                  "subInstructions": []
-                                },
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "ModVarObjet"
-                                  },
-                                  "parameters": [
-                                    "engine_particle",
-                                    "rotation",
-                                    "=",
-                                    "Random(1)"
-                                  ],
-                                  "subInstructions": []
-                                },
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "ModVarObjet"
-                                  },
-                                  "parameters": [
-                                    "engine_particle",
-                                    "opacity",
-                                    "=",
-                                    "255"
-                                  ],
-                                  "subInstructions": []
-                                },
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "ModVarObjet"
-                                  },
-                                  "parameters": [
-                                    "engine_particle",
-                                    "movement_angle",
-                                    "=",
-                                    "engine_particle.Angle() + Variable(engine_particle_angle)"
-                                  ],
-                                  "subInstructions": []
-                                },
-                                {
-                                  "type": {
-                                    "inverted": false,
-                                    "value": "ModVarScene"
-                                  },
-                                  "parameters": [
-                                    "engine_particle_angle",
-                                    "+",
-                                    "Random(20) + 40"
+                                    "3"
                                   ],
                                   "subInstructions": []
                                 }
@@ -5401,16 +5985,32 @@
                               "disabled": false,
                               "folded": false,
                               "type": "BuiltinCommonInstructions::Standard",
-                              "conditions": [],
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": true,
+                                    "value": "SoundPlaying"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "3"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
                               "actions": [
                                 {
                                   "type": {
                                     "inverted": false,
-                                    "value": "ResetTimer"
+                                    "value": "PlaySoundCanal"
                                   },
                                   "parameters": [
                                     "",
-                                    "\"engine\""
+                                    "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster_down.ogg",
+                                    "3",
+                                    "no",
+                                    "GlobalVariable(sound_volume)",
+                                    "1"
                                   ],
                                   "subInstructions": []
                                 }
@@ -5420,8 +6020,373 @@
                           ]
                         }
                       ]
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "SourisBouton"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "btn_thruster",
+                                "",
+                                "yes",
+                                ""
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "player_movement_angle",
+                                "=",
+                                "player.Angle()"
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "ModVarScene"
+                              },
+                              "parameters": [
+                                "player_speed",
+                                "=",
+                                "Variable(player_acceleration)"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": [
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "play thruster sound",
+                              "comment2": ""
+                            },
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "SoundPlaying"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "3"
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "BuiltinCommonInstructions::Once"
+                                  },
+                                  "parameters": [],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "StopSoundCanal"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "3"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "events": []
+                            },
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": true,
+                                    "value": "SoundPlaying"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "3"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "PlaySoundCanal"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/thruster.ogg",
+                                    "3",
+                                    "yes",
+                                    "GlobalVariable(sound_volume)",
+                                    "1"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "events": []
+                            },
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "create engine particles",
+                              "comment2": ""
+                            },
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "NbObjet"
+                                  },
+                                  "parameters": [
+                                    "player",
+                                    ">",
+                                    "0"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "actions": [],
+                              "events": [
+                                {
+                                  "disabled": false,
+                                  "folded": false,
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "Timer"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "0.1",
+                                        "\"engine\""
+                                      ],
+                                      "subInstructions": []
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "ModVarScene"
+                                      },
+                                      "parameters": [
+                                        "engine_particle_angle",
+                                        "=",
+                                        "0"
+                                      ],
+                                      "subInstructions": []
+                                    }
+                                  ],
+                                  "events": [
+                                    {
+                                      "disabled": false,
+                                      "folded": false,
+                                      "type": "BuiltinCommonInstructions::Repeat",
+                                      "repeatExpression": "8",
+                                      "conditions": [],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "inverted": false,
+                                            "value": "Create"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            "engine_particle",
+                                            "player.PointX(engine)",
+                                            "player.PointY(engine) + Random(10)",
+                                            ""
+                                          ],
+                                          "subInstructions": []
+                                        },
+                                        {
+                                          "type": {
+                                            "inverted": false,
+                                            "value": "ChangeColor"
+                                          },
+                                          "parameters": [
+                                            "engine_particle",
+                                            "\"255;43;43\""
+                                          ],
+                                          "subInstructions": []
+                                        },
+                                        {
+                                          "type": {
+                                            "inverted": false,
+                                            "value": "ChangePlan"
+                                          },
+                                          "parameters": [
+                                            "engine_particle",
+                                            "=",
+                                            "1"
+                                          ],
+                                          "subInstructions": []
+                                        },
+                                        {
+                                          "type": {
+                                            "inverted": false,
+                                            "value": "ModVarObjet"
+                                          },
+                                          "parameters": [
+                                            "engine_particle",
+                                            "rotation",
+                                            "=",
+                                            "Random(1)"
+                                          ],
+                                          "subInstructions": []
+                                        },
+                                        {
+                                          "type": {
+                                            "inverted": false,
+                                            "value": "ModVarObjet"
+                                          },
+                                          "parameters": [
+                                            "engine_particle",
+                                            "opacity",
+                                            "=",
+                                            "255"
+                                          ],
+                                          "subInstructions": []
+                                        },
+                                        {
+                                          "type": {
+                                            "inverted": false,
+                                            "value": "ModVarObjet"
+                                          },
+                                          "parameters": [
+                                            "engine_particle",
+                                            "movement_angle",
+                                            "=",
+                                            "engine_particle.Angle() + Variable(engine_particle_angle)"
+                                          ],
+                                          "subInstructions": []
+                                        },
+                                        {
+                                          "type": {
+                                            "inverted": false,
+                                            "value": "ModVarScene"
+                                          },
+                                          "parameters": [
+                                            "engine_particle_angle",
+                                            "+",
+                                            "Random(20) + 40"
+                                          ],
+                                          "subInstructions": []
+                                        }
+                                      ],
+                                      "events": []
+                                    },
+                                    {
+                                      "disabled": false,
+                                      "folded": false,
+                                      "type": "BuiltinCommonInstructions::Standard",
+                                      "conditions": [],
+                                      "actions": [
+                                        {
+                                          "type": {
+                                            "inverted": false,
+                                            "value": "ResetTimer"
+                                          },
+                                          "parameters": [
+                                            "",
+                                            "\"engine\""
+                                          ],
+                                          "subInstructions": []
+                                        }
+                                      ],
+                                      "events": []
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "constantly apply force on the player ship to make it move",
+                  "comment2": ""
                 },
                 {
                   "disabled": false,
@@ -5608,12 +6573,12 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "shoot",
+                  "comment": "shoot using the keyboard",
                   "comment2": ""
                 },
                 {
                   "disabled": false,
-                  "folded": false,
+                  "folded": true,
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
@@ -5810,6 +6775,269 @@
                             }
                           ],
                           "events": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "shoot using the on-screen button, the button is visible only if the game is running on a mobile device",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": true,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LayerVisible"
+                      },
+                      "parameters": [
+                        "",
+                        "\"touch\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "SourisBouton"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "btn_fire",
+                                "",
+                                "yes",
+                                ""
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Comment",
+                              "color": {
+                                "b": 109,
+                                "g": 230,
+                                "r": 255,
+                                "textB": 0,
+                                "textG": 0,
+                                "textR": 0
+                              },
+                              "comment": "create bullets",
+                              "comment2": ""
+                            },
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "Timer"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Variable(player_firerate)",
+                                    "\"player_shoot_timer\""
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "Create"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "player_bullet",
+                                    "player.PointX(firespot)",
+                                    "player.PointY(firespot)",
+                                    ""
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "SetAngle"
+                                  },
+                                  "parameters": [
+                                    "player_bullet",
+                                    "=",
+                                    "player.Angle()"
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "ChangePlan"
+                                  },
+                                  "parameters": [
+                                    "player_bullet",
+                                    "=",
+                                    "1"
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "AddForceAL"
+                                  },
+                                  "parameters": [
+                                    "player_bullet",
+                                    "player_bullet.Angle()",
+                                    "Variable(player_bullet_speed)",
+                                    "1"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "events": [
+                                {
+                                  "disabled": false,
+                                  "folded": false,
+                                  "type": "BuiltinCommonInstructions::Comment",
+                                  "color": {
+                                    "b": 109,
+                                    "g": 230,
+                                    "r": 255,
+                                    "textB": 0,
+                                    "textG": 0,
+                                    "textR": 0
+                                  },
+                                  "comment": "play shoot sound",
+                                  "comment2": ""
+                                },
+                                {
+                                  "disabled": false,
+                                  "folded": false,
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "SoundPlaying"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "1"
+                                      ],
+                                      "subInstructions": []
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "StopSoundCanal"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "1"
+                                      ],
+                                      "subInstructions": []
+                                    }
+                                  ],
+                                  "events": []
+                                },
+                                {
+                                  "disabled": false,
+                                  "folded": false,
+                                  "type": "BuiltinCommonInstructions::Standard",
+                                  "conditions": [
+                                    {
+                                      "type": {
+                                        "inverted": true,
+                                        "value": "SoundPlaying"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "1"
+                                      ],
+                                      "subInstructions": []
+                                    }
+                                  ],
+                                  "actions": [
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "PlaySoundCanal"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/audio/Laser_Shoot.ogg",
+                                        "1",
+                                        "no",
+                                        "GlobalVariable(sound_volume)",
+                                        "1"
+                                      ],
+                                      "subInstructions": []
+                                    },
+                                    {
+                                      "type": {
+                                        "inverted": false,
+                                        "value": "ResetTimer"
+                                      },
+                                      "parameters": [
+                                        "",
+                                        "\"player_shoot_timer\""
+                                      ],
+                                      "subInstructions": []
+                                    }
+                                  ],
+                                  "events": []
+                                }
+                              ]
+                            }
+                          ]
                         }
                       ]
                     }
@@ -6424,6 +7652,12 @@
               "width": 0
             }
           ],
+          "effects": []
+        },
+        {
+          "name": "touch",
+          "visibility": true,
+          "cameras": [],
           "effects": []
         }
       ],

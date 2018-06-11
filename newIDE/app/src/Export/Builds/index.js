@@ -10,6 +10,7 @@ import {
   getUrl,
 } from '../../Utils/GDevelopServices/Build';
 import Window from '../../Utils/Window';
+import BuildsWatcher from './BuildsWatcher';
 
 type ContainerProps = {|
   onBuildsUpdated: ?() => void,
@@ -26,10 +27,35 @@ export class Builds extends Component<Props, State> {
   state = {
     builds: null,
   };
+  buildsWatcher = new BuildsWatcher();
 
   componentDidMount() {
     this._refreshBuilds();
   }
+
+  componentWillUnmount() {
+    this.buildsWatcher.stop();
+  }
+
+  _startBuildsWatcher = () => {
+    if (!this.state.builds) return;
+
+    this.buildsWatcher.start({
+      userProfile: this.props.userProfile,
+      builds: this.state.builds,
+      onBuildUpdated: (newBuild: Build) => {
+        if (!this.state.builds) return;
+
+        this.setState({
+          builds: this.state.builds.map((oldBuild: Build) => {
+            if (newBuild.id === oldBuild.id) return newBuild;
+
+            return oldBuild;
+          }),
+        });
+      },
+    });
+  };
 
   _refreshBuilds = () => {
     const { getAuthorizationHeader, profile } = this.props.userProfile;
@@ -42,6 +68,7 @@ export class Builds extends Component<Props, State> {
             builds,
           },
           () => {
+            this._startBuildsWatcher();
             if (this.props.onBuildsUpdated) this.props.onBuildsUpdated();
           }
         );

@@ -1,19 +1,19 @@
 import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
-import CircularProgress from 'material-ui/CircularProgress';
 import FlatButton from 'material-ui/FlatButton';
 import { Spacer, Line } from '../../UI/Grid';
 import EmptyMessage from '../../UI/EmptyMessage';
-import difference_in_minutes from 'date-fns/difference_in_minutes';
+import difference_in_seconds from 'date-fns/difference_in_seconds';
+import LinearProgress from 'material-ui/LinearProgress';
 
 const buildTypesConfig = {
   'cordova-build': {
-    estimatedTimeInMinutes: 3,
+    estimatedTimeInSeconds: 180,
     completeDescription:
       'You can download it on your Android phone and install it.',
   },
   'electron-build': {
-    estimatedTimeInMinutes: 8,
+    estimatedTimeInSeconds: 480,
     completeDescription: 'You can download the game for each platform.',
   },
 };
@@ -48,12 +48,11 @@ export default ({ build, onDownload }: Props) => {
   ];
 
   const config = buildTypesConfig[build.type];
-  const minutesSinceLastUpdate = Math.abs(difference_in_minutes(
-    build.updatedAt,
-    Date.now()
-  ));
+  const secondsSinceLastUpdate = Math.abs(
+    difference_in_seconds(build.updatedAt, Date.now())
+  );
   const estimatedRemainingTime = Math.max(
-    config ? config.estimatedTimeInMinutes - minutesSinceLastUpdate : 0,
+    config ? config.estimatedTimeInSeconds - secondsSinceLastUpdate : 0,
     0
   );
 
@@ -73,15 +72,17 @@ export default ({ build, onDownload }: Props) => {
     </React.Fragment>
   ) : build.status === 'pending' ? (
     <Line alignItems="center" expand>
-      <CircularProgress size={20} />
+      <LinearProgress
+        style={{ flex: 1 }}
+        max={config.estimatedTimeInSeconds}
+        value={config.estimatedTimeInSeconds - estimatedRemainingTime}
+        mode={estimatedRemainingTime > 0 ? 'determinate' : 'indeterminate'}
+      />
       <Spacer />
       {estimatedRemainingTime > 0 ? (
-        <p>
-          Build in progress... Estimated time is ~{estimatedRemainingTime}{' '}
-          minutes.
-        </p>
+        <p>~{Math.round(estimatedRemainingTime / 60)} minutes.</p>
       ) : (
-        <p>Build in progress... Should finish soon.</p>
+        <p>Should finish soon.</p>
       )}
     </Line>
   ) : build.status === 'complete' ? (

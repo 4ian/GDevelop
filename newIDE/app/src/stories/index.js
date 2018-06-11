@@ -274,11 +274,37 @@ storiesOf('LocalOnlineCordovaExport', module)
   .add('Progress (waiting-for-build)', () => (
     <Progress exportStep={'waiting-for-build'} />
   ))
-  .add('Progress (build)', () => <Progress exportStep={'build'} />)
-  .add('Progress (build) (errored)', () => (
-    <Progress exportStep={'build'} errored />
+  .add('Progress (build)', () => (
+    <Progress
+      exportStep={'build'}
+      build={{
+        type: 'electron-build',
+        status: 'pending',
+        updatedAt: Date.now(),
+      }}
+    />
   ))
-  .add('Progress (done)', () => <Progress exportStep={'done'} />);
+  .add('Progress (build) (errored)', () => (
+    <Progress
+      exportStep={'build'}
+      build={{
+        status: 'error',
+        logsKey: '/fake-error.log',
+      }}
+    />
+  ))
+  .add('Progress (build) (complete)', () => (
+    <Progress
+      exportStep={'build'}
+      build={{
+        type: 'cordova-build',
+        status: 'complete',
+        logsKey: '/fake-error.log',
+        apkKey: '/fake-game.apk',
+        updatedAt: Date.now(),
+      }}
+    />
+  ));
 
 storiesOf('BuildProgress', module)
   .addDecorator(paperDecorator)

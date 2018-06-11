@@ -1,25 +1,22 @@
 import * as React from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
 import { Step, Stepper, StepLabel, StepContent } from 'material-ui/Stepper';
 import CircularProgress from 'material-ui/CircularProgress';
 import LinearProgress from 'material-ui/LinearProgress';
-import FlatButton from 'material-ui/FlatButton';
 import { Line, Spacer } from '../../../UI/Grid';
+import BuildProgress from '../../Builds/BuildProgress';
 
+const styles = {
+  stepper: { flex: 1 },
+};
+
+//TODO: Factor in BuildProgressSteps
 export default ({
   exportStep,
-  downloadUrl,
-  onDownloadWindowsZip,
-  onDownloadWindowsExe,
-  onDownloadMacOSZip,
-  onDownloadLinuxAppImage,
-  onDownloadLogs,
+  onDownload,
+  build,
   uploadMax,
   uploadProgress,
-  buildMax,
-  buildProgress,
   errored,
-  onPlayStore,
 }) => (
   <Stepper
     activeStep={
@@ -29,9 +26,10 @@ export default ({
           ? 1
           : exportStep === 'waiting-for-build' || exportStep === 'build'
             ? 2
-            : exportStep === 'done' ? 3 : undefined
+            : undefined
     }
     orientation="vertical"
+    style={styles.stepper}
   >
     <Step>
       <StepLabel>Game export</StepLabel>
@@ -70,58 +68,9 @@ export default ({
       </StepContent>
     </Step>
     <Step>
-      <StepLabel>Build</StepLabel>
+      <StepLabel>Build and download</StepLabel>
       <StepContent>
-        {errored ? (
-          <Line alignItems="center">
-            <p>Something wrong happened :(</p>
-            <Spacer />
-            <RaisedButton label="See logs" onClick={onDownloadLogs} />
-          </Line>
-        ) : exportStep === 'waiting-for-build' ? (
-          <Line alignItems="center">
-            <CircularProgress size={20} />
-            <Spacer />
-            <p>Waiting for build to start...</p>
-          </Line>
-        ) : (
-          <Line alignItems="center" expand>
-            <LinearProgress
-              style={{ flex: 1 }}
-              max={buildMax}
-              value={buildProgress}
-              mode="determinate"
-            />
-          </Line>
-        )}
-      </StepContent>
-    </Step>
-    <Step>
-      <StepLabel>Download</StepLabel>
-      <StepContent>
-        <Line>
-          <RaisedButton
-            label="Windows zip"
-            primary
-            onClick={onDownloadWindowsZip}
-          />
-          <RaisedButton
-            label="Windows"
-            primary
-            onClick={onDownloadWindowsExe}
-          />
-          <RaisedButton
-            label="macOS (zip)"
-            primary
-            onClick={onDownloadMacOSZip}
-          />
-          <RaisedButton
-            label="Linux (AppImage)"
-            primary
-            onClick={onDownloadLinuxAppImage}
-          />
-          <FlatButton label="See logs" onClick={onDownloadLogs} />
-        </Line>
+        {build && <BuildProgress build={build} onDownload={onDownload} />}
       </StepContent>
     </Step>
   </Stepper>

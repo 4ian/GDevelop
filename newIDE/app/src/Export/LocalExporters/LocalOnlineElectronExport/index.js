@@ -8,7 +8,6 @@ import {
   type Build,
   buildElectron,
   getUrl,
-  getBuild,
 } from '../../../Utils/GDevelopServices/Build';
 import UserProfileContext, {
   type UserProfile,
@@ -21,12 +20,15 @@ import Progress from './Progress';
 import { archiveFolder } from '../../../Utils/Archiver';
 import optionalRequire from '../../../Utils/OptionalRequire.js';
 import Window from '../../../Utils/Window';
-import { delay } from '../../../Utils/Delay';
 import CreateProfile from '../../../Profile/CreateProfile';
 import LimitDisplayer from '../../../Profile/LimitDisplayer';
-import { displayProjectErrorsBox, getErrors } from '../../../ProjectManager/ProjectErrorsChecker';
+import {
+  displayProjectErrorsBox,
+  getErrors,
+} from '../../../ProjectManager/ProjectErrorsChecker';
 import { translate, type TranslatorProps } from 'react-i18next';
 import { type Limit } from '../../../Utils/GDevelopServices/Usage';
+import BuildsWatcher from '../../Builds/BuildsWatcher';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
@@ -40,16 +42,13 @@ export type LocalOnlineElectronExportStep =
   | 'compress'
   | 'upload'
   | 'waiting-for-build'
-  | 'build'
-  | 'done';
+  | 'build';
 
 type State = {
   exportStep: LocalOnlineElectronExportStep,
   build: ?Build,
   uploadProgress: number,
   uploadMax: number,
-  buildMax: number,
-  buildProgress: number,
   errored: boolean,
 };
 
@@ -64,10 +63,9 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     build: null,
     uploadProgress: 0,
     uploadMax: 0,
-    buildProgress: 0,
-    buildMax: 0,
     errored: false,
   };
+  buildsWatcher = new BuildsWatcher();
 
   static prepareExporter = (): Promise<any> => {
     return new Promise((resolve, reject) => {
@@ -98,6 +96,10 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     });
   };
 
+  componentWillUnmount() {
+    this.buildsWatcher.stop();
+  }
+
   launchExport = (): Promise<string> => {
     const { project, t } = this.props;
     if (!project) return Promise.reject();
@@ -106,11 +108,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
       .then(({ exporter, outputDir }) => {
         const exportOptions = new gd.MapStringBoolean();
         exportOptions.set('exportForElectron', true);
-        exporter.exportWholePixiProject(
-          project,
-          outputDir,
-          exportOptions
-        );
+        exporter.exportWholePixiProject(project, outputDir, exportOptions);
         exportOptions.delete();
         exporter.delete();
 
@@ -157,51 +155,21 @@ class LocalOnlineElectronExport extends Component<Props, State> {
   launchBuild = (
     userProfile: UserProfile,
     uploadBucketKey: string
-  ): Promise<string> => {
-    const { getAuthorizationHeader, profile } = userProfile;
-    if (!profile) return Promise.reject(new Error('User is not authenticated'));
-
-    return buildElectron(
-      getAuthorizationHeader,
-      profile.uid,
-      uploadBucketKey
-    ).then(build => {
-      return build.id;
-    });
-  };
-
-  pollBuild = async (
-    userProfile: UserProfile,
-    buildId: string
   ): Promise<Build> => {
     const { getAuthorizationHeader, profile } = userProfile;
     if (!profile) return Promise.reject(new Error('User is not authenticated'));
 
-    try {
-      let build = null;
-      let tries = 0;
-      const waitTime = 1000;
-      const maxWaitTime = 540000; //Wait up to 9 minutes
-      do {
-        await delay(waitTime);
-        build = await getBuild(getAuthorizationHeader, profile.uid, buildId);
-        this.setState({
-          build,
-          buildMax: maxWaitTime,
-          buildProgress: tries * waitTime,
-        });
-        tries += 1;
-      } while (
-        build &&
-        build.status === 'pending' &&
-        tries * waitTime < maxWaitTime
-      );
+    return buildElectron(getAuthorizationHeader, profile.uid, uploadBucketKey);
+  };
 
-      if (build.status !== 'complete') throw build;
-      return build;
-    } catch (err) {
-      throw err;
-    }
+  startBuildWatch = (userProfile: UserProfile) => {
+    if (!this.state.build) return;
+
+    this.buildsWatcher.start({
+      userProfile,
+      builds: [this.state.build],
+      onBuildUpdated: (build: Build) => this.setState({ build }),
+    });
   };
 
   launchWholeExport = (userProfile: UserProfile) => {
@@ -249,56 +217,24 @@ class LocalOnlineElectronExport extends Component<Props, State> {
         });
         return this.launchBuild(userProfile, uploadBucketKey);
       }, handleError(t('Error while uploading the game. Check your internet connection or try again later.')))
-      .then(buildId => {
-        this.setState({
-          exportStep: 'build',
-        });
-
-        return this.pollBuild(userProfile, buildId);
-      }, handleError(t('Error while lauching the build of the game.')))
       .then(build => {
-        this.setState({
-          exportStep: 'done',
-          build,
-        });
-        userProfile.onRefreshUserProfile();
-      }, handleError(t('Error while building the game.')));
+        this.setState(
+          {
+            build,
+            exportStep: 'build',
+          },
+          () => {
+            this.startBuildWatch(userProfile);
+          }
+        );
+      }, handleError(t('Error while lauching the build of the game.')));
   };
 
-  _downloadLogs = () => {
-    const { build } = this.state;
-    if (!build || !build.logsKey) return;
+  _download = (key: string) => {
+    if (!this.state.build || !this.state.build[key]) return;
 
-    Window.openExternalURL(getUrl(build.logsKey));
+    Window.openExternalURL(getUrl(this.state.build[key]));
   };
-
-  _downloadWindowsZip = () => {
-    const { build } = this.state;
-    if (!build || !build.windowsZipKey) return;
-
-    Window.openExternalURL(getUrl(build.windowsZipKey));
-  }
-
-  _downloadWindowsExe = () => {
-    const { build } = this.state;
-    if (!build || !build.windowsExeKey) return;
-
-    Window.openExternalURL(getUrl(build.windowsExeKey));
-  }
-
-  _downloadMacOSZip = () => {
-    const { build } = this.state;
-    if (!build || !build.macosZipKey) return;
-
-    Window.openExternalURL(getUrl(build.macosZipKey));
-  }
-
-  _downloadLinuxAppImage = () => {
-    const { build } = this.state;
-    if (!build || !build.linuxAppImageKey) return;
-
-    Window.openExternalURL(getUrl(build.linuxAppImageKey));
-  }
 
   render() {
     const {
@@ -306,8 +242,6 @@ class LocalOnlineElectronExport extends Component<Props, State> {
       build,
       uploadMax,
       uploadProgress,
-      buildMax,
-      buildProgress,
       errored,
     } = this.state;
     const { project, t } = this.props;
@@ -316,7 +250,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     const getBuildLimit = (userProfile: UserProfile): ?Limit =>
       userProfile.limits ? userProfile.limits['electron-build'] : null;
     const canLaunchBuild = (userProfile: UserProfile) => {
-      if (!errored && exportStep !== '' && exportStep !== 'done') return false;
+      if (!errored && exportStep !== '' && exportStep !== 'build') return false;
 
       const limit: ?Limit = getBuildLimit(userProfile);
       if (limit && limit.limitReached) return false;
@@ -358,22 +292,13 @@ class LocalOnlineElectronExport extends Component<Props, State> {
                 onLogin={userProfile.onLogin}
               />
             )}
-            <Line>
+            <Line expand>
               <Progress
                 exportStep={exportStep}
-                downloadUrl={
-                  build && build.apkKey ? getUrl(build.apkKey) : null
-                }
-                logsUrl={build && build.logsKey ? getUrl(build.logsKey) : null}
-                onDownloadWindowsZip={this._downloadWindowsZip}
-                onDownloadWindowsExe={this._downloadWindowsExe}
-                onDownloadMacOSZip={this._downloadMacOSZip}
-                onDownloadLinuxAppImage={this._downloadLinuxAppImage}
-                onDownloadLogs={this._downloadLogs}
+                build={build}
+                onDownload={this._download}
                 uploadMax={uploadMax}
                 uploadProgress={uploadProgress}
-                buildMax={buildMax}
-                buildProgress={buildProgress}
                 errored={errored}
               />
             </Line>

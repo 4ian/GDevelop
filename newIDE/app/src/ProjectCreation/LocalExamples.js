@@ -37,9 +37,12 @@ export default class LocalExamples extends Component {
           return;
         }
 
-        this.setState({
-          exampleNames,
-        }, () => this.props.onExamplesLoaded());
+        this.setState(
+          {
+            exampleNames: exampleNames.filter(name => name !== '.DS_Store'),
+          },
+          () => this.props.onExamplesLoaded()
+        );
       });
     });
   }
@@ -87,13 +90,14 @@ I confirm that any assets can be used freely by anybody, including for commercia
         <Line>
           <Column expand noMargin>
             <List>
-              {this.state.exampleNames && this.state.exampleNames.map(exampleName => (
-                <ListItem
-                  key={exampleName}
-                  primaryText={formatExampleName(exampleName)}
-                  onClick={() => this.createFromExample(exampleName)}
-                />
-              ))}
+              {this.state.exampleNames &&
+                this.state.exampleNames.map(exampleName => (
+                  <ListItem
+                    key={exampleName}
+                    primaryText={formatExampleName(exampleName)}
+                    onClick={() => this.createFromExample(exampleName)}
+                  />
+                ))}
               {!this.state.exampleNames && <PlaceholderLoader />}
             </List>
             <Column expand>

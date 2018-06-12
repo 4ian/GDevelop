@@ -1,18 +1,23 @@
+import animationSpeedScale from '../fixtures/animation-speed-scale/animation-speed-scale.json';
 import asteroids from '../fixtures/asteroids/asteroids.json';
 import brakeout from '../fixtures/brakeout/brakeout.json';
+import buttons from '../fixtures/buttons/buttons.json';
 import changePositionOfObject from '../fixtures/change-position-of-object/change-position-of-object.json';
 import changeScaleOfSprites from '../fixtures/change-scale-of-sprites/change-scale-of-sprites.json';
 import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sprite-animation.json';
+import changeSpriteColor from '../fixtures/change-sprite-color/change-sprite-color.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
 import infiniteScrollingBackground from '../fixtures/infinite-scrolling-background/infinite-scrolling-background.json';
 import instanceTimer from '../fixtures/instance-timer/instance-timer.json';
 import inventorySystem from '../fixtures/inventory-system/inventory-system.json';
 import keyboardPractice from '../fixtures/keyboard-practice/keyboard-practice.json';
+import magnet from '../fixtures/magnet/magnet.json';
 import manipulateTextObject from '../fixtures/manipulate-text-object/manipulate-text-object.json';
 import moveCameraToPosition from '../fixtures/move-camera-to-position/move-camera-to-position.json';
 import moveObjectTowardPosition from '../fixtures/move-object-toward-position/move-object-toward-position.json';
 import moveObjectWithPhysics from '../fixtures/move-object-with-physics/move-object-with-physics.json';
+import objectSelection from '../fixtures/object-selection/object-selection.json';
 import parallax from '../fixtures/parallax/parallax.json';
 import parallaxScrolling from '../fixtures/parallax-scrolling/parallax-scrolling.json';
 import parseJsonFromApi from '../fixtures/parse-json-from-api/parse-json-from-api.json';
@@ -23,6 +28,7 @@ import pathfindingBasics from '../fixtures/pathfinding-basics/pathfinding-basics
 import physics from '../fixtures/physics/physics.json';
 import platformer from '../fixtures/platformer/platformer.json';
 import playStopSpriteAnimation from '../fixtures/play-stop-sprite-animation/play-stop-sprite-animation.json';
+import rain from '../fixtures/rain/rain.json';
 import randomColorPicker from '../fixtures/random-color-picker/random-color-picker.json';
 import rotateTowardMouse from '../fixtures/rotate-toward-mouse/rotate-toward-mouse.json';
 import rotateTowardPosition from '../fixtures/rotate-toward-position/rotate-toward-position.json';
@@ -38,11 +44,17 @@ import zombieLaser from '../fixtures/zombie-laser/zombie-laser.json';
 
 export default class BrowserProjectOpener {
   static readInternalFile(url) {
-    if (url === 'internal://asteroids') {
+    if (url === 'internal://animation-speed-scale') {
+      return Promise.resolve(animationSpeedScale);
+    }
+    else if (url === 'internal://asteroids') {
       return Promise.resolve(asteroids);
     }
     else if (url === 'internal://brakeout') {
       return Promise.resolve(brakeout);
+    }
+    else if (url === 'internal://buttons') {
+      return Promise.resolve(buttons);
     }
     else if (url === 'internal://change-position-of-object') {
       return Promise.resolve(changePositionOfObject);
@@ -52,6 +64,9 @@ export default class BrowserProjectOpener {
     }
     else if (url === 'internal://change-sprite-animation') {
       return Promise.resolve(changeSpriteAnimation);
+    }
+    else if (url === 'internal://change-sprite-color') {
+      return Promise.resolve(changeSpriteColor);
     }
     else if (url === 'internal://create-object-with-mouseclick') {
       return Promise.resolve(createObjectWithMouseclick);
@@ -71,6 +86,9 @@ export default class BrowserProjectOpener {
     else if (url === 'internal://keyboard-practice') {
       return Promise.resolve(keyboardPractice);
     }
+    else if (url === 'internal://magnet') {
+      return Promise.resolve(magnet);
+    }
     else if (url === 'internal://manipulate-text-object') {
       return Promise.resolve(manipulateTextObject);
     }
@@ -82,6 +100,9 @@ export default class BrowserProjectOpener {
     }
     else if (url === 'internal://move-object-with-physics') {
       return Promise.resolve(moveObjectWithPhysics);
+    }
+    else if (url === 'internal://object-selection') {
+      return Promise.resolve(objectSelection);
     }
     else if (url === 'internal://parallax') {
       return Promise.resolve(parallax);
@@ -112,6 +133,9 @@ export default class BrowserProjectOpener {
     }
     else if (url === 'internal://play-stop-sprite-animation') {
       return Promise.resolve(playStopSpriteAnimation);
+    }
+    else if (url === 'internal://rain') {
+      return Promise.resolve(rain);
     }
     else if (url === 'internal://random-color-picker') {
       return Promise.resolve(randomColorPicker);

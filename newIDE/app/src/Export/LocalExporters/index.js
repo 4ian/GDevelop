@@ -60,7 +60,7 @@ export const getLocalExporters = () => [
     advanced: true,
   },
   {
-    name: 'Windows/macOS/Linux',
+    name: 'Windows/macOS/Linux (beta)',
     renderIcon: (props) => <LaptopMac {...props}/>,
     description: 'Package your game as an app for Windows, macOS or Linux directly from GDevelop.',
     key: 'localonlineelectronexport',

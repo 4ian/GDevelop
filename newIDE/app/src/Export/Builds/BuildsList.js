@@ -49,7 +49,7 @@ export default ({ builds, onDownload }: Props) => {
               return (
                 <Paper style={styles.buildContainer} key={build.id}>
                   <p>
-                    {build.type} - Finished on{' '}
+                    {build.type} - Last updated on{' '}
                     {format(build.updatedAt, 'YYYY-MM-DD HH:mm:ss')}
                   </p>
                   {!isOld && (

@@ -16,7 +16,6 @@ import { Column, Line } from '../../../UI/Grid';
 import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { findGDJS } from '../LocalGDJSFinder';
 import localFileSystem from '../LocalFileSystem';
-import Progress from './Progress';
 import { archiveFolder } from '../../../Utils/Archiver';
 import optionalRequire from '../../../Utils/OptionalRequire.js';
 import Window from '../../../Utils/Window';
@@ -29,23 +28,17 @@ import {
 import { translate, type TranslatorProps } from 'react-i18next';
 import { type Limit } from '../../../Utils/GDevelopServices/Usage';
 import BuildsWatcher from '../../Builds/BuildsWatcher';
+import BuildStepsProgress, {
+  type BuildStep,
+} from '../../Builds/BuildStepsProgress';
 const path = optionalRequire('path');
 const os = optionalRequire('os');
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
-
 const gd = global.gd;
 
-export type LocalOnlineElectronExportStep =
-  | ''
-  | 'export'
-  | 'compress'
-  | 'upload'
-  | 'waiting-for-build'
-  | 'build';
-
 type State = {
-  exportStep: LocalOnlineElectronExportStep,
+  exportStep: BuildStep,
   build: ?Build,
   uploadProgress: number,
   uploadMax: number,
@@ -293,7 +286,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
               />
             )}
             <Line expand>
-              <Progress
+              <BuildStepsProgress
                 exportStep={exportStep}
                 build={build}
                 onDownload={this._download}

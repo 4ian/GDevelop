@@ -23,6 +23,10 @@ type Props = {|
   onDownload: (key: string) => void,
 |};
 
+/**
+ * Show an estimate of the progress of a build or the button
+ * to download the artifacts.
+ */
 export default ({ build, onDownload }: Props) => {
   const buttons = [
     {

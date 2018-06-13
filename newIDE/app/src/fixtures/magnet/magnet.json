@@ -12,10 +12,9 @@
     "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\magnet\\game.json",
+    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\GIT\\GD\\newIDE\\app\\resources\\examples\\magnet\\magnet.json",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
-    "version": "1.0.0",
     "winExecutableFilename": "",
     "winExecutableIconFile": "",
     "name": "Aimant",
@@ -285,8 +284,8 @@
           "locked": false,
           "name": "Magnet",
           "width": 0,
-          "x": 19,
-          "y": 6,
+          "x": 30,
+          "y": 75,
           "zOrder": 5,
           "numberProperties": [
             {
@@ -985,13 +984,13 @@
                       "originPoint": {
                         "name": "origine",
                         "x": 0,
-                        "y": 0
+                        "y": 50
                       },
                       "centerPoint": {
-                        "automatic": true,
+                        "automatic": false,
                         "name": "centre",
-                        "x": 80,
-                        "y": 45.5
+                        "x": 0,
+                        "y": 50
                       },
                       "customCollisionMask": [
                         [

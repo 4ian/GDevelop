@@ -180,7 +180,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
         this.setState({
           errored: true,
         });
-        showErrorBox(message, {
+        showErrorBox(message + (err.message ? `\n${err.message}` : ''), {
           exportStep: this.state.exportStep,
           rawError: err,
         });
@@ -194,6 +194,7 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       uploadProgress: 0,
       uploadMax: 0,
       errored: false,
+      build: null,
     });
     this.launchExport()
       .then(outputDir => {

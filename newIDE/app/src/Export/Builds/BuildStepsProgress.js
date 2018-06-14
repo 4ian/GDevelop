@@ -6,6 +6,7 @@ import LinearProgress from 'material-ui/LinearProgress';
 import { Line, Spacer } from '../../UI/Grid';
 import BuildProgress from './BuildProgress';
 import { type Build } from '../../Utils/GDevelopServices/Build';
+import EmptyMessage from '../../UI/EmptyMessage';
 
 const styles = {
   stepper: { flex: 1 },
@@ -26,6 +27,7 @@ type Props = {|
   uploadMax: number,
   uploadProgress: number,
   errored: boolean,
+  showSeeAllMyBuildsExplanation?: boolean,
 |};
 
 /**
@@ -39,6 +41,7 @@ export default ({
   uploadMax,
   uploadProgress,
   errored,
+  showSeeAllMyBuildsExplanation,
 }: Props) => (
   <Stepper
     activeStep={
@@ -94,6 +97,11 @@ export default ({
       <StepContent>
         {!build && <p>Build is starting...</p>}
         {build && <BuildProgress build={build} onDownload={onDownload} />}
+        {showSeeAllMyBuildsExplanation && <EmptyMessage>
+          If you close this window while the build is being done, you can see
+          its progress and download the game later by clicking on See All My
+          Builds below.
+        </EmptyMessage>}
       </StepContent>
     </Step>
   </Stepper>

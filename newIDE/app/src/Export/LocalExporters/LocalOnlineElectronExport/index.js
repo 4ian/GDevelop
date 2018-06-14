@@ -3,6 +3,7 @@
 import React, { Component } from 'react';
 import assignIn from 'lodash/assignIn';
 import RaisedButton from 'material-ui/RaisedButton';
+import Checkbox from 'material-ui/Checkbox';
 import { sendExportLaunched } from '../../../Utils/Analytics/EventSender';
 import {
   type Build,
@@ -27,6 +28,7 @@ import {
 } from '../../../ProjectManager/ProjectErrorsChecker';
 import { translate, type TranslatorProps } from 'react-i18next';
 import { type Limit } from '../../../Utils/GDevelopServices/Usage';
+import { type TargetName } from '../../../Utils/GDevelopServices/Build';
 import BuildsWatcher from '../../Builds/BuildsWatcher';
 import BuildStepsProgress, {
   type BuildStep,
@@ -43,6 +45,7 @@ type State = {
   uploadProgress: number,
   uploadMax: number,
   errored: boolean,
+  targets: Array<TargetName>,
 };
 
 type Props = TranslatorProps & {
@@ -57,6 +60,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     uploadProgress: 0,
     uploadMax: 0,
     errored: false,
+    targets: ['winExe'],
   };
   buildsWatcher = new BuildsWatcher();
 
@@ -152,7 +156,12 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     const { getAuthorizationHeader, profile } = userProfile;
     if (!profile) return Promise.reject(new Error('User is not authenticated'));
 
-    return buildElectron(getAuthorizationHeader, profile.uid, uploadBucketKey);
+    return buildElectron(
+      getAuthorizationHeader,
+      profile.uid,
+      uploadBucketKey,
+      this.state.targets
+    );
   };
 
   startBuildWatch = (userProfile: UserProfile) => {
@@ -230,6 +239,18 @@ class LocalOnlineElectronExport extends Component<Props, State> {
     Window.openExternalURL(getUrl(this.state.build[key]));
   };
 
+  _setTarget = (targetName: TargetName, enable: boolean) => {
+    if (enable && this.state.targets.indexOf(targetName) === -1) {
+      this.setState({
+        targets: [...this.state.targets, targetName],
+      });
+    } else if (!enable && this.state.targets.indexOf(targetName) !== -1) {
+      this.setState({
+        targets: this.state.targets.filter(name => name !== targetName),
+      });
+    }
+  };
+
   render() {
     const {
       exportStep,
@@ -249,6 +270,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
       const limit: ?Limit = getBuildLimit(userProfile);
       if (limit && limit.limitReached) return false;
 
+      if (!this.state.targets.length) return false;
+
       return true;
     };
 
@@ -258,9 +281,30 @@ class LocalOnlineElectronExport extends Component<Props, State> {
           <Column noMargin>
             <Line>
               {t(
-                'Your game will be exported and packaged online as an stand-alone game for Windows, Linux and macOS.'
+                'Your game will be exported and packaged online as an stand-alone game for Windows, Linux and/or macOS.'
               )}
             </Line>
+            <Checkbox
+              label="Windows (zip file)"
+              checked={this.state.targets.indexOf('winZip') !== -1}
+              onCheck={(e, checked) => this._setTarget('winZip', checked)}
+            />
+            <Checkbox
+              label="Windows (auto-installer file)"
+              checked={this.state.targets.indexOf('winExe') !== -1}
+              onCheck={(e, checked) => this._setTarget('winExe', checked)}
+            />
+            <Checkbox
+              label="macOS (zip file)"
+              checked={this.state.targets.indexOf('macZip') !== -1}
+              onCheck={(e, checked) => this._setTarget('macZip', checked)}
+            />
+            <Checkbox
+              label="Linux (AppImage)"
+              checked={this.state.targets.indexOf('linuxAppImage') !== -1}
+              onCheck={(e, checked) =>
+                this._setTarget('linuxAppImage', checked)}
+            />
             {userProfile.authenticated && (
               <Line justifyContent="center">
                 <RaisedButton
@@ -294,6 +338,7 @@ class LocalOnlineElectronExport extends Component<Props, State> {
                 uploadMax={uploadMax}
                 uploadProgress={uploadProgress}
                 errored={errored}
+                showSeeAllMyBuildsExplanation
               />
             </Line>
           </Column>

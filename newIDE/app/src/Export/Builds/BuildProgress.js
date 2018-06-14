@@ -8,13 +8,14 @@ import LinearProgress from 'material-ui/LinearProgress';
 
 const buildTypesConfig = {
   'cordova-build': {
-    estimatedTimeInSeconds: 180,
+    estimatedTimeInSeconds: () => 180,
     completeDescription:
       'You can download it on your Android phone and install it.',
   },
   'electron-build': {
-    estimatedTimeInSeconds: 480,
-    completeDescription: 'You can download the game for each platform.',
+    estimatedTimeInSeconds: (build: Build) =>
+      150 * (build.targets ? build.targets.length : 0),
+    completeDescription: '',
   },
 };
 
@@ -35,7 +36,7 @@ export default ({ build, onDownload }: Props) => {
     },
     {
       displayName: 'Windows (zip)',
-      key: 'windowsZip',
+      key: 'windowsZipKey',
     },
     {
       displayName: 'Windows (exe)',
@@ -56,7 +57,7 @@ export default ({ build, onDownload }: Props) => {
     difference_in_seconds(build.updatedAt, Date.now())
   );
   const estimatedRemainingTime = Math.max(
-    config ? config.estimatedTimeInSeconds - secondsSinceLastUpdate : 0,
+    config ? config.estimatedTimeInSeconds(build) - secondsSinceLastUpdate : 0,
     0
   );
 
@@ -78,8 +79,8 @@ export default ({ build, onDownload }: Props) => {
     <Line alignItems="center" expand>
       <LinearProgress
         style={{ flex: 1 }}
-        max={config.estimatedTimeInSeconds}
-        value={config.estimatedTimeInSeconds - estimatedRemainingTime}
+        max={config.estimatedTimeInSeconds(build)}
+        value={config.estimatedTimeInSeconds(build) - estimatedRemainingTime}
         mode={estimatedRemainingTime > 0 ? 'determinate' : 'indeterminate'}
       />
       <Spacer />

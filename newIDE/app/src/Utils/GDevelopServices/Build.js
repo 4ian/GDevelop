@@ -5,6 +5,8 @@ import { GDevelopBuildApi } from './ApiConfigs';
 export const getUrl = (key: string) =>
   `https://s3-eu-west-1.amazonaws.com/gd-build/${key}`;
 
+export type TargetName = 'winExe' | 'winZip' | 'macZip' | 'linuxAppImage';
+
 export type Build = {
   id: string,
   userId: string,
@@ -17,6 +19,7 @@ export type Build = {
   linuxAppImageKey?: string,
   status: 'pending' | 'complete' | 'error',
   type: 'cordova-build' | 'electron-build',
+  targets?: Array<TargetName>,
   createdAt: number,
   updatedAt: number,
 };
@@ -24,14 +27,15 @@ export type Build = {
 export const buildElectron = (
   getAuthorizationHeader: () => Promise<string>,
   userId: string,
-  key: string
+  key: string,
+  targets: Array<TargetName>
 ): Promise<Build> => {
   return getAuthorizationHeader()
     .then(authorizationHeader =>
       axios.post(
         `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
           userId
-        )}&key=${encodeURIComponent(key)}&type=electron-build`,
+        )}&key=${encodeURIComponent(key)}&type=electron-build&targets=${encodeURIComponent(targets.join(','))}`,
         null,
         {
           params: {},

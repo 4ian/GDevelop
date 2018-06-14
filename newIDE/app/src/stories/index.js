@@ -339,6 +339,7 @@ storiesOf('BuildStepsProgress', module)
       uploadMax={100}
       uploadProgress={20}
       errored
+      showSeeAllMyBuildsExplanation
     />
   ))
   .add('BuildStepsProgress (build) (errored)', () => (

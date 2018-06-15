@@ -10,7 +10,7 @@ const editorContentWindow = document.getElementById('piskel-frame')
 let baseExportPath;
 let piskelOptions; // The options received from GDevelop
 
-let piskelAnimationNameInput; // controler to rename piskel animations
+let piskelAnimationNameInput = {}; // controler to rename piskel animations
 const updatePiskelName = function() {
   piskelAnimationNameInput.value = piskelAnimationNameInput.value.replace(
     /[^a-zA-Z0-9_-]/g,
@@ -46,7 +46,7 @@ editorContentWindow.piskelReadyCallbacks.push(function() {
 /**
  * Inject custom buttons in Piskel's header,
  * get rid of the new file button,
- * make animation name editable later
+ * make animation name editable
  */
 document.getElementById('piskel-frame').onload = function() {
   const editorContentDocument = document.getElementById('piskel-frame')
@@ -66,13 +66,12 @@ document.getElementById('piskel-frame').onload = function() {
   piskelAppHeader.align = 'right';
 
   piskelAnimationNameInput = editorContentDocument.createElement('input');
-  piskelAnimationNameInput.style = 'margin-right: 5px; margin-top: 5px;';
   piskelAnimationNameInput.id = 'piskelAnimationNameInput';
   piskelOptions = { name: 'New Animation' };
   piskelAnimationNameInput.oninput = updatePiskelName;
   piskelAnimationNameInput.type = 'text';
   piskelAnimationNameInput.style =
-    'text-align: center;border: 2px solid yellow;border-radius: 4px;background-color:black; color: yellow;';
+    'text-align: center;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;margin-right: 5px; margin-top: 5px;';
   piskelAppHeader.appendChild(piskelAnimationNameInput);
 
   const saveButton = editorContentDocument.createElement('button');

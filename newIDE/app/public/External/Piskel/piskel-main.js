@@ -11,11 +11,14 @@ let baseExportPath;
 let piskelOptions; // The options received from GDevelop
 
 let piskelAnimationNameInput; // controler to rename piskel animations
-const updatePiskelName = function(){
-  piskelAnimationNameInput.value = piskelAnimationNameInput.value.replace(/[^a-zA-Z0-9_-]/g, "")
-  piskelOptions.name = piskelAnimationNameInput.value
-  baseExportPath = piskelOptions.projectPath + '/' + piskelOptions.name
-}
+const updatePiskelName = function() {
+  piskelAnimationNameInput.value = piskelAnimationNameInput.value.replace(
+    /[^a-zA-Z0-9_-]/g,
+    ''
+  );
+  piskelOptions.name = piskelAnimationNameInput.value;
+  baseExportPath = piskelOptions.projectPath + '/' + piskelOptions.name;
+};
 
 const updateFrameElements = function() {
   setTimeout(function() {
@@ -64,11 +67,12 @@ document.getElementById('piskel-frame').onload = function() {
 
   piskelAnimationNameInput = editorContentDocument.createElement('input');
   piskelAnimationNameInput.style = 'margin-right: 5px; margin-top: 5px;';
-  piskelAnimationNameInput.id = "piskelAnimationNameInput";
-  piskelOptions = {name:"New Animation"};
+  piskelAnimationNameInput.id = 'piskelAnimationNameInput';
+  piskelOptions = { name: 'New Animation' };
   piskelAnimationNameInput.oninput = updatePiskelName;
-  piskelAnimationNameInput.type="text";
-  piskelAnimationNameInput.style="text-align: center;border: 2px solid yellow;border-radius: 4px;background-color:black; color: yellow;";
+  piskelAnimationNameInput.type = 'text';
+  piskelAnimationNameInput.style =
+    'text-align: center;border: 2px solid yellow;border-radius: 4px;background-color:black; color: yellow;';
   piskelAppHeader.appendChild(piskelAnimationNameInput);
 
   const saveButton = editorContentDocument.createElement('button');
@@ -183,7 +187,11 @@ function saveToGD() {
       });
     },
     function(err) {
-      ipcRenderer.send('piskel-changes-saved', outputResources, piskelOptions.name);
+      ipcRenderer.send(
+        'piskel-changes-saved',
+        outputResources,
+        piskelOptions.name
+      );
       remote.getCurrentWindow().close();
     }
   );
@@ -219,14 +227,18 @@ function piskelCreateAnimation(pskl, piskelOptions) {
     pskl.app.piskelController.setPiskel(piskel);
     pskl.app.piskelController.setFPS(sprite.fps);
   });
-  pskl.app.settingsController.settingsContainer.getElementsByClassName('tool-icon  icon-settings-resize-white')[0].click(); /// call resize window
-  pskl.app.settingsController.settingsContainer.getElementsByClassName('textfield resize-size-field')[0].focus();
+  pskl.app.settingsController.settingsContainer
+    .getElementsByClassName('tool-icon  icon-settings-resize-white')[0]
+    .click(); /// call resize window
+  pskl.app.settingsController.settingsContainer
+    .getElementsByClassName('textfield resize-size-field')[0]
+    .focus();
 }
 
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   piskelOptions = receivedOptions;
   piskelAnimationNameInput.value = piskelOptions.name;
-  
+
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   if (!pskl) return;

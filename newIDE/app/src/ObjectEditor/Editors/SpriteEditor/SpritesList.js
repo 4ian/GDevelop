@@ -261,7 +261,7 @@ export default class SpritesList extends Component<Props, void> {
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
         onReplaceByDirection(newDirection);
         newDirection.delete();
-      },
+      }    
     });
   };
 

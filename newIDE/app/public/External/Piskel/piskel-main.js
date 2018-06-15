@@ -10,6 +10,13 @@ const editorContentWindow = document.getElementById('piskel-frame')
 let baseExportPath;
 let piskelOptions; // The options received from GDevelop
 
+let piskelAnimationNameInput; // controler to rename piskel animations
+const updatePiskelName = function(){
+  piskelAnimationNameInput.value = piskelAnimationNameInput.value.replace(/[^a-zA-Z0-9_-]/g, "")
+  piskelOptions.name = piskelAnimationNameInput.value
+  baseExportPath = piskelOptions.projectPath + '/' + piskelOptions.name
+}
+
 const updateFrameElements = function() {
   setTimeout(function() {
     const editorContentDocument = document.getElementById('piskel-frame')
@@ -44,12 +51,25 @@ document.getElementById('piskel-frame').onload = function() {
   const newButton = editorContentDocument.getElementsByClassName(
     'new-piskel-desktop button button-primary'
   )[0];
+  const oldPiskelNameLabel = editorContentDocument.getElementsByClassName(
+    'piskel-name'
+  )[0];
   newButton.style.display = 'none';
+  oldPiskelNameLabel.style.display = 'none';
 
   const piskelAppHeader = editorContentDocument.getElementsByClassName(
     'fake-piskelapp-header'
   )[0];
   piskelAppHeader.align = 'right';
+
+  piskelAnimationNameInput = editorContentDocument.createElement('input');
+  piskelAnimationNameInput.style = 'margin-right: 5px; margin-top: 5px;';
+  piskelAnimationNameInput.id = "piskelAnimationNameInput";
+  piskelOptions = {name:"New Animation"};
+  piskelAnimationNameInput.oninput = updatePiskelName;
+  // piskelAnimationNameInput.pattern="[A-Za-z]{1,10}";
+  piskelAnimationNameInput.type="text";
+  piskelAppHeader.appendChild(piskelAnimationNameInput);
 
   const saveButton = editorContentDocument.createElement('button');
   saveButton.innerHTML = 'Save to GDevelop';
@@ -126,7 +146,7 @@ function saveToGD() {
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   const layer = pskl.app.piskelController.getCurrentLayer();
-
+  updatePiskelName(); // Recalculate basepath
   // Generate the path of the files that will be written
   const outputResources = [];
   for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
@@ -163,7 +183,7 @@ function saveToGD() {
       });
     },
     function(err) {
-      ipcRenderer.send('piskel-changes-saved', outputResources);
+      ipcRenderer.send('piskel-changes-saved', outputResources, piskelOptions.name);
       remote.getCurrentWindow().close();
     }
   );
@@ -205,8 +225,8 @@ function piskelCreateAnimation(pskl, piskelOptions) {
 
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   piskelOptions = receivedOptions;
-  baseExportPath = piskelOptions.projectPath + '/' + piskelOptions.name;
-
+  piskelAnimationNameInput.value = piskelOptions.name;
+  
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   if (!pskl) return;

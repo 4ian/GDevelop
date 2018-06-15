@@ -71,7 +71,7 @@ document.getElementById('piskel-frame').onload = function() {
   piskelAnimationNameInput.oninput = updatePiskelName;
   piskelAnimationNameInput.type = 'text';
   piskelAnimationNameInput.style =
-    'text-align: center;border: 2px solid #52c4f9;border-radius: 3px;background-color:#282828; color: #52c4f9;margin-right: 5px; margin-top: 5px;';
+    'text-align: center;border: 2px solid #52c4f9;border-radius: 3px;background-color:#282828; color: white;margin-right: 5px; margin-top: 5px;';
   piskelAppHeader.appendChild(piskelAnimationNameInput);
 
   const saveButton = editorContentDocument.createElement('button');

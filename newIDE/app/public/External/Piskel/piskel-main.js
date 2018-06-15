@@ -199,6 +199,8 @@ function piskelCreateAnimation(pskl, piskelOptions) {
     pskl.app.piskelController.setPiskel(piskel);
     pskl.app.piskelController.setFPS(sprite.fps);
   });
+  pskl.app.settingsController.settingsContainer.getElementsByClassName('tool-icon  icon-settings-resize-white')[0].click(); /// call resize window
+  pskl.app.settingsController.settingsContainer.getElementsByClassName('textfield resize-size-field')[0].focus();
 }
 
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {

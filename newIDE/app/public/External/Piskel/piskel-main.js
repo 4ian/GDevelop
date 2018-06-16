@@ -11,7 +11,7 @@ let baseExportPath;
 let piskelOptions; // The options received from GDevelop
 
 let piskelAnimationNameInput = {}; // controler to rename piskel animations
-const updatePiskelName = function() {
+const updatePiskelBasePath = function() {
   piskelAnimationNameInput.value = piskelAnimationNameInput.value.replace(
     /[^a-zA-Z0-9_-]/g,
     ''
@@ -68,7 +68,7 @@ document.getElementById('piskel-frame').onload = function() {
   piskelAnimationNameInput = editorContentDocument.createElement('input');
   piskelAnimationNameInput.id = 'piskelAnimationNameInput';
   piskelOptions = { name: 'New Animation' };
-  piskelAnimationNameInput.oninput = updatePiskelName;
+  piskelAnimationNameInput.oninput = updatePiskelBasePath;
   piskelAnimationNameInput.type = 'text';
   piskelAnimationNameInput.style =
     'text-align: center;border: 2px solid #52c4f9;border-radius: 3px;background-color:#282828; color: white;margin-right: 5px; margin-top: 5px;';
@@ -76,13 +76,15 @@ document.getElementById('piskel-frame').onload = function() {
 
   const saveButton = editorContentDocument.createElement('button');
   saveButton.innerHTML = 'Save to GDevelop';
-  saveButton.style = 'border: 2px solid white;border-radius: 1px;margin-left: 20px; margin-right: 10px; margin-top: 5px;background-color:white;';
+  saveButton.style =
+    'border: 2px solid white;border-radius: 1px;margin-left: 20px; margin-right: 10px; margin-top: 5px;background-color:white;';
   piskelAppHeader.appendChild(saveButton);
   saveButton.addEventListener('click', saveToGD);
 
   const cancelButton = editorContentDocument.createElement('button');
   cancelButton.innerHTML = 'Cancel';
-  cancelButton.style = 'border: 2px solid white;border-radius: 1px;margin-right: 5px; margin-top: 5px;background-color:white;';
+  cancelButton.style =
+    'border: 2px solid white;border-radius: 1px;margin-right: 5px; margin-top: 5px;background-color:white;';
   piskelAppHeader.appendChild(cancelButton);
   cancelButton.addEventListener('click', cancelChanges);
 };
@@ -149,7 +151,7 @@ function saveToGD() {
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   const layer = pskl.app.piskelController.getCurrentLayer();
-  updatePiskelName(); // Recalculate basepath
+  updatePiskelBasePath(); // Recalculate basepath
   // Generate the path of the files that will be written
   const outputResources = [];
   for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {

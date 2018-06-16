@@ -1,5 +1,8 @@
+import advancedShapeBasedPainter from '../fixtures/advanced-shape-based-painter/advanced-shape-based-painter.json';
 import animationSpeedScale from '../fixtures/animation-speed-scale/animation-speed-scale.json';
 import asteroids from '../fixtures/asteroids/asteroids.json';
+import basicArtificialIntelligence from '../fixtures/basic-artificial-intelligence/basic-artificial-intelligence.json';
+import basicTopdownCarDriving from '../fixtures/basic-topdown-car-driving/basic-topdown-car-driving.json';
 import brakeout from '../fixtures/brakeout/brakeout.json';
 import buttons from '../fixtures/buttons/buttons.json';
 import changePositionOfObject from '../fixtures/change-position-of-object/change-position-of-object.json';
@@ -7,6 +10,7 @@ import changeScaleOfSprites from '../fixtures/change-scale-of-sprites/change-sca
 import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sprite-animation.json';
 import changeSpriteColor from '../fixtures/change-sprite-color/change-sprite-color.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
+import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-lastpressedkey/customize-keys-with-lastpressedkey.json';
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
 import infiniteScrollingBackground from '../fixtures/infinite-scrolling-background/infinite-scrolling-background.json';
 import instanceTimer from '../fixtures/instance-timer/instance-timer.json';
@@ -17,7 +21,9 @@ import manipulateTextObject from '../fixtures/manipulate-text-object/manipulate-
 import moveCameraToPosition from '../fixtures/move-camera-to-position/move-camera-to-position.json';
 import moveObjectTowardPosition from '../fixtures/move-object-toward-position/move-object-toward-position.json';
 import moveObjectWithPhysics from '../fixtures/move-object-with-physics/move-object-with-physics.json';
+import multitouch from '../fixtures/multitouch/multitouch.json';
 import objectSelection from '../fixtures/object-selection/object-selection.json';
+import openUrlInBrowser from '../fixtures/open-url-in-browser/open-url-in-browser.json';
 import parallax from '../fixtures/parallax/parallax.json';
 import parallaxScrolling from '../fixtures/parallax-scrolling/parallax-scrolling.json';
 import parseJsonFromApi from '../fixtures/parse-json-from-api/parse-json-from-api.json';
@@ -35,8 +41,10 @@ import rotateTowardPosition from '../fixtures/rotate-toward-position/rotate-towa
 import rotateWithKeypress from '../fixtures/rotate-with-keypress/rotate-with-keypress.json';
 import saveLoad from '../fixtures/save-load/save-load.json';
 import shootBullets from '../fixtures/shoot-bullets/shoot-bullets.json';
+import shootingBulletsExplanation from '../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
 import spaceShooter from '../fixtures/space-shooter/space-shooter.json';
 import splashScreen from '../fixtures/splash-screen/splash-screen.json';
+import textEntryObject from '../fixtures/text-entry-object/text-entry-object.json';
 import toggleMusicPlaySound from '../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
 import typeOnTextEffect from '../fixtures/type-on-text-effect/type-on-text-effect.json';
 import zDepth from '../fixtures/z-depth/z-depth.json';
@@ -44,133 +52,107 @@ import zombieLaser from '../fixtures/zombie-laser/zombie-laser.json';
 
 export default class BrowserProjectOpener {
   static readInternalFile(url) {
-    if (url === 'internal://animation-speed-scale') {
+    if (url === 'internal://advanced-shape-based-painter') {
+      return Promise.resolve(advancedShapeBasedPainter);
+    } else if (url === 'internal://animation-speed-scale') {
       return Promise.resolve(animationSpeedScale);
-    }
-    else if (url === 'internal://asteroids') {
+    } else if (url === 'internal://asteroids') {
       return Promise.resolve(asteroids);
-    }
-    else if (url === 'internal://brakeout') {
+    } else if (url === 'internal://basic-artificial-intelligence') {
+      return Promise.resolve(basicArtificialIntelligence);
+    } else if (url === 'internal://basic-topdown-car-driving') {
+      return Promise.resolve(basicTopdownCarDriving);
+    } else if (url === 'internal://brakeout') {
       return Promise.resolve(brakeout);
-    }
-    else if (url === 'internal://buttons') {
+    } else if (url === 'internal://buttons') {
       return Promise.resolve(buttons);
-    }
-    else if (url === 'internal://change-position-of-object') {
+    } else if (url === 'internal://change-position-of-object') {
       return Promise.resolve(changePositionOfObject);
-    }
-    else if (url === 'internal://change-scale-of-sprites') {
+    } else if (url === 'internal://change-scale-of-sprites') {
       return Promise.resolve(changeScaleOfSprites);
-    }
-    else if (url === 'internal://change-sprite-animation') {
+    } else if (url === 'internal://change-sprite-animation') {
       return Promise.resolve(changeSpriteAnimation);
-    }
-    else if (url === 'internal://change-sprite-color') {
+    } else if (url === 'internal://change-sprite-color') {
       return Promise.resolve(changeSpriteColor);
-    }
-    else if (url === 'internal://create-object-with-mouseclick') {
+    } else if (url === 'internal://create-object-with-mouseclick') {
       return Promise.resolve(createObjectWithMouseclick);
-    }
-    else if (url === 'internal://drag-camera-with-mouse') {
+    } else if (url === 'internal://customize-keys-with-lastpressedkey') {
+      return Promise.resolve(customizeKeysWithLastpressedkey);
+    } else if (url === 'internal://drag-camera-with-mouse') {
       return Promise.resolve(dragCameraWithMouse);
-    }
-    else if (url === 'internal://infinite-scrolling-background') {
+    } else if (url === 'internal://infinite-scrolling-background') {
       return Promise.resolve(infiniteScrollingBackground);
-    }
-    else if (url === 'internal://instance-timer') {
+    } else if (url === 'internal://instance-timer') {
       return Promise.resolve(instanceTimer);
-    }
-    else if (url === 'internal://inventory-system') {
+    } else if (url === 'internal://inventory-system') {
       return Promise.resolve(inventorySystem);
-    }
-    else if (url === 'internal://keyboard-practice') {
+    } else if (url === 'internal://keyboard-practice') {
       return Promise.resolve(keyboardPractice);
-    }
-    else if (url === 'internal://magnet') {
+    } else if (url === 'internal://magnet') {
       return Promise.resolve(magnet);
-    }
-    else if (url === 'internal://manipulate-text-object') {
+    } else if (url === 'internal://manipulate-text-object') {
       return Promise.resolve(manipulateTextObject);
-    }
-    else if (url === 'internal://move-camera-to-position') {
+    } else if (url === 'internal://move-camera-to-position') {
       return Promise.resolve(moveCameraToPosition);
-    }
-    else if (url === 'internal://move-object-toward-position') {
+    } else if (url === 'internal://move-object-toward-position') {
       return Promise.resolve(moveObjectTowardPosition);
-    }
-    else if (url === 'internal://move-object-with-physics') {
+    } else if (url === 'internal://move-object-with-physics') {
       return Promise.resolve(moveObjectWithPhysics);
-    }
-    else if (url === 'internal://object-selection') {
+    } else if (url === 'internal://multitouch') {
+      return Promise.resolve(multitouch);
+    } else if (url === 'internal://object-selection') {
       return Promise.resolve(objectSelection);
-    }
-    else if (url === 'internal://parallax') {
+    } else if (url === 'internal://open-url-in-browser') {
+      return Promise.resolve(openUrlInBrowser);
+    } else if (url === 'internal://parallax') {
       return Promise.resolve(parallax);
-    }
-    else if (url === 'internal://parallax-scrolling') {
+    } else if (url === 'internal://parallax-scrolling') {
       return Promise.resolve(parallaxScrolling);
-    }
-    else if (url === 'internal://parse-json-from-api') {
+    } else if (url === 'internal://parse-json-from-api') {
       return Promise.resolve(parseJsonFromApi);
-    }
-    else if (url === 'internal://particles-explosions') {
+    } else if (url === 'internal://particles-explosions') {
       return Promise.resolve(particlesExplosions);
-    }
-    else if (url === 'internal://particles-various-effects') {
+    } else if (url === 'internal://particles-various-effects') {
       return Promise.resolve(particlesVariousEffects);
-    }
-    else if (url === 'internal://pathfinding') {
+    } else if (url === 'internal://pathfinding') {
       return Promise.resolve(pathfinding);
-    }
-    else if (url === 'internal://pathfinding-basics') {
+    } else if (url === 'internal://pathfinding-basics') {
       return Promise.resolve(pathfindingBasics);
-    }
-    else if (url === 'internal://physics') {
+    } else if (url === 'internal://physics') {
       return Promise.resolve(physics);
-    }
-    else if (url === 'internal://platformer') {
+    } else if (url === 'internal://platformer') {
       return Promise.resolve(platformer);
-    }
-    else if (url === 'internal://play-stop-sprite-animation') {
+    } else if (url === 'internal://play-stop-sprite-animation') {
       return Promise.resolve(playStopSpriteAnimation);
-    }
-    else if (url === 'internal://rain') {
+    } else if (url === 'internal://rain') {
       return Promise.resolve(rain);
-    }
-    else if (url === 'internal://random-color-picker') {
+    } else if (url === 'internal://random-color-picker') {
       return Promise.resolve(randomColorPicker);
-    }
-    else if (url === 'internal://rotate-toward-mouse') {
+    } else if (url === 'internal://rotate-toward-mouse') {
       return Promise.resolve(rotateTowardMouse);
-    }
-    else if (url === 'internal://rotate-toward-position') {
+    } else if (url === 'internal://rotate-toward-position') {
       return Promise.resolve(rotateTowardPosition);
-    }
-    else if (url === 'internal://rotate-with-keypress') {
+    } else if (url === 'internal://rotate-with-keypress') {
       return Promise.resolve(rotateWithKeypress);
-    }
-    else if (url === 'internal://save-load') {
+    } else if (url === 'internal://save-load') {
       return Promise.resolve(saveLoad);
-    }
-    else if (url === 'internal://shoot-bullets') {
+    } else if (url === 'internal://shoot-bullets') {
       return Promise.resolve(shootBullets);
-    }
-    else if (url === 'internal://space-shooter') {
+    } else if (url === 'internal://shooting-bullets-explanation') {
+      return Promise.resolve(shootingBulletsExplanation);
+    } else if (url === 'internal://space-shooter') {
       return Promise.resolve(spaceShooter);
-    }
-    else if (url === 'internal://splash-screen') {
+    } else if (url === 'internal://splash-screen') {
       return Promise.resolve(splashScreen);
-    }
-    else if (url === 'internal://toggle-music-play-sound') {
+    } else if (url === 'internal://text-entry-object') {
+      return Promise.resolve(textEntryObject);
+    } else if (url === 'internal://toggle-music-play-sound') {
       return Promise.resolve(toggleMusicPlaySound);
-    }
-    else if (url === 'internal://type-on-text-effect') {
+    } else if (url === 'internal://type-on-text-effect') {
       return Promise.resolve(typeOnTextEffect);
-    }
-    else if (url === 'internal://z-depth') {
+    } else if (url === 'internal://z-depth') {
       return Promise.resolve(zDepth);
-    }
-    else if (url === 'internal://zombie-laser') {
+    } else if (url === 'internal://zombie-laser') {
       return Promise.resolve(zombieLaser);
     }
 

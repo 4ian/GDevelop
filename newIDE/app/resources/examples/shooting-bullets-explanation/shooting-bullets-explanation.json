@@ -1,0 +1,997 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 97,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "folderProject": false,
+    "linuxExecutableFilename": "",
+    "macExecutableFilename": "",
+    "orientation": "default",
+    "packageName": "",
+    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\shooting-bullets-explanation\\shooting-bullets-explanation.json",
+    "sizeOnStartupMode": "",
+    "useExternalSourceFiles": false,
+    "winExecutableFilename": "",
+    "winExecutableIconFile": "",
+    "name": "Basic explanation about shooting bullets",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 10,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      },
+      {
+        "name": "CommonDialogs"
+      },
+      {
+        "name": "DestroyOutsideBehavior"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "Bullet.png",
+        "kind": "image",
+        "name": "Tir.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "tank1fr1.png",
+        "kind": "image",
+        "name": "tank1fr1.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "Pointer-Standard.png",
+        "kind": "image",
+        "name": "Pointer-Standard.png",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 125,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "One_32object",
+      "name": "One object",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 125,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 125,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": false,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": -65.4804,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Tank",
+          "width": 0,
+          "x": 337,
+          "y": 215,
+          "zOrder": -1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Target",
+          "width": 0,
+          "x": 476.5,
+          "y": 213.5,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "Bullet",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [
+            {
+              "extraBorder": 0,
+              "name": "DestroyOutside",
+              "type": "DestroyOutsideBehavior::DestroyOutside"
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": true,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Tir.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 5,
+                        "y": 5
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 5,
+                        "y": 5
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 10,
+                            "y": 0
+                          },
+                          {
+                            "x": 10,
+                            "y": 10
+                          },
+                          {
+                            "x": 0,
+                            "y": 10
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Tank",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank1fr1.png",
+                      "points": [
+                        {
+                          "name": "Canon",
+                          "x": 61,
+                          "y": 31
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 35,
+                        "y": 31
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 70,
+                            "y": 0
+                          },
+                          {
+                            "x": 70,
+                            "y": 62
+                          },
+                          {
+                            "x": 0,
+                            "y": 62
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Target",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Pointer-Standard.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 22,
+                        "y": 22
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 44,
+                            "y": 0
+                          },
+                          {
+                            "x": 44,
+                            "y": 44
+                          },
+                          {
+                            "x": 0,
+                            "y": 44
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Shoot if left button is pressed and timer is ok :\nCreate a bullet\nMake the bullet move\nand reset the timer to fire another bullet later.",
+          "comment2": "Tirer si le bouton gauche est press� et le chronom�tre sup�rieur � 0.25 secondes :\nOn cr�er un tir\nOn le met en mouvement\nOn remet � z�ro le chronom�tre pour pouvoir tirer plus tard."
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SourisBouton"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Timer"
+              },
+              "parameters": [
+                "",
+                "0.25",
+                "\"FireRate\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "Create"
+              },
+              "parameters": [
+                "",
+                "Bullet",
+                "Tank.PointX(Canon)",
+                "Tank.PointY(Canon)",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "AddForceVersPos"
+              },
+              "parameters": [
+                "Bullet",
+                "MouseX()",
+                "MouseY()",
+                "300",
+                "1"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ResetTimer"
+              },
+              "parameters": [
+                "",
+                "\"FireRate\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "Target",
+                "=",
+                "MouseX()",
+                "=",
+                "MouseY()"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "TourneVersPos"
+              },
+              "parameters": [
+                "Tank",
+                "MouseX()",
+                "MouseY()"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 125,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Multiple_32objects",
+      "name": "Multiple objects",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 125,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 125,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": false,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": -65.4804,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Tank",
+          "width": 0,
+          "x": 520,
+          "y": 216,
+          "zOrder": -1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -65.4804,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Tank",
+          "width": 0,
+          "x": 337,
+          "y": 215,
+          "zOrder": -1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -65.4804,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Tank",
+          "width": 0,
+          "x": 138,
+          "y": 201,
+          "zOrder": -1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Target",
+          "width": 0,
+          "x": 608.5,
+          "y": 178.5,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "Bullet",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [
+            {
+              "extraBorder": 0,
+              "name": "DestroyOutside",
+              "type": "DestroyOutsideBehavior::DestroyOutside"
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": true,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Tir.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 5,
+                        "y": 5
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 5,
+                        "y": 5
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 10,
+                            "y": 0
+                          },
+                          {
+                            "x": 10,
+                            "y": 10
+                          },
+                          {
+                            "x": 0,
+                            "y": 10
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Tank",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "tank1fr1.png",
+                      "points": [
+                        {
+                          "name": "Canon",
+                          "x": 61,
+                          "y": 31
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 35,
+                        "y": 31
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 70,
+                            "y": 0
+                          },
+                          {
+                            "x": 70,
+                            "y": 62
+                          },
+                          {
+                            "x": 0,
+                            "y": 62
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Target",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "Pointer-Standard.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 22,
+                        "y": 22
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 44,
+                            "y": 0
+                          },
+                          {
+                            "x": 44,
+                            "y": 44
+                          },
+                          {
+                            "x": 0,
+                            "y": 44
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "When there is more than one object which\nmust shoot a bullet, use \"For each object\" event\nso as to create a bullet for each of the objects.",
+          "comment2": "Quand plus d'un objet doit tirer, utilisez\nl'�v�nement \"Pour chaque objet\" afin de cr�er\nun tir pour chacun des objets."
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SourisBouton"
+              },
+              "parameters": [
+                "",
+                "Left"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "Timer"
+              },
+              "parameters": [
+                "",
+                "0.25",
+                "\"FireRate\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "ResetTimer"
+              },
+              "parameters": [
+                "",
+                "\"FireRate\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "Tank",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Create"
+                  },
+                  "parameters": [
+                    "",
+                    "Bullet",
+                    "Tank.PointX(Canon)",
+                    "Tank.PointY(Canon)",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "AddForceVersPos"
+                  },
+                  "parameters": [
+                    "Bullet",
+                    "MouseX(\"\",0)",
+                    "MouseY(\"\",0)",
+                    "300",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "There is nothing more to change in our example.",
+          "comment2": "Il n'y a rien de plus � modifier ici."
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "TourneVersPos"
+              },
+              "parameters": [
+                "Tank",
+                "MouseX(\"\",0)",
+                "MouseY(\"\",0)"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "Target",
+                "=",
+                "MouseX()",
+                "=",
+                "MouseY()"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

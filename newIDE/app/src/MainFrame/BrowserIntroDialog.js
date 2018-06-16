@@ -22,7 +22,7 @@ export default class BetaIntroDialog extends Component {
       <Dialog actions={actions} open={open} onRequestClose={onClose}>
         <div>
           <p>
-            This is a <b>beta version</b> of GDevelop 5 that you can try online.
+            This is a version of GDevelop 5 that you can try online.
           </p>
           <p>
             Choose a <b>new project to create</b> and then <b>open the scene</b>{' '}

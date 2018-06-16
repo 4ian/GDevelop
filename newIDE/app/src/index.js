@@ -40,7 +40,6 @@ import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
-import LocalIntroDialog from './MainFrame/LocalIntroDialog';
 
 // Uncomment to enable logs in console when a component is potentially doing
 // an unnecessary update
@@ -88,7 +87,6 @@ if (electron) {
               startersComponent={LocalStarters}
             />
           }
-          introDialog={<LocalIntroDialog />}
           onSaveProject={LocalProjectWriter.saveProject}
           onChooseProject={LocalProjectOpener.chooseProjectFile}
           onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}

@@ -62,6 +62,7 @@ export const getLocalExporters = () => [
   {
     name: 'Windows/macOS/Linux (beta)',
     renderIcon: (props) => <LaptopMac {...props}/>,
+    helpPage: '/publishing/windows-macos-linux',
     description: 'Package your game as an app for Windows, macOS or Linux directly from GDevelop.',
     key: 'localonlineelectronexport',
     ExportComponent: LocalOnlineElectronExport,
@@ -69,6 +70,7 @@ export const getLocalExporters = () => [
   {
     name: 'Windows/macOS/Linux (manual)',
     renderIcon: (props) => <LaptopMac {...props}/>,
+    helpPage: '/publishing/windows-macos-linux-with-electron',
     description: 'Build the game locally and export it manually to Windows, macOS or Linux with third-party developer tools.',
     key: 'localelectronexport',
     ExportComponent: LocalElectronExport,

@@ -6,6 +6,8 @@ import Subheader from 'material-ui/Subheader';
 import { List, ListItem } from 'material-ui/List';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
+import BuildsDialog from './Builds/BuildsDialog';
+import { Line } from '../UI/Grid';
 
 const styles = {
   icon: { width: 40, height: 40 },
@@ -17,6 +19,7 @@ export default class ExportDialog extends Component {
   state = {
     chosenExporterKey: '',
     showExperimental: false,
+    buildsDialogOpen: false,
   };
 
   chooseExporter = key => {
@@ -28,6 +31,12 @@ export default class ExportDialog extends Component {
   _showExperimental = (show = true) => {
     this.setState({
       showExperimental: show,
+    });
+  };
+
+  _openBuildsDialog = (open = true) => {
+    this.setState({
+      buildsDialogOpen: open,
     });
   };
 
@@ -51,7 +60,7 @@ export default class ExportDialog extends Component {
       project,
       open,
       onClose,
-      authentification,
+      authentification, //Still exist?
       onChangeSubscription,
       exporters,
     } = this.props;
@@ -87,8 +96,44 @@ export default class ExportDialog extends Component {
             key="help"
             helpPagePath={(exporter && exporter.helpPage) || '/publishing'}
           />,
-          !chosenExporterKey &&
-            (!showExperimental ? (
+          <FlatButton
+            key="builds"
+            label="See all my builds"
+            onClick={() => this._openBuildsDialog(true)}
+          />,
+        ]}
+        open={open}
+        noMargin
+        autoScrollBodyContent
+      >
+        {!exporter && (
+          <React.Fragment>
+            <List>
+              {exporters
+                .filter(
+                  exporter => !exporter.advanced && !exporter.experimental
+                )
+                .map((exporter, index) =>
+                  this._renderExporterListItem(exporter, index)
+                )}
+
+              <Subheader>Advanced</Subheader>
+              {exporters
+                .filter(exporter => exporter.advanced)
+                .map((exporter, index) =>
+                  this._renderExporterListItem(exporter, index)
+                )}
+
+              {showExperimental && <Subheader>Experimental</Subheader>}
+              {showExperimental &&
+                exporters
+                  .filter(exporter => exporter.experimental)
+                  .map((exporter, index) =>
+                    this._renderExporterListItem(exporter, index)
+                  )}
+            </List>
+            <Line justifyContent="center" alignItems="center">
+            {!showExperimental ? (
               <FlatButton
                 key="toggle-experimental"
                 icon={<Visibility />}
@@ -104,45 +149,24 @@ export default class ExportDialog extends Component {
                 onClick={() => this._showExperimental(false)}
                 label="Hide experimental exports"
               />
-            )),
-        ]}
-        open={open}
-        noMargin
-        autoScrollBodyContent
-      >
-        {!exporter && (
-          <List>
-            {exporters
-              .filter(exporter => !exporter.advanced && !exporter.experimental)
-              .map((exporter, index) =>
-                this._renderExporterListItem(exporter, index)
-              )}
-
-            <Subheader>Advanced</Subheader>
-            {exporters
-              .filter(exporter => exporter.advanced)
-              .map((exporter, index) =>
-                this._renderExporterListItem(exporter, index)
-              )}
-
-            {showExperimental && <Subheader>Experimental</Subheader>}
-            {showExperimental &&
-              exporters
-                .filter(exporter => exporter.experimental)
-                .map((exporter, index) =>
-                  this._renderExporterListItem(exporter, index)
-                )}
-          </List>
+            )}
+            </Line>
+          </React.Fragment>
         )}
         {exporter && (
           <div style={styles.content}>
             <exporter.ExportComponent
               project={project}
-              authentification={authentification}
+              authentification={authentification} //Still exist?
               onChangeSubscription={onChangeSubscription}
+              onOpenBuildsDialog={this._openBuildsDialog}
             />
           </div>
         )}
+        <BuildsDialog
+          open={this.state.buildsDialogOpen}
+          onClose={() => this._openBuildsDialog(false)}
+        />
       </Dialog>
     );
   }

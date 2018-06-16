@@ -181,13 +181,19 @@ bool Exporter::ExportWholePixiProject(
   };
 
   if (exportOptions["exportForCordova"]) {
-    // Prepare the export directory
     fs.MkDir(exportDir);
+    fs.MkDir(exportDir + "/www");
 
     if (!exportProject(exportDir + "/www")) return false;
 
     if (!helper.ExportCordovaConfigFile(exportedProject, exportDir))
       return false;
+  } else if (exportOptions["exportForElectron"]) {
+    fs.MkDir(exportDir);
+
+    if (!exportProject(exportDir + "/app")) return false;
+
+    if (!helper.ExportElectronFiles(exportedProject, exportDir)) return false;
   } else {
     if (!exportProject(exportDir)) return false;
   }

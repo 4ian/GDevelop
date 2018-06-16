@@ -17,7 +17,6 @@ import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
 import LocalExport from '../Export/LocalExporters/LocalExport';
 import LocalCordovaExport from '../Export/LocalExporters/LocalCordovaExport';
-import Progress from '../Export/LocalExporters/LocalOnlineCordovaExport/Progress';
 import LocalS3Export from '../Export/LocalExporters/LocalS3Export';
 import LocalNetworkPreviewDialog from '../Export/LocalExporters/LocalPreviewLauncher/LocalNetworkPreviewDialog';
 import TextEditor from '../ObjectEditor/Editors/TextEditor';
@@ -85,6 +84,8 @@ import LoginDialog from '../Profile/LoginDialog';
 import UserProfileContext from '../Profile/UserProfileContext';
 import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
+import BuildProgress from '../Export/Builds/BuildProgress';
+import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 
 const gd = global.gd;
 const {
@@ -260,24 +261,194 @@ storiesOf('LocalCordovaExport', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LocalCordovaExport project={project} />);
 
-storiesOf('LocalOnlineCordovaExport', module)
+storiesOf('BuildStepsProgress', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('Progress (not started)', () => <Progress exportStep={''} />)
-  .add('Progress (export)', () => <Progress exportStep={'export'} />)
-  .add('Progress (compress)', () => <Progress exportStep={'compress'} />)
-  .add('Progress (upload)', () => <Progress exportStep={'upload'} />)
-  .add('Progress (upload) (errored)', () => (
-    <Progress exportStep={'upload'} errored />
+  .add('BuildStepsProgress (not started)', () => (
+    <BuildStepsProgress
+      exportStep={''}
+      build={null}
+      onDownload={action('download')}
+      uploadMax={0}
+      uploadProgress={0}
+      errored={false}
+    />
   ))
-  .add('Progress (waiting-for-build)', () => (
-    <Progress exportStep={'waiting-for-build'} />
+  .add('BuildStepsProgress (export)', () => (
+    <BuildStepsProgress
+      exportStep={'export'}
+      build={null}
+      onDownload={action('download')}
+      uploadMax={0}
+      uploadProgress={0}
+      errored={false}
+    />
   ))
-  .add('Progress (build)', () => <Progress exportStep={'build'} />)
-  .add('Progress (build) (errored)', () => (
-    <Progress exportStep={'build'} errored />
+  .add('BuildStepsProgress (compress)', () => (
+    <BuildStepsProgress
+      exportStep={'compress'}
+      build={null}
+      onDownload={action('download')}
+      uploadMax={0}
+      uploadProgress={0}
+      errored={false}
+    />
   ))
-  .add('Progress (done)', () => <Progress exportStep={'done'} />);
+  .add('BuildStepsProgress (upload)', () => (
+    <BuildStepsProgress
+      exportStep={'upload'}
+      build={null}
+      onDownload={action('download')}
+      uploadMax={100}
+      uploadProgress={20}
+      errored={false}
+    />
+  ))
+  .add('BuildStepsProgress (upload) (errored)', () => (
+    <BuildStepsProgress
+      exportStep={'upload'}
+      build={null}
+      onDownload={action('download')}
+      uploadMax={100}
+      uploadProgress={20}
+      errored
+    />
+  ))
+  .add('BuildStepsProgress (waiting-for-build)', () => (
+    <BuildStepsProgress
+      exportStep={'waiting-for-build'}
+      build={null}
+      onDownload={action('download')}
+      uploadMax={100}
+      uploadProgress={20}
+      errored
+    />
+  ))
+  .add('BuildStepsProgress (build)', () => (
+    <BuildStepsProgress
+      exportStep={'build'}
+      build={{
+        id: 'fake-build-id',
+        userId: 'fake-user-id',
+        type: 'electron-build',
+        status: 'pending',
+        updatedAt: Date.now(),
+        createdAt: Date.now(),
+      }}
+      onDownload={action('download')}
+      uploadMax={100}
+      uploadProgress={20}
+      errored
+      showSeeAllMyBuildsExplanation
+    />
+  ))
+  .add('BuildStepsProgress (build) (errored)', () => (
+    <BuildStepsProgress
+      exportStep={'build'}
+      build={{
+        id: 'fake-build-id',
+        userId: 'fake-user-id',
+        type: 'cordova-build',
+        status: 'error',
+        logsKey: '/fake-error.log',
+        updatedAt: Date.now(),
+        createdAt: Date.now(),
+      }}
+      onDownload={action('download')}
+      uploadMax={100}
+      uploadProgress={20}
+      errored
+    />
+  ))
+  .add('BuildStepsProgress (build) (complete)', () => (
+    <BuildStepsProgress
+      exportStep={'build'}
+      build={{
+        id: 'fake-build-id',
+        userId: 'fake-user-id',
+        type: 'cordova-build',
+        status: 'complete',
+        logsKey: '/fake-error.log',
+        apkKey: '/fake-game.apk',
+        updatedAt: Date.now(),
+        createdAt: Date.now(),
+      }}
+      onDownload={action('download')}
+      uploadMax={100}
+      uploadProgress={20}
+      errored
+    />
+  ));
+
+storiesOf('BuildProgress', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('errored', () => (
+    <BuildProgress
+      build={{
+        status: 'error',
+        logsKey: '/fake-error.log',
+      }}
+      onDownload={action('download')}
+    />
+  ))
+  .add('pending (electron-build)', () => (
+    <BuildProgress
+      build={{
+        type: 'electron-build',
+        status: 'pending',
+        updatedAt: Date.now(),
+      }}
+      onDownload={action('download')}
+    />
+  ))
+  .add('pending (cordova-build)', () => (
+    <BuildProgress
+      build={{
+        type: 'cordova-build',
+        status: 'pending',
+        updatedAt: Date.now(),
+      }}
+      onDownload={action('download')}
+    />
+  ))
+  .add('pending and very old (cordova-build)', () => (
+    <BuildProgress
+      build={{
+        type: 'cordova-build',
+        status: 'pending',
+        updatedAt: Date.now() - 1000 * 3600 * 24,
+      }}
+      onDownload={action('download')}
+    />
+  ))
+  .add('complete (cordova-build)', () => (
+    <BuildProgress
+      build={{
+        type: 'cordova-build',
+        status: 'complete',
+        logsKey: '/fake-error.log',
+        apkKey: '/fake-game.apk',
+        updatedAt: Date.now(),
+      }}
+      onDownload={action('download')}
+    />
+  ))
+  .add('complete (electron-build)', () => (
+    <BuildProgress
+      build={{
+        type: 'electron-build',
+        status: 'complete',
+        logsKey: '/fake-error.log',
+        windowsExeKey: '/fake-windows-game.exe',
+        windowsZipKey: '/fake-windows-game.zip',
+        macosZipKey: '/fake-macos-game.zip',
+        linuxAppImageKey: '/fake-linux-game.AppImage',
+        updatedAt: Date.now(),
+      }}
+      onDownload={action('download')}
+    />
+  ));
 
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)

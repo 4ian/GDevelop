@@ -1,24 +1,48 @@
+// @flow
 import * as React from 'react';
-import RaisedButton from 'material-ui/RaisedButton';
 import { Step, Stepper, StepLabel, StepContent } from 'material-ui/Stepper';
 import CircularProgress from 'material-ui/CircularProgress';
 import LinearProgress from 'material-ui/LinearProgress';
-import FlatButton from 'material-ui/FlatButton';
-import { Line, Spacer } from '../../../UI/Grid';
-import HelpButton from '../../../UI/HelpButton';
+import { Line, Spacer } from '../../UI/Grid';
+import BuildProgress from './BuildProgress';
+import { type Build } from '../../Utils/GDevelopServices/Build';
+import EmptyMessage from '../../UI/EmptyMessage';
 
+const styles = {
+  stepper: { flex: 1 },
+};
+
+export type BuildStep =
+  | ''
+  | 'export'
+  | 'compress'
+  | 'upload'
+  | 'waiting-for-build'
+  | 'build';
+
+type Props = {|
+  exportStep: BuildStep,
+  onDownload: (key: string) => void,
+  build: ?Build,
+  uploadMax: number,
+  uploadProgress: number,
+  errored: boolean,
+  showSeeAllMyBuildsExplanation?: boolean,
+|};
+
+/**
+ * Can be used in an exporter to show the overall progress of a build
+ * (including local archiving/upload steps and remote build progress)
+ */
 export default ({
   exportStep,
-  downloadUrl,
   onDownload,
-  onDownloadLogs,
+  build,
   uploadMax,
   uploadProgress,
-  buildMax,
-  buildProgress,
   errored,
-  onPlayStore,
-}) => (
+  showSeeAllMyBuildsExplanation,
+}: Props) => (
   <Stepper
     activeStep={
       exportStep === 'export'
@@ -27,9 +51,10 @@ export default ({
           ? 1
           : exportStep === 'waiting-for-build' || exportStep === 'build'
             ? 2
-            : exportStep === 'done' ? 3 : undefined
+            : undefined
     }
     orientation="vertical"
+    style={styles.stepper}
   >
     <Step>
       <StepLabel>Game export</StepLabel>
@@ -47,7 +72,7 @@ export default ({
         {errored ? (
           <p>
             Can't upload your game to the build service. Please check your
-            internet connection or try again later
+            internet connection or try again later.
           </p>
         ) : exportStep === 'compress' ? (
           <Line alignItems="center">
@@ -68,42 +93,15 @@ export default ({
       </StepContent>
     </Step>
     <Step>
-      <StepLabel>Build</StepLabel>
+      <StepLabel>Build and download</StepLabel>
       <StepContent>
-        {errored ? (
-          <p>Something wrong happened :(</p>
-        ) : exportStep === 'waiting-for-build' ? (
-          <Line alignItems="center">
-            <CircularProgress size={20} />
-            <Spacer />
-            <p>Waiting for build to start...</p>
-          </Line>
-        ) : (
-          <Line alignItems="center" expand>
-            <LinearProgress
-              style={{ flex: 1 }}
-              max={buildMax}
-              value={buildProgress}
-              mode="determinate"
-            />
-          </Line>
-        )}
-      </StepContent>
-    </Step>
-    <Step>
-      <StepLabel>Download</StepLabel>
-      <StepContent>
-        <Line>
-          <RaisedButton label="Download" primary onClick={onDownload} />
-          <HelpButton
-            label="Upload to Play Store"
-            helpPagePath="/publishing/android_and_ios/play-store"
-          />
-          <FlatButton label="See logs" onClick={onDownloadLogs} />
-        </Line>
-        <Line expand>
-          You can download it on your Android phone and install it.
-        </Line>
+        {!build && <p>Build is starting...</p>}
+        {build && <BuildProgress build={build} onDownload={onDownload} />}
+        {showSeeAllMyBuildsExplanation && <EmptyMessage>
+          If you close this window while the build is being done, you can see
+          its progress and download the game later by clicking on See All My
+          Builds below.
+        </EmptyMessage>}
       </StepContent>
     </Step>
   </Stepper>

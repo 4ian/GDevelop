@@ -27,10 +27,12 @@ type Props = {|
 |};
 
 type State = {|
+  desktopIconResourceNames: Array<string>,
   androidIconResourceNames: Array<string>,
   iosIconResourceNames: Array<string>,
 |};
 
+const desktopSizes = [512];
 const androidSizes = [192, 144, 96, 72, 48, 36];
 const iosSizes = [
   180,
@@ -62,6 +64,9 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
   _loadFrom(project: gdProject): State {
     return {
+      desktopIconResourceNames: desktopSizes.map(size =>
+        project.getPlatformSpecificAssets().get('desktop', `icon-${size}`)
+      ),
       androidIconResourceNames: androidSizes.map(size =>
         project.getPlatformSpecificAssets().get('android', `icon-${size}`)
       ),
@@ -96,6 +101,16 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       const fullPath = path.resolve(projectPath, resources[0].getFile());
 
       Promise.all([
+        ...desktopSizes.map(size =>
+          resizeImage(
+            fullPath,
+            path.join(projectPath, `desktop-icon-${size}.png`),
+            {
+              width: size,
+              height: size,
+            }
+          )
+        ),
         ...androidSizes.map(size =>
           resizeImage(
             fullPath,
@@ -124,6 +139,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
         // Add resources to the game
         const allResourcesNames = [
+          ...desktopSizes.map(size => `desktop-icon-${size}.png`),
           ...androidSizes.map(size => `android-icon-${size}.png`),
           ...iosSizes.map(size => `ios-icon-${size}.png`),
         ];
@@ -144,6 +160,9 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
         ResourcesLoader.burstUrlsCacheForResources(project, allResourcesNames);
         setTimeout(() => {
           this.setState({
+            desktopIconResourceNames: desktopSizes.map(
+              size => `desktop-icon-${size}.png`
+            ),
             androidIconResourceNames: androidSizes.map(
               size => `android-icon-${size}.png`
             ),
@@ -156,8 +175,17 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
 
   _onApply = () => {
     const { project } = this.props;
-    const { androidIconResourceNames, iosIconResourceNames } = this.state;
+    const {
+      desktopIconResourceNames,
+      androidIconResourceNames,
+      iosIconResourceNames,
+    } = this.state;
 
+    desktopSizes.forEach((size, index) => {
+      project
+        .getPlatformSpecificAssets()
+        .set('desktop', `icon-${size}`, desktopIconResourceNames[index]);
+    });
     androidSizes.forEach((size, index) => {
       project
         .getPlatformSpecificAssets()
@@ -192,7 +220,11 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
       onChooseResource,
       resourceExternalEditors,
     } = this.props;
-    const { androidIconResourceNames, iosIconResourceNames } = this.state;
+    const {
+      desktopIconResourceNames,
+      androidIconResourceNames,
+      iosIconResourceNames,
+    } = this.state;
 
     return (
       <Dialog
@@ -215,6 +247,26 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             </p>
           )}
         </Line>
+        <p>Desktop (Windows, macOS and Linux) icon:</p>
+        {desktopSizes.map((size, index) => (
+          <ResourceSelectorWithThumbnail
+            key={size}
+            floatingLabelText={`Desktop icon (${size}x${size} px)`}
+            project={project}
+            resourceSources={resourceSources}
+            onChooseResource={onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
+            resourceKind="image"
+            resourceName={desktopIconResourceNames[index]}
+            onChange={resourceName => {
+              const newIcons = [...desktopIconResourceNames];
+              newIcons[index] = resourceName;
+              this.setState({
+                desktopIconResourceNames: newIcons,
+              });
+            }}
+          />
+        ))}
         <p>Android icons:</p>
         {androidSizes.map((size, index) => (
           <ResourceSelectorWithThumbnail

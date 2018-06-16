@@ -17,7 +17,6 @@ import {
 import { translate, type TranslatorProps } from 'react-i18next';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
-import Window from '../../Utils/Window';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
 
@@ -32,7 +31,7 @@ type State = {|
   exportFinishedDialogOpen: boolean,
 |};
 
-class LocalCordovaExport extends Component<Props, State> {
+class LocalElectronExport extends Component<Props, State> {
   state = {
     exportFinishedDialogOpen: false,
     outputDir: '',
@@ -71,17 +70,17 @@ class LocalCordovaExport extends Component<Props, State> {
     const { t, project } = this.props;
     if (!project) return;
 
-    sendExportLaunched('local-cordova');
+    sendExportLaunched('local-electron');
 
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
 
     const outputDir = this.state.outputDir;
     project.setLastCompilationDirectory(outputDir);
 
-    LocalCordovaExport.prepareExporter()
+    LocalElectronExport.prepareExporter()
       .then(({ exporter }) => {
         const exportOptions = new gd.MapStringBoolean();
-        exportOptions.set('exportForCordova', true);
+        exportOptions.set('exportForElectron', true);
         exporter.exportWholePixiProject(project, outputDir, exportOptions);
         exportOptions.delete();
         exporter.delete();
@@ -99,10 +98,6 @@ class LocalCordovaExport extends Component<Props, State> {
     if (shell) shell.openItem(this.state.outputDir);
   };
 
-  openPhoneGapBuild = () => {
-    Window.openExternalURL('https://build.phonegap.com');
-  };
-
   render() {
     const { t, project } = this.props;
     if (!project) return null;
@@ -112,13 +107,9 @@ class LocalCordovaExport extends Component<Props, State> {
         <Line>
           <Column noMargin>
             <p>
-              This will export your game as a Cordova project. Cordova is a
-              technology that enables HTML5 games to be packaged for <b>iOS</b>,{' '}
-              <b>Android</b> and more.
-            </p>
-            <p>
-              Third-party tools like <b>Adobe PhoneGap Build</b> allow game
-              developers to bundle their games using Cordova.
+              This will export your game so that you can package it for Windows,
+              macOS or Linux. You will need to install third-party tools
+              (Node.js, Electron Builder) to package your game by yourself.
             </p>
           </Column>
         </Line>
@@ -165,24 +156,14 @@ class LocalCordovaExport extends Component<Props, State> {
           open={this.state.exportFinishedDialogOpen}
         >
           <p>
-            You can now compress and upload the game to <b>PhoneGap Build</b>{' '}
-            which will compile it for you to an iOS and Android app.
+            The game was properly exported. You can now use Electron Builder
+            (you need Node.js installed and to use the command-line to run it)
+            to create an executable.
           </p>
-          <p>
-            You can also compile the game by yourself using Cordova command-line
-            tool to iOS (XCode is required) or Android (Android SDK is
-            required).
-          </p>
-          <RaisedButton
-            fullWidth
-            primary
-            onClick={() => this.openPhoneGapBuild()}
-            label={t('Open PhoneGap Build')}
-          />
         </Dialog>
       </Column>
     );
   }
 }
 
-export default translate()(LocalCordovaExport);
+export default translate()(LocalElectronExport);

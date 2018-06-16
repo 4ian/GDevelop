@@ -18,7 +18,10 @@ import EmptyMessage from '../UI/EmptyMessage';
 import { showMessageBox, showErrorBox } from '../UI/Messages/MessageBox';
 import LeftLoader from '../UI/LeftLoader';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
-import { sendSubscriptionDialogShown, sendChoosePlanClicked } from '../Utils/Analytics/EventSender';
+import {
+  sendSubscriptionDialogShown,
+  sendChoosePlanClicked,
+} from '../Utils/Analytics/EventSender';
 
 const styles = {
   descriptionText: {
@@ -28,7 +31,7 @@ const styles = {
     marginBottom: 8,
   },
   card: {
-    marginBottom: 5,
+    margin: 16,
   },
   actions: {
     textAlign: 'right',
@@ -174,10 +177,10 @@ export default class SubscriptionDialog extends Component<Props, State> {
             <Column>
               <Line>
                 <p>
-                  Get a subscription to package your games for Android, use live
-                  preview over wifi and more. With a subscription, you're also
-                  supporting the development of GDevelop, an open-source
-                  software!
+                  Get a subscription to package your games for Android, Windows,
+                  macOS and Linux, use live preview over wifi and more. With a
+                  subscription, you're also supporting the development of
+                  GDevelop, which is an open-source software.
                 </p>
               </Line>
             </Column>
@@ -192,10 +195,12 @@ export default class SubscriptionDialog extends Component<Props, State> {
                   subtitle={plan.smallDescription}
                 />
                 {plan.descriptionBullets.map((bulletText, index) => (
-                  <Line noMargin alignItems="center" key={index}>
-                    <CheckCircle style={styles.bulletIcon} />
-                    <p style={styles.bulletText}>{bulletText}</p>
-                  </Line>
+                  <Column key={index} expand>
+                    <Line noMargin alignItems="center">
+                      <CheckCircle style={styles.bulletIcon} />
+                      <p style={styles.bulletText}>{bulletText}</p>
+                    </Line>
+                  </Column>
                 ))}
                 <p style={styles.descriptionText}>
                   {plan.extraDescription || ''}
@@ -228,11 +233,15 @@ export default class SubscriptionDialog extends Component<Props, State> {
                 </CardActions>
               </Card>
             ))}
+            <Column>
+              <Line>
             <EmptyMessage>
               Subscriptions can be stopped at any time. GDevelop uses Stripe.com
               for secure payment. No credit card data is stored by GDevelop:
               everything is managed by Stripe secure infrastructure.
             </EmptyMessage>
+              </Line>
+              </Column>
             {!userProfile.authenticated && (
               <PlaceholderMessage>
                 <p>

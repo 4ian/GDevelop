@@ -1,14 +1,16 @@
 // @flow
 import * as React from 'react';
 import FlatButton from 'material-ui/FlatButton';
-import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Dialog from '../UI/Dialog';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SubscriptionChecker from '../Profile/SubscriptionChecker';
+import { translate, type TranslatorProps } from 'react-i18next';
+import { getErrors, displayProjectErrorsBox } from './ProjectErrorsChecker';
 
-type Props = {|
+type Props = TranslatorProps & {|
   project: gdProject,
   open: boolean,
   onClose: Function,
@@ -21,13 +23,14 @@ type State = {|
   windowDefaultHeight: number,
   name: string,
   author: string,
+  version: string,
   packageName: string,
   orientation: string,
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
 |};
 
-export default class ProjectPropertiesDialog extends React.Component<
+class ProjectPropertiesDialog extends React.Component<
   Props,
   State
 > {
@@ -44,6 +47,7 @@ export default class ProjectPropertiesDialog extends React.Component<
       windowDefaultHeight: project.getMainWindowDefaultHeight(),
       name: project.getName(),
       author: project.getAuthor(),
+      version: project.getVersion(),
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
@@ -61,12 +65,13 @@ export default class ProjectPropertiesDialog extends React.Component<
   }
 
   _onApply = () => {
-    const { project } = this.props;
+    const { project, t } = this.props;
     const {
       windowDefaultWidth,
       windowDefaultHeight,
       name,
       author,
+      version,
       packageName,
       orientation,
       sizeOnStartupMode,
@@ -76,10 +81,13 @@ export default class ProjectPropertiesDialog extends React.Component<
     project.setDefaultHeight(windowDefaultHeight);
     project.setName(name);
     project.setAuthor(author);
+    project.setVersion(version);
     project.setPackageName(packageName);
     project.setOrientation(orientation);
     project.setSizeOnStartupMode(sizeOnStartupMode);
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
+
+    if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
 
     this.props.onApply();
   };
@@ -103,6 +111,7 @@ export default class ProjectPropertiesDialog extends React.Component<
       windowDefaultWidth,
       windowDefaultHeight,
       author,
+      version,
       packageName,
       orientation,
       sizeOnStartupMode,
@@ -117,48 +126,56 @@ export default class ProjectPropertiesDialog extends React.Component<
           onRequestClose={this.props.onClose}
           autoScrollBodyContent={true}
         >
-          <TextField
+          <SemiControlledTextField
             floatingLabelText="Game name"
             fullWidth
             type="text"
             value={name}
-            onChange={(e, value) => this.setState({ name: value })}
+            onChange={value => this.setState({ name: value })}
           />
-          <TextField
+          <SemiControlledTextField
             floatingLabelText="Game's window width"
             fullWidth
             type="number"
-            value={windowDefaultWidth}
-            onChange={(e, value) =>
+            value={'' + windowDefaultWidth}
+            onChange={value =>
               this.setState({
                 windowDefaultWidth: Math.max(0, parseInt(value, 10)),
               })}
           />
-          <TextField
+          <SemiControlledTextField
             floatingLabelText="Game's window height"
             fullWidth
             type="number"
-            value={windowDefaultHeight}
-            onChange={(e, value) =>
+            value={'' + windowDefaultHeight}
+            onChange={value =>
               this.setState({
                 windowDefaultHeight: Math.max(0, parseInt(value, 10)),
               })}
           />
-          <TextField
+          <SemiControlledTextField
             floatingLabelText="Author name"
             fullWidth
             hintText="Your name"
             type="text"
             value={author}
-            onChange={(e, value) => this.setState({ author: value })}
+            onChange={value => this.setState({ author: value })}
           />
-          <TextField
+          <SemiControlledTextField
+            floatingLabelText="Version number (X.Y.Z)"
+            fullWidth
+            hintText="1.0.0"
+            type="text"
+            value={version}
+            onChange={value => this.setState({ version: value })}
+          />
+          <SemiControlledTextField
             floatingLabelText="Package name (for iOS and Android)"
             fullWidth
             hintText="com.example.mygame"
             type="text"
             value={packageName}
-            onChange={(e, value) => this.setState({ packageName: value })}
+            onChange={value => this.setState({ packageName: value })}
           />
           <SelectField
             fullWidth
@@ -219,3 +236,5 @@ export default class ProjectPropertiesDialog extends React.Component<
     );
   }
 }
+
+export default translate()(ProjectPropertiesDialog);

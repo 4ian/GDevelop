@@ -146,9 +146,9 @@ export default {
   fileExists: function(filename) {
     filename = this._translateURL(filename);
     try {
-      return fs.existsSync(filename);
+      const stat = fs.statSync(filename);
+      return stat.isFile();
     } catch (e) {
-      console.log('fileExists(' + filename + ') failed: ' + e);
       return false;
     }
   },

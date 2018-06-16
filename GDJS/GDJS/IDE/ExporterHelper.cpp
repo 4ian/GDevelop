@@ -21,6 +21,7 @@
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
+#include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/IDE/wxTools/ShowFolder.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -301,6 +302,67 @@ bool ExporterHelper::ExportCocos2dFiles(
       lastError = "Unable to write Cocos2d-JS project.json file.";
       return false;
     }
+  }
+
+  return true;
+}
+
+bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
+                                         gd::String exportDir) {
+  gd::String jsonName =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetName()));
+  gd::String jsonAuthor =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetAuthor()));
+  gd::String jsonVersion =
+      gd::Serializer::ToJSON(gd::SerializerElement(project.GetVersion()));
+  gd::String jsonMangledName = gd::Serializer::ToJSON(gd::SerializerElement(
+      gd::SceneNameMangler::GetMangledSceneName(project.GetName())
+          .LowerCase().FindAndReplace(" ", "-")));
+
+  {
+    gd::String str =
+        fs.ReadFile(gdjsRoot + "/Runtime/Electron/package.json")
+            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName)
+            .FindAndReplace("\"GDJS_GAME_AUTHOR\"", jsonAuthor)
+            .FindAndReplace("\"GDJS_GAME_VERSION\"", jsonVersion)
+            .FindAndReplace("\"GDJS_GAME_MANGLED_NAME\"", jsonMangledName);
+
+    if (!fs.WriteToFile(exportDir + "/package.json", str)) {
+      lastError = "Unable to write Electron package.json file.";
+      return false;
+    }
+  }
+
+  {
+    gd::String str =
+        fs.ReadFile(gdjsRoot + "/Runtime/Electron/main.js")
+            .FindAndReplace(
+                "800 /*GDJS_WINDOW_WIDTH*/",
+                gd::String::From<int>(project.GetMainWindowDefaultWidth()))
+            .FindAndReplace(
+                "600 /*GDJS_WINDOW_HEIGHT*/",
+                gd::String::From<int>(project.GetMainWindowDefaultHeight()))
+            .FindAndReplace("\"GDJS_GAME_NAME\"", jsonName);
+
+    if (!fs.WriteToFile(exportDir + "/main.js", str)) {
+      lastError = "Unable to write Electron main.js file.";
+      return false;
+    }
+  }
+
+  auto &platformSpecificAssets = project.GetPlatformSpecificAssets();
+  auto &resourceManager = project.GetResourcesManager();
+
+  gd::String iconFilename =
+      resourceManager
+          .GetResource(platformSpecificAssets.Get("desktop", "icon-512"))
+          .GetFile();
+  auto projectDirectory = gd::AbstractFileSystem::NormalizeSeparator(
+      fs.DirNameFrom(project.GetProjectFile()));
+  fs.MakeAbsolute(iconFilename, projectDirectory);
+  fs.MkDir(exportDir + "/buildResources");
+  if (fs.FileExists(iconFilename)) {
+    fs.CopyFile(iconFilename, exportDir + "/buildResources/icon.png");
   }
 
   return true;

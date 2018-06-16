@@ -10,7 +10,7 @@ import { showErrorBox } from '../../../UI/Messages/MessageBox';
 import { findGDJS } from '../LocalGDJSFinder';
 import localFileSystem from '../LocalFileSystem';
 import Progress from './Progress';
-import { archiveFolder } from './Archiver';
+import { archiveFolder } from '../../../Utils/Archiver';
 import optionalRequire from '../../../Utils/OptionalRequire.js';
 import { translate, type TranslatorProps } from 'react-i18next';
 import Window from '../../../Utils/Window';

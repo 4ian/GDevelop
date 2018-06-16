@@ -6,12 +6,13 @@ import LocalCordovaExport from './LocalCordovaExport';
 import LocalCocos2dExport from './LocalCocos2dExport';
 import LocalOnlineElectronExport from './LocalOnlineElectronExport';
 import LocalFacebookInstantGamesExport from './LocalFacebookInstantGamesExport';
+import LocalElectronExport from './LocalElectronExport';
 import PhoneIphone from 'material-ui/svg-icons/hardware/phone-iphone';
 import LaptopMac from 'material-ui/svg-icons/hardware/laptop-mac';
 import Folder from 'material-ui/svg-icons/file/folder';
-import Devices from 'material-ui/svg-icons/device/devices';
 import Facebook from '../../UI/CustomSvgIcons/Facebook';
 import Cordova from '../../UI/CustomSvgIcons/Cordova';
+import Chrome from '../../UI/CustomSvgIcons/Chrome';
 
 export const getLocalExporters = () => [
   {
@@ -32,7 +33,7 @@ export const getLocalExporters = () => [
   },
   {
     name: 'Web (upload online)',
-    renderIcon: (props) => <Devices {...props}/>,
+    renderIcon: (props) => <Chrome {...props}/>,
     helpPage: '/publishing/web',
     description: 'Upload your game online directly from GDevelop and share the link to players. Play to your game using your browser on computers and mobile phones.',
     key: 'locals3export',
@@ -53,18 +54,27 @@ export const getLocalExporters = () => [
     renderIcon: (props) => <Cordova {...props}/>,
     helpPage: '/publishing/android_and_ios_with_cordova',
     description:
-      'Build the game locally as a Cordova project, and export it manually then to iOS or Android with Cordova developers tools.',
+      'Build the game locally as a Cordova project, and export it manually to iOS or Android with Cordova developers tools.',
     key: 'localcordovaexport',
     ExportComponent: LocalCordovaExport,
     advanced: true,
   },
   {
-    name: 'Windows/macOS/Linux (coming soon)',
+    name: 'Windows/macOS/Linux (beta)',
     renderIcon: (props) => <LaptopMac {...props}/>,
-    description: 'Package your game as an app for Windows, macOs or Linux.',
-    disabled: true,
+    helpPage: '/publishing/windows-macos-linux',
+    description: 'Package your game as an app for Windows, macOS or Linux directly from GDevelop.',
     key: 'localonlineelectronexport',
     ExportComponent: LocalOnlineElectronExport,
+  },
+  {
+    name: 'Windows/macOS/Linux (manual)',
+    renderIcon: (props) => <LaptopMac {...props}/>,
+    helpPage: '/publishing/windows-macos-linux-with-electron',
+    description: 'Build the game locally and export it manually to Windows, macOS or Linux with third-party developer tools.',
+    key: 'localelectronexport',
+    ExportComponent: LocalElectronExport,
+    advanced: true,
   },
   {
     name: 'Cocos2d-JS',

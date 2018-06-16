@@ -3,9 +3,9 @@ import BrowserExport from './BrowserExport';
 import PhoneIphone from 'material-ui/svg-icons/hardware/phone-iphone';
 import LaptopMac from 'material-ui/svg-icons/hardware/laptop-mac';
 import Folder from 'material-ui/svg-icons/file/folder';
-import Devices from 'material-ui/svg-icons/device/devices';
 import Facebook from '../../UI/CustomSvgIcons/Facebook';
 import Cordova from '../../UI/CustomSvgIcons/Cordova';
+import Chrome from '../../UI/CustomSvgIcons/Chrome';
 
 export const getBrowserExporters = () => [
   {
@@ -26,7 +26,7 @@ export const getBrowserExporters = () => [
   },
   {
     name: 'Web (upload online)',
-    renderIcon: props => <Devices {...props} />,
+    renderIcon: props => <Chrome {...props} />,
     description:
       'Upload your game online directly from GDevelop and share the link to players. Play to your game using your browser on computers and mobile phones.',
     key: 'locals3export',
@@ -54,7 +54,6 @@ export const getBrowserExporters = () => [
     name: 'Windows/macOS/Linux (coming soon)',
     renderIcon: props => <LaptopMac {...props} />,
     description: 'Package your game as an app for Windows, macOs or Linux.',
-    disabled: true,
     key: 'localonlineelectronexport',
     ExportComponent: BrowserExport,
   },

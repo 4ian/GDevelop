@@ -8,7 +8,10 @@ import Star from 'material-ui/svg-icons/toggle/star';
 import Favorite from 'material-ui/svg-icons/action/favorite';
 import UserProfileContext, { type UserProfile } from './UserProfileContext';
 import { Column, Line } from '../UI/Grid';
-import { sendSubscriptionCheckDialogShown, sendSubscriptionCheckDismiss } from '../Utils/Analytics/EventSender';
+import {
+  sendSubscriptionCheckDialogShown,
+  sendSubscriptionCheckDismiss,
+} from '../Utils/Analytics/EventSender';
 
 type Props = {|
   title: string,
@@ -52,7 +55,7 @@ export class SubscriptionCheckDialog extends Component<
     this.setState({
       open: true,
     });
-    sendSubscriptionCheckDialogShown({mode, title});
+    sendSubscriptionCheckDialogShown({ mode, title });
 
     return false;
   }
@@ -113,16 +116,16 @@ export class SubscriptionCheckDialog extends Component<
             <Star style={styles.icon} />
             <p style={styles.iconText}>
               Having a subscription allows you to use the one-click export for
-              Android, launch live previews over wifi, disable the GDevelop
-              splashscreen during loading and more!
+              Android, Windows, macOS and Linux, launch live previews over wifi,
+              disable the GDevelop splashscreen during loading and more!
             </p>
           </Line>
           <Line noMargin alignItems="center">
             <Favorite style={styles.icon} />
             <p style={styles.iconText}>
               You're also supporting the development of GDevelop, an open-source
-              software! In the future, more exports (iOS, Windows/Mac/Linux) and
-              online services will be available for users with a subscription.
+              software! In the future, more online services will be available
+              for users with a subscription.
             </p>
           </Line>
           <p style={styles.thanksText}>

@@ -10,7 +10,10 @@ import { findGDJS } from './LocalGDJSFinder';
 import localFileSystem from './LocalFileSystem';
 import LocalFolderPicker from '../../UI/LocalFolderPicker';
 import HelpButton from '../../UI/HelpButton';
-import { displayProjectErrorsBox, getErrors } from '../../ProjectManager/ProjectErrorsChecker';
+import {
+  displayProjectErrorsBox,
+  getErrors,
+} from '../../ProjectManager/ProjectErrorsChecker';
 import { translate, type TranslatorProps } from 'react-i18next';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
@@ -78,14 +81,10 @@ class LocalElectronExport extends Component<Props, State> {
       .then(({ exporter }) => {
         const exportOptions = new gd.MapStringBoolean();
         exportOptions.set('exportForElectron', true);
-        exporter.exportWholePixiProject(
-          project,
-          outputDir,
-          exportOptions
-        );
+        exporter.exportWholePixiProject(project, outputDir, exportOptions);
         exportOptions.delete();
         exporter.delete();
-        
+
         this.setState({
           exportFinishedDialogOpen: true,
         });
@@ -108,8 +107,9 @@ class LocalElectronExport extends Component<Props, State> {
         <Line>
           <Column noMargin>
             <p>
-              This will export your game so that you can package it for Windows, macOS or Linux. You will need to install
-              third-party tools (Node.js, Electron Builder) to package your game by yourself.
+              This will export your game so that you can package it for Windows,
+              macOS or Linux. You will need to install third-party tools
+              (Node.js, Electron Builder) to package your game by yourself.
             </p>
           </Column>
         </Line>
@@ -156,7 +156,9 @@ class LocalElectronExport extends Component<Props, State> {
           open={this.state.exportFinishedDialogOpen}
         >
           <p>
-            The game was properly exported. You can now use Electron Builder or another packaging tool to create an executable.
+            The game was properly exported. You can now use Electron Builder
+            (you need Node.js installed and to use the command-line to run it)
+            to create an executable.
           </p>
         </Dialog>
       </Column>

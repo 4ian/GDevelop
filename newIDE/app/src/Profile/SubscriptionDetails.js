@@ -17,7 +17,7 @@ export default ({ subscription, onChangeSubscription }: Props) =>
         <p>
           You are subscribed to {subscription.planId}. Congratulations! You have
           access to more online services, including building your game for
-          Android in one-click!
+          Android, Windows, macOS and Linux in one click!
         </p>
       </Line>
       <Line justifyContent="center">
@@ -33,7 +33,7 @@ export default ({ subscription, onChangeSubscription }: Props) =>
       <Line>
         <p>
           You don't have any subscription. Get one to access to all online
-          services, including building your game for Android in one-click!
+          services, including building your game for Android, Windows, macOS and Linux in one click!
         </p>
       </Line>
       <Line justifyContent="center">

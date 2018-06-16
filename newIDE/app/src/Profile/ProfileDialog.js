@@ -12,7 +12,6 @@ import HelpButton from '../UI/HelpButton';
 import UsagesDetails from './UsagesDetails';
 import SubscriptionDetails from './SubscriptionDetails';
 import UserProfileContext, { type UserProfile } from './UserProfileContext';
-import LimitDisplayer from './LimitDisplayer';
 
 type Props = {|
   open: boolean,
@@ -85,17 +84,6 @@ export default class ProfileDialog extends Component<Props, State> {
               <Tab label="Online services usage" value="usage">
                 {userProfile.authenticated ? (
                   <Column noMargin>
-                    <Column>
-                      <LimitDisplayer
-                        subscription={userProfile.subscription}
-                        limit={
-                          userProfile.limits
-                            ? userProfile.limits['cordova-build']
-                            : null
-                        }
-                        onChangeSubscription={this.props.onChangeSubscription}
-                      />
-                    </Column>
                     <UsagesDetails usages={userProfile.usages} />
                   </Column>
                 ) : (

@@ -228,7 +228,7 @@ export default class SpritesList extends Component<Props, void> {
           direction.getTimeBetweenFrames() > 0
             ? 1 / direction.getTimeBetweenFrames()
             : 1,
-        name: animationName ? `${objectName}-${animationName}` : `${objectName}`,
+        name: animationName ? `${animationName}` : `${objectName}`,
         isLooping: direction.isLooping(),
       },
       onChangesSaved: resources => {
@@ -256,7 +256,7 @@ export default class SpritesList extends Component<Props, void> {
           newDirection.addSprite(sprite);
           sprite.delete();
         });
-
+        console.log(newDirection)
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
         onReplaceByDirection(newDirection);

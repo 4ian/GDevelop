@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import path from 'path';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Dialog from '../UI/Dialog';
@@ -14,6 +13,8 @@ import {
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { resizeImage, isResizeSupported } from './ImageResizer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import optionalRequire from '../Utils/OptionalRequire';
+const path = optionalRequire('path');
 const gd = global.gd;
 
 type Props = {|
@@ -92,7 +93,7 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
     if (!sources.length) return;
 
     onChooseResource(sources[0].name, false).then(resources => {
-      if (!resources.length) {
+      if (!resources.length || !path) {
         return;
       }
 

@@ -54,7 +54,6 @@ export const openPiskel = ({
       resourcesManager.addResource(imageResource);
       imageResource.delete();
     });
-    console.log("name from piskel:"+newAnimationName);
     onChangesSaved(outputResources,newAnimationName);
   });
 

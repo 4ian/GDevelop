@@ -21,7 +21,6 @@
     "classnames": "2.2.5",
     "create-react-context": "^0.1.6",
     "date-fns": "^1.29.0",
-    "electron": "^2.0.2",
     "element-closest": "2.0.2",
     "firebase": "^4.8.2",
     "flat": "2.0.1",

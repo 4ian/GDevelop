@@ -320,6 +320,8 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
       }
 
       updateFrameElements();
+      /// We need this in case the user has used a subfolder 
+      piskelOptions.projectPath = piskelOptions.resources[0].resourcePath.substring(0, piskelOptions.resources[0].resourcePath.lastIndexOf('/'));      
       updatePiskelBasePath();
       // Disable changing path and naming convention by user - on animations imported from gdevelop
       saveFolderLabel.removeEventListener('click',selectBaseFolderPath);

@@ -12,9 +12,10 @@
     "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\basic-artificial-intelligence\\basic-artificial-intelligence.json",
+    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\basic-ai-with-pathfinding\\basic-ai-with-pathfinding.json",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
+    "version": "1.0.0",
     "winExecutableFilename": "",
     "winExecutableIconFile": "",
     "name": "Basic artificial intelligence",
@@ -111,7 +112,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "bordure2.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/bordure2.png",
         "kind": "image",
         "name": "bordure2.png",
         "smoothed": true,
@@ -119,7 +120,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "tankV1.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV1.png",
         "kind": "image",
         "name": "tank1",
         "smoothed": false,
@@ -127,7 +128,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "tankV2.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV2.png",
         "kind": "image",
         "name": "tank2",
         "smoothed": false,
@@ -135,7 +136,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "tankV3.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV3.png",
         "kind": "image",
         "name": "tank3",
         "smoothed": false,
@@ -143,7 +144,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "tankV4.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV4.png",
         "kind": "image",
         "name": "tank4",
         "smoothed": false,
@@ -151,7 +152,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "tankV5.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV5.png",
         "kind": "image",
         "name": "tank5",
         "smoothed": false,
@@ -159,7 +160,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "tankV6.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV6.png",
         "kind": "image",
         "name": "tank6",
         "smoothed": false,
@@ -167,7 +168,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "tankV7.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV7.png",
         "kind": "image",
         "name": "tank7",
         "smoothed": false,
@@ -175,7 +176,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "bordure.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/bordure.png",
         "kind": "image",
         "name": "bordure.png",
         "smoothed": false,
@@ -183,7 +184,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "TankB1.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/TankB1.png",
         "kind": "image",
         "name": "TankB1.png",
         "smoothed": false,
@@ -191,11 +192,19 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "alert.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/alert.png",
         "kind": "image",
         "name": "alert.png",
         "smoothed": true,
         "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV1.png",
+        "kind": "image",
+        "name": "tankV1.png",
+        "smoothed": true,
+        "userAdded": true
       }
     ],
     "resourceFolders": []
@@ -262,8 +271,8 @@
           "locked": false,
           "name": "Perso",
           "width": 0,
-          "x": 272,
-          "y": 83,
+          "x": 286,
+          "y": 37,
           "zOrder": 0,
           "numberProperties": [
             {
@@ -283,7 +292,7 @@
           "name": "Mur",
           "width": 0,
           "x": 384,
-          "y": 256,
+          "y": 448,
           "zOrder": 0,
           "numberProperties": [
             {
@@ -322,8 +331,8 @@
           "locked": false,
           "name": "IA",
           "width": 0,
-          "x": 545,
-          "y": 220,
+          "x": 555,
+          "y": 166,
           "zOrder": 0,
           "numberProperties": [
             {
@@ -422,13 +431,13 @@
           "locked": false,
           "name": "Mur",
           "width": 0,
-          "x": 576,
-          "y": 256,
+          "x": 352,
+          "y": 384,
           "zOrder": 0,
           "numberProperties": [
             {
               "name": "animation",
-              "value": 0
+              "value": 1
             }
           ],
           "stringProperties": [],
@@ -457,9 +466,109 @@
           "locked": false,
           "name": "Mur",
           "width": 0,
+          "x": 96,
+          "y": 224,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 288,
+          "y": 352,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 384,
+          "y": 256,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": -32,
+          "y": -64,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 384,
+          "y": -64,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
           "x": 160,
-          "y": -32,
-          "zOrder": 1,
+          "y": -64,
+          "zOrder": 0,
           "numberProperties": [
             {
               "name": "animation",
@@ -479,7 +588,7 @@
           "width": 0,
           "x": 640,
           "y": 160,
-          "zOrder": 1,
+          "zOrder": 0,
           "numberProperties": [
             {
               "name": "animation",
@@ -499,7 +608,7 @@
           "width": 0,
           "x": 640,
           "y": 64,
-          "zOrder": 1,
+          "zOrder": 0,
           "numberProperties": [
             {
               "name": "animation",
@@ -519,7 +628,7 @@
           "width": 0,
           "x": 640,
           "y": -32,
-          "zOrder": 1,
+          "zOrder": 0,
           "numberProperties": [
             {
               "name": "animation",
@@ -537,29 +646,9 @@
           "locked": false,
           "name": "Mur",
           "width": 0,
-          "x": 384,
-          "y": -32,
-          "zOrder": 1,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 1
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Mur",
-          "width": 0,
-          "x": 384,
-          "y": 64,
-          "zOrder": 1,
+          "x": 352,
+          "y": 256,
+          "zOrder": 0,
           "numberProperties": [
             {
               "name": "animation",
@@ -578,8 +667,8 @@
           "name": "Mur",
           "width": 0,
           "x": 160,
-          "y": 160,
-          "zOrder": 1,
+          "y": 128,
+          "zOrder": 0,
           "numberProperties": [
             {
               "name": "animation",
@@ -598,8 +687,128 @@
           "name": "Mur",
           "width": 0,
           "x": 160,
-          "y": 64,
-          "zOrder": 1,
+          "y": 32,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 576,
+          "y": 256,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 418,
+          "y": -65,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 512,
+          "y": -64,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 608,
+          "y": -64,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 64,
+          "y": -64,
+          "zOrder": 0,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 384,
+          "y": 32,
+          "zOrder": 0,
           "numberProperties": [
             {
               "name": "animation",
@@ -673,7 +882,14 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "cost": 2,
+              "impassable": true,
+              "name": "PathfindingObstacle",
+              "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+            }
+          ],
           "animations": [
             {
               "name": "",
@@ -740,7 +956,21 @@
           "type": "Sprite",
           "updateIfNotVisible": true,
           "variables": [],
-          "behaviors": [],
+          "behaviors": [
+            {
+              "acceleration": 50,
+              "allowDiagonals": true,
+              "angleOffset": 0,
+              "angularMaxSpeed": 180,
+              "cellHeight": 30,
+              "cellWidth": 30,
+              "extraBorder": 0,
+              "maxSpeed": 50,
+              "name": "Pathfinding",
+              "rotateObject": true,
+              "type": "PathfindingBehavior::PathfindingBehavior"
+            }
+          ],
           "animations": [
             {
               "name": "",
@@ -1569,7 +1799,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Move alerted tank toward player",
+          "comment": "Move alerted tank toward player using the pathfinding behavior\nTanks have the pathfinidng behavior and the walls having the pathfinding obstacle behavior so the tanks going to avoid the walls\nOnce a tank start moving even if the tank is no longer alerted it is still going to move toward the last set (known) position until they reach the destination and then stop\nWe add a random number to the destination of the tanks to avoid the tanks stopping in the same position and overlaping each other. The result, some tanks may move much longer then others even if they are not alerted",
           "comment2": "Arr�ter la poursuite au bout d'un temps."
         },
         {
@@ -1595,24 +1825,14 @@
             {
               "type": {
                 "inverted": false,
-                "value": "AddForceVers"
+                "value": "PathfindingBehavior::SetDestination"
               },
               "parameters": [
                 "IA",
-                "Perso",
-                "50",
-                "0"
-              ],
-              "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "TourneVers"
-              },
-              "parameters": [
-                "IA",
-                "Perso"
+                "Pathfinding",
+                "",
+                "Perso.X() + Random(60)",
+                "Perso.Y() + Random(60)"
               ],
               "subInstructions": []
             }
@@ -1631,7 +1851,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Make the tanks stop following player after some time by setting the alert value to 0, if the raycast colliding with the player, it is going to be alerted again.",
+          "comment": "Make tanks being no longer alerted after some time by setting the Alert value to 0 after few seconds, if the raycast hit the player, the tank is going to be alerted again.",
           "comment2": "Arr�ter la poursuite au bout d'un temps."
         },
         {
@@ -1692,41 +1912,8 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Collision management\nIf IA is in collision with the wall move IA away from the wall to avoid it going to through the wall\nIf the Player (Perso) is colliding witht the wall, move the player away from the wall to void it going though the wall",
+          "comment": "Collision management\nIf the Player (Perso) is colliding witht the wall, move the player away from the wall to void it going though the wall",
           "comment2": "Gestion des collisions"
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Collision"
-              },
-              "parameters": [
-                "IA",
-                "Mur"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "Rebondir"
-              },
-              "parameters": [
-                "IA",
-                "Mur",
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
         },
         {
           "disabled": false,
@@ -1856,10 +2043,13 @@
             {
               "type": {
                 "inverted": false,
-                "value": "Arret"
+                "value": "PathfindingBehavior::Speed"
               },
               "parameters": [
-                "IA"
+                "IA",
+                "Pathfinding",
+                "=",
+                "0"
               ],
               "subInstructions": []
             }
@@ -1887,11 +2077,14 @@
           "conditions": [
             {
               "type": {
-                "inverted": true,
-                "value": "Arret"
+                "inverted": false,
+                "value": "PathfindingBehavior::Speed"
               },
               "parameters": [
-                "IA"
+                "IA",
+                "Pathfinding",
+                ">",
+                "0"
               ],
               "subInstructions": []
             }
@@ -1949,7 +2142,16 @@
           "effects": []
         }
       ],
-      "behaviorsSharedData": []
+      "behaviorsSharedData": [
+        {
+          "name": "Pathfinding",
+          "type": "PathfindingBehavior::PathfindingBehavior"
+        },
+        {
+          "name": "PathfindingObstacle",
+          "type": "PathfindingBehavior::PathfindingObstacleBehavior"
+        }
+      ]
     }
   ],
   "externalEvents": [],

@@ -276,26 +276,6 @@
           "initialVariables": []
         },
         {
-          "angle": 90,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Mur",
-          "width": 0,
-          "x": 352,
-          "y": 96,
-          "zOrder": 0,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 0
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
           "angle": 0,
           "customSize": false,
           "height": 0,
@@ -345,46 +325,6 @@
           "width": 0,
           "x": 545,
           "y": 220,
-          "zOrder": 0,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 0
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 90,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Mur",
-          "width": 0,
-          "x": 608,
-          "y": 0,
-          "zOrder": 0,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 0
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 90,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Mur",
-          "width": 0,
-          "x": 352,
-          "y": 0,
           "zOrder": 0,
           "numberProperties": [
             {
@@ -456,106 +396,6 @@
           "initialVariables": []
         },
         {
-          "angle": 90,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Mur",
-          "width": 0,
-          "x": 160,
-          "y": 0,
-          "zOrder": 0,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 0
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 90,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Mur",
-          "width": 0,
-          "x": 160,
-          "y": 96,
-          "zOrder": 0,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 0
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 90,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Mur",
-          "width": 0,
-          "x": 160,
-          "y": 192,
-          "zOrder": 0,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 0
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 90,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Mur",
-          "width": 0,
-          "x": 608,
-          "y": 96,
-          "zOrder": 0,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 0
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 90,
-          "customSize": false,
-          "height": 0,
-          "layer": "",
-          "locked": false,
-          "name": "Mur",
-          "width": 0,
-          "x": 608,
-          "y": 192,
-          "zOrder": 0,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 0
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
           "angle": 0,
           "customSize": false,
           "height": 0,
@@ -607,6 +447,166 @@
           "y": 548,
           "zOrder": 0,
           "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 160,
+          "y": -32,
+          "zOrder": 1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 640,
+          "y": 160,
+          "zOrder": 1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 640,
+          "y": 64,
+          "zOrder": 1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 640,
+          "y": -32,
+          "zOrder": 1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 384,
+          "y": -32,
+          "zOrder": 1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 384,
+          "y": 64,
+          "zOrder": 1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 160,
+          "y": 160,
+          "zOrder": 1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Mur",
+          "width": 0,
+          "x": 160,
+          "y": 64,
+          "zOrder": 1,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
           "stringProperties": [],
           "initialVariables": []
         }
@@ -696,39 +696,26 @@
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
-                        "x": 48,
-                        "y": 16
+                        "x": 0,
+                        "y": 0
                       },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 96,
-                            "y": 0
-                          },
-                          {
-                            "x": 96,
-                            "y": 32
-                          },
-                          {
-                            "x": 0,
-                            "y": 32
-                          }
-                        ]
-                      ]
+                      "customCollisionMask": []
                     }
                   ]
-                },
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
                 {
                   "looping": false,
                   "timeBetweenFrames": 1,
                   "sprites": [
                     {
                       "hasCustomCollisionMask": false,
-                      "image": "bordure.png",
+                      "image": "bordure2.png",
                       "points": [],
                       "originPoint": {
                         "name": "origine",
@@ -738,71 +725,10 @@
                       "centerPoint": {
                         "automatic": true,
                         "name": "centre",
-                        "x": 48,
-                        "y": 16
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 96,
-                            "y": 0
-                          },
-                          {
-                            "x": 96,
-                            "y": 32
-                          },
-                          {
-                            "x": 0,
-                            "y": 32
-                          }
-                        ]
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "looping": false,
-                  "timeBetweenFrames": 1,
-                  "sprites": [
-                    {
-                      "hasCustomCollisionMask": false,
-                      "image": "bordure.png",
-                      "points": [],
-                      "originPoint": {
-                        "name": "origine",
                         "x": 0,
                         "y": 0
                       },
-                      "centerPoint": {
-                        "automatic": true,
-                        "name": "centre",
-                        "x": 48,
-                        "y": 16
-                      },
-                      "customCollisionMask": [
-                        [
-                          {
-                            "x": 0,
-                            "y": 0
-                          },
-                          {
-                            "x": 96,
-                            "y": 0
-                          },
-                          {
-                            "x": 96,
-                            "y": 32
-                          },
-                          {
-                            "x": 0,
-                            "y": 32
-                          }
-                        ]
-                      ]
+                      "customCollisionMask": []
                     }
                   ]
                 }
@@ -1225,13 +1151,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "AddForceXY"
+                "value": "SetAngle"
               },
               "parameters": [
                 "Perso",
-                "-75",
-                "0",
-                "0"
+                "-",
+                "4"
               ],
               "subInstructions": []
             }
@@ -1259,13 +1184,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "AddForceXY"
+                "value": "SetAngle"
               },
               "parameters": [
                 "Perso",
-                "75",
-                "0",
-                "0"
+                "+",
+                "4"
               ],
               "subInstructions": []
             }
@@ -1293,12 +1217,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "AddForceXY"
+                "value": "AddForceAL"
               },
               "parameters": [
                 "Perso",
-                "0",
-                "-75",
+                "Perso.Angle()",
+                "75",
                 "0"
               ],
               "subInstructions": []
@@ -1327,12 +1251,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "AddForceXY"
+                "value": "AddForceAL"
               },
               "parameters": [
                 "Perso",
-                "0",
-                "75",
+                "Perso.Angle()",
+                "-75",
                 "0"
               ],
               "subInstructions": []
@@ -1352,43 +1276,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Rotate the blue tank toward the mouse",
-          "comment2": ""
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "TourneVersPos"
-              },
-              "parameters": [
-                "Perso",
-                "MouseX(\"\",0)",
-                "MouseY(\"\",0)"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "If left mouse button or touch is down, move the blue tank toward the position of the pointer",
+          "comment": "If left mouse button or touch is down, move and rotate the blue tank toward the position of the pointer",
           "comment2": ""
         },
         {
@@ -1409,6 +1297,18 @@
             }
           ],
           "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "TourneVersPos"
+              },
+              "parameters": [
+                "Perso",
+                "MouseX(\"\",0)",
+                "MouseY(\"\",0)"
+              ],
+              "subInstructions": []
+            },
             {
               "type": {
                 "inverted": false,

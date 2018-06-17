@@ -26,7 +26,6 @@ export default class PointsPreview extends React.Component {
 
   render() {
     const { pointsContainer, imageWidth, imageHeight } = this.props;
-
     const nonDefaultPoints = pointsContainer.getAllNonDefaultPoints();
     const points = mapVector(nonDefaultPoints, (point, i) =>
       this._renderPoint(point.getName(), point.getX(), point.getY())

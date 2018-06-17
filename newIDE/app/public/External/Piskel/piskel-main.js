@@ -96,7 +96,7 @@ document.getElementById('piskel-frame').onload = function() {
 
   saveFolderLabel = editorContentDocument.createElement('label');
   saveFolderLabel.innerHTML = '';
-  saveFolderLabel.style = 'margin-right: 5px; font-size:17px';
+  saveFolderLabel.style = 'margin-right: 5px; font-size:15px';
   saveFolderLabel.addEventListener('click', selectBaseFolderPath);
   piskelAppHeader.appendChild(saveFolderLabel);
 
@@ -106,7 +106,7 @@ document.getElementById('piskel-frame').onload = function() {
   piskelAnimationNameInput.oninput = updatePiskelBasePath;
   piskelAnimationNameInput.type = 'text';
   piskelAnimationNameInput.style =
-    'font-size:17px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;margin-right: 5px; margin-top: 5px;';
+    'font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;margin-right: 5px; margin-top: 5px;';
   piskelAppHeader.appendChild(piskelAnimationNameInput);
 
   const saveButton = editorContentDocument.createElement('button');

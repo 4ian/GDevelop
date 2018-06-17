@@ -32,6 +32,7 @@ import openUrlInBrowser from '../fixtures/open-url-in-browser/open-url-in-browse
 import parallax from '../fixtures/parallax/parallax.json';
 import parallaxScrolling from '../fixtures/parallax-scrolling/parallax-scrolling.json';
 import parseJsonFromApi from '../fixtures/parse-json-from-api/parse-json-from-api.json';
+import parseJsonString from '../fixtures/parse-json-string/parse-json-string.json';
 import particlesExplosions from '../fixtures/particles-explosions/particles-explosions.json';
 import particlesVariousEffects from '../fixtures/particles-various-effects/particles-various-effects.json';
 import pathfinding from '../fixtures/pathfinding/pathfinding.json';
@@ -53,6 +54,7 @@ import spaceShooter from '../fixtures/space-shooter/space-shooter.json';
 import splashScreen from '../fixtures/splash-screen/splash-screen.json';
 import textEntryObject from '../fixtures/text-entry-object/text-entry-object.json';
 import textFadeInOut from '../fixtures/text-fade-in-out/text-fade-in-out.json';
+import textToSpeech from '../fixtures/text-to-speech/text-to-speech.json';
 import toggleMusicPlaySound from '../fixtures/toggle-music-play-sound/toggle-music-play-sound.json';
 import typeOnTextEffect from '../fixtures/type-on-text-effect/type-on-text-effect.json';
 import zDepth from '../fixtures/z-depth/z-depth.json';
@@ -128,6 +130,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(parallaxScrolling);
     } else if (url === 'internal://parse-json-from-api') {
       return Promise.resolve(parseJsonFromApi);
+    } else if (url === 'internal://parse-json-string') {
+      return Promise.resolve(parseJsonString);
     } else if (url === 'internal://particles-explosions') {
       return Promise.resolve(particlesExplosions);
     } else if (url === 'internal://particles-various-effects') {
@@ -170,6 +174,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(textEntryObject);
     } else if (url === 'internal://text-fade-in-out') {
       return Promise.resolve(textFadeInOut);
+    } else if (url === 'internal://text-to-speech') {
+      return Promise.resolve(textToSpeech);
     } else if (url === 'internal://toggle-music-play-sound') {
       return Promise.resolve(toggleMusicPlaySound);
     } else if (url === 'internal://type-on-text-effect') {

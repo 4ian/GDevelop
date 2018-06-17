@@ -11,7 +11,7 @@ GDJS is composed of two parts: the C++ part exposing the GDJS to GDevelop IDE (*
 
   * First, take a look at the *Readme.md* at the root of the repository. For GDevelop 5, [follow the README](https://github.com/4ian/GD/blob/master/newIDE/README.md) to start the editor.
   * If you then want to work on the game engine, take a look at the *Runtime* folder and at [the scripts](https://github.com/4ian/GD/tree/master/GDJS/scripts) that will be useful to have your changes reflected in GDevelop.
-  * For reference, you can look into the [developer documentation](http://4ian.github.io/GD-Documentation/) and the documentation of GDJS [here](http://4ian.github.io/GD-Documentation/GDJS Documentation).
+  * For reference, you can look into the [developer documentation](http://4ian.github.io/GD-Documentation/) and the documentation of GDJS [here](http://4ian.github.io/GD-Documentation/GDJS%20Documentation).
 
 Contributing
 ------------

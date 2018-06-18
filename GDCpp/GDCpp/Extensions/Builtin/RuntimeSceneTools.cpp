@@ -246,17 +246,32 @@ bool GD_API RaycastObject(
     gd::Variable &varX,
     gd::Variable &varY,
     bool inverted) {
+  return RaycastObjectToPosition(pickedObjectLists,
+                                 x, y,
+                                 x + dist*cos(angle*3.14159/180.0),
+                                 y + dist*sin(angle*3.14159/180.0),
+                                 varX, varY, inverted);
+}
+
+bool GD_API RaycastObjectToPosition(
+    std::map<gd::String, std::vector<RuntimeObject *> *> pickedObjectLists,
+    float x,
+    float y,
+    float endX,
+    float endY,
+    gd::Variable &varX,
+    gd::Variable &varY,
+    bool inverted) {
   RuntimeObject *matchObject = NULL;
-  float testSqDist = inverted ? 0 : dist * dist;
+  float testSqDist = inverted ? 0 : (endX - x)*(endX - x) + (endY - y)*(endY - y);
   float resultX = 0.0f;
   float resultY = 0.0f;
-  for (auto it = pickedObjectLists.begin(); it != pickedObjectLists.end();
-       ++it) {
+  for (auto it = pickedObjectLists.begin(); it != pickedObjectLists.end(); ++it) {
     if (it->second == NULL) continue;
     auto list = *it->second;
 
     for (std::size_t i = 0; i < list.size(); ++i) {
-      RaycastResult result = list[i]->RaycastTest(x, y, angle, dist, !inverted);
+      RaycastResult result = list[i]->RaycastTest(x, y, endX, endY, !inverted);
 
       if (result.collision) {
         if (!inverted && (result.closeSqDist <= testSqDist)) {

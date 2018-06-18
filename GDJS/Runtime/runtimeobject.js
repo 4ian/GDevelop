@@ -1154,27 +1154,26 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
  * @method raycastTest
  * @param x {Number} The raycast source X
  * @param y {Number} The raycast source Y
- * @param angle {Number} The raycast angle
- * @param dist {Number} The raycast max distance
+ * @param endX {Number} The raycast end position X
+ * @param endY {Number} The raycast end position Y
  * @param closest {Boolean} Get the closest or farthest collision mask result?
  * @return A raycast result with the contact points and distances
  */
-gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist, closest) {
+gdjs.RuntimeObject.prototype.raycastTest = function(x, y, endX, endY, closest) {
     var objW = this.getWidth();
     var objH = this.getHeight();
     var diffX = this.getDrawableX()+this.getCenterX() - x;
     var diffY = this.getDrawableY()+this.getCenterY() - y;
-    var boundingRadius = Math.sqrt(objW*objW + objH*objH)/2.0;
+    var sqBoundingR = (objW*objW + objH*objH) / 4.0;
+    var sqDist = (endX - x)*(endX - x) + (endY - y)*(endY - y);
 
     var result = gdjs.Polygon.raycastTest._statics.result;
     result.collision = false;
 
-    if ( Math.sqrt(diffX*diffX + diffY*diffY) > boundingRadius + dist )
+    if ( diffX*diffX + diffY*diffY > sqBoundingR + sqDist + 2*Math.sqrt(sqDist*sqBoundingR) )
         return result;
     
-    var endX = x + dist*Math.cos(angle*Math.PI/180.0);
-    var endY = y + dist*Math.sin(angle*Math.PI/180.0);
-    var testSqDist = closest ? dist*dist : 0;
+    var testSqDist = closest ? sqDist : 0;
 
     var hitBoxes = this.getHitBoxes();
     for (var i=0; i<hitBoxes.length; i++) {
@@ -1184,7 +1183,7 @@ gdjs.RuntimeObject.prototype.raycastTest = function(x, y, angle, dist, closest) 
                 testSqDist = res.closeSqDist;
                 result = res;
             }
-            else if ( !closest && (res.farSqDist > testSqDist) && (res.farSqDist <= dist*dist) ) {
+            else if ( !closest && (res.farSqDist > testSqDist) && (res.farSqDist <= sqDist) ) {
                 testSqDist = res.farSqDist;
                 result = res;
             }

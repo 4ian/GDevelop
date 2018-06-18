@@ -409,23 +409,21 @@ bool RuntimeObject::IsCollidingWithPoint(float pointX, float pointY) {
   return false;
 }
 
-RaycastResult RuntimeObject::RaycastTest(
-    float x, float y, float angle, float dist, bool closest) {
+RaycastResult RuntimeObject::RaycastTest(float x, float y, float endX, float endY, bool closest) {
   float objW = GetWidth();
   float objH = GetHeight();
   float diffX = GetDrawableX() + GetCenterX() - x;
   float diffY = GetDrawableY() + GetCenterY() - y;
-  float boundingRadius = sqrt(objW * objW + objH * objH) / 2.0;
+  float sqBoundingR = (objW * objW + objH * objH) / 4.0;
+  float sqDist = (endX - x)*(endX - x) + (endY - y)*(endY - y);
 
   RaycastResult result;
   result.collision = false;
 
-  if (sqrt(diffX * diffX + diffY * diffY) > boundingRadius + dist)
+  if ( diffX*diffX + diffY*diffY > sqBoundingR + sqDist + 2*sqrt(sqDist*sqBoundingR) )
     return result;
 
-  float endX = x + dist * cos(angle * 3.14159 / 180.0);
-  float endY = y + dist * sin(angle * 3.14159 / 180.0);
-  float testSqDist = closest ? dist * dist : 0.0f;
+  float testSqDist = closest ? sqDist : 0.0f;
 
   vector<Polygon2d> hitboxes = GetHitBoxes();
   for (std::size_t i = 0; i < hitboxes.size(); ++i) {
@@ -435,8 +433,7 @@ RaycastResult RuntimeObject::RaycastTest(
       if (closest && (res.closeSqDist < testSqDist)) {
         testSqDist = res.closeSqDist;
         result = res;
-      } else if (!closest && (res.farSqDist > testSqDist) &&
-                 (res.farSqDist <= dist * dist)) {
+      } else if ( !closest && (res.farSqDist > testSqDist) && (res.farSqDist <= sqDist) ) {
         testSqDist = res.farSqDist;
         result = res;
       }

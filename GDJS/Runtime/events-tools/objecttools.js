@@ -317,19 +317,28 @@ gdjs.evtTools.object.pickNearestObject = function(objectsLists, x, y, inverted) 
 };
 
 gdjs.evtTools.object.raycastObject = function(objectsLists, x, y, angle, dist, varX, varY, inverted) {
+    return gdjs.evtTools.object.raycastObjectToPosition(
+                objectsLists,
+                x, y,
+                x + dist*Math.cos(angle*Math.PI/180.0),
+                y + dist*Math.sin(angle*Math.PI/180.0),
+                varX, varY, inverted);
+};
+
+gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX, endY, varX, varY, inverted) {
     var matchObject = null;
-    var testSqDist = inverted ? 0 : dist*dist;
+    var testSqDist = inverted ? 0 : (endX - x)*(endX - x) + (endY - y)*(endY - y);
     var resultX = 0;
     var resultY = 0;
 
-    var lists = gdjs.staticArray(gdjs.evtTools.object.raycastObject);
+    var lists = gdjs.staticArray(gdjs.evtTools.object.raycastObjectToPosition);
     objectsLists.values(lists);
     for (var i = 0; i < lists.length; i++) {
         var list = lists[i];
 
         for (var j = 0; j < list.length; j++) {
             var object = list[j];
-            var result = object.raycastTest(x, y, angle, dist, !inverted);
+            var result = object.raycastTest(x, y, endX, endY, !inverted);
             
             if( result.collision ) {
                 if ( !inverted && (result.closeSqDist <= testSqDist) ) {

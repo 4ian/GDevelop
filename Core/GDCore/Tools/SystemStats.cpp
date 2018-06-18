@@ -8,8 +8,8 @@
 #include "stdlib.h"
 #include "string.h"
 #if defined(WINDOWS)
-#include "psapi.h"
 #include "windows.h"
+#include "psapi.h"
 #endif
 
 namespace gd {

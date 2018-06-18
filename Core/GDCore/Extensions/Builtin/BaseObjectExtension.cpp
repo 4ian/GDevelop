@@ -1027,6 +1027,33 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
+      .AddCondition("RaycastToPosition",
+                    _("Raycast to position"),
+                    _("Sends a ray from the given source position to the final point, "
+                      "intersecting the closest object.\nThe instersected "
+                      "object will become the only one taken into account.\nIf "
+                      "the condition is inverted, the object to be intersected "
+                      "will be the farthest one within the ray radius."),
+                    _("Raycast _PARAM0_ from _PARAM1_;_PARAM2_, and save the "
+                      "result in _PARAM5_, _PARAM6_"),
+                    _("Collision"),
+                    "res/conditions/raycast24.png",
+                    "res/conditions/raycast.png")
+      .AddParameter("objectList", _("Objects to test against the ray"))
+      .AddParameter("expression", _("Ray source X position"))
+      .AddParameter("expression", _("Ray source Y position"))
+      .AddParameter("expression", _("Ray target X position"))
+      .AddParameter("expression", _("Ray target Y position"))
+      .AddParameter(
+          "scenevar",
+          _("Variable where to store the X position of the intersection"))
+      .AddParameter(
+          "scenevar",
+          _("Variable where to store the Y position of the intersection"))
+      .AddCodeOnlyParameter("conditionInverted", "")
+      .MarkAsAdvanced();
+
+  extension
       .AddExpression(
           "Count",
           _("Number of objects"),

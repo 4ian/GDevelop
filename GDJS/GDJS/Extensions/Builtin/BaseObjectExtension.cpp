@@ -194,6 +194,8 @@ BaseObjectExtension::BaseObjectExtension() {
       .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest");
   GetAllConditions()["Raycast"].SetFunctionName(
       "gdjs.evtTools.object.raycastObject");
+  GetAllConditions()["RaycastToPosition"].SetFunctionName(
+      "gdjs.evtTools.object.raycastObjectToPosition");
   GetAllConditions()["Distance"].SetFunctionName(
       "gdjs.evtTools.object.distanceTest");
   GetAllConditions()["SeDirige"].SetFunctionName(

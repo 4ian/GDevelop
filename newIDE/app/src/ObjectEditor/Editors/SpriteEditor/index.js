@@ -146,6 +146,7 @@ class Animation extends React.Component<AnimationProps, void> {
                 onReplaceDirection(i, newDirection)}
               objectName={objectName}
               animationName={animationName}
+              onChangeName={onChangeName}
             />
           );
         })}

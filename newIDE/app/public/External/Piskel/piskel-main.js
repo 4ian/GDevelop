@@ -12,16 +12,17 @@ let baseExportPath;
 let piskelOptions; // The options received from GDevelop
 
 let saveFolderLabel,
-  piskelAnimationNameInput = {}; // controler for save path of new frames
+  piskelAnimationNameInput = {}; // controlers for save path of new frames
 const updatePiskelBasePath = function() {
   piskelAnimationNameInput.value = piskelAnimationNameInput.value.replace(
     /[^a-zA-Z0-9_-]/g,
     ''
-  );
+  ); // Don't allow the user to enter any characters that would lead to an invalid path
   piskelOptions.name = piskelAnimationNameInput.value;
   baseExportPath = piskelOptions.projectPath + '/' + piskelOptions.name;
   saveFolderLabel.innerHTML = piskelOptions.projectPath + '\\';
-  saveFolderLabel.title = 'Click to Change: ' + piskelOptions.projectPath;
+  saveFolderLabel.title =
+    'Click to Change path: \n' + piskelOptions.projectPath;
 };
 
 let projectBasePath;
@@ -75,7 +76,7 @@ editorContentWindow.piskelReadyCallbacks.push(function() {
 /**
  * Inject custom buttons in Piskel's header,
  * get rid of the new file button,
- * make animation name editable
+ * make animation name and path editable
  */
 document.getElementById('piskel-frame').onload = function() {
   const editorContentDocument = document.getElementById('piskel-frame')
@@ -92,11 +93,10 @@ document.getElementById('piskel-frame').onload = function() {
   const piskelAppHeader = editorContentDocument.getElementsByClassName(
     'fake-piskelapp-header'
   )[0];
-  piskelAppHeader.align = 'right';
 
   saveFolderLabel = editorContentDocument.createElement('label');
   saveFolderLabel.innerHTML = '';
-  saveFolderLabel.style = 'margin-right: 5px; font-size:15px';
+  saveFolderLabel.style = 'float: left;margin-left: 2px; font-size:15px;';
   saveFolderLabel.addEventListener('click', selectBaseFolderPath);
   piskelAppHeader.appendChild(saveFolderLabel);
 
@@ -106,20 +106,20 @@ document.getElementById('piskel-frame').onload = function() {
   piskelAnimationNameInput.oninput = updatePiskelBasePath;
   piskelAnimationNameInput.type = 'text';
   piskelAnimationNameInput.style =
-    'font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;margin-right: 5px; margin-top: 5px;';
+    'float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;';
   piskelAppHeader.appendChild(piskelAnimationNameInput);
 
   const saveButton = editorContentDocument.createElement('button');
   saveButton.innerHTML = 'Save to GDevelop';
   saveButton.style =
-    'border: 2px solid white;border-radius: 1px;margin-left: 20px; margin-right: 10px; margin-top: 5px;background-color:white;';
+    'float:right;margin-left:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;';
   piskelAppHeader.appendChild(saveButton);
   saveButton.addEventListener('click', saveToGD);
 
   const cancelButton = editorContentDocument.createElement('button');
   cancelButton.innerHTML = 'Cancel';
   cancelButton.style =
-    'border: 2px solid white;border-radius: 1px;margin-right: 5px; margin-top: 5px;background-color:white;';
+    'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;';
   piskelAppHeader.appendChild(cancelButton);
   cancelButton.addEventListener('click', cancelChanges);
 };
@@ -269,7 +269,7 @@ function piskelCreateAnimation(pskl, piskelOptions) {
   pskl.app.settingsController.settingsContainer
     .getElementsByClassName('textfield resize-size-field')[0]
     .focus();
-  updatePiskelBasePath();
+  updatePiskelBasePath(); //update the path label
 }
 
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
@@ -335,14 +335,15 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         0,
         piskelOptions.resources[0].resourcePath.lastIndexOf('/')
       );
-      updatePiskelBasePath();
+      updatePiskelBasePath(); //update the path label
       // Disable changing path and naming convention by user - on animations imported from gdevelop
       saveFolderLabel.removeEventListener('click', selectBaseFolderPath);
       piskelAnimationNameInput.style.color = '#8bb0b2';
-      piskelAnimationNameInput.style.border = '1px solid black';
+      piskelAnimationNameInput.style.border = '2px solid black';
       piskelAnimationNameInput.disabled = true;
       saveFolderLabel.style.color = '#8bb0b2';
-      saveFolderLabel.title = 'Changing the path is disabled on imported animations!'
+      saveFolderLabel.title =
+        'Changing the path is disabled on imported GD animations!';
     }
   );
 });

@@ -19,7 +19,7 @@ gdjs.HowlerSound = function(o) {
     this._paused = false;
     this._stopped = true;
     this._canBeDestroyed = false;
-    this._rate = o.rate || 1; //Read-only
+    this._rate = o.rate || 1;
 
     //Add custom events listener to keep
     //track of the sound status.
@@ -56,8 +56,12 @@ gdjs.HowlerSound.prototype.stop = function() {
 gdjs.HowlerSound.prototype.canBeDestroyed = function() {
 	return this._canBeDestroyed;
 };
-gdjs.HowlerSound.prototype.rate = function() {
-	return this._rate;
+gdjs.HowlerSound.prototype.getRate = function() {
+    return this._rate;
+};
+gdjs.HowlerSound.prototype.setRate = function(rate) {
+    this._rate = gdjs.HowlerSoundManager.clampRate(rate);
+    this.rate(this._rate);
 };
 
 /**

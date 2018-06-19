@@ -112,7 +112,7 @@ document.getElementById('piskel-frame').onload = function() {
   const saveButton = editorContentDocument.createElement('button');
   saveButton.innerHTML = 'Save to GDevelop';
   saveButton.style =
-    'float:right;margin-left:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;';
+    'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;';
   piskelAppHeader.appendChild(saveButton);
   saveButton.addEventListener('click', saveToGD);
 

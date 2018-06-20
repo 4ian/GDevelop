@@ -77,6 +77,7 @@ import {
   fakeAuthenticatedButLoadingUserProfile,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
+import profilerMeasures from '../fixtures/ProfilerMeasuresTestData.json';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
@@ -86,6 +87,7 @@ import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
 import BuildProgress from '../Export/Builds/BuildProgress';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
+import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 
 const gd = global.gd;
 const {
@@ -499,6 +501,9 @@ storiesOf('DebuggerContent', module)
           onRefresh={action('on refresh')}
           onEdit={() => false}
           onCall={() => false}
+          onStartProfiler={action('start profiler')}
+          onStopProfiler={action('stop profiler')}
+          profilerMeasures={profilerMeasures}
         />
       </div>
     </DragDropContextProvider>
@@ -513,9 +518,20 @@ storiesOf('DebuggerContent', module)
           onRefresh={action('on refresh')}
           onEdit={() => false}
           onCall={() => false}
+          onStartProfiler={action('start profiler')}
+          onStopProfiler={action('stop profiler')}
+          profilerMeasures={profilerMeasures}
         />
       </div>
     </DragDropContextProvider>
+  ));
+
+storiesOf('MeasuresTable', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <div style={{ height: 250 }}>
+      <MeasuresTable profilerMeasures={profilerMeasures} />
+    </div>
   ));
 
 storiesOf('AboutDialog', module)

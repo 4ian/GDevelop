@@ -18,6 +18,9 @@ import Checkbox from 'material-ui/Checkbox';
 import Flash from 'material-ui/svg-icons/image/flash-on';
 import FlashOff from 'material-ui/svg-icons/image/flash-off';
 import HelpButton from '../UI/HelpButton';
+import Profiler from './Profiler';
+import { type ProfilerMeasuresSection } from '.';
+
 type Props = {|
   gameData: ?any,
   onEdit: EditFunction,
@@ -25,6 +28,9 @@ type Props = {|
   onPlay: () => void,
   onPause: () => void,
   onRefresh: () => void,
+  onStartProfiler: () => void,
+  onStopProfiler: () => void,
+  profilerMeasures: ?ProfilerMeasuresSection,
 |};
 
 type State = {|
@@ -49,7 +55,15 @@ export default class DebuggerContent extends React.Component<Props, State> {
   };
 
   render() {
-    const { gameData, onRefresh, onCall, onEdit } = this.props;
+    const {
+      gameData,
+      onRefresh,
+      onCall,
+      onEdit,
+      onStartProfiler,
+      onStopProfiler,
+      profilerMeasures,
+    } = this.props;
     const {
       selectedInspector,
       selectedInspectorFullPath,
@@ -142,8 +156,21 @@ export default class DebuggerContent extends React.Component<Props, State> {
               </Column>
             </Column>
           ),
+          profiler: (
+            <MosaicWindow
+              title="Profiler"
+              // Pass profilerMeasures to force MosaicWindow update when profilerMeasures is changed
+              profilerMeasures={profilerMeasures}
+            >
+              <Profiler
+                onStart={onStartProfiler}
+                onStop={onStopProfiler}
+                profilerMeasures={profilerMeasures}
+              />
+            </MosaicWindow>
+          ),
         }}
-        initialEditorNames={['inspectors', 'selected-inspector']}
+        initialEditorNames={['inspectors', 'selected-inspector', 'profiler']}
         initialSplitPercentage={32}
       />
     );

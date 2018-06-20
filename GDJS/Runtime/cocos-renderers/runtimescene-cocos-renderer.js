@@ -81,7 +81,7 @@ gdjs.RuntimeSceneCocosRenderer.prototype._renderProfileText = function() {
         this._cocosScene.addChild(this._profilerText, 100);
     }
 
-    var average = this._runtimeScene._profiler.getAverage();
+    var average = this._runtimeScene._profiler.getSectionAverage("Frame");
     var total = Object.keys(average).reduce(function(sum, key) {
         return sum + (key !== 'total' ? average[key] : 0);
     }, 0);

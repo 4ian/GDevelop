@@ -9,6 +9,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Builtin/CommentEvent.h"
 #include "GDCore/Events/Builtin/ForEachEvent.h"
+#include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
 #include "GDCore/Events/Builtin/RepeatEvent.h"
 #include "GDCore/Events/Builtin/StandardEvent.h"
@@ -663,11 +664,32 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
       });
 
   GetAllEvents()["BuiltinCommonInstructions::Group"].SetCodeGenerator(
-      [](gd::BaseEvent& event,
+      [](gd::BaseEvent& event_,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
-        return codeGenerator.GenerateEventsListCode(event.GetSubEvents(),
-                                                    context);
+        gd::String outputCode;
+        gd::GroupEvent& event = dynamic_cast<gd::GroupEvent&>(event_);
+
+        // TODO: abstract?
+        if (!codeGenerator.GenerateCodeForRuntime()) {
+          outputCode +=
+              "if (runtimeScene.getProfiler()) { "
+              "runtimeScene.getProfiler().begin(" +
+              codeGenerator.ConvertToStringExplicit(event.GetName()) + "); }";
+        }
+
+        outputCode +=
+            codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
+
+        // TODO: abstract?
+        if (!codeGenerator.GenerateCodeForRuntime()) {
+          outputCode +=
+              "if (runtimeScene.getProfiler()) { "
+              "runtimeScene.getProfiler().end(" +
+              codeGenerator.ConvertToStringExplicit(event.GetName()) + "); }";
+        }
+
+        return outputCode;
       });
 
   AddEvent("JsCode",

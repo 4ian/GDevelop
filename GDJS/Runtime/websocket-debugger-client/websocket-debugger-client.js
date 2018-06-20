@@ -43,6 +43,11 @@ gdjs.WebsocketDebuggerClient = function(runtimegame) {
           that.set(data.path, data.newValue);
         } else if (data.command === 'call') {
           that.call(data.path, data.args);
+        } else if (data.command === 'profiler.start') {
+          runtimegame.startCurrentSceneProfiler();
+        } else if (data.command === 'profiler.stop') {
+          var framesAverageMeasures = runtimegame.stopCurrentSceneProfiler();
+          that.sendProfilerMeasures(framesAverageMeasures);
         } else {
           console.info(
             'Unknown command "' + data.command + '" received by the debugger.'
@@ -222,5 +227,61 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
     );
   }
 
+  this._ws.send(stringifiedMessage);
+};
+
+gdjs.WebsocketDebuggerClient.prototype.sendProfilerMeasures = function(framesAverageMeasures) {
+  if (!this._ws) {
+    console.warn('No connection to debugger opened to send profiler measures');
+    return;
+  }
+
+  var that = this;
+  var message = {
+    command: 'profilerMeasures',
+    payload: framesAverageMeasures,
+  };
+
+  //TODO: Factor circularSafeStringify and depthLimitedSerializer
+  
+  // This is an alternative to JSON.stringify that ensure that circular reference
+  // are replaced by a placeholder.
+  function circularSafeStringify(obj, replacer, spaces, cycleReplacer) {
+    return JSON.stringify(
+      obj,
+      depthLimitedSerializer(replacer, cycleReplacer, 18),
+      spaces
+    );
+  }
+
+  function depthLimitedSerializer(replacer, cycleReplacer, maxDepth) {
+    var stack = [],
+      keys = [];
+
+    if (cycleReplacer == null)
+      cycleReplacer = function(key, value) {
+        if (stack[0] === value) return '[Circular ~]';
+        return (
+          '[Circular ~.' + keys.slice(0, stack.indexOf(value)).join('.') + ']'
+        );
+      };
+
+    return function(key, value) {
+      if (stack.length > 0) {
+        var thisPos = stack.indexOf(this);
+        ~thisPos ? stack.splice(thisPos + 1) : stack.push(this);
+        ~thisPos ? keys.splice(thisPos, Infinity, key) : keys.push(key);
+
+        if (thisPos > maxDepth) {
+          return '[Max depth reached]';
+        } else if (~stack.indexOf(value))
+          value = cycleReplacer.call(this, key, value);
+      } else stack.push(value);
+
+      return replacer == null ? value : replacer.call(this, key, value);
+    };
+  }
+
+  var stringifiedMessage = circularSafeStringify(message);
   this._ws.send(stringifiedMessage);
 };

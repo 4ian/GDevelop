@@ -367,3 +367,26 @@ gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
   this.setDefaultWidth(width);
   this.setDefaultHeight(height);
 }
+
+/**
+ * TODO
+ * @param {*} mode 
+ */
+gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function() {
+  var currentScene = this._sceneStack.getCurrentScene();
+  if (!currentScene) return false;
+
+  currentScene.startProfiler();
+  return true;
+}
+
+/**
+ * TODO
+ * @param {*} mode 
+ */
+gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
+  var currentScene = this._sceneStack.getCurrentScene();
+  if (!currentScene) return null;
+
+  return currentScene.stopProfiler();
+}

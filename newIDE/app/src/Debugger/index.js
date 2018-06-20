@@ -15,6 +15,11 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 //Each game connected to the debugger server is identified by a unique number
 export type DebuggerId = number;
 
+export type ProfilerMeasuresSection = {|
+  time: number,
+  subsections: { [string]: ProfilerMeasuresSection }
+|};
+
 type Props = {|
   project: gdProject,
   setToolbar: React.Node => void,
@@ -26,7 +31,8 @@ type State = {|
   debuggerServerError: ?any,
 
   debuggerIds: Array<DebuggerId>,
-  debuggerGameData: { [number]: any },
+  debuggerGameData: { [DebuggerId]: any },
+  profilerMeasures: { [DebuggerId]: ProfilerMeasuresSection },
   selectedId: DebuggerId,
 |};
 
@@ -44,6 +50,7 @@ export default class Debugger extends React.Component<Props, State> {
     debuggerServerError: null,
     debuggerIds: [],
     debuggerGameData: {},
+    profilerMeasures: {},
     selectedId: 0,
   };
 
@@ -56,6 +63,7 @@ export default class Debugger extends React.Component<Props, State> {
         onPause={() => this._pause(this.state.selectedId)}
         canPlay={this._hasSelectedDebugger()}
         canPause={this._hasSelectedDebugger()}
+        onOpenProfiler={() => {/*TODO*/}}
       />
     );
   }
@@ -165,6 +173,13 @@ export default class Debugger extends React.Component<Props, State> {
           [id]: data.payload,
         },
       });
+    } else if (data.command === 'profilerMeasures') {
+      this.setState({
+        profilerMeasures: {
+          ...this.state.profilerMeasures,
+          [id]: data.payload,
+        },
+      });
     } else {
       console.warn(
         'Unknown command received from debugger client:',
@@ -231,6 +246,24 @@ export default class Debugger extends React.Component<Props, State> {
     setTimeout(() => this._refresh(id), 100);
     return true;
   };
+  
+  _startProfiler = (id: DebuggerId) => {
+    if (!ipcRenderer) return;
+
+    ipcRenderer.send('debugger-send-message', {
+      id,
+      message: '{"command": "profiler.start"}',
+    });
+  }
+
+  _stopProfiler = (id: DebuggerId) => {
+    if (!ipcRenderer) return;
+
+    ipcRenderer.send('debugger-send-message', {
+      id,
+      message: '{"command": "profiler.stop"}',
+    });
+  }
 
   _hasSelectedDebugger = () => {
     const { selectedId, debuggerIds } = this.state;
@@ -244,6 +277,7 @@ export default class Debugger extends React.Component<Props, State> {
       selectedId,
       debuggerIds,
       debuggerGameData,
+      profilerMeasures,
     } = this.state;
 
     return (
@@ -282,6 +316,9 @@ export default class Debugger extends React.Component<Props, State> {
                 onRefresh={() => this._refresh(selectedId)}
                 onEdit={(path, args) => this._edit(selectedId, path, args)}
                 onCall={(path, args) => this._call(selectedId, path, args)}
+                onStartProfiler={() => this._startProfiler(selectedId)}
+                onStopProfiler={() => this._stopProfiler(selectedId)}
+                profilerMeasures={profilerMeasures[selectedId]}
               />
             )}
             {!this._hasSelectedDebugger() && (

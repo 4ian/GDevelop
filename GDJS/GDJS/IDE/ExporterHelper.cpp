@@ -522,7 +522,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
             exportedLayout,
             exportedLayout.GetEvents(),
             eventsIncludes,
-            false /*Export for edittime*/);
+            false /*Export for edittime*/); //TODO: Should be set to true if exporting
     gd::String filename =
         outputDir + "/" + "code" + gd::String::From(i) + ".js";
 

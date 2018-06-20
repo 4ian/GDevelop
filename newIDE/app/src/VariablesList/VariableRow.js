@@ -11,6 +11,7 @@ import IconButton from 'material-ui/IconButton';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';
 
+//TODO: Refactor into TreeTable?
 const Indent = ({ width }) => (
   <div style={{ ...styles.indent, width }}>
     <SubdirectoryArrowRight color={styles.indentIconColor} />

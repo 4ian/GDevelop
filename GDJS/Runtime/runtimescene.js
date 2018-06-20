@@ -216,21 +216,34 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  * or a game stop was requested.
  */
 gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
-    // this._profiler.frameStarted();
-    // this._profiler.begin("timeManager");
+	if (this._profiler) this._profiler.beginFrame();
+	
+    if (this._profiler) this._profiler.begin("timeManager");
 	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
 	this._timeManager.update(elapsedTime, this._runtimeGame.getMinimalFramerate());
-    // this._profiler.begin("objects (pre-events)");
+	if (this._profiler) this._profiler.end("timeManager");
+	
+    if (this._profiler) this._profiler.begin("objects (pre-events)");
 	this._updateObjectsPreEvents();
-    // this._profiler.begin("events");
+	if (this._profiler) this._profiler.end("objects (pre-events)");
+	
+    if (this._profiler) this._profiler.begin("events");
 	this._eventsFunction(this, this._eventsContext);
-    // this._profiler.begin("objects (post-events)");
+	if (this._profiler) this._profiler.end("events");
+	
+    if (this._profiler) this._profiler.begin("objects (post-events)");
 	this._updateObjects();
-    // this._profiler.begin("objects (visibility)");
+	if (this._profiler) this._profiler.end("objects (post-events)");
+	
+    if (this._profiler) this._profiler.begin("objects (visibility)");
 	this._updateObjectsVisibility();
-    // this._profiler.begin("render");
+	if (this._profiler) this._profiler.end("objects (visibility)");
+	
+    if (this._profiler) this._profiler.begin("render");
 	this.render();
-    // this._profiler.end();
+	if (this._profiler) this._profiler.end("render");
+	
+    if (this._profiler) this._profiler.endFrame();
 
 	return !!this.getRequestedChange();
 };
@@ -657,3 +670,24 @@ gdjs.RuntimeScene.prototype.requestChange = function(change, sceneName) {
 	this._requestedChange = change;
 	this._requestedScene = sceneName;
 };
+
+/**
+ * Get the profiler associated with the scene.
+ */
+gdjs.RuntimeScene.prototype.getProfiler = function() {
+	return this._profiler;
+}
+
+gdjs.RuntimeScene.prototype.startProfiler = function() {
+	if (this._profiler) return;
+
+    this._profiler = new gdjs.Profiler();
+}
+
+gdjs.RuntimeScene.prototype.stopProfiler = function() {
+	if (!this._profiler) return null;
+
+	var averages = this._profiler.getFramesAverageMeasures();
+	this._profiler = null;
+	return averages;
+}

@@ -149,7 +149,7 @@ type Props = {|
   },
   onSelectSprite: (sprite: gdSprite, selected: boolean) => void,
   onReplaceByDirection: (newDirection: gdDirection) => void,
-  onChangeName: (newAnimationName :string) => void, // Used by piskel to set the name, if there is no name
+  onChangeName: (newAnimationName: string) => void, // Used by piskel to set the name, if there is no name
   objectName: string, // This is used for the default name of images created with Piskel.
   animationName: string, // This is used for the default name of images created with Piskel.
 |};
@@ -209,7 +209,7 @@ export default class SpritesList extends Component<Props, void> {
       onReplaceByDirection,
       onChangeName,
       objectName,
-      animationName, 
+      animationName,
     } = this.props;
     const resourceNames = mapFor(0, direction.getSpritesCount(), i => {
       return direction.getSprite(i).getImageName();
@@ -233,7 +233,7 @@ export default class SpritesList extends Component<Props, void> {
         name: animationName ? `${animationName}` : `${objectName}`,
         isLooping: direction.isLooping(),
       },
-      onChangesSaved: (resources,newAnimationName) => {
+      onChangesSaved: (resources, newAnimationName) => {
         const newDirection = new gd.Direction();
         newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
         newDirection.setLoop(direction.isLooping());
@@ -256,16 +256,16 @@ export default class SpritesList extends Component<Props, void> {
           newDirection.addSprite(sprite);
           sprite.delete();
         });
-        
+
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
         onReplaceByDirection(newDirection);
         // Set optional animation name if the user hasn't done so
-        if (animationName.length === 0) { 
-          onChangeName(newAnimationName)
+        if (animationName.length === 0) {
+          onChangeName(newAnimationName);
         }
-        newDirection.delete()
-      }    
+        newDirection.delete();
+      },
     });
   };
 

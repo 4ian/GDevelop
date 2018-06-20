@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const async = require('async');
 const remote = electron.remote;
-const { dialog } = require('electron').remote;
+const { dialog } = remote;
 
 const editorContentWindow = document.getElementById('piskel-frame')
   .contentWindow;
@@ -12,7 +12,18 @@ let baseExportPath;
 let piskelOptions; // The options received from GDevelop
 
 let saveFolderLabel,
-  piskelAnimationNameInput = {}; // controlers for save path of new frames
+  piskelAnimationNameInput = null; // controlers for save path of new frames
+
+const headerStyle = {
+  saveFolderLabel: 'float: left;margin-left: 2px; font-size:15px;',
+  piskelAnimationNameInput:
+    'float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
+  saveButton:
+    'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+  cancelButton:
+    'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+};
+
 const updatePiskelBasePath = function() {
   piskelAnimationNameInput.value = piskelAnimationNameInput.value.replace(
     /[^a-zA-Z0-9_-]/g,
@@ -20,7 +31,7 @@ const updatePiskelBasePath = function() {
   ); // Don't allow the user to enter any characters that would lead to an invalid path
   piskelOptions.name = piskelAnimationNameInput.value;
   baseExportPath = piskelOptions.projectPath + '/' + piskelOptions.name;
-  saveFolderLabel.innerHTML = piskelOptions.projectPath + '\\';
+  saveFolderLabel.textContent = piskelOptions.projectPath + '\\';
   saveFolderLabel.title =
     'Click to Change path: \n' + piskelOptions.projectPath;
 };
@@ -30,7 +41,7 @@ const selectBaseFolderPath = function() {
   if (!projectBasePath) {
     projectBasePath = piskelOptions.projectPath;
   }
-  var selectedDir = dialog.showOpenDialog(remote.getCurrentWindow(), {
+  const selectedDir = dialog.showOpenDialog(remote.getCurrentWindow(), {
     properties: ['openDirectory'],
   });
   if (!selectedDir) {
@@ -46,7 +57,6 @@ const selectBaseFolderPath = function() {
     return;
   }
   piskelOptions.projectPath = selectedDir;
-  alert('New frames  will be saved in:\n' + piskelOptions.projectPath);
   updatePiskelBasePath();
 };
 
@@ -95,33 +105,29 @@ document.getElementById('piskel-frame').onload = function() {
   )[0];
 
   saveFolderLabel = editorContentDocument.createElement('label');
-  saveFolderLabel.innerHTML = '';
-  saveFolderLabel.style = 'float: left;margin-left: 2px; font-size:15px;';
   saveFolderLabel.addEventListener('click', selectBaseFolderPath);
   piskelAppHeader.appendChild(saveFolderLabel);
 
   piskelAnimationNameInput = editorContentDocument.createElement('input');
-  piskelAnimationNameInput.id = 'piskelAnimationNameInput';
   piskelOptions = { name: 'New Animation' };
   piskelAnimationNameInput.oninput = updatePiskelBasePath;
   piskelAnimationNameInput.type = 'text';
-  piskelAnimationNameInput.style =
-    'float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;';
   piskelAppHeader.appendChild(piskelAnimationNameInput);
 
   const saveButton = editorContentDocument.createElement('button');
-  saveButton.innerHTML = 'Save to GDevelop';
-  saveButton.style =
-    'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;';
+  saveButton.textContent = 'Save to GDevelop';
   piskelAppHeader.appendChild(saveButton);
   saveButton.addEventListener('click', saveToGD);
 
   const cancelButton = editorContentDocument.createElement('button');
-  cancelButton.innerHTML = 'Cancel';
-  cancelButton.style =
-    'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;';
+  cancelButton.textContent = 'Cancel';
   piskelAppHeader.appendChild(cancelButton);
   cancelButton.addEventListener('click', cancelChanges);
+
+  // Apply header styles
+  Object.keys(headerStyle).forEach(function(key) {
+    eval(key).style = headerStyle[key];
+  });
 };
 
 function fileExists(path) {
@@ -265,7 +271,7 @@ function piskelCreateAnimation(pskl, piskelOptions) {
   });
   pskl.app.settingsController.settingsContainer
     .getElementsByClassName('tool-icon  icon-settings-resize-white')[0]
-    .click(); /// call resize window
+    .click(); // call resize window
   pskl.app.settingsController.settingsContainer
     .getElementsByClassName('textfield resize-size-field')[0]
     .focus();
@@ -330,20 +336,24 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
       }
 
       updateFrameElements();
-      /// We need this in case the user has used a subfolder
+      // We need this in case the user has used a subfolder
       piskelOptions.projectPath = piskelOptions.resources[0].resourcePath.substring(
         0,
         piskelOptions.resources[0].resourcePath.lastIndexOf('/')
       );
       updatePiskelBasePath(); //update the path label
       // Disable changing path and naming convention by user - on animations imported from gdevelop
-      saveFolderLabel.removeEventListener('click', selectBaseFolderPath);
-      piskelAnimationNameInput.style.color = '#8bb0b2';
-      piskelAnimationNameInput.style.border = '2px solid black';
-      piskelAnimationNameInput.disabled = true;
-      saveFolderLabel.style.color = '#8bb0b2';
-      saveFolderLabel.title =
-        'Changing the path is disabled on imported GD animations!';
+      disablePiskelSavePathControls();
     }
   );
 });
+
+function disablePiskelSavePathControls() {
+  saveFolderLabel.removeEventListener('click', selectBaseFolderPath);
+  piskelAnimationNameInput.style.color = '#8bb0b2';
+  piskelAnimationNameInput.style.border = '2px solid black';
+  piskelAnimationNameInput.disabled = true;
+  saveFolderLabel.style.color = '#8bb0b2';
+  saveFolderLabel.title =
+    'Changing the path is disabled on imported GD animations!';
+}

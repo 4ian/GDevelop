@@ -3,6 +3,7 @@ import { type Theme } from '../DefaultTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import './Mosaic.css';
 import './EventsSheet.css';
+import './Table.css';
 
 const almostWhite = '#EEE';
 const lightWhite = '#DDD';
@@ -100,6 +101,7 @@ const theme: Theme = {
   },
   mosaicRootClassName: 'mosaic-gd-dark-theme',
   eventsSheetRootClassName: 'gd-events-sheet-dark-theme',
+  tableRootClassName: 'gd-table-dark-theme',
 };
 
 export default getMuiTheme(theme);

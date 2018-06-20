@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
+import muiThemeable from 'material-ui/styles/muiThemeable';
 import { AutoSizer, Table, Column } from 'react-virtualized';
-import '../../UI/Theme/Table.css';
 const gd = global.gd;
 
-export default class InstancesList extends Component {
+class InstancesList extends Component {
   shouldComponentUpdate(nextProps) {
     // Rendering the component is costly as it iterates over
     // every instances, so the prop freezeUpdate allows to ask the component to stop
@@ -67,7 +67,7 @@ export default class InstancesList extends Component {
   };
 
   render() {
-    const { instances } = this.props;
+    const { instances, muiTheme } = this.props;
 
     this.renderedRows.length = 0;
     instances.iterateOverInstances(this.instanceRowRenderer);
@@ -85,6 +85,7 @@ export default class InstancesList extends Component {
             key={tableKey}
             headerHeight={30}
             height={height}
+            className={muiTheme.tableRootClassName}
             headerClassName={'tableHeaderColumn'}
             rowCount={this.renderedRows.length}
             rowGetter={this._rowGetter}
@@ -141,3 +142,4 @@ export default class InstancesList extends Component {
     );
   }
 }
+export default muiThemeable()(InstancesList);

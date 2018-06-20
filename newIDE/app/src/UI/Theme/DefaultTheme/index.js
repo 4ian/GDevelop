@@ -2,6 +2,7 @@
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import './Mosaic.css';
 import './EventsSheet.css';
+import './Table.css';
 
 const gdevelopPurple = '#9100ce';
 const gdevelopLightBlue = '#4ab0e4';
@@ -85,6 +86,7 @@ const theme = {
   },
   mosaicRootClassName: 'mosaic-gd-default-theme',
   eventsSheetRootClassName: 'gd-events-sheet-default-theme',
+  tableRootClassName: 'gd-table-default-theme',
 };
 
 export type Theme = $Exact<typeof theme>;

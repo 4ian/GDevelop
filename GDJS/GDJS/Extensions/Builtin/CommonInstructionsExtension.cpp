@@ -670,24 +670,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String outputCode;
         gd::GroupEvent& event = dynamic_cast<gd::GroupEvent&>(event_);
 
-        // TODO: abstract?
-        if (!codeGenerator.GenerateCodeForRuntime()) {
-          outputCode +=
-              "if (runtimeScene.getProfiler()) { "
-              "runtimeScene.getProfiler().begin(" +
-              codeGenerator.ConvertToStringExplicit(event.GetName()) + "); }";
-        }
-
+        outputCode +=
+            codeGenerator.GenerateProfilerSectionBegin(event.GetName());
         outputCode +=
             codeGenerator.GenerateEventsListCode(event.GetSubEvents(), context);
-
-        // TODO: abstract?
-        if (!codeGenerator.GenerateCodeForRuntime()) {
-          outputCode +=
-              "if (runtimeScene.getProfiler()) { "
-              "runtimeScene.getProfiler().end(" +
-              codeGenerator.ConvertToStringExplicit(event.GetName()) + "); }";
-        }
+        outputCode += codeGenerator.GenerateProfilerSectionEnd(event.GetName());
 
         return outputCode;
       });

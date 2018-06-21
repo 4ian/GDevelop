@@ -374,6 +374,17 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GetObjectListName(
       const gd::String& name, const gd::EventsCodeGenerationContext& context);
 
+  /**
+   * \brief Generate the code to notify the profiler of the beginning of a
+   * section.
+   */
+  virtual gd::String GenerateProfilerSectionBegin(const gd::String& section) { return ""; };
+
+  /**
+   * \brief Generate the code to notify the profiler of the end of a section.
+   */
+  virtual gd::String GenerateProfilerSectionEnd(const gd::String& section) { return ""; };
+
  protected:
   /**
    * \brief Generate the code for a single parameter.

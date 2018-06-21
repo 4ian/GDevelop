@@ -111,3 +111,38 @@ gdjs.Profiler.prototype.getFramesAverageMeasures = function() {
 
   return framesAverageMeasures;
 };
+
+/**
+ * @brief Convert measures for a section into texts.
+ * Useful for ingame profiling.
+ * 
+ * @param {*} sectionName The name of the section
+ * @param {*} profilerSection The section measures
+ * @param {*} outputs The array where to push the results
+ */
+gdjs.Profiler.getProfilerSectionTexts = function(
+  sectionName,
+  profilerSection,
+  outputs
+) {
+  var percent =
+    profilerSection.parent && profilerSection.parent.time !== 0
+      ? ((profilerSection.time / profilerSection.parent.time) * 100).toFixed(1)
+      : "100%";
+  var time = profilerSection.time.toFixed(2);
+  outputs.push(
+    sectionName + ": " + time + "ms (" + percent + ")"
+  );
+  var subsectionsOutputs = [];
+
+  for (var subsectionName in profilerSection.subsections) {
+    if (profilerSection.subsections.hasOwnProperty(subsectionName)) {
+      gdjs.Profiler.getProfilerSectionTexts(
+        subsectionName,
+        profilerSection.subsections[subsectionName],
+        subsectionsOutputs
+      );
+    }
+  }
+  outputs.push.apply(outputs, subsectionsOutputs);
+};

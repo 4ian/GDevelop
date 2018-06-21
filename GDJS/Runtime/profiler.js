@@ -26,26 +26,34 @@ gdjs.Profiler = function() {
 gdjs.Profiler.prototype.beginFrame = function() {
   this._currentFrameMeasure = {
     parent: null,
-    startTime: this._getTimeNow(),
+    time: 0,
+    lastStartTime: this._getTimeNow(),
     subsections: {}
   };
   this._currentSection = this._currentFrameMeasure;
 };
 
 gdjs.Profiler.prototype.begin = function(sectionName) {
+  // Push the new section
   var subsections = this._currentSection.subsections;
   var subsection = (subsections[sectionName] = subsections[sectionName] || {
     parent: this._currentSection,
-    startTime: this._getTimeNow(),
+    time: 0,
+    lastStartTime: 0,
     subsections: {}
   });
   this._currentSection = subsection;
+
+  // Start the timer
+  this._currentSection.lastStartTime = this._getTimeNow();
 };
 
 gdjs.Profiler.prototype.end = function(sectionName) {
-  var sectionTime = this._getTimeNow() - this._currentSection.startTime;
-
+  // Stop the timer
+  var sectionTime = this._getTimeNow() - this._currentSection.lastStartTime;
   this._currentSection.time = (this._currentSection.time || 0) + sectionTime;
+
+  // Pop the section
   this._currentSection = this._currentSection.parent;
 };
 

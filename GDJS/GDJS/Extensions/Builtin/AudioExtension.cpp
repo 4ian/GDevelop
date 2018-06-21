@@ -82,6 +82,12 @@ AudioExtension::AudioExtension() {
   GetAllConditions()["MusicChannelPlayingOffset"].SetFunctionName(
       "gdjs.evtTools.sound.getMusicOnChannelPlayingOffset");
 
+  GetAllActions()["ModPitchSoundChannel"]
+      .SetFunctionName("gdjs.evtTools.sound.setSoundOnChannelPitch")
+      .SetGetter("gdjs.evtTools.sound.getSoundOnChannelPitch");
+  GetAllActions()["ModPitchMusicChannel"]
+      .SetFunctionName("gdjs.evtTools.sound.setMusicOnChannelPitch")
+      .SetGetter("gdjs.evtTools.sound.getMusicOnChannelPitch");
   GetAllConditions()["SoundChannelPitch"].SetFunctionName(
       "gdjs.evtTools.sound.getSoundOnChannelPitch");
   GetAllConditions()["MusicChannelPitch"].SetFunctionName(

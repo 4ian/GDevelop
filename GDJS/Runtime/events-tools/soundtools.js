@@ -84,7 +84,12 @@ gdjs.evtTools.sound.setSoundOnChannelPlayingOffset = function(runtimeScene, chan
 
 gdjs.evtTools.sound.getSoundOnChannelPitch = function(runtimeScene, channel) {
     var sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-    return sound ? sound.rate() : 1;
+    return sound ? sound.getRate() : 1;
+};
+
+gdjs.evtTools.sound.setSoundOnChannelPitch = function(runtimeScene, channel, pitch) {
+    var sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
+    sound && sound.setRate(pitch);
 };
 
 //Musics:
@@ -149,5 +154,10 @@ gdjs.evtTools.sound.setMusicOnChannelPlayingOffset = function(runtimeScene, chan
 
 gdjs.evtTools.sound.getMusicOnChannelPitch = function(runtimeScene, channel) {
     var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
-    return music ? music.rate() : 1;
+    return music ? music.getRate() : 1;
+};
+
+gdjs.evtTools.sound.setMusicOnChannelPitch = function(runtimeScene, channel, pitch) {
+    var music = runtimeScene.getSoundManager().getMusicOnChannel(channel);
+    music && music.setRate(pitch);
 };

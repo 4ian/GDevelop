@@ -93,7 +93,7 @@ bool ExporterHelper::ExportLayoutForPixiPreview(gd::Project &project,
   AddLibsInclude(true, false, true, includesFiles);
 
   // Generate events code
-  if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles))
+  if (!ExportEventsCode(exportedProject, codeOutputDir, includesFiles, true))
     return false;
 
   // Export source files
@@ -317,7 +317,8 @@ bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
       gd::Serializer::ToJSON(gd::SerializerElement(project.GetVersion()));
   gd::String jsonMangledName = gd::Serializer::ToJSON(gd::SerializerElement(
       gd::SceneNameMangler::GetMangledSceneName(project.GetName())
-          .LowerCase().FindAndReplace(" ", "-")));
+          .LowerCase()
+          .FindAndReplace(" ", "-")));
 
   {
     gd::String str =
@@ -510,7 +511,8 @@ void ExporterHelper::RemoveIncludes(bool pixiRenderers,
 
 bool ExporterHelper::ExportEventsCode(gd::Project &project,
                                       gd::String outputDir,
-                                      std::vector<gd::String> &includesFiles) {
+                                      std::vector<gd::String> &includesFiles,
+                                      bool exportForPreview) {
   fs.MkDir(outputDir);
 
   for (std::size_t i = 0; i < project.GetLayoutsCount(); ++i) {
@@ -522,7 +524,7 @@ bool ExporterHelper::ExportEventsCode(gd::Project &project,
             exportedLayout,
             exportedLayout.GetEvents(),
             eventsIncludes,
-            false /*Export for edittime*/); //TODO: Should be set to true if exporting
+            !exportForPreview);
     gd::String filename =
         outputDir + "/" + "code" + gd::String::From(i) + ".js";
 

@@ -125,7 +125,8 @@ class ExporterHelper {
    */
   bool ExportEventsCode(gd::Project &project,
                         gd::String outputDir,
-                        std::vector<gd::String> &includesFiles);
+                        std::vector<gd::String> &includesFiles,
+                        bool exportForPreview);
 
   /**
    * \brief Copy the external source files used by the game into the export

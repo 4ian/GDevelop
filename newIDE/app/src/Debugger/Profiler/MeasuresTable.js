@@ -96,7 +96,7 @@ export default class MeasuresTable extends React.Component<Props, State> {
     }));
   };
 
-  _rowClassName = ({ index }) => {
+  _rowClassName = ({ index }: { index: number }) => {
     if (index < 0) {
       return 'tableHeaderRow';
     } else {

@@ -84,7 +84,7 @@ gdjs.evtTools.sound.setSoundOnChannelPlayingOffset = function(runtimeScene, chan
 
 gdjs.evtTools.sound.getSoundOnChannelPitch = function(runtimeScene, channel) {
     var sound = runtimeScene.getSoundManager().getSoundOnChannel(channel);
-    return sound ? sound.rate() : 1;
+    return sound ? sound.getRate() : 1;
 };
 
 gdjs.evtTools.sound.setSoundOnChannelPitch = function(runtimeScene, channel, pitch) {

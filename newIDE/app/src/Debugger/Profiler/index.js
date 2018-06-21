@@ -4,6 +4,7 @@ import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton';
 import MeasuresTable from './MeasuresTable';
 import { type ProfilerMeasuresSection } from '..';
+import EmptyMessage from '../../UI/EmptyMessage';
 
 const styles = {
   container: {
@@ -32,7 +33,15 @@ export default class Profiler extends React.Component<Props, void> {
         <RaisedButton label="Start profiling" onClick={onStart} />
         <RaisedButton label="Stop profiling" onClick={onStop} />
         <div style={styles.tableContainer}>
-          <MeasuresTable profilerMeasures={profilerMeasures} />
+          {profilerMeasures && (
+            <MeasuresTable profilerMeasures={profilerMeasures} />
+          )}
+          {!profilerMeasures && (
+            <EmptyMessage>
+              Start profiling and then stop it after a few seconds to see the
+              results.
+            </EmptyMessage>
+          )}
         </div>
       </Paper>
     );

@@ -63,6 +63,8 @@ export default class Debugger extends React.Component<Props, State> {
     selectedId: 0,
   };
 
+  _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
+
   updateToolbar() {
     if (!this.props.isActive) return;
 
@@ -72,7 +74,10 @@ export default class Debugger extends React.Component<Props, State> {
         onPause={() => this._pause(this.state.selectedId)}
         canPlay={this._hasSelectedDebugger()}
         canPause={this._hasSelectedDebugger()}
-        onOpenProfiler={() => {/*TODO*/}}
+        onOpenProfiler={() => {
+          if (this._debuggerContents[this.state.selectedId])
+            this._debuggerContents[this.state.selectedId].openProfiler()
+        }}
       />
     );
   }
@@ -189,6 +194,14 @@ export default class Debugger extends React.Component<Props, State> {
           [id]: data.payload,
         },
       });
+    } else if (data.command === 'profiler.started') {
+      this.setState(state => ({
+        profilingInProgress: { ...state.profilingInProgress, [id]: true },
+      }));
+    } else if (data.command === 'profiler.stopped') {
+      this.setState(state => ({
+        profilingInProgress: { ...state.profilingInProgress, [id]: false },
+      }));
     } else {
       console.warn(
         'Unknown command received from debugger client:',
@@ -259,9 +272,6 @@ export default class Debugger extends React.Component<Props, State> {
   _startProfiler = (id: DebuggerId) => {
     if (!ipcRenderer) return;
 
-    this.setState(state => ({
-      profilingInProgress: { ...state.profilingInProgress, [id]: true },
-    }));
     ipcRenderer.send('debugger-send-message', {
       id,
       message: '{"command": "profiler.start"}',
@@ -271,9 +281,6 @@ export default class Debugger extends React.Component<Props, State> {
   _stopProfiler = (id: DebuggerId) => {
     if (!ipcRenderer) return;
 
-    this.setState(state => ({
-      profilingInProgress: { ...state.profilingInProgress, [id]: false },
-    }));
     ipcRenderer.send('debugger-send-message', {
       id,
       message: '{"command": "profiler.stop"}',
@@ -326,6 +333,7 @@ export default class Debugger extends React.Component<Props, State> {
             />
             {this._hasSelectedDebugger() && (
               <DebuggerContent
+                ref={debuggerContent => this._debuggerContents[selectedId] = debuggerContent}
                 gameData={debuggerGameData[selectedId]}
                 onPlay={() => this._play(selectedId)}
                 onPause={() => this._pause(selectedId)}

@@ -45,18 +45,20 @@ export const openPiskel = ({
 
   // Listen to events meaning that edition in Piskel is finished
   ipcRenderer.removeAllListeners('piskel-changes-saved');
-  ipcRenderer.on('piskel-changes-saved', (event, outputResources) => {
-    const resourcesManager = project.getResourcesManager();
-    outputResources.forEach(resource => {
-      const imageResource = new gd.ImageResource();
-      imageResource.setFile(path.relative(projectPath, resource.path));
-      imageResource.setName(resource.name);
-      resourcesManager.addResource(imageResource);
-      imageResource.delete();
-    });
-
-    onChangesSaved(outputResources);
-  });
+  ipcRenderer.on(
+    'piskel-changes-saved',
+    (event, outputResources, newAnimationName) => {
+      const resourcesManager = project.getResourcesManager();
+      outputResources.forEach(resource => {
+        const imageResource = new gd.ImageResource();
+        imageResource.setFile(path.relative(projectPath, resource.path));
+        imageResource.setName(resource.name);
+        resourcesManager.addResource(imageResource);
+        imageResource.delete();
+      });
+      onChangesSaved(outputResources, newAnimationName);
+    }
+  );
 
   // Issue the event to open piskel
   ipcRenderer.send('piskel-open-then-load-animation', completePiskelOptions);

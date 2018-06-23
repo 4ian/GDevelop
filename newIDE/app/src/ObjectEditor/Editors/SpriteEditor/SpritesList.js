@@ -149,6 +149,7 @@ type Props = {|
   },
   onSelectSprite: (sprite: gdSprite, selected: boolean) => void,
   onReplaceByDirection: (newDirection: gdDirection) => void,
+  onChangeName: (newAnimationName: string) => void, // Used by piskel to set the name, if there is no name
   objectName: string, // This is used for the default name of images created with Piskel.
   animationName: string, // This is used for the default name of images created with Piskel.
 |};
@@ -206,6 +207,7 @@ export default class SpritesList extends Component<Props, void> {
       direction,
       resourcesLoader,
       onReplaceByDirection,
+      onChangeName,
       objectName,
       animationName,
     } = this.props;
@@ -228,17 +230,16 @@ export default class SpritesList extends Component<Props, void> {
           direction.getTimeBetweenFrames() > 0
             ? 1 / direction.getTimeBetweenFrames()
             : 1,
-        name: animationName ? `${objectName}-${animationName}` : `${objectName}`,
+        name: animationName ? `${animationName}` : `${objectName}`,
         isLooping: direction.isLooping(),
       },
-      onChangesSaved: resources => {
+      onChangesSaved: (resources, newAnimationName) => {
         const newDirection = new gd.Direction();
         newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
         newDirection.setLoop(direction.isLooping());
         resources.forEach(resource => {
           const sprite = new gd.Sprite();
           sprite.setImageName(resource.name);
-
           // Restore collision masks and points
           if (resource.originalIndex !== undefined) {
             const originalSprite = direction.getSprite(resource.originalIndex);
@@ -252,7 +253,6 @@ export default class SpritesList extends Component<Props, void> {
               copySpritePolygons(direction.getSprite(0), sprite);
             }
           }
-
           newDirection.addSprite(sprite);
           sprite.delete();
         });
@@ -260,6 +260,10 @@ export default class SpritesList extends Component<Props, void> {
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
         onReplaceByDirection(newDirection);
+        // Set optional animation name if the user hasn't done so
+        if (animationName.length === 0) {
+          onChangeName(newAnimationName);
+        }
         newDirection.delete();
       },
     });

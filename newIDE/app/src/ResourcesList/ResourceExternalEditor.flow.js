@@ -11,7 +11,7 @@ export type ExternalEditorOpenOptions = {|
   singleFrame: boolean, // If set to true, edition should be limited to a single frame
   resourceNames: Array<string>,
   onChangesSaved: (
-    Array<{ path: string, name: string, originalIndex: ?number }>
+    Array<{ path: string, name: string, originalIndex: ?number }>, newName: string
   ) => void,
   extraOptions: {
     name: string,

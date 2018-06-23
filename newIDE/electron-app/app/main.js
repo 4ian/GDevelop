@@ -120,8 +120,8 @@ app.on('ready', function () {
   });
 
   //TODO: Move in PiskelWindow? And use a callback like onReady
-  ipcMain.on('piskel-changes-saved', (event, imageResources) => {
-    mainWindow.webContents.send('piskel-changes-saved', imageResources);
+  ipcMain.on('piskel-changes-saved', (event, imageResources, newAnimationName) => {
+    mainWindow.webContents.send('piskel-changes-saved', imageResources, newAnimationName);
   });
 
   // S3Upload events:

@@ -6,7 +6,7 @@ import flatMap from 'lodash/flatMap';
 import { type ProfilerMeasuresSection } from '..';
 import IconButton from 'material-ui/IconButton';
 import ExpandMore from 'material-ui/svg-icons/navigation/expand-more';
-import ExpandLess from 'material-ui/svg-icons/navigation/expand-less';
+import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 
 const styles = {
   indent: {
@@ -110,7 +110,7 @@ export default class MeasuresTable extends React.Component<Props, State> {
         <div style={{ width: rowData.depth * 8 }} />
         {rowData.hasSubsections ? (
           <IconButton onClick={() => this._toggleSection(rowData.path)}>
-            {rowData.isCollapsed ? <ExpandLess /> : <ExpandMore />}
+            {rowData.isCollapsed ? <ChevronRight /> : <ExpandMore />}
           </IconButton>
         ) : (
           <div style={{ width: 24 }} />

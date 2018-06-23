@@ -142,7 +142,12 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         <EditorMosaic
           editors={editors}
           ref={editorMosaic => (this.editorMosaic = editorMosaic)}
-          initialEditorNames={['properties', 'resources-list']}
+          initialNodes={{
+            direction: 'row',
+            first: 'properties',
+            second: 'resources-list',
+            splitPercentage: 75,
+          }}
         />
         <InfoBar
           message="Properties panel is already opened"

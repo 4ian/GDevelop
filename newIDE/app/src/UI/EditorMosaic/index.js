@@ -11,19 +11,7 @@ import CloseButton from './CloseButton';
 import 'react-mosaic-component/react-mosaic-component.css';
 import './style.css';
 
-const createMosaicNodesFromArray = (array, splitPercentage = 23) => {
-  if (array.length === 0) return null;
-  if (array.length === 1) return array[0];
-
-  return {
-    direction: 'row',
-    first: array[0],
-    second: createMosaicNodesFromArray(array.slice(1), 100 - splitPercentage),
-    splitPercentage: splitPercentage,
-  };
-};
-
-const addRightNode = (currentNode, newNode, splitPercentage) => {
+const addRightNode = (currentNode, newNode, splitPercentage, direction = 'row') => {
   if (currentNode.second && typeof currentNode.second !== 'string') {
     return {
       ...currentNode,
@@ -32,7 +20,7 @@ const addRightNode = (currentNode, newNode, splitPercentage) => {
   }
 
   return {
-    direction: 'row',
+    direction,
     first: currentNode,
     second: newNode,
     splitPercentage,
@@ -62,10 +50,7 @@ export default class ThemableEditorMosaic extends Component {
     super(props);
 
     this.state = {
-      mosaicNode: createMosaicNodesFromArray(
-        props.initialEditorNames,
-        props.initialSplitPercentage || 23
-      ),
+      mosaicNode: props.initialNodes,
     };
   }
 

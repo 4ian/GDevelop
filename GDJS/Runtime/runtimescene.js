@@ -218,10 +218,8 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
 gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
 	if (this._profiler) this._profiler.beginFrame();
 	
-    if (this._profiler) this._profiler.begin("timeManager");
 	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
 	this._timeManager.update(elapsedTime, this._runtimeGame.getMinimalFramerate());
-	if (this._profiler) this._profiler.end("timeManager");
 	
     if (this._profiler) this._profiler.begin("objects (pre-events)");
 	this._updateObjectsPreEvents();
@@ -672,22 +670,29 @@ gdjs.RuntimeScene.prototype.requestChange = function(change, sceneName) {
 };
 
 /**
- * Get the profiler associated with the scene.
+ * Get the profiler associated with the scene, or null if none.
  */
 gdjs.RuntimeScene.prototype.getProfiler = function() {
 	return this._profiler;
 }
 
+/**
+ * Start a new profiler to measures the time passed in sections of the engine
+ * in the scene.
+ */
 gdjs.RuntimeScene.prototype.startProfiler = function() {
 	if (this._profiler) return;
 
     this._profiler = new gdjs.Profiler();
 }
 
+/**
+ * Stop the profiler being run on the scene and return it so measures can be extracted from it
+ */
 gdjs.RuntimeScene.prototype.stopProfiler = function() {
 	if (!this._profiler) return null;
 
-	var averages = this._profiler.getFramesAverageMeasures();
+	var oldProfiler = this._profiler;
 	this._profiler = null;
-	return averages;
+	return oldProfiler;
 }

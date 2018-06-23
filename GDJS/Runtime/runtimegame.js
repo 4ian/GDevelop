@@ -369,7 +369,7 @@ gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
 }
 
 /**
- * Start the profiler for the currently running scene.
+ * Start a profiler for the currently running scene.
  * @method startCurrentSceneProfiler
  */
 gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function() {
@@ -381,8 +381,8 @@ gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function() {
 }
 
 /**
- * Stop the profiler for the currently running scene and return the measure.
- * @return The average measures.
+ * Stop the profiler for the currently running scene and return it so can measures can be extracted.
+ * @return The gdjs.Profiler that was used for doing the measures or null.
  * @method stopCurrentSceneProfiler
  */
 gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {

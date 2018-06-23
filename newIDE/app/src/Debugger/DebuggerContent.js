@@ -19,7 +19,7 @@ import Flash from 'material-ui/svg-icons/image/flash-on';
 import FlashOff from 'material-ui/svg-icons/image/flash-off';
 import HelpButton from '../UI/HelpButton';
 import Profiler from './Profiler';
-import { type ProfilerMeasuresSection } from '.';
+import { type ProfilerOutput } from '.';
 
 type Props = {|
   gameData: ?any,
@@ -30,7 +30,8 @@ type Props = {|
   onRefresh: () => void,
   onStartProfiler: () => void,
   onStopProfiler: () => void,
-  profilerMeasures: ?ProfilerMeasuresSection,
+  profilerOutput: ?ProfilerOutput,
+  profilingInProgress: boolean,
 |};
 
 type State = {|
@@ -62,7 +63,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
       onEdit,
       onStartProfiler,
       onStopProfiler,
-      profilerMeasures,
+      profilerOutput,
+      profilingInProgress,
     } = this.props;
     const {
       selectedInspector,
@@ -159,18 +161,30 @@ export default class DebuggerContent extends React.Component<Props, State> {
           profiler: (
             <MosaicWindow
               title="Profiler"
-              // Pass profilerMeasures to force MosaicWindow update when profilerMeasures is changed
-              profilerMeasures={profilerMeasures}
+              // Pass profilerOutput to force MosaicWindow update when profilerOutput is changed
+              profilerOutput={profilerOutput}
+              profilingInProgress={profilingInProgress}
             >
               <Profiler
                 onStart={onStartProfiler}
                 onStop={onStopProfiler}
-                profilerMeasures={profilerMeasures}
+                profilerOutput={profilerOutput}
+                profilingInProgress={profilingInProgress}
               />
             </MosaicWindow>
           ),
         }}
-        initialEditorNames={['inspectors', 'selected-inspector', 'profiler']}
+        initialNodes={{
+          direction: 'column',
+          first: {
+            direction: 'row',
+            first: 'inspectors',
+            second: 'selected-inspector',
+            splitPercentage: 25,
+          },
+          second: 'profiler',
+          splitPercentage: 65,
+        }}
         initialSplitPercentage={32}
       />
     );

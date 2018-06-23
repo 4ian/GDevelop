@@ -45,9 +45,14 @@ gdjs.WebsocketDebuggerClient = function(runtimegame) {
           that.call(data.path, data.args);
         } else if (data.command === 'profiler.start') {
           runtimegame.startCurrentSceneProfiler();
+          that.sendProfilerStarted();
         } else if (data.command === 'profiler.stop') {
-          var framesAverageMeasures = runtimegame.stopCurrentSceneProfiler();
-          that.sendProfilerMeasures(framesAverageMeasures);
+          var profiler = runtimegame.stopCurrentSceneProfiler();
+          that.sendProfilerOutput(
+            profiler.getFramesAverageMeasures(),
+            profiler.getStats()
+          );
+          that.sendProfilerStopped();
         } else {
           console.info(
             'Unknown command "' + data.command + '" received by the debugger.'
@@ -195,22 +200,52 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
   this._ws.send(stringifiedMessage);
 };
 
-gdjs.WebsocketDebuggerClient.prototype.sendProfilerMeasures = function(
-  framesAverageMeasures
+gdjs.WebsocketDebuggerClient.prototype.sendProfilerStarted = function() {
+  if (!this._ws) {
+    console.warn('No connection to debugger opened');
+    return;
+  }
+
+  this._ws.send(
+    this._circularSafeStringify({
+      command: 'profiler.started',
+      payload: null,
+    })
+  );
+};
+
+gdjs.WebsocketDebuggerClient.prototype.sendProfilerStopped = function() {
+  if (!this._ws) {
+    console.warn('No connection to debugger opened');
+    return;
+  }
+
+  this._ws.send(
+    this._circularSafeStringify({
+      command: 'profiler.stopped',
+      payload: null,
+    })
+  );
+};
+
+gdjs.WebsocketDebuggerClient.prototype.sendProfilerOutput = function(
+  framesAverageMeasures,
+  stats
 ) {
   if (!this._ws) {
     console.warn('No connection to debugger opened to send profiler measures');
     return;
   }
 
-  var that = this;
-  var message = {
-    command: 'profilerMeasures',
-    payload: framesAverageMeasures,
-  };
-
-  var stringifiedMessage = this._circularSafeStringify(message);
-  this._ws.send(stringifiedMessage);
+  this._ws.send(
+    this._circularSafeStringify({
+      command: 'profiler.output',
+      payload: {
+        framesAverageMeasures: framesAverageMeasures,
+        stats: stats,
+      },
+    })
+  );
 };
 
 // This is an alternative to JSON.stringify that ensure that circular reference

@@ -3,8 +3,10 @@ import * as React from 'react';
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton';
 import MeasuresTable from './MeasuresTable';
-import { type ProfilerMeasuresSection } from '..';
+import { type ProfilerOutput } from '..';
 import EmptyMessage from '../../UI/EmptyMessage';
+import { Line } from '../../UI/Grid';
+import LinearProgress from 'material-ui/LinearProgress';
 
 const styles = {
   container: {
@@ -21,22 +23,38 @@ const styles = {
 type Props = {|
   onStart: () => void,
   onStop: () => void,
-  profilerMeasures: ?ProfilerMeasuresSection,
+  profilerOutput: ?ProfilerOutput,
+  profilingInProgress: boolean,
 |};
 
 export default class Profiler extends React.Component<Props, void> {
   render() {
-    const { onStart, onStop, profilerMeasures } = this.props;
+    const {
+      onStart,
+      onStop,
+      profilerOutput,
+      profilingInProgress,
+    } = this.props;
 
     return (
       <Paper style={styles.container}>
-        <RaisedButton label="Start profiling" onClick={onStart} />
-        <RaisedButton label="Stop profiling" onClick={onStop} />
+        <Line alignItems="center" justifyContent="center">
+          {!profilingInProgress && profilerOutput && (<p>Last run collected on {profilerOutput.stats.framesCount} frames.</p>)
+          }
+          {!profilingInProgress && profilerOutput && <RaisedButton label="Restart" onClick={onStart} />}
+          {!profilingInProgress && !profilerOutput && <RaisedButton label="Start profiling" onClick={onStart} />}
+          {profilingInProgress && <RaisedButton label="Stop profiling" onClick={onStop} />}
+        </Line>
+        {profilingInProgress && (
+          <Line alignItems="center">
+            <LinearProgress style={{ flex: 1 }} mode={'indeterminate'} />
+          </Line>
+        )}
         <div style={styles.tableContainer}>
-          {profilerMeasures && (
-            <MeasuresTable profilerMeasures={profilerMeasures} />
+          {profilerOutput && (
+            <MeasuresTable profilerMeasures={profilerOutput.framesAverageMeasures} />
           )}
-          {!profilerMeasures && (
+          {!profilerOutput && (
             <EmptyMessage>
               Start profiling and then stop it after a few seconds to see the
               results.

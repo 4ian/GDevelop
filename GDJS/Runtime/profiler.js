@@ -7,18 +7,18 @@ gdjs.Profiler = function() {
   this._currentFrameMeasure = null; // The measures being done
   this._currentSection = null; // The section being measured
 
-  this._maxFramesCount = 30; //TODO: add framesCount
-  // this._framesCount = 30; // The number of frames that have been measured
+  this._maxFramesCount = 600;
+  this._framesCount = 0; // The number of frames that have been measured
   while (this._framesMeasures.length < this._maxFramesCount) {
     this._framesMeasures.push({
       parent: null,
       time: 0,
-      subsections: {}
+      subsections: {},
     });
   }
 
   this._getTimeNow =
-    window.performance && typeof window.performance.now === "function"
+    window.performance && typeof window.performance.now === 'function'
       ? window.performance.now.bind(window.performance)
       : Date.now;
 };
@@ -28,7 +28,7 @@ gdjs.Profiler.prototype.beginFrame = function() {
     parent: null,
     time: 0,
     lastStartTime: this._getTimeNow(),
-    subsections: {}
+    subsections: {},
   };
   this._currentSection = this._currentFrameMeasure;
 };
@@ -40,7 +40,7 @@ gdjs.Profiler.prototype.begin = function(sectionName) {
     parent: this._currentSection,
     time: 0,
     lastStartTime: 0,
-    subsections: {}
+    subsections: {},
   });
   this._currentSection = subsection;
 
@@ -60,12 +60,15 @@ gdjs.Profiler.prototype.end = function(sectionName) {
 gdjs.Profiler.prototype.endFrame = function() {
   if (this._currentSection.parent !== null) {
     throw new Error(
-      "Mismatch in profiler, endFrame should be called on root section"
+      'Mismatch in profiler, endFrame should be called on root section'
     );
   }
 
   this.end();
 
+  this._framesCount++;
+  if (this._framesCount > this._maxFramesCount)
+    this._framesCount = this._maxFramesCount;
   this._framesMeasures[this._currentFrameIndex] = this._currentFrameMeasure;
   this._currentFrameIndex++;
   if (this._currentFrameIndex >= this._maxFramesCount)
@@ -88,7 +91,7 @@ gdjs.Profiler._addAverageSectionTimes = function(
       ] = destinationSubsections[sectionName] || {
         parent: destinationSection,
         time: 0,
-        subsections: {}
+        subsections: {},
       });
 
       gdjs.Profiler._addAverageSectionTimes(
@@ -101,18 +104,22 @@ gdjs.Profiler._addAverageSectionTimes = function(
   }
 };
 
+/**
+ * Return the measures for all the section of the game during the frames
+ * captured.
+ */
 gdjs.Profiler.prototype.getFramesAverageMeasures = function() {
   var framesAverageMeasures = {
     parent: null,
     time: 0,
-    subsections: {}
+    subsections: {},
   };
 
-  for (var i = 0; i < this._framesMeasures.length; ++i) {
+  for (var i = 0; i < this._framesCount; ++i) {
     gdjs.Profiler._addAverageSectionTimes(
       this._framesMeasures[i],
       framesAverageMeasures,
-      this._framesMeasures.length,
+      this._framesCount,
       i
     );
   }
@@ -121,9 +128,18 @@ gdjs.Profiler.prototype.getFramesAverageMeasures = function() {
 };
 
 /**
+ * Get stats measured during the frames captured.
+ */
+gdjs.Profiler.prototype.getStats = function() {
+  return {
+    framesCount: this._framesCount,
+  };
+};
+
+/**
  * @brief Convert measures for a section into texts.
  * Useful for ingame profiling.
- * 
+ *
  * @param {*} sectionName The name of the section
  * @param {*} profilerSection The section measures
  * @param {*} outputs The array where to push the results
@@ -136,11 +152,9 @@ gdjs.Profiler.getProfilerSectionTexts = function(
   var percent =
     profilerSection.parent && profilerSection.parent.time !== 0
       ? ((profilerSection.time / profilerSection.parent.time) * 100).toFixed(1)
-      : "100%";
+      : '100%';
   var time = profilerSection.time.toFixed(2);
-  outputs.push(
-    sectionName + ": " + time + "ms (" + percent + ")"
-  );
+  outputs.push(sectionName + ': ' + time + 'ms (' + percent + ')');
   var subsectionsOutputs = [];
 
   for (var subsectionName in profilerSection.subsections) {

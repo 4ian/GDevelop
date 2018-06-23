@@ -17,7 +17,14 @@ export type DebuggerId = number;
 
 export type ProfilerMeasuresSection = {|
   time: number,
-  subsections: { [string]: ProfilerMeasuresSection }
+  subsections: { [string]: ProfilerMeasuresSection },
+|};
+
+export type ProfilerOutput = {|
+  framesAverageMeasures: ProfilerMeasuresSection,
+  stats: {
+    framesCount: number,
+  },
 |};
 
 type Props = {|
@@ -32,7 +39,8 @@ type State = {|
 
   debuggerIds: Array<DebuggerId>,
   debuggerGameData: { [DebuggerId]: any },
-  profilerMeasures: { [DebuggerId]: ProfilerMeasuresSection },
+  profilerOutputs: { [DebuggerId]: ProfilerOutput },
+  profilingInProgress: { [DebuggerId]: boolean },
   selectedId: DebuggerId,
 |};
 
@@ -50,7 +58,8 @@ export default class Debugger extends React.Component<Props, State> {
     debuggerServerError: null,
     debuggerIds: [],
     debuggerGameData: {},
-    profilerMeasures: {},
+    profilerOutputs: {},
+    profilingInProgress: {},
     selectedId: 0,
   };
 
@@ -173,10 +182,10 @@ export default class Debugger extends React.Component<Props, State> {
           [id]: data.payload,
         },
       });
-    } else if (data.command === 'profilerMeasures') {
+    } else if (data.command === 'profiler.output') {
       this.setState({
-        profilerMeasures: {
-          ...this.state.profilerMeasures,
+        profilerOutputs: {
+          ...this.state.profilerOutputs,
           [id]: data.payload,
         },
       });
@@ -246,24 +255,30 @@ export default class Debugger extends React.Component<Props, State> {
     setTimeout(() => this._refresh(id), 100);
     return true;
   };
-  
+
   _startProfiler = (id: DebuggerId) => {
     if (!ipcRenderer) return;
 
+    this.setState(state => ({
+      profilingInProgress: { ...state.profilingInProgress, [id]: true },
+    }));
     ipcRenderer.send('debugger-send-message', {
       id,
       message: '{"command": "profiler.start"}',
     });
-  }
+  };
 
   _stopProfiler = (id: DebuggerId) => {
     if (!ipcRenderer) return;
 
+    this.setState(state => ({
+      profilingInProgress: { ...state.profilingInProgress, [id]: false },
+    }));
     ipcRenderer.send('debugger-send-message', {
       id,
       message: '{"command": "profiler.stop"}',
     });
-  }
+  };
 
   _hasSelectedDebugger = () => {
     const { selectedId, debuggerIds } = this.state;
@@ -277,7 +292,8 @@ export default class Debugger extends React.Component<Props, State> {
       selectedId,
       debuggerIds,
       debuggerGameData,
-      profilerMeasures,
+      profilerOutputs,
+      profilingInProgress,
     } = this.state;
 
     return (
@@ -318,7 +334,8 @@ export default class Debugger extends React.Component<Props, State> {
                 onCall={(path, args) => this._call(selectedId, path, args)}
                 onStartProfiler={() => this._startProfiler(selectedId)}
                 onStopProfiler={() => this._stopProfiler(selectedId)}
-                profilerMeasures={profilerMeasures[selectedId]}
+                profilerOutput={profilerOutputs[selectedId]}
+                profilingInProgress={profilingInProgress[selectedId]}
               />
             )}
             {!this._hasSelectedDebugger() && (

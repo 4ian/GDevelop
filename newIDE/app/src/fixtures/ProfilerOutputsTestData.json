@@ -1,0 +1,41 @@
+{
+  "stats": {
+    "framesCount": 150
+  },
+  "framesAverageMeasures": {
+    "time": 1.5,
+    "subsections": {
+      "section 1": {
+        "time": 0.3,
+        "subsections": {}
+      },
+      "section 2": {
+        "time": 0.3,
+        "subsections": {
+          "section 1.1": {
+            "time": 0.2,
+            "subsections": {}
+          },
+          "section 1.2": {
+            "time": 0.1,
+            "subsections": {
+              "section 1.2.1": {
+                "time": 0.1,
+                "subsections": {}
+              }
+            }
+          }
+        }
+      },
+      "section 3": {
+        "time": 0.9,
+        "subsections": {
+          "section 3.1": {
+            "time": 0.85,
+            "subsections": {}
+          }
+        }
+      }
+    }
+  }
+}

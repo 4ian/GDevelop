@@ -19,14 +19,8 @@
 class wxBitmap;
 namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class EventsCodeGenerator;
-}
-namespace gd {
 class EventsCodeGenerationContext;
 }
 
@@ -91,9 +85,24 @@ class GD_CORE_API ParameterMetadata {
    * \brief Return true if the type of the parameter is "object", "objectPtr" or
    * "objectList". \see gd::ParameterMetadata::GetType
    */
-  static bool IsObject(const gd::String &type) {
-    return type == "object" || type == "objectPtr" || type == "objectList" ||
-           type == "objectListWithoutPicking";
+  static bool IsObject(const gd::String &parameterType) {
+    return parameterType == "object" || parameterType == "objectPtr" || parameterType == "objectList" ||
+           parameterType == "objectListWithoutPicking";
+  }
+
+  /**
+   * \brief Return true if the type of the parameter is "object", "objectPtr" or
+   * "objectList". \see gd::ParameterMetadata::GetType
+   */
+  static bool IsExpression(const gd::String &type, const gd::String &parameterType) {
+    if (type == "number") {
+      return parameterType == "expression" || parameterType == "camera";
+    } else if (type == "string") {
+      return parameterType == "string" || parameterType == "layer" ||
+             parameterType == "color" || parameterType == "file" ||
+             parameterType == "joyaxis";
+    }
+    return false;
   }
 };
 

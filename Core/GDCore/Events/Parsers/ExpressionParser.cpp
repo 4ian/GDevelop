@@ -867,7 +867,7 @@ bool ExpressionParser::PrepareParameter(
     gd::Expression& parameter,
     const gd::ParameterMetadata& parametersInfo,
     const size_t positionInExpression) {
-  if (parametersInfo.type == "expression" || parametersInfo.type == "camera") {
+  if (ParameterMetadata::IsExpression("number", parametersInfo.type)) {
     if (parametersInfo.optional && parameter.GetPlainString().empty())
       parameter = parametersInfo.defaultValue.empty()
                       ? gd::Expression("0")
@@ -879,10 +879,7 @@ bool ExpressionParser::PrepareParameter(
 
       return false;
     }
-  } else if (parametersInfo.type == "string" ||
-             parametersInfo.type == "layer" || parametersInfo.type == "color" ||
-             parametersInfo.type == "file" ||
-             parametersInfo.type == "joyaxis") {
+  } else if (ParameterMetadata::IsExpression("string", parametersInfo.type)) {
     if (parametersInfo.optional && parameter.GetPlainString().empty())
       parameter = parametersInfo.defaultValue.empty()
                       ? gd::Expression("\"\"")

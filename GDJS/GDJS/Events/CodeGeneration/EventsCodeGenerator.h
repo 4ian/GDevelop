@@ -13,19 +13,11 @@
 #include "GDCore/Events/InstructionsList.h"
 namespace gd {
 class ObjectMetadata;
-}
-namespace gd {
 class BehaviorMetadata;
-}
-namespace gd {
 class InstructionMetadata;
-}
-namespace gd {
 class ExpressionCodeGenerationInformation;
-}
-namespace gd {
 class EventsCodeGenerationContext;
-}
+}  // namespace gd
 
 namespace gdjs {
 
@@ -174,6 +166,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateNegatedPredicat(const gd::String& predicat) const {
     return "!(" + predicat + ")";
   };
+
   virtual gd::String GenerateReferenceToUpperScopeBoolean(
       const gd::String& referenceName,
       const gd::String& referencedBoolean,
@@ -181,6 +174,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 
   virtual gd::String GenerateObjectsDeclarationCode(
       gd::EventsCodeGenerationContext& context);
+
+  virtual gd::String GenerateProfilerSectionBegin(const gd::String & section);
+  virtual gd::String GenerateProfilerSectionEnd(const gd::String & section);
 
   /**
    * \brief Construct a code generator for the specified project and layout.

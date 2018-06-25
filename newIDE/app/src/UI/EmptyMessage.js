@@ -1,5 +1,5 @@
-import React from 'react';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import * as React from 'react';
+import ThemeConsumer from './Theme/ThemeConsumer';
 
 const styles = {
   messageStyle: {
@@ -16,20 +16,29 @@ const styles = {
   },
 };
 
-const ThemableEmptyMessage = props => (
-  <div style={{ ...styles.containerStyle, ...props.style }}>
-    <span
-      style={{
-        ...styles.messageStyle,
-        textShadow: `1px 1px 0px ${props.muiTheme.emptyMessage.shadowColor}`,
-        ...props.messageStyle,
-      }}
-    >
-      {props.children}
-    </span>
-  </div>
-);
+type Props = {|
+  style?: Object,
+  messageStyle?: Object,
+  children: React.Node,
+|};
 
-const EmptyMessage = muiThemeable()(ThemableEmptyMessage);
+const EmptyMessage = (props: Props) => (
+  <ThemeConsumer>
+    {muiTheme => (
+      <div style={{ ...styles.containerStyle, ...props.style }}>
+        <span
+          style={{
+            ...styles.messageStyle,
+            textShadow: `1px 1px 0px ${muiTheme.emptyMessage
+              .shadowColor}`,
+            ...props.messageStyle,
+          }}
+        >
+          {props.children}
+        </span>
+      </div>
+    )}
+  </ThemeConsumer>
+);
 
 export default EmptyMessage;

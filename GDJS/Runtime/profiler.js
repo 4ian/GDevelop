@@ -1,53 +1,170 @@
+/**
+ * A basic profiling tool that can be used to measure time spent in sections of the engine
+ */
 gdjs.Profiler = function() {
-    this._currentSection = null;
-    this._frameIndex = 0;
-    this.datas = [];
+  this._framesMeasures = []; // All the measures for the last frames
+  this._currentFrameIndex = 0;
+  this._currentFrameMeasure = null; // The measures being done
+  this._currentSection = null; // The section being measured
 
-    while(this.datas.length < 30) {
-        this.datas.push({});
-    }
+  this._maxFramesCount = 600;
+  this._framesCount = 0; // The number of frames that have been measured
+  while (this._framesMeasures.length < this._maxFramesCount) {
+    this._framesMeasures.push({
+      parent: null,
+      time: 0,
+      subsections: {},
+    });
+  }
 
-    this._averages = {};
-    this._counts = {};
-}
+  this._getTimeNow =
+    window.performance && typeof window.performance.now === 'function'
+      ? window.performance.now.bind(window.performance)
+      : Date.now;
+};
 
-gdjs.Profiler.prototype.frameStarted = function() {
-    this._currentSection = null;
-
-    this._frameIndex++;
-    if (this._frameIndex >= 30) this._frameIndex = 0;
-    this._frameStart = Date.now();
-}
+gdjs.Profiler.prototype.beginFrame = function() {
+  this._currentFrameMeasure = {
+    parent: null,
+    time: 0,
+    lastStartTime: this._getTimeNow(),
+    subsections: {},
+  };
+  this._currentSection = this._currentFrameMeasure;
+};
 
 gdjs.Profiler.prototype.begin = function(sectionName) {
-    if (this._currentSection) this.end();
+  // Push the new section
+  var subsections = this._currentSection.subsections;
+  var subsection = (subsections[sectionName] = subsections[sectionName] || {
+    parent: this._currentSection,
+    time: 0,
+    lastStartTime: 0,
+    subsections: {},
+  });
+  this._currentSection = subsection;
 
-    this._currentSection = sectionName;
-    this._currentStart = Date.now();
-}
+  // Start the timer
+  this._currentSection.lastStartTime = this._getTimeNow();
+};
 
-gdjs.Profiler.prototype.end = function() {
-    this.datas[this._frameIndex][this._currentSection] = Date.now() - this._currentStart;
-    this.datas[this._frameIndex]['total'] = Date.now() - this._frameStart;
-}
+gdjs.Profiler.prototype.end = function(sectionName) {
+  // Stop the timer
+  var sectionTime = this._getTimeNow() - this._currentSection.lastStartTime;
+  this._currentSection.time = (this._currentSection.time || 0) + sectionTime;
 
-gdjs.Profiler.prototype.getAverage = function() {
-    for(var p in this._averages) {
-        if (this._averages.hasOwnProperty(p)) this._averages[p] = 0;
-        if (this._counts.hasOwnProperty(p)) this._counts[p] = 0;
+  // Pop the section
+  this._currentSection = this._currentSection.parent;
+};
+
+gdjs.Profiler.prototype.endFrame = function() {
+  if (this._currentSection.parent !== null) {
+    throw new Error(
+      'Mismatch in profiler, endFrame should be called on root section'
+    );
+  }
+
+  this.end();
+
+  this._framesCount++;
+  if (this._framesCount > this._maxFramesCount)
+    this._framesCount = this._maxFramesCount;
+  this._framesMeasures[this._currentFrameIndex] = this._currentFrameMeasure;
+  this._currentFrameIndex++;
+  if (this._currentFrameIndex >= this._maxFramesCount)
+    this._currentFrameIndex = 0;
+};
+
+gdjs.Profiler._addAverageSectionTimes = function(
+  section,
+  destinationSection,
+  totalCount,
+  i
+) {
+  destinationSection.time =
+    (destinationSection.time || 0) + section.time / totalCount;
+  for (var sectionName in section.subsections) {
+    if (section.subsections.hasOwnProperty(sectionName)) {
+      var destinationSubsections = destinationSection.subsections;
+      var destinationSubsection = (destinationSubsections[
+        sectionName
+      ] = destinationSubsections[sectionName] || {
+        parent: destinationSection,
+        time: 0,
+        subsections: {},
+      });
+
+      gdjs.Profiler._addAverageSectionTimes(
+        section.subsections[sectionName],
+        destinationSubsection,
+        totalCount,
+        i
+      );
     }
+  }
+};
 
-    for(var i = 0;i < this.datas.length;++i) {
-        for(var p in this.datas[i]) {
-            this._averages[p] = (this._averages[p] || 0) + this.datas[i][p];
-            this._counts[p] = (this._counts[p] || 0) + 1;
-        }
+/**
+ * Return the measures for all the section of the game during the frames
+ * captured.
+ */
+gdjs.Profiler.prototype.getFramesAverageMeasures = function() {
+  var framesAverageMeasures = {
+    parent: null,
+    time: 0,
+    subsections: {},
+  };
+
+  for (var i = 0; i < this._framesCount; ++i) {
+    gdjs.Profiler._addAverageSectionTimes(
+      this._framesMeasures[i],
+      framesAverageMeasures,
+      this._framesCount,
+      i
+    );
+  }
+
+  return framesAverageMeasures;
+};
+
+/**
+ * Get stats measured during the frames captured.
+ */
+gdjs.Profiler.prototype.getStats = function() {
+  return {
+    framesCount: this._framesCount,
+  };
+};
+
+/**
+ * @brief Convert measures for a section into texts.
+ * Useful for ingame profiling.
+ *
+ * @param {*} sectionName The name of the section
+ * @param {*} profilerSection The section measures
+ * @param {*} outputs The array where to push the results
+ */
+gdjs.Profiler.getProfilerSectionTexts = function(
+  sectionName,
+  profilerSection,
+  outputs
+) {
+  var percent =
+    profilerSection.parent && profilerSection.parent.time !== 0
+      ? ((profilerSection.time / profilerSection.parent.time) * 100).toFixed(1)
+      : '100%';
+  var time = profilerSection.time.toFixed(2);
+  outputs.push(sectionName + ': ' + time + 'ms (' + percent + ')');
+  var subsectionsOutputs = [];
+
+  for (var subsectionName in profilerSection.subsections) {
+    if (profilerSection.subsections.hasOwnProperty(subsectionName)) {
+      gdjs.Profiler.getProfilerSectionTexts(
+        subsectionName,
+        profilerSection.subsections[subsectionName],
+        subsectionsOutputs
+      );
     }
-
-    for(var p in this._averages) {
-        if (this._averages.hasOwnProperty(p)) this._averages[p] /= this._counts[p];
-    }
-
-
-    return this._averages;
-}
+  }
+  outputs.push.apply(outputs, subsectionsOutputs);
+};

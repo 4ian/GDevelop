@@ -524,12 +524,8 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
             gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
             gd::ExpressionParser expressionParser(ParaEdit.at(i)->GetValue());
 
-            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game.GetCurrentPlatform(), game, scene, callbacks)))
+            if ((ParameterMetadata::IsExpression("string", instructionMetadata.parameters[i].type) && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(ParameterMetadata::IsExpression("number", instructionMetadata.parameters[i].type) && !expressionParser.ParseMathExpression(game.GetCurrentPlatform(), game, scene, callbacks)))
             {
                 message = expressionParser.GetFirstError();
 

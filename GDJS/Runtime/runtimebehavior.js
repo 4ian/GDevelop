@@ -46,7 +46,14 @@ gdjs.RuntimeBehavior.prototype.getNameId = function() {
  * @param runtimeScene The runtimeScene owning the object
  */
 gdjs.RuntimeBehavior.prototype.stepPreEvents = function(runtimeScene) {
-	if ( this._activated ) this.doStepPreEvents(runtimeScene);
+	if ( this._activated ) {
+		var profiler = runtimeScene.getProfiler();
+		if (profiler) profiler.begin(this.name);
+		
+		this.doStepPreEvents(runtimeScene);
+
+		if (profiler) profiler.end(this.name);
+	}
 };
 
 /**
@@ -56,7 +63,14 @@ gdjs.RuntimeBehavior.prototype.stepPreEvents = function(runtimeScene) {
  * @param runtimeScene The runtimeScene owning the object
  */
 gdjs.RuntimeBehavior.prototype.stepPostEvents = function(runtimeScene) {
-	if ( this._activated ) this.doStepPostEvents(runtimeScene);
+	if ( this._activated ) {
+		var profiler = runtimeScene.getProfiler();
+		if (profiler) profiler.begin(this.name);
+		
+		this.doStepPostEvents(runtimeScene);
+
+		if (profiler) profiler.end(this.name);
+	}
 };
 
 /**

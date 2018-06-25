@@ -18,6 +18,9 @@ import Checkbox from 'material-ui/Checkbox';
 import Flash from 'material-ui/svg-icons/image/flash-on';
 import FlashOff from 'material-ui/svg-icons/image/flash-off';
 import HelpButton from '../UI/HelpButton';
+import Profiler from './Profiler';
+import { type ProfilerOutput } from '.';
+
 type Props = {|
   gameData: ?any,
   onEdit: EditFunction,
@@ -25,6 +28,10 @@ type Props = {|
   onPlay: () => void,
   onPause: () => void,
   onRefresh: () => void,
+  onStartProfiler: () => void,
+  onStopProfiler: () => void,
+  profilerOutput: ?ProfilerOutput,
+  profilingInProgress: boolean,
 |};
 
 type State = {|
@@ -48,8 +55,23 @@ export default class DebuggerContent extends React.Component<Props, State> {
     rawMode: false,
   };
 
+  _editors: ?EditorMosaic = null;
+
+  openProfiler = () => {
+    if (this._editors) this._editors.openEditor('profiler', 'bottom');
+  }
+
   render() {
-    const { gameData, onRefresh, onCall, onEdit } = this.props;
+    const {
+      gameData,
+      onRefresh,
+      onCall,
+      onEdit,
+      onStartProfiler,
+      onStopProfiler,
+      profilerOutput,
+      profilingInProgress,
+    } = this.props;
     const {
       selectedInspector,
       selectedInspectorFullPath,
@@ -58,6 +80,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
 
     return (
       <EditorMosaic
+        ref={editors => this._editors = editors}
         editors={{
           inspectors: (
             <MosaicWindow
@@ -142,8 +165,33 @@ export default class DebuggerContent extends React.Component<Props, State> {
               </Column>
             </Column>
           ),
+          profiler: (
+            <MosaicWindow
+              title="Profiler"
+              // Pass profilerOutput to force MosaicWindow update when profilerOutput is changed
+              profilerOutput={profilerOutput}
+              profilingInProgress={profilingInProgress}
+            >
+              <Profiler
+                onStart={onStartProfiler}
+                onStop={onStopProfiler}
+                profilerOutput={profilerOutput}
+                profilingInProgress={profilingInProgress}
+              />
+            </MosaicWindow>
+          ),
         }}
-        initialEditorNames={['inspectors', 'selected-inspector']}
+        initialNodes={{
+          direction: 'column',
+          first: {
+            direction: 'row',
+            first: 'inspectors',
+            second: 'selected-inspector',
+            splitPercentage: 25,
+          },
+          second: 'profiler',
+          splitPercentage: 65,
+        }}
         initialSplitPercentage={32}
       />
     );

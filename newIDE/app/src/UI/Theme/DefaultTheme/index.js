@@ -2,6 +2,7 @@
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import './Mosaic.css';
 import './EventsSheet.css';
+import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './Table.css';
 
 const gdevelopPurple = '#9100ce';

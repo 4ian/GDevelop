@@ -586,7 +586,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         supplementaryParametersTypes) {
   gd::String argOutput;
 
-  if (metadata.type == "expression" || metadata.type == "camera") {
+  if (ParameterMetadata::IsExpression("number", metadata.type)) {
     CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
 
     gd::ExpressionParser parser(parameter);
@@ -598,9 +598,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     }
 
     if (argOutput.empty()) argOutput = "0";
-  } else if (metadata.type == "string" || metadata.type == "layer" ||
-             metadata.type == "color" || metadata.type == "file" ||
-             metadata.type == "joyaxis") {
+  } else if (ParameterMetadata::IsExpression("string", metadata.type)) {
     CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
 
     gd::ExpressionParser parser(parameter);
@@ -828,6 +826,7 @@ gd::String EventsCodeGenerator::ConvertToStringExplicit(
 std::vector<gd::String> EventsCodeGenerator::ExpandObjectsName(
     const gd::String& objectName,
     const EventsCodeGenerationContext& context) const {
+  // Note: this logic is duplicated in EventsContextAnalyzer::ExpandObjectsName
   std::vector<gd::String> realObjects;
   if (project.GetObjectGroups().Has(objectName))
     realObjects =

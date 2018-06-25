@@ -714,6 +714,22 @@ gd::String EventsCodeGenerator::GetCodeNamespace() {
          "Code.";
 }
 
+gd::String EventsCodeGenerator::GenerateProfilerSectionBegin(
+    const gd::String& section) {
+  if (GenerateCodeForRuntime()) return "";
+
+  return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().begin(" +
+         ConvertToStringExplicit(section) + "); }";
+}
+
+gd::String EventsCodeGenerator::GenerateProfilerSectionEnd(
+    const gd::String& section) {
+  if (GenerateCodeForRuntime()) return "";
+
+  return "if (runtimeScene.getProfiler()) { runtimeScene.getProfiler().end(" +
+         ConvertToStringExplicit(section) + "); }";
+}
+
 EventsCodeGenerator::EventsCodeGenerator(gd::Project& project,
                                          const gd::Layout& layout)
     : gd::EventsCodeGenerator(project, layout, JsPlatform::Get()) {}

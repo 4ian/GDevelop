@@ -10,13 +10,21 @@ type Props = {|
   canPlay: boolean,
   onPause: () => void,
   canPause: boolean,
+  onOpenProfiler: () => void,
 |} & TranslatorProps;
 
 type State = {||};
 
 export class Toolbar extends PureComponent<Props, State> {
   render() {
-    const { t, onPlay, onPause, canPlay, canPause } = this.props;
+    const {
+      t,
+      onPlay,
+      onPause,
+      canPlay,
+      canPause,
+      onOpenProfiler,
+    } = this.props;
 
     return (
       <ToolbarGroup lastChild>
@@ -26,12 +34,17 @@ export class Toolbar extends PureComponent<Props, State> {
           disabled={!canPlay}
           tooltip={t('Play the game')}
         />
-        <ToolbarSeparator />
         <ToolbarIcon
           onClick={onPause}
           src="res/ribbon_default/pause32.png"
           disabled={!canPause}
           tooltip={t('Pause the game')}
+        />
+        <ToolbarSeparator />
+        <ToolbarIcon
+          onClick={onOpenProfiler}
+          src="res/ribbon_default/profiler32.png"
+          tooltip={t('Open the performance profiler')}
         />
       </ToolbarGroup>
     );

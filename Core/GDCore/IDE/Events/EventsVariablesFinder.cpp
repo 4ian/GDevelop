@@ -174,7 +174,7 @@ std::set<gd::String> EventsVariablesFinder::FindArgumentsInInstructions(
           results.insert(instructions[aId].GetParameter(pNb).GetPlainString());
       }
       // Search in expressions
-      else if (instrInfos.parameters[pNb].type == "expression") {
+      else if (ParameterMetadata::IsExpression("number", instrInfos.parameters[pNb].type)) {
         CallbacksForSearchingVariable callbacks(
             results, parameterType, objectName);
 
@@ -183,11 +183,7 @@ std::set<gd::String> EventsVariablesFinder::FindArgumentsInInstructions(
         parser.ParseMathExpression(platform, project, layout, callbacks);
       }
       // Search in gd::String expressions
-      else if (instrInfos.parameters[pNb].type == "string" ||
-               instrInfos.parameters[pNb].type == "file" ||
-               instrInfos.parameters[pNb].type == "joyaxis" ||
-               instrInfos.parameters[pNb].type == "color" ||
-               instrInfos.parameters[pNb].type == "layer") {
+      else if (ParameterMetadata::IsExpression("string", instrInfos.parameters[pNb].type)) {
         CallbacksForSearchingVariable callbacks(
             results, parameterType, objectName);
 

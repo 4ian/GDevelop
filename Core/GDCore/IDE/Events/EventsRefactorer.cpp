@@ -217,7 +217,7 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
           actions[aId].GetParameter(pNb).GetPlainString() == oldName)
         actions[aId].SetParameter(pNb, gd::Expression(newName));
       // Replace object's name in expressions
-      else if (instrInfos.parameters[pNb].type == "expression") {
+      else if (ParameterMetadata::IsExpression("number", instrInfos.parameters[pNb].type)) {
         gd::String newExpression;
         gd::String oldExpression =
             actions[aId].GetParameter(pNb).GetPlainString();
@@ -232,11 +232,7 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
         }
       }
       // Replace object's name in text expressions
-      else if (instrInfos.parameters[pNb].type == "string" ||
-               instrInfos.parameters[pNb].type == "file" ||
-               instrInfos.parameters[pNb].type == "joyaxis" ||
-               instrInfos.parameters[pNb].type == "color" ||
-               instrInfos.parameters[pNb].type == "layer") {
+      else if (ParameterMetadata::IsExpression("string", instrInfos.parameters[pNb].type)) {
         gd::String newExpression;
         gd::String oldExpression =
             actions[aId].GetParameter(pNb).GetPlainString();
@@ -285,7 +281,7 @@ bool EventsRefactorer::RenameObjectInConditions(
           conditions[cId].GetParameter(pNb).GetPlainString() == oldName)
         conditions[cId].SetParameter(pNb, gd::Expression(newName));
       // Replace object's name in expressions
-      else if (instrInfos.parameters[pNb].type == "expression") {
+      else if (ParameterMetadata::IsExpression("number", instrInfos.parameters[pNb].type)) {
         gd::String newExpression;
         gd::String oldExpression =
             conditions[cId].GetParameter(pNb).GetPlainString();
@@ -299,11 +295,7 @@ bool EventsRefactorer::RenameObjectInConditions(
         }
       }
       // Replace object's name in text expressions
-      else if (instrInfos.parameters[pNb].type == "string" ||
-               instrInfos.parameters[pNb].type == "file" ||
-               instrInfos.parameters[pNb].type == "joyaxis" ||
-               instrInfos.parameters[pNb].type == "color" ||
-               instrInfos.parameters[pNb].type == "layer") {
+      else if (ParameterMetadata::IsExpression("string", instrInfos.parameters[pNb].type)) {
         gd::String newExpression;
         gd::String oldExpression =
             conditions[cId].GetParameter(pNb).GetPlainString();
@@ -389,7 +381,7 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
         break;
       }
       // Replace object's name in expressions
-      else if (instrInfos.parameters[pNb].type == "expression") {
+      else if (ParameterMetadata::IsExpression("number", instrInfos.parameters[pNb].type)) {
         CallbacksForRemovingObject callbacks(name);
 
         gd::ExpressionParser parser(
@@ -401,11 +393,7 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
         }
       }
       // Replace object's name in text expressions
-      else if (instrInfos.parameters[pNb].type == "string" ||
-               instrInfos.parameters[pNb].type == "file" ||
-               instrInfos.parameters[pNb].type == "joyaxis" ||
-               instrInfos.parameters[pNb].type == "color" ||
-               instrInfos.parameters[pNb].type == "layer") {
+      else if (ParameterMetadata::IsExpression("string", instrInfos.parameters[pNb].type)) {
         CallbacksForRemovingObject callbacks(name);
 
         gd::ExpressionParser parser(
@@ -457,7 +445,7 @@ bool EventsRefactorer::RemoveObjectInConditions(
         break;
       }
       // Replace object's name in expressions
-      else if (instrInfos.parameters[pNb].type == "expression") {
+      else if (ParameterMetadata::IsExpression("number", instrInfos.parameters[pNb].type)) {
         CallbacksForRemovingObject callbacks(name);
 
         gd::ExpressionParser parser(
@@ -469,11 +457,7 @@ bool EventsRefactorer::RemoveObjectInConditions(
         }
       }
       // Replace object's name in text expressions
-      else if (instrInfos.parameters[pNb].type == "string" ||
-               instrInfos.parameters[pNb].type == "file" ||
-               instrInfos.parameters[pNb].type == "joyaxis" ||
-               instrInfos.parameters[pNb].type == "color" ||
-               instrInfos.parameters[pNb].type == "layer") {
+      else if (ParameterMetadata::IsExpression("string", instrInfos.parameters[pNb].type)) {
         CallbacksForRemovingObject callbacks(name);
 
         gd::ExpressionParser parser(

@@ -15,7 +15,6 @@ import { installRaven } from './Utils/Analytics/Raven';
 import { installFullstory } from './Utils/Analytics/Fullstory';
 import { unregister } from './registerServiceWorker';
 import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
-import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 
 // Import for browser only IDE
 import BrowserExamples from './ProjectCreation/BrowserExamples';

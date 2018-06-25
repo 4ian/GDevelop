@@ -613,11 +613,17 @@ export default class SceneEditor extends Component {
         <EditorMosaic
           editors={editors}
           ref={editorMosaic => (this.editorMosaic = editorMosaic)}
-          initialEditorNames={
-            this.props.showObjectsList
-              ? ['properties', 'instances-editor', 'objects-list']
-              : ['properties', 'instances-editor']
-          }
+          initialNodes={{
+            direction: 'row',
+            first: 'properties',
+            splitPercentage: 23,
+            second: {
+              direction: 'row',
+              first: 'instances-editor',
+              second: this.props.showObjectsList ? 'objects-list' : null,
+              splitPercentage: 77,
+            },
+          }}
         />
         <ObjectEditorDialog
           open={!!this.state.editedObject}

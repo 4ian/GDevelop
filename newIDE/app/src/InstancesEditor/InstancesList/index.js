@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 import { AutoSizer, Table, Column } from 'react-virtualized';
+import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 const gd = global.gd;
 
-class InstancesList extends Component {
+export default class InstancesList extends Component {
   shouldComponentUpdate(nextProps) {
     // Rendering the component is costly as it iterates over
     // every instances, so the prop freezeUpdate allows to ask the component to stop
@@ -67,7 +67,7 @@ class InstancesList extends Component {
   };
 
   render() {
-    const { instances, muiTheme } = this.props;
+    const { instances } = this.props;
 
     this.renderedRows.length = 0;
     instances.iterateOverInstances(this.instanceRowRenderer);
@@ -78,68 +78,71 @@ class InstancesList extends Component {
     const tableKey = instances.ptr;
 
     return (
-      <AutoSizer>
-        {({ height, width }) => (
-          <Table
-            ref={table => (this.table = table)}
-            key={tableKey}
-            headerHeight={30}
-            height={height}
-            className={muiTheme.tableRootClassName}
-            headerClassName={'tableHeaderColumn'}
-            rowCount={this.renderedRows.length}
-            rowGetter={this._rowGetter}
-            rowHeight={35}
-            onRowClick={this._onRowClick}
-            rowClassName={this._rowClassName}
-            width={width}
-          >
-            <Column
-              label="Object name"
-              dataKey="name"
-              width={width * 0.35}
-              className={'tableColumn'}
-            />
-            <Column
-              label=""
-              dataKey="locked"
-              width={width * 0.05}
-              className={'tableColumn'}
-            />
-            <Column
-              label="X"
-              dataKey="x"
-              width={width * 0.1}
-              className={'tableColumn'}
-            />
-            <Column
-              label="Y"
-              dataKey="y"
-              width={width * 0.1}
-              className={'tableColumn'}
-            />
-            <Column
-              label="Angle"
-              dataKey="angle"
-              width={width * 0.1}
-              className={'tableColumn'}
-            />
-            <Column
-              label="Layer"
-              dataKey="layer"
-              width={width * 0.2}
-              className={'tableColumn'}
-            />
-            <Column
-              label="Z Order"
-              dataKey="zOrder"
-              width={width * 0.1}
-              className={'tableColumn'}
-            />
-          </Table>
+      <ThemeConsumer>
+        {muiTheme => (
+          <AutoSizer>
+            {({ height, width }) => (
+              <Table
+                ref={table => (this.table = table)}
+                key={tableKey}
+                headerHeight={30}
+                height={height}
+                className={muiTheme.tableRootClassName}
+                headerClassName={'tableHeaderColumn'}
+                rowCount={this.renderedRows.length}
+                rowGetter={this._rowGetter}
+                rowHeight={35}
+                onRowClick={this._onRowClick}
+                rowClassName={this._rowClassName}
+                width={width}
+              >
+                <Column
+                  label="Object name"
+                  dataKey="name"
+                  width={width * 0.35}
+                  className={'tableColumn'}
+                />
+                <Column
+                  label=""
+                  dataKey="locked"
+                  width={width * 0.05}
+                  className={'tableColumn'}
+                />
+                <Column
+                  label="X"
+                  dataKey="x"
+                  width={width * 0.1}
+                  className={'tableColumn'}
+                />
+                <Column
+                  label="Y"
+                  dataKey="y"
+                  width={width * 0.1}
+                  className={'tableColumn'}
+                />
+                <Column
+                  label="Angle"
+                  dataKey="angle"
+                  width={width * 0.1}
+                  className={'tableColumn'}
+                />
+                <Column
+                  label="Layer"
+                  dataKey="layer"
+                  width={width * 0.2}
+                  className={'tableColumn'}
+                />
+                <Column
+                  label="Z Order"
+                  dataKey="zOrder"
+                  width={width * 0.1}
+                  className={'tableColumn'}
+                />
+              </Table>
+            )}
+          </AutoSizer>
         )}
-      </AutoSizer>
+      </ThemeConsumer>
     );
   }
 }
-export default muiThemeable()(InstancesList);

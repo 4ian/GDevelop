@@ -35,7 +35,7 @@ export class Toolbar extends PureComponent {
               },
               { type: 'separator' },
               {
-                label: 'Preview with debugger',
+                label: 'Preview with debugger and performance profiler',
                 click: () => this.props.onOpenDebugger(),
               },
             ]}

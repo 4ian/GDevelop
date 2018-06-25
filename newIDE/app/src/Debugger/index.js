@@ -15,6 +15,18 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 //Each game connected to the debugger server is identified by a unique number
 export type DebuggerId = number;
 
+export type ProfilerMeasuresSection = {|
+  time: number,
+  subsections: { [string]: ProfilerMeasuresSection },
+|};
+
+export type ProfilerOutput = {|
+  framesAverageMeasures: ProfilerMeasuresSection,
+  stats: {
+    framesCount: number,
+  },
+|};
+
 type Props = {|
   project: gdProject,
   setToolbar: React.Node => void,
@@ -26,7 +38,9 @@ type State = {|
   debuggerServerError: ?any,
 
   debuggerIds: Array<DebuggerId>,
-  debuggerGameData: { [number]: any },
+  debuggerGameData: { [DebuggerId]: any },
+  profilerOutputs: { [DebuggerId]: ProfilerOutput },
+  profilingInProgress: { [DebuggerId]: boolean },
   selectedId: DebuggerId,
 |};
 
@@ -44,8 +58,12 @@ export default class Debugger extends React.Component<Props, State> {
     debuggerServerError: null,
     debuggerIds: [],
     debuggerGameData: {},
+    profilerOutputs: {},
+    profilingInProgress: {},
     selectedId: 0,
   };
+
+  _debuggerContents: { [DebuggerId]: ?DebuggerContent } = {};
 
   updateToolbar() {
     if (!this.props.isActive) return;
@@ -56,6 +74,10 @@ export default class Debugger extends React.Component<Props, State> {
         onPause={() => this._pause(this.state.selectedId)}
         canPlay={this._hasSelectedDebugger()}
         canPause={this._hasSelectedDebugger()}
+        onOpenProfiler={() => {
+          if (this._debuggerContents[this.state.selectedId])
+            this._debuggerContents[this.state.selectedId].openProfiler()
+        }}
       />
     );
   }
@@ -165,6 +187,21 @@ export default class Debugger extends React.Component<Props, State> {
           [id]: data.payload,
         },
       });
+    } else if (data.command === 'profiler.output') {
+      this.setState({
+        profilerOutputs: {
+          ...this.state.profilerOutputs,
+          [id]: data.payload,
+        },
+      });
+    } else if (data.command === 'profiler.started') {
+      this.setState(state => ({
+        profilingInProgress: { ...state.profilingInProgress, [id]: true },
+      }));
+    } else if (data.command === 'profiler.stopped') {
+      this.setState(state => ({
+        profilingInProgress: { ...state.profilingInProgress, [id]: false },
+      }));
     } else {
       console.warn(
         'Unknown command received from debugger client:',
@@ -232,6 +269,24 @@ export default class Debugger extends React.Component<Props, State> {
     return true;
   };
 
+  _startProfiler = (id: DebuggerId) => {
+    if (!ipcRenderer) return;
+
+    ipcRenderer.send('debugger-send-message', {
+      id,
+      message: '{"command": "profiler.start"}',
+    });
+  };
+
+  _stopProfiler = (id: DebuggerId) => {
+    if (!ipcRenderer) return;
+
+    ipcRenderer.send('debugger-send-message', {
+      id,
+      message: '{"command": "profiler.stop"}',
+    });
+  };
+
   _hasSelectedDebugger = () => {
     const { selectedId, debuggerIds } = this.state;
     return debuggerIds.indexOf(selectedId) !== -1;
@@ -244,6 +299,8 @@ export default class Debugger extends React.Component<Props, State> {
       selectedId,
       debuggerIds,
       debuggerGameData,
+      profilerOutputs,
+      profilingInProgress,
     } = this.state;
 
     return (
@@ -276,12 +333,17 @@ export default class Debugger extends React.Component<Props, State> {
             />
             {this._hasSelectedDebugger() && (
               <DebuggerContent
+                ref={debuggerContent => this._debuggerContents[selectedId] = debuggerContent}
                 gameData={debuggerGameData[selectedId]}
                 onPlay={() => this._play(selectedId)}
                 onPause={() => this._pause(selectedId)}
                 onRefresh={() => this._refresh(selectedId)}
                 onEdit={(path, args) => this._edit(selectedId, path, args)}
                 onCall={(path, args) => this._call(selectedId, path, args)}
+                onStartProfiler={() => this._startProfiler(selectedId)}
+                onStopProfiler={() => this._stopProfiler(selectedId)}
+                profilerOutput={profilerOutputs[selectedId]}
+                profilingInProgress={profilingInProgress[selectedId]}
               />
             )}
             {!this._hasSelectedDebugger() && (

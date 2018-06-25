@@ -367,3 +367,27 @@ gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
   this.setDefaultWidth(width);
   this.setDefaultHeight(height);
 }
+
+/**
+ * Start a profiler for the currently running scene.
+ * @param onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
+ * @method startCurrentSceneProfiler
+ */
+gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function(onProfilerStopped) {
+  var currentScene = this._sceneStack.getCurrentScene();
+  if (!currentScene) return false;
+
+  currentScene.startProfiler(onProfilerStopped);
+  return true;
+}
+
+/**
+ * Stop the profiler for the currently running scene.
+ * @method stopCurrentSceneProfiler
+ */
+gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
+  var currentScene = this._sceneStack.getCurrentScene();
+  if (!currentScene) return null;
+
+  currentScene.stopProfiler();
+}

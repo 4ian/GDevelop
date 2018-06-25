@@ -77,6 +77,7 @@ import {
   fakeAuthenticatedButLoadingUserProfile,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
+import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
 import SubscriptionDetails from '../Profile/SubscriptionDetails';
 import UsagesDetails from '../Profile/UsagesDetails';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
@@ -86,6 +87,8 @@ import { SubscriptionCheckDialog } from '../Profile/SubscriptionChecker';
 import DebuggerContent from '../Debugger/DebuggerContent';
 import BuildProgress from '../Export/Builds/BuildProgress';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
+import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
+import Profiler from '../Debugger/Profiler';
 
 const gd = global.gd;
 const {
@@ -499,6 +502,10 @@ storiesOf('DebuggerContent', module)
           onRefresh={action('on refresh')}
           onEdit={() => false}
           onCall={() => false}
+          onStartProfiler={action('start profiler')}
+          onStopProfiler={action('stop profiler')}
+          profilerOutput={profilerOutput}
+          profilingInProgress={false}
         />
       </div>
     </DragDropContextProvider>
@@ -513,9 +520,72 @@ storiesOf('DebuggerContent', module)
           onRefresh={action('on refresh')}
           onEdit={() => false}
           onCall={() => false}
+          onStartProfiler={action('start profiler')}
+          onStopProfiler={action('stop profiler')}
+          profilerOutput={profilerOutput}
+          profilingInProgress={true}
         />
       </div>
     </DragDropContextProvider>
+  ));
+
+storiesOf('Profiler', module)
+  .addDecorator(muiDecorator)
+  .add('without profiler output', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 550, display: 'flex' }}>
+        <Profiler
+          onStart={action('start profiler')}
+          onStop={action('stop profiler')}
+          profilerOutput={null}
+          profilingInProgress={false}
+        />
+      </div>
+    </DragDropContextProvider>
+  ))
+  .add('without profiler output, while profiling', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 550, display: 'flex' }}>
+        <Profiler
+          onStart={action('start profiler')}
+          onStop={action('stop profiler')}
+          profilerOutput={null}
+          profilingInProgress={true}
+        />
+      </div>
+    </DragDropContextProvider>
+  ))
+  .add('with profiler output', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 550, display: 'flex' }}>
+        <Profiler
+          onStart={action('start profiler')}
+          onStop={action('stop profiler')}
+          profilerOutput={profilerOutput}
+          profilingInProgress={false}
+        />
+      </div>
+    </DragDropContextProvider>
+  ))
+  .add('with profiler output, while profiling', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 550, display: 'flex' }}>
+        <Profiler
+          onStart={action('start profiler')}
+          onStop={action('stop profiler')}
+          profilerOutput={profilerOutput}
+          profilingInProgress={true}
+        />
+      </div>
+    </DragDropContextProvider>
+  ));
+
+storiesOf('MeasuresTable', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <div style={{ height: 250 }}>
+      <MeasuresTable profilerMeasures={profilerOutput.framesAverageMeasures} />
+    </div>
   ));
 
 storiesOf('AboutDialog', module)

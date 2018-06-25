@@ -3,7 +3,7 @@
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 
-#ifdef __WINDOWS__
+#ifdef WINDOWS
     #include <wx/msw/winundef.h>
 #endif
 

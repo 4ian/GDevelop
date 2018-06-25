@@ -33,7 +33,8 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
-    this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
+	this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
+	this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
 
     this.onCanvasResized();
 };
@@ -138,6 +139,8 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 
 gdjs.RuntimeScene.prototype.unloadScene = function() {
 	if ( !this._isLoaded ) return;
+
+	if (this._profiler) this.stopProfiler();
 
     if (this._renderer && this._renderer.onSceneUnloaded)
         this._renderer.onSceneUnloaded();
@@ -671,6 +674,7 @@ gdjs.RuntimeScene.prototype.requestChange = function(change, sceneName) {
 
 /**
  * Get the profiler associated with the scene, or null if none.
+ * @method getProfiler
  */
 gdjs.RuntimeScene.prototype.getProfiler = function() {
 	return this._profiler;
@@ -679,20 +683,29 @@ gdjs.RuntimeScene.prototype.getProfiler = function() {
 /**
  * Start a new profiler to measures the time passed in sections of the engine
  * in the scene.
+ * @param onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
+ * @method startProfiler
  */
-gdjs.RuntimeScene.prototype.startProfiler = function() {
+gdjs.RuntimeScene.prototype.startProfiler = function(onProfilerStopped) {
 	if (this._profiler) return;
 
-    this._profiler = new gdjs.Profiler();
+	this._profiler = new gdjs.Profiler();
+	this._onProfilerStopped = onProfilerStopped;
 }
 
 /**
- * Stop the profiler being run on the scene and return it so measures can be extracted from it
+ * Stop the profiler being run on the scene.
+ * @method stopProfiler
  */
 gdjs.RuntimeScene.prototype.stopProfiler = function() {
 	if (!this._profiler) return null;
 
 	var oldProfiler = this._profiler;
+	var onProfilerStopped = this._onProfilerStopped;
 	this._profiler = null;
-	return oldProfiler;
+	this._onProfilerStopped = null;
+
+	if (onProfilerStopped) {
+		onProfilerStopped(oldProfiler);
+	}
 }

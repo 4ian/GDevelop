@@ -44,15 +44,16 @@ gdjs.WebsocketDebuggerClient = function(runtimegame) {
         } else if (data.command === 'call') {
           that.call(data.path, data.args);
         } else if (data.command === 'profiler.start') {
-          runtimegame.startCurrentSceneProfiler();
+          runtimegame.startCurrentSceneProfiler(function (stoppedProfiler) {
+            that.sendProfilerOutput(
+              stoppedProfiler.getFramesAverageMeasures(),
+              stoppedProfiler.getStats()
+            );
+            that.sendProfilerStopped();
+          });
           that.sendProfilerStarted();
         } else if (data.command === 'profiler.stop') {
-          var profiler = runtimegame.stopCurrentSceneProfiler();
-          that.sendProfilerOutput(
-            profiler.getFramesAverageMeasures(),
-            profiler.getStats()
-          );
-          that.sendProfilerStopped();
+          runtimegame.stopCurrentSceneProfiler();
         } else {
           console.info(
             'Unknown command "' + data.command + '" received by the debugger.'

@@ -37,6 +37,7 @@ import {
 } from './SelectionHandler';
 import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
+import EventsContextAnalyzerDialog from './EventsContextAnalyzerDialog';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -66,6 +67,10 @@ export default class EventsSheet extends Component {
       inlineEditing: false,
       inlineEditingAnchorEl: null,
       inlineEditingChangesMade: false,
+
+      eventsContextAnalyzerOpen: false,
+      analyzedEventsContextObjectsNames: null,
+      analyzedEventsContextObjectOrGroupNames: null,
     };
 
     this._keyboardShortcuts = new KeyboardShortcuts({
@@ -105,7 +110,7 @@ export default class EventsSheet extends Component {
         showPreviewButton={this.props.showPreviewButton}
         showNetworkPreviewButton={this.props.showNetworkPreviewButton}
         onPreview={() => this.props.onPreview({})}
-        onNetworkPreview={() => this.props.onPreview({networkPreview: true})}
+        onNetworkPreview={() => this.props.onPreview({ networkPreview: true })}
         onOpenDebugger={() => {
           this.props.onOpenDebugger();
           this.props.onPreview({});
@@ -308,7 +313,7 @@ export default class EventsSheet extends Component {
       event.setDisabled(!event.isDisabled())
     );
     this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
-  }
+  };
 
   deleteSelection = () => {
     const { events } = this.props;
@@ -469,6 +474,42 @@ export default class EventsSheet extends Component {
     this.setState({ history: newHistory }, () => this.updateToolbar());
   };
 
+  _openEventsContextAnalyzer = () => {
+    const { project, layout } = this.props;
+    const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
+      gd.JsPlatform.get(),
+      project,
+      layout
+    );
+
+    const eventsList = new gd.EventsList();
+    getSelectedEvents(this.state.selection).forEach(event =>
+      eventsList.insertEvent(event, eventsList.getEventsCount())
+    );
+
+    eventsContextAnalyzer.launch(eventsList);
+    eventsList.delete();
+
+    const eventsContext = eventsContextAnalyzer.getEventsContext();
+    this.setState({
+      eventsContextAnalyzerOpen: true,
+      analyzedEventsContextObjectsNames: eventsContext
+        .getObjectNames()
+        .toNewVectorString()
+        .toJSArray(),
+      analyzedEventsContextObjectOrGroupNames: eventsContext
+        .getObjectOrGroupNames()
+        .toNewVectorString()
+        .toJSArray(),
+    });
+  };
+
+  _closeEventsContextAnalyzer = () => {
+    this.setState({
+      eventsContextAnalyzerOpen: false,
+    });
+  };
+
   render() {
     const {
       project,
@@ -566,6 +607,11 @@ export default class EventsSheet extends Component {
               click: this.redo,
               enabled: canRedo(this.state.history),
               accelerator: 'CmdOrCtrl+Shift+Z',
+            },
+            { type: 'separator' },
+            {
+              label: 'Analyze objects used in this event',
+              click: this._openEventsContextAnalyzer,
             },
           ]}
         />
@@ -666,6 +712,16 @@ export default class EventsSheet extends Component {
             resourceSources={this.props.resourceSources}
             onChooseResource={this.props.onChooseResource}
             resourceExternalEditors={this.props.resourceExternalEditors}
+          />
+        )}
+        {this.state.eventsContextAnalyzerOpen && (
+          <EventsContextAnalyzerDialog
+            open={this.state.eventsContextAnalyzerOpen}
+            onClose={this._closeEventsContextAnalyzer}
+            objectsNames={this.state.analyzedEventsContextObjectsNames}
+            objectOrGroupNames={
+              this.state.analyzedEventsContextObjectOrGroupNames
+            }
           />
         )}
       </div>

@@ -826,6 +826,7 @@ gd::String EventsCodeGenerator::ConvertToStringExplicit(
 std::vector<gd::String> EventsCodeGenerator::ExpandObjectsName(
     const gd::String& objectName,
     const EventsCodeGenerationContext& context) const {
+  // Note: this logic is duplicated in EventsContextAnalyzer::ExpandObjectsName
   std::vector<gd::String> realObjects;
   if (project.GetObjectGroups().Has(objectName))
     realObjects =

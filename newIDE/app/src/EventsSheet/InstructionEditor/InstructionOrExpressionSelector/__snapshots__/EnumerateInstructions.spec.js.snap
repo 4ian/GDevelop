@@ -143,6 +143,11 @@ Object {
         "fullGroupName": "Common conditions for all objects/Collision",
         "type": "Raycast",
       },
+      "Raycast to position": Object {
+        "displayedName": "Raycast to position",
+        "fullGroupName": "Common conditions for all objects/Collision",
+        "type": "RaycastToPosition",
+      },
     },
     "Layer": Object {
       "Compare layer": Object {
@@ -1465,6 +1470,16 @@ Array [
     "type": "ModGlobalVolume",
   },
   Object {
+    "displayedName": "Pitch of the music on a channel",
+    "fullGroupName": "Audio/Music on channels",
+    "type": "ModPitchMusicChannel",
+  },
+  Object {
+    "displayedName": "Pitch of the sound of a channel",
+    "fullGroupName": "Audio/Sounds on channels",
+    "type": "ModPitchSoundChannel",
+  },
+  Object {
     "displayedName": "Playing offset of the music on a channel",
     "fullGroupName": "Audio/Music on channels",
     "type": "ModPlayingOffsetMusicChannel",
@@ -2358,6 +2373,11 @@ Array [
     "displayedName": "Raycast",
     "fullGroupName": "Common conditions for all objects/Collision",
     "type": "Raycast",
+  },
+  Object {
+    "displayedName": "Raycast to position",
+    "fullGroupName": "Common conditions for all objects/Collision",
+    "type": "RaycastToPosition",
   },
   Object {
     "displayedName": "An object is moving toward another",

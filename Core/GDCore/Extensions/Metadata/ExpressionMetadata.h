@@ -181,6 +181,11 @@ class GD_CORE_API ExpressionMetadata {
     return codeExtraInformation.SetFunctionName(functionName);
   }
 
+  // TODO
+  ExpressionCodeGenerationInformation& GetCodeExtraInformation() {
+    return codeExtraInformation;
+  };
+
   ExpressionCodeGenerationInformation codeExtraInformation;
 
   /** Don't use this constructor. Only here to fullfil std::map requirements

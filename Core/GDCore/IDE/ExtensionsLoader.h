@@ -17,8 +17,13 @@ namespace gd {
 /**
  * \brief Internal class loading static extensions.
  *
- * Class that load extensions and store them in ExtensionsManager
- * \see ExtensionsManager
+ * Class that load extensions and store them in a Platform.
+ * 
+ * \note This is for loading extensions declared in C++, usually in
+ * files called "Extension.cpp" or "JsExtension.cpp".
+ * GDevelop 5 extensions can also be declared directly in JavaScript. 
+ * See newIDE/app/src/JsExtensionsLoader and "JsExtension.js" files
+ * for extensions declared in JavaScript.
  */
 class GD_CORE_API ExtensionsLoader {
  public:

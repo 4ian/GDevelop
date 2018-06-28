@@ -383,6 +383,12 @@ class GD_CORE_API InstructionMetadata {
   ExtraInformation codeExtraInformation;  ///< Information about how generate
                                           ///< code for the instruction
 
+
+  // TODO
+  ExtraInformation &GetCodeExtraInformation() {
+    return codeExtraInformation;
+  }
+
   /**
    * \brief Declare if the instruction being declared is somewhat manipulating
    * in a standard way. \param type "number" or "string" \note Shortcut for

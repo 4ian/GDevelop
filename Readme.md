@@ -11,6 +11,7 @@ Getting started [![Build Status](https://semaphoreci.com/api/v1/4ian/gd/branches
 | --- | --- |
 | Download GDevelop to make games | Go on [GDevelop website](https://gdevelop-app.com) to download GD! |
 | Contribute to the new editor | Download [Node.js] and follow this [README](newIDE/README.md). |
+| Create/improve an extension | Download [Node.js] and follow this [README](newIDE/README-extensions.md). |
 | Contribute to the old C++ editor | Download and launch [CMake], choose this directory as the source, generate the Makefile and launch it. Be sure to have [required development libraries](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/setup_dev_env.html) installed. <br><br> Fully detailed instructions are [available here](http://4ian.github.io/GD-Documentation). |
 | Help to translate GDevelop | Go on the [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop). |
 

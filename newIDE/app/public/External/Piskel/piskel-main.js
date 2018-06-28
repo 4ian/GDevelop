@@ -12,6 +12,7 @@ let baseExportPath;
 let piskelOptions; // The options received from GDevelop
 
 let saveFolderLabel,
+  setFolderButton,
   piskelAnimationNameInput = null; // controlers for save path of new frames
 
 const headerStyle = {
@@ -22,6 +23,8 @@ const headerStyle = {
     'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
   cancelButton:
     'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+  setFolderButton:
+    'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
 };
 
 const updatePiskelBasePath = function() {
@@ -43,6 +46,7 @@ const selectBaseFolderPath = function() {
   }
   const selectedDir = dialog.showOpenDialog(remote.getCurrentWindow(), {
     properties: ['openDirectory'],
+    defaultPath: projectBasePath,
   });
   if (!selectedDir) {
     return;
@@ -123,6 +127,11 @@ document.getElementById('piskel-frame').onload = function() {
   cancelButton.textContent = 'Cancel';
   piskelAppHeader.appendChild(cancelButton);
   cancelButton.addEventListener('click', cancelChanges);
+
+  setFolderButton = editorContentDocument.createElement('button');
+  setFolderButton.textContent = 'Set Folder';
+  piskelAppHeader.appendChild(setFolderButton);
+  setFolderButton.addEventListener('click', selectBaseFolderPath);
 
   // Apply header styles
   Object.keys(headerStyle).forEach(function(key) {
@@ -356,4 +365,6 @@ function disablePiskelSavePathControls() {
   saveFolderLabel.style.color = '#8bb0b2';
   saveFolderLabel.title =
     'Changing the path is disabled on imported GD animations!';
+  setFolderButton.removeEventListener('click', selectBaseFolderPath);
+  setFolderButton.style.visibility = 'hidden';
 }

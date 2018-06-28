@@ -14,7 +14,7 @@ export type ExtensionLoadingResult = {
 };
 
 export interface JsExtensionsLoader {
-  loadAllExtensions(): Promise<Array<ExtensionLoadingResult>>;
+  loadAllExtensions(): Promise<Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>>;
 }
 
 /**

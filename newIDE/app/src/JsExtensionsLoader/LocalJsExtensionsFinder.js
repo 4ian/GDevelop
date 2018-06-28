@@ -22,9 +22,9 @@ const checkIfPathHasJsExtensionModule = (
   });
 };
 
-export const findJsExtensionModules = () => {
+export const findJsExtensionModules = (): Promise<any> => {
   return new Promise((resolve, reject) => {
-    findGDJS(gdjsRoot => {
+    findGDJS((gdjsRoot: ?string) => {
       if (!gdjsRoot) {
         return reject();
       }

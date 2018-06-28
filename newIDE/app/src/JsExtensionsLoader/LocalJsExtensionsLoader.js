@@ -20,7 +20,7 @@ export default class LocalJsExtensionsLoader implements JsExtensionsLoader {
     return findJsExtensionModules().then(
       extensionModulePaths => {
         return Promise.all(
-          extensionModulePaths.map(extensionModulePath => {
+          extensionModulePaths.map((extensionModulePath) => {
             console.log(extensionModulePath);
             let extensionModule = null;
             try {
@@ -59,6 +59,7 @@ export default class LocalJsExtensionsLoader implements JsExtensionsLoader {
       },
       err => {
         console.error(`Unable to find JS extensions modules`);
+        throw err;
       }
     );
   }

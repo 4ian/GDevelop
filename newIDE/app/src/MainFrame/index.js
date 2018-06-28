@@ -166,7 +166,7 @@ export default class MainFrame extends React.Component<Props, State> {
     const { extensionsLoader } = this.props;
     if (extensionsLoader) {
       extensionsLoader
-        .loadAllExtensions(this.state.currentProject)
+        .loadAllExtensions()
         .then(loadingResults => {
           const successLoadingResults = loadingResults.filter(
             loadingResult => !loadingResult.result.error

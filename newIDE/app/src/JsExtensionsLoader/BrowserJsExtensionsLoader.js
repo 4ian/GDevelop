@@ -19,7 +19,7 @@ const jsExtensions = [
  * for the web-app where everything must be bundled.
  */
 export default class BrowserJsExtensionsLoader implements JsExtensionsLoader {
-  loadAllExtensions(): Promise<Array<ExtensionLoadingResult>> {
+  loadAllExtensions(): Promise<Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>> {
     return Promise.resolve(
       jsExtensions.map(({ name, extensionModule }) => ({
         extensionModulePath: 'internal-extension://' + name,

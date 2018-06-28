@@ -47,13 +47,13 @@ class FacebookInstantGamesJsExtension : public gd::PlatformExtension {
         .codeExtraInformation
         .SetIncludeFile(
             "Extensions/FacebookInstantGames/facebookinstantgamestools.js")
-        .SetFunctionName("gdjs.evtTools.facebookInstantGames.getPlayerId()");
+        .SetFunctionName("gdjs.evtTools.facebookInstantGames.getPlayerId");
 
     GetAllStrExpressions()["FacebookInstantGames::PlayerName"]
         .codeExtraInformation
         .SetIncludeFile(
             "Extensions/FacebookInstantGames/facebookinstantgamestools.js")
-        .SetFunctionName("gdjs.evtTools.facebookInstantGames.getPlayerName()");
+        .SetFunctionName("gdjs.evtTools.facebookInstantGames.getPlayerName");
 
     StripUnimplementedInstructionsAndExpressions();
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();

@@ -110,33 +110,33 @@ document.getElementById('piskel-frame').onload = function() {
 
   saveFolderLabel = editorContentDocument.createElement('label');
   saveFolderLabel.addEventListener('click', selectBaseFolderPath);
+  saveFolderLabel.style = headerStyle.saveFolderLabel;
   piskelAppHeader.appendChild(saveFolderLabel);
 
   piskelAnimationNameInput = editorContentDocument.createElement('input');
   piskelOptions = { name: 'New Animation' };
   piskelAnimationNameInput.oninput = updatePiskelBasePath;
   piskelAnimationNameInput.type = 'text';
+  piskelAnimationNameInput.style = headerStyle.piskelAnimationNameInput;
   piskelAppHeader.appendChild(piskelAnimationNameInput);
 
   const saveButton = editorContentDocument.createElement('button');
   saveButton.textContent = 'Save to GDevelop';
+  saveButton.style = headerStyle.saveButton;
   piskelAppHeader.appendChild(saveButton);
   saveButton.addEventListener('click', saveToGD);
 
   const cancelButton = editorContentDocument.createElement('button');
   cancelButton.textContent = 'Cancel';
+  cancelButton.style = headerStyle.cancelButton;
   piskelAppHeader.appendChild(cancelButton);
   cancelButton.addEventListener('click', cancelChanges);
 
   setFolderButton = editorContentDocument.createElement('button');
   setFolderButton.textContent = 'Set Folder';
+  setFolderButton.style = headerStyle.setFolderButton;
   piskelAppHeader.appendChild(setFolderButton);
   setFolderButton.addEventListener('click', selectBaseFolderPath);
-
-  // Apply header styles
-  Object.keys(headerStyle).forEach(function(key) {
-    eval(key).style = headerStyle[key];
-  });
 };
 
 function fileExists(path) {

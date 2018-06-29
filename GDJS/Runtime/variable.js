@@ -29,7 +29,7 @@ gdjs.Variable = function(varData)
 			//Try to guess the type of the value, as GD has no way ( for now ) to specify
 			//the type of a variable.
 			var valueWhenConsideredAsNumber = parseFloat(initialValue, 10);
-			if(valueWhenConsideredAsNumber === valueWhenConsideredAsNumber) { //"Since NaN is the only JavaScript value that is treated as unequal to itself, you can always test if a value is NaN by checking it for equality to itself"
+			if(valueWhenConsideredAsNumber === valueWhenConsideredAsNumber && valueWhenConsideredAsNumber.toString() === initialValue) { //"Since NaN is the only JavaScript value that is treated as unequal to itself, you can always test if a value is NaN by checking it for equality to itself"
 				this._value = parseFloat(initialValue, 10);
 			}
 			else { //We have a string (Maybe empty).
@@ -112,6 +112,22 @@ gdjs.Variable.prototype.hasChild = function(childName) {
 gdjs.Variable.prototype.removeChild = function(childName) {
 	if ( !this._isStructure ) return;
 	delete this._children[childName];
+}
+
+/**
+ * Remove all the children.
+ *
+ * If the variable is not a structure, nothing is done.
+ * @method clearChildren
+ */
+gdjs.Variable.prototype.clearChildren = function() {
+	if ( !this._isStructure ) return;
+
+	for ( var child in this._children ) {
+		if ( this._children.hasOwnProperty(child) ){
+			delete this._children[child];
+		}
+	}
 }
 
 /**

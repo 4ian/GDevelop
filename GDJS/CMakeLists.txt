@@ -62,6 +62,11 @@ file(GLOB_RECURSE f3 GDJS/IDE/Dialogs/*)
 set(source_files ${source_files} ${f3})
 ENDIF()
 
+file(GLOB_RECURSE formatted_source_files GDJS/Events/* GDJS/Extensions/* GDJS/IDE/*)
+list(REMOVE_ITEM formatted_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/Dialogs/GDJSDialogs.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/Dialogs/GDJSDialogs.h" "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/Dialogs/GDJSDialogsBitmaps.cpp")
+list(REMOVE_ITEM formatted_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/mongoose/mongoose.c" "${CMAKE_CURRENT_SOURCE_DIR}/GDJS/IDE/mongoose/mongoose.h")
+gd_add_clang_utils(GDJS "${formatted_source_files}")
+
 add_library(
         GDJS
         SHARED
@@ -98,11 +103,12 @@ ELSE()
 	IF(WIN32)
 		add_custom_target(GDJS_Runtime
 			ALL
-			COMMAND "${GD_base_dir}/GDJS/scripts/CopyRuntimeToGD.bat")
+			COMMAND "${GD_base_dir}/GDJS/scripts/CopyRuntimeToGD.bat" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/JsPlatform/Runtime
+			WORKING_DIRECTORY ${GD_base_dir}/GDJS/scripts)
 	ELSE()
 		add_custom_target(GDJS_Runtime
 			ALL
-			COMMAND sh "CopyRuntimeToGD.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/JsPlatform/Runtime
+			COMMAND bash "CopyRuntimeToGD.sh" ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${CMAKE_SYSTEM_NAME}/JsPlatform/Runtime
 			WORKING_DIRECTORY ${GD_base_dir}/GDJS/scripts)
 	ENDIF()
 ENDIF()

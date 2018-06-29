@@ -1,4 +1,3 @@
 #include "ErrorManager.h"
 
-ErrorManager * ErrorManager::_singleton = 0;
-
+ErrorManager* ErrorManager::_singleton = 0;

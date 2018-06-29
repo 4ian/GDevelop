@@ -77,7 +77,6 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     wxBoxSizer* BoxSizer5;
     wxBoxSizer* BoxSizer10;
     wxBoxSizer* topPartSizer;
-    wxBoxSizer* rightPartSizer;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer2;
@@ -101,35 +100,34 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     treeSizer->AddGrowableRow(0);
 
     instructionsTree = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
-    instructionsTree->SetMinSize(wxSize(300,-1));
+    instructionsTree->SetMinSize(wxSize(300,470));
     instructionsTree->SetToolTip(editingAction ? _("Choose the action to use") : _("Choose the condition to use"));
 
-    treeSizer->Add(instructionsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    treeSizer->Add(instructionsTree, 1, wxALL|wxEXPAND, 0);
 
     searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     searchCtrl->SetMinSize(wxSize(-1,24));
 
-    treeSizer->Add(searchCtrl, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    topPartSizer->Add(treeSizer, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    treeSizer->Add(searchCtrl, 1, wxALL|wxEXPAND, 0);
+
+    topPartSizer->Add(treeSizer, 0, wxALL|wxEXPAND, 0);
     rightPartSizer = new wxBoxSizer(wxVERTICAL);
     FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
     FlexGridSizer3->AddGrowableCol(1);
     FlexGridSizer3->AddGrowableRow(0);
     ActionImg = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/unknownAction24.png")).Rescale(wxSize(24,24).GetWidth(),wxSize(24,24).GetHeight())), wxDefaultPosition, wxSize(24,24), wxNO_BORDER, _T("ID_STATICBITMAP1"));
-    FlexGridSizer3->Add(ActionImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
+    FlexGridSizer3->Add(ActionImg, 1, wxALL, 5);
     instructionNameTxt = new wxStaticText(this, ID_STATICTEXT1, editingAction ? _("No action chosen") : _("No condition chosen"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    instructionNameTxt->SetMinSize(wxSize(450, -1));
     wxFont instructionNameTxtFont(16,wxFONTFAMILY_SWISS,wxFONTSTYLE_NORMAL,wxFONTWEIGHT_BOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     instructionNameTxt->SetFont(instructionNameTxtFont);
-    BoxSizer4->Add(instructionNameTxt, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer3->Add(BoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    rightPartSizer->Add(FlexGridSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
+    FlexGridSizer3->Add(instructionNameTxt, 1, wxALL|wxEXPAND, 5);
+    rightPartSizer->Add(FlexGridSizer3, 0, wxALL|wxEXPAND, 5);
 
     // Selected instruction description
     instructionDescriptionTxt = new wxStaticText(this, ID_STATICTEXT2, editingAction ? _("Choose an action in the list") : _("Choose a condition in the list"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-    BoxSizer3->Add(instructionDescriptionTxt, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    rightPartSizer->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    instructionDescriptionTxt->SetMinSize(wxSize(450, -1));
+    rightPartSizer->Add(instructionDescriptionTxt, 0, wxALL|wxEXPAND, 5);
 
     // A warning displayed if the instruction is not available on one of the project's platforms despite being available in the current one
     notAvailableWarningTxt = new wxStaticText(this, wxNewId(), "", wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
@@ -144,24 +142,22 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(480,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
     BoxSizer1->Add(StaticLine1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     rightPartSizer->Add(BoxSizer1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    scrolledPanel = new wxScrolledWindow(this, wxNewId(), wxDefaultPosition, wxDefaultSize, wxVSCROLL);
     GridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
     GridSizer1->AddGrowableCol(1);
-    rightPartSizer->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    scrolledPanel->SetSizer(GridSizer1);
+    scrolledPanel->FitInside();
+    scrolledPanel->SetScrollRate(0, 5);
+    rightPartSizer->Add(scrolledPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     topPartSizer->Add(rightPartSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer6->Add(topPartSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
 
     //Invert button:
-    wxStaticBoxSizer* invertBox = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Inversion"));
-    wxFlexGridSizer * invertCheckboxSizer = new wxFlexGridSizer(0, 3, 0, 0);
-    invertCheckboxSizer->AddGrowableCol(1);
-    invertCheckboxSizer->AddGrowableRow(0);
     invertedCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Invert the condition"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
     invertedCheck->SetValue(false);
     invertedCheck->SetToolTip(_("When inverted, a condition will check the negation of what it normally does."));
-    invertCheckboxSizer->Add(invertedCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    invertBox->Add(invertCheckboxSizer, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    rightPartSizer->Add(invertBox, 0, wxALL | wxALIGN_BOTTOM, 5);
+    rightPartSizer->Add(invertedCheck, 0, wxALL | wxALIGN_BOTTOM, 5);
 
     //Bottom part
     StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
@@ -192,10 +188,9 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
     SetSizer(BoxSizer6);
     BoxSizer6->Fit(this);
     BoxSizer6->SetSizeHints(this);
-    SetMinSize(wxSize(500,500));
     Center();
 
-    parametersHelper.SetWindowAndSizer(this, GridSizer1)
+    parametersHelper.SetWindowAndSizer(scrolledPanel, GridSizer1)
         .SetProjectAndLayout(game, scene);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeItemActivated);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&InstructionSelectorDialog::OninstructionsTreeSelectionChanged);
@@ -220,7 +215,7 @@ InstructionSelectorDialog::InstructionSelectorDialog(wxWindow* parent, gd::Proje
 
     instructionType = "";
 
-    if (editingAction) invertBox->Show(false);
+    if (editingAction) invertedCheck->Show(false);
     RefreshList();
     Center();
     SetSize(-1, 600);
@@ -458,7 +453,7 @@ void InstructionSelectorDialog::RefreshFromInstruction()
             gd::MetadataProvider::GetActionMetadata(*platform, instructionType) :
             gd::MetadataProvider::GetConditionMetadata(*platform, instructionType);
 
-        if ( otherPlatformMetadata.codeExtraInformation.functionCallName.empty() )
+        if ( otherPlatformMetadata.codeExtraInformation.functionCallName.empty() && !otherPlatformMetadata.codeExtraInformation.HasCustomCodeGenerator() )
         {
             notAvailableWarningTxt->SetLabel( notAvailableWarningTxt->GetLabel() + gd::String(" ") + platform->GetFullName() );
             notAvailableWarningTxt->Show();
@@ -477,6 +472,8 @@ void InstructionSelectorDialog::RefreshFromInstruction()
     }
 
     GridSizer1->Layout();
+    scrolledPanel->FitInside();
+    rightPartSizer->Layout();
 
     if (!editingAction)
         invertedCheck->SetValue(isInverted);
@@ -527,14 +524,10 @@ void InstructionSelectorDialog::OnOkBtClick(wxCommandEvent& event)
             gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
             gd::ExpressionParser expressionParser(ParaEdit.at(i)->GetValue());
 
-            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game.GetCurrentPlatform(), game, scene, callbacks)))
+            if ((ParameterMetadata::IsExpression("string", instructionMetadata.parameters[i].type) && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(ParameterMetadata::IsExpression("number", instructionMetadata.parameters[i].type) && !expressionParser.ParseMathExpression(game.GetCurrentPlatform(), game, scene, callbacks)))
             {
-                message = expressionParser.firstErrorStr;
+                message = expressionParser.GetFirstError();
 
                 parametersHaveErrors = true;
                 ParaEdit[i]->SetBackgroundColour(wxColour(255, 194, 191));

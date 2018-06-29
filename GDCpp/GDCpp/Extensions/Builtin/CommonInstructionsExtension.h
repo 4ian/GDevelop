@@ -7,13 +7,13 @@
  *
  * \ingroup BuiltinExtensions
  */
-class CommonInstructionsExtension : public ExtensionBase
-{
-    public:
-        CommonInstructionsExtension();
-        virtual ~CommonInstructionsExtension() {};
-    protected:
-    private:
+class CommonInstructionsExtension : public ExtensionBase {
+ public:
+  CommonInstructionsExtension();
+  virtual ~CommonInstructionsExtension(){};
+
+ protected:
+ private:
 };
 
-#endif // COMMONINSTRUCTIONSEXTENSION_H
+#endif  // COMMONINSTRUCTIONSEXTENSION_H

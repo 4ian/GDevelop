@@ -68,13 +68,13 @@ gdjs.Polygon.prototype.computeEdges = function() {
 		else v2 = this.vertices[i + 1];
 
 		this.edges[i][0] = v2[0] - v1[0];
-        this.edges[i][1] = v2[1] - v1[1];
+		this.edges[i][1] = v2[1] - v1[1];
 	}
 };
 
 gdjs.Polygon.prototype.isConvex = function() {
 	this.computeEdges();
-	edgesLen = this.edges.length;
+	var edgesLen = this.edges.length;
 
 	if ( edgesLen < 3 ) {
 		return false;
@@ -87,7 +87,7 @@ gdjs.Polygon.prototype.isConvex = function() {
 		if ( (zCrossProduct > 0) !== zProductIsPositive ) return false;
 	}
 
-	var lastZCrossProduct = this.edges[edgesLen-1][0]*this.edges[0][1] - this.edges[edgesLen][1]*this.edges[0][0];
+	var lastZCrossProduct = this.edges[edgesLen-1][0]*this.edges[0][1] - this.edges[edgesLen-1][1]*this.edges[0][0];
 	if ( (lastZCrossProduct > 0) !== zProductIsPositive ) return false;
 
 	return true;
@@ -219,6 +219,146 @@ gdjs.Polygon.collisionTest._statics = {
 	}
 };
 
+/**
+ * Do a raycast test.<br>
+ * Please note that the polygon must be <b>convex</b>!
+ * For some theory, check <a href="https://www.codeproject.com/Tips/862988/Find-the-Intersection-Point-of-Two-Line-Segments">Find the Intersection Point of Two Line Segments</a>
+ *
+ * @method raycastTest
+ * @static
+ * @param poly {Polygon} The polygon to test
+ * @param startX {Number} The raycast start point X
+ * @param startY {Number} The raycast start point Y
+ * @param endX {Number} The raycast end point X
+ * @param endY {Number} The raycast end point Y
+ * @return A raycast result with the contact points and distances
+ */
+gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
+{
+    var result = gdjs.Polygon.raycastTest._statics.result;
+    result.collision = false;
+
+    if ( poly.vertices.length < 2 )
+    {
+        return result;
+    }
+
+    poly.computeEdges();
+    var p = gdjs.Polygon.raycastTest._statics.p;
+    var q = gdjs.Polygon.raycastTest._statics.q;
+    var r = gdjs.Polygon.raycastTest._statics.r;
+    var s = gdjs.Polygon.raycastTest._statics.s;
+    var minSqDist = Number.MAX_VALUE;
+
+    // Ray segment: p + t*r, with p = start and r = end - start
+    p[0] = startX;
+    p[1] = startY;
+    r[0] = endX - startX;
+    r[1] = endY - startY;
+
+    for(var i=0; i<poly.edges.length; i++)
+    {
+        // Edge segment: q + u*s
+        q[0] = poly.vertices[i][0];
+        q[1] = poly.vertices[i][1];
+        s[0] = poly.edges[i][0];
+        s[1] = poly.edges[i][1];
+        var deltaQP = gdjs.Polygon.raycastTest._statics.deltaQP;
+        deltaQP[0] = q[0] - p[0];
+        deltaQP[1] = q[1] - p[1];
+        var crossRS = gdjs.Polygon.crossProduct(r, s);
+        var t = gdjs.Polygon.crossProduct(deltaQP, s) / crossRS;
+        var u = gdjs.Polygon.crossProduct(deltaQP, r) / crossRS;
+
+        // Collinear
+        if ( Math.abs(crossRS) <= 0.0001 && Math.abs(gdjs.Polygon.crossProduct(deltaQP, r)) <= 0.0001 )
+        {
+            // Project the ray and the edge to work on floats, keeping linearity through t
+            var axis = gdjs.Polygon.raycastTest._statics.axis;
+            axis[0] = r[0];
+            axis[1] = r[1];
+            gdjs.Polygon.normalise(axis);
+            var rayA = 0;
+            var rayB = gdjs.Polygon.dotProduct(axis, r);
+            var edgeA = gdjs.Polygon.dotProduct(axis, deltaQP);
+            var edgeB = gdjs.Polygon.dotProduct(axis, [deltaQP[0] + s[0], deltaQP[1] + s[1]]);
+            // Get overlapping range
+            var minOverlap = Math.max(Math.min(rayA, rayB), Math.min(edgeA, edgeB));
+            var maxOverlap = Math.min(Math.max(rayA, rayB), Math.max(edgeA, edgeB));
+            if( minOverlap > maxOverlap ){
+                return result;
+            }
+            result.collision = true;
+            // Zero distance ray
+            if( rayB === 0 ){
+                result.closeX = startX;
+                result.closeY = startY;
+                result.closeSqDist = 0;
+                result.farX = startX;
+                result.farY = startY;
+                result.farSqDist = 0;
+            }
+            var t1 = minOverlap / Math.abs(rayB);
+            var t2 = maxOverlap / Math.abs(rayB);
+            result.closeX = startX + t1*r[0];
+            result.closeY = startY + t1*r[1];
+            result.closeSqDist = t1*t1*(r[0]*r[0] + r[1]*r[1]);
+            result.farX = startX + t2*r[0];
+            result.farY = startY + t2*r[1];
+            result.farSqDist = t2*t2*(r[0]*r[0] + r[1]*r[1]);
+
+            return result;
+        }
+        // One point intersection
+        else if ( crossRS !== 0 && 0<=t && t<=1 && 0<=u && u<=1 )
+        {
+            var x = p[0] + t*r[0];
+            var y = p[1] + t*r[1];
+            
+            var sqDist = (x-startX)*(x-startX) + (y-startY)*(y-startY);
+            if ( sqDist < minSqDist )
+            {
+                if ( !result.collision ){
+                    result.farX = x;
+                    result.farY = y;
+                    result.farSqDist = sqDist;
+                }
+                minSqDist = sqDist;
+                result.closeX = x;
+                result.closeY = y;
+                result.closeSqDist = sqDist;
+                result.collision = true;
+            }
+            else
+            {
+                result.farX = x;
+                result.farY = y;
+                result.farSqDist = sqDist;
+            }
+        }
+    }
+
+    return result;
+};
+
+gdjs.Polygon.raycastTest._statics = {
+    p: [0,0],
+    q: [0,0],
+    r: [0,0],
+    s: [0,0],
+    deltaQP: [0,0],
+    axis: [0,0],
+    result: {
+        collision: false,
+        closeX: 0,
+        closeY: 0,
+        closeSqDist: 0,
+        farX: 0,
+        farY: 0,
+        farSqDist: 0
+    }
+}
+
 //Tools functions :
 gdjs.Polygon.normalise = function(v)
 {
@@ -235,6 +375,13 @@ gdjs.Polygon.dotProduct = function(a, b)
     var dp = a[0]*b[0] + a[1]*b[1];
 
     return dp;
+}
+
+gdjs.Polygon.crossProduct = function(a, b)
+{
+    var cp = a[0]*b[1] - a[1]*b[0];
+
+    return cp;
 }
 
 gdjs.Polygon.project = function(axis, p, result)
@@ -258,3 +405,29 @@ gdjs.Polygon.distance = function(minA, maxA, minB, maxB)
     if (minA < minB) return minB - maxA;
     else return minA - maxB;
 }
+
+/**
+ * Check if a point is inside a polygon.
+ *
+ * Uses <a href="https://wrf.ecse.rpi.edu//Research/Short_Notes/pnpoly.html">PNPOLY</a> by W. Randolph Franklin.
+ *
+ * @method isPointInside
+ * @static
+ * @param poly {Polygon} The polygon to test
+ * @param x {Number} The point x coordinate
+ * @param y {Number} The point y coordinate
+ * @return {Boolean} true if the point is inside the polygon
+ */
+gdjs.Polygon.isPointInside = function(poly, x, y)
+{
+    var inside = false;
+    var vi, vj;
+    for (var i = 0, j = poly.vertices.length-1; i < poly.vertices.length; j = i++) {
+        vi = poly.vertices[i];
+        vj = poly.vertices[j];
+        if ( ((vi[1]>y) != (vj[1]>y)) && (x < (vj[0]-vi[0]) * (y-vi[1]) / (vj[1]-vi[1]) + vi[0]) )
+            inside = !inside;
+    }
+
+    return inside;
+};

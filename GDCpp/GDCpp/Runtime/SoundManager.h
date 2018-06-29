@@ -1,20 +1,22 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 #ifndef SOUNDMANAGER_H
 #define SOUNDMANAGER_H
 
 #include <SFML/Audio.hpp>
-#include "GDCpp/Runtime/Sound.h"
-#include "GDCpp/Runtime/Music.h"
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include <map>
-namespace gd { class ResourcesManager; }
-#undef PlaySound //Avoid a nasty macro from polluting everything
+#include "GDCpp/Runtime/Music.h"
+#include "GDCpp/Runtime/Sound.h"
+namespace gd {
+class ResourcesManager;
+}
+#undef PlaySound  // Avoid a nasty macro from polluting everything
 
 using namespace std;
 
@@ -26,117 +28,128 @@ using namespace std;
  *
  * \ingroup SoundEngine
  */
-class GD_API SoundManager
-{
-public:
-    SoundManager();
-    ~SoundManager() {};
+class GD_API SoundManager {
+ public:
+  SoundManager();
+  ~SoundManager(){};
 
-    /**
-     * \brief Set the gd::ResourcesManager used by the SoundManager.
-     */
-    void SetResourcesManager(gd::ResourcesManager * resourcesManager_) { resourcesManager = resourcesManager_; }
+  /**
+   * \brief Set the gd::ResourcesManager used by the SoundManager.
+   */
+  void SetResourcesManager(gd::ResourcesManager* resourcesManager_) {
+    resourcesManager = resourcesManager_;
+  }
 
-    vector < std::shared_ptr<Music> >  musics;
-    vector < std::shared_ptr<Sound> >  sounds;
+  vector<std::shared_ptr<Music> > musics;
+  vector<std::shared_ptr<Sound> > sounds;
 
-    /**
-     * \brief Play a sound (wav files).
-     * \param file The resource name, or filename to load.
-     * \param repeat true to loop the sound
-     * \param volume The volume, between 0 and 100.
-     * \param pitch The pithc, 1 by default
-     */
-    void PlaySound(const gd::String & name, bool repeat, float volume, float pitch);
+  /**
+   * \brief Play a sound (wav files).
+   * \param file The resource name, or filename to load.
+   * \param repeat true to loop the sound
+   * \param volume The volume, between 0 and 100.
+   * \param pitch The pithc, 1 by default
+   */
+  void PlaySound(const gd::String& name,
+                 bool repeat,
+                 float volume,
+                 float pitch);
 
-    /**
-     * \brief Play a music (ogg files).
-     * \param file The resource name, or filename to load.
-     * \param repeat true to loop the music
-     * \param volume The volume, between 0 and 100.
-     * \param pitch The pithc, 1 by default
-     */
-    void PlayMusic(const gd::String & name, bool repeat, float volume, float pitch);
+  /**
+   * \brief Play a music (ogg files).
+   * \param file The resource name, or filename to load.
+   * \param repeat true to loop the music
+   * \param volume The volume, between 0 and 100.
+   * \param pitch The pithc, 1 by default
+   */
+  void PlayMusic(const gd::String& name,
+                 bool repeat,
+                 float volume,
+                 float pitch);
 
-    /**
-     * \brief Play a sound (wav files) on a channel.
-     * \param file The resource name, or filename to load.
-     * \param channel The channel to use. The previous sound, if any, will be stopped.
-     * \param repeat true to loop the sound
-     * \param volume The volume, between 0 and 100.
-     * \param pitch The pithc, 1 by default
-     */
-    void PlaySoundOnChannel(const gd::String & name, unsigned int channel, bool repeat, float volume, float pitch);
+  /**
+   * \brief Play a sound (wav files) on a channel.
+   * \param file The resource name, or filename to load.
+   * \param channel The channel to use. The previous sound, if any, will be
+   * stopped. \param repeat true to loop the sound \param volume The volume,
+   * between 0 and 100. \param pitch The pithc, 1 by default
+   */
+  void PlaySoundOnChannel(const gd::String& name,
+                          unsigned int channel,
+                          bool repeat,
+                          float volume,
+                          float pitch);
 
-    /**
-     * \brief Play a music (wav files) on a channel.
-     * \param file The resource name, or filename to load.
-     * \param channel The channel to use. The previous music, if any, will be stopped.
-     * \param repeat true to loop the music
-     * \param volume The volume, between 0 and 100.
-     * \param pitch The pithc, 1 by default
-     */
-    void PlayMusicOnChannel(const gd::String & name, unsigned int channel, bool repeat, float volume, float pitch);
+  /**
+   * \brief Play a music (wav files) on a channel.
+   * \param file The resource name, or filename to load.
+   * \param channel The channel to use. The previous music, if any, will be
+   * stopped. \param repeat true to loop the music \param volume The volume,
+   * between 0 and 100. \param pitch The pithc, 1 by default
+   */
+  void PlayMusicOnChannel(const gd::String& name,
+                          unsigned int channel,
+                          bool repeat,
+                          float volume,
+                          float pitch);
 
-    /**
-     * Return pointer to a music on a channel
-     */
-    std::shared_ptr<Music> & GetMusicOnChannel(int channel);
+  /**
+   * Return pointer to a music on a channel
+   */
+  std::shared_ptr<Music>& GetMusicOnChannel(int channel);
 
-    /**
-     * Change music on a channel. Automatically destroy the old music.
-     */
-    void SetMusicOnChannel(int channel, std::shared_ptr<Music> music);
+  /**
+   * Change music on a channel. Automatically destroy the old music.
+   */
+  void SetMusicOnChannel(int channel, std::shared_ptr<Music> music);
 
-    /**
-     * Return pointer to a sound on a channel
-     */
-    std::shared_ptr<Sound> & GetSoundOnChannel(int channel);
+  /**
+   * Return pointer to a sound on a channel
+   */
+  std::shared_ptr<Sound>& GetSoundOnChannel(int channel);
 
-    /**
-     * Change sound on a channel. Automatically destroy the old sound.
-     */
-    void SetSoundOnChannel(int channel, std::shared_ptr<Sound> sound);
+  /**
+   * Change sound on a channel. Automatically destroy the old sound.
+   */
+  void SetSoundOnChannel(int channel, std::shared_ptr<Sound> sound);
 
-    /**
-     * Get global game sound volume.
-     * Example :
-     * \code
-     * float currentVolume = game.GetSoundManager().GetGlobalVolume();
-     * \endcode
-     */
-    inline float GetGlobalVolume() const { return globalVolume; }
+  /**
+   * Get global game sound volume.
+   * Example :
+   * \code
+   * float currentVolume = game.GetSoundManager().GetGlobalVolume();
+   * \endcode
+   */
+  inline float GetGlobalVolume() const { return globalVolume; }
 
-    /**
-     * Change global game sound volume.
-     */
-    void SetGlobalVolume(float volume);
+  /**
+   * Change global game sound volume.
+   */
+  void SetGlobalVolume(float volume);
 
-    /**
-     * Destroy all sounds and musics
-     */
-    void ClearAllSoundsAndMusics()
-    {
-        musicsChannel.clear();
-        soundsChannel.clear();
-        sounds.clear();
-        musics.clear();
-    }
+  /**
+   * Destroy all sounds and musics
+   */
+  void ClearAllSoundsAndMusics() {
+    musicsChannel.clear();
+    soundsChannel.clear();
+    sounds.clear();
+    musics.clear();
+  }
 
-    /**
-     * Ensure sounds and musics without channels and stopped are destroyed.
-     */
-    void ManageGarbage();
+  /**
+   * Ensure sounds and musics without channels and stopped are destroyed.
+   */
+  void ManageGarbage();
 
-private:
-    const gd::String &  GetFileFromSoundName(const gd::String & name) const;
+ private:
+  const gd::String& GetFileFromSoundName(const gd::String& name) const;
 
-    std::map<std::size_t, std::shared_ptr<Sound> >  soundsChannel;
-    std::map<std::size_t, std::shared_ptr<Music> >  musicsChannel;
+  std::map<std::size_t, std::shared_ptr<Sound> > soundsChannel;
+  std::map<std::size_t, std::shared_ptr<Music> > musicsChannel;
 
-    float globalVolume;
-    gd::ResourcesManager * resourcesManager;
+  float globalVolume;
+  gd::ResourcesManager* resourcesManager;
 };
 
-
-#endif // SOUNDMANAGER_H
+#endif  // SOUNDMANAGER_H

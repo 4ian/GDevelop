@@ -34,6 +34,11 @@ public:
     void Refresh();
 
     /**
+     * \brief Set a function to call each time a change is made.
+     */
+    void OnChange(std::function<void(gd::String)> cb) { onChangeCb = cb; }
+
+    /**
      * The editor can be linked to a layout editor canvas to update it according to the changes made in the editor.
      */
     void SetAssociatedLayoutEditorCanvas(gd::LayoutEditorCanvas * layoutCanvas) { m_layoutCanvas = layoutCanvas; Refresh(); };
@@ -97,6 +102,7 @@ private:
 
     LayoutEditorPropertiesPnl * propPnl;
     wxAuiManager * propPnlManager;
+    std::function<void(gd::String)> onChangeCb;
 
     gd::String m_layerSelected;
 };

@@ -89,7 +89,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
     requestedDeltaX += this._currentSpeed*timeDelta;
 
     //Compute the list of the objects that will be used
-    this._updatePotentialCollidingObjects(Math.max(requestedDeltaX, this._maxFallingSpeed) );
+    this._updatePotentialCollidingObjects(Math.max(requestedDeltaX, this._maxFallingSpeed*timeDelta) );
     this._updateOverlappedJumpThru();
 
     //Check that the floor object still exists and is near the object.

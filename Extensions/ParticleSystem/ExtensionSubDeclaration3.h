@@ -1,14 +1,9 @@
-#ifndef EXTENSIONSUBDECLARATION1_H
-#define EXTENSIONSUBDECLARATION1_H
+#ifndef EXTENSIONSUBDECLARATION3_H
+#define EXTENSIONSUBDECLARATION3_H
 
-class ExtensionObjectInfos;
-void ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos);
+namespace gd {
+class ObjectMetadata;
+}
+void ExtensionSubDeclaration3(gd::ObjectMetadata& objInfos);
 
-#endif // EXTENSIONSUBDECLARATION1_H
-
-
-
-
-
-
-
+#endif  // EXTENSIONSUBDECLARATION3_H

@@ -1,0 +1,82 @@
+{
+  "name": "gdevelop-ide",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "homepage": ".",
+  "devDependencies": {
+    "flow-bin": "^0.61.0",
+    "flow-coverage-report": "^0.4.0",
+    "follow-redirects": "^1.2.3",
+    "prettier": "1.7.0",
+    "react-scripts": "1.0.17",
+    "shelljs": "^0.7.7",
+    "unzip2": "^0.2.5"
+  },
+  "dependencies": {
+    "@storybook/react": "3.2.19",
+    "aws-sdk": "^2.100.0",
+    "axios": "^0.16.1",
+    "blueimp-md5": "^2.10.0",
+    "classnames": "2.2.5",
+    "create-react-context": "^0.1.6",
+    "date-fns": "^1.29.0",
+    "element-closest": "2.0.2",
+    "firebase": "^4.8.2",
+    "flat": "2.0.1",
+    "fontfaceobserver": "2.0.13",
+    "i18next": "^10.0.3",
+    "keen-tracking": "1.1.3",
+    "lodash": "4.17.4",
+    "material-ui": "0.20",
+    "material-ui-search-bar": "0.4.1",
+    "pixi-simple-gesture": "0.2.2",
+    "pixi.js": "3.0.11",
+    "prop-types": "^15.5.10",
+    "raven-js": "^3.19.1",
+    "react": "^16.2.0",
+    "react-color": "2.13.8",
+    "react-dnd": "2.5.4",
+    "react-dnd-html5-backend": "2.5.4",
+    "react-dom": "^16.2.0",
+    "react-error-boundary": "^1.2.0",
+    "react-i18next": "6.2.0",
+    "react-json-view": "^1.16.1",
+    "react-measure": "1.4.7",
+    "react-mosaic-component": "1.0.3",
+    "react-sortable-hoc": "0.6.8",
+    "react-sortable-tree": "1.5.3",
+    "react-test-renderer": "16.2.0",
+    "react-virtualized": "9.14.1",
+    "slugs": "0.1.3",
+    "source-map-explorer": "^1.4.0",
+    "wait-promise": "0.4.1",
+    "why-did-you-update": "^0.1.1"
+  },
+  "scripts": {
+    "postinstall": "npm run import-resources",
+    "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js && node import-piskel-editor.js",
+    "start": "npm run import-resources && react-scripts start",
+    "build": "npm run import-resources && react-scripts build",
+    "format": "prettier --write \"src/**/*.js\"",
+    "test": "react-scripts test --env=jsdom",
+    "flow": "flow",
+    "storybook": "start-storybook -p 9009 -s public",
+    "analyze-test-coverage": "react-scripts test --env=jsdom --coverage",
+    "analyze-flow-coverage": "flow-coverage-report",
+    "analyze-source-map": "source-map-explorer build/static/js/main.*"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "flow-coverage-report": {
+    "includeGlob": [
+      "src/**/*.js"
+    ],
+    "type": [
+      "text",
+      "html",
+      "json"
+    ]
+  }
+}

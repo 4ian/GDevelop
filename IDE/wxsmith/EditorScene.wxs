@@ -40,13 +40,25 @@
 								<handler function="OnhScrollbarScroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
 							</object>
 							<object class="Custom" name="ID_CUSTOM3" subclass="gd::LayoutEditorCanvas" variable="layoutEditorCanvas" member="yes">
-								<creating_code>$(THIS) = new $(CLASS)($(PARENT), project, layout, layout.GetInitialInstances(), layout.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);</creating_code>
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT), project, layout, layout.GetInitialInstances(), layout.GetAssociatedSettings(), mainFrameWrapper);</creating_code>
 								<local_include>1</local_include>
 								<style></style>
 								<pos>0,0</pos>
 								<size>800,600</size>
 								<focused>1</focused>
 								<handler function="OnsceneCanvasSetFocus" entry="EVT_SET_FOCUS" />
+							</object>
+						</object>
+						<label>Scene</label>
+						<icon code='gd::SkinHelper::GetIcon(&quot;scene&quot;, 16)' />
+					</object>
+					<object class="AuiNotebookPage">
+						<object class="wxPanel" name="ID_PANEL2" variable="externalSceneEditorContainerPanel" member="yes">
+							<object class="wxFlexGridSizer" variable="externalEditorContainerSizer" member="no">
+								<cols>1</cols>
+								<rows>1</rows>
+								<growablecols>0</growablecols>
+								<growablerows>0</growablerows>
 							</object>
 						</object>
 						<label>Scene</label>

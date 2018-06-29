@@ -507,6 +507,17 @@ gdjs.RuntimeObject.variableRemoveChild = function(variable, childName) {
 gdjs.RuntimeObject.prototype.variableRemoveChild = gdjs.RuntimeObject.variableRemoveChild;
 
 /**
+ * @method variableClearChildren
+ * @static
+ * @private
+ * @param variable The variable to be cleared
+ */
+gdjs.RuntimeObject.variableClearChildren = function(variable) {
+    variable.clearChildren();
+};
+gdjs.RuntimeObject.prototype.variableClearChildren = gdjs.RuntimeObject.variableClearChildren;
+
+/**
  * Shortcut to test if a variable exists for the object.
  * @method hasVariable
  * @param name {String} The variable to be tested
@@ -970,8 +981,8 @@ gdjs.RuntimeObject.prototype.getDistanceToObject = function(otherObject) {
 gdjs.RuntimeObject.prototype.getSqDistanceToObject = function(otherObject) {
     if ( otherObject === null ) return 0;
 
-    var x = this.getX()+this.getCenterX() - (otherObject.getX()+otherObject.getCenterX());
-    var y = this.getY()+this.getCenterY() - (otherObject.getY()+otherObject.getCenterY());
+    var x = this.getDrawableX()+this.getCenterX() - (otherObject.getDrawableX()+otherObject.getCenterX());
+    var y = this.getDrawableY()+this.getCenterY() - (otherObject.getDrawableY()+otherObject.getCenterY());
 
     return x*x+y*y;
 };
@@ -983,8 +994,8 @@ gdjs.RuntimeObject.prototype.getSqDistanceToObject = function(otherObject) {
  * @param pointY {Number} Y position
  */
 gdjs.RuntimeObject.prototype.getSqDistanceTo = function(pointX, pointY) {
-    var x = this.getX()+this.getCenterX() - pointX;
-    var y = this.getY()+this.getCenterY() - pointY;
+    var x = this.getDrawableX()+this.getCenterX() - pointX;
+    var y = this.getDrawableY()+this.getCenterY() - pointY;
 
     return x*x+y*y;
 };
@@ -1140,12 +1151,46 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
 };
 
 /**
- * Check the distance between two objects.
- * @method distanceTest
- * @static
+ * @method raycastTest
+ * @param x {Number} The raycast source X
+ * @param y {Number} The raycast source Y
+ * @param endX {Number} The raycast end position X
+ * @param endY {Number} The raycast end position Y
+ * @param closest {Boolean} Get the closest or farthest collision mask result?
+ * @return A raycast result with the contact points and distances
  */
-gdjs.RuntimeObject.distanceTest = function(obj1, obj2, distance) {
-    return obj1.getSqDistanceToObject(obj2) <= distance;
+gdjs.RuntimeObject.prototype.raycastTest = function(x, y, endX, endY, closest) {
+    var objW = this.getWidth();
+    var objH = this.getHeight();
+    var diffX = this.getDrawableX()+this.getCenterX() - x;
+    var diffY = this.getDrawableY()+this.getCenterY() - y;
+    var sqBoundingR = (objW*objW + objH*objH) / 4.0;
+    var sqDist = (endX - x)*(endX - x) + (endY - y)*(endY - y);
+
+    var result = gdjs.Polygon.raycastTest._statics.result;
+    result.collision = false;
+
+    if ( diffX*diffX + diffY*diffY > sqBoundingR + sqDist + 2*Math.sqrt(sqDist*sqBoundingR) )
+        return result;
+    
+    var testSqDist = closest ? sqDist : 0;
+
+    var hitBoxes = this.getHitBoxes();
+    for (var i=0; i<hitBoxes.length; i++) {
+        var res =  gdjs.Polygon.raycastTest(hitBoxes[i], x, y, endX, endY);
+        if ( res.collision ) {
+            if ( closest && (res.closeSqDist < testSqDist) ) {
+                testSqDist = res.closeSqDist;
+                result = res;
+            }
+            else if ( !closest && (res.farSqDist > testSqDist) && (res.farSqDist <= sqDist) ) {
+                testSqDist = res.farSqDist;
+                result = res;
+            }
+        }
+    }
+    
+    return result;
 };
 
 /**
@@ -1162,6 +1207,15 @@ gdjs.RuntimeObject.prototype.insideObject = function(x, y) {
         && this.getDrawableY() <= y
         && this.getDrawableY() + this.getHeight() >= y;
 }
+
+/**
+ * Check the distance between two objects.
+ * @method distanceTest
+ * @static
+ */
+gdjs.RuntimeObject.distanceTest = function(obj1, obj2, distance) {
+    return obj1.getSqDistanceToObject(obj2) <= distance;
+};
 
 /**
  * Return true if the cursor, or any touch, is on the object.
@@ -1190,6 +1244,23 @@ gdjs.RuntimeObject.prototype.cursorOnObject = function(runtimeScene) {
 
     return false;
 };
+
+/**
+ * \brief Check if a point is inside the object collision hitboxes.
+ * @method isCollidingWithPoint
+ * @param pointX The point x coordinate.
+ * @param pointY The point y coordinate.
+ * @return true if the point is inside the object collision hitboxes.
+ */
+gdjs.RuntimeObject.prototype.isCollidingWithPoint = function(pointX, pointY) {
+    var hitBoxes = this.getHitBoxes();
+    for(var i = 0; i < this.hitBoxes.length; ++i) {
+       if ( gdjs.Polygon.isPointInside(hitBoxes[i], pointX, pointY) )
+            return true;
+    }
+
+    return false;
+}
 
 
 /**

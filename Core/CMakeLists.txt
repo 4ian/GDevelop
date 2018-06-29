@@ -72,6 +72,10 @@ IF(NO_GUI)
 	list(REMOVE_ITEM source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs.h" "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs_dialogs_bitmaps.cpp")
 ENDIF()
 
+file(GLOB_RECURSE formatted_source_files tests/* GDCore/Events/* GDCore/Extensions/* GDCore/IDE/* GDCore/Project/* GDCore/Serialization/* GDCore/Tools/*)
+list(REMOVE_ITEM formatted_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs.h" "${CMAKE_CURRENT_SOURCE_DIR}/GDCore/IDE/Dialogs/GDCoreDialogs_dialogs_bitmaps.cpp")
+gd_add_clang_utils(GDCore "${formatted_source_files}")
+
 add_library(GDCore SHARED ${source_files})
 add_dependencies(GDCore GDVersion)
 IF(EMSCRIPTEN)

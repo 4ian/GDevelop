@@ -1,0 +1,29 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+
+# testing
+coverage
+flow-coverage
+
+# production
+build
+
+# misc
+.DS_Store
+.env
+.env.local
+npm-debug.log
+
+# GD library
+public/libGD.js
+public/External/Piskel/piskel-editor
+public/External/Piskel/piskel-editor.zip
+
+# Resources
+public/res
+public/CppPlatform
+public/JsPlatform
+resources/GDJS
+

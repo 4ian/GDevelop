@@ -9,38 +9,41 @@ This project is released under the MIT License.
 
 #include "GDCore/Tools/Localization.h"
 
+void DeclareSystemInfoExtension(gd::PlatformExtension& extension);
+
 /**
  * \brief This class declares information about the JS extension.
  */
-class JsExtension : public gd::PlatformExtension
-{
-public:
+class SystemInfoJsExtension : public gd::PlatformExtension {
+ public:
+  /**
+   * \brief Constructor of an extension declares everything the extension
+   * contains: objects, actions, conditions and expressions.
+   */
+  SystemInfoJsExtension() {
+    DeclareSystemInfoExtension(*this);
 
-    /**
-     * \brief Constructor of an extension declares everything the extension contains: objects, actions, conditions and expressions.
-     */
-    JsExtension()
-    {
-        SetExtensionInformation("SystemInfo",
-            _("System information"),
-            _("Provides information about the system running the game"),
-            "Florian Rival",
-            "Open source (MIT License)");
+    GetAllConditions()["SystemInfo::IsMobile"]
+        .codeExtraInformation
+        .SetIncludeFile("Extensions/SystemInfo/systeminfotools.js")
+        .SetFunctionName("gdjs.evtTools.systemInfo.isMobile");
 
-        CloneExtension("GDevelop C++ platform", "SystemInfo");
-
-        GetAllConditions()["SystemInfo::IsMobile"].codeExtraInformation.SetIncludeFile("SystemInfo/systeminfotools.js")
-            .SetFunctionName("gdjs.evtTools.systemInfo.isMobile");
-
-        StripUnimplementedInstructionsAndExpressions();
-    };
+    StripUnimplementedInstructionsAndExpressions();
+    GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
+  };
 };
 
+#if defined(EMSCRIPTEN)
+extern "C" gd::PlatformExtension* CreateGDJSSystemInfoExtension() {
+  return new SystemInfoJsExtension;
+}
+#else
 /**
  * Used by GDevelop to create the extension class
  * -- Do not need to be modified. --
  */
-extern "C" gd::PlatformExtension * GD_EXTENSION_API CreateGDJSExtension() {
-    return new JsExtension;
+extern "C" gd::PlatformExtension* GD_EXTENSION_API CreateGDJSExtension() {
+  return new SystemInfoJsExtension;
 }
+#endif
 #endif

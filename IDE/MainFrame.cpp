@@ -175,7 +175,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     MenuItem41 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM4, _("Decompose an animated GIF"), wxEmptyString, wxITEM_NORMAL);
     MenuItem41->SetBitmap(wxBitmap(wxImage(_T("res/importgif.png"))));
     decomposerContextMenu.Append(MenuItem41);
-    MenuItem42 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM5, _("Decompose a RPG Maker character"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem42 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM5, _("Decompose an RPG Maker character"), wxEmptyString, wxITEM_NORMAL);
     MenuItem42->SetBitmap(wxBitmap(wxImage(_T("res/importrpgmaker.png"))));
     decomposerContextMenu.Append(MenuItem42);
     MenuItem43 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM6, _("Decompose a spritesheet"), wxEmptyString, wxITEM_NORMAL);
@@ -292,6 +292,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_PAGE_CHANGING, ( wxObjectEventFunction )&MainFrame::OnRibbonPageChanging );
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_HELP_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonHelpBtClick );
     Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_TOGGLED, ( wxObjectEventFunction )&MainFrame::OnRibbonToggleBtClick );
+    Connect( wxID_ANY, wxEVT_ACTIVATE, ( wxObjectEventFunction )&MainFrame::OnActivate );
 
     #ifdef GD_NO_UPDATE_CHECKER //Remove the menu item to check for updates
     helpMenu.Delete(MenuItem21); //(useful when GD is distributed on a system managing updates by itself).
@@ -364,7 +365,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     static int widths[2] = { -1, 175 };
     statusBar->SetFieldsCount(2);
     statusBar->SetStatusWidths(2, widths);
-    statusBar->SetStatusText( "2008-2016", 1 );
+    statusBar->SetStatusText("2008-2017", 1);
     SetStatusBar(statusBar);
 
     std::vector<wxWindow*> controlsToBeDisabledOnPreview; //Used below:
@@ -514,6 +515,8 @@ MainFrame::~MainFrame()
 {
     //(*Destroy(MainFrame)
     //*)
+    editorsManager.SetNotebook(NULL);
+    Disconnect( wxID_ANY, wxEVT_ACTIVATE, ( wxObjectEventFunction )&MainFrame::OnActivate );
 
     //Deinitialize the frame manager
     m_mgr.UnInit();
@@ -654,31 +657,7 @@ void MainFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
         editorsNotebook->SetWindowStyleFlag(style);
     }
 
-    if ( EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection())) )
-    {
-        sceneEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::Get()->WriteToLogFile("Switched to the editor of layout \""+sceneEditorPtr->GetLayout().GetName()+"\"");
-    }
-    else if ( ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
-    {
-        imagesEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::Get()->WriteToLogFile("Switched to resources editor of project \""+imagesEditorPtr->project.GetName()+"\"");
-    }
-    else if ( CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
-    {
-        codeEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::Get()->WriteToLogFile("Switched to code editor of file \""+codeEditorPtr->filename+"\"");
-    }
-    else if ( ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
-    {
-        externalEventsEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::Get()->WriteToLogFile("Switched to the editor of external events \""+externalEventsEditorPtr->events.GetName()+"\"");
-    }
-    else if ( ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
-    {
-        externalLayoutEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::Get()->WriteToLogFile("Switched to the editor of external layout \""+externalLayoutEditorPtr->GetExternalLayout().GetName()+"\"");
-    }
+    editorsManager.PageChanged(editorsNotebook->GetPage(event.GetSelection()));
 }
 
 void MainFrame::OnRibbonPageChanging(wxRibbonBarEvent& evt)
@@ -1022,4 +1001,14 @@ void MainFrame::OnDecomposeSSSelected(wxCommandEvent& event)
 void MainFrame::OnRibbonDecomposerDropDownClicked(wxRibbonButtonBarEvent& evt)
 {
     evt.PopupMenu(&decomposerContextMenu);
+}
+
+void MainFrame::OnActivate(wxActivateEvent& event)
+{
+    if (event.GetActive())
+        editorsManager.PageChanged(editorsNotebook->GetCurrentPage());
+    else if (!event.GetActive())
+        editorsManager.MainFrameNotDisplayed();
+
+    event.Skip();
 }

@@ -19,7 +19,7 @@ gdjs.HowlerSound = function(o) {
     this._paused = false;
     this._stopped = true;
     this._canBeDestroyed = false;
-    this._rate = o.rate || 1; //Read-only
+    this._rate = o.rate || 1;
 
     //Add custom events listener to keep
     //track of the sound status.
@@ -56,8 +56,12 @@ gdjs.HowlerSound.prototype.stop = function() {
 gdjs.HowlerSound.prototype.canBeDestroyed = function() {
 	return this._canBeDestroyed;
 };
-gdjs.HowlerSound.prototype.rate = function() {
-	return this._rate;
+gdjs.HowlerSound.prototype.getRate = function() {
+    return this._rate;
+};
+gdjs.HowlerSound.prototype.setRate = function(rate) {
+    this._rate = gdjs.HowlerSoundManager.clampRate(rate);
+    this.rate(this._rate);
 };
 
 /**
@@ -75,10 +79,58 @@ gdjs.HowlerSoundManager = function(resources)
     this._resources = resources;
     this._availableResources = {}; //Map storing "audio" resources for faster access.
 
+    this._globalVolume = 100;
+
     this._sounds = {};
     this._musics = {};
     this._freeSounds = []; //Sounds without an assigned channel.
     this._freeMusics = []; //Musics without an assigned channel.
+
+    this._pausedSounds = [];
+    this._paused = false;
+
+    var that = this;
+    this._checkForPause = function() {
+      if (that._paused) {
+        this.pause();
+        that._pausedSounds.push(this);
+      }
+    };
+
+    document.addEventListener("deviceready", function() {
+        // pause/resume sounds in Cordova when the app is being paused/resumed
+        document.addEventListener("pause", function() {
+          var soundList = that._freeSounds.concat(that._freeMusics);
+          for (var key in that._sounds) {
+            if (that._sounds.hasOwnProperty(key)) {
+              soundList.push(that._sounds[key]);
+            }
+          }
+          for (var key in that._musics) {
+            if (that._musics.hasOwnProperty(key)) {
+              soundList.push(that._musics[key]);
+            }
+          }
+          for (var i=0; i < soundList.length; i++) {
+            var sound = soundList[i];
+            if (!sound.paused() && !sound.stopped()) {
+              sound.pause();
+              that._pausedSounds.push(sound);
+            }
+          }
+          that._paused = true;
+        }, false);
+        document.addEventListener("resume", function() {
+          for (var i=0; i < that._pausedSounds.length; i++) {
+            var sound = that._pausedSounds[i];
+            if (!sound.stopped()) {
+              sound.play();
+            }
+          }
+          that._pausedSounds.length = 0;
+          that._paused = false;
+        }, false);
+    });
 };
 
 gdjs.SoundManager = gdjs.HowlerSoundManager; //Register the class to let the engine use it.
@@ -150,12 +202,14 @@ gdjs.HowlerSoundManager.prototype.playSound = function(soundName, loop, volume, 
 	});
 
 	this._storeSoundInArray(this._freeSounds, sound).play();
+
+	sound.on('play', this._checkForPause);
 };
 
 gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function(soundName, channel, loop, volume, pitch) {
 	var	oldSound = this._sounds[channel];
 	if (oldSound) {
-		oldSound.stop();
+		oldSound.unload();
 	}
 
 	var soundFile = this._getFileFromSoundName(soundName);
@@ -169,6 +223,8 @@ gdjs.HowlerSoundManager.prototype.playSoundOnChannel = function(soundName, chann
 
 	sound.play();
 	this._sounds[channel] = sound;
+
+	sound.on('play', this._checkForPause);
 };
 
 gdjs.HowlerSoundManager.prototype.getSoundOnChannel = function(channel) {
@@ -187,12 +243,14 @@ gdjs.HowlerSoundManager.prototype.playMusic = function(soundName, loop, volume, 
 	});
 
 	this._storeSoundInArray(this._freeMusics, sound).play();
+
+	sound.on('play', this._checkForPause);
 };
 
 gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function(soundName, channel, loop, volume, pitch) {
 	var	oldMusic = this._musics[channel];
 	if (oldMusic) {
-		oldMusic.stop();
+		oldMusic.unload();
 	}
 
 	var soundFile = this._getFileFromSoundName(soundName);
@@ -207,6 +265,8 @@ gdjs.HowlerSoundManager.prototype.playMusicOnChannel = function(soundName, chann
 
 	music.play();
 	this._musics[channel] = music;
+
+	music.on('play', this._checkForPause);
 };
 
 gdjs.HowlerSoundManager.prototype.getMusicOnChannel = function(channel) {
@@ -214,40 +274,43 @@ gdjs.HowlerSoundManager.prototype.getMusicOnChannel = function(channel) {
 };
 
 gdjs.HowlerSoundManager.prototype.setGlobalVolume = function(volume) {
-	Howler.volume(volume/100);
+	this._globalVolume = volume;
+	if (this._globalVolume > 100) this._globalVolume = 100;
+	if (this._globalVolume < 0) this._globalVolume = 0;
+	Howler.volume(this._globalVolume/100);
 };
 
 gdjs.HowlerSoundManager.prototype.getGlobalVolume = function() {
-	return Howler.volume()*100;
+	return this._globalVolume;
 };
 
 gdjs.HowlerSoundManager.prototype.clearAll = function() {
 	for (var i = 0;i<this._freeSounds.length;++i)  {
-		if (this._freeSounds[i]) this._freeSounds[i].stop();
+		if (this._freeSounds[i]) this._freeSounds[i].unload();
 	}
 	for (var i = 0;i<this._freeMusics.length;++i)  {
-		if (this._freeMusics[i]) this._freeMusics[i].stop();
+		if (this._freeMusics[i]) this._freeMusics[i].unload();
 	}
 	this._freeSounds.length = 0;
 	this._freeMusics.length = 0;
 
 	for (var p in this._sounds) {
 		if (this._sounds.hasOwnProperty(p) && this._sounds[p]) {
-			this._sounds[p].stop();
+			this._sounds[p].unload();
 			delete this._sounds[p];
 		}
 	}
 	for (var p in this._musics) {
 		if (this._musics.hasOwnProperty(p) && this._musics[p]) {
-			this._musics[p].stop();
+			this._musics[p].unload();
 			delete this._musics[p];
 		}
 	}
+	this._pausedSounds.length = 0;
 }
 
 gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete, resources) {
 	resources = resources || this._resources;
-
     var files = [];
 	for(var i = 0, len = resources.length;i<len;++i) {
 		var res = resources[i];
@@ -264,10 +327,8 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete
 
     var loaded = 0;
     function onLoad(audioFile) {
-        console.log("loaded" + audioFile);
         loaded++;
         if (loaded === files.length) {
-            console.log("All audio loaded");
             return onComplete();
         }
 
@@ -277,13 +338,12 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete
 	var that = this;
     for(var i = 0;i<files.length;++i) {
         (function(audioFile) {
-            console.log("Loading" + audioFile)
-            var sound = new Howl({
-              src: [audioFile], //TODO: ogg, mp3...
-              preload: true,
-              onload: onLoad.bind(that, audioFile),
-              onloaderror: onLoad.bind(that, audioFile)
-            });
+            var sound = new XMLHttpRequest();
+            sound.addEventListener('load', onLoad.bind(that, audioFile));
+            sound.addEventListener('error', onLoad.bind(that, audioFile));
+            sound.addEventListener('abort', onLoad.bind(that, audioFile));
+            sound.open('GET', audioFile);
+            sound.send();
         })(files[i]);
     }
 }

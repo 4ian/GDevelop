@@ -1,13 +1,19 @@
 find_package(Git)
 
 if(GIT_FOUND)
-	EXECUTE_PROCESS(
-       		COMMAND ${GIT_EXECUTABLE} describe --tags
-       		OUTPUT_VARIABLE GD_VERSION_STR
-       		RESULT_VARIABLE GIT_DESCRIBE_RESULT
-       		ERROR_VARIABLE GIT_DESCRIBE_ERROR
-       		OUTPUT_STRIP_TRAILING_WHITESPACE
-   	)
+
+	# Retrieving GDevelop version from Git tags is disabled as GDevelop 5
+	# is being developed and we still want the old IDE version to stay at 4.
+	# The old IDE has the same version number as GDCore/libGD.js
+	# Hence, version of GDevelop 4 is manually specified in CMakeLists.txt
+	# EXECUTE_PROCESS(
+    #    		COMMAND ${GIT_EXECUTABLE} describe --tags
+    #    		OUTPUT_VARIABLE GD_VERSION_STR
+    #    		RESULT_VARIABLE GIT_DESCRIBE_RESULT
+    #    		ERROR_VARIABLE GIT_DESCRIBE_ERROR
+    #    		OUTPUT_STRIP_TRAILING_WHITESPACE
+	# )
+	set(GD_VERSION_STR ${CMAKE_ARGV4})
 
 	set(VERSIONPRIV_PATH "${CMAKE_ARGV3}/VersionPriv.h")
 	set(ORIGINAL_CONTENT " ")

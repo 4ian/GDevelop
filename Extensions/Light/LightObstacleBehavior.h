@@ -27,69 +27,73 @@ freely, subject to the following restrictions:
 #ifndef LIGHTOBSTACLEBEHAVIOR_H
 #define LIGHTOBSTACLEBEHAVIOR_H
 
-#include "GDCpp/Runtime/Project/Behavior.h"
-#include "GDCpp/Runtime/RuntimeObject.h"
-#include "Light.h"
-#include "LightManager.h"
 #include <map>
 #include <set>
+#include "GDCpp/Runtime/Project/Behavior.h"
+#include "GDCpp/Runtime/RuntimeObject.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
-namespace gd { class SerializerElement; }
-namespace gd { class Layout; }
+#include "Light.h"
+#include "LightManager.h"
+namespace gd {
+class SerializerElement;
+}
+namespace gd {
+class Layout;
+}
 class LightObstacleBehaviorEditor;
 
 /**
  * Behavior that set an object as an obstacle for light objects
  */
-class GD_EXTENSION_API LightObstacleBehavior : public Behavior
-{
-friend class LightObstacleBehaviorEditor;
+class GD_EXTENSION_API LightObstacleBehavior : public Behavior {
+  friend class LightObstacleBehaviorEditor;
 
-public:
-    LightObstacleBehavior();
-    virtual ~LightObstacleBehavior();
-    virtual Behavior* Clone() const { return new LightObstacleBehavior(*this);}
+ public:
+  LightObstacleBehavior();
+  virtual ~LightObstacleBehavior();
+  virtual Behavior* Clone() const { return new LightObstacleBehavior(*this); }
 
-    /**
-     * Access to the object owning the behavior
-     */
-    inline RuntimeObject * GetObject() {return object;};
+  /**
+   * Access to the object owning the behavior
+   */
+  inline RuntimeObject* GetObject() { return object; };
 
-    /**
-     * Access to the object owning the behavior
-     */
-    inline const RuntimeObject * GetObject() const {return object;};
+  /**
+   * Access to the object owning the behavior
+   */
+  inline const RuntimeObject* GetObject() const { return object; };
 
-    virtual void OnDeActivate();
-    virtual void OnActivate();
+  virtual void OnDeActivate();
+  virtual void OnActivate();
 
-private:
+ private:
+#if defined(GD_IDE_ONLY)
+  /**
+   * Called when user wants to edit the behavior.
+   */
+  virtual void EditBehavior(wxWindow* parent,
+                            gd::Project& game_,
+                            gd::Layout* scene,
+                            gd::MainFrameWrapper& mainFrameWrapper_);
+#endif
 
-    #if defined(GD_IDE_ONLY)
-    /**
-     * Called when user wants to edit the behavior.
-     */
-    virtual void EditBehavior( wxWindow* parent, gd::Project & game_, gd::Layout * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
-    #endif
+  virtual void DoStepPostEvents(RuntimeScene& scene);
 
-    virtual void DoStepPostEvents(RuntimeScene & scene);
+  /**
+   * Tool function
+   */
+  sf::Vector2f RotatePoint(const sf::Vector2f& point, float angle);
 
-    /**
-     * Tool function
-     */
-    sf::Vector2f RotatePoint( const sf::Vector2f& point, float angle );
+  std::vector<Wall*> wallsOfObject;
+  float objectOldX;
+  float objectOldY;
+  float objectOldAngle;
+  float objectOldWidth;
+  float objectOldHeight;
 
-    std::vector <Wall*> wallsOfObject;
-    float objectOldX;
-    float objectOldY;
-    float objectOldAngle;
-    float objectOldWidth;
-    float objectOldHeight;
+  bool disabled;
 
-    bool disabled;
-
-    std::shared_ptr<Light_Manager> manager;
+  std::shared_ptr<Light_Manager> manager;
 };
 
-#endif // LIGHTOBSTACLEBEHAVIOR_H
-
+#endif  // LIGHTOBSTACLEBEHAVIOR_H

@@ -279,7 +279,7 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     
     bottomSizer->Add(localeBmp, 0, wxALL|wxALIGN_CENTER_VERTICAL, 4);
     
-    m_hyperLink572 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help to translate GD in your language"), wxT("https://crowdin.com/project/gdevelop"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink572 = new wxHyperlinkCtrl(this, wxID_ANY, _("Help by translating GD to your language"), wxT("https://crowdin.com/project/gdevelop"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
     m_hyperLink572->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink572->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink572->SetVisitedColour(wxColour(wxT("#FF0000")));
@@ -393,4 +393,56 @@ LayersEditorPanelBase::~LayersEditorPanelBase()
     m_auimgr->UnInit();
     delete m_auimgr;
 
+}
+
+ExternalEditorPanelBase::ExternalEditorPanelBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+    : wxPanel(parent, id, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxCraftergfm8VaInitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer119 = new wxFlexGridSizer(0, 0, 0, 0);
+    flexGridSizer119->SetFlexibleDirection( wxBOTH );
+    flexGridSizer119->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer119->AddGrowableCol(0);
+    flexGridSizer119->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer119);
+    
+    wxFlexGridSizer* flexGridSizer121 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer121->SetFlexibleDirection( wxBOTH );
+    flexGridSizer121->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer119->Add(flexGridSizer121, 1, wxALL|wxALIGN_CENTER, 5);
+    
+    captionText = new wxStaticText(this, wxID_ANY, _("The scene is edited in a separate window"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer121->Add(captionText, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    
+    loadingProgress = new wxGauge(this, wxID_ANY, 100, wxDefaultPosition, wxSize(-1,-1), wxGA_HORIZONTAL);
+    loadingProgress->SetValue(10);
+    
+    flexGridSizer121->Add(loadingProgress, 0, wxALL|wxEXPAND, 5);
+    
+    openButton = new wxButton(this, wxID_ANY, _("Open the scene editor"), wxDefaultPosition, wxSize(-1,-1), 0);
+    
+    flexGridSizer121->Add(openButton, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 5);
+    
+    SetName(wxT("ExternalEditorPanelBase"));
+    SetSize(-1,-1);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    // Connect events
+    openButton->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ExternalEditorPanelBase::onOpenEditorClicked), NULL, this);
+    
+}
+
+ExternalEditorPanelBase::~ExternalEditorPanelBase()
+{
+    openButton->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(ExternalEditorPanelBase::onOpenEditorClicked), NULL, this);
+    
 }

@@ -18,10 +18,14 @@
 #include "LayoutEditorPropertiesPnl.h"
 #include "ObjectsEditor.h"
 #include "LayersEditorPanel.h"
+#include "ExternalEditorPanel.h"
 #include "../MainFrame.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"
+#include "GDCore/IDE/Dialogs/ExternalEditor/ExternalEditor.h"
+#include "GDCore/IDE/ProjectStripper.h"
+#include "GDCore/Tools/HexToRgb.h"
 
 using namespace gd;
 
@@ -45,10 +49,11 @@ BEGIN_EVENT_TABLE(ExternalLayoutEditor,wxPanel)
 END_EVENT_TABLE()
 
 ExternalLayoutEditor::ExternalLayoutEditor(wxWindow* parent, gd::Project & project_, gd::ExternalLayout & externalLayout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
-layoutEditorCanvas(NULL),
-externalLayout(externalLayout_),
-project(project_),
-mainFrameWrapper(mainFrameWrapper_)
+	layoutEditorCanvas(NULL),
+	externalLayout(externalLayout_),
+	project(project_),
+	mainFrameWrapper(mainFrameWrapper_),
+	isEditorDisplayed(true)
 {
     gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
 
@@ -129,13 +134,107 @@ mainFrameWrapper(mainFrameWrapper_)
     Connect(ID_SCROLLBAR2,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&ExternalLayoutEditor::OnscrollBar2Scroll);
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_DROPDOWN,(wxObjectEventFunction)&ExternalLayoutEditor::OnparentSceneComboBoxDropDown);
 
+	m_mgr.SetManagedWindow( this );
+
+	externalEditorPanel = new ExternalEditorPanel(corePanel);
+	FlexGridSizer3->Add(externalEditorPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+ 	externalEditorPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&ExternalLayoutEditor::OnexternalEditorPanelResize,0,this);
+	mainFrameWrapper.GetMainEditor()->Connect(wxEVT_MOVE,(wxObjectEventFunction)&ExternalLayoutEditor::OnexternalEditorPanelMoved,0,this);
+	externalEditorPanel->OnOpenEditor([this]() {
+		if (!externalLayoutEditor) return;
+
+		if (externalLayoutEditor->IsLaunchedAndConnected())
+			externalLayoutEditor->Show();
+		else
+			externalLayoutEditor->Launch("external-layout-editor", externalLayout.GetName());
+	});
+
 	//Prepare pane manager
-    m_mgr.SetManagedWindow( this );
     m_mgr.AddPane( corePanel, wxAuiPaneInfo().Name( wxT( "LayoutPanel" ) ).Center().CloseButton( false ).Caption( _( "Scene's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
 
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
 
     Refresh();
+}
+
+void ExternalLayoutEditor::CreateExternalLayoutEditor()
+{
+	externalLayoutEditor = std::shared_ptr<gd::ExternalEditor>(new gd::ExternalEditor);
+	externalLayoutEditor->OnSendUpdate([this](gd::String scope) {
+		if (scope == "instances")
+        {
+			gd::SerializerElement serializedInstances;
+			this->externalLayout.GetInitialInstances().SerializeTo(serializedInstances);
+			return serializedInstances;
+		}
+
+		gd::SerializerElement serializedProject;
+		gd::Project strippedProject = project;
+		gd::ProjectStripper::StripProjectForExternalLayoutEdition(strippedProject, this->externalLayout.GetName());
+		strippedProject.SerializeTo(serializedProject);
+
+		return serializedProject;
+	});
+	externalLayoutEditor->OnUpdateReceived([this](gd::SerializerElement object, gd::String scope) {
+		std::cout << "Updating \"" << scope << "\" from the external editor." << std::endl;
+
+		gd::String name = externalLayout.GetAssociatedLayout();
+	    gd::Layout * layout = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
+		if (scope == "instances")
+			this->externalLayout.GetInitialInstances().UnserializeFrom(object);
+		else if (scope == "uiSettings")
+			this->externalLayout.GetAssociatedSettings().UnserializeFrom(object);
+		else if (scope == "windowTitle" && layout)
+			layout->SetWindowDefaultTitle(object.GetValue().GetString());
+		else if (scope == "layers" && layout)
+		{
+			layout->UnserializeLayersFrom(object);
+			if (layersEditor) layersEditor->Refresh();
+		}
+		else if (scope == "backgroundColor" && layout)
+		{
+			std::map<gd::String, unsigned int> rgbColor = {
+				{"r", 0}, {"g", 0}, {"b", 0}
+			};
+			HexToRgb(object.GetValue().GetString().To<int>(), rgbColor);
+			layout->SetBackgroundColor(rgbColor["r"], rgbColor["g"], rgbColor["b"]);
+		}
+		else
+		{
+			std::cout << "Updating \"" << scope << "\" is not supported." << std::endl;
+		}
+	});
+	externalLayoutEditor->OnEditObject([this](const gd::String & objectName){
+		gd::String name = externalLayout.GetAssociatedLayout();
+	    gd::Layout * layout = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
+		if (!objectsEditor || !layout) return;
+
+		externalLayoutEditor->Hide(true);
+		if (layout->HasObjectNamed(objectName))
+		{
+			objectsEditor->SelectObject(layout->GetObject(objectName), false);
+			objectsEditor->EditObject(layout->GetObject(objectName), false);
+		}
+		else if (project.HasObjectNamed(objectName))
+		{
+			objectsEditor->SelectObject(project.GetObject(objectName), true);
+			objectsEditor->EditObject(project.GetObject(objectName), true);
+		}
+		else
+		{
+			std::cout << "Could not find object \"" << objectName << "\" to edit." << std::endl;
+		}
+
+		UpdateExternalLayoutEditorSize(true);
+		externalLayoutEditor->Show();
+	});
+	externalLayoutEditor->OnLaunchPreview([this](){
+		if (layoutEditorCanvas) layoutEditorCanvas->LaunchPreview();
+	});
+	externalLayoutEditor->OnLaunched([this]() {
+		externalEditorPanel->HideLoader();
+	});
+	externalLayoutEditor->Launch("external-layout-editor", externalLayout.GetName());
 }
 
 ExternalLayoutEditor::~ExternalLayoutEditor()
@@ -170,6 +269,12 @@ void ExternalLayoutEditor::OnResize(wxSizeEvent& event)
     contextPanel->SetSize(GetSize().GetWidth(), contextPanel->GetSize().GetHeight());
     layoutPanel->SetPosition(wxPoint(0,contextPanel->GetSize().GetHeight()));
     layoutPanel->SetSize(GetSize().GetWidth(),GetSize().GetHeight()-contextPanel->GetSize().GetHeight());
+	if (externalEditorPanel)
+	{
+		externalEditorPanel->SetPosition(wxPoint(0,contextPanel->GetSize().GetHeight()));
+		externalEditorPanel->SetSize(GetSize().GetWidth(),GetSize().GetHeight()-contextPanel->GetSize().GetHeight());
+		UpdateExternalLayoutEditorSize();
+	}
 }
 
 void ExternalLayoutEditor::OnscenePanelResize(wxSizeEvent& event)
@@ -179,6 +284,29 @@ void ExternalLayoutEditor::OnscenePanelResize(wxSizeEvent& event)
 
     scrollBar1->SetSize(0, layoutPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight(), layoutPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), scrollBar1->GetSize().GetHeight());
     scrollBar2->SetSize(layoutPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), 0, scrollBar2->GetSize().GetWidth(), layoutPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
+}
+
+void ExternalLayoutEditor::UpdateExternalLayoutEditorSize(bool force)
+{
+	if (!externalLayoutEditor) return;
+	if (!isEditorDisplayed && !force) return;
+
+	auto rect = corePanel->GetScreenRect();
+	rect.SetY(rect.GetY() + contextPanel->GetSize().GetHeight());
+	rect.SetHeight(rect.GetHeight() - contextPanel->GetSize().GetHeight());
+	externalLayoutEditor->SetBounds(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
+}
+
+void ExternalLayoutEditor::OnexternalEditorPanelMoved(wxMoveEvent& event)
+{
+	UpdateExternalLayoutEditorSize();
+	event.Skip();
+}
+
+void ExternalLayoutEditor::OnexternalEditorPanelResize(wxSizeEvent& event)
+{
+	UpdateExternalLayoutEditorSize();
+	event.Skip();
 }
 
 void ExternalLayoutEditor::OnscrollBar2Scroll(wxScrollEvent& event)
@@ -191,10 +319,25 @@ void ExternalLayoutEditor::OnscrollBar1Scroll(wxScrollEvent& event)
     layoutEditorCanvas->OnhScrollbarScroll(event);
 }
 
-void ExternalLayoutEditor::ForceRefreshRibbonAndConnect()
+void ExternalLayoutEditor::EditorDisplayed()
 {
-    mainFrameWrapper.SetRibbonPage(_("Scene"));
+	isEditorDisplayed = true;
+	mainFrameWrapper.SetRibbonPage(_("Scene"));
     if (layoutEditorCanvas) layoutEditorCanvas->ConnectEvents();
+	if (externalLayoutEditor)
+	{
+		UpdateExternalLayoutEditorSize();
+		externalLayoutEditor->Show();
+	}
+}
+
+void ExternalLayoutEditor::EditorNotDisplayed()
+{
+	isEditorDisplayed = false;
+	if (externalLayoutEditor)
+	{
+		externalLayoutEditor->Hide();
+	}
 }
 
 void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
@@ -205,15 +348,29 @@ void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
 
 void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 {
+    bool useExternalEditor = false;
+    wxConfigBase::Get()->Read("/SceneEditor/ExternalSceneEditor", &useExternalEditor, false);
+
     if ( &layout == &emptyLayout )
     {
         layoutPanel->Hide();
+        externalEditorPanel->Hide();
         helpPanel->Show();
     }
     else
     {
-        layoutPanel->Show();
-        helpPanel->Hide();
+		if (useExternalEditor)
+		{
+	        layoutPanel->Hide();
+	        externalEditorPanel->Show();
+	        helpPanel->Hide();
+
+	        CreateExternalLayoutEditor();
+		} else {
+	        layoutPanel->Show();
+	        externalEditorPanel->Hide();
+	        helpPanel->Hide();
+		}
 
         gd::InitialInstancesContainer & instanceContainer = externalLayout.GetInitialInstances();
 
@@ -256,8 +413,20 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
         wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
         m_mgr.LoadPerspective(perspective);
 
+		objectsEditor->OnChange([this](gd::String changeScope) {
+			if (!externalLayoutEditor) return;
+
+			if (changeScope == "object-added")
+				externalLayoutEditor->SendUpdate("", true);
+			else
+				externalLayoutEditor->SetDirty();
+		});
+		layersEditor->OnChange([this](gd::String changeScope) {
+			if (externalLayoutEditor) externalLayoutEditor->SetDirty();
+		});
+
         m_mgr.Update();
-        ForceRefreshRibbonAndConnect();
+        EditorDisplayed();
     }
 
     //Save the choice
@@ -268,6 +437,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 
 void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
 {
+	if (externalLayoutEditor) externalLayoutEditor->Show();
     gd::String name = parentSceneComboBox->GetValue();
     gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 
@@ -287,6 +457,7 @@ void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
  */
 void ExternalLayoutEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
 {
+	if (externalLayoutEditor) externalLayoutEditor->Hide(true);
     parentSceneComboBox->Clear();
     parentSceneComboBox->Append(_("No layout"));
 

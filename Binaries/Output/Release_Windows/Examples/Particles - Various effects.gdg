@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <project firstLayout="">
-    <gdVersion build="84" major="3" minor="6" revision="0" />
-    <properties linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
+    <gdVersion build="97" major="4" minor="0" revision="0" />
+    <properties folderProject="false" linuxExecutableFilename="" macExecutableFilename="" orientation="default" packageName="" projectFile="C:\Users\Maciel\Programacion\gits\GD\Binaries\Output\Release_Windows\Examples\Particles - Various effects.gdg" useExternalSourceFiles="false" winExecutableFilename="" winExecutableIconFile="">
         <name>Project</name>
         <author></author>
         <windowWidth>800</windowWidth>
         <windowHeight>600</windowHeight>
-        <latestCompilationDirectory></latestCompilationDirectory>
+        <latestCompilationDirectory>C:\Users\Maciel\AppData\Local\Temp\GDTemporaries\JSCocosExportParticles</latestCompilationDirectory>
         <maxFPS>60</maxFPS>
         <minFPS>10</minFPS>
         <verticalSync>false</verticalSync>
+        <platformSpecificAssets />
+        <loadingScreen showGDevelopSplash="true" />
         <extensions>
             <extension name="BuiltinObject" />
             <extension name="BuiltinAudio" />
@@ -34,6 +36,7 @@
         </extensions>
         <platforms>
             <platform name="GDevelop C++ platform" />
+            <platform name="GDevelop JS platform" />
         </platforms>
         <currentPlatform>GDevelop C++ platform</currentPlatform>
     </properties>
@@ -47,8 +50,8 @@
     <objectsGroups />
     <variables />
     <layouts>
-        <layout b="0" disableInputWhenNotFocused="true" mangledName="Nouvelle_32sc_232ne" name="Nouvelle scène" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="0" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="0">
-            <uiSettings associatedLayout="" grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
+        <layout b="0" disableInputWhenNotFocused="true" mangledName="Scene" name="Scene" oglFOV="90.000000" oglZFar="500.000000" oglZNear="1.000000" r="0" standardSortMethod="true" stopSoundsOnStartup="true" title="" v="0">
+            <uiSettings grid="false" gridB="255" gridG="180" gridHeight="32" gridOffsetX="0" gridOffsetY="0" gridR="158" gridWidth="32" snap="true" windowMask="false" zoomFactor="1.000000" />
             <objectsGroups />
             <variables />
             <instances>
@@ -99,47 +102,47 @@
                 </instance>
             </instances>
             <objects>
-                <object additive="true" alphaParam="Mutable" angleParam="Mutable" blueParam="Random" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="10.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="300.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Random" maxParticleNb="5000" name="Fire" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="30.000000" particleBlue1="50.000000" particleBlue2="0.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="-100.000000" particleGravityZ="0.000000" particleGreen1="50.000000" particleGreen2="204.000000" particleLifeTimeMax="2.500000" particleLifeTimeMin="0.500000" particleRed1="240.000000" particleRed2="1.000000" particleSize1="100.000000" particleSize2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="10.000000" rendererParam2="20.000000" rendererType="Quad" sizeParam="Mutable" tank="-1.000000" textureParticleName="Fire" type="ParticleSystem::ParticleEmitter" zoneRadius="5.000000">
+                <object additive="true" alphaParam="Mutable" angleParam="Mutable" blueParam="Mutable" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="10.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="30.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Mutable" maxParticleNb="200" name="Fire" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="30.000000" particleBlue1="50.000000" particleBlue2="0.000000" particleEditionSimpleMode="true" particleGravityX="0.000000" particleGravityY="-100.000000" particleGravityZ="0.000000" particleGreen1="50.000000" particleGreen2="191.000000" particleLifeTimeMax="2.500000" particleLifeTimeMin="0.500000" particleRed1="240.000000" particleRed2="255.000000" particleSize1="100.000000" particleSize2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Mutable" rendererParam1="10.000000" rendererParam2="20.000000" rendererType="Quad" sizeParam="Mutable" tank="-1.000000" textureParticleName="Fire" type="ParticleSystem::ParticleEmitter" zoneRadius="5.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
-                <object additive="false" alphaParam="Mutable" angleParam="Random" blueParam="Enabled" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="0.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="200.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Enabled" maxParticleNb="5000" name="Smoke" particleAlpha1="160.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="360.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="50.000000" particleBlue2="0.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="-100.000000" particleGravityZ="0.000000" particleGreen1="50.000000" particleGreen2="0.800000" particleLifeTimeMax="2.500000" particleLifeTimeMin="0.500000" particleRed1="50.000000" particleRed2="1.000000" particleSize1="20.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="30.000000" rendererParam2="30.000000" rendererType="Quad" sizeParam="Mutable" tank="-1.000000" textureParticleName="Fire" type="ParticleSystem::ParticleEmitter" zoneRadius="7.000000">
+                <object additive="false" alphaParam="Mutable" angleParam="Random" blueParam="Mutable" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="360.000000" emitterForceMax="0.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="150.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Mutable" maxParticleNb="150" name="Smoke" particleAlpha1="160.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="360.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="255.000000" particleBlue2="149.000000" particleEditionSimpleMode="true" particleGravityX="0.000000" particleGravityY="-100.000000" particleGravityZ="0.000000" particleGreen1="250.000000" particleGreen2="144.000000" particleLifeTimeMax="2.500000" particleLifeTimeMin="0.500000" particleRed1="253.000000" particleRed2="135.000000" particleSize1="20.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Mutable" rendererParam1="30.000000" rendererParam2="30.000000" rendererType="Quad" sizeParam="Mutable" tank="-1.000000" textureParticleName="Fire" type="ParticleSystem::ParticleEmitter" zoneRadius="15.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
-                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Random" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="65.000000" emitterForceMin="25.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="200.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Random" maxParticleNb="5000" name="Particles" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="125.000000" particleBlue2="204.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="250.000000" particleGreen1="125.000000" particleGreen2="204.000000" particleLifeTimeMax="2.500000" particleLifeTimeMin="0.500000" particleRed1="204.000000" particleRed2="255.000000" particleSize1="0.000000" particleSize2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Random" rendererParam1="8.000000" rendererParam2="1.000000" rendererType="Point" sizeParam="Random" tank="-1.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="2.000000">
+                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Random" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="65.000000" emitterForceMin="25.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="200.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Random" maxParticleNb="5000" name="Particles" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="125.000000" particleBlue2="204.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="250.000000" particleGreen1="125.000000" particleGreen2="204.000000" particleLifeTimeMax="2.500000" particleLifeTimeMin="0.500000" particleRed1="204.000000" particleRed2="255.000000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Random" rendererParam1="8.000000" rendererParam2="1.000000" rendererType="Point" sizeParam="Random" tank="-1.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="2.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
-                <object additive="false" alphaParam="Mutable" angleParam="Random" blueParam="Random" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="0.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="100.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Random" maxParticleNb="5000" name="Beam" particleAlpha1="250.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="204.000000" particleBlue2="255.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="0.000000" particleGravityZ="500.000000" particleGreen1="127.000000" particleGreen2="230.000000" particleLifeTimeMax="2.000000" particleLifeTimeMin="0.500000" particleRed1="153.000000" particleRed2="180.000000" particleSize1="0.000000" particleSize2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Random" rendererParam1="3.000000" rendererParam2="1.000000" rendererType="Line" sizeParam="Random" tank="-1.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="3.000000">
+                <object additive="false" alphaParam="Mutable" angleParam="Random" blueParam="Random" destroyWhenNoParticles="false" emissionEditionSimpleMode="false" emitterAngleA="-55.000000" emitterAngleB="-35.000000" emitterForceMax="5.000000" emitterForceMin="0.000000" emitterXDirection="0.000000" emitterYDirection="1.000000" emitterZDirection="0.000000" flow="100.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Random" maxParticleNb="151" name="Beam" particleAlpha1="250.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="204.000000" particleBlue2="255.000000" particleEditionSimpleMode="false" particleGravityX="100.000000" particleGravityY="0.000000" particleGravityZ="500.000000" particleGreen1="127.000000" particleGreen2="230.000000" particleLifeTimeMax="2.000000" particleLifeTimeMin="0.500000" particleRed1="153.000000" particleRed2="180.000000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Random" rendererParam1="100.000000" rendererParam2="3.000000" rendererType="Line" sizeParam="Random" tank="-1.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="20.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
-                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Random" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="0.000000" emitterForceMax="65.000000" emitterForceMin="25.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="0.000000" flow="300.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Random" maxParticleNb="5000" name="Beam2" particleAlpha1="125.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="255.000000" particleBlue2="204.000000" particleEditionSimpleMode="false" particleGravityX="-500.000000" particleGravityY="0.000000" particleGravityZ="0.000000" particleGreen1="204.000000" particleGreen2="125.000000" particleLifeTimeMax="5.000000" particleLifeTimeMin="0.500000" particleRed1="127.000000" particleRed2="0.500000" particleSize1="0.000000" particleSize2="0.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="0.500000" rendererParam2="2.000000" rendererType="Line" sizeParam="Random" tank="-1.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="3.000000">
+                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Random" destroyWhenNoParticles="false" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="0.000000" emitterForceMax="65.000000" emitterForceMin="25.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="0.000000" flow="50.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Random" maxParticleNb="5000" name="Beam2" particleAlpha1="125.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="255.000000" particleBlue2="204.000000" particleEditionSimpleMode="false" particleGravityX="-500.000000" particleGravityY="0.000000" particleGravityZ="0.000000" particleGreen1="204.000000" particleGreen2="125.000000" particleLifeTimeMax="5.000000" particleLifeTimeMin="0.500000" particleRed1="127.000000" particleRed2="0.500000" particleSize1="100.000000" particleSize2="100.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Enabled" rendererParam1="10.000000" rendererParam2="3.000000" rendererType="Line" sizeParam="Random" tank="-1.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="10.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
-                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Random" destroyWhenNoParticles="true" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="180.000000" emitterForceMax="100.000000" emitterForceMin="25.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="400.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Enabled" maxParticleNb="5000" name="Pyro" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="204.000000" particleBlue2="255.000000" particleEditionSimpleMode="false" particleGravityX="0.000000" particleGravityY="-100.000000" particleGravityZ="0.000000" particleGreen1="127.000000" particleGreen2="1.000000" particleLifeTimeMax="1.000000" particleLifeTimeMin="0.500000" particleRed1="127.000000" particleRed2="230.000000" particleSize1="100.000000" particleSize2="1.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Random" rendererParam1="0.060000" rendererParam2="3.000000" rendererType="Line" sizeParam="Mutable" tank="600.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="7.000000">
+                <object additive="true" alphaParam="Mutable" angleParam="Random" blueParam="Random" destroyWhenNoParticles="true" emissionEditionSimpleMode="true" emitterAngleA="0.000000" emitterAngleB="360.000000" emitterForceMax="100.000000" emitterForceMin="25.000000" emitterXDirection="0.000000" emitterYDirection="0.000000" emitterZDirection="1.000000" flow="70.000000" friction="2.000000" gravityEditionSimpleMode="true" greenParam="Enabled" maxParticleNb="151" name="Pyro" particleAlpha1="204.000000" particleAlpha2="0.000000" particleAlphaRandomness1="0.000000" particleAlphaRandomness2="0.000000" particleAngle1="0.000000" particleAngle2="0.000000" particleAngleRandomness1="0.000000" particleAngleRandomness2="0.000000" particleBlue1="204.000000" particleBlue2="255.000000" particleEditionSimpleMode="false" particleGravityX="-0.000080" particleGravityY="-200.000000" particleGravityZ="0.000000" particleGreen1="127.000000" particleGreen2="1.000000" particleLifeTimeMax="1.000000" particleLifeTimeMin="0.500000" particleRed1="127.000000" particleRed2="230.000000" particleSize1="100.000000" particleSize2="1.000000" particleSizeRandomness1="0.000000" particleSizeRandomness2="0.000000" redParam="Random" rendererParam1="8.000000" rendererParam2="8.000000" rendererType="Line" sizeParam="Mutable" tank="80.000000" textureParticleName="" type="ParticleSystem::ParticleEmitter" zoneRadius="25.000000">
                     <variables />
-                    <automatisms />
+                    <behaviors />
                 </object>
             </objects>
             <events>
                 <event disabled="false" folded="false">
                     <type>BuiltinCommonInstructions::Standard</type>
                     <conditions>
-                        <condition>
+                        <instruction>
                             <type inverted="false" value="Timer" />
                             <parameters>
                                 <parameter></parameter>
-                                <parameter>Random(0.3)+1</parameter>
+                                <parameter>1</parameter>
                                 <parameter>&quot;Creating&quot;</parameter>
                             </parameters>
-                            <subConditions />
-                        </condition>
+                            <subInstructions />
+                        </instruction>
                     </conditions>
                     <actions>
-                        <action>
+                        <instruction>
                             <type inverted="false" value="Create" />
                             <parameters>
                                 <parameter></parameter>
@@ -148,16 +151,16 @@
                                 <parameter>100+Random(300)</parameter>
                                 <parameter></parameter>
                             </parameters>
-                            <subActions />
-                        </action>
-                        <action>
+                            <subInstructions />
+                        </instruction>
+                        <instruction>
                             <type inverted="false" value="ResetTimer" />
                             <parameters>
                                 <parameter></parameter>
                                 <parameter>&quot;Creating&quot;</parameter>
                             </parameters>
-                            <subActions />
-                        </action>
+                            <subInstructions />
+                        </instruction>
                     </actions>
                     <events />
                 </event>
@@ -167,9 +170,10 @@
                     <cameras>
                         <camera defaultSize="true" defaultViewport="true" height="0.000000" viewportBottom="1.000000" viewportLeft="0.000000" viewportRight="1.000000" viewportTop="0.000000" width="0.000000" />
                     </cameras>
+                    <effects />
                 </layer>
             </layers>
-            <automatismsSharedData />
+            <behaviorsSharedData />
         </layout>
     </layouts>
     <externalEvents />

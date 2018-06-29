@@ -4,19 +4,18 @@
 #include "GDCpp/Extensions/ExtensionBase.h"
 
 /**
- * \brief Standard extension providing conversion ( ToString/ToNumber ) features.
+ * \brief Standard extension providing conversion ( ToString/ToNumber )
+ * features.
  *
  * \ingroup BuiltinExtensions
  */
-class CommonConversionsExtension : public ExtensionBase
-{
-    public:
-        CommonConversionsExtension();
-        virtual ~CommonConversionsExtension() {};
-    protected:
-    private:
+class CommonConversionsExtension : public ExtensionBase {
+ public:
+  CommonConversionsExtension();
+  virtual ~CommonConversionsExtension(){};
+
+ protected:
+ private:
 };
 
-
-#endif // COMMONCONVERSIONSEXTENSION_H
-
+#endif  // COMMONCONVERSIONSEXTENSION_H

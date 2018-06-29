@@ -1,0 +1,25 @@
+/* Mosaic layout */
+.mosaic-gd-dark-theme.mosaic {
+  background-color: #303030 !important;
+}
+
+/* Mosaic window and tile */
+.mosaic-gd-dark-theme .mosaic-window-toolbar {
+  background: #3c4698 !important;
+}
+
+.mosaic-gd-dark-theme .mosaic-window-body {
+  background: #303030 !important;
+}
+
+.mosaic-gd-dark-theme .mosaic-window .mosaic-window-title {
+  color: white !important;
+  font-weight: 400 !important;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Hovered titlebar background */
+.mosaic-gd-dark-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
+.mosaic-gd-dark-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+  background: #3c4698 !important;
+}

@@ -1,0 +1,74 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`HelpIcon renders nothing if the helpPagePath is empty 1`] = `null`;
+
+exports[`HelpIcon renders the icon linking to a help page 1`] = `
+<button
+  disabled={false}
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onKeyDown={[Function]}
+  onKeyUp={[Function]}
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
+  onMouseOut={[Function]}
+  onTouchStart={[Function]}
+  style={
+    Object {
+      "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+      "background": "none",
+      "border": 10,
+      "boxSizing": "border-box",
+      "cursor": "pointer",
+      "display": "inline-block",
+      "fontFamily": "Roboto, sans-serif",
+      "fontSize": 0,
+      "fontWeight": "inherit",
+      "height": 48,
+      "margin": 0,
+      "muiPrepared": true,
+      "outline": "none",
+      "overflow": "visible",
+      "padding": 12,
+      "position": "relative",
+      "textDecoration": "none",
+      "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+      "verticalAlign": null,
+      "width": 48,
+    }
+  }
+  tabIndex={0}
+  type="button"
+>
+  <div
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchStart={[Function]}
+  >
+    <svg
+      onMouseEnter={[Function]}
+      onMouseLeave={[Function]}
+      style={
+        Object {
+          "color": "rgba(0, 0, 0, 0.87)",
+          "display": "inline-block",
+          "fill": "currentColor",
+          "height": 24,
+          "muiPrepared": true,
+          "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+          "userSelect": "none",
+          "width": 24,
+        }
+      }
+      viewBox="0 0 24 24"
+    >
+      <path
+        d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"
+      />
+    </svg>
+  </div>
+</button>
+`;

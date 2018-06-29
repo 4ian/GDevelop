@@ -1,3 +1,4 @@
+#!/bin/bash
 #Get the destination, or copy by default to release directory
 DESTINATION=../../Binaries/Output/Release_Linux/JsPlatform/Runtime/
 if [ "$(uname)" == "Darwin" ]; then
@@ -8,10 +9,10 @@ if [ ! $# -eq 0 ]; then
 fi
 
 #Copy all js files
-echo "Copying GDJS and extensions runtime files (*.js) to '$DESTINATION'..."
+echo "ℹ️ Copying GDJS and extensions runtime files (*.js) to '$DESTINATION'..."
 
 mkdir -p "$DESTINATION"
 cp -R ../Runtime/* "$DESTINATION"
 rsync -r -u --include=*.js --include=*/ --exclude=* ../../Extensions/  "$DESTINATION"/Extensions/
 
-echo "Done."
+echo "✅ Copied GDJS and extensions runtime files (*.js) to '$DESTINATION'."

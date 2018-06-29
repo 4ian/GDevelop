@@ -87,8 +87,8 @@ gdjs.evtTools.camera.centerCamera = function(runtimeScene, object, anticipateMov
     var layer = runtimeScene.getLayer(layer);
     var xOffset = 0; var yOffset = 0;
     if ( anticipateMove && !object.hasNoForces() ) {
-        var objectAverageForce  = object.getAverageForce();
-        var elapsedTimeInSeconds = obj.getElapsedTime(runtimeScene) / 1000;
+        var objectAverageForce = object.getAverageForce();
+        var elapsedTimeInSeconds = object.getElapsedTime(runtimeScene) / 1000;
 
         xOffset = objectAverageForce.getX() * elapsedTimeInSeconds;
         yOffset = objectAverageForce.getY() * elapsedTimeInSeconds;
@@ -104,8 +104,8 @@ gdjs.evtTools.camera.centerCameraWithinLimits = function(runtimeScene, object, l
     var layer = runtimeScene.getLayer(layer);
     var xOffset = 0; var yOffset = 0;
     if ( anticipateMove && !object.hasNoForces() ) {
-        var objectAverageForce  = object.getAverageForce();
-        var elapsedTimeInSeconds = obj.getElapsedTime(runtimeScene) / 1000;
+        var objectAverageForce = object.getAverageForce();
+        var elapsedTimeInSeconds = object.getElapsedTime(runtimeScene) / 1000;
 
         xOffset = objectAverageForce.getX() * elapsedTimeInSeconds;
         yOffset = objectAverageForce.getY() * elapsedTimeInSeconds;

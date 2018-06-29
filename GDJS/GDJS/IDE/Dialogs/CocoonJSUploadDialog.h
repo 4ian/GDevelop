@@ -1,7 +1,7 @@
 /*
  * GDevelop JS Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #ifndef COCOONJSUPLOADDIALOG_H
@@ -11,13 +11,13 @@
 /**
  * \brief Dialog used to explain how to use CocoonJS.
  */
-class CocoonJSUploadDialog : public BaseCocoonJSUploadDialog
-{
-public:
-    CocoonJSUploadDialog(wxWindow* parent, wxString packageLocation);
-    virtual ~CocoonJSUploadDialog();
-protected:
-    virtual void OnCloseBtClicked(wxCommandEvent& event);
+class CocoonJSUploadDialog : public BaseCocoonJSUploadDialog {
+ public:
+  CocoonJSUploadDialog(wxWindow* parent, wxString packageLocation);
+  virtual ~CocoonJSUploadDialog();
+
+ protected:
+  virtual void OnCloseBtClicked(wxCommandEvent& event);
 };
-#endif // COCOONJSUPLOADDIALOG_H
+#endif  // COCOONJSUPLOADDIALOG_H
 #endif

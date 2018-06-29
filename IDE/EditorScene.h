@@ -22,15 +22,17 @@
 #include <wx/ribbon/toolbar.h>
 #include <memory>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-namespace gd {class Layout;}
-namespace gd {class Project;}
-namespace gd {class LayoutEditorCanvas;}
-namespace gd {class ObjectsEditor;}
+namespace gd { class Layout; }
+namespace gd { class Project; }
+namespace gd { class LayoutEditorCanvas; }
+namespace gd { class ObjectsEditor; }
 class LayersEditorPanel;
+namespace gd { class ExternalEditor; }
 class CppLayoutPreviewer;
 class EventsEditor;
 class LayoutEditorPropertiesPnl;
 class InitialPositionBrowserDlg;
+class ExternalEditorPanel;
 
 /**
  * \brief Panel containing all the editors of a layout.
@@ -55,7 +57,13 @@ public:
     /**
      * Can be called by parent so as to refresh ribbon for this editor.
      */
-    void ForceRefreshRibbonAndConnect();
+    void EditorDisplayed();
+
+    /**
+     * Can be called by parent to let the editor know that it's not the editor
+     * displayed and focused.
+     */
+    void EditorNotDisplayed();
 
     /**
      * Return true if the editor can be closed, false otherwise ( i.e. Scene is being previewed )
@@ -69,6 +77,7 @@ protected:
     static const long ID_SCROLLBAR4;
     static const long ID_CUSTOM3;
     static const long ID_PANEL1;
+    static const long ID_PANEL2;
     static const long ID_CUSTOM2;
     static const long ID_PANEL6;
     static const long ID_AUINOTEBOOK1;
@@ -96,16 +105,23 @@ private:
     void OnvScrollbarScrollThumbRelease(wxScrollEvent& event);
     void OnhScrollbarScrollThumbRelease(wxScrollEvent& event);
     //*)
+    void OnexternalEditorPanelResize(wxSizeEvent& event);
+    void OnexternalEditorPanelMoved(wxMoveEvent& event);
+    void OnMainFrameActivate(wxActivateEvent& event);
+    void CreateExternalLayoutEditor(wxWindow * parent = NULL);
+    void UpdateExternalLayoutEditorSize(bool force = false);
 
     //(*Declarations(EditorScene)
     EventsEditor* eventsEditor;
     gd::LayoutEditorCanvas* layoutEditorCanvas;
     wxPanel* scenePanel;
     wxPanel* eventsPanel;
+    wxPanel* externalSceneEditorContainerPanel;
     wxScrollBar* hScrollbar;
     wxAuiNotebook* notebook;
     wxScrollBar* vScrollbar;
     //*)
+    ExternalEditorPanel * externalEditorPanel;
     std::shared_ptr<gd::ObjectsEditor> objectsEditor;
     std::shared_ptr<LayersEditorPanel> layersEditor;
     std::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
@@ -114,6 +130,10 @@ private:
     gd::Project & project;
     gd::Layout & layout;
     gd::MainFrameWrapper mainFrameWrapper;
+
+    std::shared_ptr<gd::ExternalEditor> externalEventsEditor;
+    std::shared_ptr<gd::ExternalEditor> externalLayoutEditor;
+    bool isEditorDisplayed;
 
     wxAuiManager m_mgr;
 

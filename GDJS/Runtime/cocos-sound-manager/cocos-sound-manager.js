@@ -39,8 +39,10 @@ gdjs.CocosEffect.prototype.stop = function() {
 gdjs.CocosEffect.prototype.stopped = function() {
 	return this._stopped;
 };
-gdjs.CocosEffect.prototype.rate = function() {
+gdjs.CocosEffect.prototype.getRate = function() {
 	return 1; //Unsupported
+};
+gdjs.CocosEffect.prototype.setRate = function(rate) { //Unsupported
 };
 gdjs.CocosEffect.prototype.volume = function() {
 	return 1; //Unsupported

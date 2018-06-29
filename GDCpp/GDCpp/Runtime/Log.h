@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef LOG_H_INCLUDED
@@ -15,5 +15,4 @@
  */
 void GD_API GDLogBanner();
 
-#endif // LOG_H_INCLUDED
-
+#endif  // LOG_H_INCLUDED

@@ -1,0 +1,1277 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`StartPage renders the start page with a project 1`] = `
+<div
+  style={
+    Object {
+      "backgroundColor": "#f0f0f0",
+      "display": "flex",
+      "flex": 1,
+      "overflowY": "scroll",
+    }
+  }
+>
+  <div
+    style={
+      Object {
+        "display": "flex",
+        "flexDirection": "column",
+        "minHeight": 350,
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "alignItems": undefined,
+          "display": "flex",
+          "flex": 1,
+          "justifyContent": "center",
+          "marginBottom": 8,
+          "marginTop": 8,
+        }
+      }
+    >
+      <div
+        style={
+          Object {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "maxWidth": 400,
+          }
+        }
+      >
+        <div
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0,0,0,0)",
+              "backgroundColor": "#f0f0f0",
+              "borderRadius": 2,
+              "boxShadow": "0 1px 6px rgba(0, 0, 0, 0.12),
+                     0 1px 4px rgba(0, 0, 0, 0.12)",
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "margin": 10,
+              "muiPrepared": true,
+              "padding": 5,
+              "textAlign": "center",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "width": "100%",
+            }
+          }
+        >
+          <img
+            alt=""
+            src="res/GD-logo-big.png"
+            style={
+              Object {
+                "width": "100%",
+              }
+            }
+          />
+          <p>
+            GDevelop is an easy-to-use game creator with no programming language to learn.
+          </p>
+        </div>
+        <div
+          className={undefined}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0,0,0,0)",
+              "backgroundColor": "#f0f0f0",
+              "borderRadius": 2,
+              "boxShadow": "0 1px 6px rgba(0, 0, 0, 0.12),
+                     0 1px 4px rgba(0, 0, 0, 0.12)",
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "minWidth": "100%",
+              "muiPrepared": true,
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+            }
+          }
+        >
+          <button
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+            style={
+              Object {
+                "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+                "backgroundColor": "#4ab0e4",
+                "border": 10,
+                "borderRadius": 2,
+                "boxSizing": "border-box",
+                "cursor": "pointer",
+                "display": "inline-block",
+                "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+                "fontSize": "inherit",
+                "fontWeight": "inherit",
+                "height": 32,
+                "lineHeight": "32px",
+                "margin": 0,
+                "muiPrepared": true,
+                "outline": "none",
+                "padding": 0,
+                "position": "relative",
+                "textAlign": "center",
+                "textDecoration": "none",
+                "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+                "verticalAlign": null,
+                "width": "100%",
+              }
+            }
+            tabIndex={0}
+            type="button"
+          >
+            <div
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchStart={[Function]}
+            >
+              <div
+                style={
+                  Object {
+                    "backgroundColor": false,
+                    "borderRadius": 2,
+                    "height": 32,
+                    "muiPrepared": true,
+                    "top": 0,
+                    "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+                  }
+                }
+              >
+                <span
+                  style={
+                    Object {
+                      "color": "#ffffff",
+                      "fontSize": 14,
+                      "fontWeight": 500,
+                      "letterSpacing": 0,
+                      "margin": 0,
+                      "muiPrepared": true,
+                      "opacity": 1,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "position": "relative",
+                      "textTransform": "uppercase",
+                      "userSelect": "none",
+                    }
+                  }
+                >
+                  Open Project Manager
+                </span>
+              </div>
+            </div>
+          </button>
+        </div>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": "100%",
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              Close project
+            </span>
+          </div>
+        </button>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": "100%",
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              Search the documentation
+            </span>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div
+      style={
+        Object {
+          "alignItems": "center",
+          "display": "flex",
+          "flex": undefined,
+          "justifyContent": "space-between",
+          "marginBottom": 8,
+          "marginTop": 8,
+        }
+      }
+    >
+      <div>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": 88,
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              About GDevelop
+            </span>
+          </div>
+        </button>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": 88,
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              Gdevelop Forums
+            </span>
+          </div>
+        </button>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": 88,
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              Help and tutorials
+            </span>
+          </div>
+        </button>
+      </div>
+      <div>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOut={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "background": "none",
+              "border": 10,
+              "boxSizing": "border-box",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": 0,
+              "fontWeight": "inherit",
+              "height": 48,
+              "margin": 0,
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "visible",
+              "padding": 12,
+              "position": "relative",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "verticalAlign": null,
+              "width": 48,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              className="icon-facebook"
+              color="rgba(0, 0, 0, 0.87)"
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              style={
+                Object {
+                  "color": "rgba(0, 0, 0, 0.87)",
+                  "display": "inline-block",
+                  "fontSize": 24,
+                  "muiPrepared": true,
+                  "position": "relative",
+                  "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+                  "userSelect": "none",
+                }
+              }
+            />
+          </div>
+        </button>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOut={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "background": "none",
+              "border": 10,
+              "boxSizing": "border-box",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": 0,
+              "fontWeight": "inherit",
+              "height": 48,
+              "margin": 0,
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "visible",
+              "padding": 12,
+              "position": "relative",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "verticalAlign": null,
+              "width": 48,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              className="icon-twitter"
+              color="rgba(0, 0, 0, 0.87)"
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              style={
+                Object {
+                  "color": "rgba(0, 0, 0, 0.87)",
+                  "display": "inline-block",
+                  "fontSize": 24,
+                  "muiPrepared": true,
+                  "position": "relative",
+                  "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+                  "userSelect": "none",
+                }
+              }
+            />
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`StartPage renders the start page with no project opened 1`] = `
+<div
+  style={
+    Object {
+      "backgroundColor": "#f0f0f0",
+      "display": "flex",
+      "flex": 1,
+      "overflowY": "scroll",
+    }
+  }
+>
+  <div
+    style={
+      Object {
+        "display": "flex",
+        "flexDirection": "column",
+        "minHeight": 350,
+        "width": "100%",
+      }
+    }
+  >
+    <div
+      style={
+        Object {
+          "alignItems": undefined,
+          "display": "flex",
+          "flex": 1,
+          "justifyContent": "center",
+          "marginBottom": 8,
+          "marginTop": 8,
+        }
+      }
+    >
+      <div
+        style={
+          Object {
+            "alignItems": "center",
+            "display": "flex",
+            "flexDirection": "column",
+            "justifyContent": "center",
+            "maxWidth": 400,
+          }
+        }
+      >
+        <div
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0,0,0,0)",
+              "backgroundColor": "#f0f0f0",
+              "borderRadius": 2,
+              "boxShadow": "0 1px 6px rgba(0, 0, 0, 0.12),
+                     0 1px 4px rgba(0, 0, 0, 0.12)",
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "margin": 10,
+              "muiPrepared": true,
+              "padding": 5,
+              "textAlign": "center",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "width": "100%",
+            }
+          }
+        >
+          <img
+            alt=""
+            src="res/GD-logo-big.png"
+            style={
+              Object {
+                "width": "100%",
+              }
+            }
+          />
+          <p>
+            GDevelop is an easy-to-use game creator with no programming language to learn.
+          </p>
+        </div>
+        <div
+          className={undefined}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0,0,0,0)",
+              "backgroundColor": "#f0f0f0",
+              "borderRadius": 2,
+              "boxShadow": "0 1px 6px rgba(0, 0, 0, 0.12),
+                     0 1px 4px rgba(0, 0, 0, 0.12)",
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "minWidth": "100%",
+              "muiPrepared": true,
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+            }
+          }
+        >
+          <button
+            disabled={false}
+            onBlur={[Function]}
+            onClick={[Function]}
+            onFocus={[Function]}
+            onKeyDown={[Function]}
+            onKeyUp={[Function]}
+            onMouseDown={[Function]}
+            onMouseEnter={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+            style={
+              Object {
+                "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+                "backgroundColor": "#4ab0e4",
+                "border": 10,
+                "borderRadius": 2,
+                "boxSizing": "border-box",
+                "cursor": "pointer",
+                "display": "inline-block",
+                "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+                "fontSize": "inherit",
+                "fontWeight": "inherit",
+                "height": 32,
+                "lineHeight": "32px",
+                "margin": 0,
+                "muiPrepared": true,
+                "outline": "none",
+                "padding": 0,
+                "position": "relative",
+                "textAlign": "center",
+                "textDecoration": "none",
+                "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+                "verticalAlign": null,
+                "width": "100%",
+              }
+            }
+            tabIndex={0}
+            type="button"
+          >
+            <div
+              onMouseDown={[Function]}
+              onMouseLeave={[Function]}
+              onMouseUp={[Function]}
+              onTouchEnd={[Function]}
+              onTouchStart={[Function]}
+            >
+              <div
+                style={
+                  Object {
+                    "backgroundColor": false,
+                    "borderRadius": 2,
+                    "height": 32,
+                    "muiPrepared": true,
+                    "top": 0,
+                    "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+                  }
+                }
+              >
+                <span
+                  style={
+                    Object {
+                      "color": "#ffffff",
+                      "fontSize": 14,
+                      "fontWeight": 500,
+                      "letterSpacing": 0,
+                      "margin": 0,
+                      "muiPrepared": true,
+                      "opacity": 1,
+                      "paddingLeft": 16,
+                      "paddingRight": 16,
+                      "position": "relative",
+                      "textTransform": "uppercase",
+                      "userSelect": "none",
+                    }
+                  }
+                >
+                  Create a new project
+                </span>
+              </div>
+            </div>
+          </button>
+        </div>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": "100%",
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              Search the documentation
+            </span>
+          </div>
+        </button>
+      </div>
+    </div>
+    <div
+      style={
+        Object {
+          "alignItems": "center",
+          "display": "flex",
+          "flex": undefined,
+          "justifyContent": "space-between",
+          "marginBottom": 8,
+          "marginTop": 8,
+        }
+      }
+    >
+      <div>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": 88,
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              About GDevelop
+            </span>
+          </div>
+        </button>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": 88,
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              Gdevelop Forums
+            </span>
+          </div>
+        </button>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "backgroundColor": "rgba(0, 0, 0, 0)",
+              "border": 10,
+              "borderRadius": 2,
+              "boxSizing": "border-box",
+              "color": "rgba(0, 0, 0, 0.87)",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": "inherit",
+              "fontWeight": "inherit",
+              "height": 32,
+              "lineHeight": "32px",
+              "margin": 0,
+              "minWidth": 88,
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "hidden",
+              "padding": 0,
+              "position": "relative",
+              "textAlign": "center",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "userSelect": "none",
+              "verticalAlign": null,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              style={
+                Object {
+                  "fontSize": 14,
+                  "fontWeight": 500,
+                  "letterSpacing": 0,
+                  "muiPrepared": true,
+                  "paddingLeft": 16,
+                  "paddingRight": 16,
+                  "position": "relative",
+                  "textTransform": "uppercase",
+                  "verticalAlign": "middle",
+                }
+              }
+            >
+              Help and tutorials
+            </span>
+          </div>
+        </button>
+      </div>
+      <div>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOut={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "background": "none",
+              "border": 10,
+              "boxSizing": "border-box",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": 0,
+              "fontWeight": "inherit",
+              "height": 48,
+              "margin": 0,
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "visible",
+              "padding": 12,
+              "position": "relative",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "verticalAlign": null,
+              "width": 48,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              className="icon-facebook"
+              color="rgba(0, 0, 0, 0.87)"
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              style={
+                Object {
+                  "color": "rgba(0, 0, 0, 0.87)",
+                  "display": "inline-block",
+                  "fontSize": 24,
+                  "muiPrepared": true,
+                  "position": "relative",
+                  "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+                  "userSelect": "none",
+                }
+              }
+            />
+          </div>
+        </button>
+        <button
+          disabled={false}
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onKeyDown={[Function]}
+          onKeyUp={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOut={[Function]}
+          onTouchStart={[Function]}
+          style={
+            Object {
+              "WebkitTapHighlightColor": "rgba(0, 0, 0, 0)",
+              "background": "none",
+              "border": 10,
+              "boxSizing": "border-box",
+              "cursor": "pointer",
+              "display": "inline-block",
+              "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
+              "fontSize": 0,
+              "fontWeight": "inherit",
+              "height": 48,
+              "margin": 0,
+              "muiPrepared": true,
+              "outline": "none",
+              "overflow": "visible",
+              "padding": 12,
+              "position": "relative",
+              "textDecoration": "none",
+              "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+              "verticalAlign": null,
+              "width": 48,
+            }
+          }
+          tabIndex={0}
+          type="button"
+        >
+          <div
+            onMouseDown={[Function]}
+            onMouseLeave={[Function]}
+            onMouseUp={[Function]}
+            onTouchEnd={[Function]}
+            onTouchStart={[Function]}
+          >
+            <span
+              className="icon-twitter"
+              color="rgba(0, 0, 0, 0.87)"
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              style={
+                Object {
+                  "color": "rgba(0, 0, 0, 0.87)",
+                  "display": "inline-block",
+                  "fontSize": 24,
+                  "muiPrepared": true,
+                  "position": "relative",
+                  "transition": "all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms",
+                  "userSelect": "none",
+                }
+              }
+            />
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;

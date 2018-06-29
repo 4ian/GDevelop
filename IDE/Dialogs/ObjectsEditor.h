@@ -50,6 +50,16 @@ public:
     virtual ~ObjectsEditor();
 
     /**
+     * \brief Open the editor of the specified object
+     */
+    void EditObject(gd::Object & object, bool isGlobalObject);
+
+    /**
+     * \brief Select the specified object in the list
+     */
+    void SelectObject(const gd::Object & object, bool isGlobalObject);
+
+    /**
      * \brief Refresh the editor.
      */
     void Refresh();
@@ -58,6 +68,11 @@ public:
      * \brief Set a function to call each time the list is refreshed.
      */
     void OnRefreshed(std::function<void()> cb) { onRefreshedCb = cb; }
+
+    /**
+     * \brief Set a function to call each time a change is made.
+     */
+    void OnChange(std::function<void(gd::String)> cb) { onChangeCb = cb; }
 
     /**
      * \brief Create the ribbon buttons for this editor
@@ -231,6 +246,7 @@ private:
     gd::String renamedItemOldName;
     wxTreeItemId lastSelectedItem;
     std::function<void()> onRefreshedCb;
+    std::function<void(gd::String)> onChangeCb;
 
     DECLARE_EVENT_TABLE()
 };

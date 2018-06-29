@@ -33,7 +33,8 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
 
-    this._profiler = new gdjs.Profiler();
+	this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
+	this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
 
     this.onCanvasResized();
 };
@@ -139,6 +140,8 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
 gdjs.RuntimeScene.prototype.unloadScene = function() {
 	if ( !this._isLoaded ) return;
 
+	if (this._profiler) this.stopProfiler();
+
     if (this._renderer && this._renderer.onSceneUnloaded)
         this._renderer.onSceneUnloaded();
 
@@ -146,6 +149,27 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
 	for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloaded.length;++i) {
 		gdjs.callbacksRuntimeSceneUnloaded[i](this);
 	}
+
+	// It should not be necessary to reset these variables, but this help
+	// ensuring that all memory related to the RuntimeScene is released immediately.
+    this._layers = new Hashtable();
+    this._variables = new gdjs.VariablesContainer();
+    this._initialBehaviorSharedData = new Hashtable();
+    this._objects = new Hashtable();
+    this._instances = new Hashtable();
+    this._instancesCache = new Hashtable();
+    this._initialObjectsData = null;
+    this._eventsFunction = null;
+    this._objectsCtor = new Hashtable();
+    this._allInstancesList = [];
+    this._instancesRemoved = [];
+
+    this._lastId = 0;
+    this._eventsContext = null;
+
+    this._isLoaded = false;
+
+    this.onCanvasResized();
 };
 
 /**
@@ -195,21 +219,32 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  * or a game stop was requested.
  */
 gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
-    // this._profiler.frameStarted();
-    // this._profiler.begin("timeManager");
+	if (this._profiler) this._profiler.beginFrame();
+	
 	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
 	this._timeManager.update(elapsedTime, this._runtimeGame.getMinimalFramerate());
-    // this._profiler.begin("objects (pre-events)");
+	
+    if (this._profiler) this._profiler.begin("objects (pre-events)");
 	this._updateObjectsPreEvents();
-    // this._profiler.begin("events");
+	if (this._profiler) this._profiler.end("objects (pre-events)");
+	
+    if (this._profiler) this._profiler.begin("events");
 	this._eventsFunction(this, this._eventsContext);
-    // this._profiler.begin("objects (post-events)");
+	if (this._profiler) this._profiler.end("events");
+	
+    if (this._profiler) this._profiler.begin("objects (post-events)");
 	this._updateObjects();
-    // this._profiler.begin("objects (visibility)");
+	if (this._profiler) this._profiler.end("objects (post-events)");
+	
+    if (this._profiler) this._profiler.begin("objects (visibility)");
 	this._updateObjectsVisibility();
-    // this._profiler.begin("render");
+	if (this._profiler) this._profiler.end("objects (visibility)");
+	
+    if (this._profiler) this._profiler.begin("render");
 	this.render();
-    // this._profiler.end();
+	if (this._profiler) this._profiler.end("render");
+	
+    if (this._profiler) this._profiler.endFrame();
 
 	return !!this.getRequestedChange();
 };
@@ -636,3 +671,41 @@ gdjs.RuntimeScene.prototype.requestChange = function(change, sceneName) {
 	this._requestedChange = change;
 	this._requestedScene = sceneName;
 };
+
+/**
+ * Get the profiler associated with the scene, or null if none.
+ * @method getProfiler
+ */
+gdjs.RuntimeScene.prototype.getProfiler = function() {
+	return this._profiler;
+}
+
+/**
+ * Start a new profiler to measures the time passed in sections of the engine
+ * in the scene.
+ * @param onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
+ * @method startProfiler
+ */
+gdjs.RuntimeScene.prototype.startProfiler = function(onProfilerStopped) {
+	if (this._profiler) return;
+
+	this._profiler = new gdjs.Profiler();
+	this._onProfilerStopped = onProfilerStopped;
+}
+
+/**
+ * Stop the profiler being run on the scene.
+ * @method stopProfiler
+ */
+gdjs.RuntimeScene.prototype.stopProfiler = function() {
+	if (!this._profiler) return null;
+
+	var oldProfiler = this._profiler;
+	var onProfilerStopped = this._onProfilerStopped;
+	this._profiler = null;
+	this._onProfilerStopped = null;
+
+	if (onProfilerStopped) {
+		onProfilerStopped(oldProfiler);
+	}
+}

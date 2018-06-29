@@ -38,18 +38,18 @@
 								</object>
 							</object>
 						</object>
-						<flag>wxALL|wxEXPAND</flag>
+						<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 						<option>1</option>
 					</object>
 					<object class="sizeritem">
 						<object class="wxStaticLine" name="ID_STATICLINE2" variable="StaticLine2" member="yes">
 							<size>10,-1</size>
 						</object>
-						<flag>wxALL|wxEXPAND</flag>
+						<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 						<option>1</option>
 					</object>
 				</object>
-				<flag>wxALL|wxEXPAND</flag>
+				<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
@@ -86,11 +86,11 @@
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -141,11 +141,11 @@
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -158,7 +158,7 @@
 												<label>Activate a log file</label>
 												<handler function="OnlogCheckClick" entry="EVT_CHECKBOX" />
 											</object>
-											<flag>wxALL|wxALIGN_LEFT</flag>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
@@ -167,12 +167,29 @@
 												<label>Warn when saving a project in a new directory</label>
 												<tooltip>Warn, when the project is saved in a new folder, that project resources should also be copied to the folder.</tooltip>
 											</object>
-											<flag>wxALL|wxALIGN_LEFT</flag>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticBoxSizer" variable="StaticBoxSizer21" member="no">
+										<label>External scene editor</label>
+										<object class="sizeritem">
+											<object class="wxCheckBox" name="ID_CHECKBOX5" variable="externalSceneEditorCheck" member="yes">
+												<label>Use the experimental, new scene editor</label>
+												<handler function="OnexternalSceneEditorCheckClick" entry="EVT_CHECKBOX" />
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -232,7 +249,7 @@
 													<object class="wxTextCtrl" name="ID_TEXTCTRL7" variable="newProjectFolderEdit" member="yes">
 														<tooltip>Path to the image editing program.</tooltip>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<border>5</border>
 													<option>1</option>
 												</object>
@@ -250,7 +267,7 @@
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -273,7 +290,7 @@
 													<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="EditeurImageEdit" member="yes">
 														<tooltip>Path to the image editing program.</tooltip>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<border>5</border>
 													<option>1</option>
 												</object>
@@ -291,7 +308,7 @@
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -315,7 +332,7 @@
 													<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="DossierTempCompEdit" member="yes">
 														<tooltip>Folder used to store temporary files when compiling a game.&#x0A;We must own write permissions on this folder.&#x0A;If empty, the default temporary folder of the system is used.</tooltip>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<border>5</border>
 													<option>1</option>
 												</object>
@@ -329,7 +346,7 @@
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<option>1</option>
 										</object>
 										<object class="sizeritem">
@@ -349,7 +366,7 @@
 														<tooltip>Folder used to store temporary files when compiling a game.&#x0A;We must own write permissions on this folder.&#x0A;If empty, the default temporary folder of the system is used.</tooltip>
 														<handler function="OneventsCompilerTempDirEditText" entry="EVT_TEXT" />
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<border>5</border>
 													<option>1</option>
 												</object>
@@ -363,7 +380,7 @@
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<option>1</option>
 										</object>
 										<object class="sizeritem">
@@ -371,12 +388,12 @@
 												<label>Delete temporaries as soon as possible</label>
 												<checked>1</checked>
 											</object>
-											<flag>wxALL|wxALIGN_LEFT</flag>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -399,7 +416,7 @@
 													<object class="wxTextCtrl" name="ID_TEXTCTRL8" variable="javaDirEdit" member="yes">
 														<tooltip>Folder used to store temporary files when compiling a game.&#x0A;We must own write permissions on this folder.&#x0A;If empty, the default temporary folder of the system is used.</tooltip>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<border>5</border>
 													<option>1</option>
 												</object>
@@ -418,7 +435,7 @@
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -458,11 +475,11 @@
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -540,7 +557,7 @@
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -558,7 +575,7 @@
 												<default>-1</default>
 												<style>wxRA_HORIZONTAL</style>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
@@ -605,11 +622,11 @@
 															<option>1</option>
 														</object>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
@@ -631,11 +648,11 @@
 															<option>1</option>
 														</object>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
@@ -664,16 +681,16 @@
 															<option>1</option>
 														</object>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
@@ -741,7 +758,7 @@
 															<border>5</border>
 														</object>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<option>1</option>
 												</object>
 											</object>
@@ -793,7 +810,7 @@
 															<option>1</option>
 														</object>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<option>1</option>
 												</object>
 											</object>
@@ -845,16 +862,16 @@
 															<option>1</option>
 														</object>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
@@ -907,7 +924,7 @@
 																	<option>1</option>
 																</object>
 															</object>
-															<flag>wxALL|wxEXPAND</flag>
+															<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 															<option>1</option>
 														</object>
 														<object class="sizeritem">
@@ -919,16 +936,16 @@
 																</content>
 																<default>-1</default>
 															</object>
-															<flag>wxALL|wxEXPAND</flag>
+															<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 															<border>5</border>
 															<option>1</option>
 														</object>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
@@ -961,7 +978,7 @@
 																	<option>1</option>
 																</object>
 															</object>
-															<flag>wxALL|wxEXPAND</flag>
+															<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 															<option>1</option>
 														</object>
 														<object class="sizeritem">
@@ -973,12 +990,12 @@
 																</content>
 																<default>-1</default>
 															</object>
-															<flag>wxALL|wxEXPAND</flag>
+															<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 															<border>5</border>
 															<option>1</option>
 														</object>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<option>1</option>
 												</object>
 											</object>
@@ -987,7 +1004,7 @@
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<option>1</option>
 								</object>
 							</object>
@@ -1025,7 +1042,7 @@
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
@@ -1050,7 +1067,7 @@
 														<style></style>
 														<size>532,211</size>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<border>5</border>
 													<option>1</option>
 												</object>
@@ -1060,7 +1077,7 @@
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -1113,7 +1130,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="codeEditorEdit" member="yes" />
-															<flag>wxALL|wxEXPAND</flag>
+															<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 															<border>5</border>
 															<option>1</option>
 														</object>
@@ -1127,15 +1144,15 @@
 															<option>1</option>
 														</object>
 													</object>
-													<flag>wxALL|wxEXPAND</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -1167,7 +1184,7 @@
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxEXPAND</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 									<border>5</border>
 									<option>1</option>
 								</object>
@@ -1176,7 +1193,7 @@
 						<label>C++ Compilation</label>
 					</object>
 				</object>
-				<flag>wxALL|wxEXPAND</flag>
+				<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 				<border>5</border>
 				<option>1</option>
 			</object>
@@ -1184,7 +1201,7 @@
 				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
 					<size>10,-1</size>
 				</object>
-				<flag>wxALL|wxEXPAND</flag>
+				<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
@@ -1219,7 +1236,7 @@
 						<option>1</option>
 					</object>
 				</object>
-				<flag>wxALL|wxEXPAND</flag>
+				<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_TOP</flag>
 				<option>1</option>
 			</object>
 		</object>

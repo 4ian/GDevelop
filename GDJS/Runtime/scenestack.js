@@ -1,3 +1,10 @@
+
+/**
+ * Hold the stack of scenes (gdjs.RuntimeScene) being played.
+ * 
+ * @namespace gdjs
+ * @class SceneStack
+ */
 gdjs.SceneStack = function(runtimeGame) {
     if (!runtimeGame) {
     	throw "SceneStack must be constructed with a gdjs.RuntimeGame."
@@ -39,6 +46,15 @@ gdjs.SceneStack.prototype.step = function(elapsedTime) {
     return true;
 };
 
+gdjs.SceneStack.prototype.renderWithoutStep = function(elapsedTime) {
+	if (this._stack.length === 0) return false;
+
+	var currentScene = this._stack[this._stack.length - 1];
+    currentScene.render(elapsedTime);
+
+    return true;
+};
+
 gdjs.SceneStack.prototype.pop = function() {
 	if (this._stack.length <= 1) return null;
 
@@ -76,4 +92,13 @@ gdjs.SceneStack.prototype.replace = function(newSceneName, clear) {
     }
 
 	return this.push(newSceneName);
+};
+
+/**
+ * Return the current gdjs.RuntimeScene being played, or null if none is run.
+ */
+gdjs.SceneStack.prototype.getCurrentScene = function() {
+	if (this._stack.length === 0) return null;
+
+	return this._stack[this._stack.length - 1];
 };

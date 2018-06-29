@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef MATHEMATICALTOOLSEXTENSION_H
@@ -13,14 +13,12 @@
  *
  * \ingroup BuiltinExtensions
  */
-class MathematicalToolsExtension : public ExtensionBase
-{
-    public:
-        MathematicalToolsExtension();
-        virtual ~MathematicalToolsExtension() {};
+class MathematicalToolsExtension : public ExtensionBase {
+ public:
+  MathematicalToolsExtension();
+  virtual ~MathematicalToolsExtension(){};
 
-    private:
+ private:
 };
 
-#endif // MATHEMATICALTOOLSEXTENSION_H
-
+#endif  // MATHEMATICALTOOLSEXTENSION_H

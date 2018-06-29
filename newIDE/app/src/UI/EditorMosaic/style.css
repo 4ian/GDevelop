@@ -1,0 +1,43 @@
+/* This overwrite the default React Mosaic theme to make
+ * it looks like Material UI  */
+
+/* Mosaic layout */
+.mosaic-gd-theme.mosaic {
+  padding: 0;
+}
+
+.mosaic-gd-theme.mosaic .mosaic-root {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.mosaic-gd-theme .mosaic-window {
+  border-radius: 0 !important;
+}
+
+.mosaic-gd-theme .mosaic-window-body {
+  display: flex;
+}
+
+/* Mosaic window and tile */
+.mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-window,
+.mosaic-gd-theme.mosaic.mosaic-blueprint-theme .mosaic-preview {
+  box-shadow: none;
+}
+
+.mosaic-gd-theme .mosaic-tile {
+  margin: 2px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.mosaic-gd-theme .mosaic-window-toolbar {
+  border-top-right-radius: 0 !important;
+  border-top-left-radius: 0 !important;
+}
+
+.mosaic-gd-theme .draggable .mosaic-window-title {
+  cursor: move;
+}

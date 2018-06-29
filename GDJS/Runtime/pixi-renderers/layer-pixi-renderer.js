@@ -1,6 +1,7 @@
 gdjs.LayerPixiRenderer = function(layer, runtimeSceneRenderer)
 {
     this._pixiContainer = new PIXI.Container();
+    this._filters = {};
     this._layer = layer;
     runtimeSceneRenderer.getPIXIContainer().addChild(this._pixiContainer);
 

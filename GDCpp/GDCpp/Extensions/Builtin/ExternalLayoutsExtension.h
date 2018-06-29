@@ -1,7 +1,7 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 
 #ifndef EXTERNALLAYOUTSEXTENSION_H
@@ -11,13 +11,10 @@
 /**
  * \brief Standard extension providing features related to external layouts.
  */
-class ExternalLayoutsExtension : public ExtensionBase
-{
-    public:
-        ExternalLayoutsExtension();
-        virtual ~ExternalLayoutsExtension() {};
+class ExternalLayoutsExtension : public ExtensionBase {
+ public:
+  ExternalLayoutsExtension();
+  virtual ~ExternalLayoutsExtension(){};
 };
 
-
-#endif // EXTERNALLAYOUTSEXTENSION_H
-
+#endif  // EXTERNALLAYOUTSEXTENSION_H

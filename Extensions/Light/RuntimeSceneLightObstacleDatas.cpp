@@ -6,14 +6,10 @@ This project is released under the MIT License.
 */
 
 #include "RuntimeSceneLightObstacleDatas.h"
-#include "SceneLightObstacleDatas.h"
 #include <iostream>
+#include "SceneLightObstacleDatas.h"
 
-RuntimeSceneLightObstacleDatas::RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & behaviorSharedDatas)
-{
-}
+RuntimeSceneLightObstacleDatas::RuntimeSceneLightObstacleDatas(
+    const SceneLightObstacleDatas& behaviorSharedDatas) {}
 
-RuntimeSceneLightObstacleDatas::~RuntimeSceneLightObstacleDatas()
-{
-}
-
+RuntimeSceneLightObstacleDatas::~RuntimeSceneLightObstacleDatas() {}

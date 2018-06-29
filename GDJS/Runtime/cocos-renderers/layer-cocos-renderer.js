@@ -96,7 +96,10 @@ gdjs.LayerCocosRenderer.prototype.render = function() {
     }
 
     if (this._renderTexture) {
-        this._renderTexture.beginWithClear(0,0,0,0);
+        // /!\ Calling beginWithClear with Cocos2d-JS 3.15.1 (and maybe other versions)
+        // will raise a "wrong number of argument" error.
+        this._renderTexture.clear(0,0,0,0);
+        this._renderTexture.begin();
         this._cocosLayer.visit();
         this._renderTexture.end();
     }

@@ -1,19 +1,17 @@
 /*
  * GDevelop C++ Platform
- * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights reserved.
- * This project is released under the MIT License.
+ * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
  */
 #ifndef MATHEMATICALTOOLS_H
 #define MATHEMATICALTOOLS_H
 
-namespace GDpriv
-{
+namespace GDpriv {
 
 /**
  * \brief Mathematical tools only used by GD events generated code.
  */
-namespace MathematicalTools
-{
+namespace MathematicalTools {
 
 double GD_API Minimal(double expression1, double expression2);
 double GD_API Maximal(double expression1, double expression2);
@@ -51,7 +49,7 @@ double GD_API mod(double x, double y);
 double GD_API angleDifference(double angle1, double angle2);
 double GD_API lerp(double a, double b, double x);
 
-}
-}
+}  // namespace MathematicalTools
+}  // namespace GDpriv
 
-#endif // MATHEMATICALTOOLS_H
+#endif  // MATHEMATICALTOOLS_H

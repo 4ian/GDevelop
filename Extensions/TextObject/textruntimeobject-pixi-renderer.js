@@ -29,13 +29,21 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
 
 gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
     var fontName = "\"gdjs_font_" + this._object._fontName + "\"";
-    var style = { align:"left" };
-	style.font = "";
-    if ( this._object._italic ) style.font += "italic ";
-    if ( this._object._bold ) style.font += "bold ";
-    style.font += this._object._characterSize + "px " + fontName;
-    style.fill = "rgb("+this._object._color[0]+","+this._object._color[1]+","+this._object._color[2]+")";
-    this._text.style = style;
+
+    var style = this._text.style;
+    style.fontStyle = this._object._italic ? 'italic' : 'normal';
+    style.fontWeight = this._object._bold ? 'bold' : 'normal';
+    style.fontSize = this._object._characterSize;
+    style.fontFamily = fontName;
+    style.fill = gdjs.rgbToHexNumber(
+        this._object._color[0],
+        this._object._color[1],
+        this._object._color[2]
+    );
+
+    // Manually ask the PIXI object to re-render as we changed a style property
+    // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/
+    this._text.dirty = true;
 };
 
 gdjs.TextRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

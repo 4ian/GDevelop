@@ -76,6 +76,10 @@ class ThemableObjectRow extends React.Component {
             enabled: Clipboard.has(CLIPBOARD_KIND),
             click: () => this.props.onPaste(),
           },
+          {
+            label: 'Duplicate',
+            click: () => this.props.onDuplicateObject(),
+          },
         ]}
       />
     );

@@ -108,6 +108,7 @@ class ObjectsList extends Component<*, *> {
               onDelete={() => this.props.onDelete(objectWithContext)}
               onCopyObject={() => this.props.onCopyObject(objectWithContext)}
               onCutObject={() => this.props.onCutObject(objectWithContext)}
+              onDuplicateObject={() => this.props.onDuplicateObject(objectWithContext)}
               onPaste={() => this.props.onPaste(objectWithContext)}
               onRename={newName =>
                 this.props.onRename(objectWithContext, newName)}
@@ -256,6 +257,11 @@ export default class ObjectsListContainer extends React.Component<
   _cutObject = (objectWithContext: ObjectWithContext) => {
     this._copyObject(objectWithContext);
     this._deleteObject(objectWithContext);
+  };
+
+  _duplicateObject = (objectWithContext: ObjectWithContext) => {
+    this._copyObject(objectWithContext);
+    this._paste(objectWithContext);
   };
 
   _paste = (objectWithContext: ObjectWithContext) => {
@@ -438,6 +444,7 @@ export default class ObjectsListContainer extends React.Component<
                 onEditObject={this.props.onEditObject}
                 onCopyObject={this._copyObject}
                 onCutObject={this._cutObject}
+                onDuplicateObject={this._duplicateObject}
                 onSetAsGlobalObject={this._setAsGlobalObject}
                 onPaste={this._paste}
                 onAddNewObject={() =>

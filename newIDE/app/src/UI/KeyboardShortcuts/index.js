@@ -167,8 +167,10 @@ export default class KeyboardShortcuts {
   _onMouseDown = evt => {
     if (!this.isFocused) return;
 
-    if (!isMacLike() && evt.button === MID_MOUSE_BUTTON) {
-      this.mouseMidButtonPressed = true;
+    if (!isMacLike()) {
+      if (evt.button === MID_MOUSE_BUTTON){
+        this.mouseMidButtonPressed = true
+      } else {this.mouseMidButtonPressed = false}
     }
   };
 

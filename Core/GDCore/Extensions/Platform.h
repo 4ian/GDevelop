@@ -27,7 +27,7 @@ class LayoutEditorCanvas;
 class ProjectExporter;
 }  // namespace gd
 
-typedef std::unique_ptr<gd::Object> (*CreateFunPtr)(gd::String name);
+typedef std::function<std::unique_ptr<gd::Object>(gd::String name)> CreateFunPtr;
 
 #undef CreateEvent
 

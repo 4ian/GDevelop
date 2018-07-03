@@ -18,11 +18,11 @@
 namespace gd {
 
 ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
-               const gd::String& name_,
-               const gd::String& fullname_,
-               const gd::String& description_,
-               const gd::String& icon24x24,
-               std::shared_ptr<gd::Object> blueprintObject_)
+                               const gd::String& name_,
+                               const gd::String& fullname_,
+                               const gd::String& description_,
+                               const gd::String& icon24x24,
+                               std::shared_ptr<gd::Object> blueprintObject_)
     : extensionNamespace(extensionNamespace_),
       blueprintObject(blueprintObject_) {
   name = name_;
@@ -45,8 +45,17 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
   }
 #endif
 #endif
-  createFunPtr = [this](gd::String name) -> std::unique_ptr<gd::Object> {
-    std::unique_ptr<gd::Object> newObject = blueprintObject->Clone();
+  createFunPtr =
+      [blueprintObject_](gd::String name) -> std::unique_ptr<gd::Object> {
+    if (blueprintObject_ == std::shared_ptr<gd::Object>()) {
+      std::cout
+          << "Error: Unable to create object. Have you declared an extension "
+             "(or ObjectMetadata) without specifying an object as blueprint?"
+          << std::endl;
+      return nullptr;
+    }
+
+    std::unique_ptr<gd::Object> newObject = blueprintObject_->Clone();
     newObject->SetName(name);
     return newObject;
   };

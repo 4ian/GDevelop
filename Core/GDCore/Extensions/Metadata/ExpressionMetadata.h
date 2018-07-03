@@ -181,7 +181,10 @@ class GD_CORE_API ExpressionMetadata {
     return codeExtraInformation.SetFunctionName(functionName);
   }
 
-  // TODO
+  /**
+   * \brief Return the structure containing the information about code
+   * generation for the expression.
+   */
   ExpressionCodeGenerationInformation& GetCodeExtraInformation() {
     return codeExtraInformation;
   };

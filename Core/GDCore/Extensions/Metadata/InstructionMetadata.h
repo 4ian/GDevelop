@@ -383,8 +383,10 @@ class GD_CORE_API InstructionMetadata {
   ExtraInformation codeExtraInformation;  ///< Information about how generate
                                           ///< code for the instruction
 
-
-  // TODO
+  /**
+   * \brief Return the structure containing the information about code
+   * generation for the instruction.
+   */
   ExtraInformation &GetCodeExtraInformation() {
     return codeExtraInformation;
   }

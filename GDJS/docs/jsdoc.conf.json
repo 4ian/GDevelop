@@ -23,7 +23,7 @@
             "outputSourceFiles" : true
         },
         "applicationName": "GDevelop JS Runtime",
-        "footer"        : "Made with ♥ by Goodboy Digital (goodboydigital.com)",
+        "footer"        : "Made with ♥ by Florian Rival and contributors (gdevelop-app.com)",
         "copyright"     : "GDevelop Copyright © 2008-2018 Florian Rival",
         "googleAnalytics": "TODO",
         "openGraph": {
@@ -49,6 +49,6 @@
         "recurse"       : true,
         "private"       : false,
         "lenient"       : true,
-        "destination"   : "./test-docs"
+        "destination"   : "../docs/GDJS Runtime Documentation"
     }
 }

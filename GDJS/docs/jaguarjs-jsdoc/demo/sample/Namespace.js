@@ -1,0 +1,4 @@
+/**
+ * @namespace
+ */
+var namespace = namespace || {};

@@ -1,0 +1,16 @@
+<?js
+	var data = obj;
+    data.forEach(function(example) {
+        if (example.caption) {
+    ?>
+        <p class="code-caption"><?js= example.caption ?></p>
+    <?js } ?>
+
+    <?js if (example.code.toString().indexOf('<pre>') === -1) { ?>
+    <pre class="prettyprint"><code><?js= example.code ?></code></pre>
+    <?js } else { ?>
+    <?js= example.code.replace(/<pre>/g, '<pre class="prettyprint">') ?>
+    <?js } ?>
+<?js
+    });
+?>

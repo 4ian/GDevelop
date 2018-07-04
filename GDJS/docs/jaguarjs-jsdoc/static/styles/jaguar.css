@@ -1,0 +1,353 @@
+html,
+body {
+  font: 1em "jaf-bernino-sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  background-color: #fff;
+}
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+li {
+  list-style-type: none;
+}
+#wrap {
+  position: relative;
+}
+::-webkit-scrollbar {
+  width: 8px;
+  background-color: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: gray;
+  border-radius: 4px;
+}
+.navigation {
+  position: fixed;
+  float: left;
+  width: 250px;
+  height: 100%;
+  background-color: #1a1a1a;
+}
+.navigation .applicationName {
+  margin: 0;
+  margin-top: 15px;
+  padding: 10px 15px;
+  font: bold 1.25em Helvetica;
+  color: #fff;
+}
+.navigation .applicationName a {
+  color: #fff;
+}
+.navigation .search {
+  padding: 10px 15px;
+}
+.navigation .search input {
+  background-color: #333;
+  color: #fff;
+  border-color: #555;
+}
+.navigation .list {
+  padding: 10px 15px 0 15px;
+  position: relative;
+  overflow: auto;
+  width: 100%;
+}
+.navigation li.item {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #333;
+}
+.navigation li.item a {
+  color: #bbb;
+}
+.navigation li.item a:hover {
+  color: #fff;
+}
+.navigation li.item .title {
+  cursor: pointer;
+  position: relative;
+  display: block;
+  font-size: 0.8em;
+}
+.navigation li.item .title a {
+  color: #e1e1e1;
+}
+.navigation li.item .title a:hover {
+  color: #fff;
+}
+.navigation li.item .title .static {
+  display: block;
+  border-radius: 3px;
+  background-color: #779c34;
+  color: #000;
+  font-size: 0.7em;
+  padding: 2px 4px;
+  float: right;
+}
+.navigation li.item .subtitle {
+  margin-top: 10px;
+  font: bold 0.65em Helvetica;
+  color: #779c34;
+  display: block;
+}
+.navigation li.item ul > li {
+  font-size: 0.7em;
+  padding-left: 8px;
+  margin-top: 2px;
+}
+.navigation li.item .itemMembers {
+  display: none;
+}
+.main {
+  padding: 20px 20px;
+  margin-left: 250px;
+}
+.main .page-title {
+  display: none;
+}
+.main h1 {
+  font-weight: bold;
+  font-size: 1.6em;
+  margin: 0;
+}
+.main h2 {
+  font-weight: bold;
+  font-size: 1.5em;
+  margin: 0;
+}
+.main h3 {
+  font-weight: bold;
+  font-size: 12px;
+  margin: 5px 0;
+}
+.main h4 {
+  font-weight: bold;
+  font-size: 1em;
+}
+.main h5 {
+  font-weight: bold;
+  font-size: 12px;
+}
+.main dd {
+  font-size: 12px;
+}
+.main h4.name span.type-signature {
+  display: inline-block;
+  border-radius: 3px;
+  background-color: gray;
+  color: #fff;
+  font-size: 0.7em;
+  padding: 2px 4px;
+}
+.main h4.name span.type {
+  margin-left: 5px;
+}
+.main h4.name span.glyphicon {
+  display: inline-block;
+  vertical-align: middle;
+  color: #e1e1e1;
+  margin-left: 7px;
+}
+.main h4.name span.returnType {
+  margin-left: 3px;
+  background-color: transparent!important;
+  color: gray!important;
+}
+.main span.static {
+  display: inline-block;
+  border-radius: 3px;
+  background-color: #779c34 !important;
+  color: #fff;
+  font-size: 0.7em;
+  padding: 2px 4px;
+  margin-right: 8px;
+}
+.main span.number {
+  background-color: gray!important;
+}
+.main span.string {
+  background-color: gray!important;
+}
+.main span.object {
+  background-color: #2a6496 !important;
+}
+.main span.array {
+  background-color: #2a6496 !important;
+}
+.main span.boolean {
+  background-color: #ee7d7d !important;
+}
+.main .subsection-title {
+  font-size: 14px;
+  margin-top: 30px;
+  color: #779c34;
+}
+.main .description {
+  margin-top: 10px;
+  font-size: 13px;
+}
+.main .description ul,
+.main .description ol {
+  margin-bottom: 15px;
+}
+.main .description p {
+  font-size: 13px;
+}
+.main .description h2 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #efefef;
+}
+.main .description pre {
+  margin: 10px 0;
+}
+.main .tag-source {
+  font-size: 12px;
+}
+.main dt.tag-source {
+  margin-top: 5px;
+}
+.main dt.tag-todo {
+  font-size: 10px;
+  display: inline-block;
+  background-color: #2a6496;
+  color: #fff;
+  padding: 2px 4px;
+  border-radius: 5px;
+}
+.main .type-signature {
+  font-size: 12px;
+}
+.main .tag-deprecated {
+  display: inline-block;
+  font-size: 10px;
+}
+.main .important {
+  background-color: #ee7d7d;
+  color: #fff;
+  padding: 2px 4px;
+  border-radius: 5px;
+}
+.main .nameContainer {
+  position: relative;
+  margin-top: 20px;
+  padding-top: 5px;
+  border-top: 1px solid #e1e1e1;
+}
+.main .nameContainer .inherited {
+  display: inline-block;
+  border-radius: 3px;
+  background-color: #888!important;
+  font-size: 0.7em;
+  padding: 2px 4px;
+  margin-right: 5px;
+}
+.main .nameContainer .inherited a {
+  color: #fff;
+}
+.main .nameContainer .tag-source {
+  position: absolute;
+  top: 17px;
+  right: 0;
+  font-size: 10px;
+}
+.main .nameContainer .tag-source a {
+  color: gray;
+}
+.main .nameContainer.inherited {
+  color: gray;
+}
+.main .nameContainer h4 {
+  margin-right: 150px;
+  line-height: 1.3;
+}
+.main .nameContainer h4 .signature {
+  font-size: 13px;
+  font-weight: normal;
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+.main .nameContainer h4 .type-signature.type a {
+  color: #fff;
+}
+.main pre {
+  font-size: 11px;
+}
+.main table {
+  width: 100%;
+  margin-bottom: 15px;
+}
+.main table th {
+  padding: 3px 3px;
+}
+.main table td {
+  vertical-align: top;
+  padding: 5px 3px;
+}
+.main table .name {
+  width: 110px;
+}
+.main table .type {
+  width: 60px;
+  color: #aaa;
+  font-size: 11px;
+}
+.main table .attributes {
+  width: 80px;
+  color: #aaa;
+  font-size: 11px;
+}
+.main table .description {
+  font-size: 12px;
+}
+.main table .description p {
+  margin: 0;
+}
+.main table .optional {
+  float: left;
+  border-radius: 3px;
+  background-color: #ddd!important;
+  font-size: 0.7em;
+  padding: 2px 4px;
+  margin-right: 5px;
+  color: gray;
+}
+.main .readme p {
+  margin-top: 15px;
+  line-height: 1.2;
+  font-size: 0.85em;
+}
+.main .readme h1 {
+  font-size: 1.7em;
+}
+.main .readme h2 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e1e1e1;
+}
+.main .readme li {
+  font-size: 0.9em;
+  margin-bottom: 10px;
+}
+.main article ol,
+.main article ul {
+  margin-left: 25px;
+}
+.main article ol > li {
+  list-style-type: decimal;
+  margin-bottom: 5px;
+}
+.main article ul > li {
+  margin-bottom: 5px;
+  list-style-type: disc;
+}
+footer {
+  margin: 15px 0;
+  padding-top: 15px;
+  border-top: 1px solid #e1e1e1;
+  font-family: "freight-text-pro", Georgia, Cambria, "Times New Roman", Times, serif;
+  font-size: 0.8em;
+  color: gray;
+}

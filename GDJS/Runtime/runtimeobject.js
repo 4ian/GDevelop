@@ -1172,7 +1172,7 @@ gdjs.RuntimeObject.prototype.cursorOnObject = function(runtimeScene) {
 };
 
 /**
- * \brief Check if a point is inside the object collision hitboxes.
+ * Check if a point is inside the object collision hitboxes.
  * @param pointX The point x coordinate.
  * @param pointY The point y coordinate.
  * @return true if the point is inside the object collision hitboxes.

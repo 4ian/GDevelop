@@ -43,13 +43,66 @@ Refer to the [GDevelop IDE Readme](./README.md) for more information about the i
 
   > ⚠️ Always check the developer console after reloading GDevelop. If there is any error signaled, click on it to see what went wrong. You may have done a syntax error or mis-used an API.
 
-### Documentation for declaring and writing extensions
+### Documentation for the game engine
 
-- Check the [game engine online documentaiton here](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation/index.html). It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to directly see how the game engine is done.
+- Check the [GDJS game engine documentation here](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation/index.html). In particular, check:
 
-- The documentation for declaring extension is not yet written (**help is welcome**!). It's almost 100% equivalent to the way extensions are declared in C++ though, so take a look at [Extension.cpp documentation](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/_about_extension_cpp.html) for now.
+  - [`gdjs.RuntimeScene`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeScene.html), the class representing a scene being played.
+  - [`gdjs.RuntimeBehavior`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeBehavior.html), the base class inherited by all behaviors.
+  - [`gdjs.RuntimeObject`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeObject.html), the base class inherited by all objects.
+  - It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to directly see how the game engine is done.
 
-### Starting a new extension from scratch
+### How to declare the extensions
+
+The API to declare extensions is almost 100% equivalent to the way extensions are declared in C++, so most links will redirect to this documentation.
+
+#### Declare the extension information
+
+Use [`extension.setExtensionInformation`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#ac53e5af617a9ed91c280d652899557c3) to declare basic information about your extension.
+
+> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
+
+#### Declare actions, conditions and expressions
+
+Use [`addAction`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a34e95be54f2dfa80b804e8e4830e7d9c), `addCondition`, `addExpression` or `addStrExpression` to declare actions, conditions or expressions.
+
+- Chain calls to [`addParameter`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_instruction_metadata.html#a95486188a843f9ac8cdb1b0700c6c7e5) to declare the parameters of your action/condition/expression.
+- Call `getCodeExtraInformation()` and then functions like [`setFunctionName` and `setIncludeFile`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_instruction_metadata_1_1_extra_information.html) to declare the JavaScript function to be called and the file to be included.
+
+> You can call these functions on the `extension` object, or on the objects returned by `extension.addObject` (for objects) or `extension.addBehavior` (for behaviors). See below.
+
+> ⚠️ Always double check that you've not forgotten an argument. Such errors/mismatchs can create silent bugs that could make GDevelop instable or crash while being used.
+
+> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
+
+#### Declare behaviors
+
+Add a behavior using [`addBehavior`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a75992fed9afce730db56af9d4d8177ca). The last two parameters are the `gd.Behavior` and the `gd.BehaviorsSharedData` object representing the behavior and its (optional) shared data
+
+- For the behavior, create a `new gd.BehaviorJsImplementation()` and define `updateProperty` and `getProperties`.
+- For the shared data (which are properties shared between all behaviors of the same type), if you don't have the need for it, just pass `new gd.BehaviorsSharedData()`. If you need shared data, create a `new gd.BehaviorSharedDataJsImplementation()` and define `updateProperty` and `getProperties`.
+
+> ⚠️ Like other functions to declare extensions, make sure that you've not forgotten to declare a function and that all arguments are correct. 
+
+> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
+
+#### Declare objects
+
+> 👋 Declaring objects is not yet fully exposed to JavaScript extensions. Your help is welcome to expose this feature!
+
+Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a554baca486909e8741e902133cceeec0). The last  parameter is the `gd.Object` representing the object:
+
+- Create a `new gd.ObjectJsImplementation()` and define `updateProperty` and `getProperties` (for the object properties) and `updateInitialInstanceProperty` and `getInitialInstanceProperties` (for the optional properties that are attached to each instance).
+
+> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
+
+#### Declare events
+
+> 👋 Declaring events is not yet exposed to JavaScript extensions. Your help is welcome to expose this feature!
+
+
+
+## Starting a new extension from scratch
 
 If you want to start a new extension:
 
@@ -58,7 +111,7 @@ If you want to start a new extension:
 - Change the extension information (`extension.setExtensionInformation`). The first argument is the extension internal name and should be the same name as your folder for consistency.
 - Remove all the actions/conditions/expressions declaration, run `node import-GDJS-Runtime.js` and reload GDevelop to verify that your extension is loaded.
 - Create a file called for example _yourextensionnametools.js_ in the same directory.
-- Add back the declarations in your extension. Use `setIncludeFile` when declaring your actions/conditions/expressions and set the name of the js file that you've created, prefixed by the path from the root folder. For example: 
+- Add back the declarations in your extension. Use `setIncludeFile` when declaring your actions/conditions/expressions and set the name of the js file that you've created, prefixed by the path from the root folder. For example:
   ```js
   .setIncludeFile("Extensions/FacebookInstantGames/facebookinstantgamestools.js")
   ```
@@ -67,8 +120,7 @@ If you want to start a new extension:
 
 Declaring extensions in JavaScript is still new, and enhancements are possible to exploit the full potential of extensions:
 
-- [ ] Add support for objects
-- [ ] Add support for behaviors
+- [ ] Add support for objects and events
 - [ ] Document how to add custom icons
 - [ ] Add a button to reload extensions without reloading GDevelop IDE entirely.
 - [ ] Create a "watcher" script that automatically run `node import-GDJS-Runtime` anytime a change is made.

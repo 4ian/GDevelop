@@ -60,7 +60,7 @@ class ObjectsList extends Component<*, *> {
 
   render() {
     let { height, width, fullList, project, selectedObjectName } = this.props;
-
+    
     return (
       <List
         ref={list => (this.list = list)}
@@ -312,7 +312,7 @@ export default class ObjectsListContainer extends React.Component<
     });
   };
 
-  _rename = (objectWithContext: ObjectWithContext, newName: string) => {
+  _rename = (objectWithContext: ObjectWithContext, newName: string) => { ///deprecate for the refactored function
     const { object } = objectWithContext;
     const { project, objectsContainer } = this.props;
 

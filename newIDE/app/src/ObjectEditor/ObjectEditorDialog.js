@@ -8,10 +8,16 @@ import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 
+import SemiControlledTextField from '../UI/SemiControlledTextField';
+
 const styles = {
   titleContainer: {
     padding: 0,
   },
+  objectTitle: {
+    left: "10px",
+    width:"available",
+  }
 };
 
 type StateType = {|
@@ -21,6 +27,7 @@ type StateType = {|
 export class ObjectEditorDialog extends Component<*, StateType> {
   state = {
     currentTab: 'properties',
+    newObjectName: this.props.objectName
   };
 
   _onChangeTab = (value: string) => {
@@ -47,7 +54,7 @@ export class ObjectEditorDialog extends Component<*, StateType> {
 
     const EditorComponent = this.props.editorComponent;
     const { currentTab } = this.state;
-
+    
     return (
       <Dialog
         key={this.props.object && this.props.object.ptr}
@@ -68,6 +75,18 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         }
         titleStyle={styles.titleContainer}
       >
+      Object Name:
+      <SemiControlledTextField
+          style={styles.objectTitle}
+          commitOnBlur
+          value={this.state.newObjectName}
+          hintText="Object Name"
+          onChange={text => {
+            if (this.props.canRenameObject(text)){
+              this.setState({newObjectName:text})
+            }
+          }}
+        />
         {currentTab === 'properties' &&
           EditorComponent && (
             <EditorComponent
@@ -78,7 +97,6 @@ export class ObjectEditorDialog extends Component<*, StateType> {
               resourceExternalEditors={this.props.resourceExternalEditors}
               onSizeUpdated={() =>
                 this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
-              objectName={this.props.objectName}
             />
           )}
         {currentTab === 'behaviors' && (

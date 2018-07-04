@@ -1,0 +1,54 @@
+{
+    "tags": {
+        "allowUnknownTags": false
+    },
+    "source": {
+        "include": [
+            "./Runtime/"
+        ],
+        "exclude": [
+            "./Runtime/Cocos2d/",
+            "./Runtime/Cordova/",
+            "./Runtime/Electron/",
+            "./Runtime/FacebookInstantGames/"
+        ],
+        "includePattern": ".+\\.js(doc)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
+    },
+    "plugins": [
+        "plugins/markdown"
+    ],
+    "templates": {
+        "default"       : {
+            "outputSourceFiles" : true
+        },
+        "applicationName": "GDevelop JS Runtime",
+        "footer"        : "Made with ♥ by Goodboy Digital (goodboydigital.com)",
+        "copyright"     : "GDevelop Copyright © 2008-2018 Florian Rival",
+        "googleAnalytics": "TODO",
+        "openGraph": {
+            "title": "GDevelop JS Runtime Documentation",
+            "type": "website",
+            "image": "",
+            "site_name": "",
+            "url": ""
+        },
+        "meta": {
+            "title": "GDevelop JS Runtime Documentation",
+            "description": "Documentation for the GDevelop JavaScript game engine",
+            "keyword": "docs, documentation, gdevelop, game, engine, html5, javascript"
+        },
+        "linenums"      : true
+    },
+    "markdown"  : {
+        "parser"        : "gfm",
+        "hardwrap"      : false
+    },
+    "opts": {
+        "encoding"      : "utf8",
+        "recurse"       : true,
+        "private"       : false,
+        "lenient"       : true,
+        "destination"   : "./test-docs"
+    }
+}

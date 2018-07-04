@@ -1,11 +1,14 @@
 /**
  * Common tools that can be used for rendering with Cocos2d-JS.
  * @class CocosTools
- * @namespace gdjs
+ * @memberof gdjs
  */
 gdjs.CocosTools = function() {
 };
 
+/**
+ * @memberof gdjs.CocosTools
+ */
 gdjs.CocosTools.hexToCCColor = function(hexColor, opacity) {
     return cc.color(
         (hexColor >> 16) & 255,
@@ -15,11 +18,18 @@ gdjs.CocosTools.hexToCCColor = function(hexColor, opacity) {
     );
 }
 
+/**
+ * @memberof gdjs.CocosTools
+ */
 gdjs.CocosTools.isHTML5 = function() {
     return (typeof document !== "undefined");
 }
 
 //TODO: move the rest to cocos-shader-tools
+
+/**
+ * @memberof gdjs.CocosTools
+ */
 gdjs.CocosTools.getDefaultVertexShader = function() {
     var projectionMatrix = gdjs.CocosTools.isHTML5() ?
         "(CC_PMatrix * CC_MVMatrix)" :
@@ -45,6 +55,9 @@ gdjs.CocosTools.getDefaultVertexShader = function() {
         + '}\n';
 }
 
+/**
+ * @memberof gdjs.CocosTools
+ */
 gdjs.CocosTools.makeNightShader = function() {
     var shader = new cc.GLProgram();
 
@@ -75,6 +88,9 @@ gdjs.CocosTools.makeNightShader = function() {
     return shader;
 }
 
+/**
+ * @memberof gdjs.CocosTools
+ */
 gdjs.CocosTools.makeLightNightShader = function() {
     var shader = new cc.GLProgram();
 
@@ -104,6 +120,9 @@ gdjs.CocosTools.makeLightNightShader = function() {
     return shader;
 }
 
+/**
+ * @memberof gdjs.CocosTools
+ */
 gdjs.CocosTools.makeSepiaShader = function() {
     var shader = new cc.GLProgram();
 
@@ -139,7 +158,7 @@ gdjs.CocosTools.makeSepiaShader = function() {
  * the shaders uniforms: uPixelSize (using texture size), uFrame
  * and uTransform (using texture and object size).
  *
- * @method makeTilingShader
+ * @memberof gdjs.CocosTools
  */
 gdjs.CocosTools.makeTilingShader = function() {
     var shader = new cc.GLProgram();
@@ -219,8 +238,7 @@ gdjs.CocosTools._effects = {
 
 /**
  * Get the shader and its uniforms name for an effect
- * @method getEffect
- * @static
+ * @memberof gdjs.CocosTools
  */
 gdjs.CocosTools.getEffect = function(effectName) {
     if (gdjs.CocosTools._effects.hasOwnProperty(effectName))
@@ -229,6 +247,9 @@ gdjs.CocosTools.getEffect = function(effectName) {
     return null;
 }
 
+/**
+ * @memberof gdjs.CocosTools
+ */
 gdjs.CocosTools.setUniformLocationWith1f = function(node, shader, uniform, uniformName, value) {
     if (gdjs.CocosTools.isHTML5()) {
         shader.setUniformLocationWith1f(uniform, value);
@@ -237,6 +258,9 @@ gdjs.CocosTools.setUniformLocationWith1f = function(node, shader, uniform, unifo
     }
 }
 
+/**
+ * @memberof gdjs.CocosTools
+ */
 gdjs.CocosTools.setUniformLocationWith2f = function(node, shader, uniform, uniformName, p1, p2) {
     if (gdjs.CocosTools.isHTML5()) {
         shader.setUniformLocationWith2f(uniform, p1, p2);
@@ -245,6 +269,9 @@ gdjs.CocosTools.setUniformLocationWith2f = function(node, shader, uniform, unifo
     }
 }
 
+/**
+ * @memberof gdjs.CocosTools
+ */
 gdjs.CocosTools.setUniformLocationWith4f = function(node, shader, uniform, uniformName, p1, p2, p3, p4) {
     if (gdjs.CocosTools.isHTML5()) {
         shader.setUniformLocationWith4f(uniform, p1, p2, p3, p4);

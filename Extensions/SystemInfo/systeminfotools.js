@@ -4,7 +4,7 @@ Copyright (c) 2016 Florian Rival (Florian.Rival@gmail.com)
  */
 
 /**
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class linkedObjects
  * @static
  * @private

@@ -8,7 +8,7 @@
  * EventsContext contains specific tools and data structures used
  * by events generated code only.
  *
- * @namespace gdjs
+ * @memberof gdjs
  * @class EventsContext
  * @constructor
  */
@@ -23,7 +23,6 @@ gdjs.EventsContext = function()
 /**
  * To be called when events begin so that "Trigger once" conditions
  * are properly handled.
- * @method startNewFrame
  */
 gdjs.EventsContext.prototype.startNewFrame = function() {
     this.clearObject(this._lastFrameOnceTrigger);
@@ -41,7 +40,6 @@ gdjs.EventsContext.prototype.startNewFrame = function() {
  * Used by "Trigger once" conditions: return true only if
  * this method was not called with the same identifier during the last frame.
  * @param triggerId The identifier of the "Trigger once" condition.
- * @method triggerOnce
  */
 gdjs.EventsContext.prototype.triggerOnce = function(triggerId) {
     this._onceTriggers[triggerId] = true;
@@ -59,7 +57,6 @@ gdjs.EventsContext.prototype.clearObject = function(obj) {
 
 /**
  * Clear the map containing objects lists.
- * @method clearEventsObjectsMap
  */
 gdjs.EventsContext.prototype.clearEventsObjectsMap = function() {
     if (this._currentObjectsMap === this._objectsMapCache.length)
@@ -71,7 +68,6 @@ gdjs.EventsContext.prototype.clearEventsObjectsMap = function() {
 
 /**
  * Add an objects list to the objects lists map.
- * @method addObjectsToEventsMap
  */
 gdjs.EventsContext.prototype.addObjectsToEventsMap = function(name, objectList) {
     this._objectsMapCache[this._currentObjectsMap].put(name, objectList);
@@ -80,7 +76,6 @@ gdjs.EventsContext.prototype.addObjectsToEventsMap = function(name, objectList) 
 
 /**
  * Return the objects lists map.
- * @method getEventsObjectsMap
  */
 gdjs.EventsContext.prototype.getEventsObjectsMap = function() {
     return this._objectsMapCache[this._currentObjectsMap++];

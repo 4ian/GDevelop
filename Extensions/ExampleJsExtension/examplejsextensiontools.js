@@ -5,7 +5,7 @@
  * 
  * Functions are being passed the arguments that were declared in the extension.
  * 
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class exampleJsExtension
  * @static
  * @private

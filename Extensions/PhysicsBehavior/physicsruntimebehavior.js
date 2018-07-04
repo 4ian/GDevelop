@@ -6,6 +6,8 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
 /**
  * Manage the common objects shared by objects having a
  * physics behavior.
+ * @memberof gdjs
+ * @class PhysicsSharedData
  */
 gdjs.PhysicsSharedData = function(runtimeScene, sharedData)
 {
@@ -70,9 +72,6 @@ gdjs.PhysicsSharedData = function(runtimeScene, sharedData)
 
 /**
  * Get the shared data for a scene.
- *
- * @method getSharedData
- * @static
  */
 gdjs.PhysicsSharedData.getSharedData = function(runtimeScene, name) {
     if (!runtimeScene.physicsSharedData) { //Create the shared data if necessary.
@@ -162,9 +161,6 @@ gdjs.PhysicsRuntimeBehavior.prototype.ownerRemovedFromScene = function() {
 /**
  * Return a Box2D.b2Vec2 with the specified coordinates.
  * Should be used instead of doing 'new Box2D.b2Vec2(x, y)'.
- *
- * @method b2Vec2
- * @private
  */
 gdjs.PhysicsRuntimeBehavior.prototype.b2Vec2 = function(x, y) {
     this._tempb2Vec2.set_x(x);

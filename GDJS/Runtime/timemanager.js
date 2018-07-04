@@ -9,8 +9,7 @@
  * frame, since the beginning of the scene and other time related values.
  *
  * @class TimeManager
- * @namespace gdjs
- * @constructor
+ * @memberof gdjs
  */
 gdjs.TimeManager = function()
 {
@@ -47,8 +46,7 @@ gdjs.TimeManager.prototype.update = function(elapsedTime, minimumFPS) {
 /**
  * Set the time scale: time will be slower if time scale is < 1,
  * faster if > 1.
- * @method setTimeScale
- * @param timeScale {Number} The new time scale (must be positive).
+ * @param {number} timeScale The new time scale (must be positive).
  */
 gdjs.TimeManager.prototype.setTimeScale = function(timeScale) {
 	if ( timeScale >= 0 ) this._timeScale = timeScale;
@@ -56,7 +54,7 @@ gdjs.TimeManager.prototype.setTimeScale = function(timeScale) {
 
 /**
  * Get the time scale.
- * @method getTimeScale
+ * @return {number} The time scale (positive, 1 is normal speed).
  */
 gdjs.TimeManager.prototype.getTimeScale = function() {
 	return this._timeScale;
@@ -65,7 +63,6 @@ gdjs.TimeManager.prototype.getTimeScale = function() {
 /**
  * Get the time since the instanciation of the manager (i.e: since
  * the beginning of the scene most of the time), in milliseconds.
- * @method getTimeFromStart
  */
 gdjs.TimeManager.prototype.getTimeFromStart = function() {
 	return this._timeFromStart;
@@ -74,7 +71,6 @@ gdjs.TimeManager.prototype.getTimeFromStart = function() {
 /**
  * Return true if update was called only once (i.e: if the scene
  * is rendering its first frame).
- * @method isFirstFrame
  */
 gdjs.TimeManager.prototype.isFirstFrame = function() {
 	return this._firstFrame;
@@ -83,7 +79,6 @@ gdjs.TimeManager.prototype.isFirstFrame = function() {
 /**
  * Return the time elapsed since the last call to update
  * (i.e: the last frame), in milliseconds.
- * @method getElapsedTime
  */
 gdjs.TimeManager.prototype.getElapsedTime = function() {
 	return this._elapsedTime;

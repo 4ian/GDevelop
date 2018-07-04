@@ -66,7 +66,6 @@ gdjs.LayerPixiRenderer.prototype._addFilters = function() {
  * Add a child to the pixi container associated to the layer.
  * All objects which are on this layer must be children of this container.
  *
- * @method addRendererObject
  * @param child The child (PIXI object) to be added.
  * @param zOrder The z order of the associated object.
  */
@@ -85,7 +84,6 @@ gdjs.LayerPixiRenderer.prototype.addRendererObject = function(child, zOrder) {
 /**
  * Change the z order of a child associated to an object.
  *
- * @method changeRendererObjectZOrder
  * @param child The child (PIXI object) to be modified.
  * @param newZOrder The z order of the associated object.
  */
@@ -98,7 +96,6 @@ gdjs.LayerPixiRenderer.prototype.changeRendererObjectZOrder = function(child, ne
  * Remove a child from the internal pixi container.
  * Should be called when an object is deleted or removed from the layer.
  *
- * @method removeRendererObject
  * @param child The child (PIXI object) to be removed.
  */
 gdjs.LayerPixiRenderer.prototype.removeRendererObject = function(child) {

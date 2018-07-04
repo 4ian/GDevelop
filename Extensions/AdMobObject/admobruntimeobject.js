@@ -12,10 +12,10 @@ if (typeof AdMob !== "undefined")
  * The AdMobRuntimeObject displays an AdMob ad banner on screen.
  * This works with Cordova compatible platforms with `cordova-plugin-admobpro` plugin installed.
  *
- * @namespace gdjs
+ * @memberof gdjs
  * @class AdMobRuntimeObject
  * @extends RuntimeObject
- * @namespace gdjs
+ * @memberof gdjs
  */
 gdjs.AdMobRuntimeObject = function(runtimeScene, objectData)
 {

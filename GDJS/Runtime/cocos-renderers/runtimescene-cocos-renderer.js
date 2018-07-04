@@ -4,6 +4,11 @@
  * This project is released under the MIT License.
  */
 
+/**
+ * Renderer for a gdjs.RuntimeScene with Cocos2d-JS.
+ * @memberof gdjs
+ * @class RuntimeSceneCocosRenderer
+ */
 gdjs.RuntimeSceneCocosRenderer = function(runtimeScene, runtimeGameRenderer)
 {
     this._runtimeScene = runtimeScene;
@@ -57,6 +62,9 @@ gdjs.RuntimeSceneCocosRenderer.prototype.onCanvasResized = function() {
     // Nothing to do here.
 };
 
+/**
+ * Render the scene
+ */
 gdjs.RuntimeSceneCocosRenderer.prototype.render = function() {
     var intColor = this._runtimeScene.getBackgroundColor();
     var r = (intColor >> 16) & 255;

@@ -5,7 +5,7 @@
  */
 
 /**
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class common
  * @static
  * @private
@@ -16,9 +16,7 @@ gdjs.evtTools.common = gdjs.evtTools.common || {};
 
 /**
  * Get the value of a variable. Equivalent of variable.getAsNumber().
- * @method getVariableValue
  * @private
- * @static
  */
 gdjs.evtTools.common.getVariableNumber = function(variable) {
     return variable.getAsNumber();
@@ -26,63 +24,49 @@ gdjs.evtTools.common.getVariableNumber = function(variable) {
 
 /**
  * Get the string of a variable. Equivalent of variable.getAsString().
- * @method getVariableValue
  * @private
- * @static
  */
 gdjs.evtTools.common.getVariableString = function(variable) {
     return variable.getAsString();
 };
 
 /**
- * @method sceneVariableExists
  * @private
- * @static
  */
 gdjs.evtTools.common.sceneVariableExists = function(runtimeScene, variableName) {
     return runtimeScene.getVariables().has(variableName);
 };
 
 /**
- * @method globalVariableExists
  * @private
- * @static
  */
 gdjs.evtTools.common.globalVariableExists = function(runtimeScene, variableName) {
     return runtimeScene.getGame().getVariables().has(variableName);
 };
 
 /**
- * @method variableChildExists
  * @private
- * @static
  */
 gdjs.evtTools.common.variableChildExists = function(variable, childName) {
     return variable.hasChild(childName);
 };
 
 /**
- * @method variableRemoveChild
  * @private
- * @static
  */
 gdjs.evtTools.common.variableRemoveChild = function(variable, childName) {
     return variable.removeChild(childName);
 };
 
 /**
- * @method variableClearChildren
  * @private
- * @static
  */
 gdjs.evtTools.common.variableClearChildren = function(variable) {
     variable.clearChildren();
 };
 
 /**
- * @method getVariableChildCount
  * @private
- * @static
  */
 gdjs.evtTools.common.getVariableChildCount = function(variable) {
     if (variable.isStructure() == false) return 0;
@@ -91,9 +75,7 @@ gdjs.evtTools.common.getVariableChildCount = function(variable) {
 
 /**
  * Convert a string to a float.
- * @method toNumber
  * @private
- * @static
  */
 gdjs.evtTools.common.toNumber = function(str) {
     return parseFloat(str);
@@ -101,9 +83,7 @@ gdjs.evtTools.common.toNumber = function(str) {
 
 /**
  * Convert a number to a string.
- * @method toString
  * @private
- * @static
  */
 gdjs.evtTools.common.toString = function(num) {
     //Using String literal is fastest than using toString according to
@@ -113,9 +93,7 @@ gdjs.evtTools.common.toString = function(num) {
 
 /**
  * Negate the boolean.
- * @method logicalNegation
  * @private
- * @static
  */
 gdjs.evtTools.common.logicalNegation = function(bool) {
     return !bool;

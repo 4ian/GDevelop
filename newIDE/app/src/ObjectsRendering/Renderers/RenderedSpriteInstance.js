@@ -46,8 +46,6 @@ RenderedSpriteInstance.prototype = Object.create(RenderedInstance.prototype);
 
 /**
  * Return a URL for thumbnail of the specified object.
- * @method getThumbnail
- * @static
  */
 RenderedSpriteInstance.getThumbnail = function(
   project,

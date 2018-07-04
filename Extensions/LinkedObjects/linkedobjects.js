@@ -6,7 +6,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
 /**
  * Manages the links between objects.
  *
- * @namespace gdjs
+ * @memberof gdjs
  * @class LinksManager
  * @constructor
  */
@@ -17,9 +17,6 @@ gdjs.LinksManager = function()
 
 /**
  * Get the links manager of a scene.
- *
- * @method getManager
- * @static
  */
 gdjs.LinksManager.getManager = function(runtimeScene) {
     if (!runtimeScene.linkedObjectsManager) { //Create the shared manager if necessary.
@@ -77,7 +74,7 @@ gdjs.LinksManager.prototype.removeLinkBetween = function(objA, objB) {
 };
 
 /**
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class linkedObjects
  * @static
  * @private

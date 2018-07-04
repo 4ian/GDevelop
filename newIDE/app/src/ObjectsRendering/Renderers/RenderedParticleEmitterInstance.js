@@ -38,8 +38,6 @@ RenderedParticleEmitterInstance.prototype = Object.create(
 
 /**
  * Return a URL for thumbnail of the specified object.
- * @method getThumbnail
- * @static
  */
 RenderedParticleEmitterInstance.getThumbnail = function(
   project,

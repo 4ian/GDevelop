@@ -1,5 +1,5 @@
 /**
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class facebookInstantGames
  * @static
  * @private

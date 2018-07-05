@@ -14,10 +14,16 @@ const styles = {
   titleContainer: {
     padding: 0,
   },
+  container: {
+    paddingLeft: 12,
+    paddingRight: 12,
+    display: 'flex',
+    alignItems: 'center',
+  },
   objectTitle: {
-    left: "10px",
-    width:"available",
-  }
+    left: '10px',
+    width: '80%',
+  },
 };
 
 type StateType = {|
@@ -27,7 +33,7 @@ type StateType = {|
 export class ObjectEditorDialog extends Component<*, StateType> {
   state = {
     currentTab: 'properties',
-    newObjectName: this.props.objectName
+    newObjectName: this.props.objectName,
   };
 
   _onChangeTab = (value: string) => {
@@ -38,23 +44,22 @@ export class ObjectEditorDialog extends Component<*, StateType> {
 
   render() {
     const actions = [
-      <FlatButton
-        key="cancel"
-        label="Cancel"
-        onClick={this.props.onCancel}
-      />,
+      <FlatButton key="cancel" label="Cancel" onClick={this.props.onCancel} />,
       <FlatButton
         key="apply"
         label="Apply"
         primary
         keyboardFocused
-        onClick={this.props.onApply}
+        onClick={() => {
+          this.props.onRename(this.state.newObjectName);
+          this.props.onApply();
+        }}
       />,
     ];
 
     const EditorComponent = this.props.editorComponent;
     const { currentTab } = this.state;
-    
+
     return (
       <Dialog
         key={this.props.object && this.props.object.ptr}
@@ -75,18 +80,20 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         }
         titleStyle={styles.titleContainer}
       >
-      Object Name:
-      <SemiControlledTextField
-          style={styles.objectTitle}
-          commitOnBlur
-          value={this.state.newObjectName}
-          hintText="Object Name"
-          onChange={text => {
-            if (this.props.canRenameObject(text)){
-              this.setState({newObjectName:text})
-            }
-          }}
-        />
+        <div style={styles.container}>
+          Object Name:
+          <SemiControlledTextField
+            style={styles.objectTitle}
+            commitOnBlur
+            value={this.state.newObjectName}
+            hintText="Object Name"
+            onChange={text => {
+              if (this.props.canRenameObject(text)) {
+                this.setState({ newObjectName: text });
+              }
+            }}
+          />
+        </div>
         {currentTab === 'properties' &&
           EditorComponent && (
             <EditorComponent

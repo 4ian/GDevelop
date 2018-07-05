@@ -77,10 +77,7 @@ export default class SceneEditor extends Component {
       layerRemoveDialogOpen: false,
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
-
-      // editedObject: null, //deprecated over below
       editedObjectWithContext: { object: null, global: null },
-      editedObjectNewName: null,
       variablesEditedInstance: null,
       selectedObjectName: null,
 
@@ -216,7 +213,6 @@ export default class SceneEditor extends Component {
 
   editObject = eObject => {
     const { project } = this.props;
-    // this.setState({ editedObject: eObject });//deprecated
     if (eObject) {
       this.setState({
         editedObjectWithContext: {
@@ -232,7 +228,6 @@ export default class SceneEditor extends Component {
         },
       });
     }
-    console.log(this.state.editedObjectWithContext);
   };
 
   editObjectByName = objectName => {
@@ -419,7 +414,7 @@ export default class SceneEditor extends Component {
       layout.hasObjectNamed(newName) ||
       project.hasObjectNamed(newName)
     ) {
-      showWarningBox('Another object with this name already exists');
+      showWarningBox('Another object with this name already exists.');
       return false;
     }
     return true;
@@ -427,14 +422,11 @@ export default class SceneEditor extends Component {
 
   _onRenameEditedObject = newName => {
     if (newName !== null) {
-      this._onRenameObject(
-        this.state.editedObjectWithContext,
-        newName
-      );
+      this._onRenameObject(this.state.editedObjectWithContext, newName);
     }
   };
 
-  _onRenameObject = (objectWithContext, newName, done=null) => {
+  _onRenameObject = (objectWithContext, newName, done = null) => {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
@@ -451,7 +443,7 @@ export default class SceneEditor extends Component {
         object.getName(),
         newName
       );
-    };
+    }
     object.setName(newName);
     if (done !== null) {
       done(true);
@@ -686,21 +678,16 @@ export default class SceneEditor extends Component {
             this.reloadResourcesFor(this.state.editedObjectWithContext.object);
             this.editObject(null);
           }}
-          canRenameObject={newName => {
-            if (
-              this._canObjectUseNewName(
-                this.state.editedObjectWithContext,
-                newName
-              )
-            ) {
-              this.setState({ editedObjectNewName: newName });
-              return true;
-            } else {
-              return false;
-            }
+          canRenameObject={tryName => {
+            return this._canObjectUseNewName(
+              this.state.editedObjectWithContext,
+              tryName
+            );
+          }}
+          onRename={newName => {
+            this._onRenameEditedObject(newName);
           }}
           onApply={() => {
-            this._onRenameEditedObject(this.state.editedObjectNewName);
             this.reloadResourcesFor(this.state.editedObjectWithContext.object);
             this.editObject(null);
             this.updateBehaviorsSharedData();

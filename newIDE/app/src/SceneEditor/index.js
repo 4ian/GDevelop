@@ -421,12 +421,10 @@ export default class SceneEditor extends Component {
   };
 
   _onRenameEditedObject = newName => {
-    if (newName !== null) {
-      this._onRenameObject(this.state.editedObjectWithContext, newName);
-    }
+    this._onRenameObject(this.state.editedObjectWithContext, newName);
   };
 
-  _onRenameObject = (objectWithContext, newName, done = null) => {
+  _onRenameObject = (objectWithContext, newName, done = () => {}) => {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
@@ -445,9 +443,7 @@ export default class SceneEditor extends Component {
       );
     }
     object.setName(newName);
-    if (done !== null) {
-      done(true);
-    }
+    done(true);
   };
 
   _onDeleteGroup = (groupWithScope, done) => {

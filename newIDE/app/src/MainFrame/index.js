@@ -213,7 +213,6 @@ export default class MainFrame extends React.Component<Props, State> {
           currentProject: project,
         },
         () => {
-          this.loadExtensions();
           cb();
         }
       );

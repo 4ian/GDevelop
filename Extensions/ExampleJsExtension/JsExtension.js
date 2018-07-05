@@ -62,7 +62,7 @@ module.exports = {
       )
       .getCodeExtraInformation()
       .setIncludeFile(
-        "Extensions/FacebookInstantGames/facebookinstantgamestools.js"
+        "Extensions/ExampleJsExtension/examplejsextensiontools.js"
       )
       .setFunctionName("gdjs.evtTools.exampleJsExtension.getString");
 
@@ -118,7 +118,9 @@ module.exports = {
         dummyBehavior,
         new gd.BehaviorsSharedData()
       )
-      .setIncludeFile("Extensions/ExampleJsExtension/dummyruntimebehavior.js");
+      .setIncludeFile("Extensions/ExampleJsExtension/dummyruntimebehavior.js")
+      // You can optionally include more than one file when the behavior is used:
+      .addIncludeFile("Extensions/ExampleJsExtension/examplejsextensiontools.js");
 
     // Declare another behavior, with shared data between the behaviors
     // In addition to the usual behavior:
@@ -185,7 +187,9 @@ module.exports = {
         dummyBehaviorWithSharedData,
         sharedData,
       )
-      .setIncludeFile("Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js");
+      .setIncludeFile("Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js")
+      // You can optionally include more than one file when the behavior is used:
+      .addIncludeFile("Extensions/ExampleJsExtension/examplejsextensiontools.js");
 
     // Declare an object.
     // Create a new gd.ObjectJsImplementation object and implement the methods

@@ -43,16 +43,36 @@ Refer to the [GDevelop IDE Readme](./README.md) for more information about the i
 
   > ⚠️ Always check the developer console after reloading GDevelop. If there is any error signaled, click on it to see what went wrong. You may have done a syntax error or mis-used an API.
 
-### Documentation for the game engine
+### Implement your feature for the game engine
 
-- Check the [GDJS game engine documentation here](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation/index.html). In particular, check:
+> ℹ️ Implement your extension in file called `extensionnametools.js` (for general functions), `objectnameruntimeobject.js` (for objects) or `behaviornameruntimebehavior.js` (for behaviors). See then the next section for declaring these files and the content of the extension to the IDE.
 
-  - [`gdjs.RuntimeScene`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeScene.html), the class representing a scene being played.
-  - [`gdjs.RuntimeBehavior`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeBehavior.html), the base class inherited by all behaviors.
-  - [`gdjs.RuntimeObject`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeObject.html), the base class inherited by all objects.
-  - It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to directly see how the game engine is done.
+Check the [GDJS game engine documentation here](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation/index.html). It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to see directly how the game engine is done when needed.
 
-### How to declare the extensions
+#### How to create functions to be called by events
+
+See examples in [examplejsextensiontools.js](../Extensions/ExampleJsExtension/examplejsextensiontools.js).
+
+Read about [`gdjs.RuntimeScene`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeScene.html), the class representing a scene being played, as lots of events can need it.
+
+#### How to create a behavior by extending `gdjs.RuntimeBehavior`
+
+See examples in [dummyruntimebehavior.js](../Extensions/ExampleJsExtension/dummyruntimebehavior.js) (or [dummywithshareddataruntimebehavior.js](../Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js) for an example with shared data between behaviors).
+
+You'll be interested in the constructor (to initialize things), `onDeActivate` (called when behavior is deactivated), `doStepPreEvents`
+and `doStepPostEvents` (to run logic before/after the events at each frame).
+
+Read about [`gdjs.RuntimeBehavior`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeBehavior.html), the base class inherited by all behaviors, to see everything that is available.
+
+#### How to create an object by extending `gdjs.RuntimeObject`
+
+> 👋 There is still no examples for objects, as declaring objects is not yet fully exposed to JavaScript extensions. Your help is welcome to expose this feature!
+
+Read about [`gdjs.RuntimeObject`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeObject.html), the base class inherited by all objects.
+
+### How to declare your extension to the IDE
+
+> ℹ️ Declaration must be done in a file called `JsExtension.js`. Your extension must be in Extensions folder, in its own directory.
 
 The API to declare extensions is almost 100% equivalent to the way extensions are declared in C++, so most links will redirect to this documentation.
 

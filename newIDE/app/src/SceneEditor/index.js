@@ -211,13 +211,13 @@ export default class SceneEditor extends Component {
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
-  editObject = eObject => {
+  editObject = editedObject => {
     const { project } = this.props;
-    if (eObject) {
+    if (editedObject) {
       this.setState({
         editedObjectWithContext: {
-          object: eObject,
-          global: project.hasObjectNamed(eObject.getName()),
+          object: editedObject,
+          global: project.hasObjectNamed(editedObject.getName()),
         },
       });
     } else {
@@ -632,6 +632,16 @@ export default class SceneEditor extends Component {
             onObjectSelected={this._onObjectSelected}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
+            canRenameObject={tryName => {
+              const editedObjectWithContext = {
+                object: layout.getObject(this.state.selectedObjectName),
+                global: project.hasObjectNamed(this.state.selectedObjectName),
+              };
+              return this._canObjectUseNewName(
+                editedObjectWithContext,
+                tryName
+              );
+            }}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
             ref={objectsList => (this._objectsList = objectsList)}

@@ -8,21 +8,12 @@ import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 
+import { Column, Line } from '../UI/Grid';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 
 const styles = {
   titleContainer: {
     padding: 0,
-  },
-  container: {
-    paddingLeft: 12,
-    paddingRight: 12,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  objectTitle: {
-    left: '10px',
-    width: '80%',
   },
 };
 
@@ -80,20 +71,22 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         }
         titleStyle={styles.titleContainer}
       >
-        <div style={styles.container}>
-          Object Name:
-          <SemiControlledTextField
-            style={styles.objectTitle}
-            commitOnBlur
-            value={this.state.newObjectName}
-            hintText="Object Name"
-            onChange={text => {
-              if (this.props.canRenameObject(text)) {
-                this.setState({ newObjectName: text });
-              }
-            }}
-          />
-        </div>
+        <Line alignItems="baseline">
+          <Column>Object Name:</Column>
+          <Column expand>
+            <SemiControlledTextField
+              fullWidth
+              commitOnBlur
+              value={this.state.newObjectName}
+              hintText="Object Name"
+              onChange={text => {
+                if (this.props.canRenameObject(text)) {
+                  this.setState({ newObjectName: text });
+                }
+              }}
+            />
+          </Column>
+        </Line>
         {currentTab === 'properties' &&
           EditorComponent && (
             <EditorComponent
@@ -104,6 +97,7 @@ export class ObjectEditorDialog extends Component<*, StateType> {
               resourceExternalEditors={this.props.resourceExternalEditors}
               onSizeUpdated={() =>
                 this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+              objectName={this.props.objectName}
             />
           )}
         {currentTab === 'behaviors' && (

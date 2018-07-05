@@ -60,7 +60,7 @@ class ObjectsList extends Component<*, *> {
 
   render() {
     let { height, width, fullList, project, selectedObjectName } = this.props;
-    
+
     return (
       <List
         ref={list => (this.list = list)}
@@ -110,7 +110,7 @@ class ObjectsList extends Component<*, *> {
               onCutObject={() => this.props.onCutObject(objectWithContext)}
               onPaste={() => this.props.onPaste(objectWithContext)}
               onRename={newName =>
-                this.props.onRename(objectWithContext, newName)}
+                this.props.onRename(objectWithContext, newName)}            
               onSetAsGlobalObject={
                 objectWithContext.global
                   ? undefined
@@ -139,6 +139,7 @@ type StateType = {|
   renamedObjectWithScope: ?ObjectWithContext,
   variablesEditedObject: any,
   searchText: string,
+  // tryName:string,
 |};
 
 export default class ObjectsListContainer extends React.Component<
@@ -153,6 +154,7 @@ export default class ObjectsListContainer extends React.Component<
       newName: string,
       cb: Function
     ) => cb(true),
+    // canRenameObject: (tryName: string)
   };
 
   sortableList: any;
@@ -312,30 +314,20 @@ export default class ObjectsListContainer extends React.Component<
     });
   };
 
-  _rename = (objectWithContext: ObjectWithContext, newName: string) => { ///deprecate for the refactored function
+  _rename = (objectWithContext: ObjectWithContext, newName: string) => { 
     const { object } = objectWithContext;
-    const { project, objectsContainer } = this.props;
 
     this.setState({
       renamedObjectWithScope: null,
     });
+    if(this.props.canRenameObject(newName)){
+      this.props.onRenameObject(objectWithContext, newName, doRename => {
+        if (!doRename) return;
 
-    if (object.getName() === newName) return;
-
-    if (
-      objectsContainer.hasObjectNamed(newName) ||
-      project.hasObjectNamed(newName)
-    ) {
-      showWarningBox('Another object with this name already exists');
-      return;
+        object.setName(newName);
+        this.forceUpdate();
+      });
     }
-
-    this.props.onRenameObject(objectWithContext, newName, doRename => {
-      if (!doRename) return;
-
-      object.setName(newName);
-      this.forceUpdate();
-    });
   };
 
   _move = (oldIndex: number, newIndex: number) => {

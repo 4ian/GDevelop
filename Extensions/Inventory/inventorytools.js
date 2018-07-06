@@ -16,7 +16,7 @@ gdjs.InventoryManager.get = function(runtimeScene, name) {
 }
 
 /**
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class inventory
  * @static
  * @private

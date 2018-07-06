@@ -10,8 +10,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  * ( see gdjs.PathfindingRuntimeBehavior.obstaclesManagers ).
  *
  * @class PathfindingObstaclesManager
- * @namespace gdjs
- * @constructor
+ * @memberof gdjs
  */
 gdjs.PathfindingObstaclesManager = function(runtimeScene)
 {
@@ -21,9 +20,6 @@ gdjs.PathfindingObstaclesManager = function(runtimeScene)
 
 /**
  * Get the obstacles manager of a scene.
- *
- * @method getManager
- * @static
  */
 gdjs.PathfindingObstaclesManager.getManager = function(runtimeScene) {
     if (!runtimeScene.pathfindingObstaclesManager) { //Create the shared manager if necessary.
@@ -35,8 +31,6 @@ gdjs.PathfindingObstaclesManager.getManager = function(runtimeScene) {
 
 /**
  * Add a obstacle to the list of existing obstacles.
- *
- * @method addObstacle
  */
 gdjs.PathfindingObstaclesManager.prototype.addObstacle = function(pathfindingObstacleBehavior) {
     this._obstaclesHSHG.addObject(pathfindingObstacleBehavior);
@@ -45,8 +39,6 @@ gdjs.PathfindingObstaclesManager.prototype.addObstacle = function(pathfindingObs
 /**
  * Remove a obstacle from the list of existing obstacles. Be sure that the obstacle was
  * added before.
- *
- * @method removeObstacle
  */
 gdjs.PathfindingObstaclesManager.prototype.removeObstacle = function(pathfindingObstacleBehavior) {
     this._obstaclesHSHG.removeObject(pathfindingObstacleBehavior);
@@ -55,9 +47,8 @@ gdjs.PathfindingObstaclesManager.prototype.removeObstacle = function(pathfinding
 /**
  * Tool class which represents a simple point with a radius and a getAABB method.
  * @class Vertex
- * @namespace gdjs.PathfindingObstaclesManager
+ * @memberof gdjs.PathfindingObstaclesManager
  * @private
- * @constructor
  */
 gdjs.PathfindingObstaclesManager.Vertex = function(x,y,radius) {
     this.x = x;
@@ -67,7 +58,6 @@ gdjs.PathfindingObstaclesManager.Vertex = function(x,y,radius) {
 
 /**
  * Return an axis aligned bouding box for the vertex.
- * @method getAABB
  */
 gdjs.PathfindingObstaclesManager.Vertex.prototype.getAABB = function(){
     var rad = this.radius, x = this.x, y = this.y;
@@ -81,7 +71,6 @@ gdjs.PathfindingObstaclesManager.Vertex.prototype.getAABB = function(){
  * @param radius The radius of the search
  * @param result If defined, the obstacles near the object will be inserted into result (Using the identifier of their owner object as key).
  * @return If result is not defined, an array with all obstacles near the position. Otherwise, nothing is returned.
- * @method getAllObstaclesAround
  */
 gdjs.PathfindingObstaclesManager.prototype.getAllObstaclesAround = function(x, y, radius, result) {
     var vertex = new gdjs.PathfindingObstaclesManager.Vertex(x,y, radius);
@@ -95,8 +84,7 @@ gdjs.PathfindingObstaclesManager.prototype.getAllObstaclesAround = function(x, y
  * considered as a obstacle by objects having Pathfinding Behavior.
  *
  * @class PathfindingObstacleRuntimeBehavior
- * @namespace gdjs
- * @constructor
+ * @memberof gdjs
  */
 gdjs.PathfindingObstacleRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 {

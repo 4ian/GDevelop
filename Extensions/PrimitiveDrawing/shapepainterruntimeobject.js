@@ -8,7 +8,7 @@
  *
  * @class ShapePainterRuntimeObject
  * @extends RuntimeObject
- * @namespace gdjs
+ * @memberof gdjs
  */
 gdjs.ShapePainterRuntimeObject = function(runtimeScene, objectData)
 {

@@ -25,8 +25,6 @@ function RenderedInstance(
 
 /**
  * Convert an angle from degrees to radians.
- * @static
- * @method toRad
  */
 RenderedInstance.toRad = function(angleInDegrees) {
   return angleInDegrees / 180 * 3.14159;
@@ -34,7 +32,6 @@ RenderedInstance.toRad = function(angleInDegrees) {
 
 /**
  * Called when the scene editor is rendered.
- * @method update
  */
 RenderedInstance.prototype.update = function() {
   //Nothing to do.
@@ -52,7 +49,6 @@ RenderedInstance.prototype.getInstance = function() {
  * Called to notify the instance renderer that its associated instance was removed from
  * the scene. The PIXI object should probably be removed from the container: This is what
  * the default implementation of the method does.
- * @method instanceRemovedFromScene
  */
 RenderedInstance.prototype.instanceRemovedFromScene = function() {
   if (
@@ -72,7 +68,6 @@ RenderedInstance.prototype.getOriginY = function() {
 
 /**
  * Return the width of the instance when the instance doesn't have a custom size.
- * @method getDefaultWidth
  */
 RenderedInstance.prototype.getDefaultWidth = function() {
   return 32;
@@ -80,7 +75,6 @@ RenderedInstance.prototype.getDefaultWidth = function() {
 
 /**
  * Return the height of the instance when the instance doesn't have a custom size.
- * @method getDefaultHeight
  */
 RenderedInstance.prototype.getDefaultHeight = function() {
   return 32;

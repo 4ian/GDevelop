@@ -20,7 +20,7 @@ IF (NOT EMSCRIPTEN)
 ENDIF()
 ADD_SUBDIRECTORY(DestroyOutsideBehavior)
 ADD_SUBDIRECTORY(DraggableBehavior)
-ADD_SUBDIRECTORY(FacebookInstantGames)
+# ADD_SUBDIRECTORY(FacebookInstantGames) - Pure JS extension, see "JsExtension.js".
 IF (NOT EMSCRIPTEN)
 	ADD_SUBDIRECTORY(Function)
 ENDIF()

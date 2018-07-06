@@ -68,6 +68,7 @@ import {
 } from '../Export/PreviewLauncher.flow';
 import { type ResourceSource } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import { type JsExtensionsLoader } from '../JsExtensionsLoader';
 
 const gd = global.gd;
 
@@ -119,6 +120,7 @@ type Props = {
   exportDialog?: React.Element<*>,
   createDialog?: React.Element<*>,
   authentification: Authentification,
+  extensionsLoader?: JsExtensionsLoader,
 };
 
 export default class MainFrame extends React.Component<Props, State> {
@@ -156,6 +158,33 @@ export default class MainFrame extends React.Component<Props, State> {
     if (this.props.introDialog && !Window.isDev()) this._openIntroDialog(true);
   }
 
+  componentDidMount() {
+    this.loadExtensions();
+  }
+
+  loadExtensions = () => {
+    const { extensionsLoader } = this.props;
+    if (extensionsLoader) {
+      extensionsLoader
+        .loadAllExtensions()
+        .then(loadingResults => {
+          const successLoadingResults = loadingResults.filter(
+            loadingResult => !loadingResult.result.error
+          );
+          const failLoadingResults = loadingResults.filter(
+            loadingResult => loadingResult.result.error
+          );
+          console.info(`Loaded ${successLoadingResults.length} JS extensions.`);
+          if (failLoadingResults.length) {
+            console.error(
+              `⚠️ Unable to load ${failLoadingResults.length} JS extensions. 🔥 Please check these errors and fix them as they could crash GDevelop:`,
+              failLoadingResults
+            );
+          }
+        });
+    }
+  };
+
   loadFromSerializedProject = (
     serializedProject: gdSerializerElement,
     cb: Function
@@ -183,7 +212,9 @@ export default class MainFrame extends React.Component<Props, State> {
         {
           currentProject: project,
         },
-        cb
+        () => {
+          cb();
+        }
       );
     });
   };
@@ -873,7 +904,7 @@ export default class MainFrame extends React.Component<Props, State> {
     this.setState({
       helpFinderDialogOpen: open,
     });
-  }
+  };
 
   setUpdateStatus = (status: UpdateStatus) => {
     this.setState({

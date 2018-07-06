@@ -1,0 +1,103 @@
+@import "common.less";
+
+::-webkit-scrollbar {
+    width: 8px;
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: gray;
+    border-radius: 4px;
+}
+
+.navigation {
+    position: fixed;
+    float: left;
+    width: @navWidth;
+    height: 100%;
+    background-color: @colorBgNavi;
+
+    .applicationName {
+        margin: 0;
+        margin-top: 15px;
+        padding: 10px 15px;
+        font: bold 1.25em Helvetica;
+        color: #fff;
+
+        a {
+            color: #fff;
+        }
+    }
+
+    .search {
+        padding: 10px 15px;
+
+        input {
+            background-color: #333;
+            color: #fff;
+            border-color: #555;
+        }
+    }
+
+    .list {
+        padding: 10px 15px 0 15px;
+        position: relative;
+        overflow: auto;
+        width: 100%;
+    }
+
+    li.item {
+        margin-bottom: 8px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #333;
+
+        a {
+            color: #bbb;
+            &:hover {
+                color: #fff;
+            }
+        }
+        .title {
+            cursor: pointer;
+            position: relative;
+            a {
+                color: #e1e1e1;
+                &:hover {
+                    color: #fff;
+                }
+            }
+            display: block;
+            font-size: 0.8em;
+
+            .static {
+                display: block;
+                border-radius: 3px;
+                background-color: @colorSubtitle;
+                color: #000;
+                font-size: 0.7em;
+                padding: 2px 4px;
+                float: right;
+            }
+        }
+
+        .subtitle {
+            margin-top: 10px;
+            font: bold 0.65em Helvetica;
+            color: @colorSubtitle;
+            display: block;
+        }
+
+
+        ul {
+            & > li {
+                font-size: 0.7em;
+                padding-left: 8px;
+                margin-top: 2px;
+            }
+        }
+
+        .itemMembers {
+            display: none;
+        }
+    }
+}

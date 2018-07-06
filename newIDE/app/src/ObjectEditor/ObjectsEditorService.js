@@ -12,8 +12,43 @@ const gd = global.gd;
  * A service returning editor components for each object type.
  */
 export default {
-  getEditorConfiguration(type: string) {
-    return this.editorConfigurations[type];
+  getEditorConfiguration(objectType: string) {
+    if (!this.editorConfigurations[objectType]) {
+      console.warn(
+        `Object with type ${objectType} has no editor configuration registered. Please use registerEditorConfiguration to register your editor.`
+      );
+    }
+
+    return this.editorConfigurations[objectType];
+  },
+  registerEditorConfiguration: function(objectType, editorConfiguration) {
+    if (!editorConfiguration.component) {
+      console.warn(
+        `Tried to register editor configuration for object "${objectType}", but "component" property is not defined.`
+      );
+      return;
+    }
+    if (!editorConfiguration.newObjectCreator) {
+      console.warn(
+        `Tried to register editor configuration for object "${objectType}", but "newObjectCreator" property is not defined.`
+      );
+      return;
+    }
+    if (!editorConfiguration.castToObjectType) {
+      console.warn(
+        `Tried to register editor configuration for object "${objectType}", but "castToObjectType" property is not defined.`
+      );
+      return;
+    }
+
+    if (!this.editorConfigurations.hasOwnProperty(objectType)) {
+      console.warn(
+        `Tried to register renderer for object "${objectType}", but an editor configuration already exists.`
+      );
+      return;
+    }
+
+    this.editorConfigurations[objectType] = editorConfiguration;
   },
   editorConfigurations: {
     Sprite: {

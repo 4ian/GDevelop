@@ -7,24 +7,21 @@
 #define OBJECTMETADATA_H
 #include <map>
 #include <memory>
+#include <functional>
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Project/Object.h"
 #include "GDCore/String.h"
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #endif
 namespace gd {
-class Object;
-}
-namespace gd {
 class InstructionMetadata;
-}
-namespace gd {
 class ExpressionMetadata;
-}
+}  // namespace gd
 class wxBitmap;
 
-typedef std::unique_ptr<gd::Object> (*CreateFunPtr)(gd::String name);
+typedef std::function<std::unique_ptr<gd::Object>(gd::String name)> CreateFunPtr;
 
 namespace gd {
 
@@ -36,10 +33,25 @@ namespace gd {
  */
 class GD_CORE_API ObjectMetadata {
  public:
+  /**
+   * \brief Construct an object metadata, using a "blueprint" object that will
+   * be copied when a new object is asked.
+   */
   ObjectMetadata(const gd::String& extensionNamespace_,
                  const gd::String& name_,
                  const gd::String& fullname_,
-                 const gd::String& informations_,
+                 const gd::String& description_,
+                 const gd::String& icon24x24_,
+                 std::shared_ptr<gd::Object> blueprintObject_);
+
+  /**
+   * \brief Construct an object metadata, with a function that will be called
+   * to instanciate a new object.
+   */
+  ObjectMetadata(const gd::String& extensionNamespace_,
+                 const gd::String& name_,
+                 const gd::String& fullname_,
+                 const gd::String& description_,
                  const gd::String& icon24x24_,
                  CreateFunPtr createFunPtrP);
   ObjectMetadata() : createFunPtr(NULL) {}
@@ -157,6 +169,10 @@ class GD_CORE_API ObjectMetadata {
   wxBitmap icon;
 #endif
 #endif
+  std::shared_ptr<gd::Object>
+      blueprintObject;  ///< The "blueprint" object to be copied when a new
+                        ///< object is asked. Can be null in case a creation
+                        ///< function is passed.
 };
 
 }  // namespace gd

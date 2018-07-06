@@ -6,7 +6,7 @@ This project is released under the MIT License.
 */
 
  /**
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  */
 gdjs.sk = gdjs.sk || {
     // Some useful constants
@@ -27,7 +27,7 @@ gdjs.sk = gdjs.sk || {
 /**
  * The Matrix holds the basic transformation data in a matrix form.
  *
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  * @class Matrix
  */
 gdjs.sk.Matrix = function(a=1, b=0, tx=0, c=0, d=1, ty=0){
@@ -110,7 +110,7 @@ gdjs.sk.Matrix.prototype.str = function(){
 /**
  * The Transform is the basic class for transformable objects as bones, slots and armatures.
  *
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  * @class Transform
  */
 gdjs.sk.Transform = function(x=0, y=0, rot=0, sx=1, sy=1){

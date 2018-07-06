@@ -1,6 +1,6 @@
 # GDevelop IDE
 
-This is a new, revamped editor for GDevelop. It is based on [React](https://facebook.github.io/react/), [Material-UI](http://www.material-ui.com), [Pixi.js](https://github.com/pixijs/pixi.js) and [Electron](https://electron.atom.io/).
+This is the GDevelop 5 editor. It is based on [React](https://facebook.github.io/react/), [Material-UI](http://www.material-ui.com), [Pixi.js](https://github.com/pixijs/pixi.js) and [Electron](https://electron.atom.io/).
 It uses GDevelop [core C++ classes compiled to Javascript](https://github.com/4ian/GDevelop.js) to work with GDevelop games.
 
 ![GDevelop editor](https://raw.githubusercontent.com/4ian/GD/master/newIDE/gd-ide-screenshot.png "GDevelop editor")
@@ -12,13 +12,13 @@ Make sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) 
 ```bash
 git clone https://github.com/4ian/GD.git
 cd GD/newIDE/app
-yarn #or npm install
+npm install #or yarn
 ```
 
 ## Development
 
 ```bash
-yarn start #or npm start
+npm start #or yarn start
 ```
 
 This will open the app in your web browser.
@@ -35,7 +35,7 @@ You can run the app with Electron. **Make sure that you've run `yarn start` in `
 
 ```bash
 cd newIDE/electron-app
-yarn #or npm install
+npm install #or yarn
 
 #For macOS:
 ./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app
@@ -53,7 +53,7 @@ You can run a [storybook](https://github.com/storybooks/storybook) that is used 
 
 ```bash
 cd newIDE/app
-yarn storybook #or npm run storybook
+npm run storybook #or yarn storybook
 ```
 
 ### Tests
@@ -62,29 +62,29 @@ Unit tests and type checking can be launched with this command:
 
 ```bash
 cd newIDE/app
-yarn test #or npm run test
-yarn flow #or npm run flow
+npm run test #or yarn test
+npm run flow #or yarn flow
 ```
 
 ### Theming
 
 It's possible to create new themes for the UI. See [this file](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/index.js) to declare a new theme. You can take a look at the [default theme](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/index.js), including the [styling of the Events Sheets](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/EventsSheet.css).
 
-### Development of the game engine
+### Development of the game engine or extensions.
 
 Make sure to have the standalone app running with Electron.
 
-The game engine ([GDJS](https://github.com/4ian/GD/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GD/tree/master/GDJS/Runtime). If you modify anything, run the `import-GDJS-Runtime.js` script:
+* If you want create/modify *a extensions*, check the [README about extensions](./README-extensions.md) for a step-by-step explanations to get started in 5 minutes.
 
-```bash
-cd newIDE/app
-cd scripts
-node import-GDJS-Runtime.js
-```
+* The *game engine core* ([GDJS](https://github.com/4ian/GD/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GD/tree/master/GDJS/Runtime). If you modify anything, run the `import-GDJS-Runtime.js` script:
 
-You can then launch a preview in GDevelop (again, be sure to be using [the standalone app running with Electron](https://github.com/4ian/GD/blob/master/newIDE/README.md#development-of-the-standalone-app) to be sure to have your changes reflected immediately).
+  ```bash
+  cd newIDE/app
+  cd scripts
+  node import-GDJS-Runtime.js
+  ```
 
-> If you want to go further and create/modify an extension, check the sources in [Extensions folder](https://github.com/4ian/GD/tree/master/Extensions) and install [GDevelop.js](https://github.com/4ian/GDevelop.js). You'll then be able to make changes in C++ source files and have this reflected in the editor.
+  You can then launch a preview in GDevelop (again, be sure to be using [the standalone app running with Electron](https://github.com/4ian/GD/blob/master/newIDE/README.md#development-of-the-standalone-app) to be sure to have your changes reflected immediately).
 
 ### Recommended tools for development
 

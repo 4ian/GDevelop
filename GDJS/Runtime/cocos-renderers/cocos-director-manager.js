@@ -10,7 +10,8 @@
  * director needs (always a scene living, different call to push the 1st scene).
  *
  * @class CocosDirectorManager
- * @namespace gdjs
+ * @memberof gdjs
+ * @param {Object} The Cocos2D-JS to use. If not specified, `cc.director` will be used.
  */
 gdjs.CocosDirectorManager = function(cocosDirector)
 {

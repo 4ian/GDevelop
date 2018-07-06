@@ -1,3 +1,9 @@
+
+/**
+ * The renderer for a gdjs.RuntimeGame using Pixi.js.
+ * @class RuntimeGamePixiRenderer
+ * @memberof gdjs
+ */
 gdjs.RuntimeGamePixiRenderer = function(game, width, height, forceFullscreen)
 {
     this._game = game;
@@ -27,7 +33,6 @@ gdjs.RuntimeGameRenderer = gdjs.RuntimeGamePixiRenderer; //Register the class to
 /**
  * Create a standard canvas inside canvasArea.
  *
- * @method createStandardCanvas
  */
 gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(canvasArea) {
     this._canvasArea = canvasArea;
@@ -52,7 +57,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(canvasAre
 
 /**
  * Get the current width of the canvas.
- * @method getCurrentWidth
  */
 gdjs.RuntimeGamePixiRenderer.prototype.getCurrentWidth = function() {
     return this._currentWidth;
@@ -60,7 +64,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.getCurrentWidth = function() {
 
 /**
  * Get the current height of the canvas.
- * @method getCurrentHeight
  */
 gdjs.RuntimeGamePixiRenderer.prototype.getCurrentHeight = function() {
     return this._currentHeight;
@@ -71,7 +74,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.getCurrentHeight = function() {
  * Note that if the canvas is fullscreen, it won't be resized, but when going back to
  * non fullscreen mode, the requested size will be used.
  *
- * @method setSize
  * @param width {Number} The new width
  * @param height {Number} The new height
  */
@@ -88,7 +90,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.setSize = function(width, height) {
  * Resize the canvas, according to _isFullscreen, _forceFullscreen, _currentWidth,
  * _currentHeight, _marginTop, _marginLeft, _marginRight, _marginBottom, _keepRatio.
  *
- * @method _resizeCanvas
  * @private
  */
 gdjs.RuntimeGamePixiRenderer.prototype.resize = function() {
@@ -157,7 +158,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.setMargins = function(top, right, bottom,
 
 /**
  * De/activate fullscreen for the game.
- * @method setFullScreen
  */
 gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function(enable) {
     if (this._forceFullscreen) return;
@@ -190,7 +190,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function(enable) {
 
 /**
  * Add the standard events handler.
- * @method bindStandardEvents
  */
 gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(manager, window, document) {
     var renderer = this._pixiRenderer;

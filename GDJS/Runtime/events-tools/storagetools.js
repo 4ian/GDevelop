@@ -7,9 +7,8 @@
 /**
  * Tools related to storage, for events generated code.
  *
- * @namespace gdjs.evtTools
- * @class storage
- * @static
+ * @memberof gdjs.evtTools
+ * @namespace storage
  * @private
  */
 gdjs.evtTools.storage = gdjs.evtTools.storage || {
@@ -23,10 +22,7 @@ gdjs.evtTools.storage = gdjs.evtTools.storage || {
  * provided by the browser.
  * The JSON object is named GDJS_filename in the localStorage object.
  *
- * @method loadJSONFileFromStorage
  * @param filename {String} The name of the JSON object
- * @static
- * @private
  */
 gdjs.evtTools.storage.loadJSONFileFromStorage = function(filename) {
 	if ( gdjs.evtTools.storage.loadedFiles.containsKey(filename) )
@@ -64,10 +60,7 @@ gdjs.evtTools.storage.loadJSONFileFromStorage = function(filename) {
  * object provided by the browser.
  * The JSON object is named GDJS_filename in the localStorage object.
  *
- * @method loadJSONFileFromStorage
  * @param filename {String} The name of the JSON object
- * @static
- * @private
  */
 gdjs.evtTools.storage.unloadJSONFile = function(filename) {
 	if ( !gdjs.evtTools.storage.loadedFiles.containsKey(filename) )

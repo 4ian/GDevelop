@@ -8,7 +8,7 @@
  *
  * @class PanelSpriteRuntimeObject
  * @extends RuntimeObject
- * @namespace gdjs
+ * @memberof gdjs
  */
 gdjs.PanelSpriteRuntimeObject = function(runtimeScene, objectData)
 {

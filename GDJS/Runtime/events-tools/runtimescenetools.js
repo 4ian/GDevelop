@@ -6,7 +6,7 @@
 
 /**
  * Tools related to runtime scene, for events generated code.
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class runtimeScene
  * @static
  * @private

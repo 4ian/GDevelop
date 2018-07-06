@@ -8,6 +8,7 @@
 #include <iostream>
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
+#include "GDCore/Project/Object.h"
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/bitmap.h>
 #include <wx/file.h>
@@ -19,14 +20,58 @@ namespace gd {
 ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
                                const gd::String& name_,
                                const gd::String& fullname_,
-                               const gd::String& informations_,
+                               const gd::String& description_,
+                               const gd::String& icon24x24,
+                               std::shared_ptr<gd::Object> blueprintObject_)
+    : extensionNamespace(extensionNamespace_),
+      blueprintObject(blueprintObject_) {
+  name = name_;
+#if defined(GD_IDE_ONLY)
+  SetFullName(gd::String(fullname_));
+  SetDescription(gd::String(description_));
+  iconFilename = icon24x24;
+#if !defined(GD_NO_WX_GUI)
+  if (!iconFilename.empty()) {
+    if (gd::SkinHelper::IconExists(icon24x24, 24))
+      SetBitmapIcon(gd::SkinHelper::GetIcon(icon24x24, 24));
+    else if (wxFile::Exists(icon24x24))
+      SetBitmapIcon(wxBitmap(icon24x24, wxBITMAP_TYPE_ANY));
+    else {
+      std::cout << "Warning: The icon file for object \"" << name_
+                << " was not found in the current skin icons"
+                << " and the specified name is not an existing filename.";
+      SetBitmapIcon(wxBitmap(24, 24));
+    }
+  }
+#endif
+#endif
+  createFunPtr =
+      [blueprintObject_](gd::String name) -> std::unique_ptr<gd::Object> {
+    if (blueprintObject_ == std::shared_ptr<gd::Object>()) {
+      std::cout
+          << "Error: Unable to create object. Have you declared an extension "
+             "(or ObjectMetadata) without specifying an object as blueprint?"
+          << std::endl;
+      return nullptr;
+    }
+
+    std::unique_ptr<gd::Object> newObject = blueprintObject_->Clone();
+    newObject->SetName(name);
+    return newObject;
+  };
+}
+
+ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
+                               const gd::String& name_,
+                               const gd::String& fullname_,
+                               const gd::String& description_,
                                const gd::String& icon24x24,
                                CreateFunPtr createFunPtrP)
     : extensionNamespace(extensionNamespace_) {
   name = name_;
 #if defined(GD_IDE_ONLY)
   SetFullName(gd::String(fullname_));
-  SetDescription(gd::String(informations_));
+  SetDescription(gd::String(description_));
   iconFilename = icon24x24;
 #if !defined(GD_NO_WX_GUI)
   if (!iconFilename.empty()) {

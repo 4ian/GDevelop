@@ -8,7 +8,7 @@ Copyright (c) 2010-2016 Florian Rival (Florian.Rival@gmail.com)
  * follow a path computed to avoid obstacles.
  *
  * @class PathfindingRuntimeBehavior
- * @constructor
+ * @memberof gdjs
  */
 gdjs.PathfindingRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 {
@@ -169,7 +169,6 @@ gdjs.PathfindingRuntimeBehavior.prototype.getDestinationY = function() {
 
 /**
  * Return true if the latest call to moveTo succeeded.
- * @method pathFound
  */
 gdjs.PathfindingRuntimeBehavior.prototype.pathFound = function() {
     return this._pathFound;
@@ -177,7 +176,6 @@ gdjs.PathfindingRuntimeBehavior.prototype.pathFound = function() {
 
 /**
  * Return true if the object reached its destination.
- * @method destinationReached
  */
 gdjs.PathfindingRuntimeBehavior.prototype.destinationReached = function() {
     return this._reachedEnd;
@@ -185,7 +183,6 @@ gdjs.PathfindingRuntimeBehavior.prototype.destinationReached = function() {
 
 /**
  * Compute and move on the path to the specified destination.
- * @method moveTo
  */
 gdjs.PathfindingRuntimeBehavior.prototype.moveTo = function(runtimeScene, x, y)
 {
@@ -319,7 +316,7 @@ gdjs.PathfindingRuntimeBehavior.prototype.doStepPostEvents = function(runtimeSce
 /**
  * Internal tool class representing a node when looking for a path
  * @private
- * @namespace gdjs.PathfindingRuntimeBehavior
+ * @memberof gdjs.PathfindingRuntimeBehavior
  * @class Node
  */
 gdjs.PathfindingRuntimeBehavior.Node = function(xPos, yPos)
@@ -341,8 +338,7 @@ gdjs.PathfindingRuntimeBehavior.Node = function(xPos, yPos)
 /**
  * Compute the euclidean distance between two positions.
  * @private
- * @namespace gdjs.PathfindingRuntimeBehavior
- * @method euclideanDistance
+ * @memberof gdjs.PathfindingRuntimeBehavior
  */
 gdjs.PathfindingRuntimeBehavior.euclideanDistance = function(a, b)
 {
@@ -352,8 +348,7 @@ gdjs.PathfindingRuntimeBehavior.euclideanDistance = function(a, b)
 /**
  * Compute the taxi distance between two positions.
  * @private
- * @namespace gdjs.PathfindingRuntimeBehavior
- * @method manhattanDistance
+ * @memberof gdjs.PathfindingRuntimeBehavior
  */
 gdjs.PathfindingRuntimeBehavior.manhattanDistance = function(a, b)
 {
@@ -361,7 +356,7 @@ gdjs.PathfindingRuntimeBehavior.manhattanDistance = function(a, b)
 };
 
 /**
- * \brief Internal tool class containing the structures used by A* and members functions related
+ * Internal tool class containing the structures used by A* and members functions related
  * to them.
  */
 gdjs.PathfindingRuntimeBehavior.SearchContext = function()

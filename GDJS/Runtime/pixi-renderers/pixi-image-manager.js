@@ -5,11 +5,11 @@
  */
 
 /**
- * PixiImageManager loads and stores textures that can be used by the objects.
+ * PixiImageManager loads and stores textures that can be used by the Pixi.js renderers.
  *
  * @class PixiImageManager
- * @namespace gdjs
- * @param runtimeGame The runtimeGame to be imageManager belongs to.
+ * @memberof gdjs
+ * @param {Object} resources The resources data of the game.
  */
 gdjs.PixiImageManager = function(resources)
 {
@@ -23,8 +23,7 @@ gdjs.ImageManager = gdjs.PixiImageManager; //Register the class to let the engin
 /**
  * Return the PIXI texture associated to the specified name.
  * Returns a placeholder texture if not found.
- * @param name The name of the texture to get.
- * @method getPIXITexture
+ * @param {string} name The name of the resource to get.
  */
 gdjs.PixiImageManager.prototype.getPIXITexture = function(name) {
 	if ( this._loadedTextures.containsKey(name) ) {
@@ -61,7 +60,6 @@ gdjs.PixiImageManager.prototype.getPIXITexture = function(name) {
 /**
  * Return a PIXI texture which can be used as a placeholder when no
  * suitable texture can be found.
- * @method getInvalidPIXITexture
  */
 gdjs.PixiImageManager.prototype.getInvalidPIXITexture = function() {
 	return this._invalidTexture;
@@ -75,7 +73,6 @@ gdjs.PixiImageManager.prototype.getInvalidPIXITexture = function() {
  * @param onComplete Callback called when loading is done.
  * @param resources The resources to be loaded. If not specified, will load the resources
  * specified in the PixiImageManager constructor.
- * @method loadTextures
  */
 gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, resources) {
 	resources = resources || this._resources;

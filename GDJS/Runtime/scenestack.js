@@ -2,7 +2,7 @@
 /**
  * Hold the stack of scenes (gdjs.RuntimeScene) being played.
  * 
- * @namespace gdjs
+ * @memberof gdjs
  * @class SceneStack
  */
 gdjs.SceneStack = function(runtimeGame) {

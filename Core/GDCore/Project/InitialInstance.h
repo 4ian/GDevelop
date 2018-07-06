@@ -206,7 +206,8 @@ class GD_CORE_API InitialInstance {
   /**
    * \brief Get the value of a float property stored in the instance.
    * \note Only use this when \a GetCustomProperties is too slow (when rendering
-   * instances for example). \return the value of the property, or 0 if it does
+   * instances for example). 
+   * \return the value of the property, or 0 if it does
    * not exists.
    */
   float GetRawFloatProperty(const gd::String& name) const;
@@ -214,10 +215,21 @@ class GD_CORE_API InitialInstance {
   /**
    * \brief Get the value of a string property stored in the instance.
    * \note Only use this when \a GetCustomProperties is too slow (when rendering
-   * instances for example). \return the value of the propety, or an empty
+   * instances for example). 
+   * \return the value of the propety, or an empty
    * string if it does not exists.
    */
   const gd::String& GetRawStringProperty(const gd::String& name) const;
+
+  /**
+   * \brief Set the value of a float property stored in the instance.
+   */
+  void SetRawFloatProperty(const gd::String& name, float value);
+
+  /**
+   * \brief Set the value of a string property stored in the instance.
+   */
+  void SetRawStringProperty(const gd::String& name, const gd::String& value);
 ///@}
 #endif
 

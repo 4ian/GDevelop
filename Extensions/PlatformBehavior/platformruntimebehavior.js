@@ -10,8 +10,7 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  * (see gdjs.PlatformRuntimeBehavior.getManager).
  *
  * @class PlatformObjectsManager
- * @namespace gdjs
- * @constructor
+ * @memberof gdjs
  */
 gdjs.PlatformObjectsManager = function(runtimeScene, sharedData)
 {
@@ -20,9 +19,6 @@ gdjs.PlatformObjectsManager = function(runtimeScene, sharedData)
 
 /**
  * Get the platforms manager of a scene.
- *
- * @method getManager
- * @static
  */
 gdjs.PlatformObjectsManager.getManager = function(runtimeScene) {
     if (!runtimeScene.platformsObjectsManager) { //Create the shared manager if necessary.
@@ -34,8 +30,6 @@ gdjs.PlatformObjectsManager.getManager = function(runtimeScene) {
 
 /**
  * Add a platform to the list of existing platforms.
- *
- * @method addPlatform
  */
 gdjs.PlatformObjectsManager.prototype.addPlatform = function(platformBehavior) {
     this._platformRBush.insert(platformBehavior);
@@ -44,8 +38,6 @@ gdjs.PlatformObjectsManager.prototype.addPlatform = function(platformBehavior) {
 /**
  * Remove a platform from the list of existing platforms. Be sure that the platform was
  * added before.
- *
- * @method removePlatform
  */
 gdjs.PlatformObjectsManager.prototype.removePlatform = function(platformBehavior) {
     this._platformRBush.remove(platformBehavior);
@@ -53,10 +45,9 @@ gdjs.PlatformObjectsManager.prototype.removePlatform = function(platformBehavior
 
 /**
  * Returns all the platforms around the specified object.
- * @param object {gdjs.RuntimeObject} The object
- * @param maxMovementLength The maximum distance, in pixels, the object is going to do.
+ * @param {gdjs.RuntimeObject} object The object
+ * @param {number} maxMovementLength The maximum distance, in pixels, the object is going to do.
  * @return An array with all platforms near the object.
- * @method getAllPlatformsAround
  */
 gdjs.PlatformObjectsManager.prototype.getAllPlatformsAround = function(object, maxMovementLength, result) {
     var ow = object.getWidth();
@@ -79,8 +70,7 @@ gdjs.PlatformObjectsManager.prototype.getAllPlatformsAround = function(object, m
  * considered as a platform by objects having PlatformerObject Behavior.
  *
  * @class PlatformRuntimeBehavior
- * @namespace gdjs
- * @constructor
+ * @memberof gdjs
  */
 gdjs.PlatformRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 {

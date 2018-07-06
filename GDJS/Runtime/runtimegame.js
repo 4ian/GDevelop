@@ -7,11 +7,10 @@
 /**
  * Represents a game being played.
  *
- * @constructor
- * @namespace gdjs
+ * @memberof gdjs
  * @class RuntimeGame
- * @param data The object (usually stored in data.json) containing the full project data
- * @param spec Optional object for specifiying additional options: {forceFullscreen: ...}
+ * @param {Object} data The object (usually stored in data.json) containing the full project data
+ * @param {Object} spec Optional object for specifiying additional options: {forceFullscreen: ...}
  */
 gdjs.RuntimeGame = function(data, spec) {
   spec = spec || {};
@@ -60,8 +59,7 @@ gdjs.RuntimeGame.prototype.getRenderer = function() {
 
 /**
  * Get the variables of the RuntimeGame.
- * @method getVariables
- * @return a variablesContainer object.
+ * @return {gdjs.VariablesContainer} The global variables
  */
 gdjs.RuntimeGame.prototype.getVariables = function() {
   return this._variables;
@@ -69,7 +67,6 @@ gdjs.RuntimeGame.prototype.getVariables = function() {
 
 /**
  * Get the gdjs.SoundManager of the RuntimeGame.
- * @method getSoundManager
  * @return {gdjs.SoundManager} The sound manager.
  */
 gdjs.RuntimeGame.prototype.getSoundManager = function() {
@@ -78,7 +75,6 @@ gdjs.RuntimeGame.prototype.getSoundManager = function() {
 
 /**
  * Get the gdjs.ImageManager of the RuntimeGame.
- * @method getImageManager
  * @return {gdjs.ImageManager} The image manager.
  */
 gdjs.RuntimeGame.prototype.getImageManager = function() {
@@ -88,7 +84,7 @@ gdjs.RuntimeGame.prototype.getImageManager = function() {
 /**
  * Get the input manager of the game, storing mouse, keyboard
  * and touches states.
- * @return The input manager owned by the game
+ * @return {gdjs.InputManager} The input manager owned by the game
  */
 gdjs.RuntimeGame.prototype.getInputManager = function() {
   return this._inputManager;
@@ -96,8 +92,7 @@ gdjs.RuntimeGame.prototype.getInputManager = function() {
 
 /**
  * Get the object containing the game data
- * @method getGameData
- * @return The object associated to the game.
+ * @return {Object} The object associated to the game.
  */
 gdjs.RuntimeGame.prototype.getGameData = function() {
   return this._data;
@@ -106,8 +101,7 @@ gdjs.RuntimeGame.prototype.getGameData = function() {
 /**
  * Get the data associated to a scene.
  *
- * @method getSceneData
- * @param sceneName The name of the scene. If not defined, the first scene will be returned.
+ * @param {string} sceneName The name of the scene. If not defined, the first scene will be returned.
  * @return The data associated to the scene.
  */
 gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
@@ -130,9 +124,8 @@ gdjs.RuntimeGame.prototype.getSceneData = function(sceneName) {
 /**
  * Check if a scene exists
  *
- * @method hasScene
- * @param sceneName The name of the scene to search.
- * @return true if the scene exists. If sceneName is undefined, true if the game has a scene.
+ * @param {string} sceneName The name of the scene to search.
+ * @return {boolean} true if the scene exists. If sceneName is undefined, true if the game has a scene.
  */
 gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
   var isTrue = false;
@@ -151,9 +144,8 @@ gdjs.RuntimeGame.prototype.hasScene = function(sceneName) {
 /**
  * Get the data associated to an external layout.
  *
- * @method getExternalLayoutData
- * @param name The name of the external layout.
- * @return The data associated to the external layout or null if not found.
+ * @param {string} name The name of the external layout.
+ * @return {Object} The data associated to the external layout or null if not found.
  */
 gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
   var externalLayout = null;
@@ -171,8 +163,7 @@ gdjs.RuntimeGame.prototype.getExternalLayoutData = function(name) {
 
 /**
  * Get the data representing all the global objects of the game.
- * @method getInitialObjectsData
- * @return The data associated to the global objects.
+ * @return {Object} The data associated to the global objects.
  */
 gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
   return this._data.objects || [];
@@ -182,7 +173,6 @@ gdjs.RuntimeGame.prototype.getInitialObjectsData = function() {
  * Get the original width of the game, as set on the startup of the game.
  *
  * This is guaranteed to never change, even if the size of the game is changed afterwards.
- * @method getOriginalWidth
  */
 gdjs.RuntimeGame.prototype.getOriginalWidth = function() {
   return this._originalWidth;
@@ -192,7 +182,6 @@ gdjs.RuntimeGame.prototype.getOriginalWidth = function() {
  * Get the original height of the game, as set on the startup of the game.
  *
  * This is guaranteed to never change, even if the size of the game is changed afterwards.
- * @method getOriginalHeight
  */
 gdjs.RuntimeGame.prototype.getOriginalHeight = function() {
   return this._originalHeight;
@@ -201,7 +190,6 @@ gdjs.RuntimeGame.prototype.getOriginalHeight = function() {
 /**
  * Get the default width of the game: canvas is created with this width,
  * and cameras of layers are created using this width when a scene is started.
- * @method getDefaultWidth
  */
 gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
   return this._defaultWidth;
@@ -210,7 +198,6 @@ gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
 /**
  * Get the default height of the game: canvas is created with this height,
  * and cameras of layers are created using this height when a scene is started.
- * @method getDefaultHeight
  */
 gdjs.RuntimeGame.prototype.getDefaultHeight = function() {
   return this._defaultHeight;
@@ -219,8 +206,7 @@ gdjs.RuntimeGame.prototype.getDefaultHeight = function() {
 /**
  * Change the default width of the game: It won't affect the canvas size, but
  * new scene cameras will be created with this size.
- * @method setDefaultWidth
- * @param width {Number} The new default width
+ * @param {number} width The new default width
  */
 gdjs.RuntimeGame.prototype.setDefaultWidth = function(width) {
   this._defaultWidth = width;
@@ -229,8 +215,7 @@ gdjs.RuntimeGame.prototype.setDefaultWidth = function(width) {
 /**
  * Change the default height of the game: It won't affect the canvas size, but
  * new scene cameras will be created with this size.
- * @method setDefaultHeight
- * @param height {Number} The new default height
+ * @param {number} height The new default height
  */
 gdjs.RuntimeGame.prototype.setDefaultHeight = function(height) {
   this._defaultHeight = height;
@@ -239,7 +224,6 @@ gdjs.RuntimeGame.prototype.setDefaultHeight = function(height) {
 /**
  * Return the minimal fps that must be guaranteed by the game
  * (otherwise, game is slowed down).
- * @method getMinimalFramerate
  */
 gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
   return this._minFPS;
@@ -248,8 +232,7 @@ gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
 /**
  * Set or unset the game as paused.
  * When paused, the game won't step and will be freezed. Useful for debugging.
- * @method pause
- * @param enable {Boolean} true to pause the game, false to unpause
+ * @param {boolean} enable true to pause the game, false to unpause
  */
 gdjs.RuntimeGame.prototype.pause = function(enable) {
   this._paused = enable;
@@ -257,7 +240,6 @@ gdjs.RuntimeGame.prototype.pause = function(enable) {
 
 /**
  * Load all assets, displaying progress in renderer.
- * @method loadAllAssets
  */
 gdjs.RuntimeGame.prototype.loadAllAssets = function(callback, progressCallback) {
   var loadingScreen = new gdjs.LoadingScreenRenderer(
@@ -289,6 +271,9 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback, progressCallback) 
   );
 };
 
+/**
+ * Start the game loop, to be called once assets are loaded.
+ */
 gdjs.RuntimeGame.prototype.startGameLoop = function() {
   if (!this.hasScene()) {
     console.log('The game has no scene.');
@@ -341,8 +326,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
 
 /**
  * Enlarge/reduce the width (or the height) of the game to fill the screen.
- * @method adaptRendererSizeToFillScreen
- * @param mode {string} "adaptWidth" to change the width, "adaptHeight" to change the height
+ * @param {string} mode `adaptWidth` to change the width, `adaptHeight` to change the height
  */
 gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
   if (!gdjs.RuntimeGameRenderer || !gdjs.RuntimeGameRenderer.getScreenWidth || !gdjs.RuntimeGameRenderer.getScreenHeight)
@@ -370,8 +354,7 @@ gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
 
 /**
  * Start a profiler for the currently running scene.
- * @param onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
- * @method startCurrentSceneProfiler
+ * @param {Function} onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
  */
 gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function(onProfilerStopped) {
   var currentScene = this._sceneStack.getCurrentScene();
@@ -383,7 +366,6 @@ gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function(onProfilerStoppe
 
 /**
  * Stop the profiler for the currently running scene.
- * @method stopCurrentSceneProfiler
  */
 gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
   var currentScene = this._sceneStack.getCurrentScene();

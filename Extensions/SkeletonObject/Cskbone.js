@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 
 /**
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  * @class SharedBone
  */
 gdjs.sk.SharedBone = function(){
@@ -47,7 +47,7 @@ gdjs.sk.SharedBone.prototype.loadDragonBones = function(boneData){
 /**
  * The Bone holds basic transform data in a hierarchy tree.
  *
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  * @class Bone
  * @extends gdjs.sk.Transform
  */

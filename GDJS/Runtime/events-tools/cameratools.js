@@ -5,10 +5,9 @@
  */
 
 /**
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class camera
  * @private
- * @static
  */
 gdjs.evtTools.camera = gdjs.evtTools.camera || {};
 

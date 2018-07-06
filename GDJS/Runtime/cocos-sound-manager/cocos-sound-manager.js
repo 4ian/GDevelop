@@ -5,7 +5,7 @@
  */
 
 /**
- * @namespace gdjs
+ * @memberof gdjs
  * @class CocosEffect
  * @private
  */
@@ -52,7 +52,7 @@ gdjs.CocosEffect.prototype.seek = function() {
 };
 
 /**
- * @namespace gdjs
+ * @memberof gdjs
  * @class CocosSoundManager
  * @constructor
  */
@@ -72,9 +72,8 @@ gdjs.SoundManager = gdjs.CocosSoundManager; //Register the class to let the engi
  * Names and files are loaded from resources when preloadAudio is called. If no
  * file is associated to the given name, then the name will be considered as a
  * filename and will be returned.
- * @method _getFileFromSoundName
- * @private
  * @return The associated filename
+ * @private
  */
 gdjs.CocosSoundManager.prototype._getFileFromSoundName = function(soundName) {
 	if (this._availableResources.hasOwnProperty(soundName) &&

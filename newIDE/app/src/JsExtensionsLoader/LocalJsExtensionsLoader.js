@@ -21,7 +21,6 @@ export default class LocalJsExtensionsLoader implements JsExtensionsLoader {
       extensionModulePaths => {
         return Promise.all(
           extensionModulePaths.map((extensionModulePath) => {
-            console.log(extensionModulePath);
             let extensionModule = null;
             try {
               extensionModule = optionalRequire(extensionModulePath, {

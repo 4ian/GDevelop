@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 
 /**
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  * @class SharedSlot
  */
 gdjs.sk.SharedSlot = function(){
@@ -157,7 +157,7 @@ gdjs.sk.SharedSlot.prototype.loadDragonBonesSkinData = function(skinDatas, index
 /**
  * The Slot display images transformed by animations itself and bones.
  *
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  * @class Slot
  * @extends gdjs.sk.Transform
  */

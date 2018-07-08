@@ -7,29 +7,28 @@
 /**
  * Polygon represents a polygon which can be used to create collisions masks for RuntimeObject.
  *
- * @constructor
- * @namespace gdjs
+ * @memberof gdjs
  * @class Polygon
  */
 gdjs.Polygon = function()
 {
     /**
      * The vertices of the polygon
-     * @property vertices
+     * @member {Array}
      */
     this.vertices = [];
 
     /**
      * The edges of the polygon. This property is only valid after calling
      * computeEdges, and remains valid until vertices are modified.
-     * @property edges
+     * @member {Array}
      */
     this.edges = [];
 
     /**
      * The center of the polygon. This property is only valid after calling
      * computeCenter, and remains valid until vertices are modified.
-     * @property center
+     * @member {Array}
      */
     this.center = [0,0];
 };
@@ -126,11 +125,9 @@ gdjs.Polygon.createRectangle = function(width, height) {
  * Based on <a href="http://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection">this</a>
  * and <a href="http://stackoverflow.com/questions/5742329/problem-with-collision-response-sat">this</a> article.
  *
- * @method collisionTest
- * @static
- * @return {Boolean} true if polygons are overlapping
- * @param p1 {polygon} The first polygon
- * @param p2 {polygon} The second polygon
+ * @return {boolean} true if polygons are overlapping
+ * @param {gdjs.Polygon} p1 The first polygon
+ * @param {gdjs.Polygon} p2 The second polygon
  */
 gdjs.Polygon.collisionTest = function(p1,p2) {
     //Algorithm core :
@@ -222,15 +219,14 @@ gdjs.Polygon.collisionTest._statics = {
 /**
  * Do a raycast test.<br>
  * Please note that the polygon must be <b>convex</b>!
- * For some theory, check <a href="https://www.codeproject.com/Tips/862988/Find-the-Intersection-Point-of-Two-Line-Segments">Find the Intersection Point of Two Line Segments</a>
+ * 
+ * For some theory, check <a href="https://www.codeproject.com/Tips/862988/Find-the-Intersection-Point-of-Two-Line-Segments">Find the Intersection Point of Two Line Segments</a>.
  *
- * @method raycastTest
- * @static
- * @param poly {Polygon} The polygon to test
- * @param startX {Number} The raycast start point X
- * @param startY {Number} The raycast start point Y
- * @param endX {Number} The raycast end point X
- * @param endY {Number} The raycast end point Y
+ * @param {gdjs.Polygon} poly The polygon to test
+ * @param {number} startX The raycast start point X
+ * @param {number} startY The raycast start point Y
+ * @param {number} endX The raycast end point X
+ * @param {number} endY The raycast end point Y
  * @return A raycast result with the contact points and distances
  */
 gdjs.Polygon.raycastTest = function(poly, startX, startY, endX, endY)
@@ -411,12 +407,10 @@ gdjs.Polygon.distance = function(minA, maxA, minB, maxB)
  *
  * Uses <a href="https://wrf.ecse.rpi.edu//Research/Short_Notes/pnpoly.html">PNPOLY</a> by W. Randolph Franklin.
  *
- * @method isPointInside
- * @static
- * @param poly {Polygon} The polygon to test
- * @param x {Number} The point x coordinate
- * @param y {Number} The point y coordinate
- * @return {Boolean} true if the point is inside the polygon
+ * @param {gdjs.Polygon} poly The polygon to test
+ * @param {number} x The point x coordinate
+ * @param {number} y The point y coordinate
+ * @return {boolean} true if the point is inside the polygon
  */
 gdjs.Polygon.isPointInside = function(poly, x, y)
 {

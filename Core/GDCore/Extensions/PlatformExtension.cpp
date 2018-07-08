@@ -116,6 +116,25 @@ gd::ExpressionMetadata& PlatformExtension::AddStrExpression(
 #endif
 }
 
+gd::ObjectMetadata& PlatformExtension::AddObject(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& icon24x24,
+    std::shared_ptr<gd::Object> instance) {
+  gd::String nameWithNamespace =
+      GetNameSpace().empty() ? name : GetNameSpace() + name;
+  objectsInfos[nameWithNamespace] =
+      ObjectMetadata(GetNameSpace(),
+                     nameWithNamespace,
+                     fullname,
+                     description,
+                     icon24x24,
+                     instance);
+
+  return objectsInfos[nameWithNamespace];
+}
+
 gd::BehaviorMetadata& PlatformExtension::AddBehavior(
     const gd::String& name,
     const gd::String& fullname,
@@ -399,131 +418,6 @@ bool PlatformExtension::IsBuiltin() const {
 }
 
 #if defined(GD_IDE_ONLY)
-void PlatformExtension::CloneExtension(
-    const gd::String& platformName,
-    const gd::String& extensionName,
-    bool stripFunctionsNameAndCodeGeneration) {
-  gd::Platform* platform =
-      gd::PlatformManager::Get()->GetPlatform(platformName);
-  if (!platform) {
-    std::cout << "Unable to clone extension \"" << extensionName << "\" from "
-              << platformName << ": This platform doesn't exist.";
-    return;
-  }
-
-  std::shared_ptr<gd::PlatformExtension> extension =
-      platform->GetExtension(extensionName);
-  if (!extension) {
-    std::cout << "Unable to clone extension \"" << extensionName << "\" from "
-              << platformName << ": This extension doesn't exist.";
-    return;
-  }
-
-  *this = *extension;
-
-  if (stripFunctionsNameAndCodeGeneration) {
-    for (std::map<gd::String, gd::InstructionMetadata>::iterator it =
-             GetAllActions().begin();
-         it != GetAllActions().end();
-         ++it)
-      it->second.SetFunctionName("").SetGetter("").RemoveCustomCodeGenerator();
-
-    for (std::map<gd::String, gd::InstructionMetadata>::iterator it =
-             GetAllConditions().begin();
-         it != GetAllConditions().end();
-         ++it)
-      it->second.SetFunctionName("").SetGetter("").RemoveCustomCodeGenerator();
-
-    for (std::map<gd::String, gd::ExpressionMetadata>::iterator it =
-             GetAllExpressions().begin();
-         it != GetAllExpressions().end();
-         ++it)
-      it->second.SetFunctionName("").RemoveCustomCodeGenerator();
-
-    for (std::map<gd::String, gd::ExpressionMetadata>::iterator it =
-             GetAllStrExpressions().begin();
-         it != GetAllStrExpressions().end();
-         ++it)
-      it->second.SetFunctionName("").RemoveCustomCodeGenerator();
-
-    for (std::map<gd::String, gd::ObjectMetadata>::iterator objIt =
-             objectsInfos.begin();
-         objIt != objectsInfos.end();
-         ++objIt) {
-      gd::ObjectMetadata& obj = objIt->second;
-
-      for (std::map<gd::String, gd::InstructionMetadata>::iterator it =
-               obj.actionsInfos.begin();
-           it != obj.actionsInfos.end();
-           ++it)
-        it->second.SetFunctionName("")
-            .SetGetter("")
-            .RemoveCustomCodeGenerator();
-
-      for (std::map<gd::String, gd::InstructionMetadata>::iterator it =
-               obj.conditionsInfos.begin();
-           it != obj.conditionsInfos.end();
-           ++it)
-        it->second.SetFunctionName("")
-            .SetGetter("")
-            .RemoveCustomCodeGenerator();
-
-      for (std::map<gd::String, gd::ExpressionMetadata>::iterator it =
-               obj.expressionsInfos.begin();
-           it != obj.expressionsInfos.end();
-           ++it)
-        it->second.SetFunctionName("").RemoveCustomCodeGenerator();
-
-      for (std::map<gd::String, gd::ExpressionMetadata>::iterator it =
-               obj.strExpressionsInfos.begin();
-           it != obj.strExpressionsInfos.end();
-           ++it)
-        it->second.SetFunctionName("").RemoveCustomCodeGenerator();
-    }
-
-    for (std::map<gd::String, gd::BehaviorMetadata>::iterator objIt =
-             behaviorsInfo.begin();
-         objIt != behaviorsInfo.end();
-         ++objIt) {
-      gd::BehaviorMetadata& obj = objIt->second;
-
-      for (std::map<gd::String, gd::InstructionMetadata>::iterator it =
-               obj.actionsInfos.begin();
-           it != obj.actionsInfos.end();
-           ++it)
-        it->second.SetFunctionName("")
-            .SetGetter("")
-            .RemoveCustomCodeGenerator();
-
-      for (std::map<gd::String, gd::InstructionMetadata>::iterator it =
-               obj.conditionsInfos.begin();
-           it != obj.conditionsInfos.end();
-           ++it)
-        it->second.SetFunctionName("")
-            .SetGetter("")
-            .RemoveCustomCodeGenerator();
-
-      for (std::map<gd::String, gd::ExpressionMetadata>::iterator it =
-               obj.expressionsInfos.begin();
-           it != obj.expressionsInfos.end();
-           ++it)
-        it->second.SetFunctionName("").RemoveCustomCodeGenerator();
-
-      for (std::map<gd::String, gd::ExpressionMetadata>::iterator it =
-               obj.strExpressionsInfos.begin();
-           it != obj.strExpressionsInfos.end();
-           ++it)
-        it->second.SetFunctionName("").RemoveCustomCodeGenerator();
-    }
-
-    for (std::map<gd::String, gd::EventMetadata>::iterator it =
-             eventsInfos.begin();
-         it != eventsInfos.end();
-         ++it)
-      it->second.ClearCodeGenerationAndPreprocessing();
-  }
-}
-
 void PlatformExtension::StripUnimplementedInstructionsAndExpressions() {
   for (std::map<gd::String, gd::InstructionMetadata>::iterator it =
            GetAllActions().begin();

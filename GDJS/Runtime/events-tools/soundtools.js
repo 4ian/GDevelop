@@ -7,7 +7,7 @@
 /**
  * Class used by events to interact with the soundManager.
  *
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class sound
  * @static
  * @private

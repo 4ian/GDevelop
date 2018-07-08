@@ -4,6 +4,11 @@
  * This project is released under the MIT License.
  */
 
+/**
+ * The renderer for a gdjs.RuntimeGame using Cocos2D-JS.
+ * @class RuntimeGameCocosRenderer
+ * @memberof gdjs
+ */
 gdjs.RuntimeGameCocosRenderer = function(game, width, height, forceFullscreen)
 {
     this._directorManager = new gdjs.CocosDirectorManager();
@@ -44,7 +49,6 @@ gdjs.RuntimeGameCocosRenderer.prototype.setMargins = function(top, right, bottom
 
 /**
  * De/activate fullscreen for the game.
- * @method setFullScreen
  */
 gdjs.RuntimeGameCocosRenderer.prototype.setFullScreen = function(enable) {
     //TODO
@@ -69,8 +73,7 @@ gdjs.RuntimeGameCocosRenderer.prototype.getDirectorManager = function() {
 
 /**
  * As Cocos2d is managing the game loop, the Cocos scenes need to call this
- * function to step the game engine. See RuntimeSceneCocosRenderer.
- * @method onSceneUpdated
+ * function to step the game engine. See gdjs.RuntimeSceneCocosRenderer.
  */
 gdjs.RuntimeGameCocosRenderer.prototype.onSceneUpdated = function(dt) {
     if (!this._gameLoopFn(dt)) {

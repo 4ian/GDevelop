@@ -58,7 +58,10 @@ export default {
         pixiContainer,
         PixiResourcesLoader
       );
-    else
+    else {
+      console.warn(
+        `Object with type ${objectType} has no instance renderer registered. Please use registerInstanceRenderer to register your renderer.`
+      );
       return new this.renderers['unknownObjectType'](
         project,
         layout,
@@ -67,17 +70,23 @@ export default {
         pixiContainer,
         PixiResourcesLoader
       );
+    }
   },
-  registerInstanceRenderer: function(objectType, renderFunction) {
-    if (!this.renderers.hasOwnProperty(objectType)) {
+  registerInstanceRenderer: function(objectType, renderer) {
+    if (!renderer.getThumbnail) {
       console.warn(
-        'Tried to register renderer for object "' +
-          objectType +
-          '", but a renderer already exists.'
+        `Tried to register renderer for object "${objectType}", but getThumbnail is not defined.`
       );
       return;
     }
 
-    this.renderers[objectType] = renderFunction;
+    if (!this.renderers.hasOwnProperty(objectType)) {
+      console.warn(
+        `Tried to register renderer for object "${objectType}", but a renderer already exists.`
+      );
+      return;
+    }
+
+    this.renderers[objectType] = renderer;
   },
 };

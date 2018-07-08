@@ -7,10 +7,9 @@
 /**
  * A Variable is an object storing a value (number or a string) or children variables.
  *
- * @constructor
- * @namespace gdjs
+ * @memberof gdjs
  * @class Variable
- * @param varData optional object used to initialize the variable.
+ * @param {Object} varData optional object used to initialize the variable.
  */
 gdjs.Variable = function(varData)
 {
@@ -56,9 +55,9 @@ gdjs.Variable = function(varData)
 
 
 /**
- * Used ( usually by VariablesContainer ) to set that the variable must be
+ * Used (usually by gdjs.VariablesContainer) to set that the variable must be
  * considered as not existing in the container.
- * @method setUndefinedInContainer
+ * @private
  */
 gdjs.Variable.prototype.setUndefinedInContainer = function() {
     this._undefinedInContainer = true;
@@ -66,8 +65,8 @@ gdjs.Variable.prototype.setUndefinedInContainer = function() {
 
 /**
  * Check if the variable must be considered as not existing in its container
- * ( Usually a VariablesContainer ).
- * @method isUndefinedInContainer
+ * (usually a gdjs.VariablesContainer).
+ * @private
  * @return true if the container must consider that the variable does not exist.
  */
 gdjs.Variable.prototype.isUndefinedInContainer = function() {
@@ -79,7 +78,6 @@ gdjs.Variable.prototype.isUndefinedInContainer = function() {
  *
  * If the variable has not the specified child, an empty variable with the specified name
  * is added as child.
- * @method getChild
  */
 gdjs.Variable.prototype.getChild = function(childName) {
 
@@ -95,7 +93,6 @@ gdjs.Variable.prototype.getChild = function(childName) {
  * Return the child in a variable.
  *
  * Check if the variable has the specified children
- * @method hasChild
  * @return true if variable has the children with the specified name
  */
 gdjs.Variable.prototype.hasChild = function(childName) {
@@ -106,7 +103,6 @@ gdjs.Variable.prototype.hasChild = function(childName) {
  * Remove the child with the specified name.
  *
  * If the variable has not the specified child, nothing is done.
- * @method removeChild
  * @param childName The name of the child to be removed
  */
 gdjs.Variable.prototype.removeChild = function(childName) {
@@ -118,7 +114,6 @@ gdjs.Variable.prototype.removeChild = function(childName) {
  * Remove all the children.
  *
  * If the variable is not a structure, nothing is done.
- * @method clearChildren
  */
 gdjs.Variable.prototype.clearChildren = function() {
 	if ( !this._isStructure ) return;
@@ -132,7 +127,6 @@ gdjs.Variable.prototype.clearChildren = function() {
 
 /**
  * Get the value of the variable, considered as a number
- * @method getAsNumber
  * @return {Number} The number stored
  */
 gdjs.Variable.prototype.getAsNumber = function() {
@@ -147,7 +141,6 @@ gdjs.Variable.prototype.getAsNumber = function() {
 
 /**
  * Change the value of the variable, considered as a number
- * @method setNumber
  * @param newValue {Number} The new value to be set
  */
 gdjs.Variable.prototype.setNumber = function(newValue) {
@@ -158,7 +151,6 @@ gdjs.Variable.prototype.setNumber = function(newValue) {
 
 /**
  * Get the value of the variable, considered as a string
- * @method getAsString
  * @return {String} The number stored
  */
 gdjs.Variable.prototype.getAsString = function() {
@@ -172,7 +164,6 @@ gdjs.Variable.prototype.getAsString = function() {
 
 /**
  * Change the value of the variable, considered as a string
- * @method setString
  * @param newValue {String} The new string to be set
  */
 gdjs.Variable.prototype.setString = function(newValue) {
@@ -183,7 +174,6 @@ gdjs.Variable.prototype.setString = function(newValue) {
 
 /**
  * Return true if the variable is a structure.
- * @method isStructure
  */
 gdjs.Variable.prototype.isStructure = function() {
 	return this._isStructure;
@@ -191,7 +181,6 @@ gdjs.Variable.prototype.isStructure = function() {
 
 /**
  * Return true if the variable is a number.
- * @method isNumber
  */
 gdjs.Variable.prototype.isNumber = function() {
 	return !this._isStructure && !this._numberDirty;
@@ -199,7 +188,6 @@ gdjs.Variable.prototype.isNumber = function() {
 
 /**
  * Return the object containing all the children of the variable
- * @method getAllChildren
  */
 gdjs.Variable.prototype.getAllChildren = function() {
 	return this._children;

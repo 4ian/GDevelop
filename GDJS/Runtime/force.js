@@ -5,14 +5,13 @@
  */
 
 /**
- * A Force is used to move objects.
+ * A vector used to move objects.
  *
- * @namespace gdjs
+ * @memberof gdjs
  * @class Force
- * @constructor
- * @param x The initial x component
- * @param y The initial y component
- * @param clearing The clearing
+ * @param {number} x The initial x component
+ * @param {number} y The initial y component
+ * @param {number} damping The damping (0 for a force that disappear on next frame, 1 to keep it)
  */
 gdjs.Force = function(x,y, clearing)
 {
@@ -26,7 +25,6 @@ gdjs.Force = function(x,y, clearing)
 
 /**
  * Returns the X component of the force.
- * @method getX
  */
 gdjs.Force.prototype.getX = function() {
 	return this._x;
@@ -34,7 +32,6 @@ gdjs.Force.prototype.getX = function() {
 
 /**
  * Returns the Y component of the force.
- * @method getY
  */
 gdjs.Force.prototype.getY = function() {
 	return this._y;
@@ -42,7 +39,6 @@ gdjs.Force.prototype.getY = function() {
 
 /**
  * Set the x component of the force.
- * @method setX
  * @param x {Number} The new X component
  */
 gdjs.Force.prototype.setX = function(x) {
@@ -52,7 +48,6 @@ gdjs.Force.prototype.setX = function(x) {
 
 /**
  * Set the y component of the force.
- * @method setY
  * @param y {Number} The new Y component
  */
 gdjs.Force.prototype.setY = function(y) {
@@ -62,7 +57,6 @@ gdjs.Force.prototype.setY = function(y) {
 
 /**
  * Set the angle of the force.
- * @method setAngle
  * @param angle {Number} The new angle
  */
 gdjs.Force.prototype.setAngle = function(angle) {
@@ -79,7 +73,6 @@ gdjs.Force.prototype.setAngle = function(angle) {
 
 /**
  * Set the length of the force.
- * @method setLength
  * @param len {Number} The length
  */
 gdjs.Force.prototype.setLength = function(len) {
@@ -96,7 +89,6 @@ gdjs.Force.prototype.setLength = function(len) {
 
 /**
  * Get the angle of the force
- * @method getAngle
  */
 gdjs.Force.prototype.getAngle = function() {
 	if ( this._dirty ) {
@@ -112,7 +104,6 @@ gdjs.Force.prototype.getAngle = function() {
 
 /**
  * Get the length of the force
- * @method getLength
  */
 gdjs.Force.prototype.getLength = function() {
 	if ( this._dirty ) {
@@ -127,7 +118,6 @@ gdjs.Force.prototype.getLength = function() {
 
 /**
  * Return true if the force is temporary, false if it is permanent.
- * @method getClearing
  */
 gdjs.Force.prototype.getClearing = function() {
 	return this._clearing;
@@ -135,7 +125,6 @@ gdjs.Force.prototype.getClearing = function() {
 
 /**
  * Set if the force clearing.
- * @method setClearing
  */
 gdjs.Force.prototype.setClearing = function(clearing) {
 	this._clearing = clearing;

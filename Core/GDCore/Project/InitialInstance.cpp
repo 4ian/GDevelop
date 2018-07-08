@@ -145,6 +145,16 @@ const gd::String& InitialInstance::GetRawStringProperty(
   const auto& it = stringInfos.find(name);
   return it != stringInfos.end() ? it->second : *badStringProperyValue;
 }
+
+void InitialInstance::SetRawFloatProperty(const gd::String& name, float value)
+{
+  floatInfos[name] = value;
+}
+
+void InitialInstance::SetRawStringProperty(const gd::String& name, const gd::String& value)
+{
+  stringInfos[name] = value;
+}
 #endif
 
 }  // namespace gd

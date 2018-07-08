@@ -19,42 +19,20 @@
 
 namespace gd {
 class Instruction;
-}
-namespace gd {
 class InstructionMetadata;
-}
-namespace gd {
 class ExpressionMetadata;
-}
-namespace gd {
 class ObjectMetadata;
-}
-namespace gd {
 class BehaviorMetadata;
-}
-namespace gd {
 class BaseEvent;
-}
-namespace gd {
 class EventMetadata;
-}
-namespace gd {
 class EventCodeGenerator;
-}
-namespace gd {
 class ArbitraryResourceWorker;
-}
-namespace gd {
 class BehaviorsSharedData;
-}
-namespace gd {
 class Behavior;
-}
-namespace gd {
 class Object;
 }
 
-typedef std::unique_ptr<gd::Object> (*CreateFunPtr)(gd::String name);
+typedef std::function<std::unique_ptr<gd::Object>(gd::String name)> CreateFunPtr;
 
 namespace gd {
 
@@ -171,13 +149,29 @@ class GD_CORE_API PlatformExtension {
    * \param icon The 24x24 icon of the object:
    res/icons_[SkinName]/[iconName]24.png will be first tried,
    * and then if it does not exists, the full entered name will be tried.
-   \endcode
    */
   template <class T>
   gd::ObjectMetadata& AddObject(const gd::String& name_,
                                 const gd::String& fullname_,
                                 const gd::String& description_,
                                 const gd::String& icon24x24_);
+
+  /**
+   * \brief Declare a new object as being part of the extension.
+   * \note This method does nothing when used for GD C++ runtime.
+   * \param name The name of the object
+   * \param fullname The user friendly name of the object
+   * \param description The user friendly description of the object
+   * \param icon The 24x24 icon of the object:
+   res/icons_[SkinName]/[iconName]24.png will be first tried,
+   * and then if it does not exists, the full entered name will be tried.
+   * \param instance The "blueprint" object to be copied when a new object is asked for.
+   */
+  gd::ObjectMetadata& AddObject(const gd::String& name_,
+                                const gd::String& fullname_,
+                                const gd::String& description_,
+                                const gd::String& icon24x24_,
+                                std::shared_ptr<gd::Object> instance);
 
   /**
    * \brief Declare a new behavior as being part of the extension.
@@ -403,24 +397,6 @@ class GD_CORE_API PlatformExtension {
    */
   virtual void ExposeActionsResources(Instruction& action,
                                       gd::ArbitraryResourceWorker& worker){};
-
-  /**
-   * \brief Clone the extension of another platform.
-   *
-   * This can be used when you want a platform to conform to another.<br>
-   * It is still possible to make some changes after the cloning by using getter
-   * methods.<br> See also
-   * gd::PlatformExtension::StripUnimplementedInstructionsAndExpressions.
-   *
-   * \param platformName The name of the platform in which the source extension
-   * must be searched for. \param extensionName The name of the source extension
-   * to be copied. \param stripFunctionsNameAndCodeGeneration If set to true,
-   * all functions names and code generator of all
-   * instructions/expression/events will be removed.
-   */
-  void CloneExtension(const gd::String& platformName,
-                      const gd::String& extensionName,
-                      bool stripFunctionsNameAndCodeGeneration = true);
 
   /**
    * \brief Delete all instructions having no functions name or custom code

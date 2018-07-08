@@ -7,16 +7,14 @@
 /**
  * Tools related to strings manipulation, for events generated code.
  *
- * @namespace gdjs.evtTools
- * @class string
- * @static
+ * @memberof gdjs.evtTools
+ * @namespace string
  * @private
  */
 gdjs.evtTools.string = gdjs.evtTools.string || {};
 
 /**
  * Return a string containing a new line character.
- * @method newLine
  * @private
  */
 gdjs.evtTools.string.newLine = function() {
@@ -25,7 +23,6 @@ gdjs.evtTools.string.newLine = function() {
 
 /**
  * Return a character from its codepoint.
- * @method fromCodePoint
  * @private
  */
 gdjs.evtTools.string.fromCodePoint = function(codePoint) {
@@ -34,7 +31,6 @@ gdjs.evtTools.string.fromCodePoint = function(codePoint) {
 
 /**
  * Return the uppercased version of the string.
- * @method toUpperCase
  * @private
  */
 gdjs.evtTools.string.toUpperCase = function(str) {
@@ -43,7 +39,6 @@ gdjs.evtTools.string.toUpperCase = function(str) {
 
 /**
  * Return the lowercased version of the string.
- * @method toLowerCase
  * @private
  */
 gdjs.evtTools.string.toLowerCase = function(str) {
@@ -52,7 +47,6 @@ gdjs.evtTools.string.toLowerCase = function(str) {
 
 /**
  * Return a new string containing the substring of the original string.
- * @method subStr
  * @private
  */
 gdjs.evtTools.string.subStr = function(str, start, len) {
@@ -64,7 +58,6 @@ gdjs.evtTools.string.subStr = function(str, start, len) {
 
 /**
  * Return a new string containing the character at the specified position.
- * @method strAt
  * @private
  */
 gdjs.evtTools.string.strAt = function(str, start) {
@@ -76,7 +69,6 @@ gdjs.evtTools.string.strAt = function(str, start) {
 
 /**
  * Return the string repeated.
- * @method strAt
  * @private
  */
 gdjs.evtTools.string.strRepeat = function(str, count) {
@@ -89,7 +81,6 @@ gdjs.evtTools.string.strRepeat = function(str, count) {
 
 /**
  * Return the length of the string
- * @method strLen
  * @private
  */
 gdjs.evtTools.string.strLen = function(str) {
@@ -98,7 +89,6 @@ gdjs.evtTools.string.strLen = function(str) {
 
 /**
  * Search in a string
- * @method strFind
  * @private
  */
 gdjs.evtTools.string.strFind = function(str, what) {
@@ -107,7 +97,6 @@ gdjs.evtTools.string.strFind = function(str, what) {
 
 /**
  * Reverse search in a string
- * @method strRFind
  * @private
  */
 gdjs.evtTools.string.strRFind = function(str, what) {
@@ -116,7 +105,6 @@ gdjs.evtTools.string.strRFind = function(str, what) {
 
 /**
  * Search in a string, starting from a specified position.
- * @method strFindFrom
  * @private
  */
 gdjs.evtTools.string.strFindFrom = function(str, what, pos) {
@@ -125,7 +113,6 @@ gdjs.evtTools.string.strFindFrom = function(str, what, pos) {
 
 /**
  * Reverse search in a string, starting from a specified position.
- * @method strRFindFrom
  * @private
  */
 gdjs.evtTools.string.strRFindFrom = function(str, what, pos) {

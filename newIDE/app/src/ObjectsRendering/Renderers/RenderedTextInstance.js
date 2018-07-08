@@ -44,8 +44,6 @@ RenderedTextInstance.prototype = Object.create(RenderedInstance.prototype);
 
 /**
  * Return a URL for thumbnail of the specified object.
- * @method getThumbnail
- * @static
  */
 RenderedTextInstance.getThumbnail = function(project, resourcesLoader, object) {
   return 'CppPlatform/Extensions/texticon24.png';

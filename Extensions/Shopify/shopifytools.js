@@ -20,7 +20,7 @@ gdjs.ShopifyClientsManager.get = function(runtimeScene, name) {
 }
 
 /**
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class shopify
  * @static
  * @private

@@ -384,6 +384,14 @@ class GD_CORE_API InstructionMetadata {
                                           ///< code for the instruction
 
   /**
+   * \brief Return the structure containing the information about code
+   * generation for the instruction.
+   */
+  ExtraInformation &GetCodeExtraInformation() {
+    return codeExtraInformation;
+  }
+
+  /**
    * \brief Declare if the instruction being declared is somewhat manipulating
    * in a standard way. \param type "number" or "string" \note Shortcut for
    * `codeExtraInformation.SetManipulatedType(type)`.

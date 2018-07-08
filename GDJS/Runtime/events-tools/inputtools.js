@@ -7,7 +7,7 @@
 /**
  * Tools related to input ( Keyboard, mouse ), for events generated code.
  *
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class input
  * @static
  * @private
@@ -17,7 +17,6 @@ gdjs.evtTools.input = gdjs.evtTools.input || {};
 /**
  * Return true if the specified key is pressed
  *
- * @method isKeyPressed
  * @private
  */
 gdjs.evtTools.input.isKeyPressed = function(runtimeScene, key) {
@@ -31,7 +30,6 @@ gdjs.evtTools.input.isKeyPressed = function(runtimeScene, key) {
 /**
  * Return true if the specified key was just released
  *
- * @method isKeyPressed
  * @private
  */
 gdjs.evtTools.input.wasKeyReleased = function(runtimeScene, key) {
@@ -44,7 +42,6 @@ gdjs.evtTools.input.wasKeyReleased = function(runtimeScene, key) {
 
 /**
  * Return the name of the last key pressed in the game
- * @method lastPressedKey
  * @private
  */
 gdjs.evtTools.input.lastPressedKey = function(runtimeScene) {
@@ -69,9 +66,7 @@ gdjs.evtTools.input.lastPressedKey = function(runtimeScene) {
 
 /**
  * Hashmap associated each name of a key to its keyCode.
- * @namespace gdjs.evtTools
- * @property keysNameToCode
- * @static
+ * @memberof gdjs.evtTools
  */
 gdjs.evtTools.input.keysNameToCode = {
     "a": 65,

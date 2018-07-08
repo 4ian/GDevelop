@@ -7,7 +7,7 @@ This project is released under the MIT License.
 
 
 /**
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  * @class SharedArmature
  */
 gdjs.sk.SharedArmature = function(){
@@ -78,7 +78,7 @@ gdjs.sk.SharedArmature.prototype.loadDragonBones = function(armatureData, textur
 /**
  * The Armature holds the bones and slots/attachments as well as its animations.
  *
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  * @class Armature
  * @extends gdjs.sk.Transform
  */

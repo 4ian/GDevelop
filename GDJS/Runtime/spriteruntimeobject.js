@@ -5,14 +5,13 @@
  */
 
 /**
- * A frame used by a SpriteAnimation in a SpriteRuntimeObject.
+ * A frame used by a SpriteAnimation in a {@link SpriteRuntimeObject}.
  *
  * It contains the texture displayed as well as information like the points position
  * or the collision mask.
  *
- * @namespace gdjs
+ * @memberof gdjs
  * @class SpriteAnimationFrame
- * @constructor
  */
 gdjs.SpriteAnimationFrame = function(imageManager, frameData)
 {
@@ -81,7 +80,6 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
  * Get a point of the frame.<br>
  * If the point does not exist, the origin is returned.
  *
- * @method getPoint
  * @return The requested point.
  */
 gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
@@ -92,11 +90,10 @@ gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
 };
 
 /**
- * Represents a direction of an animation of a SpriteRuntimeObject.
+ * Represents a direction of an animation of a {@link SpriteRuntimeObject}.
  *
  * @class SpriteAnimationDirection
- * @namespace gdjs
- * @constructor
+ * @memberof gdjs
  */
 gdjs.SpriteAnimationDirection = function(imageManager, directionData)
 {
@@ -117,11 +114,10 @@ gdjs.SpriteAnimationDirection = function(imageManager, directionData)
 };
 
 /**
- * Represents an animation of a SpriteRuntimeObject.
+ * Represents an animation of a {@link SpriteRuntimeObject}.
  *
  * @class SpriteAnimation
- * @namespace gdjs
- * @constructor
+ * @memberof gdjs
  */
 gdjs.SpriteAnimation = function(imageManager, animData)
 {
@@ -144,7 +140,7 @@ gdjs.SpriteAnimation = function(imageManager, animData)
  * The SpriteRuntimeObject represents an object that can display images.
  *
  * @class SpriteRuntimeObject
- * @namespace gdjs
+ * @memberof gdjs
  * @extends gdjs.RuntimeObject
  */
 gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
@@ -213,7 +209,6 @@ gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = func
 
 /**
  * Update the current frame of the object according to the elapsed time on the scene.
- * @method update
  */
 gdjs.SpriteRuntimeObject.prototype.update = function(runtimeScene) {
     //Playing the animation of all objects including the ones outside the screen can be
@@ -285,7 +280,6 @@ gdjs.SpriteRuntimeObject.prototype.getRendererObject = function() {
  * Fallback to the default implementation (rotated bounding box) if there is no custom
  * hitboxes defined for the current animation frame.
  *
- * @method updateHitBoxes
  */
 gdjs.SpriteRuntimeObject.prototype.updateHitBoxes = function() {
     if ( this._frameDirty ) this._updateFrame(); //Beware, _animationFrame could be invalid if this._frameDirty === true.
@@ -499,7 +493,6 @@ gdjs.SpriteRuntimeObject.prototype.getPointY = function(name) {
  * in global coordinates)
  * @return An array containing the x and y position of the point in global coordinates. If result parameter is
  * defined, nothing is returned by the method.
- * @method _transformToGlobal
  * @private
  */
 gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
@@ -739,7 +732,6 @@ gdjs.SpriteRuntimeObject.prototype.getScaleX = function() {
 //Other :
 
 /**
- * @method turnTowardObject
  * @param obj The target object
  * @param scene The scene containing the object
  * @deprecated

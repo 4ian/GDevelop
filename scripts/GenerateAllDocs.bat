@@ -1,5 +1,6 @@
 @echo off
 rem Script launching the generation of the documentations of all modules
+rem Install globally doxgen and jsdoc before starting it.
 echo Generating all docs...
 cd ..
 cd Core\docs
@@ -14,8 +15,8 @@ cd GDCpp\docs
 doxygen > ..\..\scripts\logs\GDCppDoxygenLog.txt 2> ..\..\scripts\logs\GDCppDoxygenWarningLog.txt
 IF NOT ERRORLEVEL 0 echo "Error during doc generation"
 cd ..\..
-cd GDJS\docs
-yuidoc ../Runtime > ..\..\scripts\logs\GDJSYuidDocLog.txt  2> ..\..\scripts\logs\GDJSYuidDocWarningLog.txt
+cd GDJS
+jsdoc -c docs/jsdoc.conf.json -t docs/jaguarjs-jsdoc docs/DocMainPage.md
 IF NOT ERRORLEVEL 0 echo "Error during doc generation"
-cd ..\..
+cd ..
 cd scripts

@@ -1,4 +1,5 @@
 #Script launching the generation of the documentations of all modules
+#Install globally doxgen and jsdoc before starting it.
 echo Generating all docs...
 mkdir -p logs
 cd ..
@@ -11,7 +12,7 @@ cd ../..
 cd GDCpp/docs
 doxygen > ../../scripts/logs/GDCppDoxygenLog.txt 2> ../../scripts/logs/GDCppDoxygenWarningLog.txt
 cd ../..
-cd GDJS/docs
-yuidoc ../Runtime > ../../scripts/logs/GDJSYuidDocLog.txt  2> ../../scripts/logs/GDJSYuidDocWarningLog.txt
-cd ../..
+cd GDJS
+jsdoc -c docs/jsdoc.conf.json -t docs/jaguarjs-jsdoc docs/DocMainPage.md
+cd ..
 cd scripts

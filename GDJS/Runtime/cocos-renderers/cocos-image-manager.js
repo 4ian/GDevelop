@@ -4,6 +4,13 @@
  * This project is released under the MIT License.
  */
 
+/**
+ * CocosImageManager loads and stores textures that can be used by the Cocos2D-JS renderers.
+ *
+ * @class CocosImageManager
+ * @memberof gdjs
+ * @param {Object} resources The resources data of the game.
+ */
 gdjs.CocosImageManager = function(resources)
 {
     this._resources = {};
@@ -17,6 +24,11 @@ gdjs.CocosImageManager = function(resources)
 
 gdjs.ImageManager = gdjs.CocosImageManager; //Register the class to let the engine use it.
 
+/**
+ * Return the texture associated to the specified name.
+ * Returns a placeholder texture if not found.
+ * @param {string} name The name of the resource to get.
+ */
 gdjs.CocosImageManager.prototype.getTexture = function(imageName) {
     var texture;
     if (this._resources.hasOwnProperty(imageName)) {
@@ -31,6 +43,12 @@ gdjs.CocosImageManager.prototype.getTexture = function(imageName) {
     return texture;
 };
 
+/**
+ * Return a texture which can be used as a placeholder when no
+ * suitable texture can be found.
+ * TODO: The path to the file is hardcoded and can create crash if not existing,
+ * especially when compiled to a native game on iOS/Android/macOS.
+ */
 gdjs.CocosImageManager.prototype.getInvalidTexture = function() {
     return "res/HelloWorld.png"; //TODO
 };

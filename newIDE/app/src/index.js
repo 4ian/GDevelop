@@ -26,6 +26,7 @@ import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
 import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
 import { getBrowserExporters } from './Export/BrowserExporters';
+import BrowserJsExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
 
 // Import for Electron powered IDE.
 import ExternalEditor from './ExternalEditor';
@@ -39,6 +40,7 @@ import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
+import LocalJsExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
 
 // Uncomment to enable logs in console when a component is potentially doing
 // an unnecessary update
@@ -92,9 +94,10 @@ if (electron) {
           resourceSources={localResourceSources}
           resourceExternalEditors={localResourceExternalEditors}
           authentification={authentification}
+          extensionsLoader={new LocalJsExtensionsLoader()}
         />
       </ElectronEventsBridge>
-    );
+    ); 
   }
 } else {
   app = (
@@ -113,6 +116,7 @@ if (electron) {
       resourceSources={browserResourceSources}
       resourceExternalEditors={browserResourceExternalEditors}
       authentification={authentification}
+      extensionsLoader={new BrowserJsExtensionsLoader()}
     />
   );
 }

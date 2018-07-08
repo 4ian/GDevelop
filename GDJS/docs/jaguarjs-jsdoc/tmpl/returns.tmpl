@@ -1,0 +1,86 @@
+<?js
+var returns = obj;
+var parentReturn = null;
+var hasName = false;
+var hasType = false;
+
+returns.forEach(function (ret, i) {
+    if (ret && (ret.description || ret.name)) {
+        ret.description = ret.description.toString().replace(/<\/?p>/g, '');
+
+        var isNamed = ret.name ? true : false;
+        var name = ret.name || ret.description;
+        var startSpacePos = name.indexOf(' ');
+
+        if (parentReturn !== null && name.indexOf(parentReturn.name + '.') === 0) {
+            ret.name = isNamed ? name.substr(parentReturn.name.length + 1) : name.substr(parentReturn.name.length + 1, startSpacePos - (parentReturn.name.length + 1));
+        
+            if (!isNamed) {
+                ret.description = ret.description.substr(startSpacePos + 1);
+            }
+
+            ret.isSubReturns = true;
+            parentReturn.subReturns = parentReturn.subReturns || [];
+            parentReturn.subReturns.push(ret);
+            returns[i] = null;
+        } else if (returns.length > 1 || ret.isSubReturns) {
+            if (!isNamed) {
+                ret.name = ret.description.substr(0, startSpacePos !== -1 ? startSpacePos : ret.description.length);
+                ret.description = startSpacePos !== -1 ? ret.description.substr(startSpacePos + 1) : '';
+            }
+            
+            parentReturn = ret;
+        }
+    }
+
+    if (ret.name) {
+        hasName = true;
+    }
+
+    if (ret.type) {
+        hasType = true;
+    }
+});
+?>
+
+<?js if (hasType) { ?>
+<table class="params">
+    <thead>
+    <tr>
+        <?js if (hasName) { ?><th>Name</th><?js } ?>
+        <th>Type</th>
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?js
+        var self = this;
+        returns.forEach(function(ret) {
+            if (!ret) {
+                return false;
+            }
+    ?>
+        <tr>
+            <?js if (ret.name) { ?><td class="name"><code><?js= ret.name ?></code></td><?js } ?>
+            <td class="type">
+            <?js
+                if (ret.type && ret.type.names) {
+                    ret.type.names.forEach(function(name, i) { ?>
+                        <?js= self.linkto(name, self.htmlsafe(name)) ?>
+                        <?js if (i < ret.type.names.length-1) { ?> | <?js } ?>
+                    <?js }); 
+                }
+            ?>
+            </td>
+            <td class="description last"><?js= ret.description ?><?js if (ret.subReturns) { ?>
+                <?js= self.partial('returns.tmpl', ret.subReturns) ?>
+            <?js } ?></td>
+        </tr>
+    <?js }); ?>
+    </tbody>
+</table>
+<?js } else { ?>
+<?js if (returns[0].description) { ?>
+<?js= returns[0].description ?>
+<?js } ?>
+<?js } ?>

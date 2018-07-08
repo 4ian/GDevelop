@@ -6,7 +6,7 @@
 
 /**
  * Tools related to window, for events generated code.
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class window
  * @static
  * @private

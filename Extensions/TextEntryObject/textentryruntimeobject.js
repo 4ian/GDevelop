@@ -8,7 +8,7 @@
  *
  * @class TextEntryRuntimeObject
  * @extends RuntimeObject
- * @namespace gdjs
+ * @memberof gdjs
  */
 gdjs.TextEntryRuntimeObject = function(runtimeScene, objectData)
 {

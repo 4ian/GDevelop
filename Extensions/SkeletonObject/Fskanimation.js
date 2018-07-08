@@ -6,7 +6,7 @@ This project is released under the MIT License.
 */
 
 /**
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  * @class SharedAnimation
  */
 gdjs.sk.SharedAnimation = function(){
@@ -75,7 +75,7 @@ gdjs.sk.SharedAnimation.prototype.loadDragonBones = function(animationData, fps,
 /**
  * The Animation holds information to transform bones and slots through time.
  *
- * @namespace gdjs.sk
+ * @memberof gdjs.sk
  * @class Animation
  */
 gdjs.sk.Animation = function(armature){

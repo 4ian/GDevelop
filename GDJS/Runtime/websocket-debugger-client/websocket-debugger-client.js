@@ -2,7 +2,10 @@
  * This DebuggerClient connects to a websocket server and can dump
  * the data of the current game, and receive message to change a field or
  * call a function on an object of the specified runtimeGame.
- * @param {*} runtimegame
+ * 
+ * @memberof gdjs
+ * @class WebsocketDebuggerClient
+ * @param {gdjs.RuntimeGame} The `gdjs.RuntimeGame` to be debug
  */
 gdjs.WebsocketDebuggerClient = function(runtimegame) {
   this._runtimegame = runtimegame;

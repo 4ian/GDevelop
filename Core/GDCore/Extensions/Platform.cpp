@@ -26,12 +26,15 @@ Platform::~Platform() {}
 
 bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
   std::cout << extension->GetName();
+  bool loaded = false;
   for (std::size_t i = 0; i < extensionsLoaded.size(); ++i) {
     if (extensionsLoaded[i]->GetName() == extension->GetName()) {
-      std::cout << "(Already loaded!)" << std::endl;
-      return false;
+      std::cout << "(replacing existing extension)" << std::endl;
+      extensionsLoaded[i] = extension;
+      loaded = true;
     }
   }
+  if (!loaded) extensionsLoaded.push_back(extension);
 
   // Load all creation/destruction functions for objects provided by the
   // extension
@@ -41,7 +44,6 @@ bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
         extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
   }
 
-  extensionsLoaded.push_back(extension);
   std::cout << ", ";
   return true;
 }

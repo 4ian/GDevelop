@@ -6,6 +6,9 @@ type EmscriptenObject = Object & {
     ptr: Number
 };
 
+declare type gdPlatform = EmscriptenObject;
+declare type gdPlatformExtension = EmscriptenObject;
+
 declare type gdProject = EmscriptenObject;
 declare type gdLayout = EmscriptenObject;
 declare type gdExternalLayout = EmscriptenObject;

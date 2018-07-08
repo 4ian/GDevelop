@@ -65,6 +65,8 @@ class GD_API JsPlatform : public gd::Platform {
   GetProjectExporters() const;
 #endif
 
+  void AddNewExtension(const gd::PlatformExtension & extension);
+
   /**
    * \brief When the IDE is ready, start the tiny web server used for preview.
    */

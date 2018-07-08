@@ -9,7 +9,7 @@ This project is released under the MIT License.
 /**
  * The SkeletonRuntimeObject imports and displays skeletal animations files.
  *
- * @namespace gdjs
+ * @memberof gdjs
  * @class SkeletonRuntimeObject
  * @extends RuntimeObject
  */

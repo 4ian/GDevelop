@@ -5,7 +5,7 @@
  */
 
 /**
- * @namespace gdjs.evtTools
+ * @memberof gdjs.evtTools
  * @class network
  * @static
  * @private

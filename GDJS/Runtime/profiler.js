@@ -1,5 +1,8 @@
 /**
- * A basic profiling tool that can be used to measure time spent in sections of the engine
+ * A basic profiling tool that can be used to measure time spent in sections of the engine.
+ * @class Profiler
+ * @see gdjs.RuntimeGame
+ * @memberof gdjs
  */
 gdjs.Profiler = function() {
   this._framesMeasures = []; // All the measures for the last frames
@@ -137,11 +140,11 @@ gdjs.Profiler.prototype.getStats = function() {
 };
 
 /**
- * @brief Convert measures for a section into texts.
+ * Convert measures for a section into texts.
  * Useful for ingame profiling.
  *
- * @param {*} sectionName The name of the section
- * @param {*} profilerSection The section measures
+ * @param {string} sectionName The name of the section
+ * @param {s} profilerSection The section measures
  * @param {*} outputs The array where to push the results
  */
 gdjs.Profiler.getProfilerSectionTexts = function(

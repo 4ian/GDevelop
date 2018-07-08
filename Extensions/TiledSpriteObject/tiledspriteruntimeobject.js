@@ -8,7 +8,7 @@
  *
  * @class TiledSpriteRuntimeObject
  * @extends RuntimeObject
- * @namespace gdjs
+ * @memberof gdjs
  */
 gdjs.TiledSpriteRuntimeObject = function(runtimeScene, objectData)
 {

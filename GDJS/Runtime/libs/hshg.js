@@ -1,6 +1,11 @@
 // Hierarchical Spatial Hash Grid: HSHG
 //Note that this file has been customized so that HSHG is put into the gdjs object.
 //Thus, it must be included after gd.js
+
+/**
+ * @namespace
+ * @memberof gdjs
+ */
 gdjs.HSHG = gdjs.HSHG || {};
 
 (function(root, undefined){
@@ -81,7 +86,7 @@ function getLongestAABBEdge(min, max){
  * A hierarchical spatial grid containing objects and allowing fast test collisions between them.
  *
  * @class HSHG
- * @namespace gdjs.HSHG
+ * @memberof gdjs.HSHG
  * @constructor
  */
 function HSHG(){
@@ -99,8 +104,6 @@ function HSHG(){
 /**
  * Add an object to the grid. The object can be anything as long as it provides a getAABB method.
  * An 'HSHG' property is added to the object, and is then deleted when the object is removed from the HSHG.
- *
- * @method addObject
  */
 HSHG.prototype.addObject = function(obj){
 	var  x ,i
@@ -168,7 +171,6 @@ HSHG.prototype.addObject = function(obj){
 
 /**
  * Remove an object from the HSHG. The object must be in the HSHG before being removed.
- * @method removeObject
  */
 HSHG.prototype.removeObject = function(obj){
 	var  meta = obj.HSHG
@@ -199,7 +201,6 @@ HSHG.prototype.removeObject = function(obj){
 
 /**
  * Must be called when objects have been moved ( typically at each "tick" of the game/simulation ).
- * @method update
  */
 HSHG.prototype.update = function(){
 	this.UPDATE_METHOD.call(this);
@@ -207,8 +208,7 @@ HSHG.prototype.update = function(){
 
 /**
  * Return a list of objects colliding with theObject.
- * @param theObject The object to be tested against.
- * @method queryForCollisionWith
+ * @param {gdjs.RuntimeObject} theObject The object to be tested against.
  */
 HSHG.prototype.queryForCollisionWith = function(theObject, result){
 
@@ -340,7 +340,7 @@ HSHG.update_REMOVEALL = update_REMOVEALL;
  * Grid
  *
  * @class Grid
- * @namespace gdjs.HSHG
+ * @memberof gdjs.HSHG
  * @constructor
  * @param cellSize {int} the pixel size of each cell of the grid
  * @param cellCount {int} the total number of cells for the grid (width x height)
@@ -591,7 +591,7 @@ Grid.prototype.expandGrid = function(){
  * A cell of a grid
  *
  * @class Cell
- * @namespace gdjs.HSHG
+ * @memberof gdjs.HSHG
  * @constructor
  * @private
  */

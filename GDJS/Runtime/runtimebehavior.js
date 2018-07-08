@@ -8,10 +8,10 @@
  * RuntimeBehavior represents a behavior being used by a RuntimeObject.
  *
  * @class RuntimeBehavior
- * @constructor
- * @param runtimeScene The scene owning the object of the behavior
- * @param behaviorData The object used to setup the behavior
- * @param owner The object owning the behavior
+ * @memberof gdjs
+ * @param {gdjs.RuntimeScene} runtimeScene The scene owning the object of the behavior
+ * @param {Object} behaviorData The object used to setup the behavior
+ * @param {gdjs.RuntimeObject} owner The object owning the behavior
  */
 gdjs.RuntimeBehavior = function(runtimeScene, behaviorData, owner)
 {
@@ -23,8 +23,7 @@ gdjs.RuntimeBehavior = function(runtimeScene, behaviorData, owner)
 };
 /**
  * Get the name of the behavior.
- * @method getName
- * @return {String} The behavior's name.
+ * @return {string} The behavior's name.
  */
 gdjs.RuntimeBehavior.prototype.getName = function() {
 	return this.name;
@@ -32,8 +31,7 @@ gdjs.RuntimeBehavior.prototype.getName = function() {
 
 /**
  * Get the name identifier of the behavior.
- * @method getNameId
- * @return {Number} The behavior's name identifier.
+ * @return {number} The behavior's name identifier.
  */
 gdjs.RuntimeBehavior.prototype.getNameId = function() {
 	return this._nameId;
@@ -42,8 +40,7 @@ gdjs.RuntimeBehavior.prototype.getNameId = function() {
 /**
  * Called at each frame before events. Call doStepPreEvents.<br>
  * Behaviors writers: Please do not redefine this method. Redefine doStepPreEvents instead.
- * @method stepPreEvents
- * @param runtimeScene The runtimeScene owning the object
+ * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene owning the object
  */
 gdjs.RuntimeBehavior.prototype.stepPreEvents = function(runtimeScene) {
 	if ( this._activated ) {
@@ -59,8 +56,7 @@ gdjs.RuntimeBehavior.prototype.stepPreEvents = function(runtimeScene) {
 /**
  * Called at each frame after events. Call doStepPostEvents.<br>
  * Behaviors writers: Please do not redefine this method. Redefine doStepPreEvents instead.
- * @method stepPostEvents
- * @param runtimeScene The runtimeScene owning the object
+ * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene owning the object
  */
 gdjs.RuntimeBehavior.prototype.stepPostEvents = function(runtimeScene) {
 	if ( this._activated ) {
@@ -75,7 +71,6 @@ gdjs.RuntimeBehavior.prototype.stepPostEvents = function(runtimeScene) {
 
 /**
  * De/Activate the behavior
- * @method activate
  */
 gdjs.RuntimeBehavior.prototype.activate = function(enable) {
 	if ( enable === undefined ) enable = true;
@@ -91,7 +86,6 @@ gdjs.RuntimeBehavior.prototype.activate = function(enable) {
 
 /**
  * Return true if the behavior is activated
- * @method activated
  */
 gdjs.RuntimeBehavior.prototype.activated = function() {
 	return this._activated;
@@ -100,7 +94,6 @@ gdjs.RuntimeBehavior.prototype.activated = function() {
 /**
  * Behaviors writers: Reimplement this method to do extra work
  * when the behavior is activated
- * @method onActivate
  */
 gdjs.RuntimeBehavior.prototype.onActivate = function() {
 
@@ -109,7 +102,6 @@ gdjs.RuntimeBehavior.prototype.onActivate = function() {
 /**
  * Behaviors writers: Reimplement this method to do extra work
  * when the behavior is deactivated
- * @method onDeActivate
  */
 gdjs.RuntimeBehavior.prototype.onDeActivate = function() {
 
@@ -117,8 +109,7 @@ gdjs.RuntimeBehavior.prototype.onDeActivate = function() {
 
 /**
  * Behaviors writers: This method is called each tick before events are done.
- * @method doStepPreEvents
- * @param runtimeScene The runtimeScene owning the object
+ * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene owning the object
  */
 gdjs.RuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
 
@@ -126,8 +117,7 @@ gdjs.RuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
 
 /**
  * Behaviors writers: This method is called each tick after events are done.
- * @method doStepPostEvents
- * @param runtimeScene The runtimeScene owning the object
+ * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene owning the object
  */
 gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 
@@ -136,7 +126,6 @@ gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 /**
  * Behaviors writers: This method is called when the owner of the behavior
  * is removed from its scene.
- * @method ownerRemovedFromScene
  */
 gdjs.RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
 

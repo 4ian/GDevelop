@@ -6,21 +6,17 @@
 
 /**
  * Tools related to objects, for events generated code.
- * @namespace gdjs.evtTools
- * @class object
- * @static
- * @private
+ * @memberof gdjs.evtTools
+ * @namespace object
  */
 gdjs.evtTools.object = gdjs.evtTools.object || {};
 
 
 /**
- * \brief Keep only the specified object in the lists of picked objects.
+ * Keep only the specified object in the lists of picked objects.
  *
- * @method pickOnly
  * @param objectsLists The lists of objects to trim
  * @param runtimeObject {gdjs.RuntimeObject} The object to keep in the lists
- * @static
  */
 gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
     var lists = gdjs.staticArray(gdjs.evtTools.object.pickOnly);
@@ -53,9 +49,6 @@ gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
  * Note: predicate is called with the two objects to compare, and an optional argument `extraArg`.
  * This should be used to avoid declaring the predicate as a closure that would be created and destroyed
  * at each call to twoListsTest (potentially multiple time per frame).
- *
- * @method TwoListsTest
- * @static
  */
 gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLists2, inverted, extraArg) {
 
@@ -149,7 +142,7 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
 }
 
 /**
- * @brief Filter objects to keep only the one that fullfil the predicate
+ * Filter objects to keep only the one that fullfil the predicate
  *
  * Objects that do not fullfil the predicate are removed from objects lists.
  *
@@ -158,9 +151,6 @@ gdjs.evtTools.object.twoListsTest = function(predicate, objectsLists1, objectsLi
  * @param negatePredicate If set to true, the result of the predicate is negated.
  * @param extraArg Argument passed to the predicate (along with the object). Useful for avoiding relying on temporary closures.
  * @return true if at least one object fulfill the predicate.
- *
- * @method PickObjectsIf
- * @static
  */
 gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePredicate, extraArg) {
     var isTrue = false;

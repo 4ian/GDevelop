@@ -25,15 +25,15 @@ module.exports = {
     extension
       .addCondition(
         "MyNewCondition",
-        "Dummy condition example",
-        "This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5.",
-        "Call the example condition with _PARAM0_ and _PARAM1_",
-        "Dummy Extension",
+        t("Dummy condition example"),
+        t("This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5."),
+        t("Call the example condition with _PARAM0_ and _PARAM1_"),
+        t("Dummy Extension"),
         "res/conditions/camera24.png",
         "res/conditions/camera.png"
       )
-      .addParameter("expression", "Number 1", "", false)
-      .addParameter("string", "Text 1", "", false)
+      .addParameter("expression", t("Number 1"), "", false)
+      .addParameter("string", t("Text 1"), "", false)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/ExampleJsExtension/examplejsextensiontools.js"
@@ -43,12 +43,12 @@ module.exports = {
     extension
       .addExpression(
         "DummyExpression",
-        "Dummy expression example",
-        "This is an example of an expression",
-        "Dummy Extension",
+        t("Dummy expression example"),
+        t("This is an example of an expression"),
+        t("Dummy Extension"),
         "res/actions/camera.png"
       )
-      .addParameter("expression", "Maximum", "", false)
+      .addParameter("expression", t("Maximum"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("gdjs.random");
 

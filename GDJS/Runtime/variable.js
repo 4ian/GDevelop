@@ -151,7 +151,7 @@ gdjs.Variable.prototype.setNumber = function(newValue) {
 
 /**
  * Get the value of the variable, considered as a string
- * @return {String} The number stored
+ * @return {string} The number stored
  */
 gdjs.Variable.prototype.getAsString = function() {
 	if ( this._stringDirty ) {
@@ -164,7 +164,7 @@ gdjs.Variable.prototype.getAsString = function() {
 
 /**
  * Change the value of the variable, considered as a string
- * @param newValue {String} The new string to be set
+ * @param {string} newValue The new string to be set
  */
 gdjs.Variable.prototype.setString = function(newValue) {
 	this._str = newValue;

@@ -29,9 +29,9 @@ module.exports = {
         t("Save player data"),
         t("Save the content of the given variable in the player data, stored on Facebook Instant Games servers"),
         t("Save the content of _PARAM1_ in key _PARAM1_ of player data (store success message in _PARAM2_ or error in _PARAM3_)"),
-        t("Player data"),
-        "JsPlatform/Extensions/Facebookicon24.png",
-        "JsPlatform/Extensions/Facebookicon16.png"
+        t("Facebook Instant Games/Player data"),
+        "JsPlatform/Extensions/facebookicon24.png",
+        "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter("string", 'Data key name (e.g: "Lives")', "", false)
       .addParameter(
@@ -64,9 +64,9 @@ module.exports = {
         t("Load player data"),
         t("Load the player data with the given key in a variable"),
         t("Load player data with key _PARAM0_ in _PARAM1_ (or error in _PARAM2_)"),
-        t("Player data"),
-        "JsPlatform/Extensions/Facebookicon24.png",
-        "JsPlatform/Extensions/Facebookicon16.png"
+        t("Facebook Instant Games/Player data"),
+        "JsPlatform/Extensions/facebookicon24.png",
+        "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter("string", t('Data key name (e.g: "Lives")'), "", false)
       .addParameter(
@@ -93,9 +93,9 @@ module.exports = {
         t("Save player score"),
         t("Save the score, and optionally the content of the given variable in the player score, for the given metadata."),
         t("In leaderboard _PARAM0_, save score _PARAM1_ for the player and extra data from _PARAM2_ (store success message in _PARAM3_ or error in _PARAM4_)"),
-        t("Leaderboards"),
-        "JsPlatform/Extensions/Facebookicon24.png",
-        "JsPlatform/Extensions/Facebookicon16.png"
+        t("Facebook Instant Games/Leaderboards"),
+        "JsPlatform/Extensions/facebookicon24.png",
+        "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter("string", 'Leaderboard name (e.g: "PlayersBestTimes")', "", false)
       .addParameter("expression", 'Score to register for the player', "", false)
@@ -129,9 +129,9 @@ module.exports = {
         t("Load player entry"),
         t("Load the player entry in the given leaderboard"),
         t("Load player entry from leaderboard _PARAM0_. Set rank in _PARAM1_, score in _PARAM2_ (extra data if any in _PARAM3_ and error in _PARAM4_)"),
-        t("Leaderboards"),
-        "JsPlatform/Extensions/Facebookicon24.png",
-        "JsPlatform/Extensions/Facebookicon16.png"
+        t("Facebook Instant Games/Leaderboards"),
+        "JsPlatform/Extensions/facebookicon24.png",
+        "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter("string", 'Leaderboard name (e.g: "PlayersBestTimes")', "", false)
       .addParameter(
@@ -170,7 +170,7 @@ module.exports = {
         t("Player identifier"),
         t("Get the player unique identifier"),
         t("Facebook Instant Games"),
-        "JsPlatform/Extensions/Facebookicon16.png"
+        "JsPlatform/Extensions/facebookicon16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -184,7 +184,7 @@ module.exports = {
         t("Player name"),
         t("Get the player name"),
         t("Facebook Instant Games"),
-        "JsPlatform/Extensions/Facebookicon16.png"
+        "JsPlatform/Extensions/facebookicon16.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(

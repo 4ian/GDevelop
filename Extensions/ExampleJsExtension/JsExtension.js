@@ -26,7 +26,9 @@ module.exports = {
       .addCondition(
         "MyNewCondition",
         t("Dummy condition example"),
-        t("This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5."),
+        t(
+          "This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5."
+        ),
         t("Call the example condition with _PARAM0_ and _PARAM1_"),
         t("Dummy Extension"),
         "res/conditions/camera24.png",
@@ -72,7 +74,11 @@ module.exports = {
     // Everything that is stored inside the behavior is in "behaviorContent" and is automatically
     // saved/loaded to JSON.
     var dummyBehavior = new gd.BehaviorJsImplementation();
-    dummyBehavior.updateProperty = function(behaviorContent, propertyName, newValue) {
+    dummyBehavior.updateProperty = function(
+      behaviorContent,
+      propertyName,
+      newValue
+    ) {
       if (propertyName === "My first property") {
         behaviorContent.property1 = newValue;
         return true;
@@ -93,9 +99,9 @@ module.exports = {
       );
       behaviorProperties.set(
         "My other property",
-        new gd.PropertyDescriptor(behaviorContent.property2 ? "true" : "false").setType(
-          "Boolean"
-        )
+        new gd.PropertyDescriptor(
+          behaviorContent.property2 ? "true" : "false"
+        ).setType("Boolean")
       );
 
       return behaviorProperties;
@@ -120,14 +126,20 @@ module.exports = {
       )
       .setIncludeFile("Extensions/ExampleJsExtension/dummyruntimebehavior.js")
       // You can optionally include more than one file when the behavior is used:
-      .addIncludeFile("Extensions/ExampleJsExtension/examplejsextensiontools.js");
+      .addIncludeFile(
+        "Extensions/ExampleJsExtension/examplejsextensiontools.js"
+      );
 
     // Declare another behavior, with shared data between the behaviors
     // In addition to the usual behavior:
     // Create a new gd.BehaviorSharedDataJsImplementation object and implement the methods
     // that are called to get and set the properties of the shared data.
     var dummyBehaviorWithSharedData = new gd.BehaviorJsImplementation();
-    dummyBehaviorWithSharedData.updateProperty = function(behaviorContent, propertyName, newValue) {
+    dummyBehaviorWithSharedData.updateProperty = function(
+      behaviorContent,
+      propertyName,
+      newValue
+    ) {
       if (propertyName === "My behavior property") {
         behaviorContent.property1 = newValue;
         return true;
@@ -147,12 +159,16 @@ module.exports = {
     };
     dummyBehaviorWithSharedData.setRawJSONContent(
       JSON.stringify({
-        property1: "Initial value 1",
+        property1: "Initial value 1"
       })
     );
 
     var sharedData = new gd.BehaviorSharedDataJsImplementation();
-    sharedData.updateProperty = function(sharedContent, propertyName, newValue) {
+    sharedData.updateProperty = function(
+      sharedContent,
+      propertyName,
+      newValue
+    ) {
       if (propertyName === "My shared property") {
         sharedContent.sharedProperty1 = newValue;
         return true;
@@ -165,14 +181,14 @@ module.exports = {
 
       sharedProperties.set(
         "My shared property",
-        new gd.PropertyDescriptor(sharedContent.sharedProperty1 || '')
+        new gd.PropertyDescriptor(sharedContent.sharedProperty1 || "")
       );
 
       return sharedProperties;
     };
     sharedData.setRawJSONContent(
       JSON.stringify({
-        sharedProperty1: "Initial shared value 1",
+        sharedProperty1: "Initial shared value 1"
       })
     );
     extension
@@ -185,11 +201,15 @@ module.exports = {
         "CppPlatform/Extensions/topdownmovementicon.png",
         "DummyBehaviorWithSharedData",
         dummyBehaviorWithSharedData,
-        sharedData,
+        sharedData
       )
-      .setIncludeFile("Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js")
+      .setIncludeFile(
+        "Extensions/ExampleJsExtension/dummywithshareddataruntimebehavior.js"
+      )
       // You can optionally include more than one file when the behavior is used:
-      .addIncludeFile("Extensions/ExampleJsExtension/examplejsextensiontools.js");
+      .addIncludeFile(
+        "Extensions/ExampleJsExtension/examplejsextensiontools.js"
+      );
 
     // Declare an object.
     // Create a new gd.ObjectJsImplementation object and implement the methods
@@ -198,7 +218,11 @@ module.exports = {
     // Everything that is stored inside the object is in "content" and is automatically
     // saved/loaded to JSON.
     var dummyObject = new gd.ObjectJsImplementation();
-    dummyObject.updateProperty = function(objectContent, propertyName, newValue) {
+    dummyObject.updateProperty = function(
+      objectContent,
+      propertyName,
+      newValue
+    ) {
       if (propertyName === "My first property") {
         objectContent.property1 = newValue;
         return true;
@@ -223,9 +247,9 @@ module.exports = {
       );
       objectProperties.set(
         "My other property",
-        new gd.PropertyDescriptor(objectContent.property2 ? "true" : "false").setType(
-          "boolean"
-        )
+        new gd.PropertyDescriptor(
+          objectContent.property2 ? "true" : "false"
+        ).setType("boolean")
       );
       objectProperties.set(
         "My third property",
@@ -296,5 +320,36 @@ module.exports = {
     );
 
     return extension;
+  },
+  /**
+   * You can optionally add sanity tests that will check the basic working
+   * of your extension behaviors/objects by instanciating behaviors/objects
+   * and setting the property to a given value.
+   * 
+   * If you don't have any tests, you can simply return an empty array like this:
+   * `runExtensionSanityTests: extension => []`
+   * 
+   * But it is recommended to create tests for the behaviors/objects properties you created
+   * to avoid mistakes.
+   */
+  runExtensionSanityTests: extension => {
+    const dummyBehavior = extension
+      .getBehaviorMetadata("MyDummyExtension::DummyBehavior")
+      .get();
+    const sharedData = extension
+      .getBehaviorMetadata("MyDummyExtension::DummyBehaviorWithSharedData")
+      .getSharedDataInstance();
+    return [
+      gd.ProjectHelper.sanityCheckBehaviorProperty(
+        dummyBehavior,
+        "My first property",
+        "Testing value"
+      ),
+      gd.ProjectHelper.sanityCheckBehaviorsSharedDataProperty(
+        sharedData,
+        "My shared property",
+        "Testing value"
+      )
+    ];
   }
 };

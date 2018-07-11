@@ -129,7 +129,7 @@ If you want to start a new extension:
 - Choose a unique and descriptive name. Create a folder with this name in _Extensions_.
 - Create a file in it named _JsExtension.js_ and copy the content of the _JsExtension.js_ of another extension.
 - Change the extension information (`extension.setExtensionInformation`). The first argument is the extension internal name and should be the same name as your folder for consistency.
-- Remove all the actions/conditions/expressions declaration, run `node import-GDJS-Runtime.js` and reload GDevelop to verify that your extension is loaded.
+- Remove all the actions/conditions/expressions declarations and tests, run `node import-GDJS-Runtime.js` and reload GDevelop to verify that your extension is loaded.
 - Create a file called for example _yourextensionnametools.js_ in the same directory.
 - Add back the declarations in your extension. Use `setIncludeFile` when declaring your actions/conditions/expressions and set the name of the js file that you've created, prefixed by the path from the root folder. For example:
   ```js

@@ -193,5 +193,6 @@ module.exports = {
       .setFunctionName("gdjs.evtTools.facebookInstantGames.getPlayerName");
 
     return extension;
-  }
+  },
+  runExtensionSanityTests: extension => [],
 };

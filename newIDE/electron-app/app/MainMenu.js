@@ -128,6 +128,32 @@ const buildMainMenuFor = window => {
           electron.shell.openExternal(package.homepage);
         },
       },
+      { type: 'separator' },
+      {
+        label: 'Community forums',
+        click() {
+          electron.shell.openExternal('http://forum.compilgames.net');
+        },
+      },
+      {
+        label: 'Community Discord chat',
+        click() {
+          electron.shell.openExternal('https://discord.gg/YnKk8Ev');
+        },
+      },
+      { type: 'separator' },
+      {
+        label: 'Contribute to GDevelop',
+        click() {
+          electron.shell.openExternal('https://gdevelop-app.com/contribute/');
+        },
+      },
+      {
+        label: 'Create extensions for GDevelop',
+        click() {
+          electron.shell.openExternal('https://github.com/4ian/GD/blob/master/newIDE/README-extensions.md');
+        },
+      },
     ],
   };
   if (process.platform !== 'darwin') {

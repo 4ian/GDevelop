@@ -11,7 +11,7 @@
  * More information on https://github.com/4ian/GD/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: (t, gd) => {
+  createExtension: function(t, gd) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       "MyDummyExtension",
@@ -327,12 +327,12 @@ module.exports = {
    * and setting the property to a given value.
    * 
    * If you don't have any tests, you can simply return an empty array like this:
-   * `runExtensionSanityTests: extension => []`
+   * `runExtensionSanityTests: function(extension) { return []; }`
    * 
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: extension => {
+  runExtensionSanityTests: function(extension) {
     const dummyBehavior = extension
       .getBehaviorMetadata("MyDummyExtension::DummyBehavior")
       .get();

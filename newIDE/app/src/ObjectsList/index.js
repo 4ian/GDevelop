@@ -110,7 +110,7 @@ class ObjectsList extends Component<*, *> {
               onCutObject={() => this.props.onCutObject(objectWithContext)}
               onPaste={() => this.props.onPaste(objectWithContext)}
               onRename={newName =>
-                this.props.onRename(objectWithContext, newName)}            
+                this.props.onRename(objectWithContext, newName)}
               onSetAsGlobalObject={
                 objectWithContext.global
                   ? undefined
@@ -139,7 +139,6 @@ type StateType = {|
   renamedObjectWithScope: ?ObjectWithContext,
   variablesEditedObject: any,
   searchText: string,
-  // tryName:string,
 |};
 
 export default class ObjectsListContainer extends React.Component<
@@ -154,7 +153,6 @@ export default class ObjectsListContainer extends React.Component<
       newName: string,
       cb: Function
     ) => cb(true),
-    // canRenameObject: (tryName: string)
   };
 
   sortableList: any;
@@ -314,7 +312,7 @@ export default class ObjectsListContainer extends React.Component<
     });
   };
 
-  _rename = (objectWithContext: ObjectWithContext, newName: string) => { 
+  _rename = (objectWithContext: ObjectWithContext, newName: string) => {
     const { object } = objectWithContext;
 
     this.setState({

@@ -402,8 +402,6 @@ export default class SceneEditor extends Component {
     done(true);
   };
 
-  //use this function to check if the new name can be used
-  // on apply new name event
   _canObjectUseNewName = (objectWithContext, newName) => {
     const { project, layout } = this.props;
     const { object } = objectWithContext;

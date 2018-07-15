@@ -381,6 +381,24 @@ gdjs.ParticleEmitterObject.prototype.setParticleBlue2 = function(blue){
     }
 };
 
+gdjs.ParticleEmitterObject.prototype.setParticleColor1 = function(rgbColor){
+    var colors = rgbColor.split(";");
+    if ( colors.length < 3 ) return;
+
+    this.setParticleRed1(parseInt(colors[0]));
+    this.setParticleGreen1(parseInt(colors[1]));
+    this.setParticleBlue1(parseInt(colors[2]));
+};
+
+gdjs.ParticleEmitterObject.prototype.setParticleColor2 = function(rgbColor){
+    var colors = rgbColor.split(";");
+    if ( colors.length < 3 ) return;
+
+    this.setParticleRed2(parseInt(colors[0]));
+    this.setParticleGreen2(parseInt(colors[1]));
+    this.setParticleBlue2(parseInt(colors[2]));
+};
+
 gdjs.ParticleEmitterObject.prototype.getParticleSize1 = function(){
     return this.size1;
 };

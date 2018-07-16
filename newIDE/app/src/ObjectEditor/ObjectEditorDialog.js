@@ -19,6 +19,7 @@ const styles = {
 
 type StateType = {|
   currentTab: string,
+  newObjectName: string,
 |};
 
 export class ObjectEditorDialog extends Component<*, StateType> {

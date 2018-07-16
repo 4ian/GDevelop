@@ -314,28 +314,18 @@ export default class ObjectsListContainer extends React.Component<
 
   _rename = (objectWithContext: ObjectWithContext, newName: string) => {
     const { object } = objectWithContext;
-    const { project, objectsContainer } = this.props;
 
     this.setState({
       renamedObjectWithScope: null,
     });
+    if(this.props.canRenameObject(newName)){
+      this.props.onRenameObject(objectWithContext, newName, doRename => {
+        if (!doRename) return;
 
-    if (object.getName() === newName) return;
-
-    if (
-      objectsContainer.hasObjectNamed(newName) ||
-      project.hasObjectNamed(newName)
-    ) {
-      showWarningBox('Another object with this name already exists');
-      return;
+        object.setName(newName);
+        this.forceUpdate();
+      });
     }
-
-    this.props.onRenameObject(objectWithContext, newName, doRename => {
-      if (!doRename) return;
-
-      object.setName(newName);
-      this.forceUpdate();
-    });
   };
 
   _move = (oldIndex: number, newIndex: number) => {

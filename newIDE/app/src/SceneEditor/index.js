@@ -30,6 +30,8 @@ import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import EditorBar from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
+import { showWarningBox } from '../UI/Messages/MessageBox';
+
 import {
   undo,
   redo,
@@ -75,8 +77,7 @@ export default class SceneEditor extends Component {
       layerRemoveDialogOpen: false,
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
-
-      editedObject: null,
+      editedObjectWithContext: { object: null, global: null },
       variablesEditedInstance: null,
       selectedObjectName: null,
 
@@ -210,8 +211,23 @@ export default class SceneEditor extends Component {
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
-  editObject = object => {
-    this.setState({ editedObject: object });
+  editObject = editedObject => {
+    const { project } = this.props;
+    if (editedObject) {
+      this.setState({
+        editedObjectWithContext: {
+          object: editedObject,
+          global: project.hasObjectNamed(editedObject.getName()),
+        },
+      });
+    } else {
+      this.setState({
+        editedObjectWithContext: {
+          object: null,
+          global: null,
+        },
+      });
+    }
   };
 
   editObjectByName = objectName => {
@@ -386,7 +402,35 @@ export default class SceneEditor extends Component {
     done(true);
   };
 
-  _onRenameObject = (objectWithContext, newName, done) => {
+  _canObjectUseNewName = (objectWithContext, newName) => {
+    const { project, layout } = this.props;
+    const { object } = objectWithContext;
+
+    if (object.getName() === newName) {
+      return true;
+    } else if (
+      layout.hasObjectNamed(newName) ||
+      project.hasObjectNamed(newName)
+    ) {
+      showWarningBox('Another object with this name already exists.');
+      return false;
+    }
+    return true;
+  };
+
+  _onRenameEditedObject = newName => {
+    const { editedObjectWithContext } = this.state;
+
+    // Avoid triggering renaming refactoring if name has not really changed
+    if (
+      editedObjectWithContext.object &&
+      editedObjectWithContext.object.getName() !== newName
+    ) {
+      this._onRenameObject(this.state.editedObjectWithContext, newName);
+    }
+  };
+
+  _onRenameObject = (objectWithContext, newName, done = () => {}) => {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
@@ -404,6 +448,7 @@ export default class SceneEditor extends Component {
         newName
       );
     }
+    object.setName(newName);
     done(true);
   };
 
@@ -589,6 +634,16 @@ export default class SceneEditor extends Component {
             onObjectSelected={this._onObjectSelected}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
+            canRenameObject={tryName => {
+              const editedObjectWithContext = {
+                object: layout.getObject(this.state.selectedObjectName),
+                global: project.hasObjectNamed(this.state.selectedObjectName),
+              };
+              return this._canObjectUseNewName(
+                editedObjectWithContext,
+                tryName
+              );
+            }}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
             ref={objectsList => (this._objectsList = objectsList)}
@@ -607,7 +662,6 @@ export default class SceneEditor extends Component {
         </MosaicWindow>
       ),
     };
-
     return (
       <div style={styles.container}>
         <EditorMosaic
@@ -626,18 +680,27 @@ export default class SceneEditor extends Component {
           }}
         />
         <ObjectEditorDialog
-          open={!!this.state.editedObject}
-          object={this.state.editedObject}
+          open={!!this.state.editedObjectWithContext.object}
+          object={this.state.editedObjectWithContext.object}
           project={project}
           resourceSources={resourceSources}
           resourceExternalEditors={resourceExternalEditors}
           onChooseResource={onChooseResource}
           onCancel={() => {
-            this.reloadResourcesFor(this.state.editedObject);
+            this.reloadResourcesFor(this.state.editedObjectWithContext.object);
             this.editObject(null);
           }}
+          canRenameObject={tryName => {
+            return this._canObjectUseNewName(
+              this.state.editedObjectWithContext,
+              tryName
+            );
+          }}
+          onRename={newName => {
+            this._onRenameEditedObject(newName);
+          }}
           onApply={() => {
-            this.reloadResourcesFor(this.state.editedObject);
+            this.reloadResourcesFor(this.state.editedObjectWithContext.object);
             this.editObject(null);
             this.updateBehaviorsSharedData();
             this.forceUpdateObjectsList();

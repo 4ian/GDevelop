@@ -97,7 +97,7 @@ gdjs.SpriteRuntimeObjectPixiRenderer.prototype.setColor = function(rgbColor) {
    var colors = rgbColor.split(";");
    if ( colors.length < 3 ) return;
 
-   this._sprite.tint = "0x" + gdjs.rgbToHex(parseInt(colors[0]), parseInt(colors[1]), parseInt(colors[2]));
+   this._sprite.tint = "0x" + gdjs.rgbToHex(parseInt(colors[0], 10), parseInt(colors[1], 10), parseInt(colors[2], 10));
 };
 
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.getWidth = function() {

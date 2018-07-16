@@ -419,7 +419,15 @@ export default class SceneEditor extends Component {
   };
 
   _onRenameEditedObject = newName => {
-    this._onRenameObject(this.state.editedObjectWithContext, newName);
+    const { editedObjectWithContext } = this.state;
+
+    // Avoid triggering renaming refactoring if name has not really changed
+    if (
+      editedObjectWithContext.object &&
+      editedObjectWithContext.object.getName() !== newName
+    ) {
+      this._onRenameObject(this.state.editedObjectWithContext, newName);
+    }
   };
 
   _onRenameObject = (objectWithContext, newName, done = () => {}) => {

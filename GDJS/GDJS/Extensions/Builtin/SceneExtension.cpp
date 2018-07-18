@@ -24,6 +24,7 @@ SceneExtension::SceneExtension() {
                           "Open source (MIT License)");
 
   GetAllExpressions()["Random"].SetFunctionName("gdjs.random");
+  GetAllExpressions()["RandomRange"].SetFunctionName("gdjs.randomRange");
   GetAllStrExpressions()["CurrentSceneName"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.getSceneName");
 

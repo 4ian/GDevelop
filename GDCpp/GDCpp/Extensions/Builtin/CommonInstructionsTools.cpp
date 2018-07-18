@@ -41,6 +41,11 @@ double GD_API Random(int end) {
   return randomDist(randomEngine);
 }
 
+double GD_API RandomRange(int min, int max, float step) {
+  if (step <= 0) return min + Random(max - min);
+  return min + Random((max - min) / step) * step; // return min if min >= max, implicit casting to int for Random(int)
+}
+
 bool GD_API LogicalNegation(bool param) { return !param; }
 
 double GD_API ToDouble(const gd::String& str) { return str.To<double>(); }

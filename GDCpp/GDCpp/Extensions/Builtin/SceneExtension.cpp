@@ -24,6 +24,9 @@ SceneExtension::SceneExtension() {
   GetAllExpressions()["Random"]
       .SetFunctionName("GDpriv::CommonInstructions::Random")
       .SetIncludeFile("GDCpp/Extensions/Builtin/CommonInstructionsTools.h");
+  GetAllExpressions()["RandomRange"]
+      .SetFunctionName("GDpriv::CommonInstructions::RandomRange")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/CommonInstructionsTools.h");
   GetAllStrExpressions()["CurrentSceneName"]
       .SetFunctionName("GetSceneName")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");

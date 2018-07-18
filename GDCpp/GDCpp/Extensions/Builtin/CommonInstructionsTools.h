@@ -19,6 +19,11 @@ namespace CommonInstructions {
 double GD_API Random(int max);
 
 /**
+ * Generate a random number between min and max, with an optional step
+ */
+double GD_API RandomRange(int min, int max, float step);
+
+/**
  * Logical negation
  * \return !param
  */

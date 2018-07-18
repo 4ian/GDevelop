@@ -29,6 +29,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddParameter("expression", _("Maximum value"));
 
   extension
+      .AddExpression("RandomRange",
+                     _("Random value in range"),
+                     _("Random value in range"),
+                     _("Random"),
+                     "res/actions/position.png")
+      .AddParameter("expression", _("Minimum value"))
+      .AddParameter("expression", _("Maximum value"))
+      .AddParameter("expression", _("Step"), "", true);
+
+  extension
       .AddStrExpression("CurrentSceneName",
                         _("Current scene name"),
                         _("Name of the current scene"),

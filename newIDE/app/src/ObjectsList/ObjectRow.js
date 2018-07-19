@@ -9,6 +9,8 @@ import Clipboard from '../Utils/Clipboard';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 
+const LEFT_MOUSE_BUTTON = 0;
+
 const styles = {
   objectName: {
     overflow: 'hidden',
@@ -156,11 +158,11 @@ class ThemableObjectRow extends React.Component {
           this.props.onObjectSelected(selected ? '' : objectName);
         }}
         onDoubleClick={(event) => {
-          if (event.button !== 0) return;
-          if (!this.props.onObjectSelected) return;
+          if (event.button !== LEFT_MOUSE_BUTTON) return;
+          if (!this.props.onEdit) return;
           if (this.props.editingName) return;
 
-          this.props.onEdit(selected ? '' : objectName);
+          this.props.onEdit(object);
         }}
       />
     );

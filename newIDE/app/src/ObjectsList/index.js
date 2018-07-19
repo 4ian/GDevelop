@@ -261,15 +261,15 @@ export default class ObjectsListContainer extends React.Component<
 
   _duplicateObject = (objectWithContext: ObjectWithContext) => {
     this._copyObject(objectWithContext);
+    this._pasteAndRename(objectWithContext);
+  };
+
+  _pasteAndRename = (objectWithContext: ObjectWithContext) => {
     this._editName(this._paste(objectWithContext));
   };
 
-  _pasteObject = (objectWithContext: ObjectWithContext) => {
-    this._editName(this._paste(objectWithContext));
-  };
-
-  _paste = (objectWithContext: ObjectWithContext): ObjectWithContext => {
-    if (!Clipboard.has(CLIPBOARD_KIND)) return;
+  _paste = (objectWithContext: ObjectWithContext): ?ObjectWithContext => {
+    if (!Clipboard.has(CLIPBOARD_KIND)) return null;
 
     const { object: pasteObject, global } = objectWithContext;
     const { object: copiedObject, type, name } = Clipboard.get(CLIPBOARD_KIND);
@@ -452,7 +452,7 @@ export default class ObjectsListContainer extends React.Component<
                 onCutObject={this._cutObject}
                 onDuplicateObject={this._duplicateObject}
                 onSetAsGlobalObject={this._setAsGlobalObject}
-                onPasteObject={this._pasteObject}
+                onPasteObject={this._pasteAndRename}
                 onAddNewObject={() =>
                   this.setState({ newObjectDialogOpen: true })}
                 onEditName={this._editName}

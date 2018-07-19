@@ -37,6 +37,7 @@ const exampleNames = [
   'infinite-scrolling-background',
   'instance-timer',
   'inventory-system',
+  'isometric-game',
   'keyboard-practice',
   'magnet',
   'manipulate-text-object',

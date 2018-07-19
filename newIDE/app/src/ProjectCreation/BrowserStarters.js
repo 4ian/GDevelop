@@ -44,6 +44,19 @@ export default class BrowserStarters extends Component {
                   this.props.onOpen('internal://space-shooter');
                 }}
               />
+              <ListItem
+                primaryText="Isometric game"
+                secondaryText={
+                  <p>
+                    An example of an isometric game where you can explore a map with your character.
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('isometric-game');
+                  this.props.onOpen('internal://isometric-game');
+                }}
+              />
             </List> 
             <Line alignItems="center" justifyContent="center">
               <RaisedButton

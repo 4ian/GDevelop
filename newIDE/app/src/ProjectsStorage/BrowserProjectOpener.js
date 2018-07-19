@@ -18,6 +18,7 @@ import findDiagonals from '../fixtures/find-diagonals/find-diagonals.json';
 import infiniteScrollingBackground from '../fixtures/infinite-scrolling-background/infinite-scrolling-background.json';
 import instanceTimer from '../fixtures/instance-timer/instance-timer.json';
 import inventorySystem from '../fixtures/inventory-system/inventory-system.json';
+import isometricGame from '../fixtures/isometric-game/isometric-game.json';
 import keyboardPractice from '../fixtures/keyboard-practice/keyboard-practice.json';
 import magnet from '../fixtures/magnet/magnet.json';
 import manipulateTextObject from '../fixtures/manipulate-text-object/manipulate-text-object.json';
@@ -102,6 +103,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(instanceTimer);
     } else if (url === 'internal://inventory-system') {
       return Promise.resolve(inventorySystem);
+    } else if (url === 'internal://isometric-game') {
+      return Promise.resolve(isometricGame);
     } else if (url === 'internal://keyboard-practice') {
       return Promise.resolve(keyboardPractice);
     } else if (url === 'internal://magnet') {

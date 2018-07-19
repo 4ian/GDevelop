@@ -108,7 +108,8 @@ class ObjectsList extends Component<*, *> {
               onDelete={() => this.props.onDelete(objectWithContext)}
               onCopyObject={() => this.props.onCopyObject(objectWithContext)}
               onCutObject={() => this.props.onCutObject(objectWithContext)}
-              onPaste={() => this.props.onPaste(objectWithContext)}
+              onDuplicateObject={() => this.props.onDuplicateObject(objectWithContext)}
+              onPasteObject={() => this.props.onPasteObject(objectWithContext)}
               onRename={newName =>
                 this.props.onRename(objectWithContext, newName)}
               onSetAsGlobalObject={
@@ -258,8 +259,17 @@ export default class ObjectsListContainer extends React.Component<
     this._deleteObject(objectWithContext);
   };
 
-  _paste = (objectWithContext: ObjectWithContext) => {
-    if (!Clipboard.has(CLIPBOARD_KIND)) return;
+  _duplicateObject = (objectWithContext: ObjectWithContext) => {
+    this._copyObject(objectWithContext);
+    this._pasteAndRename(objectWithContext);
+  };
+
+  _pasteAndRename = (objectWithContext: ObjectWithContext) => {
+    this._editName(this._paste(objectWithContext));
+  };
+
+  _paste = (objectWithContext: ObjectWithContext): ?ObjectWithContext => {
+    if (!Clipboard.has(CLIPBOARD_KIND)) return null;
 
     const { object: pasteObject, global } = objectWithContext;
     const { object: copiedObject, type, name } = Clipboard.get(CLIPBOARD_KIND);
@@ -295,6 +305,8 @@ export default class ObjectsListContainer extends React.Component<
 
     this.forceUpdate();
     if (onObjectPasted) onObjectPasted(newObject);
+
+    return {object: newObject, global,};
   };
 
   _editName = (objectWithContext: ?ObjectWithContext) => {
@@ -314,28 +326,18 @@ export default class ObjectsListContainer extends React.Component<
 
   _rename = (objectWithContext: ObjectWithContext, newName: string) => {
     const { object } = objectWithContext;
-    const { project, objectsContainer } = this.props;
 
     this.setState({
       renamedObjectWithScope: null,
     });
+    if(this.props.canRenameObject(newName)){
+      this.props.onRenameObject(objectWithContext, newName, doRename => {
+        if (!doRename) return;
 
-    if (object.getName() === newName) return;
-
-    if (
-      objectsContainer.hasObjectNamed(newName) ||
-      project.hasObjectNamed(newName)
-    ) {
-      showWarningBox('Another object with this name already exists');
-      return;
+        object.setName(newName);
+        this.forceUpdate();
+      });
     }
-
-    this.props.onRenameObject(objectWithContext, newName, doRename => {
-      if (!doRename) return;
-
-      object.setName(newName);
-      this.forceUpdate();
-    });
   };
 
   _move = (oldIndex: number, newIndex: number) => {
@@ -438,8 +440,9 @@ export default class ObjectsListContainer extends React.Component<
                 onEditObject={this.props.onEditObject}
                 onCopyObject={this._copyObject}
                 onCutObject={this._cutObject}
+                onDuplicateObject={this._duplicateObject}
                 onSetAsGlobalObject={this._setAsGlobalObject}
-                onPaste={this._paste}
+                onPasteObject={this._pasteAndRename}
                 onAddNewObject={() =>
                   this.setState({ newObjectDialogOpen: true })}
                 onEditName={this._editName}

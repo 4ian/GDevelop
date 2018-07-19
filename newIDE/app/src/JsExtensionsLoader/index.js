@@ -1,21 +1,56 @@
 // @flow
+import some from 'lodash/some';
 const gd = global.gd;
 
 const t = _ => _; //TODO: Implement support for i18n for extensions.
 
 export type JsExtensionModule = {
   createExtension(t, gd): gdPlatformExtension,
+  runExtensionSanityTests(extension: gdPlatformExtension): Array<string>,
 };
 
 export type ExtensionLoadingResult = {
   error: boolean,
   message: string,
+  dangerous?: boolean,
   rawError?: any,
 };
 
 export interface JsExtensionsLoader {
-  loadAllExtensions(): Promise<Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>>;
+  loadAllExtensions(): Promise<
+    Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
+  >,
 }
+
+/**
+ * Run extensions tests and check for any non-empty results.
+ */
+export const runExtensionSanityTests = (
+  extension: gdPlatformExtension,
+  jsExtensionModule: JsExtensionModule
+): ExtensionLoadingResult => {
+  if (!jsExtensionModule.runExtensionSanityTests) {
+    return {
+      error: true,
+      message:
+        'Missing runExtensionSanityTests in the extension module exports',
+    };
+  }
+
+  const testResults = jsExtensionModule.runExtensionSanityTests(extension);
+  if (some(testResults)) {
+    return {
+      error: true,
+      message: 'One or more tests are failing for the extension (see rawError)',
+      rawError: testResults,
+    };
+  }
+
+  return {
+    error: false,
+    message: 'Tests passed successfully',
+  };
+};
 
 /**
  * Load an extension from the specified JavaScript module, which is supposed
@@ -44,8 +79,24 @@ export const loadExtension = (
     }
   } catch (ex) {
     return {
-      message: `Exception caught while running createExtension. Please fix this error as this could make GDevelop unstable/crash.`,
+      message: `🚨 Exception caught while running createExtension. 💣 Please fix this error as this will make GDevelop crash at some point.`,
       error: true,
+      dangerous: true,
+      rawError: ex,
+    };
+  }
+
+  try {
+    const testsResult = runExtensionSanityTests(extension, jsExtensionModule);
+    if (testsResult.error) {
+      extension.delete();
+      return testsResult;
+    }
+  } catch (ex) {
+    return {
+      message: `🚨 Exception caught while running runExtensionSanityTests. 💣 Please fix this error as this will make GDevelop crash at some point.`,
+      error: true,
+      dangerous: true,
       rawError: ex,
     };
   }
@@ -54,7 +105,7 @@ export const loadExtension = (
   extension.delete(); // Release the extension as it was copied inside gd.JsPlatform
 
   return {
-    message: 'Successfully loaded the extension.',
+    message: '✅ Successfully loaded the extension.',
     error: false,
   };
 };

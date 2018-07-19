@@ -199,6 +199,10 @@ gdjs.ParticleEmitterObjectPixiRenderer.prototype.setColor = function(r1, g1, b1,
     this.emitter.startColor.value.r = r1;
     this.emitter.startColor.value.g = g1;
     this.emitter.startColor.value.b = b1;
+    this.emitter.startColor.next = this.emitter.startColor.next || {
+        time : 1,
+        value : {}
+    };
     this.emitter.startColor.next.value.r = r2;
     this.emitter.startColor.next.value.g = g2;
     this.emitter.startColor.next.value.b = b2;

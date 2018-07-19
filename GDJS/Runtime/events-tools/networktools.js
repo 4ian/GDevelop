@@ -6,9 +6,7 @@
 
 /**
  * @memberof gdjs.evtTools
- * @class network
- * @static
- * @private
+ * @namespace network
  */
 gdjs.evtTools.network = gdjs.evtTools.network || {};
 
@@ -44,6 +42,12 @@ gdjs.evtTools.network.sendHttpRequest = function(host, uri, body, method, conten
 	catch(e){}
 };
 
+/**
+ * Convert a variable to JSON.
+ * TODO: Move to gdjs.Variable static
+ * @param {gdjs.Variable} variable The variable to convert to JSON
+ * @returns {string} The JSON string representing the variable 
+ */
 gdjs.evtTools.network.variableStructureToJSON = function(variable)
 {
     if ( !variable.isStructure() ) {
@@ -97,14 +101,23 @@ gdjs.evtTools.network._objectToVariable = function(obj, variable)
 
 }
 
+/**
+ * Parse the given JSON and fill the content of the variable with it
+ * TODO: Move to gdjs.Variable static
+ * @param {string} jsonStr The JSON string
+ * @param {gdjs.Variable} variable The variable where to put the parsed JSON
+ * @returns {boolean} true if JSON was properly parsed
+ */
 gdjs.evtTools.network.jsonToVariableStructure = function(jsonStr, variable)
 {
-    if ( jsonStr.length === 0 ) return;
+    if ( jsonStr.length === 0 ) return false;
     try {
 		var obj = JSON.parse(jsonStr);
 		gdjs.evtTools.network._objectToVariable(obj, variable);
+		return true;
 	} catch(e) {
 		//Do nothing iF JSON was not properly parsed;
+		return false;
 	}
 }
 

@@ -88,6 +88,20 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
     if (this._currentSpeed < -this._maxSpeed) this._currentSpeed = -this._maxSpeed;
     requestedDeltaX += this._currentSpeed*timeDelta;
 
+    //0.2) Track changes in object size
+
+    //Stick the object to the floor if its height has changed.
+    if ( this._isOnFloor && this._oldHeight !== object.getHeight() ) {
+        object.setY(this._floorLastY
+            - object.getHeight()
+            + (object.getY() - object.getDrawableY())
+            - 1
+        );
+    }
+    this._oldHeight = object.getHeight();
+
+    //0.3) Update list of platforms around/related to the object
+
     //Compute the list of the objects that will be used
     this._updatePotentialCollidingObjects(Math.max(requestedDeltaX, this._maxFallingSpeed*timeDelta) );
     this._updateOverlappedJumpThru();
@@ -102,19 +116,6 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
     if ( this._isGrabbingPlatform && !this._isIn(this._potentialCollidingObjects, this._grabbedPlatform.owner.id) ) {
         this._releaseGrabbedPlatform();
     }
-
-    //0.2) Track changes in object size
-
-    //Stick the object to the floor if its height has changed.
-    if ( this._isOnFloor && this._oldHeight !== object.getHeight() ) {
-        object.setY(this._floorLastY
-            - object.getHeight()
-            + (object.getY() - object.getDrawableY())
-            - 1
-        );
-    }
-
-    this._oldHeight = object.getHeight();
 
     //1) X axis:
 

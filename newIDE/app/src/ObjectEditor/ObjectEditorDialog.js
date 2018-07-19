@@ -8,6 +8,9 @@ import BehaviorsEditor from '../BehaviorsEditor';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 
+import { Column, Line } from '../UI/Grid';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
+
 const styles = {
   titleContainer: {
     padding: 0,
@@ -16,11 +19,13 @@ const styles = {
 
 type StateType = {|
   currentTab: string,
+  newObjectName: string,
 |};
 
 export class ObjectEditorDialog extends Component<*, StateType> {
   state = {
     currentTab: 'properties',
+    newObjectName: this.props.objectName,
   };
 
   _onChangeTab = (value: string) => {
@@ -31,17 +36,16 @@ export class ObjectEditorDialog extends Component<*, StateType> {
 
   render() {
     const actions = [
-      <FlatButton
-        key="cancel"
-        label="Cancel"
-        onClick={this.props.onCancel}
-      />,
+      <FlatButton key="cancel" label="Cancel" onClick={this.props.onCancel} />,
       <FlatButton
         key="apply"
         label="Apply"
         primary
         keyboardFocused
-        onClick={this.props.onApply}
+        onClick={() => {
+          this.props.onRename(this.state.newObjectName);
+          this.props.onApply();
+        }}
       />,
     ];
 
@@ -68,6 +72,22 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         }
         titleStyle={styles.titleContainer}
       >
+        <Line alignItems="baseline">
+          <Column>Object Name:</Column>
+          <Column expand>
+            <SemiControlledTextField
+              fullWidth
+              commitOnBlur
+              value={this.state.newObjectName}
+              hintText="Object Name"
+              onChange={text => {
+                if (this.props.canRenameObject(text)) {
+                  this.setState({ newObjectName: text });
+                }
+              }}
+            />
+          </Column>
+        </Line>
         {currentTab === 'properties' &&
           EditorComponent && (
             <EditorComponent

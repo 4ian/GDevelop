@@ -165,23 +165,32 @@ export default class MainFrame extends React.Component<Props, State> {
   loadExtensions = () => {
     const { extensionsLoader } = this.props;
     if (extensionsLoader) {
-      extensionsLoader
-        .loadAllExtensions()
-        .then(loadingResults => {
-          const successLoadingResults = loadingResults.filter(
-            loadingResult => !loadingResult.result.error
+      extensionsLoader.loadAllExtensions().then(loadingResults => {
+        const successLoadingResults = loadingResults.filter(
+          loadingResult => !loadingResult.result.error
+        );
+        const failLoadingResults = loadingResults.filter(
+          loadingResult =>
+            loadingResult.result.error && !loadingResult.result.dangerous
+        );
+        const dangerousLoadingResults = loadingResults.filter(
+          loadingResult =>
+            loadingResult.result.error && loadingResult.result.dangerous
+        );
+        console.info(`Loaded ${successLoadingResults.length} JS extensions.`);
+        if (failLoadingResults.length) {
+          console.error(
+            `⚠️ Unable to load ${failLoadingResults.length} JS extensions. Please check these errors:`,
+            failLoadingResults
           );
-          const failLoadingResults = loadingResults.filter(
-            loadingResult => loadingResult.result.error
+        }
+        if (dangerousLoadingResults.length) {
+          console.error(
+            `💣 Dangerous exceptions while loading ${dangerousLoadingResults.length} JS extensions. 🔥 Please check these errors as they will CRASH GDevelop:`,
+            dangerousLoadingResults
           );
-          console.info(`Loaded ${successLoadingResults.length} JS extensions.`);
-          if (failLoadingResults.length) {
-            console.error(
-              `⚠️ Unable to load ${failLoadingResults.length} JS extensions. 🔥 Please check these errors and fix them as they could crash GDevelop:`,
-              failLoadingResults
-            );
-          }
-        });
+        }
+      });
     }
   };
 

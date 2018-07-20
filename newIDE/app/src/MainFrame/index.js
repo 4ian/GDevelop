@@ -156,7 +156,6 @@ export default class MainFrame extends React.Component<Props, State> {
 
   componentWillMount() {
     if (!this.props.integratedEditor) this.openStartPage();
-    if (this.props.introDialog && !Window.isDev()) this._openIntroDialog(true);
   }
 
   componentDidMount() {
@@ -167,7 +166,8 @@ export default class MainFrame extends React.Component<Props, State> {
       this.openFromPathOrURL(initialPathsOrURLsToOpen[0], () =>
         this.openSceneOrProjectManager()
       );
-    }
+    } else if (this.props.introDialog && !Window.isDev())
+      this._openIntroDialog(true);
   }
 
   loadExtensions = () => {

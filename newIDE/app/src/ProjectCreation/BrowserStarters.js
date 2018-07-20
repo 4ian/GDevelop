@@ -27,7 +27,7 @@ export default class BrowserStarters extends Component {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('platformer');
-                  this.props.onOpen('internal://platformer');
+                  this.props.onOpen('example://platformer');
                 }}
               />
               <ListItem
@@ -41,7 +41,7 @@ export default class BrowserStarters extends Component {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('space-shooter');
-                  this.props.onOpen('internal://space-shooter');
+                  this.props.onOpen('example://space-shooter');
                 }}
               />
               <ListItem
@@ -54,7 +54,7 @@ export default class BrowserStarters extends Component {
                 secondaryTextLines={2}
                 onClick={() => {
                   sendNewGameCreated('isometric-game');
-                  this.props.onOpen('internal://isometric-game');
+                  this.props.onOpen('example://isometric-game');
                 }}
               />
             </List> 

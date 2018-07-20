@@ -115,7 +115,7 @@ I confirm that any assets can be used freely by anybody, including for commercia
                   primaryText={formatExampleName(exampleName)}
                   onClick={() => {
                     sendNewGameCreated(exampleName);
-                    this.props.onOpen(`internal://${exampleName}`);
+                    this.props.onOpen(`example://${exampleName}`);
                   }}
                 />
               ))}

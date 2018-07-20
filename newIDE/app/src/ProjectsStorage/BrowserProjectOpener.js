@@ -64,131 +64,131 @@ import zombieLaser from '../fixtures/zombie-laser/zombie-laser.json';
 
 export default class BrowserProjectOpener {
   static readInternalFile(url) {
-    if (url === 'internal://advanced-shape-based-painter') {
+    if (url === 'example://advanced-shape-based-painter') {
       return Promise.resolve(advancedShapeBasedPainter);
-    } else if (url === 'internal://animation-speed-scale') {
+    } else if (url === 'example://animation-speed-scale') {
       return Promise.resolve(animationSpeedScale);
-    } else if (url === 'internal://asteroids') {
+    } else if (url === 'example://asteroids') {
       return Promise.resolve(asteroids);
-    } else if (url === 'internal://basic-ai-with-pathfinding') {
+    } else if (url === 'example://basic-ai-with-pathfinding') {
       return Promise.resolve(basicAiWithPathfinding);
-    } else if (url === 'internal://basic-artificial-intelligence') {
+    } else if (url === 'example://basic-artificial-intelligence') {
       return Promise.resolve(basicArtificialIntelligence);
-    } else if (url === 'internal://basic-topdown-car-driving') {
+    } else if (url === 'example://basic-topdown-car-driving') {
       return Promise.resolve(basicTopdownCarDriving);
-    } else if (url === 'internal://brakeout') {
+    } else if (url === 'example://brakeout') {
       return Promise.resolve(brakeout);
-    } else if (url === 'internal://buttons') {
+    } else if (url === 'example://buttons') {
       return Promise.resolve(buttons);
-    } else if (url === 'internal://car-physics') {
+    } else if (url === 'example://car-physics') {
       return Promise.resolve(carPhysics);
-    } else if (url === 'internal://center-object-within-another') {
+    } else if (url === 'example://center-object-within-another') {
       return Promise.resolve(centerObjectWithinAnother);
-    } else if (url === 'internal://change-position-of-object') {
+    } else if (url === 'example://change-position-of-object') {
       return Promise.resolve(changePositionOfObject);
-    } else if (url === 'internal://change-scale-of-sprites') {
+    } else if (url === 'example://change-scale-of-sprites') {
       return Promise.resolve(changeScaleOfSprites);
-    } else if (url === 'internal://change-sprite-animation') {
+    } else if (url === 'example://change-sprite-animation') {
       return Promise.resolve(changeSpriteAnimation);
-    } else if (url === 'internal://change-sprite-color') {
+    } else if (url === 'example://change-sprite-color') {
       return Promise.resolve(changeSpriteColor);
-    } else if (url === 'internal://create-object-with-mouseclick') {
+    } else if (url === 'example://create-object-with-mouseclick') {
       return Promise.resolve(createObjectWithMouseclick);
-    } else if (url === 'internal://customize-keys-with-lastpressedkey') {
+    } else if (url === 'example://customize-keys-with-lastpressedkey') {
       return Promise.resolve(customizeKeysWithLastpressedkey);
-    } else if (url === 'internal://drag-camera-with-mouse') {
+    } else if (url === 'example://drag-camera-with-mouse') {
       return Promise.resolve(dragCameraWithMouse);
-    } else if (url === 'internal://find-diagonals') {
+    } else if (url === 'example://find-diagonals') {
       return Promise.resolve(findDiagonals);
-    } else if (url === 'internal://infinite-scrolling-background') {
+    } else if (url === 'example://infinite-scrolling-background') {
       return Promise.resolve(infiniteScrollingBackground);
-    } else if (url === 'internal://instance-timer') {
+    } else if (url === 'example://instance-timer') {
       return Promise.resolve(instanceTimer);
-    } else if (url === 'internal://inventory-system') {
+    } else if (url === 'example://inventory-system') {
       return Promise.resolve(inventorySystem);
-    } else if (url === 'internal://isometric-game') {
+    } else if (url === 'example://isometric-game') {
       return Promise.resolve(isometricGame);
-    } else if (url === 'internal://keyboard-practice') {
+    } else if (url === 'example://keyboard-practice') {
       return Promise.resolve(keyboardPractice);
-    } else if (url === 'internal://magnet') {
+    } else if (url === 'example://magnet') {
       return Promise.resolve(magnet);
-    } else if (url === 'internal://manipulate-text-object') {
+    } else if (url === 'example://manipulate-text-object') {
       return Promise.resolve(manipulateTextObject);
-    } else if (url === 'internal://move-camera-to-position') {
+    } else if (url === 'example://move-camera-to-position') {
       return Promise.resolve(moveCameraToPosition);
-    } else if (url === 'internal://move-object-in-circle') {
+    } else if (url === 'example://move-object-in-circle') {
       return Promise.resolve(moveObjectInCircle);
-    } else if (url === 'internal://move-object-toward-position') {
+    } else if (url === 'example://move-object-toward-position') {
       return Promise.resolve(moveObjectTowardPosition);
-    } else if (url === 'internal://move-object-with-physics') {
+    } else if (url === 'example://move-object-with-physics') {
       return Promise.resolve(moveObjectWithPhysics);
-    } else if (url === 'internal://multitouch') {
+    } else if (url === 'example://multitouch') {
       return Promise.resolve(multitouch);
-    } else if (url === 'internal://object-gravity') {
+    } else if (url === 'example://object-gravity') {
       return Promise.resolve(objectGravity);
-    } else if (url === 'internal://object-selection') {
+    } else if (url === 'example://object-selection') {
       return Promise.resolve(objectSelection);
-    } else if (url === 'internal://open-url-in-browser') {
+    } else if (url === 'example://open-url-in-browser') {
       return Promise.resolve(openUrlInBrowser);
-    } else if (url === 'internal://parallax') {
+    } else if (url === 'example://parallax') {
       return Promise.resolve(parallax);
-    } else if (url === 'internal://parallax-scrolling') {
+    } else if (url === 'example://parallax-scrolling') {
       return Promise.resolve(parallaxScrolling);
-    } else if (url === 'internal://parse-json-from-api') {
+    } else if (url === 'example://parse-json-from-api') {
       return Promise.resolve(parseJsonFromApi);
-    } else if (url === 'internal://parse-json-string') {
+    } else if (url === 'example://parse-json-string') {
       return Promise.resolve(parseJsonString);
-    } else if (url === 'internal://particles-explosions') {
+    } else if (url === 'example://particles-explosions') {
       return Promise.resolve(particlesExplosions);
-    } else if (url === 'internal://particles-various-effects') {
+    } else if (url === 'example://particles-various-effects') {
       return Promise.resolve(particlesVariousEffects);
-    } else if (url === 'internal://pathfinding') {
+    } else if (url === 'example://pathfinding') {
       return Promise.resolve(pathfinding);
-    } else if (url === 'internal://pathfinding-basics') {
+    } else if (url === 'example://pathfinding-basics') {
       return Promise.resolve(pathfindingBasics);
-    } else if (url === 'internal://physics') {
+    } else if (url === 'example://physics') {
       return Promise.resolve(physics);
-    } else if (url === 'internal://platformer') {
+    } else if (url === 'example://platformer') {
       return Promise.resolve(platformer);
-    } else if (url === 'internal://play-stop-sprite-animation') {
+    } else if (url === 'example://play-stop-sprite-animation') {
       return Promise.resolve(playStopSpriteAnimation);
-    } else if (url === 'internal://rain') {
+    } else if (url === 'example://rain') {
       return Promise.resolve(rain);
-    } else if (url === 'internal://random-color-picker') {
+    } else if (url === 'example://random-color-picker') {
       return Promise.resolve(randomColorPicker);
-    } else if (url === 'internal://rotate-toward-mouse') {
+    } else if (url === 'example://rotate-toward-mouse') {
       return Promise.resolve(rotateTowardMouse);
-    } else if (url === 'internal://rotate-toward-position') {
+    } else if (url === 'example://rotate-toward-position') {
       return Promise.resolve(rotateTowardPosition);
-    } else if (url === 'internal://rotate-with-keypress') {
+    } else if (url === 'example://rotate-with-keypress') {
       return Promise.resolve(rotateWithKeypress);
-    } else if (url === 'internal://save-load') {
+    } else if (url === 'example://save-load') {
       return Promise.resolve(saveLoad);
-    } else if (url === 'internal://shoot-bullet-in-parabola') {
+    } else if (url === 'example://shoot-bullet-in-parabola') {
       return Promise.resolve(shootBulletInParabola);
-    } else if (url === 'internal://shoot-bullets') {
+    } else if (url === 'example://shoot-bullets') {
       return Promise.resolve(shootBullets);
-    } else if (url === 'internal://shooting-bullets-explanation') {
+    } else if (url === 'example://shooting-bullets-explanation') {
       return Promise.resolve(shootingBulletsExplanation);
-    } else if (url === 'internal://snap-object-to-grid') {
+    } else if (url === 'example://snap-object-to-grid') {
       return Promise.resolve(snapObjectToGrid);
-    } else if (url === 'internal://space-shooter') {
+    } else if (url === 'example://space-shooter') {
       return Promise.resolve(spaceShooter);
-    } else if (url === 'internal://splash-screen') {
+    } else if (url === 'example://splash-screen') {
       return Promise.resolve(splashScreen);
-    } else if (url === 'internal://text-entry-object') {
+    } else if (url === 'example://text-entry-object') {
       return Promise.resolve(textEntryObject);
-    } else if (url === 'internal://text-fade-in-out') {
+    } else if (url === 'example://text-fade-in-out') {
       return Promise.resolve(textFadeInOut);
-    } else if (url === 'internal://text-to-speech') {
+    } else if (url === 'example://text-to-speech') {
       return Promise.resolve(textToSpeech);
-    } else if (url === 'internal://toggle-music-play-sound') {
+    } else if (url === 'example://toggle-music-play-sound') {
       return Promise.resolve(toggleMusicPlaySound);
-    } else if (url === 'internal://type-on-text-effect') {
+    } else if (url === 'example://type-on-text-effect') {
       return Promise.resolve(typeOnTextEffect);
-    } else if (url === 'internal://z-depth') {
+    } else if (url === 'example://z-depth') {
       return Promise.resolve(zDepth);
-    } else if (url === 'internal://zombie-laser') {
+    } else if (url === 'example://zombie-laser') {
       return Promise.resolve(zombieLaser);
     }
 

@@ -3,6 +3,7 @@ import React from 'react';
 import HelpOutline from 'material-ui/svg-icons/action/help-outline';
 import IconButton from 'material-ui/IconButton';
 import { getHelpLink } from '../../Utils/HelpLink';
+import Window from '../../Utils/Window';
 
 type PropsType = {
   helpPagePath: ?string,
@@ -16,7 +17,7 @@ export default (props: PropsType) => {
   if (!helpPagePath) return null;
 
   return (
-    <IconButton onClick={() => window.open(getHelpLink(helpPagePath), 'blank')}>
+    <IconButton onClick={() => Window.openExternalURL(getHelpLink(helpPagePath))}>
       <HelpOutline />
     </IconButton>
   );

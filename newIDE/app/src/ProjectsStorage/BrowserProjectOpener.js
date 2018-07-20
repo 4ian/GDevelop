@@ -7,6 +7,7 @@ import basicTopdownCarDriving from '../fixtures/basic-topdown-car-driving/basic-
 import brakeout from '../fixtures/brakeout/brakeout.json';
 import buttons from '../fixtures/buttons/buttons.json';
 import carPhysics from '../fixtures/car-physics/car-physics.json';
+import centerObjectWithinAnother from '../fixtures/center-object-within-another/center-object-within-another.json';
 import changePositionOfObject from '../fixtures/change-position-of-object/change-position-of-object.json';
 import changeScaleOfSprites from '../fixtures/change-scale-of-sprites/change-scale-of-sprites.json';
 import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sprite-animation.json';
@@ -81,6 +82,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(buttons);
     } else if (url === 'internal://car-physics') {
       return Promise.resolve(carPhysics);
+    } else if (url === 'internal://center-object-within-another') {
+      return Promise.resolve(centerObjectWithinAnother);
     } else if (url === 'internal://change-position-of-object') {
       return Promise.resolve(changePositionOfObject);
     } else if (url === 'internal://change-scale-of-sprites') {

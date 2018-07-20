@@ -26,6 +26,7 @@ const exampleNames = [
   'brakeout',
   'buttons',
   'car-physics',
+  'center-object-within-another',
   'change-position-of-object',
   'change-scale-of-sprites',
   'change-sprite-animation',

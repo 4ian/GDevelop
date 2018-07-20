@@ -4,6 +4,7 @@ import asteroids from '../fixtures/asteroids/asteroids.json';
 import basicAiWithPathfinding from '../fixtures/basic-ai-with-pathfinding/basic-ai-with-pathfinding.json';
 import basicArtificialIntelligence from '../fixtures/basic-artificial-intelligence/basic-artificial-intelligence.json';
 import basicTopdownCarDriving from '../fixtures/basic-topdown-car-driving/basic-topdown-car-driving.json';
+import bombTheCrate from '../fixtures/bomb-the-crate/bomb-the-crate.json';
 import brakeout from '../fixtures/brakeout/brakeout.json';
 import buttons from '../fixtures/buttons/buttons.json';
 import carPhysics from '../fixtures/car-physics/car-physics.json';
@@ -76,6 +77,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(basicArtificialIntelligence);
     } else if (url === 'example://basic-topdown-car-driving') {
       return Promise.resolve(basicTopdownCarDriving);
+    } else if (url === 'example://bomb-the-crate') {
+      return Promise.resolve(bombTheCrate);
     } else if (url === 'example://brakeout') {
       return Promise.resolve(brakeout);
     } else if (url === 'example://buttons') {

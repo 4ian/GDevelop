@@ -21,6 +21,7 @@ const exampleNames = [
   'basic-ai-with-pathfinding',
   'basic-artificial-intelligence',
   'basic-topdown-car-driving',
+  'bomb-the-crate',
   'brakeout',
   'buttons',
   'car-physics',

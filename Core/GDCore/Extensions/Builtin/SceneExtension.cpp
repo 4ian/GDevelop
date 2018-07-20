@@ -22,21 +22,47 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
 
   extension
       .AddExpression("Random",
-                     _("Random value"),
-                     _("Random value"),
+                     _("Random integer"),
+                     _("Random integer"),
                      _("Random"),
                      "res/actions/position.png")
       .AddParameter("expression", _("Maximum value"));
 
   extension
-      .AddExpression("RandomRange",
-                     _("Random value in range"),
-                     _("Random value in range"),
+      .AddExpression("RandomInRange",
+                     _("Random integer in range"),
+                     _("Random integer in range"),
+                     _("Random"),
+                     "res/actions/position.png")
+      .AddParameter("expression", _("Minimum value"))
+      .AddParameter("expression", _("Maximum value"));
+
+  extension
+      .AddExpression("RandomFloat",
+                     _("Random float"),
+                     _("Random float"),
+                     _("Random"),
+                     "res/actions/position.png")
+      .AddParameter("expression", _("Maximum value"));
+
+  extension
+      .AddExpression("RandomFloatInRange",
+                     _("Random float in range"),
+                     _("Random float in range"),
+                     _("Random"),
+                     "res/actions/position.png")
+      .AddParameter("expression", _("Minimum value"))
+      .AddParameter("expression", _("Maximum value"));
+
+  extension
+      .AddExpression("RandomWithStep",
+                     _("Random value in steps"),
+                     _("Random value in steps"),
                      _("Random"),
                      "res/actions/position.png")
       .AddParameter("expression", _("Minimum value"))
       .AddParameter("expression", _("Maximum value"))
-      .AddParameter("expression", _("Step"), "", true);
+      .AddParameter("expression", _("Step"));
 
   extension
       .AddStrExpression("CurrentSceneName",

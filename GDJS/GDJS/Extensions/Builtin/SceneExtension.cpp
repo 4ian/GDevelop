@@ -24,6 +24,10 @@ SceneExtension::SceneExtension() {
                           "Open source (MIT License)");
 
   GetAllExpressions()["Random"].SetFunctionName("gdjs.random");
+  GetAllExpressions()["RandomInRange"].SetFunctionName("gdjs.randomInRange");
+  GetAllExpressions()["RandomFloat"].SetFunctionName("gdjs.randomFloat");
+  GetAllExpressions()["RandomFloatInRange"].SetFunctionName("gdjs.randomFloatInRange");
+  GetAllExpressions()["RandomWithStep"].SetFunctionName("gdjs.randomWithStep");
   GetAllStrExpressions()["CurrentSceneName"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.getSceneName");
 

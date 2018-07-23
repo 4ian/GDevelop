@@ -48,6 +48,36 @@ gdjs.random = function(max) {
 };
 
 /**
+ * Get a random integer between min and max
+ */
+gdjs.randomInRange = function(min, max) {
+  return min + gdjs.random(max - min); // return min if min >= max
+};
+
+/**
+ * Get a random float between 0 and max.
+ */
+gdjs.randomFloat = function(max) {
+  if (max <= 0) return 0;
+  return Math.random() * max;
+};
+
+/**
+ * Get a random float between min and max
+ */
+gdjs.randomFloatInRange = function(min, max) {
+  return min + gdjs.randomFloat(max - min); // return min if min >= max
+};
+
+/**
+ * Get a random number between min and max in steps
+ */
+gdjs.randomWithStep = function(min, max, step) {
+  if (step <= 0) return min + gdjs.random(max - min);
+  return min + gdjs.random(Math.floor((max - min) / step)) * step; // return min if min >= max
+};
+
+/**
  * Convert an angle in degrees to radians.
  */
 gdjs.toRad = function(angleInDegrees) {

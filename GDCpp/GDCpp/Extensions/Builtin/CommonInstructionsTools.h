@@ -14,9 +14,29 @@ namespace GDpriv {
 namespace CommonInstructions {
 
 /**
- * Generate a random number between 0 and max
+ * Generate a random integer between 0 and max
  */
 double GD_API Random(int max);
+
+/**
+ * Generate a random integer between min and max
+ */
+double GD_API RandomInRange(int min, int max);
+
+/**
+ * Generate a random float between 0 and max
+ */
+double GD_API RandomFloat(float max);
+
+/**
+ * Generate a random float between min and max
+ */
+double GD_API RandomFloatInRange(float min, float max);
+
+/**
+ * Generate a random number between min and max in steps
+ */
+double GD_API RandomWithStep(float min, float max, float step);
 
 /**
  * Logical negation

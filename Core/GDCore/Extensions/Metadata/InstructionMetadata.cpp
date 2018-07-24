@@ -28,7 +28,7 @@ InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
                                          const gd::String& smallIcon_)
     : fullname(fullname_),
       description(description_),
-      helpPage(),
+      helpPath(""),
       sentence(sentence_),
       group(group_),
       iconFilename(icon_),

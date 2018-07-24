@@ -28,11 +28,13 @@ export default class InstructionEditorDialog extends React.Component {
   render() {
     const actions = [
       <FlatButton
+        key="cancel"
         label="Cancel"
         primary={false}
         onClick={this.props.onCancel}
       />,
       <FlatButton
+        key="ok"
         label="Ok"
         primary={true}
         keyboardFocused={false}
@@ -48,7 +50,10 @@ export default class InstructionEditorDialog extends React.Component {
         contentStyle={styles.dialogContent}
         bodyStyle={styles.dialogBody}
       >
-        <InstructionEditor {...this.props} />
+        <InstructionEditor
+          {...this.props}
+          onTypeChosen={() => this.forceUpdate()}
+        />
       </Dialog>
     );
   }

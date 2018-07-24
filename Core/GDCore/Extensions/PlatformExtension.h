@@ -30,9 +30,10 @@ class ArbitraryResourceWorker;
 class BehaviorsSharedData;
 class Behavior;
 class Object;
-}
+}  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::Object>(gd::String name)> CreateFunPtr;
+typedef std::function<std::unique_ptr<gd::Object>(gd::String name)>
+    CreateFunPtr;
 
 namespace gd {
 
@@ -85,11 +86,24 @@ class GD_CORE_API PlatformExtension {
   /**
    * \brief Must be called to declare the main information about the extension.
    */
-  void SetExtensionInformation(const gd::String& name_,
-                               const gd::String& fullname_,
-                               const gd::String& description_,
-                               const gd::String& author_,
-                               const gd::String& license_);
+  PlatformExtension& SetExtensionInformation(const gd::String& name_,
+                                             const gd::String& fullname_,
+                                             const gd::String& description_,
+                                             const gd::String& author_,
+                                             const gd::String& license_);
+
+  /**
+   * \brief Set the path to the help, relative to the wiki/documentation root.
+   * For example, "/all-features/collisions" for
+   * "http://wiki.compilgames.net/doku.php/gdevelop5/all-features/collisions".
+   * 
+   * The instruction will have this help path set by default, unless you call
+   * SetHelpPath on them.
+   */
+  PlatformExtension& SetExtensionHelpPath(const gd::String& helpPath_) {
+    helpPath = helpPath_;
+    return *this;
+  }
 
   /**
    * \brief Mark this extension as deprecated: the IDE will hide it from the
@@ -165,7 +179,8 @@ class GD_CORE_API PlatformExtension {
    * \param icon The 24x24 icon of the object:
    res/icons_[SkinName]/[iconName]24.png will be first tried,
    * and then if it does not exists, the full entered name will be tried.
-   * \param instance The "blueprint" object to be copied when a new object is asked for.
+   * \param instance The "blueprint" object to be copied when a new object is
+   asked for.
    */
   gd::ObjectMetadata& AddObject(const gd::String& name_,
                                 const gd::String& fullname_,
@@ -233,6 +248,12 @@ class GD_CORE_API PlatformExtension {
    * \brief Return the name of extension license
    */
   const gd::String& GetLicense() const { return license; }
+
+  /**
+   * \brief Return the help path of extension, relative to the
+   * wiki/documentation root.
+   */
+  const gd::String& GetHelpPath() const { return helpPath; }
 
   /**
    * \brief Check if the extension is flagged as being deprecated.
@@ -427,7 +448,10 @@ class GD_CORE_API PlatformExtension {
   gd::String informations;  ///< Description displayed to users at edittime
   gd::String author;        ///< Author displayed to users at edittime
   gd::String license;       ///< License name displayed to users at edittime
-  bool deprecated;
+  bool deprecated;  ///< true if the extension is deprecated and shouldn't be
+                    ///< shown in IDE.
+  gd::String helpPath;  ///< The relative path to the help for this extension in
+                        ///< the documentation.
 
   std::map<gd::String, gd::ObjectMetadata> objectsInfos;
   std::map<gd::String, gd::BehaviorMetadata> behaviorsInfo;

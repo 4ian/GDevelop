@@ -34,6 +34,7 @@ export default class InstructionEditor extends Component {
           onChoose={type => {
             instruction.setType(type);
             this.forceUpdate();
+            if (this.props.onTypeChosen) this.props.onTypeChosen(type);
           }}
         />
         <Paper style={styles.parametersEditor} rounded={false} zDepth={2}>

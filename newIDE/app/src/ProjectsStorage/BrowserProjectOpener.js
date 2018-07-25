@@ -41,8 +41,12 @@ import particlesVariousEffects from '../fixtures/particles-various-effects/parti
 import pathfinding from '../fixtures/pathfinding/pathfinding.json';
 import pathfindingBasics from '../fixtures/pathfinding-basics/pathfinding-basics.json';
 import physics from '../fixtures/physics/physics.json';
+import pinObjectToAnother from '../fixtures/pin-object-to-another/pin-object-to-another.json';
+import pinObjectToAnotherMultipleParents from '../fixtures/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json';
 import platformer from '../fixtures/platformer/platformer.json';
+import playMusicOnMobile from '../fixtures/play-music-on-mobile/play-music-on-mobile.json';
 import playStopSpriteAnimation from '../fixtures/play-stop-sprite-animation/play-stop-sprite-animation.json';
+import racingGame from '../fixtures/racing-game/racing-game.json';
 import rain from '../fixtures/rain/rain.json';
 import randomColorPicker from '../fixtures/random-color-picker/random-color-picker.json';
 import rotateTowardMouse from '../fixtures/rotate-toward-mouse/rotate-toward-mouse.json';
@@ -55,6 +59,7 @@ import shootingBulletsExplanation from '../fixtures/shooting-bullets-explanation
 import snapObjectToGrid from '../fixtures/snap-object-to-grid/snap-object-to-grid.json';
 import spaceShooter from '../fixtures/space-shooter/space-shooter.json';
 import splashScreen from '../fixtures/splash-screen/splash-screen.json';
+import spriteFadeInOut from '../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
 import textEntryObject from '../fixtures/text-entry-object/text-entry-object.json';
 import textFadeInOut from '../fixtures/text-fade-in-out/text-fade-in-out.json';
 import textToSpeech from '../fixtures/text-to-speech/text-to-speech.json';
@@ -85,6 +90,10 @@ export default class BrowserProjectOpener {
       return Promise.resolve(buttons);
     } else if (url === 'example://car-physics') {
       return Promise.resolve(carPhysics);
+    } else if (url === 'example://pin-object-to-another') {
+      return Promise.resolve(pinObjectToAnother);
+    } else if (url === 'example://pin-object-to-another-multiple-parents') {
+      return Promise.resolve(pinObjectToAnotherMultipleParents);
     } else if (url === 'example://center-object-within-another') {
       return Promise.resolve(centerObjectWithinAnother);
     } else if (url === 'example://change-position-of-object') {
@@ -153,8 +162,12 @@ export default class BrowserProjectOpener {
       return Promise.resolve(physics);
     } else if (url === 'example://platformer') {
       return Promise.resolve(platformer);
+    } else if (url === 'example://play-music-on-mobile') {
+      return Promise.resolve(playMusicOnMobile);
     } else if (url === 'example://play-stop-sprite-animation') {
       return Promise.resolve(playStopSpriteAnimation);
+    } else if (url === 'example://racing-game') {
+      return Promise.resolve(racingGame);
     } else if (url === 'example://rain') {
       return Promise.resolve(rain);
     } else if (url === 'example://random-color-picker') {
@@ -179,6 +192,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(spaceShooter);
     } else if (url === 'example://splash-screen') {
       return Promise.resolve(splashScreen);
+    } else if (url === 'example://sprite-fade-in-out') {
+      return Promise.resolve(spriteFadeInOut);
     } else if (url === 'example://text-entry-object') {
       return Promise.resolve(textEntryObject);
     } else if (url === 'example://text-fade-in-out') {

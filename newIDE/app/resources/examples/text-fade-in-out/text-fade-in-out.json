@@ -12,9 +12,10 @@
     "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\text-fade-in-out\\text-fade-in-out.json",
+    "projectFile": "/home/szoszo/Projects/gametemplates/gdevelop5/text-fade-in-out/text-fade-in-out.json",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
+    "version": "1.0.0",
     "winExecutableFilename": "",
     "winExecutableIconFile": "",
     "name": "Project",
@@ -620,7 +621,7 @@
               "parameters": [
                 "FadeInText",
                 "=",
-                "sin( Variable(Value)*3.14159 )*255"
+                "sin( Variable(Fade)*3.14159 )*255"
               ],
               "subInstructions": []
             }

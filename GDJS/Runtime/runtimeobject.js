@@ -903,7 +903,7 @@ gdjs.RuntimeObject.prototype.separateFromObjectsList = function(objectsLists) {
 };
 
 /**
- * Get the distance, in pixels, to another object.
+ * Get the distance, in pixels, between *the center* of this object and another object.
  * @param otherObject The other object
  */
 gdjs.RuntimeObject.prototype.getDistanceToObject = function(otherObject) {
@@ -911,7 +911,7 @@ gdjs.RuntimeObject.prototype.getDistanceToObject = function(otherObject) {
 };
 
 /**
- * Get the squared distance, in pixels, to another object.
+ * Get the squared distance, in pixels, between *the center* of this object and another object.
  * @param otherObject The other object
  */
 gdjs.RuntimeObject.prototype.getSqDistanceToObject = function(otherObject) {
@@ -924,7 +924,7 @@ gdjs.RuntimeObject.prototype.getSqDistanceToObject = function(otherObject) {
 };
 
 /**
- * Get the squared distance, in pixels, to a position.
+ * Get the squared distance, in pixels, from the *object center* to a position.
  * @param pointX {Number} X position
  * @param pointY {Number} Y position
  */
@@ -936,31 +936,33 @@ gdjs.RuntimeObject.prototype.getSqDistanceTo = function(pointX, pointY) {
 };
 
 /**
- * Put the object around a position, with a specific distance and angle.<br>
- * The distance is computed between the position and the center of the object.
+ * Put the object around a position, with a specific distance and angle.
+ * The distance and angle are computed between the position and *the center of the object*.
  *
  * @param x {Number} The x position of the target
  * @param y {Number} The y position of the target
- * @param distance {Number} The distance between the object and the target
+ * @param distance {Number} The distance between the object and the target, in pixels.
  * @param angleInDegrees {Number} The angle between the object and the target, in degrees.
  */
 gdjs.RuntimeObject.prototype.putAround = function(x,y,distance,angleInDegrees) {
     var angle = angleInDegrees/180*3.14159;
 
-    this.setX( x + Math.cos(angle)*distance - this.getCenterX() );
-    this.setY( y + Math.sin(angle)*distance - this.getCenterY() );
+    // Offset the position by the center, as PutAround* methods should position the center
+    // of the object (just like GetSqDistanceTo, RaycastTest uses center too).
+    this.setX(x + Math.cos(angle)*distance + this.getX() - (this.getDrawableX() + this.getCenterX()));
+    this.setY(y + Math.sin(angle)*distance + this.getY() - (this.getDrawableY() + this.getCenterY()));
 };
 
 /**
- * Put the object around another object, with a specific distance and angle.<br>
- * The distance is computed between the centers of the objects.
+ * Put the object around another object, with a specific distance and angle.
+ * The distance and angle are computed between *the centers of the objects*.
  *
  * @param obj The target object
  * @param distance {Number} The distance between the object and the target
  * @param angleInDegrees {Number} The angle between the object and the target, in degrees.
  */
 gdjs.RuntimeObject.prototype.putAroundObject = function(obj,distance,angleInDegrees) {
-    this.putAround(obj.getX()+obj.getCenterX(), obj.getY()+obj.getCenterY(),
+    this.putAround(obj.getDrawableX()+obj.getCenterX(), obj.getDrawableY()+obj.getCenterY(),
                    distance, angleInDegrees);
 };
 

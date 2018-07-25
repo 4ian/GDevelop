@@ -101,7 +101,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   obj.AddAction("MettreAutourPos",
                 _("Put an object around a position"),
-                _("Position an object around a position, with specified angle "
+                _("Position the center of the given object around a position, "
+                  "using the specified angle "
                   "and distance."),
                 _("Put _PARAM0_ around _PARAM1_;_PARAM2_, with an angle of "
                   "_PARAM4_ degrees and _PARAM3_ pixels distance."),
@@ -599,7 +600,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("MettreAutour",
                 _("Put an object around another"),
                 _("Position an object around another, with the specified angle "
-                  "and distance."),
+                  "and distance. The center of the objects are used for "
+                  "positioning them."),
                 _("Put _PARAM0_ around _PARAM1_, with an angle of _PARAM3_ "
                   "degrees and _PARAM2_ pixels distance."),
                 _("Position"),
@@ -1027,18 +1029,19 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("RaycastToPosition",
-                    _("Raycast to position"),
-                    _("Sends a ray from the given source position to the final point, "
-                      "intersecting the closest object.\nThe instersected "
-                      "object will become the only one taken into account.\nIf "
-                      "the condition is inverted, the object to be intersected "
-                      "will be the farthest one within the ray radius."),
-                    _("Raycast _PARAM0_ from _PARAM1_;_PARAM2_, and save the "
-                      "result in _PARAM5_, _PARAM6_"),
-                    _("Collision"),
-                    "res/conditions/raycast24.png",
-                    "res/conditions/raycast.png")
+      .AddCondition(
+          "RaycastToPosition",
+          _("Raycast to position"),
+          _("Sends a ray from the given source position to the final point, "
+            "intersecting the closest object.\nThe instersected "
+            "object will become the only one taken into account.\nIf "
+            "the condition is inverted, the object to be intersected "
+            "will be the farthest one within the ray radius."),
+          _("Raycast _PARAM0_ from _PARAM1_;_PARAM2_, and save the "
+            "result in _PARAM5_, _PARAM6_"),
+          _("Collision"),
+          "res/conditions/raycast24.png",
+          "res/conditions/raycast.png")
       .AddParameter("objectList", _("Objects to test against the ray"))
       .AddParameter("expression", _("Ray source X position"))
       .AddParameter("expression", _("Ray source Y position"))

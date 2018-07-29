@@ -37,8 +37,11 @@ gdjs.RuntimeGameRenderer = gdjs.RuntimeGamePixiRenderer; //Register the class to
 gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(canvasArea) {
     this._canvasArea = canvasArea;
 
+    //This prevents flickering on some mobile devices
+    PIXI.glCore.VertexArrayObject.FORCE_NATIVE = true;
+
     //Create the renderer and setup the rendering area
-    this._pixiRenderer = PIXI.autoDetectRenderer(this._game.getDefaultWidth(), this._game.getDefaultHeight());
+    this._pixiRenderer = PIXI.autoDetectRenderer(width=this._game.getDefaultWidth(), height=this._game.getDefaultHeight(), {transparent: true} );
     canvasArea.style["position"] = "absolute";
     canvasArea.appendChild(this._pixiRenderer.view); // add the renderer view element to the DOM
     canvasArea.tabindex = "1"; //Ensure that the canvas has the focus.

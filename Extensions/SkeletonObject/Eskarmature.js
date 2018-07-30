@@ -183,7 +183,7 @@ gdjs.sk.Armature.prototype.setRenderers = function(){
         }
     }
 
-    if(this.isRoot){
+    if(this.isRoot && this.debugRenderer){
         this.renderer.addDebugRenderer(this.debugRenderer);
     }
 };

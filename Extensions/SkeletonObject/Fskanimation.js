@@ -155,7 +155,7 @@ gdjs.sk.Animation.prototype.update = function(delta){
         this.finished = true;
     }
 
-    var frame = this.getFrameAtTime(this.time);
+    var frame = this.finished ? this.shared.duration : this.getFrameAtTime(this.time);
 
     for(var i=0; i<this.boneAnimators.length; i++){
         this.boneAnimators[i].setFrame(frame);
@@ -937,6 +937,8 @@ gdjs.sk.BlendBoneAnimator.prototype.blend = function(first, second, duration){
     var x1 = second ? second.shared.channelX.getKey(0) : 0.0;
     var y1 = second ? second.shared.channelY.getKey(0) : 0.0;
     var rot1 = second ? second.shared.channelRot.getKey(0) : 0.0;
+    if(rot1 <= 0 && Math.abs(rot1 - rot0) > Math.abs(rot1 + 360 - rot0)) rot1 += 360;
+    if(rot1 >= 0 && Math.abs(rot1 - rot0) > Math.abs(rot1 - 360 - rot0)) rot1 -= 360;
     var sx1 = second ? second.shared.channelSclX.getKey(0) : 1.0;
     var sy1 = second ? second.shared.channelSclY.getKey(0) : 1.0;
     this.channelX.blend(x0, x1, duration);

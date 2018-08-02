@@ -39,7 +39,7 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
 
   _sendHelpSearch = debounce(() => {
     if (this.state.searchText) sendHelpSearch(this.state.searchText.trim());
-  }, 1300);
+  }, 2900);
 
   render() {
     const { open, onClose } = this.props;

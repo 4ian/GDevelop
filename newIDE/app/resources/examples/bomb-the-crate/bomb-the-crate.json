@@ -12,7 +12,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florianrival/Downloads/BombTheCrate/game.json",
+    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/bomb-the-crate/bomb-the-crate.json",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
@@ -403,7 +403,7 @@
           "width": 64,
           "x": 0,
           "y": 0,
-          "zOrder": 0,
+          "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -418,7 +418,7 @@
           "width": 896,
           "x": 0,
           "y": 576,
-          "zOrder": 0,
+          "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -433,7 +433,7 @@
           "width": 832,
           "x": 64,
           "y": 0,
-          "zOrder": 0,
+          "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -448,7 +448,7 @@
           "width": 64,
           "x": 832,
           "y": 64,
-          "zOrder": 0,
+          "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -671,8 +671,8 @@
           "locked": true,
           "name": "NewObject",
           "width": 0,
-          "x": 309,
-          "y": 233,
+          "x": 68,
+          "y": 524,
           "zOrder": 3,
           "numberProperties": [],
           "stringProperties": [],
@@ -681,14 +681,44 @@
         {
           "angle": 0,
           "customSize": true,
-          "height": 637,
+          "height": 512,
           "layer": "",
           "locked": true,
-          "name": "Grass",
-          "width": 895,
-          "x": 0,
-          "y": 0,
-          "zOrder": -1,
+          "name": "Tile_Grass",
+          "width": 768,
+          "x": 64,
+          "y": 64,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Crate",
+          "width": 0,
+          "x": 512,
+          "y": 256,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Crate",
+          "width": 0,
+          "x": 448,
+          "y": 192,
+          "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -1038,7 +1068,7 @@
                   "timeBetweenFrames": 1,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-2.png",
                       "points": [],
                       "originPoint": {
@@ -1052,7 +1082,26 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 3,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 61
+                          },
+                          {
+                            "x": 3,
+                            "y": 61
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -1067,7 +1116,7 @@
                   "timeBetweenFrames": 1,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-5.png",
                       "points": [],
                       "originPoint": {
@@ -1081,7 +1130,26 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 15,
+                            "y": 0
+                          },
+                          {
+                            "x": 53,
+                            "y": 0
+                          },
+                          {
+                            "x": 53,
+                            "y": 64
+                          },
+                          {
+                            "x": 15,
+                            "y": 61
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -1096,7 +1164,7 @@
                   "timeBetweenFrames": 1,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-1.png",
                       "points": [],
                       "originPoint": {
@@ -1110,7 +1178,26 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 3,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 61
+                          },
+                          {
+                            "x": 3,
+                            "y": 61
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -1122,10 +1209,10 @@
               "directions": [
                 {
                   "looping": true,
-                  "timeBetweenFrames": 0.4,
+                  "timeBetweenFrames": 0.3,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-9.png",
                       "points": [],
                       "originPoint": {
@@ -1139,10 +1226,29 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 3,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 64
+                          },
+                          {
+                            "x": 3,
+                            "y": 64
+                          }
+                        ]
+                      ]
                     },
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-1.png",
                       "points": [],
                       "originPoint": {
@@ -1156,10 +1262,29 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 3,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 60
+                          },
+                          {
+                            "x": 3,
+                            "y": 60
+                          }
+                        ]
+                      ]
                     },
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-10.png",
                       "points": [],
                       "originPoint": {
@@ -1173,10 +1298,29 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 3,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 64
+                          },
+                          {
+                            "x": 3,
+                            "y": 64
+                          }
+                        ]
+                      ]
                     },
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-1.png",
                       "points": [],
                       "originPoint": {
@@ -1190,7 +1334,26 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 3,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 60
+                          },
+                          {
+                            "x": 3,
+                            "y": 60
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -1202,10 +1365,10 @@
               "directions": [
                 {
                   "looping": true,
-                  "timeBetweenFrames": 0.4,
+                  "timeBetweenFrames": 0.3,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-8.png",
                       "points": [],
                       "originPoint": {
@@ -1219,10 +1382,29 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 15,
+                            "y": 0
+                          },
+                          {
+                            "x": 53,
+                            "y": 0
+                          },
+                          {
+                            "x": 53,
+                            "y": 64
+                          },
+                          {
+                            "x": 15,
+                            "y": 64
+                          }
+                        ]
+                      ]
                     },
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-7.png",
                       "points": [],
                       "originPoint": {
@@ -1236,10 +1418,29 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 11,
+                            "y": 0
+                          },
+                          {
+                            "x": 57,
+                            "y": 0
+                          },
+                          {
+                            "x": 57,
+                            "y": 64
+                          },
+                          {
+                            "x": 11,
+                            "y": 64
+                          }
+                        ]
+                      ]
                     },
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-6.png",
                       "points": [],
                       "originPoint": {
@@ -1253,10 +1454,29 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 15,
+                            "y": 0
+                          },
+                          {
+                            "x": 53,
+                            "y": 0
+                          },
+                          {
+                            "x": 53,
+                            "y": 64
+                          },
+                          {
+                            "x": 15,
+                            "y": 64
+                          }
+                        ]
+                      ]
                     },
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-7.png",
                       "points": [],
                       "originPoint": {
@@ -1270,7 +1490,26 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 11,
+                            "y": 0
+                          },
+                          {
+                            "x": 57,
+                            "y": 0
+                          },
+                          {
+                            "x": 57,
+                            "y": 64
+                          },
+                          {
+                            "x": 11,
+                            "y": 64
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -1282,10 +1521,10 @@
               "directions": [
                 {
                   "looping": true,
-                  "timeBetweenFrames": 0.4,
+                  "timeBetweenFrames": 0.3,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-3.png",
                       "points": [],
                       "originPoint": {
@@ -1299,10 +1538,29 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 3,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 64
+                          },
+                          {
+                            "x": 3,
+                            "y": 64
+                          }
+                        ]
+                      ]
                     },
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-2.png",
                       "points": [],
                       "originPoint": {
@@ -1316,10 +1574,29 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 3,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 61
+                          },
+                          {
+                            "x": 3,
+                            "y": 61
+                          }
+                        ]
+                      ]
                     },
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-4.png",
                       "points": [],
                       "originPoint": {
@@ -1333,10 +1610,29 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 3,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 64
+                          },
+                          {
+                            "x": 3,
+                            "y": 64
+                          }
+                        ]
+                      ]
                     },
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Player-2.png",
                       "points": [],
                       "originPoint": {
@@ -1350,13 +1646,41 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 3,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 0
+                          },
+                          {
+                            "x": 64,
+                            "y": 61
+                          },
+                          {
+                            "x": 3,
+                            "y": 61
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
               ]
             }
           ]
+        },
+        {
+          "height": 64,
+          "name": "Tile_Grass",
+          "texture": "Grass-1.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 64,
+          "variables": [],
+          "behaviors": []
         },
         {
           "height": 64,
@@ -1392,7 +1716,7 @@
                   "timeBetweenFrames": 1,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Right_Flame.png",
                       "points": [],
                       "originPoint": {
@@ -1406,7 +1730,26 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 16
+                          },
+                          {
+                            "x": 48,
+                            "y": 16
+                          },
+                          {
+                            "x": 48,
+                            "y": 48
+                          },
+                          {
+                            "x": 0,
+                            "y": 48
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -1430,7 +1773,7 @@
                   "timeBetweenFrames": 1,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Left_Flame.png",
                       "points": [],
                       "originPoint": {
@@ -1444,7 +1787,26 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 16,
+                            "y": 16
+                          },
+                          {
+                            "x": 64,
+                            "y": 16
+                          },
+                          {
+                            "x": 64,
+                            "y": 48
+                          },
+                          {
+                            "x": 16,
+                            "y": 48
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -1468,7 +1830,7 @@
                   "timeBetweenFrames": 1,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Up_Flame.png",
                       "points": [],
                       "originPoint": {
@@ -1482,7 +1844,26 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 16,
+                            "y": 16
+                          },
+                          {
+                            "x": 48,
+                            "y": 16
+                          },
+                          {
+                            "x": 48,
+                            "y": 64
+                          },
+                          {
+                            "x": 16,
+                            "y": 64
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -1506,7 +1887,7 @@
                   "timeBetweenFrames": 1,
                   "sprites": [
                     {
-                      "hasCustomCollisionMask": false,
+                      "hasCustomCollisionMask": true,
                       "image": "Down_Flame.png",
                       "points": [],
                       "originPoint": {
@@ -1520,7 +1901,26 @@
                         "x": 0,
                         "y": 0
                       },
-                      "customCollisionMask": []
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 16,
+                            "y": 0
+                          },
+                          {
+                            "x": 48,
+                            "y": 0
+                          },
+                          {
+                            "x": 48,
+                            "y": 48
+                          },
+                          {
+                            "x": 16,
+                            "y": 48
+                          }
+                        ]
+                      ]
                     }
                   ]
                 }
@@ -1537,7 +1937,7 @@
           "underlined": false,
           "variables": [],
           "behaviors": [],
-          "string": "Press \"Space\" to create a bomb",
+          "string": "Use the \"Arrow Keys\" to move.\nPress \"Space\" to create a bomb",
           "font": "",
           "characterSize": 20,
           "color": {
@@ -1545,15 +1945,6 @@
             "g": 255,
             "r": 255
           }
-        },
-        {
-          "height": 32,
-          "name": "Grass",
-          "texture": "Grass-1.png",
-          "type": "TiledSpriteObject::TiledSprite",
-          "width": 32,
-          "variables": [],
-          "behaviors": []
         }
       ],
       "events": [
@@ -1569,7 +1960,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Assets are available and completely free at https://opengameart.org/content/bomb-party-the-complete-set\nCredits to: Cem Kalyoncu/cemkalyoncu (for the modified version of the spritesheet) and\nto Matt Hackett/richtaur (for the original version of the spritesheet)",
+          "comment": "I do not own the assets used in this example; it is available and completely\nfree at https://opengameart.org/content/bomb-party-the-complete-set\nCredits to: Cem Kalyoncu/cemkalyoncu (for the modified version of the spritesheet) and\nto Matt Hackett/richtaur (for the original version of the spritesheet)",
           "comment2": ""
         },
         {
@@ -1608,28 +1999,17 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Handle collisions",
+          "comment": "Handle player collision",
           "comment2": ""
         },
         {
           "disabled": false,
           "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "SeparateFromObjects"
-              },
-              "parameters": [
-                "Player",
-                "Unmovables"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
+          "type": "BuiltinCommonInstructions::Link",
+          "include": {
+            "includeConfig": 0
+          },
+          "target": "Player Collision"
         },
         {
           "disabled": false,
@@ -1984,8 +2364,8 @@
                   "parameters": [
                     "",
                     "Bomb",
-                    "Player.X()",
-                    "Player.Y()",
+                    "round(Player.X()/64)*64",
+                    "round(Player.Y()/64)*64",
                     ""
                   ],
                   "subInstructions": []
@@ -2237,7 +2617,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Check if bomb is finished with its exploding animation; then create the fire explosion effect",
+          "comment": "Check if bomb is finished with it's exploding animation; then will create the fire explosion effect",
           "comment2": ""
         },
         {
@@ -2476,7 +2856,7 @@
             "textG": 0,
             "textR": 0
           },
-          "comment": "Delete fire explosion once it is done",
+          "comment": "Delete fire explotion once it is done",
           "comment2": ""
         },
         {
@@ -2702,6 +3082,48 @@
               "parameters": [
                 "Crate",
                 ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ]
+    },
+    {
+      "associatedLayout": "Game",
+      "lastChangeTimeStamp": 0,
+      "name": "Player Collision",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "This separates the player away from the walls, crates and etc; this makes it un-passable or a solid object",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SeparateFromObjects"
+              },
+              "parameters": [
+                "Player",
+                "Unmovables"
               ],
               "subInstructions": []
             }

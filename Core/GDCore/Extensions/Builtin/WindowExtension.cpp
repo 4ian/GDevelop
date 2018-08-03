@@ -11,12 +11,14 @@ namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation("BuiltinWindow",
-                                    _("Window features"),
-                                    _("This Built-in extension enables the "
-                                      "manipulation of the game's window"),
-                                    "Florian Rival",
-                                    "Open source (MIT License)");
+  extension
+      .SetExtensionInformation("BuiltinWindow",
+                               _("Window features"),
+                               _("This Built-in extension enables the "
+                                 "manipulation of the game's window"),
+                               "Florian Rival",
+                               "Open source (MIT License)")
+      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
 #if defined(GD_IDE_ONLY)
   extension

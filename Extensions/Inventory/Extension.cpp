@@ -17,7 +17,8 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
       _("Provides actions and conditions to add an inventory to your game, "
         "with items in memory."),
       "Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetExtensionHelpPath("all-features/inventory");
 
 #if defined(GD_IDE_ONLY)
   extension

@@ -12,13 +12,15 @@ namespace gd {
 void GD_CORE_API
 BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "BuiltinExternalLayouts",
-      _("External layouts"),
-      _("Built-in extension providing actions and conditions related to "
-        "external layouts"),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "BuiltinExternalLayouts",
+          _("External layouts"),
+          _("Built-in extension providing actions and conditions related to "
+            "external layouts"),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
 #if defined(GD_IDE_ONLY)
   extension

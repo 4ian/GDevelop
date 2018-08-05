@@ -27,7 +27,8 @@ gd::ObjectMetadata& PlatformExtension::AddObject(const gd::String& name,
                      icon24x24,
                      [](gd::String name) -> std::unique_ptr<gd::Object> {
                        return gd::make_unique<T>(name);
-                     });
+                     })
+          .SetHelpPath(GetHelpPath());
 
   return objectsInfos[nameWithNamespace];
 }

@@ -15,13 +15,6 @@ namespace gdjs {
 WindowExtension::WindowExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsWindowExtension(*this);
 
-  SetExtensionInformation(
-      "BuiltinWindow",
-      _("Window features"),
-      _("Built-in extension allowing to manipulate the game's window"),
-      "Florian Rival",
-      "Open source (MIT License)");
-
   GetAllActions()["SetFullScreen"].SetFunctionName(
       "gdjs.evtTools.window.setFullScreen");
   GetAllActions()["SetWindowMargins"].SetFunctionName(

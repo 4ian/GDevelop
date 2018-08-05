@@ -15,7 +15,8 @@ void DeclareShopifyExtension(gd::PlatformExtension& extension) {
       _("Interact with products and generate URLs for checkouts with your "
         "Shopify shop."),
       "Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetExtensionHelpPath("/all-features/shopify");
 
 #if defined(GD_IDE_ONLY)
   extension

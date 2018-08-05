@@ -18,7 +18,8 @@ void DeclarePlatformBehaviorExtension(gd::PlatformExtension& extension) {
       _("This Extension enables the use of controllable objects that can run "
         "and jump on platforms."),
       "Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetExtensionHelpPath("/behaviors/platformer");
 
   {
     gd::BehaviorMetadata& aut = extension.AddBehavior(

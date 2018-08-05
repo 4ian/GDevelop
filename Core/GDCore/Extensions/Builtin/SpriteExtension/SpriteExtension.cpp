@@ -17,9 +17,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   extension
       .SetExtensionInformation("Sprite",
                                _("Sprite"),
-                               _("Extension for adding animated objects in the "
-                                 "scene, which can contain "
-                                 "animations with directions within each."),
+                               _("Sprite are animated object which can be used for most elements of a game."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/sprite");

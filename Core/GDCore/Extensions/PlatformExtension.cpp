@@ -131,7 +131,8 @@ gd::ObjectMetadata& PlatformExtension::AddObject(
                                                    fullname,
                                                    description,
                                                    icon24x24,
-                                                   instance);
+                                                   instance)
+                                        .SetHelpPath(GetHelpPath());
 
   return objectsInfos[nameWithNamespace];
 }
@@ -157,7 +158,8 @@ gd::BehaviorMetadata& PlatformExtension::AddBehavior(
                                                       icon24x24,
                                                       className,
                                                       instance,
-                                                      sharedDatasInstance);
+                                                      sharedDatasInstance)
+                                         .SetHelpPath(GetHelpPath());
   return behaviorsInfo[nameWithNamespace];
 }
 

@@ -75,7 +75,8 @@ gd::InstructionMetadata& BehaviorMetadata::AddCondition(
                                                            sentence,
                                                            group,
                                                            icon,
-                                                           smallicon);
+                                                           smallicon)
+                                           .SetHelpPath(GetHelpPath());
   return conditionsInfos[nameWithNamespace];
 #endif
 }
@@ -98,7 +99,8 @@ gd::InstructionMetadata& BehaviorMetadata::AddAction(
                                                         sentence,
                                                         group,
                                                         icon,
-                                                        smallicon);
+                                                        smallicon)
+                                        .SetHelpPath(GetHelpPath());
   return actionsInfos[nameWithNamespace];
 #endif
 }

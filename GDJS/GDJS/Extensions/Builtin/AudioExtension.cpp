@@ -15,12 +15,6 @@ namespace gdjs {
 AudioExtension::AudioExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAudioExtension(*this);
 
-  SetExtensionInformation("BuiltinAudio",
-                          _("Audio"),
-                          _("Builtin audio extension"),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   GetAllActions()["PlaySound"].SetFunctionName("gdjs.evtTools.sound.playSound");
   GetAllActions()["PlaySoundCanal"].SetFunctionName(
       "gdjs.evtTools.sound.playSoundOnChannel");

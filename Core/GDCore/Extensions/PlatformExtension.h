@@ -96,9 +96,9 @@ class GD_CORE_API PlatformExtension {
    * \brief Set the path to the help, relative to the wiki/documentation root.
    * For example, "/all-features/collisions" for
    * "http://wiki.compilgames.net/doku.php/gdevelop5/all-features/collisions".
-   * 
-   * The instruction will have this help path set by default, unless you call
-   * SetHelpPath on them.
+   *
+   * The instructions, objects and behaviors will have this help path set by
+   * default, unless you call SetHelpPath on them.
    */
   PlatformExtension& SetExtensionHelpPath(const gd::String& helpPath_) {
     helpPath = helpPath_;

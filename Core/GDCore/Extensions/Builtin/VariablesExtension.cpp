@@ -15,7 +15,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .SetExtensionInformation(
           "BuiltinVariables",
           _("Variable features"),
-          _("This Built-in extension allows the manipulation of variables"),
+          _("Built-in extension allowing to manipulate variables"),
           "Florian Rival",
           "Open source (MIT License)")
       .SetExtensionHelpPath("/all-features/variables");

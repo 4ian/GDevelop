@@ -18,7 +18,7 @@ void DeclareAdMobObjectExtension(gd::PlatformExtension& extension) {
           _("Display an ads banner and interstitial screens powered by AdMob."),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
+      .SetExtensionHelpPath("/objects/admob");
 
   gd::ObjectMetadata& obj = extension.AddObject<AdMobObject>(
       "AdMob",

@@ -14,8 +14,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsWindowExtension(
   extension
       .SetExtensionInformation("BuiltinWindow",
                                _("Window features"),
-                               _("This Built-in extension enables the "
-                                 "manipulation of the game's window"),
+                               _("Built-in extension allowing to manipulate "
+                                 "the game window and canvas"),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);

@@ -177,8 +177,8 @@ class GD_CORE_API ObjectMetadata {
  private:
   gd::String extensionNamespace;
   gd::String name;
-#if defined(GD_IDE_ONLY)
   gd::String helpPath;
+#if defined(GD_IDE_ONLY)
   gd::String helpUrl; ///< Deprecated. Use helpPath instead.
   gd::String fullname;
   gd::String description;

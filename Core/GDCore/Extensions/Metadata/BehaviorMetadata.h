@@ -146,13 +146,13 @@ class GD_CORE_API BehaviorMetadata {
 #endif
  private:
   gd::String extensionNamespace;
+  gd::String helpPath;
 #if defined(GD_IDE_ONLY)
   gd::String fullname;
   gd::String defaultName;
   gd::String description;
   gd::String group;
   gd::String iconFilename;
-  gd::String helpPath;
 #if !defined(GD_NO_WX_GUI)
   wxBitmap icon;
 #endif

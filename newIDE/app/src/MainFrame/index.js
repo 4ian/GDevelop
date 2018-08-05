@@ -121,6 +121,7 @@ type Props = {
   createDialog?: React.Element<*>,
   authentification: Authentification,
   extensionsLoader?: JsExtensionsLoader,
+  initialPathsOrURLsToOpen: ?Array<string>,
 };
 
 export default class MainFrame extends React.Component<Props, State> {
@@ -155,11 +156,18 @@ export default class MainFrame extends React.Component<Props, State> {
 
   componentWillMount() {
     if (!this.props.integratedEditor) this.openStartPage();
-    if (this.props.introDialog && !Window.isDev()) this._openIntroDialog(true);
   }
 
   componentDidMount() {
+    const { initialPathsOrURLsToOpen } = this.props;
+
     this.loadExtensions();
+    if (initialPathsOrURLsToOpen && initialPathsOrURLsToOpen[0]) {
+      this.openFromPathOrURL(initialPathsOrURLsToOpen[0], () =>
+        this.openSceneOrProjectManager()
+      );
+    } else if (this.props.introDialog && !Window.isDev())
+      this._openIntroDialog(true);
   }
 
   loadExtensions = () => {
@@ -253,7 +261,7 @@ export default class MainFrame extends React.Component<Props, State> {
       },
       err => {
         showErrorBox(
-          'Unable to read this project. Please try again later or with another save of the project.',
+          'Unable to open this project. Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.',
           err
         );
         return;

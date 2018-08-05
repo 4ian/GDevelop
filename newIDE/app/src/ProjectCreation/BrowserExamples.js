@@ -23,9 +23,11 @@ const exampleNames = [
   'basic-ai-with-pathfinding',
   'basic-artificial-intelligence',
   'basic-topdown-car-driving',
+  'bomb-the-crate',
   'brakeout',
   'buttons',
   'car-physics',
+  'center-object-within-another',
   'change-position-of-object',
   'change-scale-of-sprites',
   'change-sprite-animation',
@@ -37,6 +39,7 @@ const exampleNames = [
   'infinite-scrolling-background',
   'instance-timer',
   'inventory-system',
+  'isometric-game',
   'keyboard-practice',
   'magnet',
   'manipulate-text-object',
@@ -57,8 +60,12 @@ const exampleNames = [
   'pathfinding-basics',
   'pathfinding',
   'physics',
+  'pin-object-to-another-multiple-parents',
+  'pin-object-to-another',
   'platformer',
+  'play-music-on-mobile',
   'play-stop-sprite-animation',
+  'racing-game',
   'rain',
   'random-color-picker',
   'rotate-toward-mouse',
@@ -71,6 +78,7 @@ const exampleNames = [
   'snap-object-to-grid',
   'space-shooter',
   'splash-screen',
+  'sprite-fade-in-out',
   'text-entry-object',
   'text-fade-in-out',
   'text-to-speech',
@@ -113,7 +121,7 @@ I confirm that any assets can be used freely by anybody, including for commercia
                   primaryText={formatExampleName(exampleName)}
                   onClick={() => {
                     sendNewGameCreated(exampleName);
-                    this.props.onOpen(`internal://${exampleName}`);
+                    this.props.onOpen(`example://${exampleName}`);
                   }}
                 />
               ))}

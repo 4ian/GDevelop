@@ -28,7 +28,7 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
 };
 
 gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
-    var fontName = "\"gdjs_font_" + this._object._fontName + "\"";
+    var fontName = this._object._fontName ? "\"gdjs_font_" + this._object._fontName + "\"" : 'Arial';
 
     var style = this._text.style;
     style.fontStyle = this._object._italic ? 'italic' : 'normal';

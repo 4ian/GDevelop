@@ -7,6 +7,7 @@
 #include <SFML/Graphics.hpp>
 #include <chrono>
 #include <random>
+#include <cmath>
 #include <sstream>
 #include "GDCpp/Runtime/profile.h"
 
@@ -39,6 +40,26 @@ double GD_API Random(int end) {
 
   std::uniform_int_distribution<int> randomDist(0, end);
   return randomDist(randomEngine);
+}
+
+double GD_API RandomInRange(int min, int max) {
+  return min + Random(max - min); // return min if min >= max
+}
+
+double GD_API RandomFloat(float end) {
+  if (end <= 0) return 0;
+
+  std::uniform_real_distribution<double> randomDist(0, end);
+  return randomDist(randomEngine);
+}
+
+double GD_API RandomFloatInRange(float min, float max) {
+  return min + RandomFloat(max - min); // return min if min >= max
+}
+
+double GD_API RandomWithStep(float min, float max, float step) {
+  if (step <= 0) return min + Random(max - min);
+  return min + Random(std::floor((max - min) / step)) * step; // return min if min >= max
 }
 
 bool GD_API LogicalNegation(bool param) { return !param; }

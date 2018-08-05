@@ -83,6 +83,16 @@ export default class LocalStarters extends Component {
                 onClick={() => this.createFromExample('space-shooter')}
               />
               <ListItem
+                primaryText="Isometric game"
+                secondaryText={
+                  <p>
+                    An example of an isometric game where you can explore a map with your character.
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => this.createFromExample('isometric-game')}
+              />
+              <ListItem
                 primaryText="Empty game"
                 secondaryText={<p>Start a new game from scratch.</p>}
                 secondaryTextLines={2}

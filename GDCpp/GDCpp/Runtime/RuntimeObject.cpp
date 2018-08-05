@@ -163,8 +163,13 @@ void RuntimeObject::PutAroundAPosition(float positionX,
                                        float angleInDegrees) {
   double angle = angleInDegrees / 180.0f * 3.14159;
 
-  SetX(positionX + cos(angle) * distance - GetCenterX());
-  SetY(positionY + sin(angle) * distance - GetCenterY());
+  // Offset the position by the center, as PutAround* methods should position
+  // the center of the object (just like GetSqDistanceTo, RaycastTest uses
+  // center too).
+  SetX(positionX + cos(angle) * distance + GetX() -
+       (GetDrawableX() + GetCenterX()));
+  SetY(positionY + sin(angle) * distance + GetY() -
+       (GetDrawableY() + GetCenterY()));
 }
 
 void RuntimeObject::AddForce(float x, float y, float clearing) {
@@ -409,18 +414,20 @@ bool RuntimeObject::IsCollidingWithPoint(float pointX, float pointY) {
   return false;
 }
 
-RaycastResult RuntimeObject::RaycastTest(float x, float y, float endX, float endY, bool closest) {
+RaycastResult RuntimeObject::RaycastTest(
+    float x, float y, float endX, float endY, bool closest) {
   float objW = GetWidth();
   float objH = GetHeight();
   float diffX = GetDrawableX() + GetCenterX() - x;
   float diffY = GetDrawableY() + GetCenterY() - y;
   float sqBoundingR = (objW * objW + objH * objH) / 4.0;
-  float sqDist = (endX - x)*(endX - x) + (endY - y)*(endY - y);
+  float sqDist = (endX - x) * (endX - x) + (endY - y) * (endY - y);
 
   RaycastResult result;
   result.collision = false;
 
-  if ( diffX*diffX + diffY*diffY > sqBoundingR + sqDist + 2*sqrt(sqDist*sqBoundingR) )
+  if (diffX * diffX + diffY * diffY >
+      sqBoundingR + sqDist + 2 * sqrt(sqDist * sqBoundingR))
     return result;
 
   float testSqDist = closest ? sqDist : 0.0f;
@@ -433,7 +440,8 @@ RaycastResult RuntimeObject::RaycastTest(float x, float y, float endX, float end
       if (closest && (res.closeSqDist < testSqDist)) {
         testSqDist = res.closeSqDist;
         result = res;
-      } else if ( !closest && (res.farSqDist > testSqDist) && (res.farSqDist <= sqDist) ) {
+      } else if (!closest && (res.farSqDist > testSqDist) &&
+                 (res.farSqDist <= sqDist)) {
         testSqDist = res.farSqDist;
         result = res;
       }
@@ -548,12 +556,10 @@ void RuntimeObject::PutAroundObject(RuntimeObject *object,
                                     float angleInDegrees) {
   if (object == NULL) return;
 
-  double angle = angleInDegrees / 180 * 3.14159;
-
-  SetX(object->GetDrawableX() + object->GetCenterX() + cos(angle) * length -
-       GetCenterX());
-  SetY(object->GetDrawableY() + object->GetCenterY() + sin(angle) * length -
-       GetCenterY());
+  PutAroundAPosition(object->GetDrawableX() + object->GetCenterX(),
+                     object->GetDrawableY() + object->GetCenterY(),
+                     length,
+                     angleInDegrees);
 }
 
 void RuntimeObject::SetXY(const char *xOperator,

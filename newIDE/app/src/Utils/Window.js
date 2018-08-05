@@ -1,4 +1,5 @@
 import optionalRequire from './OptionalRequire.js';
+import URLSearchParams from 'url-search-params';
 import { isWindows } from './Platform';
 const electron = optionalRequire('electron');
 const shell = electron ? electron.shell : null;
@@ -76,13 +77,27 @@ export default class Window {
     return electron.remote.getCurrentWindow().on('close', cb);
   }
 
+  /**
+   * Return the arguments passed to the IDE, either from Electron
+   * or from the web-app URL. The resulting object will have a key "_"
+   * containing an array of string, representing all the arguments that
+   * didn't have an option associated with them (see https://github.com/substack/minimist).
+   * (On the web-app, this is emulated using the "project" argument).
+   */
   static getArguments() {
-    if (!electron) {
-      console.warn('Unable to get arguments, electron not defined');
-      return {};
+    if (electron) {
+      return electron.remote.getGlobal('args');
     }
 
-    return electron.remote.getGlobal('args');
+    const argumentsObject = {};
+    const params = new URLSearchParams(window.location.search);
+    params.forEach((value, name) => argumentsObject[name] = value);
+
+    // Emulate the minimist behavior of putting the arguments without option
+    // in "_".
+    argumentsObject._ = argumentsObject.project ? [argumentsObject.project] : [];
+
+    return argumentsObject;
   }
 
   static showMessageBox(message, type) {

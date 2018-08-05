@@ -57,9 +57,9 @@ installFullstory();
 Window.setUpContextMenu();
 
 let app = null;
+const appArguments = Window.getArguments();
 
 if (electron) {
-  const appArguments = Window.getArguments();
   if (appArguments['server-port']) {
     app = (
       <ExternalEditor
@@ -73,6 +73,7 @@ if (electron) {
           authentification={authentification}
           onReadFromPathOrURL={() => Promise.reject('Should never be called')}
           resourceExternalEditors={localResourceExternalEditors}
+          initialPathsOrURLsToOpen={[]}
         />
       </ExternalEditor>
     );
@@ -95,6 +96,7 @@ if (electron) {
           resourceExternalEditors={localResourceExternalEditors}
           authentification={authentification}
           extensionsLoader={new LocalJsExtensionsLoader()}
+          initialPathsOrURLsToOpen={appArguments['_']}
         />
       </ElectronEventsBridge>
     ); 
@@ -117,6 +119,7 @@ if (electron) {
       resourceExternalEditors={browserResourceExternalEditors}
       authentification={authentification}
       extensionsLoader={new BrowserJsExtensionsLoader()}
+      initialPathsOrURLsToOpen={appArguments['_']}
     />
   );
 }

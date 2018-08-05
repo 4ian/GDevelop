@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
+import Window from '../Utils/Window';
 import FlatButton from 'material-ui/FlatButton';
 
 export default class BetaIntroDialog extends Component {
   _onOpenWebsite() {
-    window.open('http://gdevelop-app.com', '_blank');
+    Window.openExternalURL('http://gdevelop-app.com');
   }
 
   render() {

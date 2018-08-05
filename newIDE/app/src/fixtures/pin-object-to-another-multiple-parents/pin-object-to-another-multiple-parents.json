@@ -1,0 +1,1080 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 97,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "folderProject": false,
+    "linuxExecutableFilename": "",
+    "macExecutableFilename": "",
+    "orientation": "default",
+    "packageName": "",
+    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json",
+    "sizeOnStartupMode": "",
+    "useExternalSourceFiles": false,
+    "version": "1.0.0",
+    "winExecutableFilename": "",
+    "winExecutableIconFile": "",
+    "name": "Project",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 10,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      },
+      {
+        "name": "TextObject"
+      },
+      {
+        "name": "DraggableBehavior"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/pin-object-to-another-multiple-parents/parent.png",
+        "kind": "image",
+        "name": "parent.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/pin-object-to-another-multiple-parents/child.png",
+        "kind": "image",
+        "name": "child.png",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 209,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "New_32scene",
+      "name": "New scene",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 209,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 209,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": true,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "message",
+          "width": 0,
+          "x": 8,
+          "y": 14,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "parent",
+          "width": 0,
+          "x": 173,
+          "y": 405,
+          "zOrder": 101,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "id",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "parent",
+          "width": 0,
+          "x": 616,
+          "y": 485,
+          "zOrder": 102,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "id",
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "angle": 50,
+          "customSize": true,
+          "height": 53.3621,
+          "layer": "",
+          "locked": false,
+          "name": "child",
+          "width": 103.698,
+          "x": 83,
+          "y": 520,
+          "zOrder": 103,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "parent",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "angle": 50,
+          "customSize": true,
+          "height": 120.474,
+          "layer": "",
+          "locked": false,
+          "name": "child",
+          "width": 57.9741,
+          "x": 457,
+          "y": 486,
+          "zOrder": 104,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "parent",
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "angle": 30,
+          "customSize": true,
+          "height": 85,
+          "layer": "",
+          "locked": false,
+          "name": "child",
+          "width": 52,
+          "x": 256,
+          "y": 252,
+          "zOrder": 103,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "parent",
+              "value": "1"
+            }
+          ]
+        },
+        {
+          "angle": 30,
+          "customSize": true,
+          "height": 57.9741,
+          "layer": "",
+          "locked": false,
+          "name": "child",
+          "width": 98.9224,
+          "x": 675,
+          "y": 373,
+          "zOrder": 104,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "parent",
+              "value": "2"
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 210,
+          "layer": "",
+          "locked": false,
+          "name": "child",
+          "width": 100,
+          "x": 480,
+          "y": 196,
+          "zOrder": 105,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "parent",
+              "value": "4"
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 61.8433,
+          "layer": "",
+          "locked": false,
+          "name": "parent",
+          "width": 61.8433,
+          "x": 436,
+          "y": 209,
+          "zOrder": 106,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "id",
+              "value": "4"
+            }
+          ]
+        }
+      ],
+      "objects": [
+        {
+          "bold": false,
+          "italic": false,
+          "name": "message",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Add child objects in the editor and position, scale and rotate them as you like.\nAdd a variable \"parent\" to each child object and a variable \"id\" to its parent.\nThe value of this variable must be the same, in order to have the child choose to which it belongs.\nIn preview, move the pointer over a parent, then you can rotate the parent using A and S keys.\nYou can also drag the parent with the mouse.\nAll child objects should keep its relative rotation and position to the parent object they belong to.",
+          "font": "",
+          "characterSize": 18,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "name": "parent",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Draggable",
+              "type": "DraggableBehavior::Draggable"
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "parent.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 50,
+                        "y": 50
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 50,
+                        "y": 50
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 100,
+                            "y": 0
+                          },
+                          {
+                            "x": 100,
+                            "y": 100
+                          },
+                          {
+                            "x": 0,
+                            "y": 100
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "child",
+          "type": "Sprite",
+          "updateIfNotVisible": true,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "child.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 10,
+                        "y": 10
+                      },
+                      "centerPoint": {
+                        "automatic": false,
+                        "name": "centre",
+                        "x": 50,
+                        "y": 50
+                      },
+                      "customCollisionMask": [
+                        [
+                          {
+                            "x": 0,
+                            "y": 0
+                          },
+                          {
+                            "x": 100,
+                            "y": 0
+                          },
+                          {
+                            "x": 100,
+                            "y": 100
+                          },
+                          {
+                            "x": 0,
+                            "y": 100
+                          }
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": false,
+          "name": "Parenting",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Each parent object has an ID variable to be able to identify them and each child instance has a variable called PARENT and it value is correspond with the ID number of the parent they belong to",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "go trough each parent and each child objects and link the child objects to the parent they belong to using the ID variable of the parent and the PARENT variable of the child",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::ForEach",
+                  "object": "parent",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarObjet"
+                      },
+                      "parameters": [
+                        "child",
+                        "parent",
+                        "=",
+                        "parent.Variable(id)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "child",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LinkedObjects::LinkObjects"
+                          },
+                          "parameters": [
+                            "",
+                            "parent",
+                            "child"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "child",
+                            "InitialAngle",
+                            "=",
+                            "child.Angle()"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "child",
+                            "DistanceToParent",
+                            "=",
+                            "parent.Distance(child)"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "child",
+                            "AngleToParent",
+                            "=",
+                            "ToDeg(atan2(child.PointY(Centre) - parent.PointY(Centre), child.PointX(Centre) - parent.PointX(Centre)))"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "rotate the parent using 'a' and 's' if the pointer is over the parent object",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SourisSurObjet"
+                  },
+                  "parameters": [
+                    "parent",
+                    "",
+                    "yes",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "MouseWheelDelta()",
+                        "a"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Rotate"
+                      },
+                      "parameters": [
+                        "parent",
+                        "-50",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "MouseWheelDelta()",
+                        "s"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Rotate"
+                      },
+                      "parameters": [
+                        "parent",
+                        "50",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "update the angle and position of all child objects relative to their parent\nYou may want to consider to do this only if the parent is rotated or dragged as this calculation can be expensive in case you have many childs in the scene",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "parent",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "LinkedObjects::PickObjectsLinkedTo"
+                  },
+                  "parameters": [
+                    "",
+                    "child",
+                    "parent"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreAutour"
+                  },
+                  "parameters": [
+                    "child",
+                    "parent",
+                    "child.Variable(DistanceToParent)",
+                    "parent.Angle() + child.Variable(AngleToParent)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "child",
+                    "=",
+                    "parent.Angle() + child.Variable(InitialAngle)"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "In this example we have 2 parent object and we are using object variables and object linking in order to link the childs to their parents. In case you find this confusing, you can find an other example for pin-object-to-another that is using a single parent object only without object linking. Go to gametemplates.itch.io to download\n\nHave fun!",
+              "comment2": ""
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [
+    {
+      "associatedLayout": "New scene",
+      "lastChangeTimeStamp": 0,
+      "name": "Calculate child distance and angle",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "calculate the distance of childs from their parent \nas the position and rotation of the childs can not be changed during runtime, we need to do this calculations only at the beginning and after we update the child position and angle elsewhere using the values from here",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::ForEach",
+          "object": "parent",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::ForEach",
+              "object": "child",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "LinkedObjects::PickObjectsLinkedTo"
+                  },
+                  "parameters": [
+                    "",
+                    "child",
+                    "parent"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "child",
+                    "angle",
+                    "=",
+                    "child.Angle()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "child",
+                    "distanceX",
+                    "=",
+                    "parent.PointX(Centre) - child.PointX(Centre)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "child",
+                    "distanceY",
+                    "=",
+                    "parent.PointY(Centre) - child.PointY(Centre)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "child",
+                    "=",
+                    "parent.Angle() + child.Variable(angle)"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Egal"
+                      },
+                      "parameters": [
+                        "child.PointX(Centre)",
+                        ">",
+                        "parent.PointX(Centre)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "child",
+                        "distanceX",
+                        "=",
+                        "sqrt(child.Variable(distanceX) * child.Variable(distanceX))"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Egal"
+                      },
+                      "parameters": [
+                        "child.PointX(Centre)",
+                        "<",
+                        "parent.PointX(Centre)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "child",
+                        "distanceX",
+                        "=",
+                        "sqrt(child.Variable(distanceX) * child.Variable(distanceX)) * -1"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Egal"
+                      },
+                      "parameters": [
+                        "child.PointY(Centre)",
+                        ">",
+                        "parent.PointY(Centre)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "child",
+                        "distanceY",
+                        "=",
+                        "sqrt(child.Variable(distanceY) * child.Variable(distanceY))"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Egal"
+                      },
+                      "parameters": [
+                        "child.PointY(Centre)",
+                        "<",
+                        "parent.PointY(Centre)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarObjet"
+                      },
+                      "parameters": [
+                        "child",
+                        "distanceY",
+                        "=",
+                        "sqrt(child.Variable(distanceY) * child.Variable(distanceY)) * -1"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

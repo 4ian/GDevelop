@@ -24,6 +24,18 @@ SceneExtension::SceneExtension() {
   GetAllExpressions()["Random"]
       .SetFunctionName("GDpriv::CommonInstructions::Random")
       .SetIncludeFile("GDCpp/Extensions/Builtin/CommonInstructionsTools.h");
+  GetAllExpressions()["RandomInRange"]
+      .SetFunctionName("GDpriv::CommonInstructions::RandomInRange")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/CommonInstructionsTools.h");
+  GetAllExpressions()["RandomFloat"]
+      .SetFunctionName("GDpriv::CommonInstructions::RandomFloat")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/CommonInstructionsTools.h");
+  GetAllExpressions()["RandomFloatInRange"]
+      .SetFunctionName("GDpriv::CommonInstructions::RandomFloatInRange")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/CommonInstructionsTools.h");
+  GetAllExpressions()["RandomWithStep"]
+      .SetFunctionName("GDpriv::CommonInstructions::RandomWithStep")
+      .SetIncludeFile("GDCpp/Extensions/Builtin/CommonInstructionsTools.h");
   GetAllStrExpressions()["CurrentSceneName"]
       .SetFunctionName("GetSceneName")
       .SetIncludeFile("GDCpp/Extensions/Builtin/RuntimeSceneTools.h");

@@ -8331,6 +8331,10 @@ url-parse@^1.1.8:
     querystringify "~1.0.0"
     requires-port "~1.0.0"
 
+url-search-params@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/url-search-params/-/url-search-params-1.0.2.tgz#429958e9bf09f2c980f39dbde49de944efd93c88"
+
 url@0.10.3:
   version "0.10.3"
   resolved "https://registry.yarnpkg.com/url/-/url-0.10.3.tgz#021e4d9c7705f21bbf37d03ceb58767402774c64"

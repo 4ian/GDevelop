@@ -163,6 +163,7 @@ class ThemableObjectRow extends React.Component {
           if (this.props.editingName) return;
 
           this.props.onEdit(object);
+          this.props.onObjectSelected('');
         }}
       />
     );

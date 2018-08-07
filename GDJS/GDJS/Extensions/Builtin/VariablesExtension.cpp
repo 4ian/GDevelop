@@ -22,13 +22,6 @@ namespace gdjs {
 VariablesExtension::VariablesExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsVariablesExtension(*this);
 
-  SetExtensionInformation(
-      "BuiltinVariables",
-      _("Variable features"),
-      _("Built-in extension allowing to manipulate variables"),
-      "Florian Rival",
-      "Open source (MIT License)");
-
   GetAllConditions()["VarScene"].SetFunctionName(
       "gdjs.evtTools.common.getVariableNumber");
   GetAllConditions()["VarSceneTxt"].SetFunctionName(

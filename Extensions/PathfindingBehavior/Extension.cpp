@@ -16,7 +16,8 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
       _("Pathfinding behavior"),
       _("Compute paths for objects avoiding obstacles."),
       "Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetExtensionHelpPath("/behaviors/pathfinding");
 
   {
     gd::BehaviorMetadata& aut = extension.AddBehavior(

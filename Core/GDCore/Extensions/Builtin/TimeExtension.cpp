@@ -11,12 +11,14 @@ namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "BuiltinTime",
-      _("Time"),
-      _("Built-in extension providing actions and conditions related to time."),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation("BuiltinTime",
+                               _("Time"),
+                               _("Built-in extension providing actions and "
+                                 "conditions related to time."),
+                               "Florian Rival",
+                               "Open source (MIT License)")
+      .SetExtensionHelpPath("/all-features/timers");
 
 #if defined(GD_IDE_ONLY)
 

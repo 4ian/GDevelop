@@ -11,12 +11,14 @@ namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsJoystickExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "BuiltinJoystick",
-      _("Joysticks features"),
-      _("Built-in extension that enables the use of joysticks"),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "BuiltinJoystick",
+          _("Joysticks features"),
+          _("Built-in extension that enables the use of joysticks"),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
 #if defined(GD_IDE_ONLY)
   extension

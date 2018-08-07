@@ -14,16 +14,10 @@
 #endif
 namespace gd {
 class Behavior;
-}
-namespace gd {
 class BehaviorsSharedData;
-}
-namespace gd {
 class InstructionMetadata;
-}
-namespace gd {
 class ExpressionMetadata;
-}
+}  // namespace gd
 class wxBitmap;
 
 namespace gd {
@@ -110,6 +104,22 @@ class GD_CORE_API BehaviorMetadata {
    */
   BehaviorMetadata& AddIncludeFile(const gd::String& includeFile);
 
+  /**
+   * Get the help path of the behavior, relative to the documentation root.
+   */
+  const gd::String &GetHelpPath() const { return helpPath; }
+
+  /**
+   * Set the help path of the behavior, relative to the documentation root.
+   * 
+   * The behavior instructions will have this help path set by
+   * default, unless you call SetHelpPath on them.
+   */
+  BehaviorMetadata &SetHelpPath(const gd::String &path) {
+    helpPath = path;
+    return *this;
+  }
+
 #if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetDefaultName() const { return defaultName; }
@@ -136,6 +146,7 @@ class GD_CORE_API BehaviorMetadata {
 #endif
  private:
   gd::String extensionNamespace;
+  gd::String helpPath;
 #if defined(GD_IDE_ONLY)
   gd::String fullname;
   gd::String defaultName;

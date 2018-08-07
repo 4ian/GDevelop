@@ -12,12 +12,14 @@ namespace gd {
 void GD_CORE_API
 BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "BuiltinCommonConversions",
-      _("Standard Conversions"),
-      _("Built-in extension providing standard conversions expressions."),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "BuiltinCommonConversions",
+          _("Standard Conversions"),
+          _("Built-in extension providing standard conversions expressions."),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
 #if defined(GD_IDE_ONLY)
 

@@ -16,13 +16,6 @@ StringInstructionsExtension::StringInstructionsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
       *this);
 
-  SetExtensionInformation(
-      "BuiltinStringInstructions",
-      _("Text manipulation"),
-      _("Built-in extension providing expressions related to strings."),
-      "Florian Rival",
-      "Open source (MIT License)");
-
   GetAllStrExpressions()["NewLine"].SetFunctionName(
       "gdjs.evtTools.string.newLine");
   GetAllStrExpressions()["FromCodePoint"].SetFunctionName(

@@ -37,12 +37,6 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       *this);
 
-  SetExtensionInformation("BuiltinCommonInstructions",
-                          _("Standard events"),
-                          _("Built-in extension providing standard events."),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   GetAllEvents()["BuiltinCommonInstructions::Link"].SetPreprocessing(
       [](gd::BaseEvent& event_,
          gd::EventsCodeGenerator& codeGenerator,

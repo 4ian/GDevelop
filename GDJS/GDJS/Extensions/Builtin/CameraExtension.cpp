@@ -13,12 +13,6 @@ namespace gdjs {
 CameraExtension::CameraExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsCameraExtension(*this);
 
-  SetExtensionInformation("BuiltinCamera",
-                          _("Cameras and layers features"),
-                          _("Builtin camera extension"),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   GetAllActions()["CameraX"]
       .SetFunctionName("gdjs.evtTools.camera.setCameraX")
       .SetGetter("gdjs.evtTools.camera.getCameraX");

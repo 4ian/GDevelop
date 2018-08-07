@@ -15,13 +15,6 @@ namespace gdjs {
 CommonConversionsExtension::CommonConversionsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsCommonConversionsExtension(*this);
 
-  SetExtensionInformation(
-      "BuiltinCommonConversions",
-      _("Standard Conversions"),
-      _("Built-in extension providing standard conversions expressions."),
-      "Florian Rival",
-      "Open source (MIT License)");
-
   GetAllExpressions()["ToNumber"].SetFunctionName(
       "gdjs.evtTools.common.toNumber");
   GetAllStrExpressions()["ToString"].SetFunctionName(

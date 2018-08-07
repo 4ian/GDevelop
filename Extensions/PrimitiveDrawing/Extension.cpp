@@ -10,12 +10,14 @@ This project is released under the MIT License.
 #include "ShapePainterObject.h"
 
 void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "PrimitiveDrawing",
-      _("Primitive drawing"),
-      _("This Extension allows you to draw shapes and manipulate images."),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "PrimitiveDrawing",
+          _("Primitive drawing"),
+          _("This Extension allows you to draw shapes and manipulate images."),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("/objects/shape_painter");
 
   gd::ObjectMetadata& obj = extension.AddObject<ShapePainterObject>(
       "Drawer",  //"Drawer" is kept for compatibility with GD<=3.6.76

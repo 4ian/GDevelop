@@ -9,17 +9,9 @@
 #include "GDCore/String.h"
 namespace gd {
 class BehaviorMetadata;
-}
-namespace gd {
 class ObjectMetadata;
-}
-namespace gd {
 class ExpressionMetadata;
-}
-namespace gd {
 class ExpressionMetadata;
-}
-namespace gd {
 class Platform;
 }
 
@@ -47,14 +39,14 @@ class GD_CORE_API MetadataProvider {
 
   /**
    * Get the metadata of an action.
-   * Must work for object, behaviors and static actions.
+   * Works for object, behaviors and static actions.
    */
   static const gd::InstructionMetadata& GetActionMetadata(
       const gd::Platform& platform, gd::String actionType);
 
   /**
    * Get the metadata of a condition.
-   * Must Work for object, behaviors and static conditions.
+   * Works for object, behaviors and static conditions.
    */
   static const gd::InstructionMetadata& GetConditionMetadata(
       const gd::Platform& platform, gd::String conditionType);
@@ -81,109 +73,109 @@ class GD_CORE_API MetadataProvider {
       const gd::Platform& platform, gd::String autoType, gd::String exprType);
 
   /**
-   * Get information about a gd::String expression from its type
+   * Get information about a string expression from its type
    * Works for static expressions.
    */
   static const gd::ExpressionMetadata& GetStrExpressionMetadata(
       const gd::Platform& platform, gd::String exprType);
 
   /**
-   * Get information about a gd::String expression from its type
+   * Get information about a string expression from its type
    * Works for object expressions.
    */
   static const gd::ExpressionMetadata& GetObjectStrExpressionMetadata(
       const gd::Platform& platform, gd::String objectType, gd::String exprType);
 
   /**
-   * Get information about a gd::String expression from its type
+   * Get information about a string expression from its type
    * Works for behavior expressions.
    */
   static const gd::ExpressionMetadata& GetBehaviorStrExpressionMetadata(
       const gd::Platform& platform, gd::String autoType, gd::String exprType);
 
   /**
-   * Verifying if a ( static ) condition exists
-   * @return true if the ( static ) condition exists
+   * \brief Check if a (static) condition exists
+   * @return true if the (static) condition exists
    */
   static bool HasCondition(const gd::Platform& platform, gd::String name);
 
   /**
-   * Verifying if a ( static ) action exists
-   * @return true if the ( static ) action exists
+   * \brief Check if a (static) action exists
+   * @return true if the (static) action exists
    */
   static bool HasAction(const gd::Platform& platform, gd::String name);
 
   /**
-   * Verifying if a ( object ) action exists
-   * @return true if the ( object ) action exists
+   * \brief Check if a (object) action exists
+   * @return true if the (object) action exists
    */
   static bool HasObjectAction(const gd::Platform& platform,
                               gd::String objectType,
                               gd::String name);
 
   /**
-   * Verifying if a ( object ) condition exists
-   * @return true if the ( object ) condition exists
+   * \brief Check if a (object) condition exists
+   * @return true if the (object) condition exists
    */
   static bool HasObjectCondition(const gd::Platform& platform,
                                  gd::String objectType,
                                  gd::String name);
 
   /**
-   * Verifying if a ( Behavior ) action exists
-   * @return true if the ( Behavior ) action exists
+   * \brief Check if a (behavior) action exists
+   * @return true if the (behavior) action exists
    */
   static bool HasBehaviorAction(const gd::Platform& platform,
                                 gd::String behaviorType,
                                 gd::String name);
 
   /**
-   * Verifying if a ( Behavior ) condition exists
-   * @return true if the ( Behavior ) condition exists
+   * \brief Check if a (behavior) condition exists
+   * @return true if the (behavior) condition exists
    */
   static bool HasBehaviorCondition(const gd::Platform& platform,
                                    gd::String behaviorType,
                                    gd::String name);
 
   /**
-   * Verifying if a ( static ) expression exists
-   * @return true if the ( static ) expression exists
+   * \brief Check if a (static) expression exists
+   * @return true if the (static) expression exists
    */
   static bool HasExpression(const gd::Platform& platform, gd::String name);
 
   /**
-   * Verifying if a ( object ) expression exists
-   * @return true if the ( object ) expression exists
+   * \brief Check if a (object) expression exists
+   * @return true if the (object) expression exists
    */
   static bool HasObjectExpression(const gd::Platform& platform,
                                   gd::String objectType,
                                   gd::String name);
 
   /**
-   * Verifying if a ( behavior ) expression exists
-   * @return true if the ( behavior ) expression exists
+   * \brief Check if a (behavior) expression exists
+   * @return true if the (behavior) expression exists
    */
   static bool HasBehaviorExpression(const gd::Platform& platform,
                                     gd::String behaviorType,
                                     gd::String name);
 
   /**
-   * Verifying if a ( static ) gd::String expression exists
-   * @return true if the ( static ) gd::String expression exists
+   * \brief Check if a (static) string expression exists
+   * @return true if the (static) string expression exists
    */
   static bool HasStrExpression(const gd::Platform& platform, gd::String name);
 
   /**
-   * Verifying if a ( object ) gd::String expression exists
-   * @return true if the ( object ) gd::String expression exists
+   * \brief Check if a (object) string expression exists
+   * @return true if the (object) string expression exists
    */
   static bool HasObjectStrExpression(const gd::Platform& platform,
                                      gd::String objectType,
                                      gd::String name);
 
   /**
-   * Verifying if a ( object ) gd::String expression exists
-   * @return true if the ( object ) gd::String expression exists
+   * \brief Check if a (behavior) string expression exists
+   * @return true if the (behavior) string expression exists
    */
   static bool HasBehaviorStrExpression(const gd::Platform& platform,
                                        gd::String behaviorType,

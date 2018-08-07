@@ -17,12 +17,6 @@ namespace gdjs {
 SceneExtension::SceneExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsSceneExtension(*this);
 
-  SetExtensionInformation("BuiltinScene",
-                          _("Scene management features"),
-                          _("Built-in extension allowing to manipulate scenes"),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   GetAllExpressions()["Random"].SetFunctionName("gdjs.random");
   GetAllExpressions()["RandomInRange"].SetFunctionName("gdjs.randomInRange");
   GetAllExpressions()["RandomFloat"].SetFunctionName("gdjs.randomFloat");

@@ -11,12 +11,14 @@ namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "BuiltinAdvanced",
-      _("Advanced control features"),
-      _("Built-in extension providing advanced control features."),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "BuiltinAdvanced",
+          _("Advanced control features"),
+          _("Built-in extension providing advanced control features."),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
 #if defined(GD_IDE_ONLY)
   extension

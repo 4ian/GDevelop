@@ -5,6 +5,9 @@
     "description": "GDJS_GAME_NAME",
     "author": "GDJS_GAME_AUTHOR",
     "version": "GDJS_GAME_VERSION",
-    "dependencies": {}
+    "dependencies": {},
+    "devDependencies": {
+      "electron": "2.0.2"
+    }
   }
   

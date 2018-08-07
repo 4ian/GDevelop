@@ -9,21 +9,16 @@ import Window from '../Utils/Window';
 import optionalRequire from '../Utils/OptionalRequire';
 import IconButton from 'material-ui/IconButton';
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
+import PreferencesContext from './Preferences/PreferencesContext';
+import {
+  getUpdateStatusLabel,
+  getUpdateButtonLabel,
+  canDownloadUpdate,
+  type UpdateStatus,
+} from './UpdaterTools';
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 const gd = global.gd;
-
-export type UpdateStatus = {
-  message: string,
-  status:
-    | 'checking-for-update'
-    | 'update-available'
-    | 'update-not-available'
-    | 'error'
-    | 'download-progress'
-    | 'update-downloaded'
-    | 'unknown',
-};
 
 type Props = {
   open: boolean,
@@ -60,7 +55,10 @@ const contributors = [
   { name: 'RyanNerd', description: 'Contributions to GDevelop' },
   { name: 'greater', description: 'Contributions to GDevelop' },
   { name: 'triptych', description: 'Contributions to GDevelop' },
-  { name: 'Wend1go', description: 'Contributions to GDevelop, Tutorials, Examples' },
+  {
+    name: 'Wend1go',
+    description: 'Contributions to GDevelop, Tutorials, Examples',
+  },
   { name: 'mattiascibien', description: 'Contributions to GDevelop' },
   { name: 'araujo921', description: 'Contributions to GDevelop' },
   { name: 'ronnystandtke', description: 'Contributions to GDevelop' },
@@ -104,19 +102,6 @@ const contributors = [
   },
 ];
 
-const getUpdateString = (status: string) => {
-  if (status === 'checking-for-update') return 'Checking for update...';
-  if (status === 'update-available') return 'Update available';
-  if (status === 'update-not-available')
-    return "No update available. You're using the latest version!";
-  if (status === 'error') return 'Error while checking update';
-  if (status === 'download-progress')
-    return 'A new update is being downloaded...';
-  if (status === 'update-downloaded')
-    return 'A new update will be installed after you quit and relaunch GDevelop';
-  return '';
-};
-
 export default class AboutDialog extends PureComponent<Props, *> {
   gdVersionString = '';
   appVersionString = '';
@@ -141,6 +126,9 @@ export default class AboutDialog extends PureComponent<Props, *> {
     const { open, onClose, updateStatus } = this.props;
     if (!open) return null;
 
+    const updateStatusString = getUpdateStatusLabel(updateStatus.status);
+    const updateButtonLabel = getUpdateButtonLabel(updateStatus.status);
+
     return (
       <Dialog
         actions={[
@@ -159,65 +147,81 @@ export default class AboutDialog extends PureComponent<Props, *> {
         noMargin
         autoScrollBodyContent
       >
-        <Column noMargin>
-          <img
-            src="res/GD-logo.png"
-            alt="GDevelop logo"
-            width="535"
-            height="283"
-          />
-          <Tabs onChange={() => this.forceUpdate()}>
-            <Tab label="About GDevelop" value="about">
-              <Column>
-                <Line>
-                  GDevelop {this.appVersionString} based on GDevelop.js{' '}
-                  {this.gdVersionString}
-                </Line>
-                <Line>{getUpdateString(updateStatus.status)}</Line>
-              </Column>
-            </Tab>
-            <Tab label="Contributors" value="contributors">
-              <Column>
-                <p>GDevelop was created by Florian "4ian" Rival.</p>
-                <p>Contributors, in no particular order:</p>
-              </Column>
-              <List>
-                {contributors.map(contributor => (
-                  <ListItem
-                    key={contributor.name}
-                    primaryText={contributor.name}
-                    secondaryText={<p>{contributor.description}</p>}
-                    secondaryTextLines={
-                      contributor.description.length < 30 ? 1 : 2
-                    }
-                    rightIconButton={
-                      contributor.link ? (
-                        <IconButton
-                          onClick={() => this._openLink(contributor.link || '')}
-                        >
-                          <OpenInNew />
-                        </IconButton>
-                      ) : null
-                    }
-                  />
-                ))}
-              </List>
-              <Column expand>
-                <p>
-                  Thanks to all users of GDevelop! There must be missing tons of
-                  people, please send your name if you've contributed and you're
-                  not listed.
-                </p>
-                <Line alignItems="center" justifyContent="center">
-                  <FlatButton
-                    label="Contribute to GDevelop"
-                    onClick={this._openContributePage}
-                  />
-                </Line>
-              </Column>
-            </Tab>
-          </Tabs>
-        </Column>
+        <PreferencesContext.Consumer>
+          {({ values, checkUpdates }) => (
+            <Column noMargin>
+              <img
+                src="res/GD-logo.png"
+                alt="GDevelop logo"
+                width="535"
+                height="283"
+              />
+              <Tabs onChange={() => this.forceUpdate()}>
+                <Tab label="About GDevelop" value="about">
+                  <Column>
+                    <Line>
+                      GDevelop {this.appVersionString} based on GDevelop.js{' '}
+                      {this.gdVersionString}
+                    </Line>
+                    <Line>{updateStatusString}</Line>
+                    <Line justifyContent="center">
+                      {!!updateStatusString && (
+                        <FlatButton
+                          label={updateButtonLabel}
+                          onClick={() =>
+                            checkUpdates(
+                              canDownloadUpdate(updateStatus.status)
+                            )}
+                        />
+                      )}
+                    </Line>
+                  </Column>
+                </Tab>
+                <Tab label="Contributors" value="contributors">
+                  <Column>
+                    <p>GDevelop was created by Florian "4ian" Rival.</p>
+                    <p>Contributors, in no particular order:</p>
+                  </Column>
+                  <List>
+                    {contributors.map(contributor => (
+                      <ListItem
+                        key={contributor.name}
+                        primaryText={contributor.name}
+                        secondaryText={<p>{contributor.description}</p>}
+                        secondaryTextLines={
+                          contributor.description.length < 30 ? 1 : 2
+                        }
+                        rightIconButton={
+                          contributor.link ? (
+                            <IconButton
+                              onClick={() =>
+                                this._openLink(contributor.link || '')}
+                            >
+                              <OpenInNew />
+                            </IconButton>
+                          ) : null
+                        }
+                      />
+                    ))}
+                  </List>
+                  <Column expand>
+                    <p>
+                      Thanks to all users of GDevelop! There must be missing
+                      tons of people, please send your name if you've
+                      contributed and you're not listed.
+                    </p>
+                    <Line alignItems="center" justifyContent="center">
+                      <FlatButton
+                        label="Contribute to GDevelop"
+                        onClick={this._openContributePage}
+                      />
+                    </Line>
+                  </Column>
+                </Tab>
+              </Tabs>
+            </Column>
+          )}
+        </PreferencesContext.Consumer>
       </Dialog>
     );
   }

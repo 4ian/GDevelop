@@ -3,6 +3,7 @@ const electron = require('electron');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
+const Notification = electron.Notification;
 const parseArgs = require('minimist');
 const isDev = require('electron-is').dev();
 const ipcMain = electron.ipcMain;
@@ -22,13 +23,15 @@ const { buildMainMenuFor } = require('./MainMenu');
 const { loadPiskelWindow } = require('./PiskelWindow');
 const throttle = require('lodash.throttle');
 
+log.info('GDevelop Electron app starting...');
+
 // Logs made with electron-logs can be found
 // on Linux: ~/.config/<app name>/log.log
 // on OS X: ~/Library/Logs/<app name>/log.log
 // on Windows: %USERPROFILE%\AppData\Roaming\<app name>\log.log
 autoUpdater.logger = log;
 autoUpdater.logger.transports.file.level = 'info';
-log.info('GDevelop Electron app starting...');
+autoUpdater.autoDownload = false;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -196,9 +199,19 @@ app.on('ready', function () {
     );
   });
 
-  // This will immediately download an update, then install when the
-  // app quits.
-  autoUpdater.checkForUpdatesAndNotify();
+  ipcMain.on('updates-check-and-download', (event) => {
+    // This will immediately download an update, then install when the
+    // app quits.
+    log.info('Starting check for updates (with auto-download if any)');
+    autoUpdater.autoDownload = true;
+    autoUpdater.checkForUpdatesAndNotify();
+  });
+
+  ipcMain.on('updates-check', (event) => {
+    log.info('Starting check for updates (without auto-download)');
+    autoUpdater.autoDownload = false;
+    autoUpdater.checkForUpdates();
+  });
 
   function sendUpdateStatus(status) {
     log.info(status);

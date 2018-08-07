@@ -14,7 +14,7 @@ import Toolbar from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
 import ConfirmCloseDialog from './ConfirmCloseDialog';
-import AboutDialog, { type UpdateStatus } from './AboutDialog';
+import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
 import LoaderModal from '../UI/LoaderModal';
@@ -52,12 +52,6 @@ import SceneEditor from './Editors/SceneEditor';
 import ExternalLayoutEditor from './Editors/ExternalLayoutEditor';
 import StartPage from './Editors/StartPage';
 import ResourcesEditor from './Editors/ResourcesEditor';
-import {
-  type PreferencesState,
-  getThemeName,
-  setThemeName,
-  getDefaultPreferences,
-} from './Preferences/PreferencesHandler';
 import ErrorBoundary from '../UI/ErrorBoundary';
 import SubscriptionDialog from '../Profile/SubscriptionDialog';
 import ResourcesLoader from '../ResourcesLoader/index';
@@ -69,6 +63,11 @@ import {
 import { type ResourceSource } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
+import {
+  getUpdateNotificationTitle,
+  getUpdateNotificationBody,
+  type UpdateStatus,
+} from './UpdaterTools';
 
 const gd = global.gd;
 
@@ -95,7 +94,6 @@ type State = {|
   snackMessage: string,
   snackMessageOpen: boolean,
   preferencesDialogOpen: boolean,
-  preferences: PreferencesState,
   profileDialogOpen: boolean,
   subscriptionDialogOpen: boolean,
   updateStatus: UpdateStatus,
@@ -140,7 +138,6 @@ export default class MainFrame extends React.Component<Props, State> {
     snackMessage: '',
     snackMessageOpen: false,
     preferencesDialogOpen: false,
-    preferences: getDefaultPreferences(),
     profileDialogOpen: false,
     subscriptionDialogOpen: false,
     updateStatus: { message: '', status: 'unknown' },
@@ -923,10 +920,19 @@ export default class MainFrame extends React.Component<Props, State> {
     });
   };
 
-  setUpdateStatus = (status: UpdateStatus) => {
+  setUpdateStatus = (updateStatus: UpdateStatus) => {
     this.setState({
-      updateStatus: status,
+      updateStatus,
     });
+
+    const notificationTitle = getUpdateNotificationTitle(updateStatus);
+    const notificationBody = getUpdateNotificationBody(updateStatus);
+    if (notificationTitle) {
+      const notification = new window.Notification(notificationTitle, {
+        body: notificationBody,
+      });
+      notification.onclick = () => this.openAboutDialog(true);
+    }
   };
 
   simulateUpdateDownloaded = () =>
@@ -936,6 +942,12 @@ export default class MainFrame extends React.Component<Props, State> {
       info: {
         releaseName: 'Fake update',
       },
+    });
+
+  simulateUpdateAvailable = () =>
+    this.setUpdateStatus({
+      status: 'update-available',
+      message: 'Update available',
     });
 
   _showSnackMessage = (snackMessage: string) =>
@@ -954,7 +966,6 @@ export default class MainFrame extends React.Component<Props, State> {
       currentProject,
       genericDialog,
       projectManagerOpen,
-      preferences,
       profileDialogOpen,
       subscriptionDialogOpen,
       updateStatus,
@@ -977,10 +988,7 @@ export default class MainFrame extends React.Component<Props, State> {
       this.props.loading;
 
     return (
-      <Providers
-        themeName={getThemeName(preferences)}
-        authentification={authentification}
-      >
+      <Providers authentification={authentification}>
         <div className="main-frame">
           <ProjectTitlebar project={currentProject} />
           <Drawer
@@ -1030,6 +1038,7 @@ export default class MainFrame extends React.Component<Props, State> {
             exportProject={() => this.openExportDialog(true)}
             requestUpdate={this.props.requestUpdate}
             simulateUpdateDownloaded={this.simulateUpdateDownloaded}
+            simulateUpdateAvailable={this.simulateUpdateAvailable}
           />
           <Tabs
             value={getCurrentTabIndex(this.state.editorTabs)}
@@ -1159,11 +1168,6 @@ export default class MainFrame extends React.Component<Props, State> {
           />
           <PreferencesDialog
             open={this.state.preferencesDialogOpen}
-            themeName={getThemeName(preferences)}
-            onChangeTheme={themeName =>
-              this.setState({
-                preferences: setThemeName(preferences, themeName),
-              })}
             onClose={() => this.openPreferences(false)}
           />
           <AboutDialog

@@ -27,7 +27,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    this._checkUpdates();
+    setTimeout(() => this._checkUpdates(), 10000);
   }
 
   _setThemeName(themeName: string) {

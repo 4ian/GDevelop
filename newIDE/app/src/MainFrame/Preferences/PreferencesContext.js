@@ -15,7 +15,7 @@ export type Preferences = {|
 export const initialPreferences = {
   values: {
     autoDownloadUpdates: true,
-    theme: 'GDevelop default',
+    themeName: 'GDevelop default',
   },
   setThemeName: () => {},
   setAutoDownloadUpdates: () => {},

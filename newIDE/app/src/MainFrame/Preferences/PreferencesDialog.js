@@ -4,23 +4,25 @@ import React, { Component } from 'react';
 import SelectField from 'material-ui/SelectField';
 import FlatButton from 'material-ui/FlatButton';
 import MenuItem from 'material-ui/MenuItem';
+import Toggle from 'material-ui/Toggle';
 import Dialog from '../../UI/Dialog';
 import { Column, Line } from '../../UI/Grid';
 import { themes } from '../../UI/Theme';
 import Window from '../../Utils/Window';
+import PreferencesContext from './PreferencesContext';
 
 type Props = {|
   open: boolean,
   onClose: Function,
-  themeName: string,
-  onChangeTheme: string => void,
 |};
 
 type State = {||};
 
 export default class PreferencesDialog extends Component<Props, State> {
   createTheme() {
-    Window.openExternalURL('https://github.com/4ian/GD/tree/master/newIDE#theming');
+    Window.openExternalURL(
+      'https://github.com/4ian/GD/tree/master/newIDE#theming'
+    );
   }
 
   render() {
@@ -36,24 +38,44 @@ export default class PreferencesDialog extends Component<Props, State> {
         open={open}
         title="GDevelop preferences"
       >
-        <Line noMargin>
-          <Column noMargin>
-            <SelectField
-              floatingLabelText={'UI Theme'}
-              value={this.props.themeName}
-              onChange={(e, i, value) => this.props.onChangeTheme(value)}
-            >
-              {Object.keys(themes).map(themeName => (
-                <MenuItem
-                  value={themeName}
-                  primaryText={themeName}
-                  key={themeName}
+        <PreferencesContext.Consumer>
+          {({ values, setThemeName, setAutoDownloadUpdates }) => (
+            <Column noMargin>
+              <Line noMargin>
+                <SelectField
+                  floatingLabelText={'UI Theme'}
+                  value={values.themeName}
+                  onChange={(e, i, value) => setThemeName(value)}
+                >
+                  {Object.keys(themes).map(themeName => (
+                    <MenuItem
+                      value={themeName}
+                      primaryText={themeName}
+                      key={themeName}
+                    />
+                  ))}
+                </SelectField>
+              </Line>
+              <Line noMargin>
+                <p>
+                  You can contribute and create your own themes:{' '}
+                  <FlatButton
+                    label="Learn more"
+                    onClick={this.createTheme}
+                  />{' '}
+                </p>
+              </Line>
+              <Line>
+                <Toggle
+                  onToggle={(e, check) => setAutoDownloadUpdates(check)}
+                  toggled={values.autoDownloadUpdates}
+                  labelPosition="right"
+                  label="Auto download and install updates (recommended)"
                 />
-              ))}
-            </SelectField>
-            <p>You can contribute and create your own themes: <FlatButton label="Learn more" onClick={this.createTheme} /> </p>
-          </Column>
-        </Line>
+              </Line>
+            </Column>
+          )}
+        </PreferencesContext.Consumer>
       </Dialog>
     );
   }

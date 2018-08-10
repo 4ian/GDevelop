@@ -15,3 +15,4 @@ export const disabledText = 'disabled-text';
 export const background = 'background';
 
 export const eventsTree = 'events-tree';
+export const eventsTreeWithSearchResults = 'with-search-results';

@@ -2,28 +2,18 @@
 import * as React from 'react';
 import Instruction from './Instruction';
 import { mapFor } from '../../Utils/MapFor';
-import { isInstructionSelected } from '../SelectionHandler';
+import {
+  isInstructionSelected,
+  type InstructionsListContext,
+  type InstructionContext,
+  type ParameterContext,
+} from '../SelectionHandler';
 import { actionsContainer, conditionsContainer } from './ClassNames';
 
 const styles = {
   addButton: {
     cursor: 'pointer',
   },
-};
-
-export type InstructionsListContext = {
-  instrsList: gdInstructionsList,
-  isCondition: boolean,
-};
-
-export type InstructionContext = InstructionsListContext & {
-  instruction: gdInstruction,
-  indexInList: number,
-};
-
-export type ParameterContext = InstructionContext & {
-  parameterIndex: number,
-  domEvent: any,
 };
 
 type Props = {

@@ -9,10 +9,15 @@ import { mapFor } from '../../Utils/MapFor';
 import { getInitialSelection, isEventSelected } from '../SelectionHandler';
 import EventsRenderingService from './EventsRenderingService';
 import EventHeightsCache from './EventHeightsCache';
-import { eventsTree } from './ClassNames';
+import { eventsTree, eventsTreeWithSearchResults } from './ClassNames';
 import './style.css';
+const gd = global.gd;
 
 const indentWidth = 22;
+
+const styles = {
+  container: { flex: 1 },
+};
 
 /**
  * The component containing an event.
@@ -80,13 +85,15 @@ class EventContainer extends Component {
 
 const getNodeKey = ({ treeIndex }) => treeIndex;
 
-const ThemableSortableTree = ({ muiTheme, ...otherProps }) => (
+const ThemableSortableTree = ({ muiTheme, className, ...otherProps }) => (
   <SortableTreeWithoutDndContext
-    className={`${eventsTree} ${muiTheme.eventsSheetRootClassName}`}
+    className={`${eventsTree} ${muiTheme.eventsSheetRootClassName} ${className}`}
     {...otherProps}
   />
 );
 const SortableTree = muiThemeable()(ThemableSortableTree);
+
+const noop = () => {};
 
 /**
  * Display a tree of event. Builtin on react-sortable-tree so that event
@@ -134,6 +141,14 @@ export default class ThemableEventsTree extends Component {
   scrollToEvent(event) {
     const row = this._getEventRow(event);
     if (row !== -1 && this._list) this._list.wrappedInstance.scrollToRow(row);
+  }
+
+  /**
+   * Unfold events so that the given one is visible
+   */
+  unfoldForEvent(event) {
+    gd.EventsListUnfolder.unfoldWhenContaining(this.props.events, event);
+    this.forceEventsUpdate();
   }
 
   _getEventRow(searchedEvent) {
@@ -252,15 +267,23 @@ export default class ThemableEventsTree extends Component {
     );
   };
 
-  render() {
-    const { height } = this.props;
+  _treeSearchMethod = ({ node, searchQuery }) => {
+    const searchResults = searchQuery;
+    if (!searchResults) return false;
+    const { event } = node;
 
+    return searchResults.find(highlightedEvent =>
+      gd.compare(highlightedEvent, event)
+    );
+  };
+
+  render() {
     return (
-      <div style={{ height: height || 400 }}>
+      <div style={styles.container}>
         <SortableTree
           treeData={this.state.treeData}
           scaffoldBlockPxWidth={indentWidth}
-          onChange={() => {}}
+          onChange={noop}
           onVisibilityToggle={this._onVisibilityToggle}
           onMoveNode={this._onMoveNode}
           canDrop={this._canDrop}
@@ -270,6 +293,12 @@ export default class ThemableEventsTree extends Component {
 
             return this.eventsHeightsCache.getEventHeight(event);
           }}
+          searchMethod={this._treeSearchMethod}
+          searchQuery={this.props.searchResults}
+          searchFocusOffset={this.props.searchFocusOffset}
+          className={
+            this.props.searchResults ? eventsTreeWithSearchResults : ''
+          }
           reactVirtualizedListProps={{
             ref: list => (this._list = list),
           }}

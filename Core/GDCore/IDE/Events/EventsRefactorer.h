@@ -11,26 +11,12 @@
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class Platform;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class ExternalEvents;
-}
-namespace gd {
 class BaseEvent;
-}
-namespace gd {
 class Instruction;
-}
-namespace gd {
 typedef std::shared_ptr<gd::BaseEvent> BaseEventSPtr;
 }
 
@@ -53,6 +39,24 @@ class GD_CORE_API EventsSearchResult {
   std::weak_ptr<gd::BaseEvent> event;
   gd::EventsList* eventsList;
   std::size_t positionInList;
+
+  bool IsEventsListValid() const { return eventsList != nullptr; }
+  
+  /**
+   * \brief Get the events list containing the event pointed by the EventsSearchResult.
+   * \warning Only call this when IsEventsListValid returns true.
+   */
+  const gd::EventsList & GetEventsList() const { return *eventsList; }
+
+  std::size_t GetPositionInList() const { return positionInList; }
+  
+  bool IsEventValid() const { return !event.expired(); }
+
+  /**
+   * \brief Get the event pointed by the EventsSearchResult.
+   * \warning Only call this when IsEventValid returns true.
+   */
+  const gd::BaseEvent & GetEvent() const { return *event.lock(); }
 };
 
 /**

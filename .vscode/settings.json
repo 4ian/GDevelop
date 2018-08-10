@@ -75,7 +75,8 @@
         "cstring": "cpp",
         "iomanip": "cpp",
         "cstdint": "cpp",
-        "forward_list": "cpp"
+        "forward_list": "cpp",
+        "mutex": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

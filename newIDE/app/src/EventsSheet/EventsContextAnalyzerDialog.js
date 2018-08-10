@@ -21,9 +21,14 @@ export default class EventsContextAnalyzerDialog extends React.Component<
       <FlatButton label="Close" primary={true} onClick={this.props.onClose} />,
     ];
 
-    return <Dialog actions={actions} open={open} onRequestClose={onClose}>
-        <p>Objects or groups being directly referenced in the events: {objectOrGroupNames.join(', ')}</p>
+    return (
+      <Dialog actions={actions} open={open} onRequestClose={onClose}>
+        <p>
+          Objects or groups being directly referenced in the events:{' '}
+          {objectOrGroupNames.join(', ')}
+        </p>
         <p>All objects potentially used in events: {objectsNames.join(', ')}</p>
-    </Dialog>;
+      </Dialog>
+    );
   }
 }

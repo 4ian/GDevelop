@@ -90,6 +90,8 @@ import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../UI/i18n';
 
 const gd = global.gd;
 const {
@@ -250,20 +252,28 @@ storiesOf('LocalExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <LocalExport open project={project} onClose={action('close')} />
+    <I18nextProvider i18n={i18n}>
+      <LocalExport open project={project} onClose={action('close')} />
+    </I18nextProvider>
   ));
 
 storiesOf('LocalS3Export', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <LocalS3Export open project={project} onClose={action('close')} />
+    <I18nextProvider i18n={i18n}>
+      <LocalS3Export open project={project} onClose={action('close')} />
+    </I18nextProvider>
   ));
 
 storiesOf('LocalCordovaExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => <LocalCordovaExport project={project} />);
+  .add('default', () => (
+    <I18nextProvider i18n={i18n}>
+      <LocalCordovaExport project={project} />
+    </I18nextProvider>
+  ));
 
 storiesOf('BuildStepsProgress', module)
   .addDecorator(paperDecorator)
@@ -769,7 +779,14 @@ storiesOf('TiledSpriteEditor', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={tiledSpriteObject}>
-      <TiledSpriteEditor object={tiledSpriteObject} project={project} />
+      <TiledSpriteEditor
+        object={tiledSpriteObject}
+        project={project}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)}
+        resourceExternalEditors={[]}
+      />
     </SerializedObjectDisplay>
   ));
 
@@ -778,7 +795,14 @@ storiesOf('PanelSpriteEditor', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={panelSpriteObject}>
-      <PanelSpriteEditor object={panelSpriteObject} project={project} />
+      <PanelSpriteEditor
+        object={panelSpriteObject}
+        project={project}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)}
+        resourceExternalEditors={[]}
+      />
     </SerializedObjectDisplay>
   ));
 
@@ -787,7 +811,14 @@ storiesOf('SpriteEditor and related editors', module)
   .addDecorator(muiDecorator)
   .add('SpriteEditor', () => (
     <SerializedObjectDisplay object={spriteObject}>
-      <SpriteEditor object={spriteObject} project={project} />
+      <SpriteEditor
+        object={spriteObject}
+        project={project}
+        resourceSources={[]}
+        onChooseResource={source =>
+          action('Choose resource from source', source)}
+        resourceExternalEditors={[]}
+      />
     </SerializedObjectDisplay>
   ))
   .add('PointsEditor', () => (

@@ -28,8 +28,8 @@ exports[`StartPage renders the start page with a project 1`] = `
           "display": "flex",
           "flex": 1,
           "justifyContent": "center",
-          "marginBottom": 8,
-          "marginTop": 8,
+          "marginBottom": 4,
+          "marginTop": 4,
         }
       }
     >
@@ -326,8 +326,8 @@ exports[`StartPage renders the start page with a project 1`] = `
           "display": "flex",
           "flex": undefined,
           "justifyContent": "space-between",
-          "marginBottom": 8,
-          "marginTop": 8,
+          "marginBottom": 4,
+          "marginTop": 4,
         }
       }
     >
@@ -700,8 +700,8 @@ exports[`StartPage renders the start page with no project opened 1`] = `
           "display": "flex",
           "flex": 1,
           "justifyContent": "center",
-          "marginBottom": 8,
-          "marginTop": 8,
+          "marginBottom": 4,
+          "marginTop": 4,
         }
       }
     >
@@ -930,8 +930,8 @@ exports[`StartPage renders the start page with no project opened 1`] = `
           "display": "flex",
           "flex": undefined,
           "justifyContent": "space-between",
-          "marginBottom": 8,
-          "marginTop": 8,
+          "marginBottom": 4,
+          "marginTop": 4,
         }
       }
     >

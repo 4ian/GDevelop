@@ -6,6 +6,7 @@ import ToolbarIcon from '../UI/ToolbarIcon';
 import IconMenu from '../UI/Menu/IconMenu';
 import { mapFor } from '../Utils/MapFor';
 import flatten from 'lodash/flatten';
+import { adaptAcceleratorString } from '../UI/AcceleratorString';
 const gd = global.gd;
 
 export class Toolbar extends PureComponent {
@@ -122,7 +123,7 @@ export class Toolbar extends PureComponent {
         <ToolbarIcon
           onClick={() => this.props.onToggleSearchPanel()}
           src="res/ribbon_default/search32.png"
-          tooltip={t('Search in events')}
+          tooltip={`${t('Search in events')} ${adaptAcceleratorString('CmdOrCtrl+F')}`}
         />
         {this.props.onOpenSettings && <ToolbarSeparator />}
         {this.props.onOpenSettings && (

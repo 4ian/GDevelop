@@ -12,7 +12,7 @@ type WatchedComponent = {
  */
 export default class EventHeightsCache {
   eventHeights = {};
-  updateTimeoutId: ?number = null;
+  updateTimeoutId: ?TimeoutID = null;
   component: ?WatchedComponent = null;
 
   constructor(component: WatchedComponent) {

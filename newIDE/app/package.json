@@ -5,7 +5,7 @@
   "license": "MIT",
   "homepage": ".",
   "devDependencies": {
-    "flow-bin": "^0.61.0",
+    "flow-bin": "0.78.0",
     "flow-coverage-report": "^0.4.0",
     "follow-redirects": "^1.2.3",
     "prettier": "1.7.0",

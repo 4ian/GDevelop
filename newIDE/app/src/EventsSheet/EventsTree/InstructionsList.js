@@ -85,7 +85,10 @@ export default class InstructionsList extends React.Component<Props, *> {
             onInstructionContextMenu(x, y, instructionContext)}
           onParameterClick={(domEvent, parameterIndex) =>
             onParameterClick({
-              ...instructionContext,
+              isCondition: instructionContext.isCondition,
+              instrsList: instructionContext.instrsList,
+              instruction: instructionContext.instruction,
+              indexInList: instructionContext.indexInList,
               parameterIndex,
               domEvent,
             })}

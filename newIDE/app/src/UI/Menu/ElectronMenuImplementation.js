@@ -16,7 +16,8 @@ export default class ElectronMenuImplementation {
     const { Menu } = electron.remote;
     const browserWindow = electron.remote.getCurrentWindow();
     this.menu = Menu.buildFromTemplate(this.menuTemplate);
-    this.menu.popup(browserWindow, {
+    this.menu.popup({
+      window: browserWindow,
       x: Math.round(dimensions.left),
       y: Math.round(dimensions.top + dimensions.height),
       async: true, // Ensure the UI is not blocked on macOS.

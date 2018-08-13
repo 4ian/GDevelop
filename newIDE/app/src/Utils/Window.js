@@ -132,7 +132,7 @@ export default class Window {
         // visible selection has changed. Try to wait to show the menu until after that, otherwise the
         // visible selection will update after the menu dismisses and look weird.
         setTimeout(function() {
-          menu.popup(electron.remote.getCurrentWindow());
+          menu.popup({window: electron.remote.getCurrentWindow()});
         }, 30);
       });
     } else if (document) {

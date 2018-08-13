@@ -31,6 +31,7 @@ type State = {|
 |};
 
 export default class SearchPanel extends PureComponent<Props, State> {
+  searchTextField: ?TextField;
   state = {
     searchDirty: false,
     searchText: '',
@@ -38,6 +39,12 @@ export default class SearchPanel extends PureComponent<Props, State> {
     matchCase: false,
     searchInSelection: false,
   };
+
+  focus = () => {
+    if (this.searchTextField) {
+      this.searchTextField.focus();
+    }
+  }
 
   launchSearch = () => {
     const { searchText, searchInSelection, matchCase } = this.state;
@@ -92,6 +99,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
         <Column>
           <Line alignItems="baseline">
             <TextField
+              ref={_searchTextField => this.searchTextField = _searchTextField}
               hintText="Text to search"
               onChange={(e, searchText) =>
                 this.setState({ searchText, searchDirty: true })}

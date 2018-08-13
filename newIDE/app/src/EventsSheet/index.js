@@ -120,6 +120,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   _keyboardShortcuts: KeyboardShortcuts;
   _eventsTree: EventsTree;
   _eventSearcher: ?EventsSearcher;
+  _searchPanel: ?SearchPanel;
   eventContextMenu: ContextMenu;
   instructionContextMenu: ContextMenu;
   instructionsListContextMenu: ContextMenu;
@@ -170,6 +171,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       onCopy: this.copySelection,
       onCut: this.cutSelection,
       onPaste: this.pasteEventsOrInstructions,
+      onSearch: this._toggleSearchPanel,
     });
   }
 
@@ -210,16 +212,23 @@ export default class EventsSheet extends React.Component<Props, State> {
   }
 
   _toggleSearchPanel = () => {
-    this.setState(state => {
-      const show = !state.showSearchPanel;
-      if (!show) { 
-        if (this._eventSearcher) this._eventSearcher.reset();
-      }
+    this.setState(
+      state => {
+        const show = !state.showSearchPanel;
+        if (!show) {
+          if (this._eventSearcher) this._eventSearcher.reset();
+        }
 
-      return {
-      showSearchPanel: show,
-      };
-    });
+        return {
+          showSearchPanel: show,
+        };
+      },
+      () => {
+        if (this.state.showSearchPanel && this._searchPanel) {
+          this._searchPanel.focus();
+        }
+      }
+    );
   };
 
   addSubEvents = () => {
@@ -667,7 +676,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     return (
       <EventsSearcher
         key={events.ptr}
-        ref={eventSearcher => this._eventSearcher = eventSearcher}
+        ref={eventSearcher => (this._eventSearcher = eventSearcher)}
         events={events}
         project={project}
         layout={layout}
@@ -717,6 +726,7 @@ export default class EventsSheet extends React.Component<Props, State> {
             />
             {this.state.showSearchPanel && (
               <SearchPanel
+                ref={searchPanel => (this._searchPanel = searchPanel)}
                 onSearchInEvents={inputs =>
                   this._searchInEvents(searchInEvents, inputs)}
                 onReplaceInEvents={inputs =>

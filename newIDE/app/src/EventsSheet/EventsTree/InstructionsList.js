@@ -2,28 +2,18 @@
 import * as React from 'react';
 import Instruction from './Instruction';
 import { mapFor } from '../../Utils/MapFor';
-import { isInstructionSelected } from '../SelectionHandler';
+import {
+  isInstructionSelected,
+  type InstructionsListContext,
+  type InstructionContext,
+  type ParameterContext,
+} from '../SelectionHandler';
 import { actionsContainer, conditionsContainer } from './ClassNames';
 
 const styles = {
   addButton: {
     cursor: 'pointer',
   },
-};
-
-export type InstructionsListContext = {
-  instrsList: gdInstructionsList,
-  isCondition: boolean,
-};
-
-export type InstructionContext = InstructionsListContext & {
-  instruction: gdInstruction,
-  indexInList: number,
-};
-
-export type ParameterContext = InstructionContext & {
-  parameterIndex: number,
-  domEvent: any,
 };
 
 type Props = {
@@ -95,7 +85,10 @@ export default class InstructionsList extends React.Component<Props, *> {
             onInstructionContextMenu(x, y, instructionContext)}
           onParameterClick={(domEvent, parameterIndex) =>
             onParameterClick({
-              ...instructionContext,
+              isCondition: instructionContext.isCondition,
+              instrsList: instructionContext.instrsList,
+              instruction: instructionContext.instruction,
+              indexInList: instructionContext.indexInList,
               parameterIndex,
               domEvent,
             })}

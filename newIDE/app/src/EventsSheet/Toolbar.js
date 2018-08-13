@@ -120,10 +120,7 @@ export class Toolbar extends PureComponent {
         />
         <ToolbarSeparator />
         <ToolbarIcon
-          disabled
-          onClick={() => {
-            /*TODO*/
-          }}
+          onClick={() => this.props.onToggleSearchPanel()}
           src="res/ribbon_default/search32.png"
           tooltip={t('Search in events')}
         />

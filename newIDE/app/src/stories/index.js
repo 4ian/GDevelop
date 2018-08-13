@@ -89,6 +89,7 @@ import BuildProgress from '../Export/Builds/BuildProgress';
 import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
+import SearchPanel from '../EventsSheet/SearchPanel';
 
 const gd = global.gd;
 const {
@@ -621,7 +622,7 @@ storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <DragDropContextProvider>
-      <div className="gd-events-sheet">
+      <div className="gd-events-sheet" style={{ height: 500, display: 'flex' }}>
         <EventsTree
           events={testLayout.getEvents()}
           selectedEvents={[]}
@@ -635,31 +636,84 @@ storiesOf('EventsSheet', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <DragDropContextProvider>
-      <EventsSheet
-        project={project}
-        layout={testLayout}
-        events={testLayout.getEvents()}
-        onOpenExternalEvents={action('Open external events')}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)}
-        resourceExternalEditors={[]}
-      />
+      <div className="gd-events-sheet" style={{ height: 500, display: 'flex' }}>
+        <EventsSheet
+          project={project}
+          layout={testLayout}
+          events={testLayout.getEvents()}
+          onOpenExternalEvents={action('Open external events')}
+          resourceSources={[]}
+          onChooseResource={source =>
+            action('Choose resource from source', source)}
+          resourceExternalEditors={[]}
+          onOpenDebugger={action('open debugger')}
+          updateToolbar={() => {}}
+          onOpenLayout={action('open layout')}
+          onOpenSettings={action('open settings')}
+          onPreview={action('preview')}
+          setToolbar={() => {}}
+          showNetworkPreviewButton={false}
+          showPreviewButton={false}
+        />
+      </div>
     </DragDropContextProvider>
   ))
   .add('empty (no events)', () => (
     <DragDropContextProvider>
-      <EventsSheet
-        project={project}
-        layout={emptyLayout}
-        events={emptyLayout.getEvents()}
-        onOpenExternalEvents={action('Open external events')}
-        resourceSources={[]}
-        onChooseResource={source =>
-          action('Choose resource from source', source)}
-        resourceExternalEditors={[]}
-      />
+      <div className="gd-events-sheet" style={{ height: 500, display: 'flex' }}>
+        <EventsSheet
+          project={project}
+          layout={emptyLayout}
+          events={emptyLayout.getEvents()}
+          onOpenExternalEvents={action('Open external events')}
+          resourceSources={[]}
+          onChooseResource={source =>
+            action('Choose resource from source', source)}
+          resourceExternalEditors={[]}
+          onOpenDebugger={action('open debugger')}
+          updateToolbar={() => {}}
+          onOpenLayout={action('open layout')}
+          onOpenSettings={action('open settings')}
+          onPreview={action('preview')}
+          setToolbar={() => {}}
+          showNetworkPreviewButton={false}
+          showPreviewButton={false}
+        />
+      </div>
     </DragDropContextProvider>
+  ));
+
+storiesOf('SearchPanel', module)
+  .addDecorator(muiDecorator)
+  .add('default (no search done)', () => (
+    <SearchPanel
+      onSearchInEvents={() => {}}
+      onReplaceInEvents={() => {}}
+      resultsCount={null}
+      hasEventSelected={false}
+      onGoToNextSearchResult={action('next')}
+      onGoToPreviousSearchResult={action('previous')}
+    />
+  ))
+  .add('default (no results)', () => (
+    <SearchPanel
+      onSearchInEvents={() => {}}
+      onReplaceInEvents={() => {}}
+      resultsCount={0}
+      hasEventSelected={false}
+      onGoToNextSearchResult={action('next')}
+      onGoToPreviousSearchResult={action('previous')}
+    />
+  ))
+  .add('3 results', () => (
+    <SearchPanel
+      onSearchInEvents={() => {}}
+      onReplaceInEvents={() => {}}
+      resultsCount={3}
+      hasEventSelected={false}
+      onGoToNextSearchResult={action('next')}
+      onGoToPreviousSearchResult={action('previous')}
+    />
   ));
 
 storiesOf('ExpressionSelector', module)

@@ -3,7 +3,7 @@ import {
   type InstructionsListContext,
   type InstructionContext,
   type ParameterContext,
-} from '../InstructionsList';
+} from '../../SelectionHandler';
 
 export type EventRendererProps = {
   project: gdProject,

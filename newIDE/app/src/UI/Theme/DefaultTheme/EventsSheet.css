@@ -110,3 +110,21 @@
 .gd-events-sheet-default-theme .instruction-parameter.globalvar {
     color: rgb(131, 55, 162);
 }
+
+/**
+ * Search results highlight
+ */
+.gd-events-sheet-default-theme.with-search-results .rst__moveHandle {
+    background: #d3d3d3  !important;
+    border: 1px solid #d3d3d3  !important;
+}
+
+.gd-events-sheet-default-theme .rst__rowSearchMatch {
+    outline: none;
+    border-left: solid 3px #18DCF2
+}
+
+.gd-events-sheet-default-theme .rst__rowSearchFocus {
+    outline: none;
+    border-left: solid 5px #18DCF2
+}

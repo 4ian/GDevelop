@@ -138,7 +138,7 @@ const buildMainMenuFor = window => {
       {
         label: 'Community Discord chat',
         click() {
-          electron.shell.openExternal('https://discord.gg/YnKk8Ev');
+          electron.shell.openExternal('https://discord.gg/JWcfHEB');
         },
       },
       { type: 'separator' },

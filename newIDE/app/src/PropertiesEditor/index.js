@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
-import Checkbox from 'material-ui/Checkbox';
+import InlineCheckbox from '../UI/InlineCheckbox';
 import Subheader from 'material-ui/Subheader';
 import FlatButton from 'material-ui/FlatButton';
 import SelectField from 'material-ui/SelectField';
@@ -8,13 +9,27 @@ import MenuItem from 'material-ui/MenuItem';
 import Edit from 'material-ui/svg-icons/image/edit';
 import IconButton from 'material-ui/IconButton';
 
+export type Instance = Object; // This could be improved using generics.
+export type Instances = Array<Instance>;
+export type Field = Object;
+export type Schema = Array<Field>;
+
+type Props = {|
+  onInstancesModified?: Instances => void,
+  instances: Instances,
+  schema: Schema,
+  mode?: 'column' | 'row',
+|};
+
 const styles = {
-  container: {
+  columnContainer: {
     display: 'flex',
     flexDirection: 'column',
   },
-  checkbox: {
-    marginTop: 10,
+  rowContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'baseline',
   },
   fieldContainer: {
     flex: 1,
@@ -34,8 +49,8 @@ const styles = {
   },
 };
 
-export default class PropertiesEditor extends Component {
-  _onInstancesModified = instances => {
+export default class PropertiesEditor extends React.Component<Props, {||}> {
+  _onInstancesModified = (instances: Instances) => {
     // This properties editor is dealing with fields that are
     // responsible to update their state (see field.setValue).
 
@@ -44,7 +59,7 @@ export default class PropertiesEditor extends Component {
     else this.forceUpdate();
   };
 
-  _getFieldValue(instances, field, defaultValue) {
+  _getFieldValue(instances: Instances, field: Field, defaultValue?: any): any {
     let value = field.getValue(instances[0]);
     for (var i = 1; i < instances.length; ++i) {
       if (value !== field.getValue(instances[i])) {
@@ -56,15 +71,14 @@ export default class PropertiesEditor extends Component {
     return value;
   }
 
-  _renderEditField = field => {
+  _renderEditField = (field: Field) => {
     if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
     if (field.valueType === 'boolean') {
       return (
-        <Checkbox
+        <InlineCheckbox
           label={field.name}
           key={field.name}
-          style={styles.checkbox}
           checked={this._getFieldValue(this.props.instances, field)}
           onCheck={(event, newValue) => {
             this.props.instances.forEach(i => field.setValue(i, !!newValue));
@@ -126,7 +140,7 @@ export default class PropertiesEditor extends Component {
     }
   };
 
-  _renderSelectField = field => {
+  _renderSelectField = (field: Field) => {
     const children = field
       .getChoices()
       .map(({ value, label }) => (
@@ -178,7 +192,7 @@ export default class PropertiesEditor extends Component {
     }
   };
 
-  _renderButton = field => {
+  _renderButton = (field: Field) => {
     //TODO: multi selection handling
     return (
       <FlatButton
@@ -192,14 +206,28 @@ export default class PropertiesEditor extends Component {
   };
 
   render() {
+    const { mode } = this.props;
+
     return (
-      <div style={styles.container}>
+      <div
+        style={mode === 'row' ? styles.rowContainer : styles.columnContainer}
+      >
         {this.props.schema.map(field => {
           if (field.getChoices && field.getValue)
             return this._renderSelectField(field);
           if (field.getValue) return this._renderEditField(field);
           if (field.onClick) return this._renderButton(field);
           if (field.children) {
+            if (field.type === 'row') {
+              return (
+                <PropertiesEditor
+                  schema={field.children}
+                  instances={this.props.instances}
+                  mode="row"
+                />
+              );
+            }
+
             return (
               <div key={field.name}>
                 <Subheader style={styles.subHeader}>{field.name}</Subheader>
@@ -207,6 +235,7 @@ export default class PropertiesEditor extends Component {
                   <PropertiesEditor
                     schema={field.children}
                     instances={this.props.instances}
+                    mode="column"
                   />
                 </div>
               </div>

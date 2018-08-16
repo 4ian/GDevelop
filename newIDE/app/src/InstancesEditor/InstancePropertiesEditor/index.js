@@ -20,25 +20,38 @@ export default class InstancePropertiesEditor extends Component {
         disabled: true,
         getValue: instance => instance.getObjectName(),
         setValue: (instance, newValue) => instance.setObjectName(newValue),
-        onEditButtonClick: (instance) => this.props.onEditObjectByName(instance.getObjectName()),
+        onEditButtonClick: instance =>
+          this.props.onEditObjectByName(instance.getObjectName()),
       },
       {
-        name: 'X',
-        valueType: 'number',
-        getValue: instance => instance.getX(),
-        setValue: (instance, newValue) => instance.setX(newValue),
-      },
-      {
-        name: 'Y',
-        valueType: 'number',
-        getValue: instance => instance.getY(),
-        setValue: (instance, newValue) => instance.setY(newValue),
+        name: 'Position',
+        type: 'row',
+        children: [
+          {
+            name: 'X',
+            valueType: 'number',
+            getValue: instance => instance.getX(),
+            setValue: (instance, newValue) => instance.setX(newValue),
+          },
+          {
+            name: 'Y',
+            valueType: 'number',
+            getValue: instance => instance.getY(),
+            setValue: (instance, newValue) => instance.setY(newValue),
+          },
+        ],
       },
       {
         name: 'Angle',
         valueType: 'number',
         getValue: instance => instance.getAngle(),
         setValue: (instance, newValue) => instance.setAngle(newValue),
+      },
+      {
+        name: 'Lock position/angle in the editor',
+        valueType: 'boolean',
+        getValue: instance => instance.isLocked(),
+        setValue: (instance, newValue) => instance.setLocked(newValue),
       },
       {
         name: 'Z Order',
@@ -54,32 +67,9 @@ export default class InstancePropertiesEditor extends Component {
         setValue: (instance, newValue) => instance.setLayer(newValue),
       },
       {
-        name: 'Locked',
-        valueType: 'boolean',
-        getValue: instance => instance.isLocked(),
-        setValue: (instance, newValue) => instance.setLocked(newValue),
-      },
-      {
-        name: 'Instance variables',
-        children: [
-          {
-            name: 'Edit variables',
-            getLabel: instance =>
-              'Edit variables (' + instance.getVariables().count() + ')',
-            onClick: instance => this.props.editInstanceVariables(instance),
-          },
-        ],
-      },
-      {
         name: 'Custom size',
+        type: 'row',
         children: [
-          {
-            name: 'Enabled?',
-            valueType: 'boolean',
-            getValue: instance => instance.hasCustomSize(),
-            setValue: (instance, newValue) =>
-              instance.setHasCustomSize(newValue),
-          },
           {
             name: 'Width',
             valueType: 'number',
@@ -92,6 +82,23 @@ export default class InstancePropertiesEditor extends Component {
             getValue: instance => instance.getCustomHeight(),
             setValue: (instance, newValue) =>
               instance.setCustomHeight(newValue),
+          },
+        ],
+      },
+      {
+        name: 'Custom size?',
+        valueType: 'boolean',
+        getValue: instance => instance.hasCustomSize(),
+        setValue: (instance, newValue) => instance.setHasCustomSize(newValue),
+      },
+      {
+        name: 'Instance variables',
+        children: [
+          {
+            name: 'Edit variables',
+            getLabel: instance =>
+              'Edit variables (' + instance.getVariables().count() + ')',
+            onClick: instance => this.props.editInstanceVariables(instance),
           },
         ],
       },

@@ -37,6 +37,7 @@ declare type gdDirection = EmscriptenObject;
 declare type gdAnimation = EmscriptenObject;
 
 declare type gdVectorEventsSearchResult = EmscriptenObject;
+declare type gdMapStringPropertyDescriptor = EmscriptenObject;
 
 //Represents all objects that have serializeTo and unserializeFrom methods.
 declare type gdSerializable = EmscriptenObject;

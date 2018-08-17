@@ -38,8 +38,31 @@ export const setupAutocompletions = (monaco: any) => {
 
   findGDJS(gdjsRoot => {
     const runtimePath = path.join(gdjsRoot, 'Runtime');
+    const extensionsPath = path.join(runtimePath, 'Extensions');
+    const eventToolsPath = path.join(runtimePath, 'events-tools');
+    
     importAllJsFilesFromFolder(runtimePath);
-    importAllJsFilesFromFolder(path.join(runtimePath, 'events-tools'));
+    importAllJsFilesFromFolder(eventToolsPath);
+    fs.readdir(extensionsPath, (error: ?Error, folderNames: Array<string>) => {
+      if (error) {
+        console.error(
+          'Unable to read Extensions folders for setting up autocompletions:',
+          error
+        );
+        return;
+      }
+
+      folderNames
+        .filter(
+          folderName =>
+            !folderName.endsWith('.txt') &&
+            !folderName.endsWith('.md') &&
+            !folderName.endsWith('.gitignore')
+        )
+        .forEach(folderName =>
+          importAllJsFilesFromFolder(path.join(extensionsPath, folderName))
+        );
+    });
 
     monaco.languages.typescript.javascriptDefaults.addExtraLib(
       `

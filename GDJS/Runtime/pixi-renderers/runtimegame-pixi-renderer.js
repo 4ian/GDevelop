@@ -78,8 +78,8 @@ gdjs.RuntimeGamePixiRenderer.prototype.getCurrentHeight = function() {
  * Note that if the canvas is fullscreen, it won't be resized, but when going back to
  * non fullscreen mode, the requested size will be used.
  *
- * @param width {Number} The new width
- * @param height {Number} The new height
+ * @param {number} width The new width
+ * @param {number} height The new height
  */
 gdjs.RuntimeGamePixiRenderer.prototype.setSize = function(width, height) {
     this._currentWidth = width;

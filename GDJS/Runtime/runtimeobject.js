@@ -291,6 +291,12 @@ gdjs.RuntimeObject.prototype.rotateTowardAngle = function(angle, speed, runtimeS
         this.setAngle(angle); //...so force them to be in the path angle anyway.
 };
 
+/**
+ * Rotate the object at the given speed
+ *
+ * @param {number} speed The speed, in degrees per second.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene where the object is displayed.
+ */
 gdjs.RuntimeObject.prototype.rotate = function(speed, runtimeScene) {
     this.setAngle(this.getAngle() + speed * this.getElapsedTime(runtimeScene) / 1000);
 };
@@ -310,7 +316,7 @@ gdjs.RuntimeObject.prototype.setAngle = function(angle) {
 /**
  * Get the rotation of the object.
  *
- * @return {number} The rotation of the object
+ * @return {number} The rotation of the object, in degrees.
  */
 gdjs.RuntimeObject.prototype.getAngle = function() {
     return this.angle;
@@ -319,7 +325,7 @@ gdjs.RuntimeObject.prototype.getAngle = function() {
 /**
  * Set the layer of the object.
  *
- * @return {string} The new layer of the object
+ * @param {string} layer The new layer of the object
  */
 gdjs.RuntimeObject.prototype.setLayer = function(layer) {
     if (layer === this.layer) return;
@@ -535,6 +541,7 @@ gdjs.RuntimeObject.prototype.getHeight = function() {
 
 /**
  * Return the X position of the object center, relative to the object position.
+ * @return {number} the X position of the object center
  */
 gdjs.RuntimeObject.prototype.getCenterX = function() {
     return this.getWidth() / 2;
@@ -542,6 +549,7 @@ gdjs.RuntimeObject.prototype.getCenterX = function() {
 
 /**
  * Return the Y position of the object center, relative to the object position.
+ * @return {number} the Y position of the object center
  */
 gdjs.RuntimeObject.prototype.getCenterY = function() {
     return this.getHeight() / 2;
@@ -571,7 +579,7 @@ gdjs.RuntimeObject.prototype._getRecycledForce = function(x, y, clearing) {
 };
 
 /**
- * Add a force to the object to make it moving.
+ * Add a force to the object to move it.
  * @param {number} x The x coordinates of the force
  * @param {number} y The y coordinates of the force
  * @param {number} clearing Set the force clearing
@@ -582,8 +590,8 @@ gdjs.RuntimeObject.prototype.addForce = function(x,y, clearing) {
 
 /**
  * Add a force using polar coordinates.
- * @param {number} angle The angle of the force
- * @param {number} len The length of the force
+ * @param {number} angle The angle of the force, in degrees.
+ * @param {number} len The length of the force, in pixels.
  * @param {number} clearing Set the force clearing
  */
 gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, clearing) {

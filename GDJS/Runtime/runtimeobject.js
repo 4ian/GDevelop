@@ -793,9 +793,12 @@ gdjs.RuntimeObject.prototype.stepBehaviorsPostEvents = function(runtimeScene) {
 };
 
 /**
- * Get a behavior from its name.<br>
+ * Get a behavior from its name.
+ * 
  * Be careful, the behavior must exists, no check is made on the name.
+ * 
  * @param name {String} The behavior name.
+ * @return {gdjs.RuntimeBehavior} The behavior with the given name, or undefined.
  */
 gdjs.RuntimeObject.prototype.getBehavior = function(name) {
     return this._behaviorsTable.get(name);

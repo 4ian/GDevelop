@@ -24,7 +24,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: '#1e1e1e',
-    overflow: 'hidden',
   },
   wrappingText: {
     fontFamily,
@@ -34,6 +33,8 @@ const styles = {
     margin: 0,
     backgroundColor: '#1e1e1e',
     color: '#d4d4d4',
+    overflowX: 'hidden',
+    maxWidth: '100%',
   },
   comment: {
     color: '#777',

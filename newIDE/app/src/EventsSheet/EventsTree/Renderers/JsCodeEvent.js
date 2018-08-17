@@ -24,6 +24,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     backgroundColor: '#1e1e1e',
+    overflow: 'hidden',
   },
   wrappingText: {
     fontFamily,

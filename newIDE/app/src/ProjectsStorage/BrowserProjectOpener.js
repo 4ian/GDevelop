@@ -21,6 +21,7 @@ import infiniteScrollingBackground from '../fixtures/infinite-scrolling-backgrou
 import instanceTimer from '../fixtures/instance-timer/instance-timer.json';
 import inventorySystem from '../fixtures/inventory-system/inventory-system.json';
 import isometricGame from '../fixtures/isometric-game/isometric-game.json';
+import javascriptBlocksInPlatformer from '../fixtures/javascript-blocks-in-platformer/javascript-blocks-in-platformer.json';
 import keyboardPractice from '../fixtures/keyboard-practice/keyboard-practice.json';
 import magnet from '../fixtures/magnet/magnet.json';
 import manipulateTextObject from '../fixtures/manipulate-text-object/manipulate-text-object.json';
@@ -120,6 +121,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(inventorySystem);
     } else if (url === 'example://isometric-game') {
       return Promise.resolve(isometricGame);
+    } else if (url === 'example://javascript-blocks-in-platformer') {
+      return Promise.resolve(javascriptBlocksInPlatformer);
     } else if (url === 'example://keyboard-practice') {
       return Promise.resolve(keyboardPractice);
     } else if (url === 'example://magnet') {

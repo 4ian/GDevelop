@@ -35,6 +35,35 @@ const styles = {
   },
 };
 
+// const publicPath = "http://localhost:3000";
+// function stripTrailingSlash(str) {
+//   return str.replace(/\/$/, '');
+// }
+// const paths = {
+//   'js': '/workerMain.js',
+// }
+
+// window.MonacoEnvironment = {
+//     getWorkerUrl: function (moduleId, label) {
+//       const pathPrefix = (typeof window.__webpack_public_path__ === 'string' ? window.__webpack_public_path__ : publicPath);
+//       console.log((pathPrefix ? stripTrailingSlash(pathPrefix) + '/' : '') + paths[label]);
+//       return (pathPrefix ? stripTrailingSlash(pathPrefix) + '/' : '') + paths[label];
+//     }
+//   };
+
+// window.MonacoEnvironment = {
+//   baseUrl: path.join(__dirname, '../node_modules/monaco-editor/min'),
+//   getWorkerUrl: (moduleId, label) => {
+//     if (moduleId === 'workerMain.js' && label === 'editorWorkerService') {
+//       return 'http://localhost:3000/External/monaco-editor-min/vs/base/worker/workerMain.js';
+//     } else if (moduleId === 'workerMain.js' && label === 'javascript') {
+//       return 'http://localhost:3000/External/monaco-editor-min/vs/language/typescript/tsWorker.js';
+//     }
+
+//     console.error("Unknown worker URL for moduleId", moduleId, " and label", label);
+//   }
+// }
+
 class StartPage extends BaseEditor {
   constructor() {
     super();
@@ -69,6 +98,16 @@ class StartPage extends BaseEditor {
         <div style={styles.innerContainer}>
           <Line expand justifyContent="center">
             <div style={styles.centerContainer}>
+          {/* <MonacoEditor
+            width="800"
+            height="400"
+            language="javascript"
+            theme="vs-dark"
+            value={ '// type your code...'}
+            options={ {
+              selectOnLineNumbers: true
+            }}
+          /> */}
               <Paper
                 zDepth={1}
                 style={{

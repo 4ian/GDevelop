@@ -379,7 +379,7 @@ gdjs.RuntimeObject.prototype.getZOrder = function() {
 
 /**
  * Get the container of the object variables
- * @return {variablesContainer} The variables of the object
+ * @return {gdjs.VariablesContainer} The variables of the object
  */
 gdjs.RuntimeObject.prototype.getVariables = function() {
     return this._variables;

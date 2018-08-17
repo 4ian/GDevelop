@@ -127,7 +127,7 @@ export default class JsCodeEvent extends React.Component<
       >
         {parameterObjects
           ? `, objects /*${parameterObjects}*/`
-          : ' /* No objects selected, only pass the scene as argument */'}
+          : ' /* Click here to choose objects to pass to JavaScript */'}
       </span>
     );
     const functionStart = (

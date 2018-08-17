@@ -12,6 +12,7 @@ export type Props = {|
   value: string,
   onChange: string => void,
   width: number,
+  onEditorMounted?: () => void,
 |};
 
 const monacoEditorOptions = {
@@ -31,21 +32,21 @@ export class CodeEditor extends React.Component<Props, State> {
     error: null,
   };
 
-  setupEditor(editor: any, monaco: any) {
-    if (monacoInitialized) {
-      console.log('Monaco editor already set up');
-      return;
-    }
-    monacoInitialized = true;
+  setupEditor = (editor: any, monaco: any) => {
+    if (!monacoInitialized) {
+      monacoInitialized = true;
 
-    monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-      // noLib: true,
-      target: monaco.languages.typescript.ScriptTarget.ES6,
-      allowNonTsExtensions: true,
-      allowJs: true,
-      checkJs: true,
-    });
-    setupAutocompletions(monaco);
+      monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+        // noLib: true,
+        target: monaco.languages.typescript.ScriptTarget.ES6,
+        allowNonTsExtensions: true,
+        allowJs: true,
+        checkJs: true,
+      });
+      setupAutocompletions(monaco);
+    }
+
+    if (this.props.onEditorMounted) this.props.onEditorMounted();
   }
 
   componentDidMount() {

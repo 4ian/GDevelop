@@ -166,6 +166,7 @@ export default class JsCodeEvent extends React.Component<
             value={jsCodeEvent.getInlineCode()}
             onChange={this.onChange}
             width={this.state.width}
+            onEditorMounted={() => this.props.onUpdate()}
           />
           {functionEnd}
           <InlinePopover

@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@storybook/react": "3.2.19",
+    "algoliasearch": "^3.30.0",
     "aws-sdk": "^2.100.0",
     "axios": "^0.16.1",
     "blueimp-md5": "^2.10.0",

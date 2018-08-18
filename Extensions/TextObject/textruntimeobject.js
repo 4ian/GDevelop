@@ -67,7 +67,7 @@ gdjs.TextRuntimeObject.prototype.setY = function(y) {
 
  /**
  * Set the angle of the object.
- * @param angle {Number} The new angle of the object
+ * @param {number} angle The new angle of the object
  */
 gdjs.TextRuntimeObject.prototype.setAngle = function(angle) {
     gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
@@ -120,7 +120,7 @@ gdjs.TextRuntimeObject.prototype.getCharacterSize = function() {
 
 /**
  * Set size of characters of the object.
- * @param newSize {Number} The new size for text.
+ * @param {number} newSize The new size for text.
  */
 gdjs.TextRuntimeObject.prototype.setCharacterSize = function(newSize) {
     if (newSize <= 1) newSize = 1;

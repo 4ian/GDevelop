@@ -125,6 +125,7 @@ gdjs.Force.prototype.getClearing = function() {
 
 /**
  * Set if the force clearing.
+ * @param {number} clearing The new value
  */
 gdjs.Force.prototype.setClearing = function(clearing) {
 	this._clearing = clearing;

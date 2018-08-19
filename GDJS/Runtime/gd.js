@@ -5,10 +5,10 @@
  */
 
 /**
- * The `gdjs` namespace should contains every class and object of the game engine.
+ * The `gdjs` namespace contains all classes and objects of the game engine.
  * @namespace
  */
-var gdjs = gdjs || {
+window.gdjs = {
   objectsTypes: new Hashtable(),
   behaviorsTypes: new Hashtable(),
   /**

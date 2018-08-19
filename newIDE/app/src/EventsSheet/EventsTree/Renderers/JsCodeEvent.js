@@ -8,11 +8,12 @@ import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
-  disabledText,
 } from '../ClassNames';
 import { getHelpLink } from '../../../Utils/HelpLink';
 import Window from '../../../Utils/Window';
 import { type EventRendererProps } from './EventRenderer.flow';
+import Measure from 'react-measure';
+import { CodeEditor } from '../../../CodeEditor';
 const gd = global.gd;
 
 const fontFamily = '"Lucida Console", Monaco, monospace';
@@ -22,30 +23,18 @@ const styles = {
     minHeight: 30,
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: 'white',
+    backgroundColor: '#1e1e1e',
   },
   wrappingText: {
     fontFamily,
+    fontSize: '12px',
     paddingLeft: 5,
     paddingRight: 5,
     margin: 0,
-  },
-  text: {
-    flex: 1,
-    whiteSpace: 'pre-line',
-    margin: 0,
-    paddingLeft: 4 * 5,
-    paddingRight: 5,
-    fontFamily,
-  },
-  textArea: {
-    paddingLeft: 4 * 5,
-    paddingRight: 5,
-    flex: 1,
-    boxSizing: 'border-box',
-    width: '100%',
-    fontSize: 14,
-    fontFamily,
+    backgroundColor: '#1e1e1e',
+    color: '#d4d4d4',
+    overflowX: 'hidden',
+    maxWidth: '100%',
   },
   comment: {
     color: '#777',
@@ -62,6 +51,7 @@ export default class JsCodeEvent extends React.Component<
   *
 > {
   state = {
+    width: 0,
     editing: false,
     editingObject: false,
     anchorEl: null,
@@ -104,6 +94,11 @@ export default class JsCodeEvent extends React.Component<
     );
   };
 
+  onChange = (newValue: string) => {
+    const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
+    jsCodeEvent.setInlineCode(newValue);
+  };
+
   editObject = (domEvent: any) => {
     this.setState({
       editingObject: true,
@@ -134,7 +129,7 @@ export default class JsCodeEvent extends React.Component<
       >
         {parameterObjects
           ? `, objects /*${parameterObjects}*/`
-          : ' /* No objects selected, only pass the scene as argument */'}
+          : ' /* Click here to choose objects to pass to JavaScript */'}
       </span>
     );
     const functionStart = (
@@ -159,54 +154,41 @@ export default class JsCodeEvent extends React.Component<
     );
 
     return (
-      <div
-        style={styles.container}
-        className={classNames({
-          [largeSelectableArea]: true,
-          [largeSelectedArea]: this.props.selected,
-        })}
-        ref={container => (this._container = container)}
-      >
-        {functionStart}
-        {!this.state.editing ? (
-          <p
-            className={classNames({
-              [selectableArea]: true,
-              [disabledText]: this.props.disabled,
-            })}
-            onClick={this.edit}
-            key="p"
-            style={styles.text}
-          >
-            {jsCodeEvent.getInlineCode()}
-          </p>
-        ) : (
-          <textarea
-            key="textarea"
-            type="text"
-            style={{ ...styles.textArea, height: this.state.height }}
-            onBlur={this.endEditing}
-            ref={input => (this._input = input)}
-          />
-        )}
-        {functionEnd}
-        <InlinePopover
-          open={this.state.editingObject}
-          anchorEl={this.state.anchorEl}
-          onRequestClose={this.endObjectEditing}
+      <Measure onMeasure={({ width }) => this.setState({ width })}>
+        <div
+          style={styles.container}
+          className={classNames({
+            [largeSelectableArea]: true,
+            [largeSelectedArea]: this.props.selected,
+          })}
+          ref={container => (this._container = container)}
         >
-          <ObjectField
-            project={this.props.project}
-            layout={this.props.layout}
-            value={parameterObjects}
-            onChange={text => {
-              jsCodeEvent.setParameterObjects(text);
-              this.props.onUpdate();
-            }}
-            isInline
+          {functionStart}
+          <CodeEditor
+            value={jsCodeEvent.getInlineCode()}
+            onChange={this.onChange}
+            width={this.state.width}
+            onEditorMounted={() => this.props.onUpdate()}
           />
-        </InlinePopover>
-      </div>
+          {functionEnd}
+          <InlinePopover
+            open={this.state.editingObject}
+            anchorEl={this.state.anchorEl}
+            onRequestClose={this.endObjectEditing}
+          >
+            <ObjectField
+              project={this.props.project}
+              layout={this.props.layout}
+              value={parameterObjects}
+              onChange={text => {
+                jsCodeEvent.setParameterObjects(text);
+                this.props.onUpdate();
+              }}
+              isInline
+            />
+          </InlinePopover>
+        </div>
+      </Measure>
     );
   }
 }

@@ -24,7 +24,6 @@ export type EventRendererProps = {
   ) => void,
   onParameterClick: ParameterContext => void,
   selection: any,
-  onUpdate: () => void,
 
   onOpenLayout: (string) => void,
   onOpenExternalEvents: (string) => void,

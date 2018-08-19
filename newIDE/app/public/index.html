@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' https://api.gdevelop-app.com https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js https://checkout.stripe.com/checkout.js https://api.keen.io https://fullstory.com/s/fs.js https://rs.fullstory.com">
     <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
     <title>GDevelop 5</title>
 
@@ -31,9 +32,9 @@
 
     <!-- GDevelop.js core -->
     <script>
-        //Ensure module is not defined to avoid libraries to think
-        //that they are in a CommonJS environment (useful when using Electron).
-        if (typeof module !== "undefined") module = undefined;
+      //Ensure module is not defined to avoid libraries to think
+      //that they are in a CommonJS environment (useful when using Electron).
+      if (typeof module !== "undefined") module = undefined;
     </script>
     <script src="%PUBLIC_URL%/libGD.js"></script>
     <script>
@@ -45,11 +46,31 @@
       }
     </script>
 
-    <!-- DocSearch support -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsearch.js@2/dist/cdn/docsearch.min.css" />
-
     <!-- Stripe.com Checkout -->
     <script src="https://checkout.stripe.com/checkout.js"></script>
+
+    <!-- Monaco Editor support -->
+    <script>
+      // Monaco editor is using amd require. Save the Node.js require if it exists (Electron)
+      nodeRequire = typeof require !== "undefined" ? require : undefined;
+    </script>
+    <script src="%PUBLIC_URL%/External/monaco-editor-min/vs/loader.js"></script>
+    <script>
+      // Restore back the Node.js require (Electron)
+      amdRequire = require;
+      require = nodeRequire;
+
+      // Set up Monaco Editor workers support
+      amdRequire.config({
+        paths: {
+          "vs": "vs"
+        }
+      });
+      window.MonacoEnvironment = {
+        getWorkerUrl: function (workerId, label) {
+          return "External/monaco-editor-min/vs/base/worker/workerMain.js";
+        }
+      };
+    </script>
   </body>
 </html>

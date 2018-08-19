@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@storybook/react": "3.2.19",
+    "algoliasearch": "^3.30.0",
     "aws-sdk": "^2.100.0",
     "axios": "^0.16.1",
     "blueimp-md5": "^2.10.0",
@@ -43,6 +44,7 @@
     "react-i18next": "6.2.0",
     "react-json-view": "^1.16.1",
     "react-measure": "1.4.7",
+    "react-monaco-editor": "^0.18.0",
     "react-mosaic-component": "1.0.3",
     "react-sortable-hoc": "0.6.8",
     "react-sortable-tree": "1.5.3",
@@ -56,7 +58,7 @@
   },
   "scripts": {
     "postinstall": "npm run import-resources",
-    "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js && node import-piskel-editor.js",
+    "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js && node import-piskel-editor.js && node import-monaco-editor.js",
     "start": "npm run import-resources && react-scripts start",
     "build": "npm run import-resources && react-scripts build",
     "format": "prettier --write \"src/**/*.js\"",

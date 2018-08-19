@@ -40,6 +40,7 @@ const exampleNames = [
   'instance-timer',
   'inventory-system',
   'isometric-game',
+  'javascript-blocks-in-platformer',
   'keyboard-practice',
   'magnet',
   'manipulate-text-object',

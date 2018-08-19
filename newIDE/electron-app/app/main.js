@@ -108,9 +108,17 @@ app.on('ready', function () {
   //Prevent any navigation inside the main window.
   mainWindow.webContents.on('will-navigate', (e, url) => {
     if (url !== mainWindow.webContents.getURL()) {
+      console.info('Opening in browser (because of will-navigate):', url);
       e.preventDefault();
       electron.shell.openExternal(url);
     }
+  });
+
+  //Prevent opening any website or url inside Electron.
+  mainWindow.webContents.on('new-window', (e, url) => {
+    console.info('Opening in browser (because of new-window): ', url);
+    e.preventDefault();
+    electron.shell.openExternal(url);
   });
 
   ipcMain.on('piskel-open-then-load-animation', (event, piskelData) => {

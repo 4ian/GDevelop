@@ -42,8 +42,6 @@ export class CodeEditor extends React.Component<Props, State> {
       getAllThemes().forEach(codeEditorTheme => {
         // Builtin themes don't have themeData, don't redefine them.
         if (codeEditorTheme.themeData) {
-          console.log(codeEditorTheme.themeName);
-          console.log(codeEditorTheme.themeData);
           monaco.editor.defineTheme(
             codeEditorTheme.themeName,
             codeEditorTheme.themeData
@@ -111,7 +109,7 @@ export class CodeEditor extends React.Component<Props, State> {
     return (
       <PreferencesContext.Consumer>
         {({ values }) => (
-          console.log(values.codeEditorThemeName) || <MonacoEditor
+          <MonacoEditor
             width={this.props.width || 600}
             height="400"
             language="javascript"

@@ -8,6 +8,7 @@ import Toggle from 'material-ui/Toggle';
 import Dialog from '../../UI/Dialog';
 import { Column, Line } from '../../UI/Grid';
 import { themes } from '../../UI/Theme';
+import { getAllThemes } from '../../CodeEditor/Theme';
 import Window from '../../Utils/Window';
 import PreferencesContext from './PreferencesContext';
 
@@ -39,7 +40,12 @@ export default class PreferencesDialog extends Component<Props, State> {
         title="GDevelop preferences"
       >
         <PreferencesContext.Consumer>
-          {({ values, setThemeName, setAutoDownloadUpdates }) => (
+          {({
+            values,
+            setThemeName,
+            setCodeEditorThemeName,
+            setAutoDownloadUpdates,
+          }) => (
             <Column noMargin>
               <Line noMargin>
                 <SelectField
@@ -52,6 +58,19 @@ export default class PreferencesDialog extends Component<Props, State> {
                       value={themeName}
                       primaryText={themeName}
                       key={themeName}
+                    />
+                  ))}
+                </SelectField>
+                <SelectField
+                  floatingLabelText={'Code editor Theme'}
+                  value={values.codeEditorThemeName}
+                  onChange={(e, i, value) => setCodeEditorThemeName(value)}
+                >
+                  {getAllThemes().map(codeEditorTheme => (
+                    <MenuItem
+                      value={codeEditorTheme.themeName}
+                      primaryText={codeEditorTheme.name}
+                      key={codeEditorTheme.themeName}
                     />
                   ))}
                 </SelectField>

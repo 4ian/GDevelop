@@ -22,6 +22,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
     values: this._loadValuesFromLocalStorage() || initialPreferences.values,
     setThemeName: this._setThemeName.bind(this),
+    setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
     setAutoDownloadUpdates: this._setAutoDownloadUpdates.bind(this),
     checkUpdates: this._checkUpdates.bind(this),
   };
@@ -36,6 +37,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           themeName,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setCodeEditorThemeName(codeEditorThemeName: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          codeEditorThemeName,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

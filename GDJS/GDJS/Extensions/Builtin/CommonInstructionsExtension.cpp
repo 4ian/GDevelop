@@ -674,7 +674,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
       });
 
   AddEvent("JsCode",
-           _("Javascript code (Web platform only)"),
+           _("Javascript code"),
            _("Insert some Javascript code into events"),
            "",
            "res/source_cpp16.png",

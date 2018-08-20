@@ -3,6 +3,8 @@ import * as React from 'react';
 import { setupAutocompletions } from './LocalCodeEditorAutocompletions';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import RaisedButton from 'material-ui/RaisedButton';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import { getAllThemes } from './Theme';
 
 export type State = {|
   MonacoEditor: ?any,
@@ -24,7 +26,8 @@ const monacoEditorOptions = {
 
 // There is only a single instance of monaco living, keep track
 // of if its initialized or not.
-let monacoInitialized = false;
+let monacoCompletionsInitialized = false;
+let monacoThemesInitialized = false;
 
 export class CodeEditor extends React.Component<Props, State> {
   state = {
@@ -32,9 +35,25 @@ export class CodeEditor extends React.Component<Props, State> {
     error: null,
   };
 
-  setupEditor = (editor: any, monaco: any) => {
-    if (!monacoInitialized) {
-      monacoInitialized = true;
+  setupEditorThemes = (monaco: any) => {
+    if (!monacoThemesInitialized) {
+      monacoThemesInitialized = true;
+
+      getAllThemes().forEach(codeEditorTheme => {
+        // Builtin themes don't have themeData, don't redefine them.
+        if (codeEditorTheme.themeData) {
+          monaco.editor.defineTheme(
+            codeEditorTheme.themeName,
+            codeEditorTheme.themeData
+          );
+        }
+      });
+    }
+  }
+
+  setupEditorCompletions = (editor: any, monaco: any) => {
+    if (!monacoCompletionsInitialized) {
+      monacoCompletionsInitialized = true;
 
       monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
         // noLib: true,
@@ -47,7 +66,7 @@ export class CodeEditor extends React.Component<Props, State> {
     }
 
     if (this.props.onEditorMounted) this.props.onEditorMounted();
-  }
+  };
 
   componentDidMount() {
     this.loadMonacoEditor();
@@ -88,16 +107,21 @@ export class CodeEditor extends React.Component<Props, State> {
     }
 
     return (
-      <MonacoEditor
-        width={this.props.width || 600}
-        height="400"
-        language="javascript"
-        theme="vs-dark"
-        value={this.props.value}
-        onChange={this.props.onChange}
-        editorDidMount={this.setupEditor}
-        options={monacoEditorOptions}
-      />
+      <PreferencesContext.Consumer>
+        {({ values }) => (
+          <MonacoEditor
+            width={this.props.width || 600}
+            height="400"
+            language="javascript"
+            theme={values.codeEditorThemeName}
+            value={this.props.value}
+            onChange={this.props.onChange}
+            editorWillMount={this.setupEditorThemes}
+            editorDidMount={this.setupEditorCompletions}
+            options={monacoEditorOptions}
+          />
+        )}
+      </PreferencesContext.Consumer>
     );
   }
 }

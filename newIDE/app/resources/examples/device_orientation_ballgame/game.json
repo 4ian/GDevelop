@@ -585,26 +585,14 @@
                 "textG": 0,
                 "textR": 0
               },
-              "comment": "Check for a value unequal to 0 to make sure the sensor is ready",
+              "comment": "Apply force to the ball",
               "comment2": ""
             },
             {
               "disabled": false,
               "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "DeviceSensors::OrientationBeta"
-                  },
-                  "parameters": [
-                    ">",
-                    "0"
-                  ],
-                  "subInstructions": []
-                }
-              ],
+              "conditions": [],
               "actions": [
                 {
                   "type": {

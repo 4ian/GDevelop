@@ -32,8 +32,8 @@ module.exports = {
         ),
         t("Orientation sensor is active"),
         t("Sensors/Orientation"),
-        "res/conditions/camera24.png",
-        "res/conditions/camera.png"
+        "JsPlatform/Extensions/orientation_active24.png",
+        "JsPlatform/Extensions/orientation_active32.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(
@@ -50,8 +50,8 @@ module.exports = {
         ),
         t("Orientation alpha is _PARAM0__PARAM1_"),
         t("Sensors/Orientation"),
-        "res/conditions/camera24.png",
-        "res/conditions/camera.png"
+        "JsPlatform/Extensions/orientation_alpha24.png",
+        "JsPlatform/Extensions/orientation_alpha32.png"
       )
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
@@ -70,8 +70,8 @@ module.exports = {
         ),
         t("Orientation beta is _PARAM0__PARAM1_"),
         t("Sensors/Orientation"),
-        "res/conditions/camera24.png",
-        "res/conditions/camera.png"
+        "JsPlatform/Extensions/orientation_beta24.png",
+        "JsPlatform/Extensions/orientation_beta32.png"
       )
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
@@ -90,8 +90,8 @@ module.exports = {
         ),
         t("Orientation gamma is _PARAM0__PARAM1_"),
         t("Sensors/Orientation"),
-        "res/conditions/camera24.png",
-        "res/conditions/camera.png"
+        "JsPlatform/Extensions/orientation_gamma24.png",
+        "JsPlatform/Extensions/orientation_gamma32.png"
       )
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
@@ -108,8 +108,8 @@ module.exports = {
         t("Activate the orientation sensor. (remember to turn it off again)"),
         t("Activate the orientation sensor."),
         t("Sensors/Orientation"),
-        "res/conditions/camera24.png",
-        "res/conditions/camera.png"
+        "JsPlatform/Extensions/orientation_active24.png",
+        "JsPlatform/Extensions/orientation_active32.png"
       )
         .getCodeExtraInformation()
       .setIncludeFile(
@@ -124,8 +124,8 @@ module.exports = {
         t("Deactivate the orientation sensor."),
         t("Deactivate the orientation sensor."),
         t("Sensors/Orientation"),
-        "res/conditions/camera24.png",
-        "res/conditions/camera.png"
+        "JsPlatform/Extensions/orientation_inactive24.png",
+        "JsPlatform/Extensions/orientation_inactive32.png"
       )
         .getCodeExtraInformation()
       .setIncludeFile(

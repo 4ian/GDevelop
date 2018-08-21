@@ -21,7 +21,7 @@ module.exports = {
       ),
       "Matthias Meike",
       "Open source (MIT License)"
-    );
+    ).setExtensionHelpPath("/all-features/device-sensors");
 
     extension
       .addCondition(

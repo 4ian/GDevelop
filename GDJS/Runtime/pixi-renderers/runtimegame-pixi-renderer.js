@@ -375,6 +375,25 @@ gdjs.RuntimeGamePixiRenderer.prototype.openURL = function() {
 }
 
 /**
+ * Close the game, if applicable
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.stopGame = function() {
+    // Try to detect the environment to use the most adapted
+    // way of closing the app
+    var electron = gdjs.RuntimeGamePixiRenderer.getElectron();
+    if (electron) {
+        var browserWindow = electron.remote.getCurrentWindow();
+        if (browserWindow) {
+            browserWindow.close();
+        }
+    } else if (typeof navigator !== "undefined" && navigator.app && navigator.app.exitApp) {
+        navigator.app.exitApp();
+    }
+
+    // HTML5 games on mobile/browsers don't have a way to close their window/page.
+}
+
+/**
  * Get the electron module, if running as a electron renderer process.
  */
 gdjs.RuntimeGamePixiRenderer.getElectron = function() {

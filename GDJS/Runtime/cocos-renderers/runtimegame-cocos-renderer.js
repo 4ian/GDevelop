@@ -107,3 +107,7 @@ gdjs.RuntimeGameCocosRenderer.prototype.openURL = function() {
         window.open(url, target);
     }
 }
+
+gdjs.RuntimeGameCocosRenderer.prototype.stopGame = function() {
+    // TODO - Not implemented as not useful for most games on mobile and browsers
+}

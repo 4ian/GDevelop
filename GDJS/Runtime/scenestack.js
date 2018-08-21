@@ -28,7 +28,8 @@ gdjs.SceneStack.prototype.step = function(elapsedTime) {
     	var request = currentScene.getRequestedChange();
         //Something special was requested by the current scene.
         if (request === gdjs.RuntimeScene.STOP_GAME) {
-            return false;
+            this._runtimeGame.getRenderer().stopGame();
+            return true;
         } else if (request === gdjs.RuntimeScene.POP_SCENE) {
         	this.pop();
         } else if (request === gdjs.RuntimeScene.PUSH_SCENE) {

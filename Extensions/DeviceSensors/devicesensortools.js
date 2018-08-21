@@ -5,23 +5,24 @@
  * @private
  */
 
-gdjs.evtTools.devicesensors = {};
-gdjs.evtTools.devicesensors.orientation = {};
-
-gdjs.evtTools.devicesensors.orientation._isActive = false;
-gdjs.evtTools.devicesensors.orientation._absolute = 0;
-gdjs.evtTools.devicesensors.orientation._alpha = 0;
-gdjs.evtTools.devicesensors.orientation._beta =  0;
-gdjs.evtTools.devicesensors.orientation._gamma =  0;
+gdjs.evtTools.devicesensors = {
+  orientation: {
+    _isActive: 0,
+    _absolute: 0,
+    _alpha: 0,
+    _beta: 0,
+    _gamma: 0
+  }
+};
 
 gdjs.evtTools.devicesensors.orientation._activateOrientationListener = function() {
   window.addEventListener("deviceorientation", gdjs.evtTools.devicesensors.orientation._handleOrientation, true);
-  gdjs.evtTools.devicesensors.orientation._isActive = true;
+  gdjs.evtTools.devicesensors.orientation._isActive = 1;
 }
 
 gdjs.evtTools.devicesensors.orientation._deactivateOrientationListener = function() {
   window.removeEventListener('deviceorientation', gdjs.evtTools.devicesensors.orientation._handleOrientation, true);
-  gdjs.evtTools.devicesensors.orientation._isActive = false;
+  gdjs.evtTools.devicesensors.orientation._isActive = 0;
 }
 
 gdjs.evtTools.devicesensors.orientation._handleOrientation = function(event) {
@@ -47,7 +48,7 @@ gdjs.evtTools.devicesensors.orientation.deactivateOrientationSensor = function()
 
 /**
  * Check if the orientation sensor is currently active
- * @return {boolean} The activation state of the orientation sensor
+ * @return {number} The activation state of the orientation sensor (0=false/1=true)
  */
 gdjs.evtTools.devicesensors.orientation.isActive = function() {
   return gdjs.evtTools.devicesensors.orientation._isActive;

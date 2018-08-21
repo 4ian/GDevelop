@@ -93,3 +93,17 @@ gdjs.RuntimeGameCocosRenderer.getScreenWidth = function() {
 gdjs.RuntimeGameCocosRenderer.getScreenHeight = function() {
     return cc.view.getFrameSize().height;
 }
+
+/**
+ * Open the given URL in the system browser
+ */
+gdjs.RuntimeGameCocosRenderer.prototype.openURL = function() {
+    // Try to detect the environment to use the most adapted
+    // way of opening an URL.
+    if (typeof cc !== "undefined" && cc.sys && cc.sys.openURL) {
+        cc.sys.openURL(url);
+    } else if (typeof window !== "undefined") {
+        var target = window.cordova ? "_system" : "_blank";
+        window.open(url, target);
+    }
+}

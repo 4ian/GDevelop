@@ -13,16 +13,23 @@ import changePositionOfObject from '../fixtures/change-position-of-object/change
 import changeScaleOfSprites from '../fixtures/change-scale-of-sprites/change-scale-of-sprites.json';
 import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sprite-animation.json';
 import changeSpriteColor from '../fixtures/change-sprite-color/change-sprite-color.json';
+import characterSelection from '../fixtures/character-selection/character-selection.json';
+import controllerInput from '../fixtures/controller-input/controller-input.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
+import customFont from '../fixtures/custom-font/custom-font.json';
 import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-lastpressedkey/customize-keys-with-lastpressedkey.json';
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
+import dropCollectItemsFromStorage from '../fixtures/drop-collect-items-from-storage/drop-collect-items-from-storage.json';
+import exitApp from '../fixtures/exit-app/exit-app.json';
 import findDiagonals from '../fixtures/find-diagonals/find-diagonals.json';
+import healthBar from '../fixtures/health-bar/health-bar.json';
 import infiniteScrollingBackground from '../fixtures/infinite-scrolling-background/infinite-scrolling-background.json';
 import instanceTimer from '../fixtures/instance-timer/instance-timer.json';
 import inventorySystem from '../fixtures/inventory-system/inventory-system.json';
 import isometricGame from '../fixtures/isometric-game/isometric-game.json';
 import javascriptBlocksInPlatformer from '../fixtures/javascript-blocks-in-platformer/javascript-blocks-in-platformer.json';
 import keyboardPractice from '../fixtures/keyboard-practice/keyboard-practice.json';
+import loadImageFromUrl from '../fixtures/load-image-from-url/load-image-from-url.json';
 import magnet from '../fixtures/magnet/magnet.json';
 import manipulateTextObject from '../fixtures/manipulate-text-object/manipulate-text-object.json';
 import moveCameraToPosition from '../fixtures/move-camera-to-position/move-camera-to-position.json';
@@ -45,6 +52,7 @@ import physics from '../fixtures/physics/physics.json';
 import pinObjectToAnother from '../fixtures/pin-object-to-another/pin-object-to-another.json';
 import pinObjectToAnotherMultipleParents from '../fixtures/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json';
 import platformer from '../fixtures/platformer/platformer.json';
+import platformerDoubleJump from '../fixtures/platformer-double-jump/platformer-double-jump.json';
 import playMusicOnMobile from '../fixtures/play-music-on-mobile/play-music-on-mobile.json';
 import playStopSpriteAnimation from '../fixtures/play-stop-sprite-animation/play-stop-sprite-animation.json';
 import racingGame from '../fixtures/racing-game/racing-game.json';
@@ -68,6 +76,7 @@ import toggleMusicPlaySound from '../fixtures/toggle-music-play-sound/toggle-mus
 import typeOnTextEffect from '../fixtures/type-on-text-effect/type-on-text-effect.json';
 import zDepth from '../fixtures/z-depth/z-depth.json';
 import zombieLaser from '../fixtures/zombie-laser/zombie-laser.json';
+
 
 export default class BrowserProjectOpener {
   static readInternalFile(url) {
@@ -105,14 +114,26 @@ export default class BrowserProjectOpener {
       return Promise.resolve(changeSpriteAnimation);
     } else if (url === 'example://change-sprite-color') {
       return Promise.resolve(changeSpriteColor);
+    } else if (url === 'example://character-selection') {
+      return Promise.resolve(characterSelection);
+    } else if (url === 'example://controller-input') {
+      return Promise.resolve(controllerInput);
     } else if (url === 'example://create-object-with-mouseclick') {
       return Promise.resolve(createObjectWithMouseclick);
+    } else if (url === 'example://custom-font') {
+      return Promise.resolve(customFont);
     } else if (url === 'example://customize-keys-with-lastpressedkey') {
       return Promise.resolve(customizeKeysWithLastpressedkey);
     } else if (url === 'example://drag-camera-with-mouse') {
       return Promise.resolve(dragCameraWithMouse);
+    } else if (url === 'example://drop-collect-items-from-storage') {
+      return Promise.resolve(dropCollectItemsFromStorage);
+    } else if (url === 'example://exit-app') {
+      return Promise.resolve(exitApp);
     } else if (url === 'example://find-diagonals') {
       return Promise.resolve(findDiagonals);
+    } else if (url === 'example://health-bar') {
+      return Promise.resolve(healthBar);
     } else if (url === 'example://infinite-scrolling-background') {
       return Promise.resolve(infiniteScrollingBackground);
     } else if (url === 'example://instance-timer') {
@@ -125,6 +146,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(javascriptBlocksInPlatformer);
     } else if (url === 'example://keyboard-practice') {
       return Promise.resolve(keyboardPractice);
+    } else if (url === 'example://load-image-from-url') {
+      return Promise.resolve(loadImageFromUrl);
     } else if (url === 'example://magnet') {
       return Promise.resolve(magnet);
     } else if (url === 'example://manipulate-text-object') {
@@ -165,6 +188,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(physics);
     } else if (url === 'example://platformer') {
       return Promise.resolve(platformer);
+    } else if (url === 'example://platformer-double-jump') {
+      return Promise.resolve(platformerDoubleJump);
     } else if (url === 'example://play-music-on-mobile') {
       return Promise.resolve(playMusicOnMobile);
     } else if (url === 'example://play-stop-sprite-animation') {

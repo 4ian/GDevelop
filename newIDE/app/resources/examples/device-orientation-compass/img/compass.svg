@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="600mm"
+   height="600mm"
+   viewBox="0 0 600 600"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="compass.svg"
+   inkscape:export-filename="/home/matthias/Programme/GD_MyFork/GD/newIDE/app/resources/examples/device-orientation-compass/img/needle.png"
+   inkscape:export-xdpi="25.400002"
+   inkscape:export-ydpi="25.400002">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="-37.299459"
+     inkscape:cy="1198.1247"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1026"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,303)">
+    <g
+       id="g4610"
+       inkscape:export-xdpi="89.203529"
+       inkscape:export-ydpi="89.203529"
+       transform="matrix(3.4905176,0,0,3.4905176,-62.816445,-509.312)"
+       style="opacity:1">
+      <circle
+         style="fill:#d3d562;fill-opacity:1;stroke-width:0.26458332"
+         r="85.422623"
+         cy="145.05356"
+         cx="103.94345"
+         id="path21" />
+      <circle
+         id="circle4534"
+         cx="103.94345"
+         cy="145.05356"
+         r="60.854172"
+         style="fill:#d5bd62;fill-opacity:1;stroke-width:0.18848635" />
+      <circle
+         style="fill:#878c36;fill-opacity:1;stroke-width:0.13814528"
+         r="44.601196"
+         cy="144.6756"
+         cx="103.94345"
+         id="circle4536" />
+      <circle
+         r="16.630953"
+         cy="79.204018"
+         cx="104.42085"
+         id="path4544"
+         style="fill:#f0f1db;fill-opacity:1;stroke-width:0.26458332" />
+      <text
+         id="text4548"
+         y="89.491074"
+         x="93.865074"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#4b4b23;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           style="font-size:28.22222137px;fill:#4b4b23;fill-opacity:1;stroke-width:0.26458332"
+           y="89.491074"
+           x="93.865074"
+           id="tspan4546"
+           sodipodi:role="line">N</tspan></text>
+      <circle
+         style="fill:#f0f1db;fill-opacity:1;stroke-width:0.26458332"
+         id="circle4555"
+         cx="104.42085"
+         cy="211.49568"
+         r="16.630953" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#4b4b23;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         x="95.318909"
+         y="221.76895"
+         id="text4559"><tspan
+           sodipodi:role="line"
+           id="tspan4557"
+           x="95.318909"
+           y="221.76895"
+           style="font-size:28.22222137px;fill:#4b4b23;fill-opacity:1;stroke-width:0.26458332">S</tspan></text>
+      <circle
+         style="fill:#f0f1db;fill-opacity:1;stroke-width:0.26458332"
+         id="circle4566"
+         cx="37.897041"
+         cy="144.6756"
+         r="16.630953" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#4b4b23;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         x="23.937515"
+         y="154.96265"
+         id="text4570"><tspan
+           sodipodi:role="line"
+           id="tspan4568"
+           x="23.937515"
+           y="154.96265"
+           style="font-size:28.22222137px;fill:#4b4b23;fill-opacity:1;stroke-width:0.26458332">W</tspan></text>
+      <circle
+         r="16.630953"
+         cy="144.6756"
+         cx="170.56668"
+         id="circle4580"
+         style="fill:#f0f1db;fill-opacity:1;stroke-width:0.26458332" />
+      <text
+         id="text4584"
+         y="154.96265"
+         x="161.16846"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#4b4b23;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           style="font-size:28.22222137px;fill:#4b4b23;fill-opacity:1;stroke-width:0.26458332"
+           y="154.96265"
+           x="161.16846"
+           id="tspan4582"
+           sodipodi:role="line">E</tspan></text>
+    </g>
+    <g
+       id="g4593"
+       transform="matrix(0,3.4905176,-3.4905176,0,804.99273,-365.81645)"
+       style="opacity:1">
+      <path
+         sodipodi:nodetypes="ssss"
+         inkscape:connector-curvature="0"
+         id="ellipse4550"
+         d="m 112.82589,144.6756 c -17.76488,0 0,0 -17.76488,0 0,0 3.976804,-45.585354 8.88244,-45.585356 4.90564,2e-6 8.88244,45.585356 8.88244,45.585356 z"
+         style="fill:#8d3737;fill-opacity:1;stroke-width:0.2346305" />
+      <path
+         style="fill:#f0f1db;fill-opacity:1;stroke-width:0.2346305"
+         d="m 112.82589,144.6756 c -17.76488,0 0,0 -17.76488,0 0,0 3.976804,45.58536 8.88244,45.58536 4.90564,0 8.88244,-45.58536 8.88244,-45.58536 z"
+         id="path4553"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssss" />
+      <circle
+         id="circle4540"
+         cx="103.94345"
+         cy="144.6756"
+         r="11.717267"
+         style="fill:#d5bd62;fill-opacity:1;stroke-width:0.03629242" />
+      <circle
+         style="fill:#b05f44;fill-opacity:1;stroke-width:0.0186961"
+         r="6.0361705"
+         cy="144.6756"
+         cx="104.42085"
+         id="circle4542" />
+    </g>
+  </g>
+</svg>

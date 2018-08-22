@@ -15,6 +15,8 @@ import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sp
 import changeSpriteColor from '../fixtures/change-sprite-color/change-sprite-color.json';
 import characterSelection from '../fixtures/character-selection/character-selection.json';
 import controllerInput from '../fixtures/controller-input/controller-input.json';
+import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
+import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
 import customFont from '../fixtures/custom-font/custom-font.json';
 import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-lastpressedkey/customize-keys-with-lastpressedkey.json';
@@ -118,6 +120,10 @@ export default class BrowserProjectOpener {
       return Promise.resolve(characterSelection);
     } else if (url === 'example://controller-input') {
       return Promise.resolve(controllerInput);
+    } else if (url === 'example://device-orientation-ballgame') {
+      return Promise.resolve(deviceOrientationBallgame);
+    } else if (url === 'example://device-orientation-compass') {
+      return Promise.resolve(deviceOrientationCompass);
     } else if (url === 'example://create-object-with-mouseclick') {
       return Promise.resolve(createObjectWithMouseclick);
     } else if (url === 'example://custom-font') {

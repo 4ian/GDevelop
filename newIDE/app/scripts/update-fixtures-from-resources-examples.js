@@ -35,6 +35,8 @@ const exampleNames = [
   'create-object-with-mouseclick',
   'custom-font',
   'customize-keys-with-lastpressedkey',
+  'device-orientation-ballgame',
+  'device-orientation-compass',
   'drag-camera-with-mouse',
   'drop-collect-items-from-storage',
   'exit-app',

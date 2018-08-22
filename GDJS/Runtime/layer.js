@@ -10,6 +10,8 @@
  * Viewports and multiple cameras are not supported.
  *
  * @class Layer
+ * @param {Object} layerData The data used to initialize the layer
+ * @param {gdjs.RuntimeScene} runtimeScene The scene in which the layer is used
  * @memberof gdjs
  */
 gdjs.Layer = function(layerData, runtimeScene)
@@ -92,6 +94,10 @@ gdjs.Layer.prototype.getCameraHeight = function(cameraId) {
 	return (+this._height)*1/this._zoomFactor;
 };
 
+/**
+ * Show (or hide) the layer.
+ * @param {boolean} enable true to show the layer, false to hide it.
+ */
 gdjs.Layer.prototype.show = function(enable) {
 	this._hidden = !enable;
     this._renderer.updateVisibility(enable);

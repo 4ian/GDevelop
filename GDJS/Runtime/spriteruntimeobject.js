@@ -5,13 +5,15 @@
  */
 
 /**
- * A frame used by a SpriteAnimation in a {@link SpriteRuntimeObject}.
+ * A frame used by a SpriteAnimation in a {@link gdjs.SpriteRuntimeObject}.
  *
  * It contains the texture displayed as well as information like the points position
  * or the collision mask.
  *
  * @memberof gdjs
  * @class SpriteAnimationFrame
+ * @param {gdjs.ImageManager} imageManager The game image manager
+ * @param {Object} frameData the data to be used to create the frame.
  */
 gdjs.SpriteAnimationFrame = function(imageManager, frameData)
 {
@@ -90,10 +92,12 @@ gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
 };
 
 /**
- * Represents a direction of an animation of a {@link SpriteRuntimeObject}.
+ * Represents a direction of an animation of a {@link gdjs.SpriteRuntimeObject}.
  *
  * @class SpriteAnimationDirection
  * @memberof gdjs
+ * @param {gdjs.ImageManager} imageManager The game image manager
+ * @param {Object} directionData the data to be used to create the direction.
  */
 gdjs.SpriteAnimationDirection = function(imageManager, directionData)
 {
@@ -118,6 +122,8 @@ gdjs.SpriteAnimationDirection = function(imageManager, directionData)
  *
  * @class SpriteAnimation
  * @memberof gdjs
+ * @param {gdjs.ImageManager} imageManager The game image manager
+ * @param {Object} directionData the data to be used to create the animation.
  */
 gdjs.SpriteAnimation = function(imageManager, animData)
 {
@@ -142,6 +148,8 @@ gdjs.SpriteAnimation = function(imageManager, animData)
  * @class SpriteRuntimeObject
  * @memberof gdjs
  * @extends gdjs.RuntimeObject
+ * @param {gdjs.RuntimeScene} runtimeScene The scene the object belongs to
+ * @param {Object} objectData the data to be used to create the object.
  */
 gdjs.SpriteRuntimeObject = function(runtimeScene, objectData)
 {
@@ -276,10 +284,9 @@ gdjs.SpriteRuntimeObject.prototype.getRendererObject = function() {
 };
 
 /**
- * Update the hit boxes for the object: <br>
+ * Update the hit boxes for the object.
  * Fallback to the default implementation (rotated bounding box) if there is no custom
  * hitboxes defined for the current animation frame.
- *
  */
 gdjs.SpriteRuntimeObject.prototype.updateHitBoxes = function() {
     if ( this._frameDirty ) this._updateFrame(); //Beware, _animationFrame could be invalid if this._frameDirty === true.
@@ -314,6 +321,10 @@ gdjs.SpriteRuntimeObject.prototype.updateHitBoxes = function() {
 
 //Animations :
 
+/**
+ * Change the animation being played.
+ * @param {number} newAnimation The index of the new animation to be played
+ */
 gdjs.SpriteRuntimeObject.prototype.setAnimation = function(newAnimation) {
     newAnimation = newAnimation | 0;
     if ( newAnimation < this._animations.length &&
@@ -328,6 +339,10 @@ gdjs.SpriteRuntimeObject.prototype.setAnimation = function(newAnimation) {
     }
 };
 
+/**
+ * Change the animation being played.
+ * @param {string} newAnimationName The name of the new animation to be played
+ */
 gdjs.SpriteRuntimeObject.prototype.setAnimationName = function(newAnimationName) {
     if (!newAnimationName) return;
 
@@ -338,10 +353,18 @@ gdjs.SpriteRuntimeObject.prototype.setAnimationName = function(newAnimationName)
     }
 };
 
+/**
+ * Get the index of the animation being played.
+ * @return {number} The index of the new animation being played
+ */
 gdjs.SpriteRuntimeObject.prototype.getAnimation = function() {
     return this._currentAnimation;
 };
 
+/**
+ * Get the name of the animation being played.
+ * @return {string} The name of the new animation being played
+ */
 gdjs.SpriteRuntimeObject.prototype.getAnimationName = function() {
     if ( this._currentAnimation >= this._animations.length ) {
         return '';
@@ -354,6 +377,10 @@ gdjs.SpriteRuntimeObject.prototype.isCurrentAnimationName = function(name) {
     return this.getAnimationName() === name;
 };
 
+/**
+ * Change the angle (or direction index) of the object
+ * @return {number} The new angle (or direction index) to be applied
+ */
 gdjs.SpriteRuntimeObject.prototype.setDirectionOrAngle = function(newValue) {
     if ( this._currentAnimation >= this._animations.length ) {
         return;
@@ -401,6 +428,7 @@ gdjs.SpriteRuntimeObject.prototype.getDirectionOrAngle = function() {
 
 /**
  * Change the current frame displayed by the animation
+ * @param {number} newFrame The index of the frame to be displayed
  */
 gdjs.SpriteRuntimeObject.prototype.setAnimationFrame = function(newFrame) {
     if ( this._currentAnimation >= this._animations.length ||
@@ -418,6 +446,7 @@ gdjs.SpriteRuntimeObject.prototype.setAnimationFrame = function(newFrame) {
 
 /**
  * Get the index of the current frame displayed by the animation
+ * @return {number} newFrame The index of the frame being displayed
  */
 gdjs.SpriteRuntimeObject.prototype.getAnimationFrame = function() {
     return this._currentFrame;
@@ -459,6 +488,11 @@ gdjs.SpriteRuntimeObject.prototype.setAnimationSpeedScale = function(ratio) {
 
 //Position :
 
+/**
+ * Get the position on X axis on the scene of the given point.
+ * @param {string} name The point name
+ * @return {number} the position on X axis on the scene of the given point.
+ */
 gdjs.SpriteRuntimeObject.prototype.getPointX = function(name) {
     if ( name.length === 0 || this._animationFrame === null ) return this.getX();
 
@@ -469,6 +503,11 @@ gdjs.SpriteRuntimeObject.prototype.getPointX = function(name) {
     return pos[0];
 };
 
+/**
+ * Get the position on Y axis on the scene of the given point.
+ * @param {string} name The point name
+ * @return {number} the position on Y axis on the scene of the given point.
+ */
 gdjs.SpriteRuntimeObject.prototype.getPointY = function(name) {
     if ( name.length === 0 || this._animationFrame === null ) return this.getY();
 
@@ -487,12 +526,10 @@ gdjs.SpriteRuntimeObject.prototype.getPointY = function(name) {
  *
  * All transformations (flipping, scale, rotation) are supported.
  *
- * @param pointX The X position of the point, in object coordinates.
- * @param pointY The Y position of the point, in object coordinates.
- * @param result Optional array that will be updated with the result (x and y position of the point
+ * @param {number} pointX The X position of the point, in object coordinates.
+ * @param {number} pointY The Y position of the point, in object coordinates.
+ * @param {Array} result Array that will be updated with the result (x and y position of the point
  * in global coordinates)
- * @return An array containing the x and y position of the point in global coordinates. If result parameter is
- * defined, nothing is returned by the method.
  * @private
  */
 gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
@@ -525,18 +562,30 @@ gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
     result[1] = y + this.getDrawableY();
 };
 
+/**
+ * Get the X position, on the scene, of the origin of the texture of the object.
+ * @return {number} the X position, on the scene, of the origin of the texture of the object.
+ */
 gdjs.SpriteRuntimeObject.prototype.getDrawableX = function() {
     if ( this._animationFrame === null ) return this.x;
 
     return this.x - this._animationFrame.origin.x*Math.abs(this._scaleX);
 };
 
+/**
+ * Get the Y position, on the scene, of the origin of the texture of the object.
+ * @return {number} the Y position, on the scene, of the origin of the texture of the object.
+ */
 gdjs.SpriteRuntimeObject.prototype.getDrawableY = function() {
     if ( this._animationFrame === null ) return this.y;
 
     return this.y - this._animationFrame.origin.y*Math.abs(this._scaleY);
 };
 
+/**
+ * Get the X position of the center of the object, relative to top-left of the object.
+ * @return {number} X position of the center of the object, relative to top-left of the object.
+ */
 gdjs.SpriteRuntimeObject.prototype.getCenterX = function() {
     if ( this._animationFrame === null ) return 0;
 
@@ -544,6 +593,10 @@ gdjs.SpriteRuntimeObject.prototype.getCenterX = function() {
     return this._animationFrame.center.x*Math.abs(this._scaleX);
 };
 
+/**
+ * Get the Y position of the center of the object, relative to top-left of the object.
+ * @return {number} Y position of the center of the object, relative to top-left of the object.
+ */
 gdjs.SpriteRuntimeObject.prototype.getCenterY = function() {
     if ( this._animationFrame === null ) return 0;
 
@@ -551,6 +604,10 @@ gdjs.SpriteRuntimeObject.prototype.getCenterY = function() {
     return this._animationFrame.center.y*Math.abs(this._scaleY);
 };
 
+/**
+ * Set the X position of the (origin of the) object.
+ * @param {number} x The new X position.
+ */
 gdjs.SpriteRuntimeObject.prototype.setX = function(x) {
     if ( x === this.x ) return;
 
@@ -561,6 +618,10 @@ gdjs.SpriteRuntimeObject.prototype.setX = function(x) {
     }
 };
 
+/**
+ * Set the Y position of the (origin of the) object.
+ * @param {number} y The new Y position.
+ */
 gdjs.SpriteRuntimeObject.prototype.setY = function(y) {
     if ( y === this.y ) return;
 
@@ -571,6 +632,10 @@ gdjs.SpriteRuntimeObject.prototype.setY = function(y) {
     }
 };
 
+/**
+ * Set the angle of the object.
+ * @param {number} angle The new angle, in degrees.
+ */
 gdjs.SpriteRuntimeObject.prototype.setAngle = function(angle) {
     if ( this._currentAnimation >= this._animations.length ) {
         return;
@@ -589,6 +654,10 @@ gdjs.SpriteRuntimeObject.prototype.setAngle = function(angle) {
     }
 };
 
+/**
+ * Get the angle of the object.
+ * @return {number} The angle, in degrees.
+ */
 gdjs.SpriteRuntimeObject.prototype.getAngle = function(angle) {
     if ( this._currentAnimation >= this._animations.length ) {
         return 0;
@@ -613,6 +682,10 @@ gdjs.SpriteRuntimeObject.prototype.getBlendMode = function() {
     return this._blendMode;
 };
 
+/**
+ * Change the transparency of the object.
+ * @param {number} opacity The new opacity, between 0 (transparent) and 255 (opaque).
+ */
 gdjs.SpriteRuntimeObject.prototype.setOpacity = function(opacity) {
     if ( opacity < 0 ) opacity = 0;
     if ( opacity > 255 ) opacity = 255;
@@ -621,10 +694,18 @@ gdjs.SpriteRuntimeObject.prototype.setOpacity = function(opacity) {
     this._renderer.updateOpacity();
 };
 
+/**
+ * Get the transparency of the object.
+ * @return {number} The opacity, between 0 (transparent) and 255 (opaque).
+ */
 gdjs.SpriteRuntimeObject.prototype.getOpacity = function() {
     return this.opacity;
 };
 
+/**
+ * Hide (or show) the object
+ * @param {boolean} enable true to hide the object, false to show it again.
+ */
 gdjs.SpriteRuntimeObject.prototype.hide = function(enable) {
     if ( enable === undefined ) enable = true;
     this.hidden = enable;
@@ -635,7 +716,7 @@ gdjs.SpriteRuntimeObject.prototype.hide = function(enable) {
 /**
  * Change the tint of the sprite object.
  *
- * \param {String} The color, in RGB format ("128;200;255").
+ * @param {string} rgbColor The color, in RGB format ("128;200;255").
  */
 gdjs.SpriteRuntimeObject.prototype.setColor = function(rgbColor) {
     this._renderer.setColor(rgbColor);
@@ -667,14 +748,29 @@ gdjs.SpriteRuntimeObject.prototype.isFlippedY = function() {
 
 //Scale and size :
 
+/**
+ * Get the width of the object.
+ *
+ * @return {number} The width of the object, in pixels.
+ */
 gdjs.SpriteRuntimeObject.prototype.getWidth = function() {
     return this._renderer.getWidth();
 };
 
+/**
+ * Get the height of the object.
+ *
+ * @return {number} The height of the object, in pixels.
+ */
 gdjs.SpriteRuntimeObject.prototype.getHeight = function() {
     return this._renderer.getHeight();
 };
 
+/**
+ * Change the width of the object. This changes the scale on X axis of the object.
+ *
+ * @param {number} width The new width of the object, in pixels.
+ */
 gdjs.SpriteRuntimeObject.prototype.setWidth = function(newWidth) {
     if ( this._frameDirty ) this._updateFrame();
 
@@ -682,6 +778,11 @@ gdjs.SpriteRuntimeObject.prototype.setWidth = function(newWidth) {
     if (unscaledWidth !== 0) this.setScaleX(newWidth / unscaledWidth);
 };
 
+/**
+ * Change the height of the object. This changes the scale on Y axis of the object.
+ *
+ * @param {number} height The new height of the object, in pixels.
+ */
 gdjs.SpriteRuntimeObject.prototype.setHeight = function(newHeight) {
     if ( this._frameDirty ) this._updateFrame();
 
@@ -689,6 +790,11 @@ gdjs.SpriteRuntimeObject.prototype.setHeight = function(newHeight) {
     if (unscaledHeight !== 0) this.setScaleY(newHeight / unscaledHeight);
 };
 
+/**
+ * Change the scale on X and Y axis of the object.
+ *
+ * @param {number} newScale The new scale (must be greater than 0).
+ */
 gdjs.SpriteRuntimeObject.prototype.setScale = function(newScale) {
     if ( newScale < 0 ) newScale = 0;
     if ( newScale === Math.abs(this._scaleX) && newScale === Math.abs(this._scaleY) ) return;
@@ -699,6 +805,11 @@ gdjs.SpriteRuntimeObject.prototype.setScale = function(newScale) {
     this.hitBoxesDirty = true;
 };
 
+/**
+ * Change the scale on X axis of the object (changing its width).
+ *
+ * @param {number} newScale The new scale (must be greater than 0).
+ */
 gdjs.SpriteRuntimeObject.prototype.setScaleX = function(newScale) {
     if ( newScale < 0 ) newScale = 0;
     if ( newScale === Math.abs(this._scaleX) ) return;
@@ -708,6 +819,11 @@ gdjs.SpriteRuntimeObject.prototype.setScaleX = function(newScale) {
     this.hitBoxesDirty = true;
 };
 
+/**
+ * Change the scale on Y axis of the object (changing its width).
+ *
+ * @param {number} newScale The new scale (must be greater than 0).
+ */
 gdjs.SpriteRuntimeObject.prototype.setScaleY = function(newScale) {
     if ( newScale < 0 ) newScale = 0;
     if ( newScale === Math.abs(this._scaleY) ) return;
@@ -717,14 +833,29 @@ gdjs.SpriteRuntimeObject.prototype.setScaleY = function(newScale) {
     this.hitBoxesDirty = true;
 };
 
+/**
+ * Get the scale of the object (or the average of the X and Y scale in case they are different).
+ *
+ * @return {number} the scale of the object (or the average of the X and Y scale in case they are different).
+ */
 gdjs.SpriteRuntimeObject.prototype.getScale = function() {
     return (Math.abs(this._scaleX)+Math.abs(this._scaleY))/2.0;
 };
 
+/**
+ * Get the scale of the object on Y axis.
+ *
+ * @return {number} the scale of the object on Y axis
+ */
 gdjs.SpriteRuntimeObject.prototype.getScaleY = function() {
     return Math.abs(this._scaleY);
 };
 
+/**
+ * Get the scale of the object on X axis.
+ *
+ * @return {number} the scale of the object on X axis
+ */
 gdjs.SpriteRuntimeObject.prototype.getScaleX = function() {
     return Math.abs(this._scaleX);
 };

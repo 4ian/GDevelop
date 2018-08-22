@@ -86,7 +86,7 @@ module.exports = {
         "OrientationGamma",
         t("Compare the value of orientation gamma"),
         t(
-          "Compare the value of orientation gamma. (Range: -90 to 90)"
+          "Compare the value of orientation gamma. (Range: -90 to 90°)"
         ),
         t("Orientation gamma is _PARAM0__PARAM1_"),
         t("Sensors/Orientation"),

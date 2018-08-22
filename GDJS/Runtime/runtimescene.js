@@ -29,10 +29,15 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._timeManager = new gdjs.TimeManager(Date.now());
     this._gameStopRequested = false;
     this._requestedScene = "";
-    this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
+	this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
+	
+	/** @type gdjs.RuntimeObject[] */
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
-    this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
-
+	
+	/** @type gdjs.RuntimeObject[] */
+	this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
+	
+	/** @type gdjs.Profiler */
 	this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
 	this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
 

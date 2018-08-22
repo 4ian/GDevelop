@@ -3,6 +3,10 @@
  * The renderer for a gdjs.RuntimeGame using Pixi.js.
  * @class RuntimeGamePixiRenderer
  * @memberof gdjs
+ * @param {gdjs.RuntimeGame} game The game that is being rendered
+ * @param {number} width The default width of the renderer
+ * @param {number} height The default height of the renderer
+ * @param {boolean} forceFullscreen If fullscreen should be always activated
  */
 gdjs.RuntimeGamePixiRenderer = function(game, width, height, forceFullscreen)
 {

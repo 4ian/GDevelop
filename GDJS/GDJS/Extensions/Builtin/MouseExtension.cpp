@@ -17,12 +17,6 @@ namespace gdjs {
 MouseExtension::MouseExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsMouseExtension(*this);
 
-  SetExtensionInformation("BuiltinMouse",
-                          _("Mouse features"),
-                          _("Built-in extension allowing to use the mouse"),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   GetAllConditions()["SourisX"].SetFunctionName(
       "gdjs.evtTools.input.getMouseX");
   GetAllConditions()["SourisY"].SetFunctionName(

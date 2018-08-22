@@ -35,7 +35,7 @@ gdjs.InputManager = function()
 
 /**
  * Should be called whenever a key is pressed
- * @param keyCode {Number} The key code associated to the key press.
+ * @param {number} keyCode The key code associated to the key press.
  */
 gdjs.InputManager.prototype.onKeyPressed = function(keyCode) {
     this._pressedKeys.put(keyCode, true);
@@ -44,7 +44,7 @@ gdjs.InputManager.prototype.onKeyPressed = function(keyCode) {
 
 /**
  * Should be called whenever a key is released
- * @param keyCode {Number} The key code associated to the key release.
+ * @param {number} keyCode The key code associated to the key release.
  */
 gdjs.InputManager.prototype.onKeyReleased = function(keyCode) {
     this._pressedKeys.put(keyCode, false);
@@ -53,7 +53,7 @@ gdjs.InputManager.prototype.onKeyReleased = function(keyCode) {
 
 /**
  * Return the code of the last key that was pressed.
- * @return {Number} The code of the last key pressed.
+ * @return {number} The code of the last key pressed.
  */
 gdjs.InputManager.prototype.getLastPressedKey = function() {
     return this._lastPressedKey;
@@ -61,7 +61,7 @@ gdjs.InputManager.prototype.getLastPressedKey = function() {
 
 /**
  * Return true if the key corresponding to keyCode is pressed.
- * @param keyCode {Number} The key code to be tested.
+ * @param {number} keyCode The key code to be tested.
  */
 gdjs.InputManager.prototype.isKeyPressed = function(keyCode) {
     return this._pressedKeys.containsKey(keyCode) && this._pressedKeys.get(keyCode);
@@ -69,7 +69,7 @@ gdjs.InputManager.prototype.isKeyPressed = function(keyCode) {
 
 /**
  * Return true if the key corresponding to keyCode was released during the last frame.
- * @param keyCode {Number} The key code to be tested.
+ * @param {number} keyCode The key code to be tested.
  */
 gdjs.InputManager.prototype.wasKeyReleased = function(keyCode) {
     return this._releasedKeys.containsKey(keyCode) && this._releasedKeys.get(keyCode);
@@ -94,8 +94,8 @@ gdjs.InputManager.prototype.anyKeyPressed = function() {
  * Should be called when the mouse is moved.<br>
  * Please note that the coordinates must be expressed relative to the view position.
  *
- * @param x {Number} The mouse new X position
- * @param y {Number} The mouse new Y position
+ * @param {number} x The mouse new X position
+ * @param {number} y The mouse new Y position
  */
 gdjs.InputManager.prototype.onMouseMove = function(x,y) {
     this._mouseX = x;
@@ -122,7 +122,7 @@ gdjs.InputManager.prototype.getMouseY = function() {
 
 /**
  * Should be called whenever a mouse button is pressed
- * @param buttonCode {Number} The mouse button code associated to the event.<br>0: Left button<br>1: Right button
+ * @param {number} buttonCode The mouse button code associated to the event.<br>0: Left button<br>1: Right button
  */
 gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
     this._pressedMouseButtons[buttonCode] = true;
@@ -131,7 +131,7 @@ gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
 
 /**
  * Should be called whenever a mouse button is released
- * @param buttonCode {Number} The mouse button code associated to the event. ( See onMouseButtonPressed )
+ * @param {number} buttonCode The mouse button code associated to the event. ( See onMouseButtonPressed )
  */
 gdjs.InputManager.prototype.onMouseButtonReleased = function(buttonCode) {
     this._pressedMouseButtons[buttonCode] = false;
@@ -140,7 +140,7 @@ gdjs.InputManager.prototype.onMouseButtonReleased = function(buttonCode) {
 
 /**
  * Return true if the mouse button corresponding to buttonCode is pressed.
- * @param buttonCode {Number} The mouse button code (0: Left button, 1: Right button).
+ * @param {number} buttonCode The mouse button code (0: Left button, 1: Right button).
  */
 gdjs.InputManager.prototype.isMouseButtonPressed = function(buttonCode) {
     return this._pressedMouseButtons[buttonCode] !== undefined && this._pressedMouseButtons[buttonCode];
@@ -148,7 +148,7 @@ gdjs.InputManager.prototype.isMouseButtonPressed = function(buttonCode) {
 
 /**
  * Return true if the mouse button corresponding to buttonCode was just released.
- * @param buttonCode {Number} The mouse button code (0: Left button, 1: Right button).
+ * @param {number} buttonCode The mouse button code (0: Left button, 1: Right button).
  */
 gdjs.InputManager.prototype.isMouseButtonReleased = function(buttonCode) {
     return this._releasedMouseButtons[buttonCode] !== undefined && this._releasedMouseButtons[buttonCode];
@@ -156,7 +156,7 @@ gdjs.InputManager.prototype.isMouseButtonReleased = function(buttonCode) {
 
 /**
  * Should be called whenever the mouse wheel is used
- * @param wheelDelta {Number} The mouse wheel delta
+ * @param {number} wheelDelta The mouse wheel delta
  */
 gdjs.InputManager.prototype.onMouseWheel = function(wheelDelta) {
     this._mouseWheelDelta = wheelDelta;

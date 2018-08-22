@@ -3,7 +3,7 @@ import {
   type InstructionsListContext,
   type InstructionContext,
   type ParameterContext,
-} from '../InstructionsList';
+} from '../../SelectionHandler';
 
 export type EventRendererProps = {
   project: gdProject,
@@ -24,7 +24,6 @@ export type EventRendererProps = {
   ) => void,
   onParameterClick: ParameterContext => void,
   selection: any,
-  onUpdate: () => void,
 
   onOpenLayout: (string) => void,
   onOpenExternalEvents: (string) => void,

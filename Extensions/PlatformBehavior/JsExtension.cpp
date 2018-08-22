@@ -23,12 +23,6 @@ class PlatformBehaviorJsExtension : public gd::PlatformExtension {
    * contains: objects, actions, conditions and expressions.
    */
   PlatformBehaviorJsExtension() {
-    SetExtensionInformation("PlatformBehavior",
-                            _("Platform Behavior"),
-                            _("Allows to use controllable objects which can "
-                              "run and jump on platforms."),
-                            "Florian Rival",
-                            "Open source (MIT License)");
     DeclarePlatformBehaviorExtension(*this);
 
     GetBehaviorMetadata("PlatformBehavior::PlatformBehavior")

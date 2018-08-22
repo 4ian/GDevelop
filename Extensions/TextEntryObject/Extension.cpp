@@ -16,7 +16,8 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
       _("This Extension enables the use of an object that captures text "
         "entered with a keyboard by a player."),
       "Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetExtensionHelpPath("/objects/text_entry");
 
   gd::ObjectMetadata& obj = extension.AddObject<TextEntryObject>(
       "TextEntry",

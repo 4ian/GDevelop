@@ -11,12 +11,14 @@ This project is released under the MIT License.
 #include <iostream>
 
 void DeclareLinkedObjectsExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "LinkedObjects",
-      _("Linked objects"),
-      _("This Extension can virtually link two objects."),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "LinkedObjects",
+          _("Linked objects"),
+          _("This Extension can virtually link two objects."),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("/all-features/linked-objects");
 
 #if defined(GD_IDE_ONLY)
 

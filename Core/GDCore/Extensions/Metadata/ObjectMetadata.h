@@ -117,6 +117,22 @@ class GD_CORE_API ObjectMetadata {
    */
   ObjectMetadata& SetBitmapIcon(const wxBitmap& bitmap_);
 
+  /**
+   * Get the help path of the object, relative to the documentation root.
+   */
+  const gd::String &GetHelpPath() const { return helpPath; }
+
+  /**
+   * Set the help path of the object, relative to the documentation root.
+   * 
+   * The object instructions will have this help path set by
+   * default, unless you call SetHelpPath on them.
+   */
+  ObjectMetadata &SetHelpPath(const gd::String &path) {
+    helpPath = path;
+    return *this;
+  }
+
   const gd::String& GetName() const { return name; }
 #if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
@@ -131,6 +147,7 @@ class GD_CORE_API ObjectMetadata {
   /**
    * \brief Set the URL pointing to the help page about this object
    * \note The path to the page must be relative to the wiki url.
+   * \deprecated Use SetHelpPath instead
    */
   ObjectMetadata& SetHelpUrl(const gd::String& url);
 
@@ -160,8 +177,9 @@ class GD_CORE_API ObjectMetadata {
  private:
   gd::String extensionNamespace;
   gd::String name;
+  gd::String helpPath;
 #if defined(GD_IDE_ONLY)
-  gd::String helpUrl;
+  gd::String helpUrl; ///< Deprecated. Use helpPath instead.
   gd::String fullname;
   gd::String description;
   gd::String iconFilename;

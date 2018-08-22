@@ -11,11 +11,13 @@ namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsCameraExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation("BuiltinCamera",
-                                    _("Cameras and layers features"),
-                                    _("Built-in camera extension"),
-                                    "Florian Rival",
-                                    "Open source (MIT License)");
+  extension
+      .SetExtensionInformation("BuiltinCamera",
+                               _("Cameras and layers features"),
+                               _("Built-in camera extension"),
+                               "Florian Rival",
+                               "Open source (MIT License)")
+      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
 #if defined(GD_IDE_ONLY)
   extension

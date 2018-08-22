@@ -21,6 +21,7 @@ type Props = {
   toggleProjectManager: boolean,
   requestUpdate: ?() => void,
   simulateUpdateDownloaded: ?() => void,
+  simulateUpdateAvailable: ?() => void,
   exportProject: Function,
 } & TranslatorProps;
 
@@ -81,6 +82,13 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
                   click: () =>
                     this.props.simulateUpdateDownloaded &&
                     this.props.simulateUpdateDownloaded(),
+                },
+                {
+                  label: 'Simulate update available',
+                  disabled: !this.props.simulateUpdateAvailable,
+                  click: () =>
+                    this.props.simulateUpdateAvailable &&
+                    this.props.simulateUpdateAvailable(),
                 },
               ]}
             />

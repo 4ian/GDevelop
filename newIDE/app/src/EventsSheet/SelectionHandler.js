@@ -2,39 +2,35 @@
 
 import values from 'lodash/values';
 
-type Event = {
-  ptr: number,
-};
-type EventsList = {
-  ptr: number,
-};
-type Instruction = {
-  ptr: number,
-};
-type InstructionsList = {
-  ptr: number,
-};
-
-type InstructionContext = {|
+export type InstructionsListContext = {|
   isCondition: boolean,
-  instrsList: InstructionsList,
-  instruction: Instruction,
+  instrsList: gdInstructionsList,
+|};
+
+export type InstructionContext = {|
+  isCondition: boolean,
+  instrsList: gdInstructionsList,
+  instruction: gdInstruction,
   indexInList: number,
 |};
 
-type InstructionsListContext = {|
+export type ParameterContext = {|
   isCondition: boolean,
-  instrsList: InstructionsList,
+  instrsList: gdInstructionsList,
+  instruction: gdInstruction,
+  indexInList: number,
+  parameterIndex: number,
+  domEvent?: any,
 |};
 
-type EventContext = {|
+export type EventContext = {|
   isCondition: boolean,
-  eventsList: EventsList,
-  event: Event,
+  eventsList: gdEventsList,
+  event: gdBaseEvent,
   indexInList: number,
 |};
 
-type SelectionState = {
+export type SelectionState = {
   selectedInstructions: { [number]: InstructionContext },
   selectedInstructionsLists: { [number]: InstructionsListContext },
   selectedEvents: { [number]: EventContext },
@@ -62,7 +58,7 @@ export const getSelectedEventContexts = (
 
 export const getSelectedInstructions = (
   selection: SelectionState
-): Array<Instruction> => {
+): Array<gdInstruction> => {
   return values(selection.selectedInstructions).map(
     (instructionContext: InstructionContext) => instructionContext.instruction
   );
@@ -89,14 +85,14 @@ export const isEventSelected = (
 
 export const isInstructionSelected = (
   selection: SelectionState,
-  instruction: Instruction
+  instruction: gdInstruction
 ): boolean => {
   return !!selection.selectedInstructions[instruction.ptr];
 };
 
 export const isInstructionsListSelected = (
   selection: SelectionState,
-  instructionsList: InstructionsList
+  instructionsList: gdInstructionsList
 ): boolean => {
   return !!selection.selectedInstructionsLists[instructionsList.ptr];
 };
@@ -150,7 +146,7 @@ export const selectInstruction = (
   instructionContext: InstructionContext,
   multiSelection: boolean = false
 ): SelectionState => {
-  const instruction: Instruction = instructionContext.instruction;
+  const instruction: gdInstruction = instructionContext.instruction;
   if (isInstructionSelected(selection, instruction)) return selection;
 
   const existingSelection = multiSelection ? selection : clearSelection();
@@ -168,7 +164,7 @@ export const selectInstructionsList = (
   instructionsListContext: InstructionsListContext,
   multiSelection: boolean = false
 ): SelectionState => {
-  const instructionsList: InstructionsList = instructionsListContext.instrsList;
+  const instructionsList: gdInstructionsList = instructionsListContext.instrsList;
   if (isInstructionsListSelected(selection, instructionsList)) return selection;
 
   const existingSelection = multiSelection ? selection : clearSelection();

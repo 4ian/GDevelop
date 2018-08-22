@@ -8,9 +8,10 @@ import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import { getTheme } from '../UI/Theme';
 import UserProfileProvider from '../Profile/UserProfileProvider';
 import Authentification from '../Utils/GDevelopServices/Authentification';
+import PreferencesProvider from './Preferences/PreferencesProvider';
+import PreferencesContext from './Preferences/PreferencesContext';
 
 type Props = {|
-  themeName: string,
   authentification: Authentification,
   children: React$Element<*>,
 |};
@@ -21,17 +22,23 @@ type Props = {|
  */
 export default class Providers extends React.Component<Props, *> {
   render() {
-    const theme = getTheme(this.props.themeName);
-
     return (
       <DragDropContextProvider>
-        <MuiThemeProvider muiTheme={theme}>
-          <I18nextProvider i18n={i18n}>
-            <UserProfileProvider authentification={this.props.authentification}>
-              {this.props.children}
-            </UserProfileProvider>
-          </I18nextProvider>
-        </MuiThemeProvider>
+        <PreferencesProvider>
+          <PreferencesContext.Consumer>
+            {({ values }) => (
+              <MuiThemeProvider muiTheme={getTheme(values.themeName)}>
+                <I18nextProvider i18n={i18n}>
+                  <UserProfileProvider
+                    authentification={this.props.authentification}
+                  >
+                    {this.props.children}
+                  </UserProfileProvider>
+                </I18nextProvider>
+              </MuiThemeProvider>
+            )}
+          </PreferencesContext.Consumer>
+        </PreferencesProvider>
       </DragDropContextProvider>
     );
   }

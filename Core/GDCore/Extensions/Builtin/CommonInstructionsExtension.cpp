@@ -22,12 +22,14 @@ namespace gd {
 void GD_CORE_API
 BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "BuiltinCommonInstructions",
-      _("Standard events"),
-      _("Built-in extension providing standard events."),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "BuiltinCommonInstructions",
+          _("Standard events"),
+          _("Built-in extension providing standard events."),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
 #if defined(GD_IDE_ONLY)
   extension

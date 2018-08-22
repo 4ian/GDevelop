@@ -11,12 +11,14 @@ namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "BuiltinVariables",
-      _("Variable features"),
-      _("This Built-in extension allows the manipulation of variables"),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "BuiltinVariables",
+          _("Variable features"),
+          _("Built-in extension allowing to manipulate variables"),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("/all-features/variables");
 
 #if defined(GD_IDE_ONLY)
   extension

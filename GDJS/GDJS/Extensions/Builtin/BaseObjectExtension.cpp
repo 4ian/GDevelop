@@ -17,12 +17,6 @@ namespace gdjs {
 BaseObjectExtension::BaseObjectExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(*this);
 
-  SetExtensionInformation("BuiltinObject",
-                          _("Base object"),
-                          _("Base object"),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   std::map<gd::String, gd::InstructionMetadata> &objectActions =
       GetAllActionsForObject("");
   std::map<gd::String, gd::InstructionMetadata> &objectConditions =

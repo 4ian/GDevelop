@@ -37,12 +37,6 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       *this);
 
-  SetExtensionInformation("BuiltinCommonInstructions",
-                          _("Standard events"),
-                          _("Built-in extension providing standard events."),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   GetAllEvents()["BuiltinCommonInstructions::Link"].SetPreprocessing(
       [](gd::BaseEvent& event_,
          gd::EventsCodeGenerator& codeGenerator,
@@ -680,7 +674,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
       });
 
   AddEvent("JsCode",
-           _("Javascript code (Web platform only)"),
+           _("Javascript code"),
            _("Insert some Javascript code into events"),
            "",
            "res/source_cpp16.png",

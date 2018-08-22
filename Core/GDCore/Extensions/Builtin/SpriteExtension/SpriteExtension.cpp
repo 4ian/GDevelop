@@ -14,13 +14,13 @@ namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "Sprite",
-      _("Sprite"),
-      _("Extension for adding animated objects in the scene, which can contain "
-        "animations with directions within each."),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation("Sprite",
+                               _("Sprite"),
+                               _("Sprite are animated object which can be used for most elements of a game."),
+                               "Florian Rival",
+                               "Open source (MIT License)")
+      .SetExtensionHelpPath("/objects/sprite");
 
   gd::ObjectMetadata& obj = extension.AddObject<SpriteObject>(
       "Sprite",

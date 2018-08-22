@@ -21,6 +21,10 @@ export default class ObjectField extends Component {
     if (this._field) this._field.focus();
   }
 
+  componentDidMount() {
+    if (this.props.value) this._doValidation();
+  }
+
   _getError = () => {
     if (this._field && !this._field.hasAValidObject())
       return "The object does not exist or can't be used here";
@@ -32,15 +36,17 @@ export default class ObjectField extends Component {
     this.setState({ errorText: this._getError() });
   };
 
+  _onChange = value => {
+    this.setState({ errorText: null });
+    this.props.onChange(value);
+  }
+
   render() {
     return (
       <ObjectSelector
         value={this.props.value}
-        onChange={value => {
-          this.setState({ errorText: null });
-          this.props.onChange(value);
-        }}
-        onChoose={objectName => this.props.onChange(objectName)}
+        onChange={this._onChange}
+        onChoose={this._onChange}
         allowedObjectType={this._allowedObjectType}
         project={this.props.project}
         layout={this.props.layout}

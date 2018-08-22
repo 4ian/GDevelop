@@ -12,13 +12,15 @@ namespace gd {
 void GD_CORE_API
 BuiltinExtensionsImplementer::ImplementsStringInstructionsExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "BuiltinStringInstructions",
-      _("Text manipulation"),
-      _("Built-in extension providing expressions for manipulating text "
-        "objects."),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "BuiltinStringInstructions",
+          _("Text manipulation"),
+          _("Built-in extension providing expressions for manipulating text "
+            "objects."),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
 #if defined(GD_IDE_ONLY)
   extension.AddStrExpression("NewLine",

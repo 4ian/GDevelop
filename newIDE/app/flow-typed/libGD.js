@@ -19,6 +19,7 @@ declare type gdBaseEvent = EmscriptenObject;
 declare type gdResource = EmscriptenObject;
 declare type gdObject = EmscriptenObject;
 declare type gdResourcesManager = EmscriptenObject;
+declare type gdEventsList = EmscriptenObject;
 
 declare type gdInstruction = EmscriptenObject;
 declare type gdInstructionMetadata = EmscriptenObject;
@@ -34,6 +35,9 @@ declare type gdSpriteObject = EmscriptenObject;
 declare type gdSprite = EmscriptenObject;
 declare type gdDirection = EmscriptenObject;
 declare type gdAnimation = EmscriptenObject;
+
+declare type gdVectorEventsSearchResult = EmscriptenObject;
+declare type gdMapStringPropertyDescriptor = EmscriptenObject;
 
 //Represents all objects that have serializeTo and unserializeFrom methods.
 declare type gdSerializable = EmscriptenObject;

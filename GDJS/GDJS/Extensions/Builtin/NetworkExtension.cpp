@@ -15,12 +15,6 @@ namespace gdjs {
 NetworkExtension::NetworkExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsNetworkExtension(*this);
 
-  SetExtensionInformation("BuiltinNetwork",
-                          _("Basic internet features"),
-                          _("Built-in extension providing network features."),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   GetAllActions()["SendRequest"].SetFunctionName(
       "gdjs.evtTools.network.sendHttpRequest");
   GetAllActions()["JSONToVariableStructure"].SetFunctionName(

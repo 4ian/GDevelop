@@ -10,11 +10,13 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
 
 void DeclareAnchorBehaviorExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation("AnchorBehavior",
-                                    _("Anchor"),
-                                    _("Anchor objects to the window's bounds."),
-                                    "Victor Levasseur",
-                                    "Open source (MIT License)");
+  extension
+      .SetExtensionInformation("AnchorBehavior",
+                               _("Anchor"),
+                               _("Anchor objects to the window's bounds."),
+                               "Victor Levasseur",
+                               "Open source (MIT License)")
+      .SetExtensionHelpPath("/behaviors/anchor");
 
   gd::BehaviorMetadata& aut = extension.AddBehavior(
       "AnchorBehavior",

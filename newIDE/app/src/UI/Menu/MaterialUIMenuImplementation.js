@@ -1,30 +1,7 @@
 import React from 'react';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
-import { isMacLike, isMobile } from '../../Utils/Platform';
-
-const adaptAcceleratorString = (accelerator: string): string => {
-  if (isMobile()) {
-    return ''; // Do not display accelerators on mobile devices
-  } else if (isMacLike()) {
-    return accelerator
-      .replace(/CmdOrCtrl\+/, '⌘')
-      .replace(/CommandOrControl\+/, '⌘')
-      .replace(/Super\+/, '⌘')
-      .replace(/Shift\+/, '⇧')
-      .replace(/Alt\+/, '⌥')
-      .replace(/Option\+/, '⌥')
-      .replace(/Delete/, '⌦')
-      .replace(/Backspace/, '⌫');
-  } else {
-    return accelerator
-      .replace(/CmdOrCtrl\+/, 'Ctrl+')
-      .replace(/CommandOrControl\+/, 'Ctrl+')
-      .replace(/Super\+/, 'Win+')
-      .replace(/Option\+/, 'Alt+')
-      .replace(/Delete/, 'DEL');
-  }
-};
+import { adaptAcceleratorString } from '../AcceleratorString';
 
 /**
  * Construct items for material-ui's Menu, using a template which

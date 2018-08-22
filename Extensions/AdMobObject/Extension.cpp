@@ -11,12 +11,14 @@ This project is released under the MIT License.
 #include "AdMobObject.h"
 
 void DeclareAdMobObjectExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "AdMobObject",
-      _("AdMob banners and interstitial screens"),
-      _("Display an ads banner and interstitial screens powered by AdMob."),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "AdMobObject",
+          _("AdMob banners and interstitial screens"),
+          _("Display an ads banner and interstitial screens powered by AdMob."),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("/objects/admob");
 
   gd::ObjectMetadata& obj = extension.AddObject<AdMobObject>(
       "AdMob",

@@ -17,7 +17,8 @@ void DeclareTiledSpriteObjectExtension(gd::PlatformExtension& extension) {
       _("Tiled Sprite Object"),
       _("This Extension enables the use of Tiled Sprite Objects."),
       "Victor Levasseur and Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetExtensionHelpPath("/objects/tiled_sprite");
 
   gd::ObjectMetadata& obj = extension.AddObject<TiledSpriteObject>(
       "TiledSprite",

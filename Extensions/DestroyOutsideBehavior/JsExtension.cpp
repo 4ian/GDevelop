@@ -22,12 +22,6 @@ class DestroyOutsideBehaviorJsExtension : public gd::PlatformExtension {
    * contains: objects, actions, conditions and expressions.
    */
   DestroyOutsideBehaviorJsExtension() {
-    SetExtensionInformation(
-        "DestroyOutsideBehavior",
-        _("Destroy Outside Screen Behavior"),
-        _("Behavior destroying object when they go outside the screen"),
-        "Florian Rival",
-        "Open source (MIT License)");
     DeclareDestroyOutsideBehaviorExtension(*this);
 
     GetBehaviorMetadata("DestroyOutsideBehavior::DestroyOutside")

@@ -1,17 +1,19 @@
+// @flow
 import { mapFor } from '../Utils/MapFor';
+import { type Schema, type Instance } from '.';
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
  *
- * @param {MapStringPropertyDescriptor} properties The properties to use
+ * @param {gdMapStringPropertyDescriptor} properties The properties to use
  * @param {*} getProperties The function called to read again the properties
  * @param {*} onUpdateProperty The function called to update a property of an object
  */
 export default (
-  properties,
-  getProperties: instance => any,
-  onUpdateProperty: (instance, propertyName, newValue) => void
-) => {
+  properties: gdMapStringPropertyDescriptor,
+  getProperties: (instance: Instance) => any,
+  onUpdateProperty: (instance: Instance, propertyName: string, newValue: string) => void
+): Schema => {
   const propertyNames = properties.keys();
   const propertyFields = mapFor(0, propertyNames.size(), i => {
     const name = propertyNames.at(i);

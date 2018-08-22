@@ -15,7 +15,8 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
       _("Draggable Behavior"),
       _("This Extension enables the movement of objects with a mouse."),
       "Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetExtensionHelpPath("behaviors/draggable");
 
   gd::BehaviorMetadata& aut =
       extension.AddBehavior("Draggable",

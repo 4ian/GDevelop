@@ -14,12 +14,14 @@ This project is released under the MIT License.
 #include "PanelSpriteObject.h"
 
 void DeclarePanelSpriteObjectExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation("PanelSpriteObject",
-                                    _("Panel Sprite (9-patch) Object"),
-                                    _("This Extension enables the use of Panel "
-                                      "Sprite (\"9-patch\") Objects."),
-                                    "Victor Levasseur and Florian Rival",
-                                    "Open source (MIT License)");
+  extension
+      .SetExtensionInformation("PanelSpriteObject",
+                               _("Panel Sprite (9-patch) Object"),
+                               _("This Extension enables the use of Panel "
+                                 "Sprite (\"9-patch\") Objects."),
+                               "Victor Levasseur and Florian Rival",
+                               "Open source (MIT License)")
+      .SetExtensionHelpPath("/objects/panel_sprite");
 
   gd::ObjectMetadata& obj = extension.AddObject<PanelSpriteObject>(
       "PanelSprite",

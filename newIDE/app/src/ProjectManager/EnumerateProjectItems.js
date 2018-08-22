@@ -14,20 +14,19 @@ export const enumerateExternalLayouts = (project: any) =>
     project.getExternalLayoutAt(i)
   );
 
-export const filterProjectItemsList = (
-  list: Array<gdLayout> | Array<gdExternalLayout> | Array<gdExternalEvents>,
+export const filterProjectItemsList = <T>(
+  list: Array<T>,
   searchText: string
-) => {
+): Array<T> => {
   if (!searchText) return list;
 
   const lowercaseSearchText = searchText.toLowerCase();
 
-  return list.filter((item: *) => {
-    return (
+  return list.filter(
+    (item: any) =>
       item
         .getName()
         .toLowerCase()
         .indexOf(lowercaseSearchText) !== -1
-    );
-  });
+  );
 };

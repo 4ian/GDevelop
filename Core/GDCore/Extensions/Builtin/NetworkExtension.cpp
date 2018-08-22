@@ -11,12 +11,14 @@ namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "BuiltinNetwork",
-      _("Basic internet features"),
-      _("Built-in extension providing network features."),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "BuiltinNetwork",
+          _("Basic internet features"),
+          _("Built-in extension providing network features."),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("/all-features/network");
 
 #if defined(GD_IDE_ONLY)
   extension

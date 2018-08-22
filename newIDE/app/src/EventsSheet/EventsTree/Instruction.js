@@ -10,10 +10,11 @@ import {
   instructionParameter,
   disabledText,
 } from './ClassNames';
-import InstructionsList, {
+import {
   type InstructionsListContext,
   type InstructionContext,
-} from './InstructionsList';
+} from '../SelectionHandler';
+import InstructionsList from './InstructionsList';
 const gd = global.gd;
 const instrFormatter = gd.InstructionSentenceFormatter.get();
 instrFormatter.loadTypesFormattingFromConfig();

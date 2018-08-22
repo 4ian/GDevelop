@@ -14,9 +14,10 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   extension.SetExtensionInformation(
       "TopDownMovementBehavior",
       _("Top-down movement"),
-      _("Move objects with either 4 or 8 directions"),
+      _("Move objects in either 4 or 8 directions"),
       "Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetExtensionHelpPath("/behaviors/topdown");
 
   gd::BehaviorMetadata& aut =
       extension.AddBehavior("TopDownMovementBehavior",

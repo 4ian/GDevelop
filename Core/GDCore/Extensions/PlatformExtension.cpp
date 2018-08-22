@@ -50,7 +50,8 @@ gd::InstructionMetadata& PlatformExtension::AddCondition(
                                                            sentence,
                                                            group,
                                                            icon,
-                                                           smallicon);
+                                                           smallicon)
+                                           .SetHelpPath(GetHelpPath());
   return conditionsInfos[nameWithNamespace];
 #endif
 }
@@ -73,7 +74,8 @@ gd::InstructionMetadata& PlatformExtension::AddAction(
                                                         sentence,
                                                         group,
                                                         icon,
-                                                        smallicon);
+                                                        smallicon)
+                                        .SetHelpPath(GetHelpPath());
   return actionsInfos[nameWithNamespace];
 #endif
 }
@@ -124,13 +126,13 @@ gd::ObjectMetadata& PlatformExtension::AddObject(
     std::shared_ptr<gd::Object> instance) {
   gd::String nameWithNamespace =
       GetNameSpace().empty() ? name : GetNameSpace() + name;
-  objectsInfos[nameWithNamespace] =
-      ObjectMetadata(GetNameSpace(),
-                     nameWithNamespace,
-                     fullname,
-                     description,
-                     icon24x24,
-                     instance);
+  objectsInfos[nameWithNamespace] = ObjectMetadata(GetNameSpace(),
+                                                   nameWithNamespace,
+                                                   fullname,
+                                                   description,
+                                                   icon24x24,
+                                                   instance)
+                                        .SetHelpPath(GetHelpPath());
 
   return objectsInfos[nameWithNamespace];
 }
@@ -156,7 +158,8 @@ gd::BehaviorMetadata& PlatformExtension::AddBehavior(
                                                       icon24x24,
                                                       className,
                                                       instance,
-                                                      sharedDatasInstance);
+                                                      sharedDatasInstance)
+                                         .SetHelpPath(GetHelpPath());
   return behaviorsInfo[nameWithNamespace];
 }
 
@@ -180,17 +183,19 @@ gd::EventMetadata& PlatformExtension::AddEvent(
 #endif
 }
 
-void PlatformExtension::SetExtensionInformation(const gd::String& name_,
-                                                const gd::String& fullname_,
-                                                const gd::String& description_,
-                                                const gd::String& author_,
-                                                const gd::String& license_) {
+PlatformExtension& PlatformExtension::SetExtensionInformation(
+    const gd::String& name_,
+    const gd::String& fullname_,
+    const gd::String& description_,
+    const gd::String& author_,
+    const gd::String& license_) {
   name = name_;
   fullname = fullname_;
   informations = description_;
   author = author_;
   license = license_;
   SetNameSpace(name_);
+  return *this;
 }
 
 std::vector<gd::String> PlatformExtension::GetExtensionObjectsTypes() const {

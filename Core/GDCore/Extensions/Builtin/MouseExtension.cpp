@@ -11,12 +11,14 @@ namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "BuiltinMouse",
-      _("Mouse features"),
-      _("Built-in extension that enables the use of a mouse"),
-      "Florian Rival",
-      "Open source (MIT License)");
+  extension
+      .SetExtensionInformation(
+          "BuiltinMouse",
+          _("Mouse features"),
+          _("Built-in extension that enables the use of a mouse"),
+          "Florian Rival",
+          "Open source (MIT License)")
+      .SetExtensionHelpPath("/events/mouse-touch");
 
 #if defined(GD_IDE_ONLY)
   extension

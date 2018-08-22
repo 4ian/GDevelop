@@ -1,5 +1,5 @@
 import React from 'react';
-const marginsSize = 8;
+const marginsSize = 4;
 
 export const Line = props => (
   <div

@@ -39,7 +39,7 @@ gdjs.Force.prototype.getY = function() {
 
 /**
  * Set the x component of the force.
- * @param x {Number} The new X component
+ * @param {number} x The new X component
  */
 gdjs.Force.prototype.setX = function(x) {
 	this._x = x;
@@ -48,7 +48,7 @@ gdjs.Force.prototype.setX = function(x) {
 
 /**
  * Set the y component of the force.
- * @param y {Number} The new Y component
+ * @param {number} y The new Y component
  */
 gdjs.Force.prototype.setY = function(y) {
 	this._y = y;
@@ -57,7 +57,7 @@ gdjs.Force.prototype.setY = function(y) {
 
 /**
  * Set the angle of the force.
- * @param angle {Number} The new angle
+ * @param {number} angle The new angle
  */
 gdjs.Force.prototype.setAngle = function(angle) {
 
@@ -73,7 +73,7 @@ gdjs.Force.prototype.setAngle = function(angle) {
 
 /**
  * Set the length of the force.
- * @param len {Number} The length
+ * @param {number} len The length
  */
 gdjs.Force.prototype.setLength = function(len) {
 
@@ -125,6 +125,7 @@ gdjs.Force.prototype.getClearing = function() {
 
 /**
  * Set if the force clearing.
+ * @param {number} clearing The new value
  */
 gdjs.Force.prototype.setClearing = function(clearing) {
 	this._clearing = clearing;

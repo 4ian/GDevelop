@@ -15,13 +15,6 @@ namespace gdjs {
 ExternalLayoutsExtension::ExternalLayoutsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsExternalLayoutsExtension(*this);
 
-  SetExtensionInformation("BuiltinExternalLayouts",
-                          _("External layouts"),
-                          _("Built-in extension providing actions and "
-                            "conditions related to external layouts"),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   GetAllActions()["BuiltinExternalLayouts::CreateObjectsFromExternalLayout"]
       .SetFunctionName(
           "gdjs.evtTools.runtimeScene.createObjectsFromExternalLayout");

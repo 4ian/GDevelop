@@ -14,13 +14,6 @@ namespace gdjs {
 AdvancedExtension::AdvancedExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsAdvancedExtension(*this);
 
-  SetExtensionInformation(
-      "BuiltinAdvanced",
-      _("Advanced control features"),
-      _("Built-in extension providing advanced control features."),
-      "Florian Rival",
-      "Open source (MIT License)");
-
   GetAllConditions()["Toujours"].SetFunctionName(
       "gdjs.evtTools.common.logicalNegation");
 }

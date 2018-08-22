@@ -13,14 +13,6 @@ namespace gdjs {
 SpriteExtension::SpriteExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsSpriteExtension(*this);
 
-  SetExtensionInformation(
-      "Sprite",
-      _("Sprite"),
-      _("Extension for adding animated objects in the scene, which can contain "
-        "animations with directions within each."),
-      "Florian Rival",
-      "Open source (MIT License)");
-
   auto& spriteActions = GetAllActionsForObject("Sprite");
   auto& spriteConditions = GetAllConditionsForObject("Sprite");
   auto& spriteExpressions = GetAllExpressionsForObject("Sprite");

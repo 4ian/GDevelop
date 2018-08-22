@@ -15,13 +15,6 @@ namespace gdjs {
 FileExtension::FileExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsFileExtension(*this);
 
-  SetExtensionInformation(
-      "BuiltinFile",
-      _("Files"),
-      _("Built-in extension providing functions for storing data."),
-      "Florian Rival",
-      "Open source (MIT License)");
-
   GetAllActions()["LoadFile"].SetFunctionName(
       "gdjs.evtTools.storage.loadJSONFileFromStorage");
   GetAllConditions()["GroupExists"].SetFunctionName(

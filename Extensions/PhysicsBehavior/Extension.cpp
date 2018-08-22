@@ -20,7 +20,8 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
       _("This extension enables the movement of objects as if they are subject "
         "to the laws of physics."),
       "Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetExtensionHelpPath("/behaviors/physics");
 
   {
     gd::BehaviorMetadata& aut = extension.AddBehavior(

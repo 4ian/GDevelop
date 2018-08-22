@@ -17,12 +17,6 @@ namespace gdjs {
 JoystickExtension::JoystickExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsJoystickExtension(*this);
 
-  SetExtensionInformation("BuiltinJoystick",
-                          _("Joysticks features"),
-                          _("Built-in extension allowing to use joysticks"),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   // Nothing is available for now.
   StripUnimplementedInstructionsAndExpressions();  // Unimplemented things are
                                                    // listed here:

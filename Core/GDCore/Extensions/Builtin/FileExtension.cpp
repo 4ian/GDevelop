@@ -11,12 +11,14 @@ namespace gd {
 
 void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
     gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation("BuiltinFile",
-                                    _("Storage and files"),
-                                    _("Built-in extension providing functions "
-                                      "to store data and manipulate files."),
-                                    "Florian Rival",
-                                    "Open source (MIT License)");
+  extension
+      .SetExtensionInformation("BuiltinFile",
+                               _("Storage and files"),
+                               _("Built-in extension providing functions "
+                                 "to store data and manipulate files."),
+                               "Florian Rival",
+                               "Open source (MIT License)")
+      .SetExtensionHelpPath("/all-features/storage");
 
 #if defined(GD_IDE_ONLY)
   extension

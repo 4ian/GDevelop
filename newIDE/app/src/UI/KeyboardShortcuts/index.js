@@ -14,6 +14,7 @@ const MINUS_KEY = 189;
 const NUMPAD_ADD = 107;
 const NUMPAD_SUBSTRACT = 109;
 const C_KEY = 67;
+const F_KEY = 70;
 const V_KEY = 86;
 const X_KEY = 88;
 const Y_KEY = 89;
@@ -29,6 +30,7 @@ export default class KeyboardShortcuts {
     onPaste,
     onUndo,
     onRedo,
+    onSearch,
     onZoomOut,
     onZoomIn,
   }) {
@@ -41,6 +43,7 @@ export default class KeyboardShortcuts {
     this.onRedo = onRedo || this._noop;
     this.onZoomOut = onZoomOut || this._noop;
     this.onZoomIn = onZoomIn || this._noop;
+    this.onSearch = onSearch || this._noop;
     this.isFocused = false;
     this.shiftPressed = false;
     this.rawCtrlPressed = false;
@@ -135,6 +138,9 @@ export default class KeyboardShortcuts {
     }
     if (this._isControlPressed() && evt.which === Y_KEY) {
       this.onRedo();
+    }
+    if (this._isControlPressed() && evt.which === F_KEY) {
+      this.onSearch();
     }
 
     if (isMacLike()) {

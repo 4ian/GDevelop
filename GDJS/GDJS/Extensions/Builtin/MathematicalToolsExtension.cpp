@@ -17,12 +17,6 @@ namespace gdjs {
 MathematicalToolsExtension::MathematicalToolsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsMathematicalToolsExtension(*this);
 
-  SetExtensionInformation("BuiltinMathematicalTools",
-                          _("Mathematical tools"),
-                          _("Built-in extension providing mathematical tools"),
-                          "Florian Rival",
-                          "Open source (MIT License)");
-
   GetAllExpressions()["cos"].SetFunctionName("Math.cos");
   GetAllExpressions()["sin"].SetFunctionName("Math.sin");
   GetAllExpressions()["tan"].SetFunctionName("Math.tan");

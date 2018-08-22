@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { Line, Column } from '../../UI/Grid';
 import ResourceSelectorWithThumbnail from '../../ResourcesList/ResourceSelectorWithThumbnail';
 import { type EditorProps } from './EditorProps.flow';
@@ -37,22 +37,22 @@ export default class TiledSpriteEditor extends React.Component<
           />
         </Line>
         <Line>
-          <TextField
+          <SemiControlledTextField
             floatingLabelText="Default width (in pixels)"
             fullWidth
             type="number"
             value={tiledSpriteObject.getWidth()}
-            onChange={(e, value) => {
+            onChange={ value => {
               tiledSpriteObject.setWidth(parseInt(value, 10));
               this.forceUpdate();
             }}
           />
-          <TextField
+          <SemiControlledTextField
             floatingLabelText="Default height (in pixels)"
             fullWidth
             type="number"
             value={tiledSpriteObject.getHeight()}
-            onChange={(e, value) => {
+            onChange={ value => {
               tiledSpriteObject.setHeight(parseInt(value, 10));
               this.forceUpdate();
             }}

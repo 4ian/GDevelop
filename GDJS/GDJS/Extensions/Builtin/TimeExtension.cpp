@@ -17,13 +17,6 @@ namespace gdjs {
 TimeExtension::TimeExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsTimeExtension(*this);
 
-  SetExtensionInformation(
-      "BuiltinTime",
-      _("Time"),
-      _("Built-in extension providing actions and conditions about the time."),
-      "Florian Rival",
-      "Open source (MIT License)");
-
   GetAllConditions()["Timer"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.timerElapsedTime");
   GetAllConditions()["TimerPaused"].SetFunctionName(

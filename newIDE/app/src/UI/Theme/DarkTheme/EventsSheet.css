@@ -117,3 +117,16 @@
 .gd-events-sheet-dark-theme .instruction-parameter.globalvar {
     color: #18DCF2;
 }
+
+/**
+ * Search results highlight
+ */
+ .gd-events-sheet-dark-theme .rst__rowSearchMatch {
+    outline: none;
+    border-left: solid 3px #18DCF2;
+}
+
+.gd-events-sheet-dark-theme .rst__rowSearchFocus {
+    outline: none;
+    border-left: solid 5px #18DCF2;
+}

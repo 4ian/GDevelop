@@ -22,7 +22,7 @@ class Project;
 class Layout;
 class EventsCodeGenerator;
 class EventsCodeGenerationContext;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -86,7 +86,8 @@ class GD_CORE_API ParameterMetadata {
    * "objectList". \see gd::ParameterMetadata::GetType
    */
   static bool IsObject(const gd::String &parameterType) {
-    return parameterType == "object" || parameterType == "objectPtr" || parameterType == "objectList" ||
+    return parameterType == "object" || parameterType == "objectPtr" ||
+           parameterType == "objectList" ||
            parameterType == "objectListWithoutPicking";
   }
 
@@ -94,7 +95,8 @@ class GD_CORE_API ParameterMetadata {
    * \brief Return true if the type of the parameter is "object", "objectPtr" or
    * "objectList". \see gd::ParameterMetadata::GetType
    */
-  static bool IsExpression(const gd::String &type, const gd::String &parameterType) {
+  static bool IsExpression(const gd::String &type,
+                           const gd::String &parameterType) {
     if (type == "number") {
       return parameterType == "expression" || parameterType == "camera";
     } else if (type == "string") {
@@ -141,15 +143,15 @@ class GD_CORE_API InstructionMetadata {
   bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
 
   /**
-   * Get the help page of the instruction.
+   * Get the help path of the instruction, relative to the documentation root.
    */
-  const gd::String &GetHelpPage() const { return helpPage; }
+  const gd::String &GetHelpPath() const { return helpPath; }
 
   /**
-   * Set the help page of the instruction.
+   * Set the help path of the instruction, relative to the documentation root.
    */
-  InstructionMetadata &SetHelpPage(const gd::String &page) {
-    helpPage = page;
+  InstructionMetadata &SetHelpPath(const gd::String &path) {
+    helpPath = path;
     return *this;
   }
 
@@ -387,9 +389,7 @@ class GD_CORE_API InstructionMetadata {
    * \brief Return the structure containing the information about code
    * generation for the instruction.
    */
-  ExtraInformation &GetCodeExtraInformation() {
-    return codeExtraInformation;
-  }
+  ExtraInformation &GetCodeExtraInformation() { return codeExtraInformation; }
 
   /**
    * \brief Declare if the instruction being declared is somewhat manipulating
@@ -421,7 +421,7 @@ class GD_CORE_API InstructionMetadata {
  private:
   gd::String fullname;
   gd::String description;
-  gd::String helpPage;
+  gd::String helpPath;
   gd::String sentence;
   gd::String group;
 #if !defined(GD_NO_WX_GUI)

@@ -109,7 +109,8 @@ gd::InstructionMetadata& ObjectMetadata::AddCondition(
                                                            sentence,
                                                            group,
                                                            icon,
-                                                           smallicon);
+                                                           smallicon)
+                                           .SetHelpPath(GetHelpPath());
   return conditionsInfos[nameWithNamespace];
 #endif
 }
@@ -132,7 +133,8 @@ gd::InstructionMetadata& ObjectMetadata::AddAction(
                                                         sentence,
                                                         group,
                                                         icon,
-                                                        smallicon);
+                                                        smallicon)
+                                        .SetHelpPath(GetHelpPath());
   return actionsInfos[nameWithNamespace];
 #endif
 }

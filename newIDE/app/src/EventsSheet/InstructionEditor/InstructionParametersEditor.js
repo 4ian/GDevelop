@@ -4,6 +4,7 @@ import Toggle from 'material-ui/Toggle';
 import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from './ParameterRenderingService';
+import HelpButton from '../../UI/HelpButton';
 const gd = global.gd;
 
 const styles = {
@@ -69,6 +70,7 @@ export default class InstructionParametersEditor extends Component {
           project.getCurrentPlatform(),
           type
         );
+    const helpPage = instructionMetadata.getHelpPath();
 
     //TODO?
     instruction.setParametersCount(instructionMetadata.getParametersCount());
@@ -133,6 +135,18 @@ export default class InstructionParametersEditor extends Component {
                 instruction.setInverted(enabled);
                 this.forceUpdate();
               }}
+            />
+          )}
+        </div>
+        <div>
+          {helpPage && (
+            <HelpButton
+              helpPagePath={instructionMetadata.getHelpPath()}
+              label={
+                this.props.isCondition
+                  ? 'Help for this condition'
+                  : 'Help for this action'
+              }
             />
           )}
         </div>

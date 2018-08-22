@@ -26,7 +26,8 @@ class Extension : public ExtensionBase {
         _("3D Box Object"),
         _("This Extension enables the use of 3D Box objects."),
         "Florian Rival",
-        "Open source (MIT License)");
+        "Open source (MIT License)")
+        .SetExtensionHelpPath("" /*TODO: Add a documentation page for this */);
 
     {
       gd::ObjectMetadata& obj =

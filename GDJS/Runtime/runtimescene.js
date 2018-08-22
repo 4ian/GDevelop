@@ -465,6 +465,7 @@ gdjs.RuntimeScene.prototype.addObject = function(obj) {
 /**
  * Get all the instances of the object called name.
  * @param {string} name Name of the object for which the instances must be returned.
+ * @return {gdjs.RuntimeObject[]} The list of objects with the given name
  */
 gdjs.RuntimeScene.prototype.getObjects = function(name){
 	if ( !this._instances.containsKey(name) ) {
@@ -479,7 +480,7 @@ gdjs.RuntimeScene.prototype.getObjects = function(name){
  * Create a new object from its name. The object is also added to the instances
  * living on the scene ( No need to call RuntimeScene.addObject )
  * @param {string} objectName The name of the object to be created
- * @return The created object
+ * @return {gdjs.RuntimeObject} The created object
  */
 gdjs.RuntimeScene.prototype.createObject = function(objectName){
 
@@ -507,7 +508,7 @@ gdjs.RuntimeScene.prototype.createObject = function(objectName){
 
 /**
  * Must be called whenever an object must be removed from the scene.
- * @param object The object to be removed.
+ * @param {gdjs.RuntimeObject} object The object to be removed.
  */
 gdjs.RuntimeScene.prototype.markObjectForDeletion = function(obj) {
 	//Add to the objects removed list.
@@ -582,6 +583,10 @@ gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
 	return null;
 };
 
+/**
+ * Get the layer with the given name
+ * @param {gdjs.Layer} name The name of the layer
+ */
 gdjs.RuntimeScene.prototype.getLayer = function(name) {
 	if ( this._layers.containsKey(name) )
 		return this._layers.get(name);
@@ -599,7 +604,7 @@ gdjs.RuntimeScene.prototype.getAllLayerNames = function(result) {
 
 /**
  * Get the TimeManager of the scene.
- * @return The gdjs.TimeManager of the scene.
+ * @return {gdjs.TimeManager} The gdjs.TimeManager of the scene.
  */
 gdjs.RuntimeScene.prototype.getTimeManager = function() {
 	return this._timeManager;
@@ -607,7 +612,7 @@ gdjs.RuntimeScene.prototype.getTimeManager = function() {
 
 /**
  * Shortcut to get the SoundManager of the game.
- * @return The gdjs.SoundManager of the game.
+ * @return {gdjs.SoundManager} The gdjs.SoundManager of the game.
  */
 gdjs.RuntimeScene.prototype.getSoundManager = function() {
 	return this._runtimeGame.getSoundManager();
@@ -640,8 +645,8 @@ gdjs.RuntimeScene.prototype.getRequestedScene = function() {
 /**
  * Request a scene change to be made. The change is handled externally (see gdjs.SceneStack)
  * thanks to getRequestedChange and getRequestedScene methods.
- * @param change One of gdjs.RuntimeScene.CONTINUE|PUSH_SCENE|POP_SCENE|REPLACE_SCENE|CLEAR_SCENES|STOP_GAME.
- * @param sceneName The name of the new scene to launch, if applicable.
+ * @param {number} change One of gdjs.RuntimeScene.CONTINUE|PUSH_SCENE|POP_SCENE|REPLACE_SCENE|CLEAR_SCENES|STOP_GAME.
+ * @param {string} sceneName The name of the new scene to launch, if applicable.
  */
 gdjs.RuntimeScene.prototype.requestChange = function(change, sceneName) {
 	this._requestedChange = change;
@@ -658,7 +663,7 @@ gdjs.RuntimeScene.prototype.getProfiler = function() {
 /**
  * Start a new profiler to measures the time passed in sections of the engine
  * in the scene.
- * @param onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
+ * @param {Function} onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
  */
 gdjs.RuntimeScene.prototype.startProfiler = function(onProfilerStopped) {
 	if (this._profiler) return;

@@ -127,7 +127,7 @@ gdjs.Variable.prototype.clearChildren = function() {
 
 /**
  * Get the value of the variable, considered as a number
- * @return {Number} The number stored
+ * @return {number} The number stored in the variable
  */
 gdjs.Variable.prototype.getAsNumber = function() {
 	if ( this._numberDirty ) {
@@ -141,7 +141,7 @@ gdjs.Variable.prototype.getAsNumber = function() {
 
 /**
  * Change the value of the variable, considered as a number
- * @param newValue {Number} The new value to be set
+ * @param {number} newValue The new value to be set
  */
 gdjs.Variable.prototype.setNumber = function(newValue) {
 	this._value = newValue;
@@ -151,7 +151,7 @@ gdjs.Variable.prototype.setNumber = function(newValue) {
 
 /**
  * Get the value of the variable, considered as a string
- * @return {string} The number stored
+ * @return {string} The string stored in the variable
  */
 gdjs.Variable.prototype.getAsString = function() {
 	if ( this._stringDirty ) {

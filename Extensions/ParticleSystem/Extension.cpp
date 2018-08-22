@@ -20,7 +20,8 @@ void DeclareParticleSystemExtension(gd::PlatformExtension& extension) {
       _("Particle system"),
       _("This Extension can display a large number of small particles."),
       "Florian Rival",
-      "Open source (MIT License)");
+      "Open source (MIT License)")
+      .SetExtensionHelpPath("/objects/particles_emitter");
 
   // Declaration of all objects available
   {

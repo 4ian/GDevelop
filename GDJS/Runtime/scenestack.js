@@ -3,6 +3,7 @@
  * Hold the stack of scenes (gdjs.RuntimeScene) being played.
  * 
  * @memberof gdjs
+ * @param {gdjs.RuntimeGame} runtimeGame The runtime game that is using the scene stack
  * @class SceneStack
  */
 gdjs.SceneStack = function(runtimeGame) {
@@ -11,6 +12,8 @@ gdjs.SceneStack = function(runtimeGame) {
     }
 
     this._runtimeGame = runtimeGame;
+
+    /** @type gdjs.RuntimeScene[] */
 	this._stack = [];
 };
 
@@ -28,7 +31,8 @@ gdjs.SceneStack.prototype.step = function(elapsedTime) {
     	var request = currentScene.getRequestedChange();
         //Something special was requested by the current scene.
         if (request === gdjs.RuntimeScene.STOP_GAME) {
-            return false;
+            this._runtimeGame.getRenderer().stopGame();
+            return true;
         } else if (request === gdjs.RuntimeScene.POP_SCENE) {
         	this.pop();
         } else if (request === gdjs.RuntimeScene.PUSH_SCENE) {

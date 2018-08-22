@@ -3,12 +3,17 @@
  * The renderer for a gdjs.RuntimeGame using Pixi.js.
  * @class RuntimeGamePixiRenderer
  * @memberof gdjs
+ * @param {gdjs.RuntimeGame} game The game that is being rendered
+ * @param {number} width The default width of the renderer
+ * @param {number} height The default height of the renderer
+ * @param {boolean} forceFullscreen If fullscreen should be always activated
  */
 gdjs.RuntimeGamePixiRenderer = function(game, width, height, forceFullscreen)
 {
     this._game = game;
 
-    this._isFullscreen = true; //Used to track if the canvas is displayed as fullscreen (see setFullscreen method).
+    this._isFullPage = true; //Used to track if the canvas is displayed on the full page.
+    this._isFullscreen = false; //Used to track if the window is displayed as fullscreen (see setFullscreen method).
     this._forceFullscreen = forceFullscreen; //If set to true, the canvas will always be displayed as fullscreen, even if _isFullscreen == false.
     this._pixiRenderer = null;
     this._canvasArea = null;
@@ -91,7 +96,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.setSize = function(width, height) {
 
 
 /**
- * Resize the canvas, according to _isFullscreen, _forceFullscreen, _currentWidth,
+ * Resize the canvas, according to _isFullPage, _isFullscreen, _forceFullscreen, _currentWidth,
  * _currentHeight, _marginTop, _marginLeft, _marginRight, _marginBottom, _keepRatio.
  *
  * @private
@@ -100,6 +105,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.resize = function() {
     var keepRatio = this._keepRatio;
 
     var reduceIfNeed = this._reduceIfNeed;
+    var isFullPage = this._forceFullscreen || this._isFullPage || this._isFullscreen;
     var isFullscreen = this._forceFullscreen || this._isFullscreen;
     var width = this.getCurrentWidth();
     var height = this.getCurrentHeight();
@@ -112,10 +118,10 @@ gdjs.RuntimeGamePixiRenderer.prototype.resize = function() {
     if (maxWidth < 0) maxWidth = 0;
     if (maxHeight < 0) maxHeight = 0;
 
-    if (isFullscreen && !keepRatio) {
+    if (isFullPage && !keepRatio) {
         width = maxWidth;
         height = maxHeight;
-    } else if (isFullscreen && keepRatio ||
+    } else if (isFullPage && keepRatio ||
         (reduceIfNeed && (width > maxWidth || height > maxHeight))) {
         var factor = maxWidth/width;
         if (height*factor > maxHeight) factor = maxHeight/height;
@@ -168,27 +174,37 @@ gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function(enable) {
 
     if (this._isFullscreen !== enable) {
         this._isFullscreen = !!enable;
+
+        var electron = gdjs.RuntimeGamePixiRenderer.getElectron();
+        if (electron) { // Use Electron BrowserWindow API
+            var browserWindow = electron.remote.getCurrentWindow();
+            if (browserWindow) {
+                browserWindow.setFullScreen(this._isFullscreen);
+            }
+        } else { // Use HTML5 Fullscreen API
+            //TODO: Do this on a user gesture, otherwise most browsers won't activate fullscreen
+            if (this._isFullscreen) {
+                if(document.documentElement.requestFullScreen) {
+                    document.documentElement.requestFullScreen();
+                } else if(document.documentElement.mozRequestFullScreen) {
+                    document.documentElement.mozRequestFullScreen();
+                } else if(document.documentElement.webkitRequestFullScreen) {
+                    document.documentElement.webkitRequestFullScreen();
+                }
+            }
+            else {
+                if(document.cancelFullScreen) {
+                    document.cancelFullScreen();
+                } else if(document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if(document.webkitCancelFullScreen) {
+                    document.webkitCancelFullScreen();
+                }
+            }
+        }
+
         this.resize();
         this._notifySceneForResize = true;
-
-        if (this._isFullscreen) {
-            if(document.documentElement.requestFullScreen) {
-                document.documentElement.requestFullScreen();
-            } else if(document.documentElement.mozRequestFullScreen) {
-                document.documentElement.mozRequestFullScreen();
-            } else if(document.documentElement.webkitRequestFullScreen) {
-                document.documentElement.webkitRequestFullScreen();
-            }
-        }
-        else {
-            if(document.cancelFullScreen) {
-                document.cancelFullScreen();
-            } else if(document.mozCancelFullScreen) {
-                document.mozCancelFullScreen();
-            } else if(document.webkitCancelFullScreen) {
-                document.webkitCancelFullScreen();
-            }
-        }
     }
 };
 
@@ -346,4 +362,48 @@ gdjs.RuntimeGamePixiRenderer.getScreenWidth = function() {
 
 gdjs.RuntimeGamePixiRenderer.getScreenHeight = function() {
     return (typeof window !== "undefined") ? window.innerHeight : 800;
+}
+
+/**
+ * Open the given URL in the system browser (or a new tab)
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.openURL = function() {
+    // Try to detect the environment to use the most adapted
+    // way of opening an URL.
+    if (typeof Cocoon !== "undefined" && Cocoon.App && Cocoon.App.openURL) {
+        Cocoon.App.openURL(url);
+    } else if (typeof window !== "undefined") {
+        var target = window.cordova ? "_system" : "_blank";
+        window.open(url, target);
+    }
+}
+
+/**
+ * Close the game, if applicable
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.stopGame = function() {
+    // Try to detect the environment to use the most adapted
+    // way of closing the app
+    var electron = gdjs.RuntimeGamePixiRenderer.getElectron();
+    if (electron) {
+        var browserWindow = electron.remote.getCurrentWindow();
+        if (browserWindow) {
+            browserWindow.close();
+        }
+    } else if (typeof navigator !== "undefined" && navigator.app && navigator.app.exitApp) {
+        navigator.app.exitApp();
+    }
+
+    // HTML5 games on mobile/browsers don't have a way to close their window/page.
+}
+
+/**
+ * Get the electron module, if running as a electron renderer process.
+ */
+gdjs.RuntimeGamePixiRenderer.getElectron = function() {
+    if (typeof require !== "undefined") {
+        return require('electron');
+    }
+
+    return null;
 }

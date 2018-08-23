@@ -5,8 +5,8 @@
  */
 #ifndef EventsTypesLister_H
 #define EventsTypesLister_H
-#include <map>
 #include <iostream>
+#include <map>
 #include <memory>
 #include <vector>
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
@@ -15,7 +15,7 @@ namespace gd {
 class BaseEvent;
 class Project;
 class EventsList;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -26,20 +26,28 @@ namespace gd {
  */
 class GD_CORE_API EventsTypesLister : public ArbitraryEventsWorker {
  public:
-  EventsTypesLister() {std::cout<< "Created"<<std::endl;};
+  EventsTypesLister(){};
   virtual ~EventsTypesLister();
 
   /**
    * Return the types of all events
    */
-  const std::vector<gd::String>& GetAllEventsTypes() {
-    return allEventsTypes;
+  const std::vector<gd::String>& GetAllEventsTypes() { return allEventsTypes; }
+
+  /**
+   * Return the types of all instructions
+   */
+  const std::vector<gd::String>& GetAllInstructionsTypes() {
+    return allInstructionsTypes;
   }
 
  private:
-  // virtual bool DoVisitEvent(gd::BaseEvent& event) override;
+  bool DoVisitEvent(gd::BaseEvent& event) override;
+  bool DoVisitInstruction(gd::Instruction& instruction,
+                          bool isCondition) override;
 
   std::vector<gd::String> allEventsTypes;
+  std::vector<gd::String> allInstructionsTypes;
 };
 
 }  // namespace gd

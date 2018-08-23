@@ -5,6 +5,7 @@
  */
 const gd = require('../public/libGD.js')();
 const fs = require('fs');
+const _ = require('lodash');
 
 // The base URL where all resources of web-app examples are stored.
 const baseUrl = 'https://df5lqcdudryde.cloudfront.net/examples';
@@ -155,23 +156,25 @@ const getObjectTypes = (projectOrLayout) => {
     types.push(object.getType());
   }
 
+  return _.uniq(types);
+}
+
+const getEventsAndInstructionsTypes = (events) => {
+  const eventsTypesLister = new gd.EventsTypesLister();
+  eventsTypesLister.launch(events);
+  const types = {
+    events: _.uniq(eventsTypesLister.getAllEventsTypes().toJSArray()),
+    instructions: _.uniq(eventsTypesLister.getAllInstructionsTypes().toJSArray()),
+  };
+  eventsTypesLister.delete();
   return types;
 }
 
-const getEventsTypes = (events) => {
-  const eventsTypesLister = new gd.EventsTypesLister();
-  eventsTypesLister.launch(events);
-  console.log("DONE");
-  return eventsTypesLister.getAllEventsTypes().toJSArray();
-}
-
 const updateResources = (project, baseUrl) => {
-  console.log(project.getLayoutsCount());
   const layout = project.getLayoutAt(0);
   console.log(getObjectTypes(layout));
   const events = layout.getEvents();
-  console.log(events.getEventAt(0));
-  console.log(getEventsTypes(events));
+  console.log(getEventsAndInstructionsTypes(events));
 };
 
 Promise.all(

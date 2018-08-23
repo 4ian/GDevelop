@@ -16,12 +16,18 @@
 
 namespace gd {
 
-// bool EventsTypesLister::DoVisitEvent(gd::BaseEvent& event) {
-//       std::cout << "hello" << &event << std::endl;
-//   allEventsTypes.push_back(event.GetType());
+bool EventsTypesLister::DoVisitEvent(gd::BaseEvent& event) {
+  allEventsTypes.push_back(event.GetType());
 
-//   return false;
-// }
+  return false;
+}
+
+bool EventsTypesLister::DoVisitInstruction(gd::Instruction& instruction,
+                                           bool isCondition) {
+  allInstructionsTypes.push_back(instruction.GetType());
+
+  return false;
+}
 
 EventsTypesLister::~EventsTypesLister() {}
 

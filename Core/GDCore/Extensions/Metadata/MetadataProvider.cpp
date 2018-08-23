@@ -21,6 +21,25 @@ gd::ObjectMetadata MetadataProvider::badObjectInfo;
 gd::InstructionMetadata MetadataProvider::badInstructionMetadata;
 gd::ExpressionMetadata MetadataProvider::badExpressionMetadata;
 gd::ExpressionMetadata MetadataProvider::badStrExpressionMetadata;
+gd::PlatformExtension MetadataProvider::badExtension;
+
+ExtensionAndMetadata<BehaviorMetadata>
+MetadataProvider::GetExtensionAndBehaviorMetadata(const gd::Platform& platform,
+                                                  gd::String behaviorType) {
+  for (std::size_t i = 0; i < platform.GetAllPlatformExtensions().size(); ++i) {
+    std::vector<gd::String> autosTypes =
+        platform.GetAllPlatformExtensions()[i]->GetBehaviorsTypes();
+    for (std::size_t j = 0; j < autosTypes.size(); ++j) {
+      if (autosTypes[j] == behaviorType)
+        return ExtensionAndMetadata(
+            *platform.GetAllPlatformExtensions()[i],
+            platform.GetAllPlatformExtensions()[i]->GetBehaviorMetadata(
+                behaviorType));
+    }
+  }
+
+  return ExtensionAndMetadata<BehaviorMetadata>(badExtension, badBehaviorInfo);
+}
 
 /**
  * Get the metadata about a behavior in a platform

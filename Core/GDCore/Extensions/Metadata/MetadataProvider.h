@@ -18,46 +18,62 @@ class PlatformExtension;
 
 namespace gd {
 
+/**
+ * \brief A container for metadata about an object/behavior/instruction/expression
+ * and its associated extension.
+ */
 template <class T>
 class ExtensionAndMetadata {
  public:
   ExtensionAndMetadata(const gd::PlatformExtension& extension_,
                        const T& metadata_)
-      : extension(extension_),
-        metadata(metadata_){
+      : extension(&extension_), metadata(&metadata_){};
 
-        };
+  /**
+   * \brief Default constructor, only here to satisfy Emscripten bindings.
+   * \warning Please do not use.
+   * \private
+   */
+  ExtensionAndMetadata()
+      : extension(nullptr), metadata(nullptr){};
 
-  const gd::PlatformExtension& GetExtension() { return extension; };
-  const T& GetMetadata() { return metadata; };
+  /**
+   * \brief Get the associated extension.
+   */
+  const gd::PlatformExtension& GetExtension() { return *extension; };
+
+  /**
+   * \brief Get the metadata.
+   */
+  const T& GetMetadata() { return *metadata; };
 
  private:
-  const gd::PlatformExtension& extension;
-  const T& metadata;
+  const gd::PlatformExtension* extension;
+  const T* metadata;
 };
 
 /**
  * \brief Allow to easily get metadata for instructions (i.e actions and
- * conditions), objects and behaviors.
+ * conditions), expressions, objects and behaviors.
  *
  * \ingroup PlatformDefinition
  */
 class GD_CORE_API MetadataProvider {
  public:
   /**
-   * Get the metadata about a behavior in a project using a platform
+   * Get the metadata about a behavior, and its associated extension.
    */
   static ExtensionAndMetadata<BehaviorMetadata> GetExtensionAndBehaviorMetadata(
       const gd::Platform& platform, gd::String behaviorType);
 
   /**
-   * Get the metadata about an object in a project using a platform
+   * Get the metadata about an object, and its associated extension.
    */
   static ExtensionAndMetadata<ObjectMetadata> GetExtensionAndObjectMetadata(
       const gd::Platform& platform, gd::String type);
 
   /**
-   * Get the metadata of an action.
+   * Get the metadata of an action, and its associated extension.
    * Works for object, behaviors and static actions.
    */
   static ExtensionAndMetadata<InstructionMetadata>
@@ -65,7 +81,7 @@ class GD_CORE_API MetadataProvider {
                                 gd::String actionType);
 
   /**
-   * Get the metadata of a condition.
+   * Get the metadata of a condition, and its associated extension.
    * Works for object, behaviors and static conditions.
    */
   static ExtensionAndMetadata<InstructionMetadata>
@@ -73,7 +89,7 @@ class GD_CORE_API MetadataProvider {
                                    gd::String conditionType);
 
   /**
-   * Get information about an expression from its type
+   * Get information about an expression, and its associated extension.
    * Works for static expressions.
    */
   static ExtensionAndMetadata<ExpressionMetadata>
@@ -81,7 +97,7 @@ class GD_CORE_API MetadataProvider {
                                     gd::String exprType);
 
   /**
-   * Get information about an expression from its type
+   * Get information about an expression, and its associated extension.
    * Works for object expressions.
    */
   static ExtensionAndMetadata<ExpressionMetadata>
@@ -90,7 +106,7 @@ class GD_CORE_API MetadataProvider {
                                           gd::String exprType);
 
   /**
-   * Get information about an expression from its type
+   * Get information about an expression, and its associated extension.
    * Works for behavior expressions.
    */
   static ExtensionAndMetadata<ExpressionMetadata>
@@ -99,7 +115,7 @@ class GD_CORE_API MetadataProvider {
                                             gd::String exprType);
 
   /**
-   * Get information about a string expression from its type
+   * Get information about a string expression, and its associated extension.
    * Works for static expressions.
    */
   static ExtensionAndMetadata<ExpressionMetadata>
@@ -107,7 +123,7 @@ class GD_CORE_API MetadataProvider {
                                        gd::String exprType);
 
   /**
-   * Get information about a string expression from its type
+   * Get information about a string expression, and its associated extension.
    * Works for object expressions.
    */
   static ExtensionAndMetadata<ExpressionMetadata>
@@ -116,7 +132,7 @@ class GD_CORE_API MetadataProvider {
                                              gd::String exprType);
 
   /**
-   * Get information about a string expression from its type
+   * Get information about a string expression, and its associated extension.
    * Works for behavior expressions.
    */
   static ExtensionAndMetadata<ExpressionMetadata>
@@ -125,13 +141,13 @@ class GD_CORE_API MetadataProvider {
                                                gd::String exprType);
 
   /**
-   * Get the metadata about a behavior in a project using a platform
+   * Get the metadata about a behavior.
    */
   static const BehaviorMetadata& GetBehaviorMetadata(
       const gd::Platform& platform, gd::String behaviorType);
 
   /**
-   * Get the metadata about an object in a project using a platform
+   * Get the metadata about an object.
    */
   static const ObjectMetadata& GetObjectMetadata(const gd::Platform& platform,
                                                  gd::String type);

@@ -26,266 +26,309 @@ gd::PlatformExtension MetadataProvider::badExtension;
 ExtensionAndMetadata<BehaviorMetadata>
 MetadataProvider::GetExtensionAndBehaviorMetadata(const gd::Platform& platform,
                                                   gd::String behaviorType) {
-  for (std::size_t i = 0; i < platform.GetAllPlatformExtensions().size(); ++i) {
-    std::vector<gd::String> autosTypes =
-        platform.GetAllPlatformExtensions()[i]->GetBehaviorsTypes();
-    for (std::size_t j = 0; j < autosTypes.size(); ++j) {
-      if (autosTypes[j] == behaviorType)
-        return ExtensionAndMetadata(
-            *platform.GetAllPlatformExtensions()[i],
-            platform.GetAllPlatformExtensions()[i]->GetBehaviorMetadata(
-                behaviorType));
+  for (auto& extension : platform.GetAllPlatformExtensions()) {
+    auto behaviorTypes = extension->GetBehaviorsTypes();
+    for (std::size_t j = 0; j < behaviorTypes.size(); ++j) {
+      if (behaviorTypes[j] == behaviorType)
+        return ExtensionAndMetadata<BehaviorMetadata>(
+            *extension, extension->GetBehaviorMetadata(behaviorType));
     }
   }
 
   return ExtensionAndMetadata<BehaviorMetadata>(badExtension, badBehaviorInfo);
 }
 
-/**
- * Get the metadata about a behavior in a platform
- */
 const BehaviorMetadata& MetadataProvider::GetBehaviorMetadata(
     const gd::Platform& platform, gd::String behaviorType) {
-  for (std::size_t i = 0; i < platform.GetAllPlatformExtensions().size(); ++i) {
-    std::vector<gd::String> autosTypes =
-        platform.GetAllPlatformExtensions()[i]->GetBehaviorsTypes();
-    for (std::size_t j = 0; j < autosTypes.size(); ++j) {
-      if (autosTypes[j] == behaviorType)
-        return platform.GetAllPlatformExtensions()[i]->GetBehaviorMetadata(
-            behaviorType);
-    }
-  }
-
-  return badBehaviorInfo;
+  return GetExtensionAndBehaviorMetadata(platform, behaviorType).GetMetadata();
 }
 
-/**
- * Get the metadata about an object in a platform
- */
-const ObjectMetadata& MetadataProvider::GetObjectMetadata(
-    const gd::Platform& platform, gd::String objectType) {
-  for (std::size_t i = 0; i < platform.GetAllPlatformExtensions().size(); ++i) {
-    std::vector<gd::String> objectsTypes =
-        platform.GetAllPlatformExtensions()[i]->GetExtensionObjectsTypes();
+ExtensionAndMetadata<ObjectMetadata>
+MetadataProvider::GetExtensionAndObjectMetadata(const gd::Platform& platform,
+                                                gd::String objectType) {
+  for (auto& extension : platform.GetAllPlatformExtensions()) {
+    auto objectsTypes = extension->GetExtensionObjectsTypes();
     for (std::size_t j = 0; j < objectsTypes.size(); ++j) {
       if (objectsTypes[j] == objectType)
-        return platform.GetAllPlatformExtensions()[i]->GetObjectMetadata(
-            objectType);
+        return ExtensionAndMetadata<ObjectMetadata>(
+            *extension, extension->GetObjectMetadata(objectType));
     }
   }
 
-  return badObjectInfo;
+  return ExtensionAndMetadata<ObjectMetadata>(badExtension, badObjectInfo);
+}
+
+const ObjectMetadata& MetadataProvider::GetObjectMetadata(
+    const gd::Platform& platform, gd::String objectType) {
+  return GetExtensionAndObjectMetadata(platform, objectType).GetMetadata();
+}
+
+ExtensionAndMetadata<InstructionMetadata>
+MetadataProvider::GetExtensionAndActionMetadata(const gd::Platform& platform,
+                                                gd::String actionType) {
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& allActions = extension->GetAllActions();
+    if (allActions.find(actionType) != allActions.end())
+      return ExtensionAndMetadata<InstructionMetadata>(
+          *extension, allActions.find(actionType)->second);
+
+    const auto& objects = extension->GetExtensionObjectsTypes();
+    for (const gd::String& extObjectType : objects) {
+      const auto& allObjectsActions =
+          extension->GetAllActionsForObject(extObjectType);
+      if (allObjectsActions.find(actionType) != allObjectsActions.end())
+        return ExtensionAndMetadata<InstructionMetadata>(
+            *extension, allObjectsActions.find(actionType)->second);
+    }
+
+    const auto& autos = extension->GetBehaviorsTypes();
+    for (std::size_t j = 0; j < autos.size(); ++j) {
+      const auto& allAutosActions =
+          extension->GetAllActionsForBehavior(autos[j]);
+      if (allAutosActions.find(actionType) != allAutosActions.end())
+        return ExtensionAndMetadata<InstructionMetadata>(
+            *extension, allAutosActions.find(actionType)->second);
+    }
+  }
+
+  return ExtensionAndMetadata<InstructionMetadata>(badExtension,
+                                                   badInstructionMetadata);
 }
 
 const gd::InstructionMetadata& MetadataProvider::GetActionMetadata(
     const gd::Platform& platform, gd::String actionType) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& allActions =
-        extensions[i]->GetAllActions();
-    if (allActions.find(actionType) != allActions.end())
-      return allActions.find(actionType)->second;
+  return GetExtensionAndActionMetadata(platform, actionType).GetMetadata();
+}
 
-    const vector<gd::String>& objects =
-        extensions[i]->GetExtensionObjectsTypes();
-    for (std::size_t j = 0; j < objects.size(); ++j) {
-      const std::map<gd::String, gd::InstructionMetadata>& allObjectsActions =
-          extensions[i]->GetAllActionsForObject(objects[j]);
-      if (allObjectsActions.find(actionType) != allObjectsActions.end())
-        return allObjectsActions.find(actionType)->second;
+ExtensionAndMetadata<InstructionMetadata>
+MetadataProvider::GetExtensionAndConditionMetadata(const gd::Platform& platform,
+                                                   gd::String conditionType) {
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& allConditions = extension->GetAllConditions();
+    if (allConditions.find(conditionType) != allConditions.end())
+      return ExtensionAndMetadata<InstructionMetadata>(
+          *extension, allConditions.find(conditionType)->second);
+
+    const auto& objects = extension->GetExtensionObjectsTypes();
+    for (const gd::String& extObjectType : objects) {
+      const auto& allObjetsConditions =
+          extension->GetAllConditionsForObject(extObjectType);
+      if (allObjetsConditions.find(conditionType) != allObjetsConditions.end())
+        return ExtensionAndMetadata<InstructionMetadata>(
+            *extension, allObjetsConditions.find(conditionType)->second);
     }
 
-    const vector<gd::String>& autos = extensions[i]->GetBehaviorsTypes();
+    const auto& autos = extension->GetBehaviorsTypes();
     for (std::size_t j = 0; j < autos.size(); ++j) {
-      const std::map<gd::String, gd::InstructionMetadata>& allAutosActions =
-          extensions[i]->GetAllActionsForBehavior(autos[j]);
-      if (allAutosActions.find(actionType) != allAutosActions.end())
-        return allAutosActions.find(actionType)->second;
+      const auto& allAutosConditions =
+          extension->GetAllConditionsForBehavior(autos[j]);
+      if (allAutosConditions.find(conditionType) != allAutosConditions.end())
+        return ExtensionAndMetadata<InstructionMetadata>(
+            *extension, allAutosConditions.find(conditionType)->second);
     }
   }
 
-  return badInstructionMetadata;
+  return ExtensionAndMetadata<InstructionMetadata>(badExtension,
+                                                   badInstructionMetadata);
 }
 
 const gd::InstructionMetadata& MetadataProvider::GetConditionMetadata(
     const gd::Platform& platform, gd::String conditionType) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& allConditions =
-        extensions[i]->GetAllConditions();
-    if (allConditions.find(conditionType) != allConditions.end())
-      return allConditions.find(conditionType)->second;
+  return GetExtensionAndConditionMetadata(platform, conditionType)
+      .GetMetadata();
+}
 
-    const vector<gd::String>& objects =
-        extensions[i]->GetExtensionObjectsTypes();
-    for (std::size_t j = 0; j < objects.size(); ++j) {
-      const std::map<gd::String, gd::InstructionMetadata>& allObjetsConditions =
-          extensions[i]->GetAllConditionsForObject(objects[j]);
-      if (allObjetsConditions.find(conditionType) != allObjetsConditions.end())
-        return allObjetsConditions.find(conditionType)->second;
-    }
-
-    const vector<gd::String>& autos = extensions[i]->GetBehaviorsTypes();
-    for (std::size_t j = 0; j < autos.size(); ++j) {
-      const std::map<gd::String, gd::InstructionMetadata>& allAutosConditions =
-          extensions[i]->GetAllConditionsForBehavior(autos[j]);
-      if (allAutosConditions.find(conditionType) != allAutosConditions.end())
-        return allAutosConditions.find(conditionType)->second;
+ExtensionAndMetadata<ExpressionMetadata>
+MetadataProvider::GetExtensionAndObjectExpressionMetadata(
+    const gd::Platform& platform, gd::String objectType, gd::String exprType) {
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& objects = extension->GetExtensionObjectsTypes();
+    if (find(objects.begin(), objects.end(), objectType) != objects.end()) {
+      const auto& allObjectExpressions =
+          extension->GetAllExpressionsForObject(objectType);
+      if (allObjectExpressions.find(exprType) != allObjectExpressions.end())
+        return ExtensionAndMetadata<ExpressionMetadata>(
+            *extension, allObjectExpressions.find(exprType)->second);
     }
   }
 
-  return badInstructionMetadata;
+  // Then check base
+  for (auto& extension : extensions) {
+    const auto& allObjectExpressions =
+        extension->GetAllExpressionsForObject("");
+    if (allObjectExpressions.find(exprType) != allObjectExpressions.end())
+      return ExtensionAndMetadata<ExpressionMetadata>(
+          *extension, allObjectExpressions.find(exprType)->second);
+  }
+
+  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                  badExpressionMetadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetObjectExpressionMetadata(
     const gd::Platform& platform, gd::String objectType, gd::String exprType) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const vector<gd::String>& objects =
-        extensions[i]->GetExtensionObjectsTypes();
-    if (find(objects.begin(), objects.end(), objectType) != objects.end()) {
-      const std::map<gd::String, gd::ExpressionMetadata>& allObjectExpressions =
-          extensions[i]->GetAllExpressionsForObject(objectType);
-      if (allObjectExpressions.find(exprType) != allObjectExpressions.end())
-        return allObjectExpressions.find(exprType)->second;
+  return GetExtensionAndObjectExpressionMetadata(platform, objectType, exprType)
+      .GetMetadata();
+}
+
+ExtensionAndMetadata<ExpressionMetadata>
+MetadataProvider::GetExtensionAndBehaviorExpressionMetadata(
+    const gd::Platform& platform, gd::String autoType, gd::String exprType) {
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& autos = extension->GetBehaviorsTypes();
+    if (find(autos.begin(), autos.end(), autoType) != autos.end()) {
+      const auto& allAutoExpressions =
+          extension->GetAllExpressionsForBehavior(autoType);
+      if (allAutoExpressions.find(exprType) != allAutoExpressions.end())
+        return ExtensionAndMetadata<ExpressionMetadata>(
+            *extension, allAutoExpressions.find(exprType)->second);
     }
   }
 
   // Then check base
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& allObjectExpressions =
-        extensions[i]->GetAllExpressionsForObject("");
-    if (allObjectExpressions.find(exprType) != allObjectExpressions.end())
-      return allObjectExpressions.find(exprType)->second;
+  for (auto& extension : extensions) {
+    const auto& allAutoExpressions =
+        extension->GetAllExpressionsForBehavior("");
+    if (allAutoExpressions.find(exprType) != allAutoExpressions.end())
+      return ExtensionAndMetadata<ExpressionMetadata>(
+          *extension, allAutoExpressions.find(exprType)->second);
   }
 
-  return badExpressionMetadata;
+  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                  badExpressionMetadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetBehaviorExpressionMetadata(
     const gd::Platform& platform, gd::String autoType, gd::String exprType) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const vector<gd::String>& autos = extensions[i]->GetBehaviorsTypes();
-    if (find(autos.begin(), autos.end(), autoType) != autos.end()) {
-      const std::map<gd::String, gd::ExpressionMetadata>& allAutoExpressions =
-          extensions[i]->GetAllExpressionsForBehavior(autoType);
-      if (allAutoExpressions.find(exprType) != allAutoExpressions.end())
-        return allAutoExpressions.find(exprType)->second;
-    }
+  return GetExtensionAndBehaviorExpressionMetadata(platform, autoType, exprType)
+      .GetMetadata();
+}
+
+ExtensionAndMetadata<ExpressionMetadata>
+MetadataProvider::GetExtensionAndExpressionMetadata(
+    const gd::Platform& platform, gd::String exprType) {
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& allExpr = extension->GetAllExpressions();
+    if (allExpr.find(exprType) != allExpr.end())
+      return ExtensionAndMetadata<ExpressionMetadata>(
+          *extension, allExpr.find(exprType)->second);
   }
 
-  // Then check base
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& allAutoExpressions =
-        extensions[i]->GetAllExpressionsForBehavior("");
-    if (allAutoExpressions.find(exprType) != allAutoExpressions.end())
-      return allAutoExpressions.find(exprType)->second;
-  }
-
-  return badExpressionMetadata;
+  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                  badExpressionMetadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetExpressionMetadata(
     const gd::Platform& platform, gd::String exprType) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& allExpr =
-        extensions[i]->GetAllExpressions();
-    if (allExpr.find(exprType) != allExpr.end())
-      return allExpr.find(exprType)->second;
-  }
-
-  return badExpressionMetadata;
+  return GetExtensionAndExpressionMetadata(platform, exprType).GetMetadata();
 }
 
-const gd::ExpressionMetadata& MetadataProvider::GetObjectStrExpressionMetadata(
+ExtensionAndMetadata<ExpressionMetadata>
+MetadataProvider::GetExtensionAndObjectStrExpressionMetadata(
     const gd::Platform& platform, gd::String objectType, gd::String exprType) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const vector<gd::String>& objects =
-        extensions[i]->GetExtensionObjectsTypes();
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& objects = extension->GetExtensionObjectsTypes();
     if (find(objects.begin(), objects.end(), objectType) != objects.end()) {
-      const std::map<gd::String, gd::ExpressionMetadata>&
-          allObjectStrExpressions =
-              extensions[i]->GetAllStrExpressionsForObject(objectType);
+      const auto& allObjectStrExpressions =
+          extension->GetAllStrExpressionsForObject(objectType);
       if (allObjectStrExpressions.find(exprType) !=
           allObjectStrExpressions.end())
-        return allObjectStrExpressions.find(exprType)->second;
+        return ExtensionAndMetadata<ExpressionMetadata>(
+            *extension, allObjectStrExpressions.find(exprType)->second);
     }
   }
 
   // Then check in functions of "Base object".
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>&
-        allObjectStrExpressions =
-            extensions[i]->GetAllStrExpressionsForObject("");
+  for (auto& extension : extensions) {
+    const auto& allObjectStrExpressions =
+        extension->GetAllStrExpressionsForObject("");
     if (allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end())
-      return allObjectStrExpressions.find(exprType)->second;
+      return ExtensionAndMetadata<ExpressionMetadata>(
+          *extension, allObjectStrExpressions.find(exprType)->second);
   }
 
-  return badStrExpressionMetadata;
+  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                  badStrExpressionMetadata);
+}
+
+const gd::ExpressionMetadata& MetadataProvider::GetObjectStrExpressionMetadata(
+    const gd::Platform& platform, gd::String objectType, gd::String exprType) {
+  return GetExtensionAndObjectStrExpressionMetadata(
+             platform, objectType, exprType)
+      .GetMetadata();
+}
+
+ExtensionAndMetadata<ExpressionMetadata>
+MetadataProvider::GetExtensionAndBehaviorStrExpressionMetadata(
+    const gd::Platform& platform, gd::String autoType, gd::String exprType) {
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& autos = extension->GetBehaviorsTypes();
+    if (find(autos.begin(), autos.end(), autoType) != autos.end()) {
+      const auto& allBehaviorStrExpressions =
+          extension->GetAllStrExpressionsForBehavior(autoType);
+      if (allBehaviorStrExpressions.find(exprType) !=
+          allBehaviorStrExpressions.end())
+        return ExtensionAndMetadata<ExpressionMetadata>(
+            *extension, allBehaviorStrExpressions.find(exprType)->second);
+    }
+  }
+
+  // Then check in functions of "Base object".
+  for (auto& extension : extensions) {
+    const auto& allBehaviorStrExpressions =
+        extension->GetAllStrExpressionsForBehavior("");
+    if (allBehaviorStrExpressions.find(exprType) !=
+        allBehaviorStrExpressions.end())
+      return ExtensionAndMetadata<ExpressionMetadata>(
+          *extension, allBehaviorStrExpressions.find(exprType)->second);
+  }
+
+  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                  badStrExpressionMetadata);
 }
 
 const gd::ExpressionMetadata&
 MetadataProvider::GetBehaviorStrExpressionMetadata(const gd::Platform& platform,
                                                    gd::String autoType,
                                                    gd::String exprType) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const vector<gd::String>& autos = extensions[i]->GetBehaviorsTypes();
-    if (find(autos.begin(), autos.end(), autoType) != autos.end()) {
-      const std::map<gd::String, gd::ExpressionMetadata>&
-          allBehaviorStrExpressions =
-              extensions[i]->GetAllStrExpressionsForBehavior(autoType);
-      if (allBehaviorStrExpressions.find(exprType) !=
-          allBehaviorStrExpressions.end())
-        return allBehaviorStrExpressions.find(exprType)->second;
-    }
+  return GetExtensionAndBehaviorStrExpressionMetadata(
+             platform, autoType, exprType)
+      .GetMetadata();
+}
+
+ExtensionAndMetadata<ExpressionMetadata>
+MetadataProvider::GetExtensionAndStrExpressionMetadata(
+    const gd::Platform& platform, gd::String exprType) {
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& allExpr = extension->GetAllStrExpressions();
+    if (allExpr.find(exprType) != allExpr.end())
+      return ExtensionAndMetadata<ExpressionMetadata>(
+          *extension, allExpr.find(exprType)->second);
   }
 
-  // Then check in functions of "Base object".
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>&
-        allBehaviorStrExpressions =
-            extensions[i]->GetAllStrExpressionsForBehavior("");
-    if (allBehaviorStrExpressions.find(exprType) !=
-        allBehaviorStrExpressions.end())
-      return allBehaviorStrExpressions.find(exprType)->second;
-  }
-
-  return badStrExpressionMetadata;
+  return ExtensionAndMetadata<ExpressionMetadata>(badExtension,
+                                                  badStrExpressionMetadata);
 }
 
 const gd::ExpressionMetadata& MetadataProvider::GetStrExpressionMetadata(
     const gd::Platform& platform, gd::String exprType) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& allExpr =
-        extensions[i]->GetAllStrExpressions();
-    if (allExpr.find(exprType) != allExpr.end())
-      return allExpr.find(exprType)->second;
-  }
-
-  return badStrExpressionMetadata;
+  return GetExtensionAndStrExpressionMetadata(platform, exprType).GetMetadata();
 }
 
 bool MetadataProvider::HasAction(const gd::Platform& platform,
                                  gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
+  auto& extensions = platform.GetAllPlatformExtensions();
 
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& actions =
-        extensions[i]->GetAllActions();
+  for (auto& extension : extensions) {
+    const auto& actions = extension->GetAllActions();
     if (actions.find(name) != actions.end()) return true;
   }
 
@@ -295,18 +338,15 @@ bool MetadataProvider::HasAction(const gd::Platform& platform,
 bool MetadataProvider::HasObjectAction(const gd::Platform& platform,
                                        gd::String objectType,
                                        gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& actions =
-        extensions[i]->GetAllActionsForObject(objectType);
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& actions = extension->GetAllActionsForObject(objectType);
     if (actions.find(name) != actions.end()) return true;
   }
 
   // Then check in functions of "Base object".
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& actions =
-        extensions[i]->GetAllActionsForObject("");
+  for (auto& extension : extensions) {
+    const auto& actions = extension->GetAllActionsForObject("");
     if (actions.find(name) != actions.end()) return true;
   }
 
@@ -316,18 +356,15 @@ bool MetadataProvider::HasObjectAction(const gd::Platform& platform,
 bool MetadataProvider::HasBehaviorAction(const gd::Platform& platform,
                                          gd::String behaviorType,
                                          gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& actions =
-        extensions[i]->GetAllActionsForBehavior(behaviorType);
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& actions = extension->GetAllActionsForBehavior(behaviorType);
     if (actions.find(name) != actions.end()) return true;
   }
 
   // Then check in functions of "Base object".
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& actions =
-        extensions[i]->GetAllActionsForBehavior("");
+  for (auto& extension : extensions) {
+    const auto& actions = extension->GetAllActionsForBehavior("");
     if (actions.find(name) != actions.end()) return true;
   }
 
@@ -336,11 +373,9 @@ bool MetadataProvider::HasBehaviorAction(const gd::Platform& platform,
 
 bool MetadataProvider::HasCondition(const gd::Platform& platform,
                                     gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& conditions =
-        extensions[i]->GetAllConditions();
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& conditions = extension->GetAllConditions();
     if (conditions.find(name) != conditions.end()) return true;
   }
 
@@ -350,18 +385,15 @@ bool MetadataProvider::HasCondition(const gd::Platform& platform,
 bool MetadataProvider::HasObjectCondition(const gd::Platform& platform,
                                           gd::String objectType,
                                           gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& conditions =
-        extensions[i]->GetAllConditionsForObject(objectType);
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& conditions = extension->GetAllConditionsForObject(objectType);
     if (conditions.find(name) != conditions.end()) return true;
   }
 
   // Then check in functions of "Base object".
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& conditions =
-        extensions[i]->GetAllConditionsForObject("");
+  for (auto& extension : extensions) {
+    const auto& conditions = extension->GetAllConditionsForObject("");
     if (conditions.find(name) != conditions.end()) return true;
   }
 
@@ -371,18 +403,16 @@ bool MetadataProvider::HasObjectCondition(const gd::Platform& platform,
 bool MetadataProvider::HasBehaviorCondition(const gd::Platform& platform,
                                             gd::String behaviorType,
                                             gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& conditions =
-        extensions[i]->GetAllConditionsForBehavior(behaviorType);
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& conditions =
+        extension->GetAllConditionsForBehavior(behaviorType);
     if (conditions.find(name) != conditions.end()) return true;
   }
 
   // Then check in functions of "Base object".
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::InstructionMetadata>& conditions =
-        extensions[i]->GetAllConditionsForBehavior("");
+  for (auto& extension : extensions) {
+    const auto& conditions = extension->GetAllConditionsForBehavior("");
     if (conditions.find(name) != conditions.end()) return true;
   }
 
@@ -391,11 +421,9 @@ bool MetadataProvider::HasBehaviorCondition(const gd::Platform& platform,
 
 bool MetadataProvider::HasExpression(const gd::Platform& platform,
                                      gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& expressions =
-        extensions[i]->GetAllExpressions();
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& expressions = extension->GetAllExpressions();
     if (expressions.find(name) != expressions.end()) return true;
   }
 
@@ -405,18 +433,15 @@ bool MetadataProvider::HasExpression(const gd::Platform& platform,
 bool MetadataProvider::HasObjectExpression(const gd::Platform& platform,
                                            gd::String objectType,
                                            gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& expressions =
-        extensions[i]->GetAllExpressionsForObject(objectType);
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& expressions = extension->GetAllExpressionsForObject(objectType);
     if (expressions.find(name) != expressions.end()) return true;
   }
 
   // Then check in functions of "Base object".
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& expressions =
-        extensions[i]->GetAllExpressionsForObject("");
+  for (auto& extension : extensions) {
+    const auto& expressions = extension->GetAllExpressionsForObject("");
     if (expressions.find(name) != expressions.end()) return true;
   }
 
@@ -426,18 +451,16 @@ bool MetadataProvider::HasObjectExpression(const gd::Platform& platform,
 bool MetadataProvider::HasBehaviorExpression(const gd::Platform& platform,
                                              gd::String behaviorType,
                                              gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& expressions =
-        extensions[i]->GetAllExpressionsForBehavior(behaviorType);
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& expressions =
+        extension->GetAllExpressionsForBehavior(behaviorType);
     if (expressions.find(name) != expressions.end()) return true;
   }
 
   // Then check in functions of "Base object".
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& expressions =
-        extensions[i]->GetAllExpressionsForBehavior("");
+  for (auto& extension : extensions) {
+    const auto& expressions = extension->GetAllExpressionsForBehavior("");
     if (expressions.find(name) != expressions.end()) return true;
   }
 
@@ -446,11 +469,9 @@ bool MetadataProvider::HasBehaviorExpression(const gd::Platform& platform,
 
 bool MetadataProvider::HasStrExpression(const gd::Platform& platform,
                                         gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& expressions =
-        extensions[i]->GetAllStrExpressions();
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& expressions = extension->GetAllStrExpressions();
     if (expressions.find(name) != expressions.end()) return true;
   }
 
@@ -460,18 +481,16 @@ bool MetadataProvider::HasStrExpression(const gd::Platform& platform,
 bool MetadataProvider::HasObjectStrExpression(const gd::Platform& platform,
                                               gd::String objectType,
                                               gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& expressions =
-        extensions[i]->GetAllStrExpressionsForObject(objectType);
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& expressions =
+        extension->GetAllStrExpressionsForObject(objectType);
     if (expressions.find(name) != expressions.end()) return true;
   }
 
   // Then check in functions of "Base object".
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& expressions =
-        extensions[i]->GetAllStrExpressionsForObject("");
+  for (auto& extension : extensions) {
+    const auto& expressions = extension->GetAllStrExpressionsForObject("");
     if (expressions.find(name) != expressions.end()) return true;
   }
 
@@ -481,18 +500,16 @@ bool MetadataProvider::HasObjectStrExpression(const gd::Platform& platform,
 bool MetadataProvider::HasBehaviorStrExpression(const gd::Platform& platform,
                                                 gd::String behaviorType,
                                                 gd::String name) {
-  std::vector<std::shared_ptr<PlatformExtension> > extensions =
-      platform.GetAllPlatformExtensions();
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& expressions =
-        extensions[i]->GetAllStrExpressionsForBehavior(behaviorType);
+  auto& extensions = platform.GetAllPlatformExtensions();
+  for (auto& extension : extensions) {
+    const auto& expressions =
+        extension->GetAllStrExpressionsForBehavior(behaviorType);
     if (expressions.find(name) != expressions.end()) return true;
   }
 
   // Then check in functions of "Base object".
-  for (std::size_t i = 0; i < extensions.size(); ++i) {
-    const std::map<gd::String, gd::ExpressionMetadata>& expressions =
-        extensions[i]->GetAllStrExpressionsForBehavior("");
+  for (auto& extension : extensions) {
+    const auto& expressions = extension->GetAllStrExpressionsForBehavior("");
     if (expressions.find(name) != expressions.end()) return true;
   }
 

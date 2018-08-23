@@ -164,7 +164,8 @@ const getEventsAndInstructionsTypes = (events) => {
   eventsTypesLister.launch(events);
   const types = {
     events: _.uniq(eventsTypesLister.getAllEventsTypes().toJSArray()),
-    instructions: _.uniq(eventsTypesLister.getAllInstructionsTypes().toJSArray()),
+    conditions: _.uniq(eventsTypesLister.getAllConditionsTypes().toJSArray()),
+    actions: _.uniq(eventsTypesLister.getAllActionsTypes().toJSArray()),
   };
   eventsTypesLister.delete();
   return types;

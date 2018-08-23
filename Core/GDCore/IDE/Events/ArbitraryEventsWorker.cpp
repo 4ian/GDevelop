@@ -6,6 +6,7 @@
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include <map>
 #include <memory>
+#include <iostream>
 #include <vector>
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
@@ -19,7 +20,9 @@ namespace gd {
 ArbitraryEventsWorker::~ArbitraryEventsWorker() {}
 
 void ArbitraryEventsWorker::VisitEventList(gd::EventsList& events) {
+  std::cout << "VisitEventList" << &events << std::endl;
   DoVisitEventList(events);
+  std::cout << "POST DoVisitEventList" << std::endl;
 
   for (std::size_t i = 0; i < events.size();) {
     if (VisitEvent(events[i]))
@@ -34,7 +37,9 @@ void ArbitraryEventsWorker::VisitEventList(gd::EventsList& events) {
 }
 
 bool ArbitraryEventsWorker::VisitEvent(gd::BaseEvent& event) {
+  std::cout << "VisitEvent" << &event << std::endl;
   bool shouldDelete = DoVisitEvent(event);
+  std::cout << "Done" << shouldDelete << std::endl;
   if (shouldDelete) return true;
 
   vector<gd::InstructionsList*> conditionsVectors =

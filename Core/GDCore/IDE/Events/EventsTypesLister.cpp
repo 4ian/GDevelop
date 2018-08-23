@@ -24,7 +24,10 @@ bool EventsTypesLister::DoVisitEvent(gd::BaseEvent& event) {
 
 bool EventsTypesLister::DoVisitInstruction(gd::Instruction& instruction,
                                            bool isCondition) {
-  allInstructionsTypes.push_back(instruction.GetType());
+  if (isCondition)
+    allConditionsTypes.push_back(instruction.GetType());
+  else
+    allActionsTypes.push_back(instruction.GetType());
 
   return false;
 }

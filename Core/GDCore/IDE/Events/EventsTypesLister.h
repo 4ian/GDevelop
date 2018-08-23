@@ -26,7 +26,7 @@ namespace gd {
  */
 class GD_CORE_API EventsTypesLister : public ArbitraryEventsWorker {
  public:
-  EventsTypesLister(){};
+  EventsTypesLister(gd::Project& project_) : project(project_){};
   virtual ~EventsTypesLister();
 
   /**
@@ -35,10 +35,17 @@ class GD_CORE_API EventsTypesLister : public ArbitraryEventsWorker {
   const std::vector<gd::String>& GetAllEventsTypes() { return allEventsTypes; }
 
   /**
-   * Return the types of all instructions
+   * Return the types of all conditions
    */
-  const std::vector<gd::String>& GetAllInstructionsTypes() {
-    return allInstructionsTypes;
+  const std::vector<gd::String>& GetAllConditionsTypes() {
+    return allConditionsTypes;
+  }
+
+  /**
+   * Return the types of all actions
+   */
+  const std::vector<gd::String>& GetAllActionsTypes() {
+    return allActionsTypes;
   }
 
  private:
@@ -47,7 +54,9 @@ class GD_CORE_API EventsTypesLister : public ArbitraryEventsWorker {
                           bool isCondition) override;
 
   std::vector<gd::String> allEventsTypes;
-  std::vector<gd::String> allInstructionsTypes;
+  std::vector<gd::String> allConditionsTypes;
+  std::vector<gd::String> allActionsTypes;
+  gd::Project& project;
 };
 
 }  // namespace gd

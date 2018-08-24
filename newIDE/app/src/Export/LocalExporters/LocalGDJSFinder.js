@@ -1,6 +1,6 @@
-// @flow
+// Note: this file don't use export/imports nor Flow to allow its usage from Node.js
 
-import optionalRequire from '../../Utils/OptionalRequire.js';
+const optionalRequire = require('../../Utils/OptionalRequire.js');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 const fs = optionalRequire('fs');
@@ -9,16 +9,16 @@ const process = optionalRequire('process');
 var isDarwin = process && /^darwin/.test(process.platform);
 
 const tryPath = (
-  path: string,
-  onExists: string => void,
-  onNoAccess: Function
+  path/*: string*/,
+  onExists/*: string => void*/,
+  onNoAccess/*: Function*/
 ) =>
   fs.access(path, fs.constants.R_OK, err => {
     if (!err) onExists(path);
     else onNoAccess();
   });
 
-export const findGDJS = (cb: (?string) => void) => {
+const findGDJS = (cb/*: (?string) => void*/) => {
   if (!path || !process || !fs) return '';
 
   const appPath = app ? app.getAppPath() : process.cwd();
@@ -47,3 +47,7 @@ export const findGDJS = (cb: (?string) => void) => {
     });
   });
 };
+
+module.exports = {
+  findGDJS
+}

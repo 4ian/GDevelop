@@ -200,5 +200,5 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function(extension) { return []; },
+  runExtensionSanityTests: function(gd, extension) { return []; },
 };

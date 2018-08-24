@@ -18,7 +18,8 @@ import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
-import LocalJsExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
+import { makeExtensionloader } from './JsExtensionsLoader/LocalJsExtensionsLoader';
+const gd = global.gd;
 
 export const create = (authentification: Authentification) => {
   Window.setUpContextMenu();
@@ -61,12 +62,15 @@ export const create = (authentification: Authentification) => {
           resourceSources={localResourceSources}
           resourceExternalEditors={localResourceExternalEditors}
           authentification={authentification}
-          extensionsLoader={new LocalJsExtensionsLoader()}
+          extensionsLoader={makeExtensionloader({
+            gd,
+            filterExamples: !Window.isDev(),
+          })}
           initialPathsOrURLsToOpen={appArguments['_']}
         />
       </ElectronEventsBridge>
-    ); 
+    );
   }
 
   return app;
-}
+};

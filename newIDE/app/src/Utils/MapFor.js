@@ -1,4 +1,4 @@
-export const mapFor = (start, end, func) => {
+const mapFor = (start, end, func) => {
   const result = [];
   for (let i = start; i < end; i++) {
     result.push(func(i));
@@ -6,7 +6,7 @@ export const mapFor = (start, end, func) => {
   return result;
 };
 
-export const mapReverseFor = (start, end, func) => {
+const mapReverseFor = (start, end, func) => {
   const result = [];
   for (let i = end - 1; i >= start; i--) {
     result.push(func(i));
@@ -14,6 +14,12 @@ export const mapReverseFor = (start, end, func) => {
   return result;
 };
 
-export const mapVector = (cppVector, func) => {
+const mapVector = (cppVector, func) => {
   return mapFor(0, cppVector.size(), i => func(cppVector.at(i), i));
 };
+
+module.exports = {
+  mapFor,
+  mapReverseFor,
+  mapVector,
+}

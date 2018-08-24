@@ -26,7 +26,7 @@ namespace gd {
  */
 class GD_CORE_API EventsTypesLister : public ArbitraryEventsWorker {
  public:
-  EventsTypesLister(gd::Project& project_) : project(project_){};
+  EventsTypesLister(const gd::Project& project_) : project(project_){};
   virtual ~EventsTypesLister();
 
   /**
@@ -56,7 +56,7 @@ class GD_CORE_API EventsTypesLister : public ArbitraryEventsWorker {
   std::vector<gd::String> allEventsTypes;
   std::vector<gd::String> allConditionsTypes;
   std::vector<gd::String> allActionsTypes;
-  gd::Project& project;
+  const gd::Project& project;
 };
 
 }  // namespace gd

@@ -35,6 +35,7 @@
     "pixi-simple-gesture": "0.2.2",
     "pixi.js": "3.0.11",
     "prop-types": "^15.5.10",
+    "randomcolor": "^0.5.3",
     "raven-js": "^3.19.1",
     "react": "^16.2.0",
     "react-color": "2.13.8",

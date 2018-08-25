@@ -4,6 +4,7 @@ import { mapVector } from '../Utils/MapFor';
 import Chip from 'material-ui/Chip';
 import TextField from 'material-ui/TextField';
 import { Column } from '../UI/Grid';
+import randomColor from 'randomcolor';
 const gd = global.gd;
 
 type Props = {|
@@ -23,23 +24,11 @@ const styles = {
   },
 };
 
-const basicHashCode = (str: string) => {
-  var hash = 0,
-    i,
-    chr;
-  if (str.length === 0) return hash;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-};
-
 const getChipColor = (extensionName: string) => {
-  const hash = Math.abs(basicHashCode(extensionName));
-
-  return `rgb(${130 + hash % 70}, ${130 + hash % 110}, 240)`;
+  return randomColor({
+    seed: extensionName,
+    luminosity: 'light',
+  });
 };
 
 export default class ExamplesSearchbar extends Component<Props> {
@@ -81,6 +70,7 @@ export default class ExamplesSearchbar extends Component<Props> {
           {this._chips.map(({ text, value }) => (
             <Chip
               key={value}
+              labelColor={!chosenExtensionName || chosenExtensionName === value ? 'black' : undefined}
               backgroundColor={
                 !chosenExtensionName || chosenExtensionName === value
                   ? getChipColor(value)

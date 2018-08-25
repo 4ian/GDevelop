@@ -1,4 +1,4 @@
-// Note: this file don't use export/imports nor Flow to allow its usage from Node.js
+// Note: this file does not use export/imports nor Flow to allow its usage from Node.js
 
 const { loadExtension } = require('.');
 const optionalRequire = require('../Utils/OptionalRequire');

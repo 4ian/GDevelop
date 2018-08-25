@@ -18,7 +18,7 @@ import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
-import { makeExtensionloader } from './JsExtensionsLoader/LocalJsExtensionsLoader';
+import makeExtensionloader from './JsExtensionsLoader/LocalJsExtensionsLoader';
 const gd = global.gd;
 
 export const create = (authentification: Authentification) => {

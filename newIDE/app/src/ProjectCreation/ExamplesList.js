@@ -19,6 +19,11 @@ type ExampleInformation = {|
   usedExtensions: ExtensionUsage,
 |};
 
+type SearchEnhancedExampleInformation = {|
+  ...ExampleInformation,
+  searchableDescription: string,
+|};
+
 type Props = {|
   exampleNames: Array<string>,
   onCreateFromExample: string => void,
@@ -29,16 +34,32 @@ type State = {|
   chosenExtensionName: string,
 |};
 
+const searchableExamplesInformation: {
+  [string]: SearchEnhancedExampleInformation,
+} = {};
+Object.keys(ExamplesInformation).forEach(exampleName => {
+  const exampleInformation = ExamplesInformation[exampleName];
+  searchableExamplesInformation[exampleName] = {
+    ...exampleInformation,
+    searchableDescription: exampleInformation.description
+      .replace(/ /g, '')
+      .toLowerCase(),
+  };
+});
+
 const formatExampleName = (name: string) => {
   if (!name.length) return '';
 
   return name[0].toUpperCase() + name.substr(1).replace(/-/g, ' ');
 };
 
-const getExampleInformation = (name: string): ExampleInformation => {
+const getExampleInformation = (
+  name: string
+): SearchEnhancedExampleInformation => {
   return (
-    ExamplesInformation[name] || {
+    searchableExamplesInformation[name] || {
       description: '',
+      searchableDescription: '',
       usedExtensions: [],
     }
   );
@@ -92,6 +113,8 @@ export default class LocalExamples extends React.Component<Props, State> {
 
   render() {
     const { searchText, chosenExtensionName } = this.state;
+    const lowercaseSearchText = searchText.toLowerCase();
+
     return (
       <Column noMargin>
         <Line noMargin>
@@ -113,9 +136,10 @@ export default class LocalExamples extends React.Component<Props, State> {
                   const exampleInformation = getExampleInformation(exampleName);
                   if (
                     (searchText &&
-                      (!fuzzyOrEmptyFilter(searchText, exampleFullName) ||
-                        exampleInformation.description.indexOf(searchText) !==
-                          -1)) ||
+                      (!fuzzyOrEmptyFilter(searchText, exampleFullName) &&
+                        exampleInformation.searchableDescription.indexOf(
+                          lowercaseSearchText
+                        ) === -1)) ||
                     !isUsingExtension(
                       exampleInformation.usedExtensions,
                       chosenExtensionName

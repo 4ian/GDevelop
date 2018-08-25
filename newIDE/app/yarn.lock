@@ -256,6 +256,10 @@
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/@types/inline-style-prefixer/-/inline-style-prefixer-3.0.1.tgz#8541e636b029124b747952e9a28848286d2b5bf6"
 
+"@types/node@*":
+  version "10.9.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-10.9.2.tgz#f0ab8dced5cd6c56b26765e1c0d9e4fdcc9f2a00"
+
 "@types/prop-types@*":
   version "15.5.5"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.5.5.tgz#17038dd322c2325f5da650a94d5f9974943625e3"
@@ -5745,6 +5749,12 @@ node-pre-gyp@^0.6.36, node-pre-gyp@^0.6.39:
     semver "^5.3.0"
     tar "^2.2.1"
     tar-pack "^3.4.0"
+
+node-require-function@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/node-require-function/-/node-require-function-1.2.0.tgz#09d73fb19a191ff0f0e8b3cdb4e5e091b47b4435"
+  dependencies:
+    "@types/node" "*"
 
 node-status-codes@^1.0.0:
   version "1.0.0"

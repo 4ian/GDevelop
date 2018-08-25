@@ -1,4 +1,5 @@
 // Note: this file don't use export/imports to allow its usage from Node.js
+const nodeRequire = require('node-require-function')(arguments);
 
 /**
  * Allow to require a Node.js/npm module without having it bundled by webpack.
@@ -11,15 +12,17 @@ const optionalRequire = (moduleName, config = {
   rethrowException: false,
 }) => {
   try {
-    // Avoid webpack trying to inject the module by using an expression
-    // and global to get the require function.
-    if (global.require) { // Electron/webpack
+    if (global.require) { 
+      // Electron will expose require on global object. Use it, with an
+      // expression to avoid webpack to try to bundle the call to require.
       return global['require'](moduleName);
-    } else if (typeof require !== 'undefined') { //Node.js/CommonJS
-      const nodeRequire = require;
+    } else if (nodeRequire) { //Node.js
+      // nodeRequire is Node.js' require function that is properly extracted 
+      // by node-require-function when running on Node.js
       return nodeRequire(moduleName);
     }
 
+    // We don't have Electron require nor Node.js require (we must be in a browser)
     return null;
   } catch (ex) {
     if (config.rethrowException) throw ex;

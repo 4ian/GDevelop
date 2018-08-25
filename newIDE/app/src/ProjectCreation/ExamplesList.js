@@ -5,7 +5,7 @@ import { Column, Line } from '../UI/Grid';
 import { List, ListItem } from 'material-ui/List';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ExamplesSearchbar from './ExamplesSearchbar';
-import ExamplesExtensionsUsage from './ExamplesExtensionsUsage';
+import ExamplesInformation from './ExamplesInformation';
 import Window from '../Utils/Window';
 import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
 
@@ -13,6 +13,11 @@ type ExtensionUsage = Array<{
   fullName: string,
   name: string,
 }>;
+
+type ExampleInformation = {|
+  description: string,
+  usedExtensions: ExtensionUsage,
+|};
 
 type Props = {|
   exampleNames: Array<string>,
@@ -28,6 +33,15 @@ const formatExampleName = (name: string) => {
   if (!name.length) return '';
 
   return name[0].toUpperCase() + name.substr(1).replace(/-/g, ' ');
+};
+
+const getExampleInformation = (name: string): ExampleInformation => {
+  return (
+    ExamplesInformation[name] || {
+      description: '',
+      usedExtensions: [],
+    }
+  );
 };
 
 const isUsingExtension = (
@@ -96,11 +110,16 @@ export default class LocalExamples extends React.Component<Props, State> {
               {this.props.exampleNames &&
                 this.props.exampleNames.map(exampleName => {
                   const exampleFullName = formatExampleName(exampleName);
-                  const extensionsUsage = ExamplesExtensionsUsage[exampleName];
+                  const exampleInformation = getExampleInformation(exampleName);
                   if (
                     (searchText &&
-                      !fuzzyOrEmptyFilter(searchText, exampleFullName)) ||
-                    !isUsingExtension(extensionsUsage, chosenExtensionName)
+                      (!fuzzyOrEmptyFilter(searchText, exampleFullName) ||
+                        exampleInformation.description.indexOf(searchText) !==
+                          -1)) ||
+                    !isUsingExtension(
+                      exampleInformation.usedExtensions,
+                      chosenExtensionName
+                    )
                   ) {
                     return null;
                   }
@@ -109,6 +128,8 @@ export default class LocalExamples extends React.Component<Props, State> {
                     <ListItem
                       key={exampleName}
                       primaryText={exampleFullName}
+                      secondaryText={exampleInformation.description}
+                      secondaryTextLines={2}
                       onClick={() =>
                         this.props.onCreateFromExample(exampleName)}
                     />

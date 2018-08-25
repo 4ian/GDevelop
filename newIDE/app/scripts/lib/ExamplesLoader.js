@@ -5,7 +5,7 @@ const getExampleNames = () => {
     fs.readdir('../resources/examples', (error, exampleNames) => {
       if (error) return reject(error);
 
-      resolve(exampleNames);
+      resolve(exampleNames.filter(name => name !== '.DS_Store'));
     });
   });
 };

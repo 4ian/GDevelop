@@ -33,6 +33,7 @@ const getChipColor = (extensionName: string) => {
 
 export default class ExamplesSearchbar extends Component<Props> {
   _chips: Array<{ text: string, value: string }> = [];
+  _textField: ?TextField;
 
   constructor(props: Props) {
     super(props);
@@ -46,6 +47,10 @@ export default class ExamplesSearchbar extends Component<Props> {
         value: extension.getName(),
       };
     }).filter(extension => !!extension);
+  }
+
+  componentDidMount() {
+    if (this._textField) this._textField.focus();
   }
 
   render() {
@@ -65,12 +70,17 @@ export default class ExamplesSearchbar extends Component<Props> {
           onChange={(e, value) => {
             onChange(value);
           }}
+          ref={textField => (this._textField = textField)}
         />
         <div style={styles.chipsList}>
           {this._chips.map(({ text, value }) => (
             <Chip
               key={value}
-              labelColor={!chosenExtensionName || chosenExtensionName === value ? 'black' : undefined}
+              labelColor={
+                !chosenExtensionName || chosenExtensionName === value
+                  ? 'black'
+                  : undefined
+              }
               backgroundColor={
                 !chosenExtensionName || chosenExtensionName === value
                   ? getChipColor(value)

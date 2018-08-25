@@ -5,7 +5,7 @@ import basicAiWithPathfinding from '../fixtures/basic-ai-with-pathfinding/basic-
 import basicArtificialIntelligence from '../fixtures/basic-artificial-intelligence/basic-artificial-intelligence.json';
 import basicTopdownCarDriving from '../fixtures/basic-topdown-car-driving/basic-topdown-car-driving.json';
 import bombTheCrate from '../fixtures/bomb-the-crate/bomb-the-crate.json';
-import brakeout from '../fixtures/brakeout/brakeout.json';
+import breakout from '../fixtures/breakout/breakout.json';
 import buttons from '../fixtures/buttons/buttons.json';
 import carPhysics from '../fixtures/car-physics/car-physics.json';
 import centerObjectWithinAnother from '../fixtures/center-object-within-another/center-object-within-another.json';
@@ -96,8 +96,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(basicTopdownCarDriving);
     } else if (url === 'example://bomb-the-crate') {
       return Promise.resolve(bombTheCrate);
-    } else if (url === 'example://brakeout') {
-      return Promise.resolve(brakeout);
+    } else if (url === 'example://breakout') {
+      return Promise.resolve(breakout);
     } else if (url === 'example://buttons') {
       return Promise.resolve(buttons);
     } else if (url === 'example://car-physics') {

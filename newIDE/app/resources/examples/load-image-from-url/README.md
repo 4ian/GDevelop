@@ -1,0 +1,1 @@
+Advanced example showing how to use JavaScript to load an image from an external URL.

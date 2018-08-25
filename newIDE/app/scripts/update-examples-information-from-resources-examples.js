@@ -17,7 +17,7 @@ var shell = require('shelljs');
 shell.exec('node import-GDJS-Runtime.js');
 gd.initializePlatforms();
 
-const outputFile = '../src/ProjectCreation/ExamplesExtensionsUsage.js';
+const outputFile = '../src/ProjectCreation/ExamplesInformation.js';
 
 const getObjectTypes = projectOrLayout => {
   return _.uniq(
@@ -160,7 +160,17 @@ const writeFile = object => {
   });
 };
 
-const examplesExtensionsUsed = {};
+const readFileContent = filename => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filename, 'utf8', (err, content) => {
+      if (err) return reject(err);
+
+      resolve(content);
+    });
+  });
+};
+
+const examplesInformation = {};
 const extensionsLoader = makeExtensionsLoader({ gd, filterExamples: false });
 extensionsLoader
   .loadAllExtensions()
@@ -173,30 +183,48 @@ extensionsLoader
     exampleNames => {
       return Promise.all(
         exampleNames.map(exampleName => {
-          return readProjectJSONFile(
-            `../resources/examples/${exampleName}/${exampleName}.json`
-          )
-            .then(projectObject => {
-              console.log(`Example "${exampleName}" loaded.`);
-              const project = loadSerializedProject(gd, projectObject);
-              const usedExtensions = computeUsedExtensions(project);
-              examplesExtensionsUsed[
-                exampleName
-              ] = usedExtensions.map(extension => ({
-                fullName: extension.getFullName(),
-                name: extension.getName(),
-              }));
-            })
-            .catch(error => {
-              console.error('Error caught:', error);
-            });
+          const exampleInformation = (examplesInformation[exampleName] = {
+            description: '',
+            usedExtensions: [],
+          });
+
+          return Promise.all([
+            readProjectJSONFile(
+              `../resources/examples/${exampleName}/${exampleName}.json`
+            )
+              .then(projectObject => {
+                console.log(`Example "${exampleName}" loaded.`);
+
+                const project = loadSerializedProject(gd, projectObject);
+                const usedExtensions = computeUsedExtensions(project);
+                exampleInformation.usedExtensions = usedExtensions.map(
+                  extension => ({
+                    fullName: extension.getFullName(),
+                    name: extension.getName(),
+                  })
+                );
+              })
+              .catch(error => {
+                console.error('Error caught while analyzing game:', error);
+              }),
+            readFileContent(
+              `../resources/examples/${exampleName}/README.md`
+            ).then(
+              readmeContent => {
+                exampleInformation.description = readmeContent;
+              },
+              error => {
+                console.error(`⚠️ No/invalid README found for ${exampleName}:`, error);
+              }
+            ),
+          ]);
         })
       );
     },
     err => console.error('Error while loading extensions', err)
   )
   .then(() => {
-    return writeFile(examplesExtensionsUsed);
+    return writeFile(examplesInformation);
   })
   .then(
     () => console.info('Done.'),

@@ -1,0 +1,1 @@
+The classic Breakout arcade game adapted in GDevelop.

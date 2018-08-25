@@ -16,7 +16,7 @@ const exampleNames = [
   'basic-artificial-intelligence',
   'basic-topdown-car-driving',
   'bomb-the-crate',
-  'brakeout',
+  'breakout',
   'buttons',
   'car-physics',
   'center-object-within-another',

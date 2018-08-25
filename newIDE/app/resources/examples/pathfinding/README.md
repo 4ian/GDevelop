@@ -1,0 +1,1 @@
+This show how to have an object moving from its position to another automatically avoiding obstacles.

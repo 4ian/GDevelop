@@ -1,15 +1,7 @@
 import React, { Component } from 'react';
-import { List, ListItem } from 'material-ui/List';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
-import RaisedButton from 'material-ui/RaisedButton';
-import Window from '../Utils/Window';
-
-const formatExampleName = (name: string) => {
-  if (!name.length) return '';
-
-  return name[0].toUpperCase() + name.substr(1).replace(/-/g, ' ');
-};
+import ExamplesList from './ExamplesList';
 
 // This is the list of available examples in src/fixtures folder.
 // To add a new example, add it first in resources/examples, using the desktop Electron version
@@ -100,53 +92,20 @@ const exampleNames = [
 ];
 
 export default class BrowserExamples extends Component {
-  _submitExample() {
-    const body = `Hi!
-
-I'd like to submit a new example to be added to GDevelop.
-Here is the link to download it: **INSERT the link to your game here, or add it as an attachment**.
-
-I confirm that any assets can be used freely by anybody, including for commercial usage.
-`;
-    Window.openExternalURL(
-      `https://github.com/4ian/GD/issues/new?body=${encodeURIComponent(
-        body
-      )}&title=New%20example`
-    );
-  }
-
   render() {
     return (
       <Column noMargin>
+        <Column>
+          <p>Choose or search for an example to open:</p>
+        </Column>
         <Line>
-          <Column>
-            <p>Choose an example to open:</p>
-          </Column>
-        </Line>
-        <Line>
-          <Column expand noMargin>
-            <List>
-              {exampleNames.map(exampleName => (
-                <ListItem
-                  key={exampleName}
-                  primaryText={formatExampleName(exampleName)}
-                  onClick={() => {
-                    sendNewGameCreated(exampleName);
-                    this.props.onOpen(`example://${exampleName}`);
-                  }}
-                />
-              ))}
-            </List>
-            <Column expand>
-              <p>Want to contribute to the examples?</p>
-              <Line alignItems="center" justifyContent="center">
-                <RaisedButton
-                  label="Submit your example"
-                  onClick={this._submitExample}
-                />
-              </Line>
-            </Column>
-          </Column>
+          <ExamplesList
+            exampleNames={exampleNames}
+            onCreateFromExample={exampleName => {
+              sendNewGameCreated(exampleName);
+              this.props.onOpen(`example://${exampleName}`);
+            }}
+          />
         </Line>
       </Column>
     );

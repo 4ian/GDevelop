@@ -27,7 +27,7 @@ export default class BrowserJsExtensionsLoader implements JsExtensionsLoader {
     return Promise.resolve(
       jsExtensions.map(({ name, extensionModule }) => ({
         extensionModulePath: 'internal-extension://' + name,
-        result: loadExtension(gd.JsPlatform.get(), extensionModule),
+        result: loadExtension(gd, gd.JsPlatform.get(), extensionModule),
       }))
     );
   }

@@ -327,12 +327,12 @@ module.exports = {
    * and setting the property to a given value.
    * 
    * If you don't have any tests, you can simply return an empty array like this:
-   * `runExtensionSanityTests: function(extension) { return []; }`
+   * `runExtensionSanityTests: function(gd, extension) { return []; }`
    * 
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function(extension) {
+  runExtensionSanityTests: function(gd, extension) {
     const dummyBehavior = extension
       .getBehaviorMetadata("MyDummyExtension::DummyBehavior")
       .get();

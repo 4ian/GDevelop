@@ -1,34 +1,34 @@
-// @flow
-import some from 'lodash/some';
-const gd = global.gd;
+// Note: this file does not use export/imports nor Flow to allow its usage from Node.js
 
+const some = require('lodash/some');
 const t = _ => _; //TODO: Implement support for i18n for extensions.
 
-export type JsExtensionModule = {
-  createExtension(t, gd): gdPlatformExtension,
-  runExtensionSanityTests(extension: gdPlatformExtension): Array<string>,
-};
+// export type JsExtensionModule = {
+//   createExtension(t, gd): gdPlatformExtension,
+//   runExtensionSanityTests(extension: gdPlatformExtension): Array<string>,
+// };
 
-export type ExtensionLoadingResult = {
-  error: boolean,
-  message: string,
-  dangerous?: boolean,
-  rawError?: any,
-};
+// export type ExtensionLoadingResult = {
+//   error: boolean,
+//   message: string,
+//   dangerous?: boolean,
+//   rawError?: any,
+// };
 
-export interface JsExtensionsLoader {
-  loadAllExtensions(): Promise<
-    Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
-  >,
-}
+// export interface JsExtensionsLoader {
+//   loadAllExtensions(): Promise<
+//     Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
+//   >,
+// }
 
 /**
  * Run extensions tests and check for any non-empty results.
  */
-export const runExtensionSanityTests = (
-  extension: gdPlatformExtension,
-  jsExtensionModule: JsExtensionModule
-): ExtensionLoadingResult => {
+const runExtensionSanityTests = (
+  gd,
+  extension/*: gdPlatformExtension*/,
+  jsExtensionModule/*: JsExtensionModule*/
+)/*: ExtensionLoadingResult*/ => {
   if (!jsExtensionModule.runExtensionSanityTests) {
     return {
       error: true,
@@ -37,7 +37,7 @@ export const runExtensionSanityTests = (
     };
   }
 
-  const testResults = jsExtensionModule.runExtensionSanityTests(extension);
+  const testResults = jsExtensionModule.runExtensionSanityTests(gd, extension);
   if (some(testResults)) {
     return {
       error: true,
@@ -56,10 +56,11 @@ export const runExtensionSanityTests = (
  * Load an extension from the specified JavaScript module, which is supposed
  * to contain a "createExtension" function returning a gd.PlatformExtension.
  */
-export const loadExtension = (
-  platform: gdPlatform,
-  jsExtensionModule: JsExtensionModule
-): ExtensionLoadingResult => {
+const loadExtension = (
+  gd,
+  platform/*: gdPlatform*/,
+  jsExtensionModule/*: JsExtensionModule*/
+)/*: ExtensionLoadingResult*/ => {
   if (!jsExtensionModule.createExtension) {
     return {
       message:
@@ -87,7 +88,7 @@ export const loadExtension = (
   }
 
   try {
-    const testsResult = runExtensionSanityTests(extension, jsExtensionModule);
+    const testsResult = runExtensionSanityTests(gd, extension, jsExtensionModule);
     if (testsResult.error) {
       extension.delete();
       return testsResult;
@@ -109,3 +110,8 @@ export const loadExtension = (
     error: false,
   };
 };
+
+module.exports = {
+  runExtensionSanityTests,
+  loadExtension,
+}

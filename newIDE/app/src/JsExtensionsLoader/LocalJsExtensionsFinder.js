@@ -1,13 +1,13 @@
-// @flow
-import { findGDJS } from '../Export/LocalExporters/LocalGDJSFinder';
-import optionalRequire from '../Utils/OptionalRequire';
-import Window from '../Utils/Window';
+// Note: this file does not use export/imports nor Flow to allow its usage from Node.js
+
+const { findGDJS } = require('../Export/LocalExporters/LocalGDJSFinder');
+const optionalRequire = require('../Utils/OptionalRequire');
 const path = optionalRequire('path');
 const fs = optionalRequire('fs');
 
 const checkIfPathHasJsExtensionModule = (
   extensionFolderPath
-): Promise<?string> => {
+) => {
   return new Promise(resolve => {
     const jsExtensionModulePath = path.join(
       extensionFolderPath,
@@ -23,9 +23,9 @@ const checkIfPathHasJsExtensionModule = (
   });
 };
 
-export const findJsExtensionModules = (): Promise<any> => {
+const findJsExtensionModules = ({ filterExamples }) => {
   return new Promise((resolve, reject) => {
-    findGDJS((gdjsRoot: ?string) => {
+    findGDJS((gdjsRoot) => {
       if (!gdjsRoot) {
         return reject();
       }
@@ -40,7 +40,7 @@ export const findJsExtensionModules = (): Promise<any> => {
         }
 
         const filteredExtensionFolders = extensionFolders.filter(folder => {
-          if (Window.isDev()) return true;
+          if (!filterExamples) return true;
 
           return folder.indexOf("Example") === -1;
         })
@@ -58,3 +58,7 @@ export const findJsExtensionModules = (): Promise<any> => {
     });
   });
 };
+
+module.exports = {
+  findJsExtensionModules,
+}

@@ -118,6 +118,17 @@ class ThemableItem extends React.Component<*, *> {
             enabled: this.props.canPaste(),
             click: () => this.props.onPaste(),
           },
+          { type: 'separator' },
+          {
+            label: 'Move up',
+            enabled: this.props.canMoveUp,
+            click: () => this.props.onMoveUp(),
+          },
+          {
+            label: 'Move down',
+            enabled: this.props.canMoveDown,
+            click: () => this.props.onMoveDown(),
+          },
         ]}
       />
     );
@@ -244,6 +255,22 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  _moveUpLayout = (index: number) => {
+    const { project } = this.props;
+    if (index <= 0) return;
+
+    project.swapLayouts(index, index - 1);
+    this.forceUpdate();
+  };
+
+  _moveDownLayout = (index: number) => {
+    const { project } = this.props;
+    if (index >= project.getLayoutsCount() - 1) return;
+
+    project.swapLayouts(index, index + 1);
+    this.forceUpdate();
+  };
+
   _copyExternalEvents = (externalEvents: gdExternalEvents) => {
     Clipboard.set(EXTERNAL_EVENTS_CLIPBOARD_KIND, {
       externalEvents: serializeToJSObject(externalEvents),
@@ -281,6 +308,22 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  _moveUpExternalEvents = (index: number) => {
+    const { project } = this.props;
+    if (index <= 0) return;
+
+    project.swapExternalEvents(index, index - 1);
+    this.forceUpdate();
+  };
+
+  _moveDownExternalEvents = (index: number) => {
+    const { project } = this.props;
+    if (index >= project.getExternalEventsCount() - 1) return;
+
+    project.swapExternalEvents(index, index + 1);
+    this.forceUpdate();
+  };
+
   _copyExternalLayout = (externalLayout: gdExternalLayout) => {
     Clipboard.set(EXTERNAL_LAYOUT_CLIPBOARD_KIND, {
       externalLayout: serializeToJSObject(externalLayout),
@@ -310,6 +353,22 @@ export default class ProjectManager extends React.Component<Props, State> {
     unserializeFromJSObject(newExternalLayout, copiedExternalLayout);
     newExternalLayout.setName(newName);
 
+    this.forceUpdate();
+  };
+
+  _moveUpExternalLayout = (index: number) => {
+    const { project } = this.props;
+    if (index <= 0) return;
+
+    project.swapExternalLayouts(index, index - 1);
+    this.forceUpdate();
+  };
+
+  _moveDownExternalLayout = (index: number) => {
+    const { project } = this.props;
+    if (index >= project.getExternalLayoutsCount() - 1) return;
+
+    project.swapExternalLayouts(index, index + 1);
     this.forceUpdate();
   };
 
@@ -432,6 +491,10 @@ export default class ProjectManager extends React.Component<Props, State> {
                     onCut={() => this._cutLayout(layout)}
                     onPaste={() => this._pasteLayout(i)}
                     canPaste={() => Clipboard.has(LAYOUT_CLIPBOARD_KIND)}
+                    canMoveUp={i !== 0}
+                    onMoveUp={() => this._moveUpLayout(i)}
+                    canMoveDown={i !== project.getLayoutsCount() - 1}
+                    onMoveDown={() => this._moveDownLayout(i)}
                   />
                 );
               })
@@ -479,6 +542,10 @@ export default class ProjectManager extends React.Component<Props, State> {
                     onPaste={() => this._pasteExternalEvents(i)}
                     canPaste={() =>
                       Clipboard.has(EXTERNAL_EVENTS_CLIPBOARD_KIND)}
+                    canMoveUp={i !== 0}
+                    onMoveUp={() => this._moveUpExternalEvents(i)}
+                    canMoveDown={i !== project.getExternalEventsCount() - 1}
+                    onMoveDown={() => this._moveDownExternalEvents(i)}
                   />
                 );
               })
@@ -526,6 +593,10 @@ export default class ProjectManager extends React.Component<Props, State> {
                     onPaste={() => this._pasteExternalLayout(i)}
                     canPaste={() =>
                       Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)}
+                    canMoveUp={i !== 0}
+                    onMoveUp={() => this._moveUpExternalLayout(i)}
+                    canMoveDown={i !== project.getExternalLayoutsCount() - 1}
+                    onMoveDown={() => this._moveDownExternalLayout(i)}
                   />
                 );
               })

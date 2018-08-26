@@ -623,7 +623,13 @@ export default class SceneEditor extends Component {
         />
       ),
       'objects-list': (
-        <MosaicWindow title="Objects">
+        <MosaicWindow
+          title="Objects"
+          selectedObjectName={
+            this.state
+              .selectedObjectName /*Ensure MosaicWindow content is updated when selectedObjectName changes*/
+          }
+        >
           <ObjectsList
             getThumbnail={ObjectsRenderingService.getThumbnail.bind(
               ObjectsRenderingService

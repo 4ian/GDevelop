@@ -84,7 +84,9 @@ export default class SceneEditor extends Component {
       editedGroup: null,
 
       uiSettings: props.initialUiSettings,
-      history: getHistoryInitialState(props.initialInstances),
+      history: getHistoryInitialState(props.initialInstances, {
+        historyMaxSize: 50,
+      }),
     };
   }
 

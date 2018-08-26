@@ -128,7 +128,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      history: getHistoryInitialState(props.events),
+      history: getHistoryInitialState(props.events, { historyMaxSize: 50 }),
 
       editedInstruction: {
         isCondition: true,

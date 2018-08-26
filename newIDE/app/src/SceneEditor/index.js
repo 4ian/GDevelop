@@ -252,6 +252,7 @@ export default class SceneEditor extends Component {
   };
 
   undo = () => {
+    this.instancesSelection.clearSelection();
     this.setState(
       {
         history: undo(this.state.history, this.props.initialInstances),
@@ -266,6 +267,7 @@ export default class SceneEditor extends Component {
   };
 
   redo = () => {
+    this.instancesSelection.clearSelection();
     this.setState(
       {
         history: redo(this.state.history, this.props.initialInstances),
@@ -326,7 +328,7 @@ export default class SceneEditor extends Component {
       },
       () => this.forceUpdatePropertiesEditor()
     );
-  }
+  };
 
   _onInstancesModified = instances => {
     this.forceUpdate();

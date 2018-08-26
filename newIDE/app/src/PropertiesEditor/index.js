@@ -221,6 +221,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
             if (field.type === 'row') {
               return (
                 <PropertiesEditor
+                  key={field.name}
                   schema={field.children}
                   instances={this.props.instances}
                   mode="row"

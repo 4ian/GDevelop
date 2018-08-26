@@ -440,6 +440,9 @@ export default class InstancesEditorContainer extends Component {
 
   _onResizeEnd = () => {
     this.instancesResizer.endResize();
+
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    this.props.onInstancesResized(selectedInstances);
   };
 
   _onClick = (x, y) => {

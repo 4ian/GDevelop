@@ -319,6 +319,15 @@ export default class SceneEditor extends Component {
     );
   };
 
+  _onInstancesResized = instances => {
+    this.setState(
+      {
+        history: saveToHistory(this.state.history, this.props.initialInstances),
+      },
+      () => this.forceUpdatePropertiesEditor()
+    );
+  }
+
   _onInstancesModified = instances => {
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
@@ -610,6 +619,7 @@ export default class SceneEditor extends Component {
           onDeleteSelection={this.deleteSelection}
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
+          onInstancesResized={this._onInstancesResized}
           onContextMenu={this._onContextMenu}
           onCopy={() => this.copySelection({ useLastCursorPosition: true })}
           onCut={() => this.cutSelection({ useLastCursorPosition: true })}

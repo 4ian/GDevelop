@@ -1,4 +1,4 @@
-export default class SelectionRectangle {
+export default class DropHandler {
   constructor({ canvas, onDrop }) {
     canvas.ondragover = canvas.ondrop = ev => {
       ev.dataTransfer.dropEffect = 'copy';

@@ -45,6 +45,8 @@ export default class StandardEvent extends React.Component<
           selection={this.props.selection}
           areConditions
           onAddNewInstruction={this.props.onAddNewInstruction}
+          onMoveToInstruction={this.props.onMoveToInstruction}
+          onMoveToInstructionsList={this.props.onMoveToInstructionsList}
           onInstructionClick={this.props.onInstructionClick}
           onInstructionDoubleClick={this.props.onInstructionDoubleClick}
           onInstructionContextMenu={this.props.onInstructionContextMenu}
@@ -60,6 +62,8 @@ export default class StandardEvent extends React.Component<
           selection={this.props.selection}
           areConditions={false}
           onAddNewInstruction={this.props.onAddNewInstruction}
+          onMoveToInstruction={this.props.onMoveToInstruction}
+          onMoveToInstructionsList={this.props.onMoveToInstructionsList}
           onInstructionClick={this.props.onInstructionClick}
           onInstructionDoubleClick={this.props.onInstructionDoubleClick}
           onInstructionContextMenu={this.props.onInstructionContextMenu}

@@ -49,7 +49,8 @@ const apiKey = '69c73fc1a710bb79543d4b91f6b81c08';
 const algoliaOptions = { hitsPerPage: 5 };
 
 export default class DocSearchArea extends React.Component<Props, State> {
-  client: algoliasearch = algoliasearch(appId, apiKey, algoliaOptions);
+  // $FlowFixMe
+  client = algoliasearch(appId, apiKey, algoliaOptions);
   state = {
     results: null,
   };
@@ -61,6 +62,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
   _launchSearchRequest = debounce(() => {
     if (this.props.value) {
       this.client
+        // $FlowFixMe
         .search([
           {
             indexName: indexName,

@@ -123,19 +123,15 @@ yarn deploy #or npm run deploy
 
 ## Current status and how to contribute
 
-This new editor is still in development and is missing some features:
+This new editor is always in development. Check the [the roadmap for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap). For example:
 
 - [ ] Support for translations (See an [example of a component that can be translated](https://github.com/4ian/GD/blob/master/newIDE/app/src/MainFrame/Toolbar.js#L44))
 - [ ] Support for native games
-- [ ] More [documentation](http://wiki.compilgames.net/doku.php/gdevelop5/start) about how to package for iOS/Android with Cordova/PhoneGap Build or Cocos2d-JS.
-- [ ] Search in events
 - [ ] More [examples](https://github.com/4ian/GD/blob/master/newIDE/app/src/ProjectCreation/BrowserExamples.js)
 - [ ] More [tutorials](http://wiki.compilgames.net/doku.php/gdevelop5/start)
 - [ ] Add more [keyboard shortcuts](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/KeyboardShortcuts/index.js)
-- [ ] Make drawers movable/draggable like the properties panel and the objects editor
+- [ ] Make [drawers movable/draggable like the properties panel and the objects editor](https://trello.com/c/GOdj2Lk5/132-allow-panels-to-be-dragged-in-a-separate-window-in-addition-to-the-main-window).
 
 You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
-
-See also [the roadmap for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
 
 This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app). Check out their documentation for common tasks or help about using it.

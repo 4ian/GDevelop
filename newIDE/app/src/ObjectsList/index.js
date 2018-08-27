@@ -108,7 +108,8 @@ class ObjectsList extends Component<*, *> {
               onDelete={() => this.props.onDelete(objectWithContext)}
               onCopyObject={() => this.props.onCopyObject(objectWithContext)}
               onCutObject={() => this.props.onCutObject(objectWithContext)}
-              onDuplicateObject={() => this.props.onDuplicateObject(objectWithContext)}
+              onDuplicateObject={() =>
+                this.props.onDuplicateObject(objectWithContext)}
               onPasteObject={() => this.props.onPasteObject(objectWithContext)}
               onRename={newName =>
                 this.props.onRename(objectWithContext, newName)}
@@ -306,7 +307,7 @@ export default class ObjectsListContainer extends React.Component<
     this.forceUpdate();
     if (onObjectPasted) onObjectPasted(newObject);
 
-    return {object: newObject, global,};
+    return { object: newObject, global };
   };
 
   _editName = (objectWithContext: ?ObjectWithContext) => {
@@ -330,7 +331,8 @@ export default class ObjectsListContainer extends React.Component<
     this.setState({
       renamedObjectWithScope: null,
     });
-    if(this.props.canRenameObject(newName)){
+
+    if (this.props.canRenameObject(objectWithContext, newName)) {
       this.props.onRenameObject(objectWithContext, newName, doRename => {
         if (!doRename) return;
 

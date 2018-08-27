@@ -415,7 +415,10 @@ export default class SceneEditor extends Component {
     done(true);
   };
 
-  _canObjectUseNewName = (objectWithContext, newName) => {
+  _canObjectUseNewName = (
+    objectWithContext: ObjectWithContext,
+    newName: string
+  ) => {
     const { project, layout } = this.props;
     const { object } = objectWithContext;
 
@@ -434,12 +437,8 @@ export default class SceneEditor extends Component {
   _onRenameEditedObject = newName => {
     const { editedObjectWithContext } = this.state;
 
-    // Avoid triggering renaming refactoring if name has not really changed
-    if (
-      editedObjectWithContext.object &&
-      editedObjectWithContext.object.getName() !== newName
-    ) {
-      this._onRenameObject(this.state.editedObjectWithContext, newName);
+    if (editedObjectWithContext.object) {
+      this._onRenameObject(editedObjectWithContext, newName);
     }
   };
 
@@ -447,20 +446,24 @@ export default class SceneEditor extends Component {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
-    if (global) {
-      gd.WholeProjectRefactorer.globalObjectRenamed(
-        project,
-        object.getName(),
-        newName
-      );
-    } else {
-      gd.WholeProjectRefactorer.objectRenamedInLayout(
-        project,
-        layout,
-        object.getName(),
-        newName
-      );
+    // Avoid triggering renaming refactoring if name has not really changed
+    if (object.getName() !== newName) {
+      if (global) {
+        gd.WholeProjectRefactorer.globalObjectRenamed(
+          project,
+          object.getName(),
+          newName
+        );
+      } else {
+        gd.WholeProjectRefactorer.objectRenamedInLayout(
+          project,
+          layout,
+          object.getName(),
+          newName
+        );
+      }
     }
+
     object.setName(newName);
     done(true);
   };
@@ -654,15 +657,11 @@ export default class SceneEditor extends Component {
             onObjectSelected={this._onObjectSelected}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
-            canRenameObject={tryName => {
-              const editedObjectWithContext = {
-                object: layout.getObject(this.state.selectedObjectName),
-                global: project.hasObjectNamed(this.state.selectedObjectName),
-              };
-              return this._canObjectUseNewName(
-                editedObjectWithContext,
-                tryName
-              );
+            canRenameObject={(
+              objectWithContext: ObjectWithContext,
+              newName: string
+            ) => {
+              return this._canObjectUseNewName(objectWithContext, newName);
             }}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}

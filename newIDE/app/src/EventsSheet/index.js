@@ -367,7 +367,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       destinationContext.instrsList.insert(instruction, destinationIndex)
     );
 
-    this.deleteSelection(); //TODO: Add a flag to delete only instructions
+    this.deleteSelection(/*deleteOnlyInstructions=*/true);
   };
 
   selectEvent = (eventContext: EventContext) => {
@@ -479,12 +479,14 @@ export default class EventsSheet extends React.Component<Props, State> {
     this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
   };
 
-  deleteSelection = () => {
+  deleteSelection = (deleteOnlyInstructions: boolean = false) => {
     const { events } = this.props;
     const eventsRemover = new gd.EventsRemover();
-    getSelectedEvents(this.state.selection).forEach(event =>
-      eventsRemover.addEventToRemove(event)
-    );
+    if (!deleteOnlyInstructions) {
+      getSelectedEvents(this.state.selection).forEach(event =>
+        eventsRemover.addEventToRemove(event)
+      );
+    }
     getSelectedInstructions(this.state.selection).forEach(instruction =>
       eventsRemover.addInstructionToRemove(instruction)
     );
@@ -495,11 +497,9 @@ export default class EventsSheet extends React.Component<Props, State> {
         selection: clearSelection(),
         inlineEditing: false,
         inlineEditingAnchorEl: null,
-      },
-      () => {
-        this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
       }
     );
+    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate())
   };
 
   copySelection = () => {

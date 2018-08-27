@@ -367,7 +367,9 @@ export default class EventsSheet extends React.Component<Props, State> {
       destinationContext.instrsList.insert(instruction, destinationIndex)
     );
 
-    this.deleteSelection(/*deleteOnlyInstructions=*/true);
+    if (!this._keyboardShortcuts.shouldCloneInstances()) {
+      this.deleteSelection(/*deleteOnlyInstructions=*/ true);
+    }
   };
 
   selectEvent = (eventContext: EventContext) => {
@@ -492,14 +494,12 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
 
     eventsRemover.launch(events);
-    this.setState(
-      {
-        selection: clearSelection(),
-        inlineEditing: false,
-        inlineEditingAnchorEl: null,
-      }
-    );
-    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate())
+    this.setState({
+      selection: clearSelection(),
+      inlineEditing: false,
+      inlineEditingAnchorEl: null,
+    });
+    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
   };
 
   copySelection = () => {

@@ -833,7 +833,7 @@ gdjs.RuntimeObject.prototype.activateBehavior = function(name, enable) {
  */
 gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
     if ( this._behaviorsTable.containsKey(name) ) {
-        this._behaviorsTable.get(name).activated();
+        return this._behaviorsTable.get(name).activated();
     }
 
     return false;

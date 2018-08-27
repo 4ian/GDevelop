@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import Instruction from './Instruction';
+import Instruction, { reactDndInstructionType } from './Instruction';
 import { mapFor } from '../../Utils/MapFor';
 import {
   isInstructionSelected,
@@ -9,6 +9,13 @@ import {
   type ParameterContext,
 } from '../SelectionHandler';
 import { actionsContainer, conditionsContainer } from './ClassNames';
+import {
+  DropTarget,
+  type DropTargetMonitor,
+  type DropTargetConnector,
+  type ConnectDropTarget,
+} from 'react-dnd';
+import DropIndicator from './DropIndicator';
 
 const styles = {
   addButton: {
@@ -16,10 +23,19 @@ const styles = {
   },
 };
 
+type DropTargetProps = {|
+  connectDropTarget: ConnectDropTarget,
+  isOver: boolean,
+|};
+
 type Props = {
   instrsList: gdInstructionsList,
   areConditions: boolean,
   onAddNewInstruction: InstructionsListContext => void,
+  onMoveToInstruction: (destinationContext: InstructionContext) => void,
+  onMoveToInstructionsList: (
+    destinationContext: InstructionsListContext
+  ) => void,
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
   onInstructionContextMenu: (x: number, y: number, InstructionContext) => void,
@@ -34,9 +50,10 @@ type Props = {
   extraClassName?: string,
   style?: Object,
   disabled: boolean,
+  ...DropTargetProps,
 };
 
-export default class InstructionsList extends React.Component<Props, *> {
+class InstructionsList extends React.Component<Props, *> {
   onAddNewInstruction = () => {
     if (this.props.onAddNewInstruction)
       this.props.onAddNewInstruction({
@@ -52,6 +69,8 @@ export default class InstructionsList extends React.Component<Props, *> {
       extraClassName,
       instrsList,
       onAddNewInstruction,
+      onMoveToInstruction,
+      onMoveToInstructionsList,
       onInstructionClick,
       onInstructionContextMenu,
       onInstructionDoubleClick,
@@ -61,6 +80,8 @@ export default class InstructionsList extends React.Component<Props, *> {
       style,
       disabled,
     } = this.props;
+
+    const { connectDropTarget, isOver } = this.props;
 
     const instructions = mapFor(0, instrsList.size(), i => {
       const instruction = instrsList.get(i);
@@ -72,13 +93,13 @@ export default class InstructionsList extends React.Component<Props, *> {
       };
 
       return (
+        // $FlowFixMe - Flow don't see that DropTarget hoc is being used in instructions?
         <Instruction
           instruction={instruction}
           isCondition={areConditions}
-          instrsList={instrsList}
-          index={i}
           key={instruction.ptr}
           selected={isInstructionSelected(selection, instruction)}
+          onMoveToInstruction={() => onMoveToInstruction(instructionContext)}
           onClick={() => onInstructionClick(instructionContext)}
           onDoubleClick={() => onInstructionDoubleClick(instructionContext)}
           onContextMenu={(x, y) =>
@@ -94,6 +115,8 @@ export default class InstructionsList extends React.Component<Props, *> {
             })}
           selection={selection}
           onAddNewSubInstruction={onAddNewInstruction}
+          onMoveToSubInstruction={onMoveToInstruction}
+          onMoveToSubInstructionsList={onMoveToInstructionsList}
           onSubInstructionClick={onInstructionClick}
           onSubInstructionDoubleClick={onInstructionDoubleClick}
           onSubInstructionContextMenu={onInstructionContextMenu}
@@ -111,7 +134,7 @@ export default class InstructionsList extends React.Component<Props, *> {
     const addButtonDefaultLabel = areConditions
       ? 'Add condition'
       : 'Add action';
-    return (
+    return connectDropTarget(
       <div
         className={`${areConditions
           ? conditionsContainer
@@ -119,6 +142,7 @@ export default class InstructionsList extends React.Component<Props, *> {
         style={style}
       >
         {instructions}
+        {isOver && <DropIndicator />}
         <a
           style={styles.addButton}
           className="add-link"
@@ -138,3 +162,35 @@ export default class InstructionsList extends React.Component<Props, *> {
     );
   }
 }
+
+// Drag'n'drop support:
+
+const instructionsListTarget = {
+  canDrop(props: Props, monitor: DropTargetMonitor) {
+    return (
+      monitor.getItem() && monitor.getItem().isCondition === props.areConditions
+    );
+  },
+  drop(props: Props) {
+    props.onMoveToInstructionsList({
+      isCondition: props.areConditions,
+      instrsList: props.instrsList,
+    });
+  },
+};
+
+function targetCollect(
+  connect: DropTargetConnector,
+  monitor: DropTargetMonitor
+): DropTargetProps {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver({ shallow: true }),
+  };
+}
+
+export default DropTarget(
+  reactDndInstructionType,
+  instructionsListTarget,
+  targetCollect
+)(InstructionsList);

@@ -64,6 +64,8 @@ class EventContainer extends Component {
             leftIndentWidth={this.props.leftIndentWidth}
             onUpdate={this._onEventUpdated}
             onAddNewInstruction={this.props.onAddNewInstruction}
+            onMoveToInstruction={this.props.onMoveToInstruction}
+            onMoveToInstructionsList={this.props.onMoveToInstructionsList}
             onInstructionClick={this.props.onInstructionClick}
             onInstructionDoubleClick={this.props.onInstructionDoubleClick}
             onInstructionContextMenu={this.props.onInstructionContextMenu}
@@ -251,6 +253,8 @@ export default class ThemableEventsTree extends Component {
         selection={this.props.selection}
         leftIndentWidth={depth * indentWidth}
         onAddNewInstruction={this.props.onAddNewInstruction}
+        onMoveToInstruction={this.props.onMoveToInstruction}
+        onMoveToInstructionsList={this.props.onMoveToInstructionsList}
         onInstructionClick={this.props.onInstructionClick}
         onInstructionDoubleClick={this.props.onInstructionDoubleClick}
         onParameterClick={this.props.onParameterClick}

@@ -54,6 +54,7 @@ import EventsSearcher, {
   type ReplaceInEventsInputs,
   type SearchInEventsInputs,
 } from './EventsSearcher';
+import { containsSubInstructions } from './ContainsSubInstruction';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -334,6 +335,44 @@ export default class EventsSheet extends React.Component<Props, State> {
       }
     );
   }
+
+  moveSelectionToInstruction = (destinationContext: InstructionContext) => {
+    this.moveSelectionToInstructionsList(
+      {
+        instrsList: destinationContext.instrsList,
+        isCondition: destinationContext.isCondition,
+      },
+      destinationContext.indexInList
+    );
+  };
+
+  moveSelectionToInstructionsList = (
+    destinationContext: InstructionsListContext,
+    indexInList: ?number = undefined
+  ) => {
+    const selectedInstructions = getSelectedInstructions(this.state.selection);
+    const destinationIndex =
+      indexInList === undefined
+        ? destinationContext.instrsList.size()
+        : indexInList;
+
+    const isTryingToDragAnInstructionIntoItsOwnNestedInstructions = !!selectedInstructions.filter(
+      instruction =>
+        containsSubInstructions(instruction, destinationContext.instrsList)
+    ).length;
+
+    if (isTryingToDragAnInstructionIntoItsOwnNestedInstructions) return;
+
+    selectedInstructions.forEach(instruction =>
+      destinationContext.instrsList.insert(instruction, destinationIndex)
+    );
+
+    this.deleteSelection();
+
+    this._saveChangesToHistory(() => {
+      this._eventsTree.forceEventsUpdate();
+    });
+  };
 
   selectEvent = (eventContext: EventContext) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
@@ -711,6 +750,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                 this.openInstructionsListContextMenu
               }
               onAddNewInstruction={this.openInstructionEditor}
+              onMoveToInstruction={this.moveSelectionToInstruction}
+              onMoveToInstructionsList={this.moveSelectionToInstructionsList}
               onParameterClick={this.openParameterEditor}
               onEventClick={this.selectEvent}
               onEventContextMenu={this.openEventContextMenu}

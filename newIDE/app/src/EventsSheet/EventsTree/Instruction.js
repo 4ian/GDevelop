@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react';
-import PropTypes from 'prop-types';
 import { mapFor } from '../../Utils/MapFor';
 import classNames from 'classnames';
 import {
@@ -15,6 +14,17 @@ import {
   type InstructionContext,
 } from '../SelectionHandler';
 import InstructionsList from './InstructionsList';
+import {
+  DragSource,
+  type DragSourceMonitor,
+  type DragSourceConnector,
+  type ConnectDragSource,
+  DropTarget,
+  type DropTargetMonitor,
+  type DropTargetConnector,
+  type ConnectDropTarget,
+} from 'react-dnd';
+import DropIndicator from './DropIndicator';
 const gd = global.gd;
 const instrFormatter = gd.InstructionSentenceFormatter.get();
 instrFormatter.loadTypesFormattingFromConfig();
@@ -33,7 +43,16 @@ const styles = {
   },
 };
 
-type Props = {
+type DragSourceProps = {|
+  connectDragSource: ConnectDragSource,
+|};
+
+type DropTargetProps = {|
+  connectDropTarget: ConnectDropTarget,
+  isOver: boolean,
+|};
+
+type Props = {|
   instruction: gdInstruction,
   isCondition: boolean,
   onClick: Function,
@@ -41,10 +60,18 @@ type Props = {
   disabled: boolean,
   onDoubleClick: () => void,
   onContextMenu: (x: number, y: number) => void,
+  onMoveToInstruction: () => void,
+
+  ...DragSourceProps,
+  ...DropTargetProps,
 
   // For potential sub-instructions list:
-  selection: PropTypes.object,
+  selection: Object,
   onAddNewSubInstruction: Function,
+  onMoveToSubInstruction: (destinationContext: InstructionContext) => void,
+  onMoveToSubInstructionsList: (
+    destinationContext: InstructionsListContext
+  ) => void,
   onSubInstructionClick: Function,
   onSubInstructionDoubleClick: Function,
   onSubInstructionsListContextMenu: (
@@ -59,9 +86,9 @@ type Props = {
     instructionContext: InstructionContext
   ) => void,
   onParameterClick: (event: any, parameterIndex: number) => void,
-};
+|};
 
-export default class Instruction extends React.Component<Props, *> {
+class Instruction extends React.Component<Props, *> {
   /**
    * Render the different parts of the text of the instruction.
    * Parameter can have formatting, be hovered and clicked. The rest
@@ -111,7 +138,9 @@ export default class Instruction extends React.Component<Props, *> {
   };
 
   render() {
-    var { instruction, isCondition } = this.props;
+    const { instruction, isCondition } = this.props;
+
+    const { connectDragSource, connectDropTarget, isOver } = this.props;
 
     //TODO: Metadata could be cached for performance boost.
     const metadata = isCondition
@@ -124,62 +153,127 @@ export default class Instruction extends React.Component<Props, *> {
           instruction.getType()
         );
 
-    return (
-      <div
-        style={styles.container}
-        className={classNames({
-          [selectableArea]: true,
-          [selectedArea]: this.props.selected,
-        })}
-        onClick={e => {
-          e.stopPropagation();
-          this.props.onClick();
-        }}
-        onDoubleClick={e => {
-          e.stopPropagation();
-          this.props.onDoubleClick();
-        }}
-        onContextMenu={e => {
-          e.stopPropagation();
-          this.props.onContextMenu(e.clientX, e.clientY);
-        }}
-      >
-        {instruction.isInverted() && (
+    const instructionDiv = connectDropTarget(
+      // $FlowFixMe
+      connectDragSource(
+        <div
+          style={styles.container}
+          className={classNames({
+            [selectableArea]: true,
+            [selectedArea]: this.props.selected,
+          })}
+          onClick={e => {
+            e.stopPropagation();
+            this.props.onClick();
+          }}
+          onDoubleClick={e => {
+            e.stopPropagation();
+            this.props.onDoubleClick();
+          }}
+          onContextMenu={e => {
+            e.stopPropagation();
+            this.props.onContextMenu(e.clientX, e.clientY);
+          }}
+        >
+          {instruction.isInverted() && (
+            <img
+              src="res/contraire.png"
+              alt="Condition is negated"
+              style={styles.icon}
+              width="20"
+              height="16"
+            />
+          )}
           <img
-            src="res/contraire.png"
-            alt="Condition is negated"
+            src={metadata.getSmallIconFilename()}
             style={styles.icon}
+            alt=""
             width="20"
             height="16"
           />
-        )}
-        <img
-          src={metadata.getSmallIconFilename()}
-          style={styles.icon}
-          alt=""
-          width="20"
-          height="16"
-        />
-        {this._renderInstructionText(metadata)}
-        {metadata.canHaveSubInstructions() && (
-          <InstructionsList
-            extraClassName={subInstructionsContainer}
-            instrsList={instruction.getSubInstructions()}
-            areConditions={this.props.isCondition}
-            selection={this.props.selection}
-            onAddNewInstruction={this.props.onAddNewSubInstruction}
-            onInstructionClick={this.props.onSubInstructionClick}
-            onInstructionDoubleClick={this.props.onSubInstructionDoubleClick}
-            onInstructionContextMenu={this.props.onSubInstructionContextMenu}
-            onInstructionsListContextMenu={
-              this.props.onSubInstructionsListContextMenu
-            }
-            onParameterClick={this.props.onSubParameterClick}
-            addButtonLabel="Add a sub-condition"
-            disabled={this.props.disabled}
-          />
-        )}
-      </div>
+          {this._renderInstructionText(metadata)}
+          {metadata.canHaveSubInstructions() && (
+            <InstructionsList
+              extraClassName={subInstructionsContainer}
+              instrsList={instruction.getSubInstructions()}
+              areConditions={this.props.isCondition}
+              selection={this.props.selection}
+              onAddNewInstruction={this.props.onAddNewSubInstruction}
+              onMoveToInstruction={this.props.onMoveToSubInstruction}
+              onMoveToInstructionsList={this.props.onMoveToSubInstructionsList}
+              onInstructionClick={this.props.onSubInstructionClick}
+              onInstructionDoubleClick={this.props.onSubInstructionDoubleClick}
+              onInstructionContextMenu={this.props.onSubInstructionContextMenu}
+              onInstructionsListContextMenu={
+                this.props.onSubInstructionsListContextMenu
+              }
+              onParameterClick={this.props.onSubParameterClick}
+              addButtonLabel="Add a sub-condition"
+              disabled={this.props.disabled}
+            />
+          )}
+        </div>
+      )
+    );
+
+    return isOver ? (
+      <React.Fragment>
+        <DropIndicator />
+        {instructionDiv}
+      </React.Fragment>
+    ) : (
+      instructionDiv
     );
   }
 }
+
+// Drag'n'drop support:
+
+export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
+
+const instructionSource = {
+  beginDrag(props) {
+    props.onClick(); // Select the dragged instruction
+    return {
+      // No need to save here what is being dragged,
+      // as its the entire selection that is considered to be dragged.
+      isCondition: props.isCondition,
+    };
+  },
+};
+
+function sourceCollect(
+  connect: DragSourceConnector,
+  monitor: DragSourceMonitor
+): DragSourceProps {
+  return {
+    connectDragSource: connect.dragSource(),
+  };
+}
+
+const instructionTarget = {
+  canDrop(props: Props, monitor: DropTargetMonitor) {
+    return (
+      monitor.getItem() && monitor.getItem().isCondition === props.isCondition
+    );
+  },
+  drop(props: Props) {
+    props.onMoveToInstruction();
+  },
+};
+
+function targetCollect(
+  connect: DropTargetConnector,
+  monitor: DropTargetMonitor
+): DropTargetProps {
+  return {
+    connectDropTarget: connect.dropTarget(),
+    isOver: monitor.isOver({ shallow: true }),
+  };
+}
+
+export default DragSource(reactDndInstructionType, instructionSource, sourceCollect)(
+  DropTarget(reactDndInstructionType, instructionTarget, targetCollect)(
+    Instruction
+  )
+);

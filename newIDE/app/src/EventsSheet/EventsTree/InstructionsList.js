@@ -26,6 +26,7 @@ const styles = {
 type DropTargetProps = {|
   connectDropTarget: ConnectDropTarget,
   isOver: boolean,
+  canDrop: boolean,
 |};
 
 type Props = {
@@ -81,7 +82,7 @@ class InstructionsList extends React.Component<Props, *> {
       disabled,
     } = this.props;
 
-    const { connectDropTarget, isOver } = this.props;
+    const { connectDropTarget, isOver, canDrop } = this.props;
 
     const instructions = mapFor(0, instrsList.size(), i => {
       const instruction = instrsList.get(i);
@@ -142,7 +143,7 @@ class InstructionsList extends React.Component<Props, *> {
         style={style}
       >
         {instructions}
-        {isOver && <DropIndicator />}
+        {isOver && <DropIndicator canDrop={canDrop} />}
         <a
           style={styles.addButton}
           className="add-link"
@@ -186,6 +187,7 @@ function targetCollect(
   return {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver({ shallow: true }),
+    canDrop: monitor.canDrop(),
   };
 }
 

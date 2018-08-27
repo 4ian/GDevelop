@@ -50,6 +50,7 @@ type DragSourceProps = {|
 type DropTargetProps = {|
   connectDropTarget: ConnectDropTarget,
   isOver: boolean,
+  canDrop: boolean,
 |};
 
 type Props = {|
@@ -139,8 +140,12 @@ class Instruction extends React.Component<Props, *> {
 
   render() {
     const { instruction, isCondition } = this.props;
-
-    const { connectDragSource, connectDropTarget, isOver } = this.props;
+    const {
+      connectDragSource,
+      connectDropTarget,
+      isOver,
+      canDrop,
+    } = this.props;
 
     //TODO: Metadata could be cached for performance boost.
     const metadata = isCondition
@@ -218,7 +223,7 @@ class Instruction extends React.Component<Props, *> {
 
     return isOver ? (
       <React.Fragment>
-        <DropIndicator />
+        <DropIndicator canDrop={canDrop} />
         {instructionDiv}
       </React.Fragment>
     ) : (
@@ -269,10 +274,15 @@ function targetCollect(
   return {
     connectDropTarget: connect.dropTarget(),
     isOver: monitor.isOver({ shallow: true }),
+    canDrop: monitor.canDrop(),
   };
 }
 
-export default DragSource(reactDndInstructionType, instructionSource, sourceCollect)(
+export default DragSource(
+  reactDndInstructionType,
+  instructionSource,
+  sourceCollect
+)(
   DropTarget(reactDndInstructionType, instructionTarget, targetCollect)(
     Instruction
   )

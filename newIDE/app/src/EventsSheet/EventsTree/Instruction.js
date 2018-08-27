@@ -262,7 +262,10 @@ const instructionTarget = {
       monitor.getItem() && monitor.getItem().isCondition === props.isCondition
     );
   },
-  drop(props: Props) {
+  drop(props: Props, monitor: DropTargetMonitor) {
+    if (monitor.didDrop()) {
+      return; // Drop already handled by a subinstruction
+    }
     props.onMoveToInstruction();
   },
 };

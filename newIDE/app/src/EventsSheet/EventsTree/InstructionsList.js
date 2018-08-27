@@ -172,7 +172,10 @@ const instructionsListTarget = {
       monitor.getItem() && monitor.getItem().isCondition === props.areConditions
     );
   },
-  drop(props: Props) {
+  drop(props: Props, monitor: DropTargetMonitor) {
+    if (monitor.didDrop()) {
+      return; // Drop already handled by an instruction
+    }
     props.onMoveToInstructionsList({
       isCondition: props.areConditions,
       instrsList: props.instrsList,

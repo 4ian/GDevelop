@@ -367,11 +367,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       destinationContext.instrsList.insert(instruction, destinationIndex)
     );
 
-    this.deleteSelection();
-
-    this._saveChangesToHistory(() => {
-      this._eventsTree.forceEventsUpdate();
-    });
+    this.deleteSelection(); //TODO: Add a flag to delete only instructions
   };
 
   selectEvent = (eventContext: EventContext) => {

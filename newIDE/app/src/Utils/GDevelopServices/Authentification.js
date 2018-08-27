@@ -5,7 +5,7 @@ import { GDevelopFirebaseConfig } from './ApiConfigs';
 export type Profile = {
   uid: string, // This represents the userId
   providerId: string,
-  email: string,
+  email: ?string,
   emailVerified: boolean,
 };
 
@@ -49,6 +49,7 @@ export default class Authentification {
   createAccount = (form: LoginForm): Promise<void> => {
     return firebase
       .auth()
+      // $FlowFixMe - Outdated definitions?
       .createUserAndRetrieveDataWithEmailAndPassword(form.email, form.password)
       .then(userCredentials => {
         this.user = userCredentials.user;
@@ -62,6 +63,7 @@ export default class Authentification {
   login = (form: LoginForm): Promise<void> => {
     return firebase
       .auth()
+      // $FlowFixMe - Outdated definitions?
       .signInAndRetrieveDataWithEmailAndPassword(form.email, form.password)
       .then(userCredentials => {
         this.user = userCredentials.user;

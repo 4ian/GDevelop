@@ -845,6 +845,39 @@ module.exports = {
       }
     ]
   },
+  "facebook-instant-game": {
+    "description": "Learn how to use the various Facebook Instant Games APIs to get information about the player, share their scores and have a leaderboard!",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Facebook Instant Games",
+        "name": "FacebookInstantGames"
+      }
+    ]
+  },
   "find-diagonals": {
     "description": "Show how to delete objects that are located at the diagonals of the click of the player in a board game.",
     "usedExtensions": [
@@ -1523,7 +1556,7 @@ module.exports = {
     ]
   },
   "parse-json-from-api": {
-    "description": "",
+    "description": "Advanced example where JSON content is fetched from a website and information extracted from it.",
     "usedExtensions": [
       {
         "fullName": "Sprite",
@@ -1710,7 +1743,7 @@ module.exports = {
     ]
   },
   "pin-object-to-another": {
-    "description": "",
+    "description": "Example showing how to have objects \"pinned\" to another, meaning that they will move/rotate and follow the object they are pinned too.",
     "usedExtensions": [
       {
         "fullName": "Text object",

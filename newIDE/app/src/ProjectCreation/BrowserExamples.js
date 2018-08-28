@@ -34,6 +34,7 @@ const exampleNames = [
   'drag-camera-with-mouse',
   'drop-collect-items-from-storage',
   'exit-app',
+  'facebook-instant-game',
   'find-diagonals',
   'health-bar',
   'infinite-scrolling-background',

@@ -23,6 +23,7 @@ import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-las
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
 import dropCollectItemsFromStorage from '../fixtures/drop-collect-items-from-storage/drop-collect-items-from-storage.json';
 import exitApp from '../fixtures/exit-app/exit-app.json';
+import facebookInstantGame from '../fixtures/facebook-instant-game/facebook-instant-game.json';
 import findDiagonals from '../fixtures/find-diagonals/find-diagonals.json';
 import healthBar from '../fixtures/health-bar/health-bar.json';
 import infiniteScrollingBackground from '../fixtures/infinite-scrolling-background/infinite-scrolling-background.json';
@@ -136,6 +137,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(dropCollectItemsFromStorage);
     } else if (url === 'example://exit-app') {
       return Promise.resolve(exitApp);
+    } else if (url === 'example://facebook-instant-game') {
+      return Promise.resolve(facebookInstantGame);
     } else if (url === 'example://find-diagonals') {
       return Promise.resolve(findDiagonals);
     } else if (url === 'example://health-bar') {

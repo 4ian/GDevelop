@@ -33,7 +33,10 @@ gdjs.TextEntryRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene
     }
 };
 
-gdjs.TextEntryRuntimeObject.prototype.update = function() {
+gdjs.TextEntryRuntimeObject.prototype.update = function(runtimeScene) {
+    //Call RuntimeObject update
+    gdjs.RuntimeObject.prototype.update.call(this, runtimeScene);
+
     if (this._renderer.getString) {
         this._str = this._renderer.getString();
     }

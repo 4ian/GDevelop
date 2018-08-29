@@ -88,6 +88,9 @@ gdjs.SkeletonRuntimeObject.prototype.stepBehaviorsPreEvents = function(runtimeSc
 };
 
 gdjs.SkeletonRuntimeObject.prototype.update = function(runtimeScene){
+    //Call RuntimeObject update
+    gdjs.RuntimeObject.prototype.update.call(this, runtimeScene);
+    
     this.rootArmature.update();
 };
 

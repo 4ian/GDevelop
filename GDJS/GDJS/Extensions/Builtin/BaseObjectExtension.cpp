@@ -143,6 +143,24 @@ BaseObjectExtension::BaseObjectExtension() {
   objectConditions["CollisionPoint"]
       .SetFunctionName("isCollidingWithPoint")
       .SetIncludeFile("runtimeobject.js");
+  objectConditions["ObjectTimer"]
+      .SetFunctionName("timerElapsedTime")
+      .SetIncludeFile("runtimeobject.js");
+  objectConditions["ObjectTimerPaused"]
+      .SetFunctionName("timerPaused")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["ResetObjectTimer"]
+      .SetFunctionName("resetTimer")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["PauseObjectTimer"]
+      .SetFunctionName("pauseTimer")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["UnPauseObjectTimer"]
+      .SetFunctionName("unpauseTimer")
+      .SetIncludeFile("runtimeobject.js");
+  objectActions["RemoveObjectTimer"]
+      .SetFunctionName("removeTimer")
+      .SetIncludeFile("runtimeobject.js");
 
   objectExpressions["X"].SetFunctionName("getX");
   objectExpressions["Y"].SetFunctionName("getY");
@@ -171,6 +189,7 @@ BaseObjectExtension::BaseObjectExtension() {
       "getAverageForce().getLength");  // Deprecated
   objectExpressions["Distance"].SetFunctionName("getDistanceToObject");
   objectExpressions["SqDistance"].SetFunctionName("getSqDistanceToObject");
+  objectExpressions["ObjectTimerElapsedTime"].SetFunctionName("getTimerElapsedTimeInSeconds");
   objectStrExpressions["ObjectName"].SetFunctionName("getName");
 
   GetAllActions()["Create"].SetFunctionName(

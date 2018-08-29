@@ -45,7 +45,10 @@ gdjs.PanelSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeSce
     }
 };
 
-gdjs.PanelSpriteRuntimeObject.prototype.update = function() {
+gdjs.PanelSpriteRuntimeObject.prototype.update = function(runtimeScene) {
+    //Call RuntimeObject update
+    gdjs.RuntimeObject.prototype.update.call(this, runtimeScene);
+
     this._renderer.ensureUpToDate();
 }
 

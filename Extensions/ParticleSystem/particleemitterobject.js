@@ -75,6 +75,9 @@ gdjs.ParticleEmitterObject.prototype.getRendererObject = function(){
 };
 
 gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){
+    //Call RuntimeObject update
+    gdjs.RuntimeObject.prototype.update.call(this, runtimeScene);
+    
     if(this._posDirty){
         this.renderer.setPosition(this.getX(), this.getY());
     }

@@ -219,6 +219,9 @@ gdjs.SpriteRuntimeObject.prototype.extraInitializationFromInitialInstance = func
  * Update the current frame of the object according to the elapsed time on the scene.
  */
 gdjs.SpriteRuntimeObject.prototype.update = function(runtimeScene) {
+    //Call RuntimeObject update
+    gdjs.RuntimeObject.prototype.update.call(this, runtimeScene);
+    
     //Playing the animation of all objects including the ones outside the screen can be
     //costly when the scene is big with a lot of animated objects. By default, we skip
     //updating the object if it is not visible.

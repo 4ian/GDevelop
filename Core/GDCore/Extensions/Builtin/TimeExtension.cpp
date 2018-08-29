@@ -24,8 +24,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddCondition("Timer",
-                    _("Value of a timer"),
-                    _("Test the elapsed time of a timer."),
+                    _("Value of a scene timer"),
+                    _("Test the elapsed time of a scene timer."),
                     _("The timer _PARAM2_ is greater than _PARAM1_ seconds"),
                     _("Timers and time"),
                     "res/conditions/timer24.png",
@@ -50,8 +50,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddCondition("TimerPaused",
-                    _("State of a timer"),
-                    _("Test if specified timer is paused."),
+                    _("Scene timer paused"),
+                    _("Test if the specified scene timer is paused."),
                     _("The timer _PARAM1_ is paused"),
                     _("Timers and time"),
                     "res/conditions/timerPaused24.png",
@@ -62,8 +62,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddAction("ResetTimer",
-                 _("Reset a timer"),
-                 _("Reset the specified timer."),
+                 _("Start (or reset) a scene timer"),
+                 _("Reset the specified scene timer, if the timer doesn't exist "
+                   "it's created and started."),
                  _("Reset the timer _PARAM1_"),
                  _("Timers and time"),
                  "res/actions/timer24.png",
@@ -73,8 +74,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddAction("PauseTimer",
-                 _("Pause a timer"),
-                 _("Pause a timer."),
+                 _("Pause a scene timer"),
+                 _("Pause a scene timer."),
                  _("Pause timer _PARAM1_"),
                  _("Timers and time"),
                  "res/actions/pauseTimer24.png",
@@ -85,8 +86,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddAction("UnPauseTimer",
-                 _("Unpause a timer"),
-                 _("Unpause a timer."),
+                 _("Unpause a scene timer"),
+                 _("Unpause a scene timer."),
                  _("Unpause timer _PARAM1_"),
                  _("Timers and time"),
                  "res/actions/unPauseTimer24.png",
@@ -97,8 +98,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddAction("RemoveTimer",
-                 _("Delete a timer"),
-                 _("Delete a timer from memory."),
+                 _("Delete a scene timer"),
+                 _("Delete a scene timer from memory."),
                  _("Delete timer _PARAM1_ from memory"),
                  _("Timers and time"),
                  "res/actions/timer24.png",
@@ -147,8 +148,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
 
   extension
       .AddExpression("TimerElapsedTime",
-                     _("Timer value"),
-                     _("Value of a timer"),
+                     _("Scene timer value"),
+                     _("Value of a scene timer"),
                      _("Time"),
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")

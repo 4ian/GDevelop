@@ -462,7 +462,7 @@ void InstructionSelectorDialog::RefreshFromInstruction()
     notAvailableWarningTxt->Wrap( 450 );
 
     //Show or hide the instructionHelpLinkCtrl
-    instructionHelpLinkCtrl->Show( instructionMetadata.GetHelpPage() != "" );
+    instructionHelpLinkCtrl->Show( instructionMetadata.GetHelpPath() != "" );
 
     //Update parameters controls
     parametersHelper.UpdateControls(instructionMetadata.parameters.size());
@@ -600,5 +600,5 @@ void InstructionSelectorDialog::OnInstructionHelpLinkCtrlClicked(wxHyperlinkEven
         gd::MetadataProvider::GetActionMetadata(game.GetCurrentPlatform(), instructionType) :
         gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), instructionType);
 
-    gd::HelpFileAccess::Get()->OpenPage( instructionMetadata.GetHelpPage() );
+    gd::HelpFileAccess::Get()->OpenPage( instructionMetadata.GetHelpPath() );
 }

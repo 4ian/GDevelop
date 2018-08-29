@@ -37,9 +37,6 @@ gdjs.TextRuntimeObject.prototype.getRendererObject = function() {
 };
 
 gdjs.TextRuntimeObject.prototype.update = function() {
-    //Call RuntimeObject update
-    gdjs.RuntimeObject.prototype.update.call(this, runtimeScene);
-    
     this._renderer.ensureUpToDate();
 };
 

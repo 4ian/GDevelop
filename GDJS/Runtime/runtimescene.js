@@ -396,9 +396,10 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
 	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
         var obj = this._allInstancesList[i];
 
+        var elapsedTime = obj.getElapsedTime(this);
         if (!obj.hasNoForces()) {
             var averageForce = obj.getAverageForce();
-            var elapsedTimeInSeconds = obj.getElapsedTime(this) / 1000;
+            var elapsedTimeInSeconds = elapsedTime / 1000;
 
             obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
             obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
@@ -408,6 +409,7 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
             obj.update(this);
         }
 		obj.stepBehaviorsPostEvents(this);
+        obj.updateTimers(elapsedTime);
 	}
 
 	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.

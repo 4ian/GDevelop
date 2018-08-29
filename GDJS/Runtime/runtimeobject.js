@@ -92,6 +92,8 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
     //Timers:
     if (this._timers === undefined)
         this._timers = new Hashtable();
+    else
+        this._timers.clear();
 };
 
 gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avoiding recreating forces each tick.
@@ -117,12 +119,7 @@ gdjs.RuntimeObject.prototype.getElapsedTime = function(runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The gdjs.RuntimeScene the object belongs to.
  */
 gdjs.RuntimeObject.prototype.update = function(runtimeScene) {
-    //Update timers
-    for (var name in this._timers.items) {
-        if (this._timers.items.hasOwnProperty(name)) {
-            this._timers.items[name].updateTime(this.getElapsedTime(runtimeScene));
-        }
-    }
+    //Nothing to do.
 };
 
 /**
@@ -849,6 +846,18 @@ gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
 };
 
 //Timers:
+
+/**
+ * Updates the object timers. Called once during the game loop, before events and rendering.
+ * @param {number} elapsedTime The elapsed time since the previous frame in milliseconds.
+ */
+gdjs.RuntimeObject.prototype.updateTimers = function(elapsedTime) {
+    for (var name in this._timers.items) {
+        if (this._timers.items.hasOwnProperty(name)) {
+            this._timers.items[name].updateTime(elapsedTime);
+        }
+    }
+};
 
 /**
  * Test a timer elapsed time, if the timer doesn't exist it is created

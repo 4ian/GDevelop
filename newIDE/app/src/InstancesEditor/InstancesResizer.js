@@ -12,7 +12,7 @@ export default class InstancesResizer {
   }
 
   _roundWidth(width) {
-    if (!this.options.snap || !this.options.grid)
+    if (!this.options.snap || !this.options.grid || this.options.gridWidth <= 0)
       return Math.max(Math.round(width), 1);
 
     return Math.max(
@@ -22,11 +22,15 @@ export default class InstancesResizer {
   }
 
   _roundHeight(height) {
-    if (!this.options.snap || !this.options.grid)
+    if (
+      !this.options.snap ||
+      !this.options.grid ||
+      this.options.gridHeight <= 0
+    )
       return Math.max(Math.round(height), 1);
 
     return Math.max(
-      Math.round(height / this.options.gridHeight) * this.options.gridHeigh,
+      Math.round(height / this.options.gridHeight) * this.options.gridHeight,
       1
     );
   }

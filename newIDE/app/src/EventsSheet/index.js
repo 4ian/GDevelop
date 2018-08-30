@@ -54,6 +54,7 @@ import EventsSearcher, {
   type ReplaceInEventsInputs,
   type SearchInEventsInputs,
 } from './EventsSearcher';
+import { containsSubInstructions } from './ContainsSubInstruction';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -128,7 +129,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
-      history: getHistoryInitialState(props.events),
+      history: getHistoryInitialState(props.events, { historyMaxSize: 50 }),
 
       editedInstruction: {
         isCondition: true,
@@ -335,6 +336,42 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
   }
 
+  moveSelectionToInstruction = (destinationContext: InstructionContext) => {
+    this.moveSelectionToInstructionsList(
+      {
+        instrsList: destinationContext.instrsList,
+        isCondition: destinationContext.isCondition,
+      },
+      destinationContext.indexInList
+    );
+  };
+
+  moveSelectionToInstructionsList = (
+    destinationContext: InstructionsListContext,
+    indexInList: ?number = undefined
+  ) => {
+    const selectedInstructions = getSelectedInstructions(this.state.selection);
+    const destinationIndex =
+      indexInList === undefined
+        ? destinationContext.instrsList.size()
+        : indexInList;
+
+    const isTryingToDragAnInstructionIntoItsOwnNestedInstructions = !!selectedInstructions.filter(
+      instruction =>
+        containsSubInstructions(instruction, destinationContext.instrsList)
+    ).length;
+
+    if (isTryingToDragAnInstructionIntoItsOwnNestedInstructions) return;
+
+    selectedInstructions.forEach(instruction =>
+      destinationContext.instrsList.insert(instruction, destinationIndex)
+    );
+
+    if (!this._keyboardShortcuts.shouldCloneInstances()) {
+      this.deleteSelection(/*deleteOnlyInstructions=*/ true);
+    }
+  };
+
   selectEvent = (eventContext: EventContext) => {
     const multiSelect = this._keyboardShortcuts.shouldMultiSelect();
     this.setState(
@@ -444,27 +481,25 @@ export default class EventsSheet extends React.Component<Props, State> {
     this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
   };
 
-  deleteSelection = () => {
+  deleteSelection = (deleteOnlyInstructions: boolean = false) => {
     const { events } = this.props;
     const eventsRemover = new gd.EventsRemover();
-    getSelectedEvents(this.state.selection).forEach(event =>
-      eventsRemover.addEventToRemove(event)
-    );
+    if (!deleteOnlyInstructions) {
+      getSelectedEvents(this.state.selection).forEach(event =>
+        eventsRemover.addEventToRemove(event)
+      );
+    }
     getSelectedInstructions(this.state.selection).forEach(instruction =>
       eventsRemover.addInstructionToRemove(instruction)
     );
 
     eventsRemover.launch(events);
-    this.setState(
-      {
-        selection: clearSelection(),
-        inlineEditing: false,
-        inlineEditingAnchorEl: null,
-      },
-      () => {
-        this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
-      }
-    );
+    this.setState({
+      selection: clearSelection(),
+      inlineEditing: false,
+      inlineEditingAnchorEl: null,
+    });
+    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
   };
 
   copySelection = () => {
@@ -711,6 +746,8 @@ export default class EventsSheet extends React.Component<Props, State> {
                 this.openInstructionsListContextMenu
               }
               onAddNewInstruction={this.openInstructionEditor}
+              onMoveToInstruction={this.moveSelectionToInstruction}
+              onMoveToInstructionsList={this.moveSelectionToInstructionsList}
               onParameterClick={this.openParameterEditor}
               onEventClick={this.selectEvent}
               onEventContextMenu={this.openEventContextMenu}

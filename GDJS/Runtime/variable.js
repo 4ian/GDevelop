@@ -17,7 +17,7 @@ gdjs.Variable = function(varData)
     this._str = "";
     this._numberDirty = false;
     this._stringDirty = true;
-    this._isStructure = false;
+	this._isStructure = false;
     this._children = {}; //TODO: Use a hashtable and avoid de/allocations.
     this._undefinedInContainer = false;
 
@@ -78,9 +78,9 @@ gdjs.Variable.prototype.isUndefinedInContainer = function() {
  *
  * If the variable has not the specified child, an empty variable with the specified name
  * is added as child.
+ * @returns {gdjs.Variable} The child variable
  */
 gdjs.Variable.prototype.getChild = function(childName) {
-
 	if ( this._children.hasOwnProperty(childName) && this._children[childName] !== undefined )
 		return this._children[childName];
 
@@ -93,7 +93,7 @@ gdjs.Variable.prototype.getChild = function(childName) {
  * Return the child in a variable.
  *
  * Check if the variable has the specified children
- * @return true if variable has the children with the specified name
+ * @return {boolean} true if variable has the children with the specified name
  */
 gdjs.Variable.prototype.hasChild = function(childName) {
 	return (this._isStructure && this._children.hasOwnProperty(childName) );
@@ -188,24 +188,48 @@ gdjs.Variable.prototype.isNumber = function() {
 
 /**
  * Return the object containing all the children of the variable
+ * @return {Object.<string, gdjs.Variable>} All the children of the variable
  */
 gdjs.Variable.prototype.getAllChildren = function() {
 	return this._children;
 }
 
+/**
+ * Add the given number to the variable value
+ * @param {number} number the number to add
+ */
 gdjs.Variable.prototype.add = function(val) {
 	this.setNumber(this.getAsNumber()+val);
 };
+
+/**
+ * Subtract the given number to the variable value
+ * @param {number} number the number to subtract
+ */
 gdjs.Variable.prototype.sub = function(val) {
 	this.setNumber(this.getAsNumber()-val);
 };
+
+/**
+ * Multiply the variable value by the given number
+ * @param {number} number the factor
+ */
 gdjs.Variable.prototype.mul = function(val) {
 	this.setNumber(this.getAsNumber()*val);
 };
+
+/**
+ * Divide the variable value by the given number
+ * @param {number} number the divisor
+ */
 gdjs.Variable.prototype.div = function(val) {
 	this.setNumber(this.getAsNumber()/val);
 };
 
+/**
+ * Concatenate the given string at the end of the variable value
+ * @param {string} str the string to append
+ */
 gdjs.Variable.prototype.concatenate = function(str) {
 	this.setString(this.getAsString()+str);
 };

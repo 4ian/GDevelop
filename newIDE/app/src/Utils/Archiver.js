@@ -1,8 +1,8 @@
 // @flow
 
 import optionalRequire from './OptionalRequire.js';
-const archiver = optionalRequire('archiver');
 const fs = optionalRequire('fs');
+const archiver = optionalRequire('archiver');
 
 /**
  * Archive the given folder to a file. Only available when running on Electron runtime.

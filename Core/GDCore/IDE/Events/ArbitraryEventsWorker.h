@@ -12,11 +12,7 @@
 #include "GDCore/String.h"
 namespace gd {
 class Instruction;
-}
-namespace gd {
 class BaseEvent;
-}
-namespace gd {
 class EventsList;
 }
 

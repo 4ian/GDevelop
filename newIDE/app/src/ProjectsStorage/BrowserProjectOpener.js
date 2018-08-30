@@ -5,7 +5,7 @@ import basicAiWithPathfinding from '../fixtures/basic-ai-with-pathfinding/basic-
 import basicArtificialIntelligence from '../fixtures/basic-artificial-intelligence/basic-artificial-intelligence.json';
 import basicTopdownCarDriving from '../fixtures/basic-topdown-car-driving/basic-topdown-car-driving.json';
 import bombTheCrate from '../fixtures/bomb-the-crate/bomb-the-crate.json';
-import brakeout from '../fixtures/brakeout/brakeout.json';
+import breakout from '../fixtures/breakout/breakout.json';
 import buttons from '../fixtures/buttons/buttons.json';
 import carPhysics from '../fixtures/car-physics/car-physics.json';
 import centerObjectWithinAnother from '../fixtures/center-object-within-another/center-object-within-another.json';
@@ -15,12 +15,15 @@ import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sp
 import changeSpriteColor from '../fixtures/change-sprite-color/change-sprite-color.json';
 import characterSelection from '../fixtures/character-selection/character-selection.json';
 import controllerInput from '../fixtures/controller-input/controller-input.json';
+import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
+import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
 import customFont from '../fixtures/custom-font/custom-font.json';
 import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-lastpressedkey/customize-keys-with-lastpressedkey.json';
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
 import dropCollectItemsFromStorage from '../fixtures/drop-collect-items-from-storage/drop-collect-items-from-storage.json';
 import exitApp from '../fixtures/exit-app/exit-app.json';
+import facebookInstantGame from '../fixtures/facebook-instant-game/facebook-instant-game.json';
 import findDiagonals from '../fixtures/find-diagonals/find-diagonals.json';
 import healthBar from '../fixtures/health-bar/health-bar.json';
 import infiniteScrollingBackground from '../fixtures/infinite-scrolling-background/infinite-scrolling-background.json';
@@ -94,8 +97,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(basicTopdownCarDriving);
     } else if (url === 'example://bomb-the-crate') {
       return Promise.resolve(bombTheCrate);
-    } else if (url === 'example://brakeout') {
-      return Promise.resolve(brakeout);
+    } else if (url === 'example://breakout') {
+      return Promise.resolve(breakout);
     } else if (url === 'example://buttons') {
       return Promise.resolve(buttons);
     } else if (url === 'example://car-physics') {
@@ -118,6 +121,10 @@ export default class BrowserProjectOpener {
       return Promise.resolve(characterSelection);
     } else if (url === 'example://controller-input') {
       return Promise.resolve(controllerInput);
+    } else if (url === 'example://device-orientation-ballgame') {
+      return Promise.resolve(deviceOrientationBallgame);
+    } else if (url === 'example://device-orientation-compass') {
+      return Promise.resolve(deviceOrientationCompass);
     } else if (url === 'example://create-object-with-mouseclick') {
       return Promise.resolve(createObjectWithMouseclick);
     } else if (url === 'example://custom-font') {
@@ -130,6 +137,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(dropCollectItemsFromStorage);
     } else if (url === 'example://exit-app') {
       return Promise.resolve(exitApp);
+    } else if (url === 'example://facebook-instant-game') {
+      return Promise.resolve(facebookInstantGame);
     } else if (url === 'example://find-diagonals') {
       return Promise.resolve(findDiagonals);
     } else if (url === 'example://health-bar') {

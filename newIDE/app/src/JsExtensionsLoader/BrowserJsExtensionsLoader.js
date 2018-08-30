@@ -11,6 +11,10 @@ const jsExtensions = [
     name: 'FacebookInstantGames',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FacebookInstantGames/JsExtension.js'),
   },
+  {
+    name: 'DeviceSensors',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceSensors/JsExtension.js'),
+  },
 ];
 
 /**
@@ -23,7 +27,7 @@ export default class BrowserJsExtensionsLoader implements JsExtensionsLoader {
     return Promise.resolve(
       jsExtensions.map(({ name, extensionModule }) => ({
         extensionModulePath: 'internal-extension://' + name,
-        result: loadExtension(gd.JsPlatform.get(), extensionModule),
+        result: loadExtension(gd, gd.JsPlatform.get(), extensionModule),
       }))
     );
   }

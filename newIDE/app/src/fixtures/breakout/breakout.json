@@ -103,7 +103,7 @@
     "resources": [
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/terrain.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/terrain.png",
         "kind": "image",
         "name": "terrain.png",
         "smoothed": true,
@@ -111,7 +111,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/barre.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/barre.png",
         "kind": "image",
         "name": "barre.png",
         "smoothed": true,
@@ -119,7 +119,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/balle.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/balle.png",
         "kind": "image",
         "name": "balle.png",
         "smoothed": true,
@@ -127,7 +127,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/brick.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick.png",
         "kind": "image",
         "name": "brick.png",
         "smoothed": true,
@@ -135,7 +135,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/balle-1.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/balle-1.png",
         "kind": "image",
         "name": "balle-1.png",
         "smoothed": true,
@@ -143,7 +143,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/brick-1-0.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-1-0.png",
         "kind": "image",
         "name": "brick-1-0.png",
         "smoothed": true,
@@ -151,7 +151,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/brick-1.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-1.png",
         "kind": "image",
         "name": "brick-1.png",
         "smoothed": true,
@@ -159,7 +159,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/brick-green-1.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-green-1.png",
         "kind": "image",
         "name": "brick-green-1.png",
         "smoothed": true,
@@ -167,7 +167,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/brick-red-1.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-red-1.png",
         "kind": "image",
         "name": "brick-red-1.png",
         "smoothed": true,
@@ -175,7 +175,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/brick-yellow-1.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-yellow-1.png",
         "kind": "image",
         "name": "brick-yellow-1.png",
         "smoothed": true,
@@ -183,7 +183,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/brick-red.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-red.png",
         "kind": "image",
         "name": "brick-red.png",
         "smoothed": true,
@@ -191,7 +191,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/brick-green.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-green.png",
         "kind": "image",
         "name": "brick-green.png",
         "smoothed": true,
@@ -199,7 +199,7 @@
       },
       {
         "alwaysLoaded": false,
-        "file": "https://df5lqcdudryde.cloudfront.net/examples/brakeout/brick-yellow.png",
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-yellow.png",
         "kind": "image",
         "name": "brick-yellow.png",
         "smoothed": true,

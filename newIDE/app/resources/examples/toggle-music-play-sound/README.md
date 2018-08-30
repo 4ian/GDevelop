@@ -1,0 +1,1 @@
+Example showing how to play a music and add controls on the screen to pause it, change the volume or mute the sounds totally.

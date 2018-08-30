@@ -161,7 +161,8 @@ export default class KeyboardShortcuts {
   };
 
   _onKeyUp = evt => {
-    if (!this.isFocused) return;
+    // Always handle key up event, even if we don't have the focus,
+    // for modifier keys to ensure we don't lose track of their pressed/unpressed status.
 
     if (!evt.metaKey) this.metaPressed = false;
     if (!evt.altKey) this.altPressed = false;

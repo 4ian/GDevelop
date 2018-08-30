@@ -27,8 +27,8 @@ gdjs.Timer.prototype.getName = function() {
 }
 
 /**
- * Get the time elapsed
- * @return {string} The time of the timer
+ * Get the time of the timer, in milliseconds.
+ * @return {number} The time of the timer, in milliseconds.
  */
 gdjs.Timer.prototype.getTime = function() {
 	return this._time;
@@ -36,6 +36,7 @@ gdjs.Timer.prototype.getTime = function() {
 
 /**
  * Notify the timer that some time has passed.
+ * @param {number} time The elapsed time, in milliseconds.
  */
 gdjs.Timer.prototype.updateTime = function(time) {
 	if ( !this._paused ) this._time += time;
@@ -43,20 +44,22 @@ gdjs.Timer.prototype.updateTime = function(time) {
 
 /**
  * Change the time.
+ * @param {number} time The new time, in milliseconds.
  */
 gdjs.Timer.prototype.setTime = function(time) {
 	this._time = time;
 }
 
 /**
- * Set time to zero.
+ * Reset the time to zero.
  */
-gdjs.Timer.prototype.reset = function(time) {
+gdjs.Timer.prototype.reset = function() {
 	this.setTime(0);
 }
 
 /**
  * Set if the timer is paused.
+ * @param {boolean} enable true to pause the timer, false otherwise.
  */
 gdjs.Timer.prototype.setPaused = function(enable) {
 	this._paused = enable;

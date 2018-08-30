@@ -46,7 +46,7 @@ module.exports = {
         "OrientationAlpha",
         t("Compare the value of orientation alpha"),
         t(
-          "Compare the value of orientation alpha."
+          "Compare the value of orientation alpha. (Range: 0 to 360°)"
         ),
         t("Orientation alpha is _PARAM0__PARAM1_"),
         t("Sensors/Orientation"),
@@ -66,7 +66,7 @@ module.exports = {
         "OrientationBeta",
         t("Compare the value of orientation beta"),
         t(
-          "Compare the value of orientation beta."
+          "Compare the value of orientation beta. (Range: -180 to 180°)"
         ),
         t("Orientation beta is _PARAM0__PARAM1_"),
         t("Sensors/Orientation"),
@@ -86,7 +86,7 @@ module.exports = {
         "OrientationGamma",
         t("Compare the value of orientation gamma"),
         t(
-          "Compare the value of orientation gamma."
+          "Compare the value of orientation gamma. (Range: -90 to 90°)"
         ),
         t("Orientation gamma is _PARAM0__PARAM1_"),
         t("Sensors/Orientation"),
@@ -200,5 +200,5 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function(extension) { return []; },
+  runExtensionSanityTests: function(gd, extension) { return []; },
 };

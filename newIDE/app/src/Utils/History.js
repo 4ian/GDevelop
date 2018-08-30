@@ -2,18 +2,17 @@ import { serializeToJSObject, unserializeFromJSObject } from './Serializer';
 
 // Tools function to keep track of the history of changes made
 // on a serializable object from libGD.js
-// TODO: This could be improved to limit the history to a maximum number
-// of undo/redo operations. Could be useful especially on mobile devices.
 
 /**
  * Return the initial state of the history
  * @param {*} serializableObject
  */
-export const getHistoryInitialState = serializableObject => {
+export const getHistoryInitialState = (serializableObject, {historyMaxSize}) => {
   return {
     undoHistory: [],
     current: serializeToJSObject(serializableObject),
     redoHistory: [],
+    maxSize: historyMaxSize,
   };
 };
 
@@ -39,8 +38,14 @@ export const canUndo = history => {
  * @param {*} serializableObject
  */
 export const saveToHistory = (history, serializableObject) => {
+  const newUndoHistory = [...history.undoHistory, history.current];
+  if (newUndoHistory.length > history.maxSize) {
+    newUndoHistory.splice(0, newUndoHistory.length - history.maxSize)
+  }
+
   return {
-    undoHistory: [...history.undoHistory, history.current],
+    ...history,
+    undoHistory: newUndoHistory,
     current: serializeToJSObject(serializableObject),
     redoHistory: [],
   };
@@ -68,6 +73,7 @@ export const undo = (history, serializableObject, project = undefined) => {
   );
 
   return {
+    ...history,
     undoHistory: history.undoHistory.slice(0, -1),
     current: newCurrent,
     redoHistory: [...history.redoHistory, history.current],
@@ -96,6 +102,7 @@ export const redo = (history, serializableObject, project = undefined) => {
   );
 
   return {
+    ...history,
     undoHistory: [...history.undoHistory, history.current],
     current: newCurrent,
     redoHistory: history.redoHistory.slice(0, -1),

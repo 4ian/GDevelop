@@ -1,25 +1,16 @@
 import React, { Component } from 'react';
 import Divider from 'material-ui/Divider';
-import RaisedButton from 'material-ui/RaisedButton';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
-import { List, ListItem } from 'material-ui/List';
 import { findExamples } from './LocalExamplesFinder';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { findEmptyPath } from './LocalPathFinder';
-import Window from '../Utils/Window';
-import PlaceholderLoader from '../UI/PlaceholderLoader';
+import ExamplesList from './ExamplesList';
 const path = optionalRequire('path');
 const electron = optionalRequire('electron');
 const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
-
-const formatExampleName = (name: string) => {
-  if (!name.length) return '';
-
-  return name[0].toUpperCase() + name.substr(1).replace(/-/g, ' ');
-};
 
 export default class LocalExamples extends Component {
   state = {
@@ -52,22 +43,7 @@ export default class LocalExamples extends Component {
       outputPath,
     });
 
-  _submitExample() {
-    const body = `Hi!
-
-I'd like to submit a new example to be added to GDevelop.
-Here is the link to download it: **INSERT the link to your game here, or add it as an attachment**.
-
-I confirm that any assets can be used freely by anybody, including for commercial usage.
-`;
-    Window.openExternalURL(
-      `https://github.com/4ian/GD/issues/new?body=${encodeURIComponent(
-        body
-      )}&title=New%20example`
-    );
-  }
-
-  createFromExample(exampleName) {
+  createFromExample = exampleName => {
     const { outputPath } = this.state;
     if (!fs || !outputPath) return;
 
@@ -77,39 +53,19 @@ I confirm that any assets can be used freely by anybody, including for commercia
       this.props.onOpen(path.join(outputPath, exampleName + '.json'));
       sendNewGameCreated(exampleName);
     });
-  }
+  };
 
   render() {
     return (
       <Column noMargin>
+        <Column>
+          <p>Choose or search for an example to open:</p>
+        </Column>
         <Line>
-          <Column>
-            <p>Choose an example to open:</p>
-          </Column>
-        </Line>
-        <Line>
-          <Column expand noMargin>
-            <List>
-              {this.state.exampleNames &&
-                this.state.exampleNames.map(exampleName => (
-                  <ListItem
-                    key={exampleName}
-                    primaryText={formatExampleName(exampleName)}
-                    onClick={() => this.createFromExample(exampleName)}
-                  />
-                ))}
-              {!this.state.exampleNames && <PlaceholderLoader />}
-            </List>
-            <Column expand>
-              <p>Want to contribute to the examples?</p>
-              <Line alignItems="center" justifyContent="center">
-                <RaisedButton
-                  label="Submit your example"
-                  onClick={this._submitExample}
-                />
-              </Line>
-            </Column>
-          </Column>
+          <ExamplesList
+            exampleNames={this.state.exampleNames}
+            onCreateFromExample={this.createFromExample}
+          />
         </Line>
         <Divider />
         <Line expand>

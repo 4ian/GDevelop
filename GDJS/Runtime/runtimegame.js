@@ -190,6 +190,7 @@ gdjs.RuntimeGame.prototype.getOriginalHeight = function() {
 /**
  * Get the default width of the game: canvas is created with this width,
  * and cameras of layers are created using this width when a scene is started.
+ * @returns {number} The default width for cameras of layers
  */
 gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
   return this._defaultWidth;
@@ -198,6 +199,7 @@ gdjs.RuntimeGame.prototype.getDefaultWidth = function() {
 /**
  * Get the default height of the game: canvas is created with this height,
  * and cameras of layers are created using this height when a scene is started.
+ * @returns {number} The default height for cameras of layers
  */
 gdjs.RuntimeGame.prototype.getDefaultHeight = function() {
   return this._defaultHeight;
@@ -280,9 +282,7 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
     return;
   }
 
-  if (this._data.properties.sizeOnStartupMode) {
-    this.adaptRendererSizeToFillScreen(this._data.properties.sizeOnStartupMode);
-  }
+  this.adaptRendererSizeToFillScreen();
 
   //Load the first scene
   var firstSceneName = this._data.firstLayout;
@@ -326,11 +326,13 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
 
 /**
  * Enlarge/reduce the width (or the height) of the game to fill the screen.
- * @param {string} mode `adaptWidth` to change the width, `adaptHeight` to change the height
+ * @param {?string} mode `adaptWidth` to change the width, `adaptHeight` to change the height. If not defined, will use the game "sizeOnStartupMode" .
  */
 gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
   if (!gdjs.RuntimeGameRenderer || !gdjs.RuntimeGameRenderer.getScreenWidth || !gdjs.RuntimeGameRenderer.getScreenHeight)
     return;
+
+  newMode = mode !== undefined ? mode : (this._data.properties.sizeOnStartupMode || '');
 
   var screenWidth = gdjs.RuntimeGameRenderer.getScreenWidth();
   var screenHeight = gdjs.RuntimeGameRenderer.getScreenHeight();
@@ -339,9 +341,9 @@ gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
   var renderer = this.getRenderer();
   var width = renderer.getCurrentWidth();
   var height = renderer.getCurrentHeight();
-  if (mode === "adaptWidth") {
+  if (newMode === "adaptWidth") {
     width = height * screenWidth / screenHeight;
-  } else if (mode === "adaptHeight") {
+  } else if (newMode === "adaptHeight") {
     height = width * screenHeight / screenWidth;
   }
 

@@ -22,7 +22,7 @@ export default ({ profile }: Props) =>
   profile ? (
     <Column>
       <Line alignItems="center">
-        <Avatar src={getGravatarUrl(profile.email, { size: 40 })} />
+        <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
         <span style={styles.title}>You are connect as {profile.email}</span>
       </Line>
       <Line>

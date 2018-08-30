@@ -88,6 +88,12 @@ gdjs.RuntimeObject = function(runtimeScene, objectData)
         this._behaviorsTable.put(autoData.name, this._behaviors[i]);
     }
     this._behaviors.length = i;//Make sure to delete already existing behaviors which are not used anymore.
+
+    //Timers:
+    if (this._timers === undefined)
+        this._timers = new Hashtable();
+    else
+        this._timers.clear();
 };
 
 gdjs.RuntimeObject.forcesGarbage = []; //Global container for unused forces, avoiding recreating forces each tick.
@@ -833,10 +839,111 @@ gdjs.RuntimeObject.prototype.activateBehavior = function(name, enable) {
  */
 gdjs.RuntimeObject.prototype.behaviorActivated = function(name) {
     if ( this._behaviorsTable.containsKey(name) ) {
-        this._behaviorsTable.get(name).activated();
+        return this._behaviorsTable.get(name).activated();
     }
 
     return false;
+};
+
+//Timers:
+
+/**
+ * Updates the object timers. Called once during the game loop, before events and rendering.
+ * @param {number} elapsedTime The elapsed time since the previous frame in milliseconds.
+ */
+gdjs.RuntimeObject.prototype.updateTimers = function(elapsedTime) {
+    for (var name in this._timers.items) {
+        if (this._timers.items.hasOwnProperty(name)) {
+            this._timers.items[name].updateTime(elapsedTime);
+        }
+    }
+};
+
+/**
+ * Test a timer elapsed time, if the timer doesn't exist it is created
+ * @param {String} timerName The timer name
+ * @param {number} timeInSeconds The time value to check in seconds
+ * @return {boolean} True if the timer exists and its value is greater than or equal than the given time, false otherwise
+ */
+gdjs.RuntimeObject.prototype.timerElapsedTime = function(timerName, timeInSeconds) {
+    if ( !this._timers.containsKey(timerName) ) {
+        this._timers.put(timerName, new gdjs.Timer(timerName));
+        return false;
+    }
+
+    return this.getTimerElapsedTimeInSeconds(timerName) >= timeInSeconds;
+};
+
+/**
+ * Test a if a timer is paused
+ * @param {String} timerName The timer name
+ * @return {boolean} True if the timer exists and is paused, false otherwise
+ */
+gdjs.RuntimeObject.prototype.timerPaused = function(timerName) {
+    if ( !this._timers.containsKey(timerName) ) {
+        return false;
+    }
+
+    return this._timers.get(timerName).isPaused();
+};
+
+/**
+ * Reset a timer, if the timer doesn't exist it is created
+ * @param {String} timerName The timer name
+ */
+gdjs.RuntimeObject.prototype.resetTimer = function(timerName) {
+    if ( !this._timers.containsKey(timerName) ) {
+        this._timers.put(timerName, new gdjs.Timer(timerName));
+    }
+
+    this._timers.get(timerName).reset();
+};
+
+/**
+ * Pause a timer, if the timer doesn't exist it is created
+ * @param {String} timerName The timer name
+ */
+gdjs.RuntimeObject.prototype.pauseTimer = function(timerName) {
+    if ( !this._timers.containsKey(timerName) ) {
+        this._timers.put(timerName, new gdjs.Timer(timerName));
+    }
+
+    this._timers.get(timerName).setPaused(true);
+};
+
+/**
+ * Unpause a timer, if the timer doesn't exist it is created
+ * @param {String} timerName The timer name
+ */
+gdjs.RuntimeObject.prototype.unpauseTimer = function(timerName) {
+    if ( !this._timers.containsKey(timerName) ) {
+        this._timers.put(timerName, new gdjs.Timer(timerName));
+    }
+
+    this._timers.get(timerName).setPaused(false);
+};
+
+/**
+ * Remove a timer
+ * @param {String} timerName The timer name
+ */
+gdjs.RuntimeObject.prototype.removeTimer = function(timerName) {
+    if ( this._timers.containsKey(timerName) ) {
+        this._timers.remove(timerName);
+    }
+};
+
+/**
+ * Get a timer elapsed time.
+ * @param {String} timerName The timer name
+ * @return {number} The timer elapsed time in seconds, 0 if the timer doesn't exist
+ */
+gdjs.RuntimeObject.prototype.getTimerElapsedTimeInSeconds = function(timerName) {
+    if ( !this._timers.containsKey(timerName) ) {
+        return 0;
+    }
+
+    return this._timers.get(timerName).getTime() / 1000.0;
 };
 
 //Other :

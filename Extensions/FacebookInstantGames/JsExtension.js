@@ -213,7 +213,7 @@ module.exports = {
 
     return extension;
   },
-  runExtensionSanityTests: function(extension) {
+  runExtensionSanityTests: function(gd, extension) {
     return [];
   }
 };

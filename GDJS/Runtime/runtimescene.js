@@ -29,10 +29,15 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._timeManager = new gdjs.TimeManager(Date.now());
     this._gameStopRequested = false;
     this._requestedScene = "";
-    this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
+	this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
+	
+	/** @type gdjs.RuntimeObject[] */
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
-    this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
-
+	
+	/** @type gdjs.RuntimeObject[] */
+	this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
+	
+	/** @type gdjs.Profiler */
 	this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
 	this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
 
@@ -391,9 +396,10 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
 	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
         var obj = this._allInstancesList[i];
 
+        var elapsedTime = obj.getElapsedTime(this);
         if (!obj.hasNoForces()) {
             var averageForce = obj.getAverageForce();
-            var elapsedTimeInSeconds = obj.getElapsedTime(this) / 1000;
+            var elapsedTimeInSeconds = elapsedTime / 1000;
 
             obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
             obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
@@ -403,6 +409,7 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
             obj.update(this);
         }
 		obj.stepBehaviorsPostEvents(this);
+        obj.updateTimers(elapsedTime);
 	}
 
 	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.

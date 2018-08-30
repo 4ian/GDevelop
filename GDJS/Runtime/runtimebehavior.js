@@ -71,6 +71,7 @@ gdjs.RuntimeBehavior.prototype.stepPostEvents = function(runtimeScene) {
 
 /**
  * De/Activate the behavior
+ * @param {boolean} enable true to enable the behavior, false to disable it
  */
 gdjs.RuntimeBehavior.prototype.activate = function(enable) {
 	if ( enable === undefined ) enable = true;

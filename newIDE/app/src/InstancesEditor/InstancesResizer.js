@@ -12,16 +12,26 @@ export default class InstancesResizer {
   }
 
   _roundWidth(width) {
-    if (!this.options.snap || !this.options.grid) return width;
+    if (!this.options.snap || !this.options.grid || this.options.gridWidth <= 0)
+      return Math.max(Math.round(width), 1);
 
-    return Math.round(width / this.options.gridWidth) * this.options.gridWidth;
+    return Math.max(
+      Math.round(width / this.options.gridWidth) * this.options.gridWidth,
+      1
+    );
   }
 
   _roundHeight(height) {
-    if (!this.options.snap || !this.options.grid) return height;
+    if (
+      !this.options.snap ||
+      !this.options.grid ||
+      this.options.gridHeight <= 0
+    )
+      return Math.max(Math.round(height), 1);
 
-    return (
-      Math.round(height / this.options.gridHeight) * this.options.gridHeight
+    return Math.max(
+      Math.round(height / this.options.gridHeight) * this.options.gridHeight,
+      1
     );
   }
 
@@ -43,7 +53,7 @@ export default class InstancesResizer {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
-    for (var i = 0; i < instances.length; i++) {
+    for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
 
       if (!selectedInstance.hasCustomSize()) {

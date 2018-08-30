@@ -6,6 +6,7 @@
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include <map>
 #include <memory>
+#include <iostream>
 #include <vector>
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"

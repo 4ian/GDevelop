@@ -1,1 +1,0 @@
-Learn how to have your objects on the scene have their own timers.

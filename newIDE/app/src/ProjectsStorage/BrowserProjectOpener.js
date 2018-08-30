@@ -27,7 +27,6 @@ import facebookInstantGame from '../fixtures/facebook-instant-game/facebook-inst
 import findDiagonals from '../fixtures/find-diagonals/find-diagonals.json';
 import healthBar from '../fixtures/health-bar/health-bar.json';
 import infiniteScrollingBackground from '../fixtures/infinite-scrolling-background/infinite-scrolling-background.json';
-import instanceTimer from '../fixtures/instance-timer/instance-timer.json';
 import inventorySystem from '../fixtures/inventory-system/inventory-system.json';
 import isometricGame from '../fixtures/isometric-game/isometric-game.json';
 import javascriptBlocksInPlatformer from '../fixtures/javascript-blocks-in-platformer/javascript-blocks-in-platformer.json';
@@ -42,6 +41,7 @@ import moveObjectWithPhysics from '../fixtures/move-object-with-physics/move-obj
 import multitouch from '../fixtures/multitouch/multitouch.json';
 import objectGravity from '../fixtures/object-gravity/object-gravity.json';
 import objectSelection from '../fixtures/object-selection/object-selection.json';
+import objectsTimers from '../fixtures/objects-timers/objects-timers.json';
 import openUrlInBrowser from '../fixtures/open-url-in-browser/open-url-in-browser.json';
 import parallax from '../fixtures/parallax/parallax.json';
 import parallaxScrolling from '../fixtures/parallax-scrolling/parallax-scrolling.json';
@@ -145,8 +145,6 @@ export default class BrowserProjectOpener {
       return Promise.resolve(healthBar);
     } else if (url === 'example://infinite-scrolling-background') {
       return Promise.resolve(infiniteScrollingBackground);
-    } else if (url === 'example://instance-timer') {
-      return Promise.resolve(instanceTimer);
     } else if (url === 'example://inventory-system') {
       return Promise.resolve(inventorySystem);
     } else if (url === 'example://isometric-game') {
@@ -175,6 +173,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(objectGravity);
     } else if (url === 'example://object-selection') {
       return Promise.resolve(objectSelection);
+    } else if (url === 'example://objects-timers') {
+      return Promise.resolve(objectsTimers);
     } else if (url === 'example://open-url-in-browser') {
       return Promise.resolve(openUrlInBrowser);
     } else if (url === 'example://parallax') {

@@ -993,27 +993,6 @@ module.exports = {
       }
     ]
   },
-  "instance-timer": {
-    "description": "Learn how to have your objects on the scene have their own timers.",
-    "usedExtensions": [
-      {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Base object",
-        "name": "BuiltinObject"
-      }
-    ]
-  },
   "inventory-system": {
     "description": "Learn how to display an inventory, with object that can be addded or removed, and how to persist it in storage.",
     "usedExtensions": [
@@ -1477,6 +1456,35 @@ module.exports = {
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
+      }
+    ]
+  },
+  "objects-timers": {
+    "description": "Example showing various usage of objects timers (timers that are stored into instances of objects on the scene, as opposed to scene timers which are stored by the scene).",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       }
     ]
   },

@@ -1,4 +1,3 @@
-
 /**
  * The renderer for a gdjs.RuntimeGame using Pixi.js.
  * @class RuntimeGamePixiRenderer
@@ -363,7 +362,6 @@ gdjs.RuntimeGamePixiRenderer.getScreenWidth = function() {
 gdjs.RuntimeGamePixiRenderer.getScreenHeight = function() {
     return (typeof window !== "undefined") ? window.innerHeight : 800;
 }
-<<<<<<< HEAD
 
 /**
  * Open the given URL in the system browser (or a new tab)
@@ -408,5 +406,3 @@ gdjs.RuntimeGamePixiRenderer.getElectron = function() {
 
     return null;
 }
-=======
->>>>>>> e014447d2cf13019e4f4e5aedbd045d3234288d2

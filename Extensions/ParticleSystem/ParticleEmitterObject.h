@@ -54,10 +54,10 @@ class GD_EXTENSION_API ParticleEmitterBase {
 
   /** Change texture name without changing it effectively at runtime
    */
-  void SetParticleTexture(gd::String imageName) {
+  void SetParticleTexture(const gd::String & imageName) {
     textureParticleName = imageName;
   };
-  gd::String GetParticleTexture() const { return textureParticleName; };
+  const gd::String & GetParticleTexture() const { return textureParticleName; };
 
   /**
    * \brief Initialize the particle system with the current objects settings.

@@ -16,3 +16,6 @@ export const background = 'background';
 
 export const eventsTree = 'events-tree';
 export const eventsTreeWithSearchResults = 'with-search-results';
+
+export const dropIndicator = 'drop-indicator';
+export const cantDropIndicator = 'cant-drop-indicator';

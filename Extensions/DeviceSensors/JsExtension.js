@@ -39,7 +39,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.isActive");
+      .setFunctionName("gdjs.deviceSensors.orientation.isActive");
 
       extension
       .addCondition(
@@ -59,7 +59,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.getOrientationAlpha");
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationAlpha");
 
       extension
       .addCondition(
@@ -79,7 +79,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.getOrientationBeta");
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationBeta");
 
       extension
       .addCondition(
@@ -99,7 +99,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.getOrientationGamma");
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationGamma");
 
     extension
       .addAction(
@@ -115,7 +115,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.activateOrientationSensor");
+      .setFunctionName("gdjs.deviceSensors.orientation.activateOrientationSensor");
 
     extension
       .addAction(
@@ -131,7 +131,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.deactivateOrientationSensor");
+      .setFunctionName("gdjs.deviceSensors.orientation.deactivateOrientationSensor");
 
     extension
       .addExpression(
@@ -144,7 +144,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.isActive");
+      .setFunctionName("gdjs.deviceSensors.orientation.isActive");
 
     extension
       .addExpression(
@@ -157,7 +157,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.getOrientationAbsolute");
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationAbsolute");
 
     extension
       .addExpression(
@@ -170,7 +170,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.getOrientationAlpha");
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationAlpha");
 
     extension
       .addExpression(
@@ -183,7 +183,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.getOrientationBeta");
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationBeta");
 
     extension
       .addExpression(
@@ -196,7 +196,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
       )
-      .setFunctionName("gdjs.evtTools.devicesensors.orientation.getOrientationGamma");
+      .setFunctionName("gdjs.deviceSensors.orientation.getOrientationGamma");
 
     return extension;
   },

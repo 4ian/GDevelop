@@ -9,41 +9,18 @@
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
-}
-namespace gd {
 class Expression;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
+class ClassWithObjects;
 class ExternalEvents;
-}
-namespace gd {
 class ParameterMetadata;
-}
-namespace gd {
 class ObjectMetadata;
-}
-namespace gd {
 class BehaviorMetadata;
-}
-namespace gd {
 class InstructionMetadata;
-}
-namespace gd {
 class EventsCodeGenerationContext;
-}
-namespace gd {
 class ExpressionCodeGenerationInformation;
-}
-namespace gd {
 class InstructionMetadata;
-}
-namespace gd {
 class Platform;
 }
 
@@ -71,6 +48,14 @@ class GD_CORE_API EventsCodeGenerator {
   EventsCodeGenerator(gd::Project& project_,
                       const gd::Layout& layout,
                       const gd::Platform& platform_);
+
+  /**
+   * \brief Construct a code generator for the specified
+   * objects/groups and platform
+   */
+  EventsCodeGenerator(const gd::Platform& platform, 
+  gd::ClassWithObjects & globalObjectsAndGroups_,
+  const gd::ClassWithObjects & objectsAndGroups_);
   virtual ~EventsCodeGenerator(){};
 
   /**
@@ -299,14 +284,31 @@ class GD_CORE_API EventsCodeGenerator {
   bool ErrorOccurred() const { return errorOccurred; };
 
   /**
-   * \brief Get the project the code is being generated for.
+   * \brief Get the global objects/groups used for code generation.
    */
-  gd::Project& GetProject() const { return project; }
+  gd::ClassWithObjects& GetGlobalObjectsAndGroups() const { return globalObjectsAndGroups; }
+
+  /**
+   * \brief Get the objects/groups used for code generation.
+   */
+  const gd::ClassWithObjects& GetObjectsAndGroups() const { return objectsAndGroups; }
+
+  /**
+   * \brief Return true if the code generation is done for a given project and layout.
+   */
+  bool HasProjectAndLayout() const { return hasProjectAndLayout; }
+
+  /**
+   * \brief Get the project the code is being generated for.
+   * \warning This is only valid if HasProjectAndLayout() is true.
+   */
+  gd::Project& GetProject() const { return *project; }
 
   /**
    * \brief Get the layout the code is being generated for.
+   * \warning This is only valid if HasProjectAndLayout() is true.
    */
-  const gd::Layout& GetLayout() const { return scene; }
+  const gd::Layout& GetLayout() const { return *scene; }
 
   /**
    * \brief Get the platform the code is being generated for.
@@ -385,6 +387,20 @@ class GD_CORE_API EventsCodeGenerator {
    */
   virtual gd::String GenerateProfilerSectionEnd(const gd::String& section) { return ""; };
 
+  /**
+   * \brief Get the namespace to be used to store code generated objects/values/functions,
+   * with the extra "dot" at the end to be used to access to a property/member.
+   *
+   * Example: "gdjs.something."
+   */
+  virtual gd::String GetCodeNamespaceAccessor();
+
+  /**
+   * \brief Get the namespace to be used to store code generated objects/values/functions.
+   *
+   * Example: "gdjs.something"
+   */
+  virtual gd::String GetCodeNamespace();
  protected:
   /**
    * \brief Generate the code for a single parameter.
@@ -614,9 +630,14 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GenerateArgumentsList(
       const std::vector<gd::String>& arguments, size_t startFrom = 0);
 
-  gd::Project& project;          ///< The project being used.
-  const gd::Layout& scene;       ///< The scene being generated.
   const gd::Platform& platform;  ///< The platform being used.
+  
+  gd::ClassWithObjects & globalObjectsAndGroups; 
+  const gd::ClassWithObjects & objectsAndGroups;
+
+  bool hasProjectAndLayout;      ///< true only if project and layout are valid references. If false, they should not be used.
+  gd::Project* project;          ///< The project being used.
+  const gd::Layout* scene;       ///< The scene being generated.
 
   bool errorOccurred;          ///< Must be set to true if an error occured.
   bool compilationForRuntime;  ///< Is set to true if the code generation is

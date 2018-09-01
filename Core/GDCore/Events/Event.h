@@ -187,8 +187,8 @@ class GD_CORE_API BaseEvent {
    *
    * \warning Even if this method is virtual, you should never redefine it:
    * always provide the code generation using gd::EventMetadata. This method is
-   * virtual as some platforms could have hidden events ( such as profiling
-   * events ) needing code generation without declaring the event as a part of
+   * virtual as some platforms could have hidden events (such as profiling
+   * events) needing code generation without declaring the event as a part of
    * an extension.
    *
    * \see gd::EventMetadata

@@ -340,7 +340,7 @@ void Layout::UnserializeFrom(gd::Project& project,
   associatedSettings.UnserializeFrom(
       element.GetChild("uiSettings", 0, "UISettings"));
 
-  objectGroups.UnserializeFrom(
+  GetObjectGroups().UnserializeFrom(
       element.GetChild("objectsGroups", 0, "GroupesObjets"));
   gd::EventsListSerialization::UnserializeEventsFrom(
       project, GetEvents(), element.GetChild("events", 0, "Events"));
@@ -435,8 +435,8 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout) {
 }
 
 #if defined(GD_IDE_ONLY)
-gd::String GD_CORE_API GetTypeOfObject(const gd::Project& project,
-                                       const gd::Layout& layout,
+gd::String GD_CORE_API GetTypeOfObject(const gd::ClassWithObjects& project,
+                                       const gd::ClassWithObjects& layout,
                                        gd::String name,
                                        bool searchInGroups) {
   gd::String type;
@@ -504,8 +504,8 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::Project& project,
   return type;
 }
 
-gd::String GD_CORE_API GetTypeOfBehavior(const gd::Project& project,
-                                         const gd::Layout& layout,
+gd::String GD_CORE_API GetTypeOfBehavior(const gd::ClassWithObjects& project,
+                                         const gd::ClassWithObjects& layout,
                                          gd::String name,
                                          bool searchInGroups) {
   for (std::size_t i = 0; i < layout.GetObjectsCount(); ++i) {
@@ -527,8 +527,8 @@ gd::String GD_CORE_API GetTypeOfBehavior(const gd::Project& project,
   return "";
 }
 
-vector<gd::String> GD_CORE_API GetBehaviorsOfObject(const gd::Project& project,
-                                                    const gd::Layout& layout,
+vector<gd::String> GD_CORE_API GetBehaviorsOfObject(const gd::ClassWithObjects& project,
+                                                    const gd::ClassWithObjects& layout,
                                                     gd::String name,
                                                     bool searchInGroups) {
   bool behaviorsAlreadyInserted = false;

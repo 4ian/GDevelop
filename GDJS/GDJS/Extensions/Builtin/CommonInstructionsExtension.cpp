@@ -37,11 +37,19 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
   gd::BuiltinExtensionsImplementer::ImplementsCommonInstructionsExtension(
       *this);
 
-  GetAllEvents()["BuiltinCommonInstructions::Link"].SetPreprocessing(
-      [](gd::BaseEvent& event_,
-         gd::EventsCodeGenerator& codeGenerator,
-         gd::EventsList& eventList,
-         unsigned int indexOfTheEventInThisList) {
+  GetAllEvents()["BuiltinCommonInstructions::Link"]
+      .SetCodeGenerator([](gd::BaseEvent& event_,
+                           gd::EventsCodeGenerator& codeGenerator,
+                           gd::EventsCodeGenerationContext& context) {
+        return "/*Link should not have any generated code. You probably "
+               "wrongly used a link in events without a layout.*/";
+      })
+      .SetPreprocessing([](gd::BaseEvent& event_,
+                           gd::EventsCodeGenerator& codeGenerator,
+                           gd::EventsList& eventList,
+                           unsigned int indexOfTheEventInThisList) {
+        if (!codeGenerator.HasProjectAndLayout()) return;
+
         gd::LinkEvent& event = dynamic_cast<gd::LinkEvent&>(event_);
         event.ReplaceLinkByLinkedEvents(
             codeGenerator.GetProject(), eventList, indexOfTheEventInThisList);
@@ -105,12 +113,6 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& parentContext) {
-            gd::String codeNamespace =
-                "gdjs." +
-                gd::SceneNameMangler::GetMangledSceneName(
-                    codeGenerator.GetLayout().GetName()) +
-                "Code.";
-
             // Conditions code
             gd::String conditionsCode;
             gd::InstructionsList& conditions = instruction.GetSubInstructions();
@@ -161,7 +163,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 gd::String objList =
                     codeGenerator.GetObjectListName(*it, context);
                 gd::String finalObjList =
-                    codeNamespace + ManObjListName(*it) +
+                    codeGenerator.GetCodeNamespaceAccessor() + ManObjListName(*it) +
                     gd::String::From(parentContext.GetContextDepth()) + "_" +
                     gd::String::From(parentContext.GetCurrentConditionDepth()) +
                     "final";
@@ -181,6 +183,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             gd::String declarationsCode;
 
             // Declarations code
+            gd::String codeNamespace = codeGenerator.GetCodeNamespaceAccessor();
             for (set<gd::String>::iterator it = emptyListsNeeded.begin();
                  it != emptyListsNeeded.end();
                  ++it) {
@@ -372,10 +375,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               ".val";
 
         // Write final code
-        gd::String whileBoolean = "gdjs." +
-                                  gd::SceneNameMangler::GetMangledSceneName(
-                                      codeGenerator.GetLayout().GetName()) +
-                                  "Code.stopDoWhile" +
+        gd::String whileBoolean = codeGenerator.GetCodeNamespaceAccessor() +
+                                  "stopDoWhile" +
                                   gd::String::From(context.GetContextDepth());
         codeGenerator.AddGlobalDeclaration(whileBoolean + " = false;\n");
         outputCode += whileBoolean + " = false;\n";
@@ -405,8 +406,6 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String outputCode;
         gd::RepeatEvent& event = dynamic_cast<gd::RepeatEvent&>(event_);
 
-        const gd::Layout& scene = codeGenerator.GetLayout();
-
         gd::String repeatNumberExpression = event.GetRepeatExpression();
 
         // Prepare expression containing how many times event must be repeated
@@ -414,10 +413,11 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::CallbacksForGeneratingExpressionCode callbacks(
             repeatCountCode, codeGenerator, parentContext);
         gd::ExpressionParser parser(repeatNumberExpression);
-        if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                        codeGenerator.GetProject(),
-                                        scene,
-                                        callbacks) ||
+        if (!parser.ParseMathExpression(
+                codeGenerator.GetPlatform(),
+                codeGenerator.GetGlobalObjectsAndGroups(),
+                codeGenerator.GetObjectsAndGroups(),
+                callbacks) ||
             repeatCountCode.empty())
           repeatCountCode = "0";
 
@@ -449,16 +449,12 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             codeGenerator.GenerateObjectsDeclarationCode(context) + "\n";
 
         // Write final code
-        gd::String repeatCountVar = "gdjs." +
-                                    gd::SceneNameMangler::GetMangledSceneName(
-                                        codeGenerator.GetLayout().GetName()) +
-                                    "Code.repeatCount" +
+        gd::String repeatCountVar = codeGenerator.GetCodeNamespaceAccessor() +
+                                    "repeatCount" +
                                     gd::String::From(context.GetContextDepth());
         codeGenerator.AddGlobalDeclaration(repeatCountVar + " = 0;\n");
-        gd::String repeatIndexVar = "gdjs." +
-                                    gd::SceneNameMangler::GetMangledSceneName(
-                                        codeGenerator.GetLayout().GetName()) +
-                                    "Code.repeatIndex" +
+        gd::String repeatIndexVar = codeGenerator.GetCodeNamespaceAccessor() +
+                                    "repeatIndex" +
                                     gd::String::From(context.GetContextDepth());
         codeGenerator.AddGlobalDeclaration(repeatIndexVar + " = 0;\n");
         outputCode += repeatCountVar + " = " + repeatCountCode + ";\n";
@@ -527,23 +523,16 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             codeGenerator.GenerateObjectsDeclarationCode(context) + "\n";
 
         gd::String forEachTotalCountVar =
-            "gdjs." +
-            gd::SceneNameMangler::GetMangledSceneName(
-                codeGenerator.GetLayout().GetName()) +
-            "Code.forEachTotalCount" +
+            codeGenerator.GetCodeNamespaceAccessor() + "forEachTotalCount" +
             gd::String::From(context.GetContextDepth());
         codeGenerator.AddGlobalDeclaration(forEachTotalCountVar + " = 0;\n");
         gd::String forEachIndexVar =
-            "gdjs." +
-            gd::SceneNameMangler::GetMangledSceneName(
-                codeGenerator.GetLayout().GetName()) +
-            "Code.forEachIndex" + gd::String::From(context.GetContextDepth());
+            codeGenerator.GetCodeNamespaceAccessor() + "forEachIndex" +
+            gd::String::From(context.GetContextDepth());
         codeGenerator.AddGlobalDeclaration(forEachIndexVar + " = 0;\n");
         gd::String forEachObjectsList =
-            "gdjs." +
-            gd::SceneNameMangler::GetMangledSceneName(
-                codeGenerator.GetLayout().GetName()) +
-            "Code.forEachObjects" + gd::String::From(context.GetContextDepth());
+            codeGenerator.GetCodeNamespaceAccessor() + "forEachObjects" +
+            gd::String::From(context.GetContextDepth());
         codeGenerator.AddGlobalDeclaration(forEachObjectsList + " = [];\n");
 
         if (realObjects.size() !=
@@ -554,10 +543,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
           outputCode += forEachObjectsList + ".length = 0;\n";
           for (unsigned int i = 0; i < realObjects.size(); ++i) {
             gd::String forEachCountVar =
-                "gdjs." +
-                gd::SceneNameMangler::GetMangledSceneName(
-                    codeGenerator.GetLayout().GetName()) +
-                "Code.forEachCount" + gd::String::From(i) + "_" +
+                codeGenerator.GetCodeNamespaceAccessor() + "forEachCount" +
+                gd::String::From(i) + "_" +
                 gd::String::From(context.GetContextDepth());
             codeGenerator.AddGlobalDeclaration(forEachCountVar + " = 0;\n");
 
@@ -593,10 +580,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
 
         // Clear all concerned objects lists and keep only one object
         if (realObjects.size() == 1) {
-          gd::String temporary = "gdjs." +
-                                 gd::SceneNameMangler::GetMangledSceneName(
-                                     codeGenerator.GetLayout().GetName()) +
-                                 "Code.forEachTemporary" +
+          gd::String temporary = codeGenerator.GetCodeNamespaceAccessor() +
+                                 "forEachTemporary" +
                                  gd::String::From(context.GetContextDepth());
           codeGenerator.AddGlobalDeclaration(temporary + " = null;\n");
           outputCode +=
@@ -622,10 +607,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             gd::String count;
             for (unsigned int j = 0; j <= i; ++j) {
               gd::String forEachCountVar =
-                  "gdjs." +
-                  gd::SceneNameMangler::GetMangledSceneName(
-                      codeGenerator.GetLayout().GetName()) +
-                  "Code.forEachCount" + gd::String::From(j) + "_" +
+                  codeGenerator.GetCodeNamespaceAccessor() + "forEachCount" +
+                  gd::String::From(j) + "_" +
                   gd::String::From(context.GetContextDepth());
 
               if (j != 0) count += "+";
@@ -683,12 +666,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                            gd::EventsCodeGenerator& codeGenerator,
                            gd::EventsCodeGenerationContext& parentContext) {
         JsCodeEvent& event = dynamic_cast<JsCodeEvent&>(event_);
-        const gd::Layout& scene = codeGenerator.GetLayout();
 
-        gd::String functionName =
-            "gdjs." +
-            gd::SceneNameMangler::GetMangledSceneName(scene.GetName()) +
-            "Code.userFunc" + gd::String::From(&event);
+        gd::String functionName = codeGenerator.GetCodeNamespaceAccessor() +
+                                  "userFunc" + gd::String::From(&event);
         gd::String callArguments = "runtimeScene";
         if (!event.GetParameterObjects().empty()) callArguments += ", objects";
 

@@ -75,8 +75,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(
     gd::String functionName,
     const std::vector<gd::Expression>& parameters,
     const gd::ExpressionMetadata& expressionInfo) {
-  const gd::Project& project = codeGenerator.GetProject();
-  const gd::Layout& scene = codeGenerator.GetLayout();
+  const gd::ClassWithObjects& globalObjectsAndGroups = codeGenerator.GetGlobalObjectsAndGroups();
+  const gd::ClassWithObjects& objectsAndGroups = codeGenerator.GetObjectsAndGroups();
 
   codeGenerator.AddIncludeFiles(
       expressionInfo.codeExtraInformation.GetIncludeFiles());
@@ -107,7 +107,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(
   for (std::size_t i = 0; i < realObjects.size(); ++i) {
     context.ObjectsListNeeded(realObjects[i]);
 
-    gd::String objectType = gd::GetTypeOfObject(project, scene, realObjects[i]);
+    gd::String objectType = gd::GetTypeOfObject(globalObjectsAndGroups, objectsAndGroups, realObjects[i]);
     const ObjectMetadata& objInfo = MetadataProvider::GetObjectMetadata(
         codeGenerator.GetPlatform(), objectType);
 
@@ -129,8 +129,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectBehaviorFunction(
     gd::String functionName,
     const std::vector<gd::Expression>& parameters,
     const gd::ExpressionMetadata& expressionInfo) {
-  const gd::Project& project = codeGenerator.GetProject();
-  const gd::Layout& scene = codeGenerator.GetLayout();
+  const gd::ClassWithObjects& globalObjectsAndGroups = codeGenerator.GetGlobalObjectsAndGroups();
+  const gd::ClassWithObjects& objectsAndGroups = codeGenerator.GetObjectsAndGroups();
 
   codeGenerator.AddIncludeFiles(
       expressionInfo.codeExtraInformation.GetIncludeFiles());
@@ -163,7 +163,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectBehaviorFunction(
 
     // Cast the object if needed
     gd::String behaviorType =
-        gd::GetTypeOfBehavior(project, scene, parameters[1].GetPlainString());
+        gd::GetTypeOfBehavior(globalObjectsAndGroups, objectsAndGroups, parameters[1].GetPlainString());
     const BehaviorMetadata& autoInfo = MetadataProvider::GetBehaviorMetadata(
         codeGenerator.GetPlatform(), behaviorType);
 
@@ -184,8 +184,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectBehaviorFunction(
 
 bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(
     const gd::Platform& platform,
-    const gd::Project& project,
-    const gd::Layout& layout,
+    const gd::ClassWithObjects& globalObjectsAndGroups,
+    const gd::ClassWithObjects& objectsAndGroups,
     gd::Expression& expression) {
   gd::String newExpression;
 
@@ -193,7 +193,7 @@ bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(
       newExpression, codeGenerator, context);
 
   gd::ExpressionParser parser(expression.GetPlainString());
-  if (!parser.ParseMathExpression(platform, project, layout, callbacks)) {
+  if (!parser.ParseMathExpression(platform, globalObjectsAndGroups, objectsAndGroups, callbacks)) {
 #if defined(GD_IDE_ONLY)
     firstErrorStr = callbacks.GetFirstError();
     firstErrorPos = callbacks.GetFirstErrorPosition();
@@ -206,8 +206,8 @@ bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(
 
 bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(
     const gd::Platform& platform,
-    const gd::Project& project,
-    const gd::Layout& layout,
+    const gd::ClassWithObjects& globalObjectsAndGroups,
+    const gd::ClassWithObjects& objectsAndGroups,
     gd::Expression& expression) {
   gd::String newExpression;
 
@@ -215,7 +215,7 @@ bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(
       newExpression, codeGenerator, context);
 
   gd::ExpressionParser parser(expression.GetPlainString());
-  if (!parser.ParseStringExpression(platform, project, layout, callbacks)) {
+  if (!parser.ParseStringExpression(platform, globalObjectsAndGroups, objectsAndGroups, callbacks)) {
 #if defined(GD_IDE_ONLY)
     firstErrorStr = callbacks.GetFirstError();
     firstErrorPos = callbacks.GetFirstErrorPosition();

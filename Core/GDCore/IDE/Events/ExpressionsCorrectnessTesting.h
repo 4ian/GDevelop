@@ -12,14 +12,8 @@
 #include "GDCore/String.h"
 namespace gd {
 class ExpressionMetadata;
-}
-namespace gd {
 class Expression;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
 }
 
@@ -46,8 +40,8 @@ namespace gd {
 class GD_CORE_API CallbacksForExpressionCorrectnessTesting
     : public gd::ParserCallbacks {
  public:
-  CallbacksForExpressionCorrectnessTesting(const gd::Project& project,
-                                           const gd::Layout& layout);
+  CallbacksForExpressionCorrectnessTesting(const gd::ClassWithObjects& project,
+                                           const gd::ClassWithObjects& layout);
   virtual ~CallbacksForExpressionCorrectnessTesting(){};
 
   void OnConstantToken(gd::String text){};
@@ -61,17 +55,17 @@ class GD_CORE_API CallbacksForExpressionCorrectnessTesting
                                 const std::vector<gd::Expression>& parameters,
                                 const gd::ExpressionMetadata& expressionInfo){};
   bool OnSubMathExpression(const gd::Platform& platform,
-                           const gd::Project& project,
-                           const gd::Layout& layout,
+                           const gd::ClassWithObjects& project,
+                           const gd::ClassWithObjects& layout,
                            gd::Expression& expression);
   bool OnSubTextExpression(const gd::Platform& platform,
-                           const gd::Project& project,
-                           const gd::Layout& layout,
+                           const gd::ClassWithObjects& project,
+                           const gd::ClassWithObjects& layout,
                            gd::Expression& expression);
 
  private:
-  const gd::Project& project;
-  const gd::Layout& layout;
+  const gd::ClassWithObjects& project;
+  const gd::ClassWithObjects& layout;
 };
 
 }  // namespace gd

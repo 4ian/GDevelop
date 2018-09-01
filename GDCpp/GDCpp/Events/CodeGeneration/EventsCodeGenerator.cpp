@@ -194,7 +194,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
 
   // Verify that object has behavior.
   vector<gd::String> behaviors =
-      gd::GetBehaviorsOfObject(project, scene, objectName);
+      gd::GetBehaviorsOfObject(GetGlobalObjectAndGroups(), GetObjectAndGroups(), objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Bad behavior requested" << endl;
@@ -326,7 +326,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
 
   // Verify that object has behavior.
   vector<gd::String> behaviors =
-      gd::GetBehaviorsOfObject(project, scene, objectName);
+      gd::GetBehaviorsOfObject(GetGlobalObjectAndGroups(), GetObjectAndGroups(), objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Bad behavior requested for an action" << endl;
@@ -577,6 +577,8 @@ EventsCodeGenerator::EventsCodeGenerator(gd::Project& project,
 EventsCodeGenerator::~EventsCodeGenerator() {}
 
 void EventsCodeGenerator::PreprocessEventList(gd::EventsList& eventsList) {
+  if (!HasProjectAndLayout()) return;
+
 #if !defined( \
     GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
   std::shared_ptr<ProfileEvent> previousProfileEvent;
@@ -591,7 +593,7 @@ void EventsCodeGenerator::PreprocessEventList(gd::EventsList& eventsList) {
 
 #if !defined( \
     GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
-      if (scene.GetProfiler() && scene.GetProfiler()->profilingActivated &&
+      if (GetLayout().GetProfiler() && GetLayout().GetProfiler()->profilingActivated &&
           eventsList[i].IsExecutable()) {
         // Define a new profile event
         std::shared_ptr<ProfileEvent> profileEvent =
@@ -611,8 +613,8 @@ void EventsCodeGenerator::PreprocessEventList(gd::EventsList& eventsList) {
 
 #if !defined( \
     GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
-  if (!eventsList.IsEmpty() && scene.GetProfiler() &&
-      scene.GetProfiler()->profilingActivated) {
+  if (!eventsList.IsEmpty() && GetLayout().GetProfiler() &&
+      GetLayout().GetProfiler()->profilingActivated) {
     // Define a new profile events
     std::shared_ptr<ProfileEvent> profileEvent =
         std::make_shared<ProfileEvent>();

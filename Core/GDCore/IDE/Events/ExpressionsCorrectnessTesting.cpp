@@ -14,14 +14,14 @@
 namespace gd {
 
 CallbacksForExpressionCorrectnessTesting::
-    CallbacksForExpressionCorrectnessTesting(const gd::Project& project_,
-                                             const gd::Layout& layout_)
+    CallbacksForExpressionCorrectnessTesting(const gd::ClassWithObjects& project_,
+                                             const gd::ClassWithObjects& layout_)
     : project(project_), layout(layout_) {}
 
 bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(
     const gd::Platform& platform,
-    const gd::Project& project,
-    const gd::Layout& layout,
+    const gd::ClassWithObjects& project,
+    const gd::ClassWithObjects& layout,
     gd::Expression& expression) {
   CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
 
@@ -39,8 +39,8 @@ bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(
 
 bool CallbacksForExpressionCorrectnessTesting::OnSubTextExpression(
     const gd::Platform& platform,
-    const gd::Project& project,
-    const gd::Layout& layout,
+    const gd::ClassWithObjects& project,
+    const gd::ClassWithObjects& layout,
     gd::Expression& expression) {
   CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
 

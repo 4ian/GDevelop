@@ -22,14 +22,8 @@
 #endif
 namespace gd {
 class BaseEvent;
-}
-namespace gd {
 class Object;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class InitialInstancesContainer;
 }
 class TiXmlElement;
@@ -147,23 +141,6 @@ class GD_CORE_API Layout : public ClassWithObjects {
    */
   gd::EventsList& GetEvents() { return events; }
 #endif
-  ///@}
-
-  /** \name Layout objects groups management
-   * Members functions related to layout objects groups management.
-   */
-  ///@{
-
-  /**
-   * Return a reference to the layout's objects groups.
-   */
-  ObjectGroupsContainer& GetObjectGroups() { return objectGroups; }
-
-  /**
-   * Return a const reference to the layout's objects groups.
-   */
-  const ObjectGroupsContainer& GetObjectGroups() const { return objectGroups; }
-
   ///@}
 
   /** \name Variable management
@@ -511,7 +488,6 @@ class GD_CORE_API Layout : public ClassWithObjects {
   gd::VariablesContainer variables;  ///< Variables list
   gd::InitialInstancesContainer initialInstances;  ///< Initial instances
   std::vector<gd::Layer> initialLayers;            ///< Initial layers
-  ObjectGroupsContainer objectGroups;              ///< Objects groups
   std::map<gd::String, std::shared_ptr<gd::BehaviorsSharedData> >
       behaviorsInitialSharedDatas;  ///< Initial shared datas of behaviors
   bool stopSoundsOnStartup;  ///< True to make the scene stop all sounds at
@@ -581,8 +557,8 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout);
  *
  * @return Type of the object/group.
  */
-gd::String GD_CORE_API GetTypeOfObject(const Project& game,
-                                       const Layout& layout,
+gd::String GD_CORE_API GetTypeOfObject(const ClassWithObjects& game,
+                                       const ClassWithObjects& layout,
                                        gd::String objectName,
                                        bool searchInGroups = true);
 
@@ -590,8 +566,8 @@ gd::String GD_CORE_API GetTypeOfObject(const Project& game,
  * \brief Get a type from a behavior name
  * @return Type of the behavior.
  */
-gd::String GD_CORE_API GetTypeOfBehavior(const Project& game,
-                                         const Layout& layout,
+gd::String GD_CORE_API GetTypeOfBehavior(const ClassWithObjects& game,
+                                         const ClassWithObjects& layout,
                                          gd::String behaviorName,
                                          bool searchInGroups = true);
 
@@ -603,8 +579,8 @@ gd::String GD_CORE_API GetTypeOfBehavior(const Project& game,
  * @return Vector containing names of behaviors
  */
 std::vector<gd::String> GD_CORE_API
-GetBehaviorsOfObject(const Project& game,
-                     const Layout& layout,
+GetBehaviorsOfObject(const ClassWithObjects& game,
+                     const ClassWithObjects& layout,
                      gd::String objectName,
                      bool searchInGroups = true);
 

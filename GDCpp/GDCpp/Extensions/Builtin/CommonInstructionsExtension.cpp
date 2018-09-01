@@ -263,6 +263,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
       .SetCodeGenerator([](gd::BaseEvent& event_,
                            gd::EventsCodeGenerator& codeGenerator,
                            gd::EventsCodeGenerationContext& context) {
+        if (!codeGenerator.HasProjectAndLayout()) {
+            return "/*Link not supported when generating code without a layout*/"
+        };
         gd::LinkEvent& event = dynamic_cast<gd::LinkEvent&>(event_);
 
         // This function is called only when the link refers to external events
@@ -288,6 +291,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                            gd::EventsCodeGenerator& codeGenerator,
                            gd::EventsList& eventList,
                            std::size_t indexOfTheEventInThisList) {
+        if (!codeGenerator.HasProjectAndLayout()) return;
+
         gd::LinkEvent& event = dynamic_cast<gd::LinkEvent&>(event_);
         gd::Project& project = codeGenerator.GetProject();
         const gd::Layout& scene = codeGenerator.GetLayout();
@@ -389,8 +394,6 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String outputCode;
         gd::RepeatEvent& event = dynamic_cast<gd::RepeatEvent&>(event_);
 
-        const gd::Layout& scene = codeGenerator.GetLayout();
-
         gd::String repeatNumberExpression = event.GetRepeatExpression();
 
         // Prepare expression containing how many times event must be repeated
@@ -399,8 +402,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             repeatCountCode, codeGenerator, parentContext);
         gd::ExpressionParser parser(repeatNumberExpression);
         if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                        codeGenerator.GetProject(),
-                                        scene,
+                                        codeGenerator.GetGlobalObjectsAndGroups(),
+                                        codeGenerator.GetObjectsAndGroups(),
                                         callbacks) ||
             repeatCountCode.empty())
           repeatCountCode = "0";

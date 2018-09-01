@@ -10,23 +10,10 @@
 #include "GDCore/String.h"
 namespace gd {
 class Expression;
-}
-namespace gd {
 class ParserCallbacks;
-}
-namespace gd {
-class Layout;
-}
-namespace gd {
-class Project;
-}
-namespace gd {
+class ClassWithObjects;
 class Platform;
-}
-namespace gd {
 class ParameterMetadata;
-}
-namespace gd {
 class ExpressionMetadata;
 }
 
@@ -47,8 +34,8 @@ class GD_CORE_API ExpressionParser {
    * \return True if expression was correctly parsed.
    */
   bool ParseMathExpression(const gd::Platform &platform,
-                           const gd::Project &project,
-                           const gd::Layout &layout,
+                           const gd::ClassWithObjects &project,
+                           const gd::ClassWithObjects &layout,
                            gd::ParserCallbacks &callbacks);
 
   /**
@@ -56,8 +43,8 @@ class GD_CORE_API ExpressionParser {
    * \return True if expression was correctly parsed.
    */
   bool ParseStringExpression(const gd::Platform &platform,
-                             const gd::Project &project,
-                             const gd::Layout &layout,
+                             const gd::ClassWithObjects &project,
+                             const gd::ClassWithObjects &layout,
                              gd::ParserCallbacks &callbacks);
 
   /**
@@ -78,8 +65,8 @@ class GD_CORE_API ExpressionParser {
   /**
    * Tool function to add a parameter
    */
-  bool AddParameterToList(const gd::Project &project,
-                          const gd::Layout &layout,
+  bool AddParameterToList(const gd::ClassWithObjects &project,
+                          const gd::ClassWithObjects &layout,
                           ParserCallbacks &,
                           std::vector<gd::Expression> &parameters,
                           gd::String parameterStr,
@@ -90,8 +77,8 @@ class GD_CORE_API ExpressionParser {
    * Tool function to prepare a parameter
    */
   bool PrepareParameter(const gd::Platform &platform,
-                        const gd::Project &project,
-                        const gd::Layout &layout,
+                        const gd::ClassWithObjects &project,
+                        const gd::ClassWithObjects &layout,
                         ParserCallbacks &,
                         gd::Expression &parameter,
                         const gd::ParameterMetadata &parametersInfo,
@@ -153,12 +140,12 @@ class GD_CORE_API ParserCallbacks {
       const gd::ExpressionMetadata &expressionInfo) = 0;
 
   virtual bool OnSubMathExpression(const gd::Platform &platform,
-                                   const gd::Project &project,
-                                   const gd::Layout &layout,
+                                   const gd::ClassWithObjects &project,
+                                   const gd::ClassWithObjects &layout,
                                    gd::Expression &expression) = 0;
   virtual bool OnSubTextExpression(const gd::Platform &platform,
-                                   const gd::Project &project,
-                                   const gd::Layout &layout,
+                                   const gd::ClassWithObjects &project,
+                                   const gd::ClassWithObjects &layout,
                                    gd::Expression &expression) = 0;
 
   /**

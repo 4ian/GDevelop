@@ -676,25 +676,6 @@ class GD_CORE_API Project : public ClassWithObjects {
 
   ///@}
 
-  /** \name Global objects groups management
-   * Members functions related to global objects groups management.
-   */
-  ///@{
-
-#if defined(GD_IDE_ONLY)
-  /**
-   * \brief Return a reference to the project's objects groups.
-   */
-  ObjectGroupsContainer& GetObjectGroups() { return objectGroups; }
-
-  /**
-   * \brief Return a const reference to the project's objects groups.
-   */
-  const ObjectGroupsContainer& GetObjectGroups() const { return objectGroups; }
-#endif
-
-  ///@}
-
   /** \name Resources management
    * Members functions related to resources management.
    */
@@ -889,7 +870,6 @@ class GD_CORE_API Project : public ClassWithObjects {
   bool useExternalSourceFiles;  ///< True if game used external source files.
   std::vector<std::unique_ptr<gd::SourceFile> >
       externalSourceFiles;  ///< List of external source files used.
-  gd::ObjectGroupsContainer objectGroups;  ///< Global objects groups
   gd::String author;                       ///< Game author name
   gd::String packageName;                  ///< Game package name
   gd::String orientation;  ///< Lock game orientation (on mobile devices).

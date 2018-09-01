@@ -14,6 +14,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+#include "GDCore/Project/ClassWithObjects.h"
 
 using namespace std;
 
@@ -291,14 +292,14 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
       gd::String objectInParameter =
           condition.GetParameter(pNb).GetPlainString();
 
-      if (!scene.HasObjectNamed(objectInParameter) &&
-          !project.HasObjectNamed(objectInParameter) &&
-          !scene.GetObjectGroups().Has(objectInParameter) &&
-          !project.GetObjectGroups().Has(objectInParameter)) {
+      if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
+          !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
+          !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
+          !GetGlobalObjectsAndGroups().GetObjectGroups().Has(objectInParameter)) {
         condition.SetParameter(pNb, gd::Expression(""));
         condition.SetType("");
       } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
-                 gd::GetTypeOfObject(project, scene, objectInParameter) !=
+                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectInParameter) !=
                      instrInfos.parameters[pNb].supplementaryInformation) {
         condition.SetParameter(pNb, gd::Expression(""));
         condition.SetType("");
@@ -327,7 +328,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
   gd::String objectName = condition.GetParameters().empty()
                               ? ""
                               : condition.GetParameter(0).GetPlainString();
-  gd::String objectType = gd::GetTypeOfObject(project, scene, objectName);
+  gd::String objectType = gd::GetTypeOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (!objectName.empty() &&
       MetadataProvider::HasObjectCondition(
           platform, objectType, condition.GetType()) &&
@@ -359,8 +360,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
 
   // Generate behavior condition if available
   gd::String behaviorType =
-      gd::GetTypeOfBehavior(project,
-                            scene,
+      gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
+                            GetObjectsAndGroups(),
                             condition.GetParameters().size() < 2
                                 ? ""
                                 : condition.GetParameter(1).GetPlainString());
@@ -469,14 +470,14 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
     if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].type)) {
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
-      if (!scene.HasObjectNamed(objectInParameter) &&
-          !project.HasObjectNamed(objectInParameter) &&
-          !scene.GetObjectGroups().Has(objectInParameter) &&
-          !project.GetObjectGroups().Has(objectInParameter)) {
+      if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
+          !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
+          !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
+          !GetGlobalObjectsAndGroups().GetObjectGroups().Has(objectInParameter)) {
         action.SetParameter(pNb, gd::Expression(""));
         action.SetType("");
       } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
-                 gd::GetTypeOfObject(project, scene, objectInParameter) !=
+                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectInParameter) !=
                      instrInfos.parameters[pNb].supplementaryInformation) {
         action.SetParameter(pNb, gd::Expression(""));
         action.SetType("");
@@ -495,7 +496,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   gd::String objectName = action.GetParameters().empty()
                               ? ""
                               : action.GetParameter(0).GetPlainString();
-  gd::String objectType = gd::GetTypeOfObject(project, scene, objectName);
+  gd::String objectType = gd::GetTypeOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (MetadataProvider::HasObjectAction(
           platform, objectType, action.GetType()) &&
       !instrInfos.parameters.empty()) {
@@ -521,8 +522,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 
   // Assign to a behavior member function if found
   gd::String behaviorType =
-      gd::GetTypeOfBehavior(project,
-                            scene,
+      gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
+                            GetObjectsAndGroups(),
                             action.GetParameters().size() < 2
                                 ? ""
                                 : action.GetParameter(1).GetPlainString());
@@ -590,7 +591,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
 
     gd::ExpressionParser parser(parameter);
-    if (!parser.ParseMathExpression(platform, project, scene, callbacks)) {
+    if (!parser.ParseMathExpression(platform, GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), callbacks)) {
       cout << "Error :" << parser.GetFirstError() << " in: " << parameter
            << endl;
 
@@ -602,7 +603,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
 
     gd::ExpressionParser parser(parameter);
-    if (!parser.ParseStringExpression(platform, project, scene, callbacks)) {
+    if (!parser.ParseStringExpression(platform, GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), callbacks)) {
       cout << "Error in text expression" << parser.GetFirstError() << endl;
 
       argOutput = "\"\"";
@@ -828,11 +829,11 @@ std::vector<gd::String> EventsCodeGenerator::ExpandObjectsName(
     const EventsCodeGenerationContext& context) const {
   // Note: this logic is duplicated in EventsContextAnalyzer::ExpandObjectsName
   std::vector<gd::String> realObjects;
-  if (project.GetObjectGroups().Has(objectName))
+  if (globalObjectsAndGroups.GetObjectGroups().Has(objectName))
     realObjects =
-        project.GetObjectGroups().Get(objectName).GetAllObjectsNames();
-  else if (scene.GetObjectGroups().Has(objectName))
-    realObjects = scene.GetObjectGroups().Get(objectName).GetAllObjectsNames();
+        globalObjectsAndGroups.GetObjectGroups().Get(objectName).GetAllObjectsNames();
+  else if (objectsAndGroups.GetObjectGroups().Has(objectName))
+    realObjects = objectsAndGroups.GetObjectGroups().Get(objectName).GetAllObjectsNames();
   else
     realObjects.push_back(objectName);
 
@@ -846,8 +847,8 @@ std::vector<gd::String> EventsCodeGenerator::ExpandObjectsName(
 
   // Ensure that all returned objects actually exists.
   for (std::size_t i = 0; i < realObjects.size();) {
-    if (!scene.HasObjectNamed(realObjects[i]) &&
-        !project.HasObjectNamed(realObjects[i]))
+    if (!objectsAndGroups.HasObjectNamed(realObjects[i]) &&
+        !globalObjectsAndGroups.HasObjectNamed(realObjects[i]))
       realObjects.erase(realObjects.begin() + i);
     else
       ++i;
@@ -1122,9 +1123,26 @@ gd::String EventsCodeGenerator::GenerateArgumentsList(
 EventsCodeGenerator::EventsCodeGenerator(gd::Project& project_,
                                          const gd::Layout& layout,
                                          const gd::Platform& platform_)
-    : project(project_),
-      scene(layout),
-      platform(platform_),
+    : platform(platform_),
+      globalObjectsAndGroups(project_),
+      objectsAndGroups(layout),
+      hasProjectAndLayout(true),
+      project(&project_),
+      scene(&layout),
+      errorOccurred(false),
+      compilationForRuntime(false),
+      maxCustomConditionsDepth(0),
+      maxConditionsListsSize(0){};
+
+EventsCodeGenerator::EventsCodeGenerator(const gd::Platform& platform_,
+  gd::ClassWithObjects & globalObjectsAndGroups_,
+  const gd::ClassWithObjects & objectsAndGroups_)
+    : platform(platform_),
+      globalObjectsAndGroups(globalObjectsAndGroups_),
+      objectsAndGroups(objectsAndGroups_),
+      hasProjectAndLayout(false),
+      project(nullptr),
+      scene(nullptr),
       errorOccurred(false),
       compilationForRuntime(false),
       maxCustomConditionsDepth(0),

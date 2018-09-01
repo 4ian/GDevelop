@@ -22,8 +22,8 @@ namespace gd {
 class CallbacksForListingObjects : public gd::ParserCallbacks {
  public:
   CallbacksForListingObjects(const gd::Platform& platform_,
-                             const gd::Project& project_,
-                             const gd::Layout& layout_,
+                             const gd::ClassWithObjects& project_,
+                             const gd::ClassWithObjects& layout_,
                              EventsContext& context_)
       : platform(platform_),
         project(project_),
@@ -80,8 +80,8 @@ class CallbacksForListingObjects : public gd::ParserCallbacks {
   };
 
   virtual bool OnSubMathExpression(const gd::Platform& platform,
-                                   const gd::Project& project,
-                                   const gd::Layout& layout,
+                                   const gd::ClassWithObjects& project,
+                                   const gd::ClassWithObjects& layout,
                                    gd::Expression& expression) {
     CallbacksForListingObjects callbacks(platform, project, layout, context);
 
@@ -91,8 +91,8 @@ class CallbacksForListingObjects : public gd::ParserCallbacks {
   }
 
   virtual bool OnSubTextExpression(const gd::Platform& platform,
-                                   const gd::Project& project,
-                                   const gd::Layout& layout,
+                                   const gd::ClassWithObjects& project,
+                                   const gd::ClassWithObjects& layout,
                                    gd::Expression& expression) {
     CallbacksForListingObjects callbacks(platform, project, layout, context);
 
@@ -103,8 +103,8 @@ class CallbacksForListingObjects : public gd::ParserCallbacks {
 
  private:
   const gd::Platform& platform;
-  const gd::Project& project;
-  const gd::Layout& layout;
+  const gd::ClassWithObjects& project;
+  const gd::ClassWithObjects& layout;
   EventsContext& context;
 };
 
@@ -112,9 +112,9 @@ bool EventsContextAnalyzer::DoVisitInstruction(gd::Instruction& instruction,
                                                bool isCondition) {
   const gd::InstructionMetadata& instrInfo =
       isCondition ? MetadataProvider::GetConditionMetadata(
-                        project.GetCurrentPlatform(), instruction.GetType())
-                  : MetadataProvider::GetActionMetadata(
-                        project.GetCurrentPlatform(), instruction.GetType());
+                        platform, instruction.GetType())
+                  : MetadataProvider::GetActionMetadata(platform,
+                                                        instruction.GetType());
 
   for (int i = 0; i < instruction.GetParametersCount() &&
                   i < instrInfo.GetParametersCount();
@@ -132,8 +132,8 @@ bool EventsContextAnalyzer::DoVisitInstruction(gd::Instruction& instruction,
 
 void EventsContextAnalyzer::AnalyzeParameter(
     const gd::Platform& platform,
-    const gd::Project& project,
-    const gd::Layout& layout,
+    const gd::ClassWithObjects& project,
+    const gd::ClassWithObjects& layout,
     const gd::ParameterMetadata& metadata,
     const gd::Expression& parameter,
     EventsContext& context) {

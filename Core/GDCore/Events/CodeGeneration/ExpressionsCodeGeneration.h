@@ -68,12 +68,12 @@ class GD_CORE_API CallbacksForGeneratingExpressionCode
                                 const std::vector<gd::Expression>& parameters,
                                 const gd::ExpressionMetadata& expressionInfo);
   bool OnSubMathExpression(const gd::Platform& platform,
-                           const gd::Project& project,
-                           const gd::Layout& layout,
+                           const gd::ClassWithObjects& project,
+                           const gd::ClassWithObjects& layout,
                            gd::Expression& expression);
   bool OnSubTextExpression(const gd::Platform& platform,
-                           const gd::Project& project,
-                           const gd::Layout& layout,
+                           const gd::ClassWithObjects& project,
+                           const gd::ClassWithObjects& layout,
                            gd::Expression& expression);
 
  private:

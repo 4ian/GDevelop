@@ -62,6 +62,9 @@ class Extension : public ExtensionBase {
                                    gd::EventsCodeGenerationContext& context) {
           gd::String functionName =
               instruction.GetParameter(0).GetPlainString();
+
+          if (!codeGenerator.HasProjectAndLayout()) return "/*Function generation not supported without layout*/";
+
           const gd::Project& project = codeGenerator.GetProject();
           const gd::Layout& layout = codeGenerator.GetLayout();
 
@@ -129,6 +132,8 @@ class Extension : public ExtensionBase {
         .SetCodeGenerator(
             [](gd::BaseEvent& event_, gd::EventsCodeGenerator& codeGenerator, gd::EventsCodeGenerationContext& /* The function has nothing to do with the current context */) {
               FunctionEvent& event = dynamic_cast<FunctionEvent&>(event_);
+
+              if (!codeGenerator.HasProjectAndLayout()) return "/*Function generation not supported without layout*/";
               const gd::Layout& layout = codeGenerator.GetLayout();
 
               // Declaring function prototype.
@@ -213,8 +218,6 @@ class Extension : public ExtensionBase {
                gd::EventsCodeGenerator& codeGenerator,
                gd::EventsCodeGenerationContext& context) {
               codeGenerator.AddIncludeFile("Function/FunctionTools.h");
-              const gd::Project& game = codeGenerator.GetProject();
-              const gd::Layout& scene = codeGenerator.GetLayout();
 
               // Ensure currentFunctionParameters vector is always existing.
               gd::String mainFakeParameters =
@@ -229,7 +232,10 @@ class Extension : public ExtensionBase {
                   expression, codeGenerator, context);
               gd::ExpressionParser parser(parameters[0].GetPlainString());
               if (!parser.ParseMathExpression(
-                      codeGenerator.GetPlatform(), game, scene, callbacks) ||
+                      codeGenerator.GetPlatform(), 
+                      codeGenerator.GetGlobalObjectsAndGroups(), 
+                      codeGenerator.GetObjectsAndGroups(),
+                      callbacks) ||
                   expression.empty())
                 expression = "0";
 

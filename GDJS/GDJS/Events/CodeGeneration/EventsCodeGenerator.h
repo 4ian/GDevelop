@@ -12,6 +12,7 @@
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/InstructionsList.h"
 namespace gd {
+class ClassWithObjects;
 class ObjectMetadata;
 class BehaviorMetadata;
 class InstructionMetadata;
@@ -35,15 +36,35 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param project Project used
    * \param scene Scene used
    * \param events events of the scene
+   * \param includeFiles A reference to a set of strings where needed
+   * includes files will be stored.
    * \param compilationForRuntime Set this to true if the code is generated for
-   * runtime. \param includeFiles A reference to a set of strings where needed
-   * includes files will be stored. \return JS code
+   * runtime.
+   *
+   * \return JavaScript code
    */
   static gd::String GenerateSceneEventsCompleteCode(
       gd::Project& project,
       const gd::Layout& scene,
       const gd::EventsList& events,
       std::set<gd::String>& includeFiles,
+      bool compilationForRuntime = false);
+
+  /**
+   * Generate JavaScript for executing events in a function
+   *
+   * \param objectsAndGroups Objects and groups
+   * \param events events of the scene
+   * \param includeFiles A reference to a set of strings where needed
+   * includes files will be stored.
+   * \param compilationForRuntime Set this to true if the code is generated for
+   * runtime.
+   *
+   * \return JavaScript code
+   */
+  static gd::String GenerateEventsFunctionCode(
+      const gd::ClassWithObjects& objectsAndGroups,
+      const gd::EventsList& events,
       bool compilationForRuntime = false);
 
   /**
@@ -94,7 +115,24 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GetObjectListName(
       const gd::String& name, const gd::EventsCodeGenerationContext& context);
 
-  gd::String GetCodeNamespace();
+  /**
+   * \brief Get the namespace to be used to store code generated
+   * objects/values/functions, with the extra "dot" at the end to be used to
+   * access to a property/member.
+   *
+   * Example: "gdjs.something."
+   */
+  virtual gd::String GetCodeNamespaceAccessor() {
+    return GetCodeNamespace() + ".";
+  };
+
+  /**
+   * \brief Get the namespace to be used to store code generated
+   * objects/values/functions.
+   *
+   * Example: "gdjs.something"
+   */
+  virtual gd::String GetCodeNamespace();
 
  protected:
   virtual gd::String GenerateParameterCodes(
@@ -175,13 +213,21 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateObjectsDeclarationCode(
       gd::EventsCodeGenerationContext& context);
 
-  virtual gd::String GenerateProfilerSectionBegin(const gd::String & section);
-  virtual gd::String GenerateProfilerSectionEnd(const gd::String & section);
+  virtual gd::String GenerateAllInstancesGetter(gd::String & objectName);
+
+  virtual gd::String GenerateProfilerSectionBegin(const gd::String& section);
+  virtual gd::String GenerateProfilerSectionEnd(const gd::String& section);
 
   /**
    * \brief Construct a code generator for the specified project and layout.
    */
   EventsCodeGenerator(gd::Project& project, const gd::Layout& layout);
+
+  /**
+   * \brief Construct a code generator for the specified objects and groups.
+   */
+  EventsCodeGenerator(gd::ClassWithObjects& globalObjectsAndGroups,
+                      const gd::ClassWithObjects& objectsAndGroups);
   virtual ~EventsCodeGenerator();
 };
 

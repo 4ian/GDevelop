@@ -51,7 +51,7 @@ node node_modules\electron\cli.js app
 
 There is a script file that automates cloning this repository, building the newIde and running it
 
-#Fow Windows:
+* For Windows:
 If you are on windows, you can download the batch script [here](https://raw.githubusercontent.com/4ian/GD/master/scripts/gitCloneAndBuildGD.bat) and run it
 
 

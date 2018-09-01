@@ -12,6 +12,15 @@ gdjs.deviceSensors = {
     _alpha: 0,
     _beta: 0,
     _gamma: 0
+  },
+  motion: {
+    _isActive: 0,
+    _rotationAlpha: 0,
+    _rotationBeta: 0,
+    _rotationGamma: 0,
+    _accelerationX: 0,
+    _accelerationY: 0,
+    _accelerationZ: 0
   }
 };
 
@@ -67,7 +76,7 @@ gdjs.deviceSensors.orientation.isActive = function() {
 }
 
 /**
- * Get the value of the device orientations absolute as a number
+ * Get the value of the device orientation's absolute as a number
  * @return {number} The device orientation's absolute value
  */
 gdjs.deviceSensors.orientation.getOrientationAbsolute = function() {
@@ -75,7 +84,7 @@ gdjs.deviceSensors.orientation.getOrientationAbsolute = function() {
 };
 
 /**
- * Get the value of the device orientations alpha as a number (Range: 0 to 360)
+ * Get the value of the device orientation's alpha as a number (Range: 0 to 360)
  * @return {number} The device orientation's alpha value
  */
 gdjs.deviceSensors.orientation.getOrientationAlpha = function() {
@@ -83,7 +92,7 @@ gdjs.deviceSensors.orientation.getOrientationAlpha = function() {
 };
 
 /**
- * Get the value of the device orientations beta as a number (Range: -180 to 180)
+ * Get the value of the device orientation's beta as a number (Range: -180 to 180)
  * @return {number} The device orientation's beta value
  */
 gdjs.deviceSensors.orientation.getOrientationBeta = function() {
@@ -91,9 +100,112 @@ gdjs.deviceSensors.orientation.getOrientationBeta = function() {
 };
 
 /**
- * Get the value of the device orientations gamma as a number (Range: -90 to 90)
- * @return {number} The device orientation's gamma value
- */
+* Get the value of the device orientation's gamma as a number (Range: -90 to 90)
+* @return {number} The device orientation's gamma value
+*/
 gdjs.deviceSensors.orientation.getOrientationGamma = function() {
   return gdjs.deviceSensors.orientation._gamma;
+};
+
+
+ /**
+  * Activate the motion sensor's listener.
+  * @private
+ */
+gdjs.deviceSensors.motion._activateMotionListener = function() {
+  window.addEventListener("devicemotion", gdjs.deviceSensors.motion._handleMotion, true);
+  gdjs.deviceSensors.motion._isActive = 1;
+}
+
+ /**
+  * Deactivate the motion sensor's listener.
+  * @private
+ */
+gdjs.deviceSensors.motion._deactivateMotionListener = function() {
+  window.removeEventListener('devicemotion', gdjs.deviceSensors.motion._handleMotion, true);
+  gdjs.deviceSensors.motion._isActive = 0;
+}
+
+ /**
+  * Motion sensor event callback function.
+  * @private
+ */
+gdjs.deviceSensors.motion._handleMotion = function(event) {
+  gdjs.deviceSensors.motion._accelerationX = event.accelerationIncludingGravity.x ? Math.round(event.accelerationIncludingGravity.x*100)/100 : 0;
+  gdjs.deviceSensors.motion._accelerationY = event.accelerationIncludingGravity.y ? Math.round(event.accelerationIncludingGravity.y*100)/100 : 0;
+  gdjs.deviceSensors.motion._accelerationZ = event.accelerationIncludingGravity.z ? Math.round(event.accelerationIncludingGravity.z*100)/100 : 0;
+
+  gdjs.deviceSensors.motion._rotationAlpha = event.rotationRate.alpha ? Math.round(event.rotationRate.alpha*100)/100 : 0;
+  gdjs.deviceSensors.motion._rotationBeta = event.rotationRate.beta ? Math.round(event.rotationRate.beta*100)/100 : 0;
+  gdjs.deviceSensors.motion._rotationGamma = event.rotationRate.gamma ? Math.round(event.rotationRate.gamma*100)/100 : 0;
+}
+
+/**
+ * Activate the motion sensor
+ */
+gdjs.deviceSensors.motion.activateMotionSensor = function() {
+  gdjs.deviceSensors.motion._activateMotionListener();
+}
+
+/**
+ * Deactivate the motion sensor
+ */
+gdjs.deviceSensors.motion.deactivateMotionSensor = function() {
+  gdjs.deviceSensors.motion._deactivateMotionListener();
+}
+
+/**
+ * Check if the motion sensor is currently active
+ * @return {number} The activation state of the motion sensor (0=false/1=true)
+ */
+gdjs.deviceSensors.motion.isActive = function() {
+  return gdjs.deviceSensors.motion._isActive;
+}
+
+/**
+ * Get the alpha rotation rate as a number
+ * @return {number} The rotation alpha value
+ */
+gdjs.deviceSensors.motion.getRotationAlpha = function() {
+  return gdjs.deviceSensors.motion._rotationAlpha;
+};
+
+/**
+ * Get the beta rotation rate as a number
+ * @return {number} The rotation beta value
+ */
+gdjs.deviceSensors.motion.getRotationBeta = function() {
+  return gdjs.deviceSensors.motion._rotationBeta;
+};
+
+/**
+ * Get the gamma rotation rate as a number
+ * @return {number} The rotation gamma value
+*/
+gdjs.deviceSensors.motion.getRotationGamma = function() {
+  return gdjs.deviceSensors.motion._rotationGamma;
+};
+
+  /**
+ * Get the acceleration value on the X-axis as a number
+ * @return {number} Acceleration on the X-axis
+ */
+gdjs.deviceSensors.motion.getAccelerationX = function() {
+  return gdjs.deviceSensors.motion._accelerationX;
+};
+
+/**
+ * Get the acceleration value on the Y-axis as a number
+ * @return {number} Acceleration on the Y-axis
+ */
+gdjs.deviceSensors.motion.getAccelerationY = function() {
+  return gdjs.deviceSensors.motion._accelerationY;
+};
+
+/**
+ * Get the acceleration value on the Z-axis as a number
+ * @return {number} Acceleration on the Z-axis
+*/
+gdjs.deviceSensors.motion.getAccelerationZ = function() {
+  return gdjs.deviceSensors.motion._accelerationZ;
 };

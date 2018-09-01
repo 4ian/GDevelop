@@ -13,7 +13,8 @@ gdjs.deviceVibration = {};
  */
 gdjs.deviceVibration.startVibration = function(duration) {
   if (typeof navigator == "undefined" || !navigator.vibrate) return
-    navigator.vibrate([duration]);
+  
+  navigator.vibrate([duration]);
 }
 
 /**

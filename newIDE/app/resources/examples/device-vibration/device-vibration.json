@@ -395,7 +395,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "DeviceVibration::VibrationStart"
+                "value": "DeviceVibration::StartVibration"
               },
               "parameters": [
                 "500"
@@ -439,10 +439,10 @@
             {
               "type": {
                 "inverted": false,
-                "value": "DeviceVibration::VibrationPatternStart"
+                "value": "DeviceVibration::StartVibrationPattern"
               },
               "parameters": [
-                "\"100,50,100,50,300,50,300,50,500,50,500\""
+                "\"200,50,200,50,500,20,500,20,500,20,500\""
               ],
               "subInstructions": []
             }
@@ -483,7 +483,7 @@
             {
               "type": {
                 "inverted": false,
-                "value": "DeviceVibration::VibrationStop"
+                "value": "DeviceVibration::StopVibration"
               },
               "parameters": [],
               "subInstructions": []

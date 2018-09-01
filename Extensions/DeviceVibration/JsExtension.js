@@ -25,7 +25,7 @@ module.exports = {
 
     extension
       .addAction(
-        "VibrationStart",
+        "StartVibration",
         t("Vibrate"),
         t("Vibrate (Duration in ms)."),
         t("Start vibration for _PARAM0_ ms"),
@@ -38,11 +38,11 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceVibration/devicevibrationtools.js"
       )
-      .setFunctionName("gdjs.deviceVibration.vibrationStart");
+      .setFunctionName("gdjs.deviceVibration.startVibration");
 
       extension
       .addAction(
-        "VibrationPatternStart",
+        "StartVibrationPattern",
         t("Vibrate by pattern"),
         t("Vibrate (Duration in ms). You can add multiple comma separated values where every second value determins the silense inbetween two vibrations. This is a string value so use quotes."),
         t("Start vibration for _PARAM0_ ms"),
@@ -55,11 +55,11 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceVibration/devicevibrationtools.js"
       )
-      .setFunctionName("gdjs.deviceVibration.vibrationPatternStart");
+      .setFunctionName("gdjs.deviceVibration.startVibrationPattern");
 
       extension
       .addAction(
-        "VibrationStop",
+        "StopVibration",
         t("Stop vibration"),
         t("Stop the vibration"),
         t("Stop vibration"),
@@ -71,7 +71,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/DeviceVibration/devicevibrationtools.js"
       )
-      .setFunctionName("gdjs.deviceVibration.vibrationStop");
+      .setFunctionName("gdjs.deviceVibration.stopVibration");
 
     return extension;
   },

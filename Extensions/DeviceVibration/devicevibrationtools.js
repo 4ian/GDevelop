@@ -17,7 +17,7 @@ gdjs.deviceVibration.vibrationStart = function(duration) {
 
 /**
  * Vibrate the mobile device in a pattern.
- * You can add multiple comma separated values where every second determines the silence between vibrations.
+ * You can add multiple comma separated values where every second one determines the silence between vibrations.
  * Example: "200,1000,500" (200ms vibration, 1sec silense, 500ms vibration)
  * @param {string} intervals Comma separated list of values (in ms).
  */

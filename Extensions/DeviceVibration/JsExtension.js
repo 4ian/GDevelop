@@ -47,8 +47,8 @@ module.exports = {
         t("Vibrate (Duration in ms). You can add multiple comma separated values where every second value determins the silense inbetween two vibrations. This is a string value so use quotes."),
         t("Start vibration for _PARAM0_ ms"),
         t("Vibration"),
-        "JsPlatform/Extensions/vibration_start24.png",
-        "JsPlatform/Extensions/vibration_start32.png"
+        "JsPlatform/Extensions/vibration_pattern_start24.png",
+        "JsPlatform/Extensions/vibration_pattern_start32.png"
       )
         .addParameter("string", t("Intervals (for example \"500,100,200\""), "", false)
         .getCodeExtraInformation()

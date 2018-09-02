@@ -14,8 +14,6 @@
  */
 gdjs.EventsContext = function()
 {
-    this._objectsMapCache = [];
-
     this._onceTriggers = {};
     this._lastFrameOnceTrigger = {};
 };
@@ -25,15 +23,13 @@ gdjs.EventsContext = function()
  * are properly handled.
  */
 gdjs.EventsContext.prototype.startNewFrame = function() {
-    this.clearObject(this._lastFrameOnceTrigger);
+    this._clearObject(this._lastFrameOnceTrigger);
     for (var k in this._onceTriggers) {
         if (this._onceTriggers.hasOwnProperty(k)) {
             this._lastFrameOnceTrigger[k] = this._onceTriggers[k];
             delete this._onceTriggers[k];
         }
     }
-
-    this._currentObjectsMap = 0;
 };
 
 /**
@@ -47,36 +43,10 @@ gdjs.EventsContext.prototype.triggerOnce = function(triggerId) {
     return !this._lastFrameOnceTrigger.hasOwnProperty(triggerId);
 };
 
-gdjs.EventsContext.prototype.clearObject = function(obj) {
+gdjs.EventsContext.prototype._clearObject = function(obj) {
     for (var k in obj) {
         if (obj.hasOwnProperty(k)) {
             delete obj[k];
         }
     }
-};
-
-/**
- * Clear the map containing objects lists.
- */
-gdjs.EventsContext.prototype.clearEventsObjectsMap = function() {
-    if (this._currentObjectsMap === this._objectsMapCache.length)
-        this._objectsMapCache.push(new Hashtable());
-
-    this._objectsMapCache[this._currentObjectsMap].clear();
-    return this;
-};
-
-/**
- * Add an objects list to the objects lists map.
- */
-gdjs.EventsContext.prototype.addObjectsToEventsMap = function(name, objectList) {
-    this._objectsMapCache[this._currentObjectsMap].put(name, objectList);
-    return this;
-};
-
-/**
- * Return the objects lists map.
- */
-gdjs.EventsContext.prototype.getEventsObjectsMap = function() {
-    return this._objectsMapCache[this._currentObjectsMap++];
 };

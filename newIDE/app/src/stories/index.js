@@ -119,39 +119,82 @@ storiesOf('Welcome', module).add('to Storybook', () => (
 storiesOf('Tabs', module)
   .addDecorator(muiDecorator)
   .add('3 tabs', () => (
-    <Tabs>
-      <Tab label="Tab 1" onClose={action('Close tab 1')}>
-        <div>Tab 1 content</div>
-      </Tab>
-      <Tab label="Tab 2" onClose={action('Close tab 2')}>
-        <div>Tab 2 content</div>
-      </Tab>
-      <Tab label="Tab 3 with a long label" onClose={action('Close tab 3')}>
-        <div>Tab 3 content</div>
-      </Tab>
-    </Tabs>
+    <div style={{ height: 400, display: 'flex' }}>
+      <Tabs>
+        <Tab label="Tab 1" onClose={action('Close tab 1')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 1 content
+          </div>
+        </Tab>
+        <Tab label="Tab 2" onClose={action('Close tab 2')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 2 content
+          </div>
+        </Tab>
+        <Tab label="Tab 3 with a long label" onClose={action('Close tab 3')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 3 content
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
   ))
   .add('long labels', () => (
-    <Tabs>
-      <Tab
-        label="Tab 1 with a very very long label"
-        onClose={action('Close tab 1')}
-      >
-        <div>Tab 1 content</div>
-      </Tab>
-      <Tab label="Small 2" onClose={action('Close tab 2')}>
-        <div>Tab 2 content</div>
-      </Tab>
-      <Tab
-        label="Tab 3 with a very very loooong label"
-        onClose={action('Close tab 3')}
-      >
-        <div>Tab 3 content</div>
-      </Tab>
-      <Tab label="Small 4" onClose={action('Close tab 4')}>
-        <div>Tab 4 content</div>
-      </Tab>
-    </Tabs>
+    <div style={{ height: 400, display: 'flex' }}>
+      <Tabs>
+        <Tab
+          label="Tab 1 with a very very long label"
+          onClose={action('Close tab 1')}
+        >
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 1 content
+          </div>
+        </Tab>
+        <Tab label="Small 2" onClose={action('Close tab 2')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 2 content
+          </div>
+        </Tab>
+        <Tab
+          label="Tab 3 with a very very loooong label"
+          onClose={action('Close tab 3')}
+        >
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 3 content
+          </div>
+        </Tab>
+        <Tab label="Small 4" onClose={action('Close tab 4')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 4 content
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
+  ))
+  .add('with ObjectsList (to check scrolling)', () => (
+    <div style={{ height: 400, display: 'flex' }}>
+      <Tabs>
+        <Tab label="Tab 1" onClose={action('Close tab 1')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            The second tab has a list of objects. Check that the scrolling
+            position is maintained while navigating between tabs.
+          </div>
+        </Tab>
+        <Tab label="Tab 2" onClose={action('Close tab 2')}>
+          <ObjectsList
+            getThumbnail={() => 'res/unknown32.png'}
+            project={project}
+            objectsContainer={testLayout}
+            onEditObject={action('On edit object')}
+          />
+        </Tab>
+        <Tab label="Tab 3" onClose={action('Close tab 3')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 3 content
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
   ));
 
 storiesOf('HelpButton', module)

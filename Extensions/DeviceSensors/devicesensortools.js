@@ -47,10 +47,10 @@ gdjs.deviceSensors.orientation._deactivateOrientationListener = function() {
   * @private
  */
 gdjs.deviceSensors.orientation._handleOrientation = function(event) {
-  gdjs.deviceSensors.orientation._absolute = event.absolute ? Math.round(event.absolute) : 0;
-  gdjs.deviceSensors.orientation._alpha = event.alpha ? Math.round(event.alpha) : 0;
-  gdjs.deviceSensors.orientation._beta = event.beta ? Math.round(event.beta) : 0;
-  gdjs.deviceSensors.orientation._gamma = event.gamma ? Math.round(event.gamma) : 0;
+  gdjs.deviceSensors.orientation._absolute = event.absolute ? event.absolute : 0;
+  gdjs.deviceSensors.orientation._alpha = event.alpha ? event.alpha : 0;
+  gdjs.deviceSensors.orientation._beta = event.beta ? event.beta : 0;
+  gdjs.deviceSensors.orientation._gamma = event.gamma ? event.gamma : 0;
 }
 
 /**
@@ -130,14 +130,18 @@ gdjs.deviceSensors.motion._deactivateMotionListener = function() {
   * Motion sensor event callback function.
   * @private
  */
-gdjs.deviceSensors.motion._handleMotion = function(event) {
-  gdjs.deviceSensors.motion._accelerationX = event.accelerationIncludingGravity.x ? Math.round(event.accelerationIncludingGravity.x*100)/100 : 0;
-  gdjs.deviceSensors.motion._accelerationY = event.accelerationIncludingGravity.y ? Math.round(event.accelerationIncludingGravity.y*100)/100 : 0;
-  gdjs.deviceSensors.motion._accelerationZ = event.accelerationIncludingGravity.z ? Math.round(event.accelerationIncludingGravity.z*100)/100 : 0;
+gdjs.deviceSensors.motion._handleMotion = function(event) {  
+  if (event.accelerationIncludingGravity){
+    gdjs.deviceSensors.motion._accelerationX = event.accelerationIncludingGravity.x ? event.accelerationIncludingGravity.x : 0;
+    gdjs.deviceSensors.motion._accelerationY = event.accelerationIncludingGravity.y ? event.accelerationIncludingGravity.y : 0;
+    gdjs.deviceSensors.motion._accelerationZ = event.accelerationIncludingGravity.z ? event.accelerationIncludingGravity.z : 0;
+  }
 
-  gdjs.deviceSensors.motion._rotationAlpha = event.rotationRate.alpha ? Math.round(event.rotationRate.alpha*100)/100 : 0;
-  gdjs.deviceSensors.motion._rotationBeta = event.rotationRate.beta ? Math.round(event.rotationRate.beta*100)/100 : 0;
-  gdjs.deviceSensors.motion._rotationGamma = event.rotationRate.gamma ? Math.round(event.rotationRate.gamma*100)/100 : 0;
+  if (event.rotationRate){
+    gdjs.deviceSensors.motion._rotationAlpha = event.rotationRate.alpha ? event.rotationRate.alpha : 0;
+    gdjs.deviceSensors.motion._rotationBeta = event.rotationRate.beta ? event.rotationRate.beta : 0;
+    gdjs.deviceSensors.motion._rotationGamma = event.rotationRate.gamma ? event.rotationRate.gamma : 0;
+  }
 }
 
 /**

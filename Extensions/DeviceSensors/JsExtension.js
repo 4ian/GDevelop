@@ -221,7 +221,7 @@ module.exports = {
         "RotationAlpha",
         t("Compare the value of rotation alpha"),
         t(
-          "Compare the value of rotation alpha."
+          "Compare the value of rotation alpha. (Note: few devices support this sensor)"
         ),
         t("Rotation alpha is _PARAM0__PARAM1_"),
         t("Sensors/Motion"),
@@ -241,7 +241,7 @@ module.exports = {
         "RotationBeta",
         t("Compare the value of rotation beta"),
         t(
-          "Compare the value of rotation beta."
+          "Compare the value of rotation beta. (Note: few devices support this sensor)"
         ),
         t("Rotation beta is _PARAM0__PARAM1_"),
         t("Sensors/Motion"),
@@ -261,7 +261,7 @@ module.exports = {
         "RotationGamma",
         t("Compare the value of rotation gamma"),
         t(
-          "Compare the value of rotation gamma."
+          "Compare the value of rotation gamma. (Note: few devices support this sensor)"
         ),
         t("Rotation gamma is _PARAM0__PARAM1_"),
         t("Sensors/Motion"),

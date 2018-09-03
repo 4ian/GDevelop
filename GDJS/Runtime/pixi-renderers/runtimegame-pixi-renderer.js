@@ -1,4 +1,3 @@
-
 /**
  * The renderer for a gdjs.RuntimeGame using Pixi.js.
  * @class RuntimeGamePixiRenderer

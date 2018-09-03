@@ -173,6 +173,8 @@ export default class EventsSheet extends React.Component<Props, State> {
       onCut: this.cutSelection,
       onPaste: this.pasteEventsOrInstructions,
       onSearch: this._toggleSearchPanel,
+      onUndo: this.undo,
+      onRedo: this.redo,
     });
   }
 
@@ -615,6 +617,8 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   undo = () => {
+    if (!canUndo(this.state.history)) return;
+
     const { events, project } = this.props;
     const newHistory = undo(this.state.history, events, project);
 
@@ -627,6 +631,8 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   redo = () => {
+    if (!canRedo(this.state.history)) return;
+
     const { events, project } = this.props;
     const newHistory = redo(this.state.history, events, project);
 

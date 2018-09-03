@@ -774,6 +774,27 @@ module.exports = {
       }
     ]
   },
+  "device-vibration": {
+    "description": "Show how to make the device vibrate.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Device vibration",
+        "name": "DeviceVibration"
+      }
+    ]
+  },
   "drag-camera-with-mouse": {
     "description": "This shows how to allow the user to move on a map with the mouse.",
     "usedExtensions": [
@@ -1348,6 +1369,35 @@ module.exports = {
       {
         "fullName": "Base object",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "move-object-with-mouse-joint": {
+    "description": "Show how to use physics engine to move an object around with the mouse and realistic movements.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Physics behavior",
+        "name": "PhysicsBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       }
     ]
   },

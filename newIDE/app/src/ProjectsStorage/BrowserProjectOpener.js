@@ -17,6 +17,7 @@ import characterSelection from '../fixtures/character-selection/character-select
 import controllerInput from '../fixtures/controller-input/controller-input.json';
 import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
 import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
+import deviceVibration from '../fixtures/device-vibration/device-vibration.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
 import customFont from '../fixtures/custom-font/custom-font.json';
 import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-lastpressedkey/customize-keys-with-lastpressedkey.json';
@@ -37,6 +38,7 @@ import manipulateTextObject from '../fixtures/manipulate-text-object/manipulate-
 import moveCameraToPosition from '../fixtures/move-camera-to-position/move-camera-to-position.json';
 import moveObjectInCircle from '../fixtures/move-object-in-circle/move-object-in-circle.json';
 import moveObjectTowardPosition from '../fixtures/move-object-toward-position/move-object-toward-position.json';
+import moveObjectWithMouseJoint from '../fixtures/move-object-with-mouse-joint/move-object-with-mouse-joint.json';
 import moveObjectWithPhysics from '../fixtures/move-object-with-physics/move-object-with-physics.json';
 import multitouch from '../fixtures/multitouch/multitouch.json';
 import objectGravity from '../fixtures/object-gravity/object-gravity.json';
@@ -125,6 +127,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(deviceOrientationBallgame);
     } else if (url === 'example://device-orientation-compass') {
       return Promise.resolve(deviceOrientationCompass);
+    } else if (url === 'example://device-vibration') {
+      return Promise.resolve(deviceVibration);
     } else if (url === 'example://create-object-with-mouseclick') {
       return Promise.resolve(createObjectWithMouseclick);
     } else if (url === 'example://custom-font') {
@@ -165,6 +169,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(moveObjectInCircle);
     } else if (url === 'example://move-object-toward-position') {
       return Promise.resolve(moveObjectTowardPosition);
+    } else if (url === 'example://move-object-with-mouse-joint') {
+      return Promise.resolve(moveObjectWithMouseJoint);
     } else if (url === 'example://move-object-with-physics') {
       return Promise.resolve(moveObjectWithPhysics);
     } else if (url === 'example://multitouch') {

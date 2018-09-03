@@ -223,7 +223,7 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Add a declaration which will be inserted after includes
    */
   void AddGlobalDeclaration(gd::String declaration) {
-    customGlobalDeclaration.insert(declaration);
+    customGlobalDeclarations.insert(declaration);
   };
 
   /**
@@ -255,7 +255,7 @@ class GD_CORE_API EventsCodeGenerator {
   /** \brief Get the custom declaration to be inserted after includes.
    */
   const std::set<gd::String>& GetCustomGlobalDeclaration() const {
-    return customGlobalDeclaration;
+    return customGlobalDeclarations;
   }
 
   /**
@@ -652,7 +652,7 @@ class GD_CORE_API EventsCodeGenerator {
   gd::String customCodeInMain;  ///< Custom code inserted before events ( in
                                 ///< main function )
   std::set<gd::String>
-      customGlobalDeclaration;      ///< Custom global C++ declarations inserted
+      customGlobalDeclarations;      ///< Custom global C++ declarations inserted
                                     ///< after includes
   size_t maxCustomConditionsDepth;  ///< The maximum depth value for all the
                                     ///< custom conditions created.

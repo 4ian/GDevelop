@@ -33,9 +33,6 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
     const gd::EventsList& events,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-  // Preprocessing then code generation can make changes to the events, so we
-  // need to do the work on a copy of the events.
-  gd::EventsList generatedEvents = events;
 
   // Prepare the global context
   unsigned int maxDepthLevelReached = 0;
@@ -43,90 +40,41 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
   EventsCodeGenerator codeGenerator(project, scene);
 
   // Generate whole events code
-  gd::String output = codeGenerator.GetCodeNamespace() + " = {};\n";
+  // Preprocessing then code generation can make changes to the events, so we
+  // need to do the work on a copy of the events.
+  gd::EventsList generatedEvents = events;
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
   codeGenerator.PreprocessEventList(generatedEvents);
   gd::String wholeEventsCode =
       codeGenerator.GenerateEventsListCode(generatedEvents, context);
 
   // Extra declarations needed by events
-  for (set<gd::String>::iterator declaration =
-           codeGenerator.GetCustomGlobalDeclaration().begin();
-       declaration != codeGenerator.GetCustomGlobalDeclaration().end();
-       ++declaration)
-    output += *declaration + "\n";
+  gd::String globalDeclarations;
+  for (auto& declaration : codeGenerator.GetCustomGlobalDeclaration())
+    globalDeclarations += declaration + "\n";
 
   // Global objects lists
-  auto generateDeclarations = [&project, &scene, &codeGenerator](
-                                  const gd::Object& object,
-                                  unsigned int maxDepth,
-                                  gd::String& globalObjectLists,
-                                  gd::String& globalObjectListsReset) {
-    gd::String type = gd::GetTypeOfObject(project, scene, object.GetName());
-    const gd::ObjectMetadata& metadata =
-        gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
-    codeGenerator.AddIncludeFiles(metadata.includeFiles);
+  auto allObjectsDeclarationsAndResets =
+      codeGenerator.GenerateAllObjectsDeclarationsAndResets(
+          maxDepthLevelReached);
+  gd::String globalObjectLists = allObjectsDeclarationsAndResets.first;
+  gd::String globalObjectListsReset = allObjectsDeclarationsAndResets.second;
 
-    // Ensure needed files are included.
-    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
-    for (std::size_t j = 0; j < behaviors.size(); ++j) {
-      const gd::BehaviorMetadata& metadata =
-          gd::MetadataProvider::GetBehaviorMetadata(
-              JsPlatform::Get(),
-              object.GetBehavior(behaviors[j]).GetTypeName());
-      codeGenerator.AddIncludeFiles(metadata.includeFiles);
-    }
+  codeGenerator.AddAllObjectsIncludeFiles();
 
-    // Generate declarations for the objects lists
-    for (unsigned int j = 1; j <= maxDepth; ++j) {
-      globalObjectLists += codeGenerator.GetCodeNamespaceAccessor() +
-                           ManObjListName(object.GetName()) +
-                           gd::String::From(j) + "= [];\n";
-      globalObjectListsReset += codeGenerator.GetCodeNamespaceAccessor() +
-                                ManObjListName(object.GetName()) +
-                                gd::String::From(j) + ".length = 0;\n";
-    }
-  };
+  // "Booleans" used by conditions
+  gd::String globalConditionsBooleans =
+      codeGenerator.GenerateAllConditionsBooleanDeclarations();
 
-  gd::String globalObjectLists;
-  gd::String globalObjectListsReset;
-
-  // TODO: Surely use ClassWithObjects
-  for (std::size_t i = 0; i < project.GetObjectsCount(); ++i)
-    generateDeclarations(project.GetObject(i),
-                         maxDepthLevelReached,
-                         globalObjectLists,
-                         globalObjectListsReset);
-
-  for (std::size_t i = 0; i < scene.GetObjectsCount(); ++i)
-    generateDeclarations(scene.GetObject(i),
-                         maxDepthLevelReached,
-                         globalObjectLists,
-                         globalObjectListsReset);
-
-  // Condition global booleans
-  gd::String globalConditionsBooleans;
-  for (unsigned int i = 0; i <= codeGenerator.GetMaxCustomConditionsDepth();
-       ++i) {
-    globalConditionsBooleans += codeGenerator.GetCodeNamespaceAccessor() +
-                                "conditionTrue_" + gd::String::From(i) +
-                                " = {val:false};\n";
-    for (std::size_t j = 0; j <= codeGenerator.GetMaxConditionsListsSize();
-         ++j) {
-      globalConditionsBooleans += codeGenerator.GetCodeNamespaceAccessor() +
-                                  "condition" + gd::String::From(j) +
-                                  "IsTrue_" + gd::String::From(i) +
-                                  " = {val:false};\n";
-    }
-  }
-
-  output += globalObjectLists + "\n" + globalConditionsBooleans + "\n\n" +
-            codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
-            codeGenerator.GetCodeNamespaceAccessor() +
-            "func = function(runtimeScene, context) {\n" +
-            "context.startNewFrame();\n" + globalObjectListsReset + "\n" +
-            codeGenerator.GetCustomCodeInMain() + wholeEventsCode +
-            "return;\n" + "}\n";
+  gd::String output = codeGenerator.GetCodeNamespace() + " = {};\n" +
+                      globalDeclarations + globalObjectLists + "\n" +
+                      globalConditionsBooleans + "\n\n" +
+                      codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
+                      codeGenerator.GetCodeNamespaceAccessor() +
+                      "func = function(runtimeScene, context) {\n" +
+                      "context.startNewFrame();\n" + globalObjectListsReset +
+                      "\n" + codeGenerator.GetCustomCodeInMain() +
+                      wholeEventsCode + "return;\n" + "}\n";
 
   // Export the symbols to avoid them being stripped by the Closure Compiler:
   output += "gdjs['" +
@@ -146,11 +94,6 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       emptyObjectsAndGroups;  // As opposed to layout events, we don't have
                               // objects in the "outer" scope.
 
-  // TODO: Factor with other Generate method.
-
-  // Preprocessing then code generation can make changes to the events, so we
-  // need to do the work on a copy of the events.
-  gd::EventsList generatedEvents = events;
 
   // Prepare the global context
   unsigned int maxDepthLevelReached = 0;
@@ -158,96 +101,118 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   EventsCodeGenerator codeGenerator(emptyObjectsAndGroups, objectsAndGroups);
 
   // Generate whole events code
-  gd::String output = codeGenerator.GetCodeNamespace() + " = {};\n";
+  // Preprocessing then code generation can make changes to the events, so we
+  // need to do the work on a copy of the events.
+  gd::EventsList generatedEvents = events;
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
   codeGenerator.PreprocessEventList(generatedEvents);
   gd::String wholeEventsCode =
       codeGenerator.GenerateEventsListCode(generatedEvents, context);
 
   // Extra declarations needed by events
-  for (set<gd::String>::iterator declaration =
-           codeGenerator.GetCustomGlobalDeclaration().begin();
-       declaration != codeGenerator.GetCustomGlobalDeclaration().end();
-       ++declaration)
-    output += *declaration + "\n";
+  gd::String globalDeclarations;
+  for (auto& declaration : codeGenerator.GetCustomGlobalDeclaration())
+    globalDeclarations += declaration + "\n";
 
   // Global objects lists
+  auto allObjectsDeclarationsAndResets =
+      codeGenerator.GenerateAllObjectsDeclarationsAndResets(
+          maxDepthLevelReached);
+  gd::String globalObjectLists = allObjectsDeclarationsAndResets.first;
+  gd::String globalObjectListsReset = allObjectsDeclarationsAndResets.second;
+
+  codeGenerator.AddAllObjectsIncludeFiles();
+
+  // "Booleans" used by conditions
+  gd::String globalConditionsBooleans =
+      codeGenerator.GenerateAllConditionsBooleanDeclarations();
+
+  gd::String output = codeGenerator.GetCodeNamespace() + " = {};\n" +
+                      globalDeclarations + globalObjectLists + "\n" +
+                      globalConditionsBooleans + "\n\n" +
+                      codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
+                      codeGenerator.GetCodeNamespaceAccessor() +
+                      "func = function(runtimeScene, context) {\n" +
+                      "context.startNewFrame();\n" + globalObjectListsReset +
+                      "\n" + codeGenerator.GetCustomCodeInMain() +
+                      wholeEventsCode + "return;\n" + "}\n";
+
+  // includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
+  //                     codeGenerator.GetIncludeFiles().end());
+  return output;
+}
+
+std::pair<gd::String, gd::String>
+EventsCodeGenerator::GenerateAllObjectsDeclarationsAndResets(
+    unsigned int maxDepthLevelReached) {
+  gd::String globalObjectLists;
+  gd::String globalObjectListsReset;
+
   auto generateDeclarations =
-      [&emptyObjectsAndGroups, &objectsAndGroups, &codeGenerator](
-          const gd::Object& object,
-          unsigned int maxDepth,
-          gd::String& globalObjectLists,
-          gd::String& globalObjectListsReset) {
-        gd::String type = gd::GetTypeOfObject(
-            emptyObjectsAndGroups, objectsAndGroups, object.GetName());
-        const gd::ObjectMetadata& metadata =
-            gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
-        codeGenerator.AddIncludeFiles(metadata.includeFiles);
-
-        // Ensure needed files are included.
-        std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
-        for (std::size_t j = 0; j < behaviors.size(); ++j) {
-          const gd::BehaviorMetadata& metadata =
-              gd::MetadataProvider::GetBehaviorMetadata(
-                  JsPlatform::Get(),
-                  object.GetBehavior(behaviors[j]).GetTypeName());
-          codeGenerator.AddIncludeFiles(metadata.includeFiles);
-        }
-
+      [this,
+       &maxDepthLevelReached,
+       &globalObjectLists,
+       &globalObjectListsReset](const gd::Object& object) {
         // Generate declarations for the objects lists
-        for (unsigned int j = 1; j <= maxDepth; ++j) {
-          globalObjectLists += codeGenerator.GetCodeNamespaceAccessor() +
+        for (unsigned int j = 1; j <= maxDepthLevelReached; ++j) {
+          globalObjectLists += GetCodeNamespaceAccessor() +
                                ManObjListName(object.GetName()) +
                                gd::String::From(j) + "= [];\n";
-          globalObjectListsReset += codeGenerator.GetCodeNamespaceAccessor() +
+          globalObjectListsReset += GetCodeNamespaceAccessor() +
                                     ManObjListName(object.GetName()) +
                                     gd::String::From(j) + ".length = 0;\n";
         }
       };
 
-  gd::String globalObjectLists;
-  gd::String globalObjectListsReset;
-
-  // TODO: Surely use ClassWithObjects
-  for (std::size_t i = 0; i < emptyObjectsAndGroups.GetObjectsCount(); ++i)
-    generateDeclarations(emptyObjectsAndGroups.GetObject(i),
-                         maxDepthLevelReached,
-                         globalObjectLists,
-                         globalObjectListsReset);
+  for (std::size_t i = 0; i < globalObjectsAndGroups.GetObjectsCount(); ++i)
+    generateDeclarations(globalObjectsAndGroups.GetObject(i));
 
   for (std::size_t i = 0; i < objectsAndGroups.GetObjectsCount(); ++i)
-    generateDeclarations(objectsAndGroups.GetObject(i),
-                         maxDepthLevelReached,
-                         globalObjectLists,
-                         globalObjectListsReset);
+    generateDeclarations(objectsAndGroups.GetObject(i));
 
-  // Condition global booleans
+  return std::make_pair(globalObjectLists, globalObjectListsReset);
+}
+
+void EventsCodeGenerator::AddAllObjectsIncludeFiles() {
+  auto addIncludeFiles = [this](const gd::Object& object) {
+    gd::String type = gd::GetTypeOfObject(
+        GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), object.GetName());
+
+    // Ensure needed files are included for the object type and its behaviors.
+    const gd::ObjectMetadata& metadata =
+        gd::MetadataProvider::GetObjectMetadata(JsPlatform::Get(), type);
+    AddIncludeFiles(metadata.includeFiles);
+
+    std::vector<gd::String> behaviors = object.GetAllBehaviorNames();
+    for (std::size_t j = 0; j < behaviors.size(); ++j) {
+      const gd::BehaviorMetadata& metadata =
+          gd::MetadataProvider::GetBehaviorMetadata(
+              JsPlatform::Get(),
+              object.GetBehavior(behaviors[j]).GetTypeName());
+      AddIncludeFiles(metadata.includeFiles);
+    }
+  };
+
+  for (std::size_t i = 0; i < globalObjectsAndGroups.GetObjectsCount(); ++i)
+    addIncludeFiles(globalObjectsAndGroups.GetObject(i));
+
+  for (std::size_t i = 0; i < objectsAndGroups.GetObjectsCount(); ++i)
+    addIncludeFiles(objectsAndGroups.GetObject(i));
+}
+
+gd::String EventsCodeGenerator::GenerateAllConditionsBooleanDeclarations() {
   gd::String globalConditionsBooleans;
-  for (unsigned int i = 0; i <= codeGenerator.GetMaxCustomConditionsDepth();
-       ++i) {
-    globalConditionsBooleans += codeGenerator.GetCodeNamespaceAccessor() +
-                                "conditionTrue_" + gd::String::From(i) +
-                                " = {val:false};\n";
-    for (std::size_t j = 0; j <= codeGenerator.GetMaxConditionsListsSize();
-         ++j) {
-      globalConditionsBooleans += codeGenerator.GetCodeNamespaceAccessor() +
-                                  "condition" + gd::String::From(j) +
-                                  "IsTrue_" + gd::String::From(i) +
-                                  " = {val:false};\n";
+  for (unsigned int i = 0; i <= GetMaxCustomConditionsDepth(); ++i) {
+    globalConditionsBooleans += GetCodeNamespaceAccessor() + "conditionTrue_" +
+                                gd::String::From(i) + " = {val:false};\n";
+    for (std::size_t j = 0; j <= GetMaxConditionsListsSize(); ++j) {
+      globalConditionsBooleans += GetCodeNamespaceAccessor() + "condition" +
+                                  gd::String::From(j) + "IsTrue_" +
+                                  gd::String::From(i) + " = {val:false};\n";
     }
   }
 
-  output += globalObjectLists + "\n" + globalConditionsBooleans + "\n\n" +
-            codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
-            codeGenerator.GetCodeNamespaceAccessor() +
-            "func = function(runtimeScene, context) {\n" +
-            "context.startNewFrame();\n" + globalObjectListsReset + "\n" +
-            codeGenerator.GetCustomCodeInMain() + wholeEventsCode +
-            "return;\n" + "}\n";
-
-  // includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
-  //                     codeGenerator.GetIncludeFiles().end());
-  return output;
+  return globalConditionsBooleans;
 }
 
 gd::String EventsCodeGenerator::GenerateObjectFunctionCall(

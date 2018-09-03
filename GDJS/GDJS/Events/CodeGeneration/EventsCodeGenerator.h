@@ -213,10 +213,35 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateObjectsDeclarationCode(
       gd::EventsCodeGenerationContext& context);
 
-  virtual gd::String GenerateAllInstancesGetter(gd::String & objectName);
+  virtual gd::String GenerateAllInstancesGetter(gd::String& objectName);
 
   virtual gd::String GenerateProfilerSectionBegin(const gd::String& section);
   virtual gd::String GenerateProfilerSectionEnd(const gd::String& section);
+
+ private:
+  /**
+   * \brief Generate the declarations of all the booleans required to run
+   * events.
+   *
+   * This should be called after generating events list code, so that the code
+   * generator knows all the booleans to be declared.
+   */
+  gd::String GenerateAllConditionsBooleanDeclarations();
+
+  /**
+   * \brief Generate the declarations of all the objects list arrays.
+   *
+   * This should be called after generating events list code, with the maximum
+   * depth reached by events.
+   */
+  std::pair<gd::String, gd::String> GenerateAllObjectsDeclarationsAndResets(
+      unsigned int maxDepthLevelReached);
+
+  /**
+   * \brief Add to include files all the files required by the object and their
+   * behaviors.
+   */
+  void AddAllObjectsIncludeFiles();
 
   /**
    * \brief Construct a code generator for the specified project and layout.

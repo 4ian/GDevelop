@@ -18,6 +18,7 @@ class SerializerElement;
 
 namespace gd {
 
+//TODO: Rename to ObjectsContainer
 /**
  * \brief Used as a base class for classes that will own objects (see
  * gd::Object).

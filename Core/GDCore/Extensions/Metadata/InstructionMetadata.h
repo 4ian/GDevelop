@@ -44,6 +44,14 @@ class GD_CORE_API ParameterMetadata {
   const gd::String &GetType() const { return type; }
 
   /**
+   * \brief Set the type of the parameter.
+   */
+  ParameterMetadata &SetType(const gd::String &type_) {
+    type = type_;
+    return *this;
+  }
+
+  /**
    * \brief Return an optional additional information, used for some parameters
    * with special type (For example, it can contains the type of object accepted
    * by the parameter).
@@ -51,14 +59,40 @@ class GD_CORE_API ParameterMetadata {
   const gd::String &GetExtraInfo() const { return supplementaryInformation; }
 
   /**
+   * \brief Set an optional additional information, used for some parameters
+   * with special type (For example, it can contains the type of object accepted
+   * by the parameter).
+   */
+  ParameterMetadata &SetExtraInfo(const gd::String &supplementaryInformation_) {
+    supplementaryInformation = supplementaryInformation_;
+    return *this;
+  }
+
+  /**
    * \brief Return true if the parameter is optional.
    */
   bool IsOptional() const { return optional; }
 
   /**
+   * \brief Set if the parameter is optional.
+   */
+  ParameterMetadata &SetOptional(bool optional_ = true) {
+    optional = optional_;
+    return *this;
+  }
+
+  /**
    * \brief Return the description of the parameter
    */
   const gd::String &GetDescription() const { return description; }
+
+  /**
+   * \brief Set the description of the parameter.
+   */
+  ParameterMetadata &SetDescription(const gd::String &description_) {
+    description = description_;
+    return *this;
+  }
 
   /**
    * \brief Return true if the parameter is only meant to be completed during
@@ -67,10 +101,29 @@ class GD_CORE_API ParameterMetadata {
   bool IsCodeOnly() const { return codeOnly; }
 
   /**
+   * \brief Set if the parameter is only meant to be completed during
+   * compilation and must not be displayed to the user.
+   */
+  ParameterMetadata &SetCodeOnly(bool codeOnly_ = true) {
+    codeOnly = codeOnly_;
+    return *this;
+  }
+
+  /**
    * \brief Get the default value for the parameter.
    */
   const gd::String &GetDefaultValue() const { return defaultValue; }
 
+  /**
+   * \brief Set the default value, if the parameter is optional.
+   */
+  ParameterMetadata &SetDefaultValue(const gd::String &defaultValue_) {
+    defaultValue = defaultValue_;
+    return *this;
+  }
+
+  // TODO: Deprecated public fields. Any direct using should be moved to
+  // getter/setter.
   gd::String type;                      ///< Parameter type
   gd::String supplementaryInformation;  ///< Used if needed
   bool optional;                        ///< True if the parameter is optional

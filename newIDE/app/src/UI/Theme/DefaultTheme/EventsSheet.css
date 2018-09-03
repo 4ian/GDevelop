@@ -133,10 +133,10 @@
 * Drag'n'drop indicator (events)
 */
 .gd-events-sheet-default-theme .drop-indicator {
-    border-top: 2px solid #18DCF2;
+    border-top: 2px solid black;
     height: 0;
-    margin-top: -1;
-    margin-bottom: -1;
+    margin-top: -1px;
+    margin-bottom: -1px;
     width: '100%';
     box-sizing: 'border-box';
 }
@@ -144,8 +144,8 @@
 .gd-events-sheet-default-theme .cant-drop-indicator {
     border-top: 2px solid #FF5C5C;
     height: 0;
-    margin-top: -1;
-    margin-bottom: -1;
+    margin-top: -1px;
+    margin-bottom: -1px;
     width: '100%';
     box-sizing: 'border-box';
 }

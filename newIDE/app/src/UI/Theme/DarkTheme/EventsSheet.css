@@ -137,8 +137,8 @@
 .gd-events-sheet-dark-theme .drop-indicator {
     border-top: 2px solid #18DCF2;
     height: 0;
-    margin-top: -1;
-    margin-bottom: -1;
+    margin-top: -1px;
+    margin-bottom: -1px;
     width: '100%';
     box-sizing: 'border-box';
 }
@@ -146,8 +146,8 @@
 .gd-events-sheet-dark-theme .cant-drop-indicator {
     border-top: 2px solid #FF5C5C;
     height: 0;
-    margin-top: -1;
-    margin-bottom: -1;
+    margin-top: -1px;
+    margin-bottom: -1px;
     width: '100%';
     box-sizing: 'border-box';
 }

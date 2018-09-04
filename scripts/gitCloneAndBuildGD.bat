@@ -4,6 +4,7 @@ REM
 REM It still requires git, nodejs and electron to be installed.
 REM If Gdevelop is already built, the script will simply launch it.
 REM ===============================================================
+echo This will install the dependencies and launch GDevelop development version. Please make sure you have git and Node.js installed.
 
 @echo off
 SET fork=4ian

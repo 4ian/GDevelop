@@ -35,7 +35,7 @@ export default class DefaultField extends Component {
         <RaisedButton
           style={styles.button}
           label="No"
-          primary={this.props.value !== 'yes'}
+          primary={this.props.value === 'no'}
           onClick={() => this.props.onChange('no')}
         />
       </div>

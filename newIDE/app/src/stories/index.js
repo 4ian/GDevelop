@@ -97,6 +97,8 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import InlineCheckbox from '../UI/InlineCheckbox';
 import LoaderModal from '../UI/LoaderModal';
 import ColorField from '../UI/ColorField';
+import EmptyMessage from '../UI/EmptyMessage';
+import BackgroundText from '../UI/BackgroundText';
 import i18n from '../UI/i18n';
 
 const gd = global.gd;
@@ -158,6 +160,16 @@ storiesOf('UI Building Blocks/DragHandle', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
+
+  storiesOf('UI Building Blocks/EmptyMessage', module)
+    .addDecorator(paperDecorator)
+    .addDecorator(muiDecorator)
+    .add('default', () => <EmptyMessage>Hello World, this is an empty message, which is centered.</EmptyMessage>);
+  
+    storiesOf('UI Building Blocks/BackgroundText', module)
+    .addDecorator(paperDecorator)
+    .addDecorator(muiDecorator)
+    .add('default', () => <BackgroundText>Hello World, this is a background text</BackgroundText>);
 
 storiesOf('UI Building Blocks/ColorField', module)
   .addDecorator(paperDecorator)

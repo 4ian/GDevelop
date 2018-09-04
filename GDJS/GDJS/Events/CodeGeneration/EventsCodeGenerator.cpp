@@ -12,6 +12,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/ClassWithObjects.h"
@@ -33,7 +34,6 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
     const gd::EventsList& events,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
-
   // Prepare the global context
   unsigned int maxDepthLevelReached = 0;
   gd::EventsCodeGenerationContext context(&maxDepthLevelReached);
@@ -66,15 +66,15 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
   gd::String globalConditionsBooleans =
       codeGenerator.GenerateAllConditionsBooleanDeclarations();
 
-  gd::String output = codeGenerator.GetCodeNamespace() + " = {};\n" +
-                      globalDeclarations + globalObjectLists + "\n" +
-                      globalConditionsBooleans + "\n\n" +
-                      codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
-                      codeGenerator.GetCodeNamespaceAccessor() +
-                      "func = function(runtimeScene, context) {\n" +
-                      "context.startNewFrame();\n" + globalObjectListsReset +
-                      "\n" + codeGenerator.GetCustomCodeInMain() +
-                      wholeEventsCode + "return;\n" + "}\n";
+  gd::String output =
+      codeGenerator.GetCodeNamespace() + " = {};\n" + globalDeclarations +
+      globalObjectLists + "\n" + globalConditionsBooleans + "\n\n" +
+      codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
+      codeGenerator.GetCodeNamespaceAccessor() +
+      "func = function(runtimeScene) {\n" +
+      "runtimeScene.getOnceTriggers().startNewFrame();\n" +
+      globalObjectListsReset + "\n" + codeGenerator.GetCustomCodeInMain() +
+      wholeEventsCode + "\n" + "return;\n" + "}\n";
 
   // Export the symbols to avoid them being stripped by the Closure Compiler:
   output += "gdjs['" +
@@ -87,13 +87,16 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
-    const gd::ClassWithObjects& objectsAndGroups,
+    gd::Project& project,
+    const std::vector<gd::ParameterMetadata>& parameters,
     const gd::EventsList& events,
     bool compilationForRuntime) {
+  gd::ClassWithObjects objectsAndGroups;
   gd::ClassWithObjects
       emptyObjectsAndGroups;  // As opposed to layout events, we don't have
                               // objects in the "outer" scope.
-
+  gd::ParameterMetadataTools::ParametersToObjectsContainer(
+      project, parameters, objectsAndGroups);
 
   // Prepare the global context
   unsigned int maxDepthLevelReached = 0;
@@ -127,19 +130,57 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   gd::String globalConditionsBooleans =
       codeGenerator.GenerateAllConditionsBooleanDeclarations();
 
-  gd::String output = codeGenerator.GetCodeNamespace() + " = {};\n" +
-                      globalDeclarations + globalObjectLists + "\n" +
-                      globalConditionsBooleans + "\n\n" +
-                      codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
-                      codeGenerator.GetCodeNamespaceAccessor() +
-                      "func = function(runtimeScene, context) {\n" +
-                      "context.startNewFrame();\n" + globalObjectListsReset +
-                      "\n" + codeGenerator.GetCustomCodeInMain() +
-                      wholeEventsCode + "return;\n" + "}\n";
+  gd::String output =
+      codeGenerator.GetCodeNamespace() + " = {};\n" + globalDeclarations +
+      globalObjectLists + "\n" + globalConditionsBooleans + "\n\n" +
+      codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
+      codeGenerator.GetCodeNamespaceAccessor() + "func = function(" +
+      codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
+          parameters) +
+      ") {\n" + codeGenerator.GenerateEventsFunctionContext(parameters) + "\n" +
+      globalObjectListsReset + "\n" + codeGenerator.GetCustomCodeInMain() +
+      wholeEventsCode + "\n" + "return;\n" + "}\n";
 
   // includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
   //                     codeGenerator.GetIncludeFiles().end());
   return output;
+}
+
+gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
+    const vector<gd::ParameterMetadata>& parameters) {
+  gd::String declaration = "";
+  for (const auto& parameter : parameters) {
+    if (!declaration.empty()) declaration += ", ";
+    declaration += parameter.GetName().empty() ? "_" : parameter.GetName();
+  }
+
+  return declaration;
+}
+
+gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
+    const vector<gd::ParameterMetadata>& parameters) {
+  gd::String objectsGetters;
+  gd::String argumentsGetters;
+  for (const auto& parameter : parameters) {
+    if (parameter.GetName().empty()) continue;
+
+    if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
+      objectsGetters +=
+          "if (objectName === " + ConvertToStringExplicit(parameter.GetName()) +
+          ") return gdjs.objectsListsToArray(" + parameter.GetName() + ");\n";
+    } else {
+      argumentsGetters +=
+          "if (argName === " + ConvertToStringExplicit(parameter.GetName()) +
+          ") return " + parameter.GetName() + ";\n";
+    }
+  }
+
+  return gd::String("var eventsFunctionContext = {\n") +
+         "  getObjects: function(objectName) {\n" + objectsGetters +
+         "    return [];"
+         "  },\n" +
+         "  getArgument: function(argName) {\n" + argumentsGetters +
+         "    return \"\";" + "  }\n" + "};\n";
 }
 
 std::pair<gd::String, gd::String>
@@ -563,7 +604,13 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
 gd::String EventsCodeGenerator::GenerateAllInstancesGetter(
     gd::String& objectName) {
-  return "runtimeScene.getObjects(" + ConvertToStringExplicit(objectName) + ")";
+  if (HasProjectAndLayout()) {
+    return "runtimeScene.getObjects(" + ConvertToStringExplicit(objectName) +
+           ")";
+  } else {
+    return "eventsFunctionContext.getObjects(" +
+           ConvertToStringExplicit(objectName) + ")";
+  }
 }
 
 gd::String EventsCodeGenerator::GenerateEventsListCode(
@@ -578,21 +625,25 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
   gd::String code =
       gd::EventsCodeGenerator::GenerateEventsListCode(events, context);
 
+  gd::String parametersCode = HasProjectAndLayout()
+                                  ? "runtimeScene"
+                                  : "runtimeScene, eventsFunctionContext";
+
   // Generate a unique name for the function.
   gd::String functionName =
       GetCodeNamespaceAccessor() + "eventsList" + gd::String::From(&events);
-  AddCustomCodeOutsideMain(
-      // The only local parameters are runtimeScene and context.
-      // List of objects, conditions booleans and any variables used by events
-      // are stored in static variables that are globally available by the whole
-      // code.
-      functionName + " = function(runtimeScene, context) {\n" + code + "\n" +
-      "}; //End of " + functionName + "\n");
+  // The only local parameters are runtimeScene and context.
+  // List of objects, conditions booleans and any variables used by events
+  // are stored in static variables that are globally available by the whole
+  // code.
+  AddCustomCodeOutsideMain(functionName + " = function(" + parametersCode +
+                           ") {\n" + code + "\n" + "}; //End of " +
+                           functionName + "\n");
 
   // Replace the code of the events by the call to the function. This does not
   // interfere with the objects picking as the lists are in static variables
   // globally available.
-  return functionName + "(runtimeScene, context);";
+  return functionName + "(" + parametersCode + ");";
 }
 
 gd::String EventsCodeGenerator::GenerateConditionsListCode(

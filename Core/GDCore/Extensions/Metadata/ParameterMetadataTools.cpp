@@ -15,27 +15,25 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
     gd::Project& project,
     const std::vector<gd::ParameterMetadata>& parameters,
     gd::ClassWithObjects& outputObjectsContainer) {
-  auto getParameterName = [](std::size_t index) {
-    return "Parameter" + gd::String::From(index);
-  };
-
   for (std::size_t i = 0; i < parameters.size(); ++i) {
     const auto& parameter = parameters[i];
+    if (parameter.GetName().empty()) continue;
+
     if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
       outputObjectsContainer.InsertNewObject(
           project,
           parameter.GetExtraInfo(),
-          getParameterName(i),
+          parameter.GetName(),
           outputObjectsContainer.GetObjectsCount());
     } else if (parameter.GetType() == "behavior") {
       // Convention is that behavior parameter is after an object parameter
       if (i != 0 &&
           gd::ParameterMetadata::IsObject(parameters[i - 1].GetType())) {
-        gd::String objectName = getParameterName(i - 1);
+        gd::String objectName = parameter.GetName();
         if (outputObjectsContainer.HasObjectNamed(objectName)) {
           const gd::Object& object =
               outputObjectsContainer.GetObject(objectName);
-          gd::String behaviorName = getParameterName(i);
+          gd::String behaviorName = parameter.GetName();
 
           if (!object.HasBehaviorNamed(behaviorName)) {
             outputObjectsContainer.GetObject(objectName)

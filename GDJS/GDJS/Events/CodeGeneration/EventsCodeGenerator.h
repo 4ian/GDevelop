@@ -53,17 +53,17 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   /**
    * Generate JavaScript for executing events in a function
    *
-   * \param objectsAndGroups Objects and groups
+   * \param project Project used
+   * \param parameters The parameters of the function (objects will be deduced from these).
    * \param events events of the scene
-   * \param includeFiles A reference to a set of strings where needed
-   * includes files will be stored.
    * \param compilationForRuntime Set this to true if the code is generated for
    * runtime.
    *
    * \return JavaScript code
    */
   static gd::String GenerateEventsFunctionCode(
-      const gd::ClassWithObjects& objectsAndGroups,
+      gd::Project& project,
+      const std::vector<gd::ParameterMetadata> & parameters,
       const gd::EventsList& events,
       bool compilationForRuntime = false);
 
@@ -242,6 +242,9 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * behaviors.
    */
   void AddAllObjectsIncludeFiles();
+
+  gd::String GenerateEventsFunctionParameterDeclarationsList(const std::vector<gd::ParameterMetadata> & parameters);
+  gd::String GenerateEventsFunctionContext(const std::vector<gd::ParameterMetadata> & parameters);
 
   /**
    * \brief Construct a code generator for the specified project and layout.

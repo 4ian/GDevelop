@@ -5,14 +5,14 @@
  */
 
 /**
- * EventsContext contains specific tools and data structures used
- * by events generated code only.
+ * OnceTriggers is used to store the status of the conditions "Trigger once",
+ * that are used in events to have conditions that are only valid for one frame in a row.
  *
  * @memberof gdjs
- * @class EventsContext
+ * @class OnceTriggers
  * @constructor
  */
-gdjs.EventsContext = function()
+gdjs.OnceTriggers = function()
 {
     this._onceTriggers = {};
     this._lastFrameOnceTrigger = {};
@@ -22,7 +22,7 @@ gdjs.EventsContext = function()
  * To be called when events begin so that "Trigger once" conditions
  * are properly handled.
  */
-gdjs.EventsContext.prototype.startNewFrame = function() {
+gdjs.OnceTriggers.prototype.startNewFrame = function() {
     this._clearObject(this._lastFrameOnceTrigger);
     for (var k in this._onceTriggers) {
         if (this._onceTriggers.hasOwnProperty(k)) {
@@ -37,13 +37,13 @@ gdjs.EventsContext.prototype.startNewFrame = function() {
  * this method was not called with the same identifier during the last frame.
  * @param triggerId The identifier of the "Trigger once" condition.
  */
-gdjs.EventsContext.prototype.triggerOnce = function(triggerId) {
+gdjs.OnceTriggers.prototype.triggerOnce = function(triggerId) {
     this._onceTriggers[triggerId] = true;
 
     return !this._lastFrameOnceTrigger.hasOwnProperty(triggerId);
 };
 
-gdjs.EventsContext.prototype._clearObject = function(obj) {
+gdjs.OnceTriggers.prototype._clearObject = function(obj) {
     for (var k in obj) {
         if (obj.hasOwnProperty(k)) {
             delete obj[k];

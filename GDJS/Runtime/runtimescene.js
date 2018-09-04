@@ -127,7 +127,7 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     	this._eventsFunction = (function() {});
     }
 
-    this._eventsContext = new gdjs.EventsContext();
+    this._onceTriggers = new gdjs.OnceTriggers();
 
     //Call global callback
 	for(var i = 0;i<gdjs.callbacksRuntimeSceneLoaded.length;++i) {
@@ -149,7 +149,6 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
     if (this._renderer && this._renderer.onSceneUnloaded)
         this._renderer.onSceneUnloaded();
 
-    this._eventsContext = new gdjs.EventsContext();
 	for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloaded.length;++i) {
 		gdjs.callbacksRuntimeSceneUnloaded[i](this);
 	}
@@ -169,7 +168,7 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
     this._instancesRemoved = [];
 
     this._lastId = 0;
-    this._eventsContext = null;
+    this._onceTriggers = null;
 
     this._isLoaded = false;
 
@@ -230,7 +229,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
 	if (this._profiler) this._profiler.end("objects (pre-events)");
 	
     if (this._profiler) this._profiler.begin("events");
-	this._eventsFunction(this, this._eventsContext);
+	this._eventsFunction(this);
 	if (this._profiler) this._profiler.end("events");
 	
     if (this._profiler) this._profiler.begin("objects (post-events)");
@@ -693,4 +692,11 @@ gdjs.RuntimeScene.prototype.stopProfiler = function() {
 	if (onProfilerStopped) {
 		onProfilerStopped(oldProfiler);
 	}
+}
+
+/**
+ * Get the structure containing the triggers for "Trigger once" conditions.
+ */
+gdjs.RuntimeScene.prototype.getOnceTriggers = function() {
+	return this._onceTriggers;
 }

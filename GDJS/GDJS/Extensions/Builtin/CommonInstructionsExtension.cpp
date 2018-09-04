@@ -163,7 +163,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                 gd::String objList =
                     codeGenerator.GetObjectListName(*it, context);
                 gd::String finalObjList =
-                    codeGenerator.GetCodeNamespaceAccessor() + ManObjListName(*it) +
+                    codeGenerator.GetCodeNamespaceAccessor() +
+                    ManObjListName(*it) +
                     gd::String::From(parentContext.GetContextDepth()) + "_" +
                     gd::String::From(parentContext.GetCurrentConditionDepth()) +
                     "final";
@@ -328,8 +329,8 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
             gd::String outputCode = codeGenerator.GenerateBooleanFullName(
                                         "conditionTrue", context) +
                                     ".val = ";
-            outputCode +=
-                "context.triggerOnce(" + gd::String::From(uniqueId) + ");\n";
+            outputCode += "runtimeScene.getOnceTriggers().triggerOnce(" +
+                          gd::String::From(uniqueId) + ");\n";
             return outputCode;
           });
 

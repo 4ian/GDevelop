@@ -435,7 +435,7 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
   InsertUnique(includesFiles, "runtimegame.js");
   InsertUnique(includesFiles, "variable.js");
   InsertUnique(includesFiles, "variablescontainer.js");
-  InsertUnique(includesFiles, "eventscontext.js");
+  InsertUnique(includesFiles, "oncetriggers.js");
   InsertUnique(includesFiles, "runtimebehavior.js");
   InsertUnique(includesFiles, "spriteruntimeobject.js");
 

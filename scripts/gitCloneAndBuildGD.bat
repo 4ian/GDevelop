@@ -1,3 +1,5 @@
+@echo off
+
 REM ===============================================================
 REM This Windows batch script downloads Gdevelop from the master branch, builds the newIde and launches it.
 REM
@@ -6,7 +8,6 @@ REM If Gdevelop is already built, the script will simply launch it.
 REM ===============================================================
 echo This will clone, install, and launch GDevelop development version. Please make sure you have git and Node.js installed.
 
-@echo off
 SET fork=4ian
 
 call git clone https://github.com/%fork%/GD.git

@@ -47,6 +47,13 @@ node node_modules\electron\cli.js app
 ./node_modules/electron/dist/electron app
 ```
 
+### Quick Install and Run
+
+There is a script file that automates cloning this repository, building the newIde and running it
+
+* For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GD/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GD to be cloned to, then simply run it.
+
+
 ### Development of UI components
 
 You can run a [storybook](https://github.com/storybooks/storybook) that is used as a playground for rapid UI component development and testing:

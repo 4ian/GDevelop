@@ -7,6 +7,7 @@ import { linkTo } from '@storybook/addon-links';
 
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
+import HelpIcon from '../UI/HelpIcon';
 import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
@@ -91,6 +92,11 @@ import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
 import { I18nextProvider } from 'react-i18next';
+import PlaceholderMessage from '../UI/PlaceholderMessage';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
+import InlineCheckbox from '../UI/InlineCheckbox';
+import LoaderModal from '../UI/LoaderModal';
+import ColorField from '../UI/ColorField';
 import i18n from '../UI/i18n';
 
 const gd = global.gd;
@@ -116,7 +122,75 @@ storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
 ));
 
-storiesOf('Tabs', module)
+storiesOf('UI Building Blocks/LoaderModal', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <LoaderModal show />);
+
+storiesOf('UI Building Blocks/InlineCheckbox', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <div style={{ display: 'flex' }}>
+      <InlineCheckbox label={'My label'} checked={true} />
+      <InlineCheckbox label={'My label 2'} checked={false} />
+    </div>
+  ));
+
+storiesOf('UI Building Blocks/PlaceholderMessage', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <PlaceholderMessage>
+      <p>
+        Neque porro quisquam est qui dolorem ipsum quia dolor sit amet,
+        consectetur, adipisci velit
+      </p>
+    </PlaceholderMessage>
+  ));
+
+storiesOf('UI Building Blocks/PlaceholderLoader', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <PlaceholderLoader />);
+
+storiesOf('UI Building Blocks/DragHandle', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <DragHandle />);
+
+storiesOf('UI Building Blocks/ColorField', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <div>
+      <ColorField
+        floatingLabelText="Particles start color"
+        disableAlpha
+        fullWidth
+        color={{
+          r: 100,
+          g: 100,
+          b: 200,
+          a: 255,
+        }}
+        onChangeComplete={() => {}}
+      />
+      <ColorField
+        floatingLabelText="This is not full width"
+        disableAlpha
+        color={{
+          r: 100,
+          g: 100,
+          b: 200,
+          a: 255,
+        }}
+        onChangeComplete={() => {}}
+      />
+    </div>
+  ));
+
+storiesOf('UI Building Blocks/Tabs', module)
   .addDecorator(muiDecorator)
   .add('3 tabs', () => (
     <div style={{ height: 400, display: 'flex' }}>
@@ -197,9 +271,13 @@ storiesOf('Tabs', module)
     </div>
   ));
 
-storiesOf('HelpButton', module)
+storiesOf('UI Building Blocks/HelpButton', module)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpButton helpPagePath="/test" />);
+
+storiesOf('UI Building Blocks/HelpIcon', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => <HelpIcon helpPagePath="/test" />);
 
 storiesOf('HelpFinder', module)
   .addDecorator(muiDecorator)
@@ -665,11 +743,6 @@ storiesOf('CreateProjectDialog', module)
 storiesOf('LayoutChooserDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LayoutChooserDialog open project={project} />);
-
-storiesOf('DragHandle', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <DragHandle />);
 
 storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)

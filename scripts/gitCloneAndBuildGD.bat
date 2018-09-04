@@ -18,5 +18,5 @@ call npm install
 cd ../app
 start cmd /k npm start
 cd ../electron-app
-TIMEOUT /T 20
+TIMEOUT /T 40
 call node node_modules\electron\cli.js app

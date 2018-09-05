@@ -210,7 +210,7 @@ export default class CollisionMasksEditor extends Component {
             <CollisionMasksPreview
               isDefaultBoundingBox={sprite.isCollisionMaskAutomatic()}
               polygons={sprite.getCustomCollisionMask()}
-              onVertexMoved={this._updateCollisionMasks}
+              onPolygonsUpdated={this._updateCollisionMasks}
             />
           )}
         </ImagePreview>

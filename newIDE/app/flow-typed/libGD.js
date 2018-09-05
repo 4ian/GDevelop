@@ -37,6 +37,7 @@ declare type gdSpriteObject = EmscriptenObject;
 declare type gdSprite = EmscriptenObject;
 declare type gdDirection = EmscriptenObject;
 declare type gdAnimation = EmscriptenObject;
+declare type gdPoint = EmscriptenObject;
 
 declare type gdVectorEventsSearchResult = EmscriptenObject;
 declare type gdMapStringPropertyDescriptor = EmscriptenObject;

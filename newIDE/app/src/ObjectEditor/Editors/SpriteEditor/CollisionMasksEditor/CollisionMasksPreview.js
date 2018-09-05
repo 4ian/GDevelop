@@ -20,7 +20,7 @@ type Props = {|
   isDefaultBoundingBox: boolean,
   imageWidth: number,
   imageHeight: number,
-  onVertexMoved: () => void,
+  onPolygonsUpdated: () => void,
 |};
 
 type State = {|
@@ -36,18 +36,6 @@ export default class CollisionMasksPreview extends React.Component<
     draggedVertex: null,
   };
 
-  _onEndDragVertex = () => {
-    const draggingWasDone = !!this.state.draggedVertex;
-    this.setState(
-      {
-        draggedVertex: null,
-      },
-      () => {
-        if (draggingWasDone) this.props.onVertexMoved();
-      }
-    );
-  };
-
   _onStartDragVertex = (draggedVertex: gdVector2f) => {
     if (this.state.draggedVertex) return;
 
@@ -56,15 +44,34 @@ export default class CollisionMasksPreview extends React.Component<
     });
   };
 
+  _onEndDragVertex = () => {
+    const draggingWasDone = !!this.state.draggedVertex;
+    this.setState(
+      {
+        draggedVertex: null,
+      },
+      () => {
+        if (draggingWasDone) this.props.onPolygonsUpdated();
+      }
+    );
+  };
+
+  /**
+   * Move a vertex with the mouse. A similar dragging implementation is done in
+   * PointsPreview (but with div and img elements).
+   * 
+   * If custom zoom is added, this should be adapted to properly set vertex coordinates.
+   * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
+   */
   _onMouseMove = (event: any) => {
     const { draggedVertex } = this.state;
     if (!draggedVertex) return;
 
-    var pointOnScreen = this._svg.createSVGPoint();
+    const pointOnScreen = this._svg.createSVGPoint();
     pointOnScreen.x = event.clientX;
     pointOnScreen.y = event.clientY;
-    var screenToSvgMatrix = this._svg.getScreenCTM().inverse();
-    var pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
+    const screenToSvgMatrix = this._svg.getScreenCTM().inverse();
+    const pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
 
     draggedVertex.set_x(pointOnSvg.x);
     draggedVertex.set_y(pointOnSvg.y);

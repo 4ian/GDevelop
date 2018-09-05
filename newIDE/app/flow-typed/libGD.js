@@ -31,6 +31,8 @@ declare type gdVariablesContainer = EmscriptenObject;
 
 declare type gdVectorPolygon2d = EmscriptenObject;
 
+declare type gdVector2f = EmscriptenObject;
+
 declare type gdSpriteObject = EmscriptenObject;
 declare type gdSprite = EmscriptenObject;
 declare type gdDirection = EmscriptenObject;

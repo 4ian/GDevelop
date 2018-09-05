@@ -10,6 +10,9 @@ const styles = {
     width: '100%',
     height: '100%',
   },
+  vertexCircle: {
+    cursor: 'move',
+  },
 };
 
 type Props = {|
@@ -17,12 +20,57 @@ type Props = {|
   isDefaultBoundingBox: boolean,
   imageWidth: number,
   imageHeight: number,
+  onVertexMoved: () => void,
+|};
+
+type State = {|
+  draggedVertex: ?gdVector2f,
 |};
 
 export default class CollisionMasksPreview extends React.Component<
   Props,
-  void
+  State
 > {
+  _svg: any;
+  state = {
+    draggedVertex: null,
+  };
+
+  _onEndDragVertex = () => {
+    const draggingWasDone = !!this.state.draggedVertex;
+    this.setState(
+      {
+        draggedVertex: null,
+      },
+      () => {
+        if (draggingWasDone) this.props.onVertexMoved();
+      }
+    );
+  };
+
+  _onStartDragVertex = (draggedVertex: gdVector2f) => {
+    if (this.state.draggedVertex) return;
+
+    this.setState({
+      draggedVertex,
+    });
+  };
+
+  _onMouseMove = (event: any) => {
+    const { draggedVertex } = this.state;
+    if (!draggedVertex) return;
+
+    var pointOnScreen = this._svg.createSVGPoint();
+    pointOnScreen.x = event.clientX;
+    pointOnScreen.y = event.clientY;
+    var screenToSvgMatrix = this._svg.getScreenCTM().inverse();
+    var pointOnSvg = pointOnScreen.matrixTransform(screenToSvgMatrix);
+
+    draggedVertex.set_x(pointOnSvg.x);
+    draggedVertex.set_y(pointOnSvg.y);
+    this.forceUpdate();
+  };
+
   _renderBoundingBox() {
     const { imageWidth, imageHeight } = this.props;
 
@@ -62,12 +110,14 @@ export default class CollisionMasksPreview extends React.Component<
           const vertices = polygon.getVertices();
           return mapVector(vertices, (vertex, j) => (
             <circle
+              onMouseDown={event => this._onStartDragVertex(vertex)}
               key={`polygon-${i}-vertex-${j}`}
-              fill="rgba(255,0,0,0.5)"
+              fill="rgba(255,0,0,0.75)"
               strokeWidth={1}
               cx={vertex.get_x()}
               cy={vertex.get_y()}
-              r={3}
+              r={5}
+              style={styles.vertexCircle}
             />
           ));
         })}
@@ -80,9 +130,12 @@ export default class CollisionMasksPreview extends React.Component<
 
     return (
       <svg
+        onMouseMove={this._onMouseMove}
+        onMouseUp={this._onEndDragVertex}
         width={this.props.imageWidth}
         height={this.props.imageHeight}
         style={styles.svg}
+        ref={svg => (this._svg = svg)}
       >
         {isDefaultBoundingBox && this._renderBoundingBox()}
         {!isDefaultBoundingBox && this._renderPolygons()}

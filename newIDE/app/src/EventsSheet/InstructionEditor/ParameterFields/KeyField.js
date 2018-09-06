@@ -151,6 +151,7 @@ export default class KeyField extends Component<ParameterFieldProps, State> {
           } else if (typeof data.value === 'string') {
             this.props.onChange(data.value);
           }
+          this.focus(); // Keep the focus after choosing an item
         }}
         dataSource={this._keyNames.map(keyName => ({
           text: keyName,

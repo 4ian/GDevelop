@@ -100,6 +100,7 @@ export default class ExternalEventsField extends Component<
           } else if (typeof data.value === 'string') {
             this.props.onChange(data.value);
           }
+          this.focus(); // Keep the focus after choosing an item
         }}
         dataSource={this._fullList}
         openOnFocus={!this.props.isInline}

@@ -98,6 +98,7 @@ export default class ObjectSelector extends Component {
           } else if (typeof data.value === 'string') {
             onChoose(data.value);
           }
+          this.focus(); // Keep the focus after choosing an item
         }}
         dataSource={this.fullList}
         ref={field => (this._field = field)}

@@ -856,18 +856,20 @@ storiesOf('SearchPanel', module)
 
 storiesOf('ExpressionSelector', module)
   .addDecorator(muiDecorator)
-  .add('number', () => (
+  .add('number (with focusOnMount)', () => (
     <ExpressionSelector
       selectedType=""
       expressionType="number"
       onChoose={action('Expression chosen')}
+      focusOnMount
     />
   ))
-  .add('string', () => (
+  .add('string (with focusOnMount)', () => (
     <ExpressionSelector
       selectedType=""
       expressionType="string"
       onChoose={action('(String) Expression chosen')}
+      focusOnMount
     />
   ));
 

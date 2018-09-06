@@ -22,7 +22,9 @@ class ThemableInstructionOrExpressionSelector extends Component {
   };
 
   componentDidMount() {
-    this._searchBar.focus();
+    if (this.props.focusOnMount) {
+      this._searchBar.focus();
+    }
   }
 
   focus = () => {

@@ -44,6 +44,7 @@ export default class InstructionEditor extends Component {
           isCondition={isCondition}
           selectedType={instruction.getType()}
           onChoose={this.chooseType}
+          focusOnMount={!instruction.getType()}
         />
         <Paper style={styles.parametersEditor} rounded={false} zDepth={2}>
           <InstructionParametersEditor
@@ -56,6 +57,7 @@ export default class InstructionEditor extends Component {
             resourceExternalEditors={this.props.resourceExternalEditors}
             ref={instructionParametersEditor =>
               (this._instructionParametersEditor = instructionParametersEditor)}
+            focusOnMount={instruction.getType()}
           />
         </Paper>
       </div>

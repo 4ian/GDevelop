@@ -222,6 +222,7 @@ export default class ExpressionField extends Component<*, State> {
                   this._handleExpressionChosen(expression);
                 }}
                 expressionType={expressionType}
+                focusOnMount
               />
             </Popover>
           )}

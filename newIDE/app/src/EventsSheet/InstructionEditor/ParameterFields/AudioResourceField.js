@@ -8,8 +8,10 @@ export default class AudioResourceField extends Component<
   ParameterFieldProps,
   void
 > {
+  _field: ?ResourceSelector;
+
   focus() {
-    // TODO
+    if (this._field) this._field.focus();
   }
 
   render() {
@@ -36,6 +38,7 @@ export default class AudioResourceField extends Component<
         initialResourceName={this.props.value}
         onChange={this.props.onChange}
         floatingLabelText="Choose the audio file to use"
+        ref={field => this._field = field}
       />
     );
   }

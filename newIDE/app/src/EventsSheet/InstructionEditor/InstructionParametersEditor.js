@@ -37,12 +37,41 @@ const styles = {
 };
 
 export default class InstructionParametersEditor extends Component {
-  _getNonCodeOnlyParametersCount(instructionMetadata) {
+  _firstVisibleField: ?any = {};
+
+  focus() {
+    // Verify that there is a field to focus.
+    if (this._getNonCodeOnlyParametersCount(this._getInstructionMetadata()) !== 0) {
+      if (this._firstVisibleField && this._firstVisibleField.focus) {
+        this._firstVisibleField.focus();
+      }
+    }
+  }
+
+  _getNonCodeOnlyParametersCount(instructionMetadata: ?gdInstructionMetadata) {
+    if (!instructionMetadata) return 0;
+
     return mapFor(0, instructionMetadata.getParametersCount(), i => {
       const parameterMetadata = instructionMetadata.getParameter(i);
       return !parameterMetadata.isCodeOnly();
     }).filter(isVisible => isVisible).length;
   }
+
+  _getInstructionMetadata = (): ?gdInstructionMetadata => {
+    const { instruction, isCondition, project } = this.props;
+    const type = instruction.getType();
+    if (!type) return null;
+
+    return isCondition
+      ? gd.MetadataProvider.getConditionMetadata(
+          project.getCurrentPlatform(),
+          type
+        )
+      : gd.MetadataProvider.getActionMetadata(
+          project.getCurrentPlatform(),
+          type
+        );
+  };
 
   _renderEmpty() {
     return (
@@ -57,24 +86,18 @@ export default class InstructionParametersEditor extends Component {
   }
 
   render() {
-    const { instruction, isCondition, project, layout } = this.props;
-    const type = instruction.getType();
-    if (!type) return this._renderEmpty();
+    const { instruction, project, layout } = this.props;
 
-    const instructionMetadata = isCondition
-      ? gd.MetadataProvider.getConditionMetadata(
-          project.getCurrentPlatform(),
-          type
-        )
-      : gd.MetadataProvider.getActionMetadata(
-          project.getCurrentPlatform(),
-          type
-        );
+    const type = instruction.getType();
+    const instructionMetadata = this._getInstructionMetadata();
+    if (!instructionMetadata) return this._renderEmpty();
+
     const helpPage = instructionMetadata.getHelpPath();
 
     //TODO?
     instruction.setParametersCount(instructionMetadata.getParametersCount());
 
+    let parameterFieldIndex = 0;
     return (
       <div style={styles.container}>
         <div style={styles.instructionHeader}>
@@ -103,6 +126,11 @@ export default class InstructionParametersEditor extends Component {
               return null;
             }
 
+            // Track the field count on screen, to affect the ref to the
+            // first visible field.
+            const isFirstVisibleParameterField = parameterFieldIndex === 0;
+            parameterFieldIndex++;
+
             return (
               <ParameterComponent
                 parameterMetadata={parameterMetadata}
@@ -119,6 +147,11 @@ export default class InstructionParametersEditor extends Component {
                 resourceSources={this.props.resourceSources}
                 onChooseResource={this.props.onChooseResource}
                 resourceExternalEditors={this.props.resourceExternalEditors}
+                ref={field => {
+                  if (isFirstVisibleParameterField) {
+                    this._firstVisibleField = field;
+                  }
+                }}
               />
             );
           })}

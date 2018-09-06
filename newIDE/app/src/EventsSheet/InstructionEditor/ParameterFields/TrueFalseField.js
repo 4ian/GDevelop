@@ -14,7 +14,7 @@ const styles = {
   },
 };
 
-export default class DefaultField extends Component {
+export default class TrueFalseField extends Component {
   focus() {}
 
   render() {

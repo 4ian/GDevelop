@@ -22,6 +22,18 @@ const styles = {
 };
 
 export default class InstructionEditor extends Component {
+  _instructionParametersEditor: ?InstructionParametersEditor;
+
+  chooseType = (type: string) => {
+    const { instruction } = this.props;
+    instruction.setType(type);
+    this.forceUpdate(() => {
+      if (this._instructionParametersEditor) {
+        this._instructionParametersEditor.focus();
+      }
+    });
+  };
+
   render() {
     const { instruction, isCondition, project, layout } = this.props;
 
@@ -31,10 +43,7 @@ export default class InstructionEditor extends Component {
           style={styles.typeSelector}
           isCondition={isCondition}
           selectedType={instruction.getType()}
-          onChoose={type => {
-            instruction.setType(type);
-            this.forceUpdate();
-          }}
+          onChoose={this.chooseType}
         />
         <Paper style={styles.parametersEditor} rounded={false} zDepth={2}>
           <InstructionParametersEditor
@@ -45,6 +54,8 @@ export default class InstructionEditor extends Component {
             resourceSources={this.props.resourceSources}
             onChooseResource={this.props.onChooseResource}
             resourceExternalEditors={this.props.resourceExternalEditors}
+            ref={instructionParametersEditor =>
+              (this._instructionParametersEditor = instructionParametersEditor)}
           />
         </Paper>
       </div>

@@ -65,6 +65,11 @@ export default class ResourceSelector extends React.Component<Props, State> {
   allResourcesNames: Array<string>;
   defaultItems: Array<AutoCompleteItem>;
   autoCompleteData: ?Array<AutoCompleteItem>;
+  _autoComplete: ?AutoComplete;
+
+  focus() {
+    if (this._autoComplete) this._autoComplete.focus();
+  }
 
   componentWillReceiveProps(nextProps: Props) {
     if (nextProps.initialResourceName !== this.props.initialResourceName) {
@@ -204,6 +209,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
           searchText={this.state.resourceName}
           fullWidth={this.props.fullWidth}
           style={styles.autoComplete}
+          ref={autoComplete => this._autoComplete = autoComplete}
         />
         {!!externalEditors.length && (
           <IconMenu

@@ -7,14 +7,14 @@
 
 gdjs.deviceSensors = {
   orientation: {
-    _isActive: 0,
+    _isActive: false,
     _absolute: 0,
     _alpha: 0,
     _beta: 0,
     _gamma: 0
   },
   motion: {
-    _isActive: 0,
+    _isActive: false,
     _rotationAlpha: 0,
     _rotationBeta: 0,
     _rotationGamma: 0,
@@ -30,7 +30,7 @@ gdjs.deviceSensors = {
  */
 gdjs.deviceSensors.orientation._activateOrientationListener = function() {
   window.addEventListener("deviceorientation", gdjs.deviceSensors.orientation._handleOrientation, true);
-  gdjs.deviceSensors.orientation._isActive = 1;
+  gdjs.deviceSensors.orientation._isActive = true;
 }
 
  /**
@@ -39,7 +39,7 @@ gdjs.deviceSensors.orientation._activateOrientationListener = function() {
  */
 gdjs.deviceSensors.orientation._deactivateOrientationListener = function() {
   window.removeEventListener('deviceorientation', gdjs.deviceSensors.orientation._handleOrientation, true);
-  gdjs.deviceSensors.orientation._isActive = 0;
+  gdjs.deviceSensors.orientation._isActive = false;
 }
 
  /**
@@ -114,7 +114,7 @@ gdjs.deviceSensors.orientation.getOrientationGamma = function() {
  */
 gdjs.deviceSensors.motion._activateMotionListener = function() {
   window.addEventListener("devicemotion", gdjs.deviceSensors.motion._handleMotion, true);
-  gdjs.deviceSensors.motion._isActive = 1;
+  gdjs.deviceSensors.motion._isActive = true;
 }
 
  /**
@@ -123,7 +123,7 @@ gdjs.deviceSensors.motion._activateMotionListener = function() {
  */
 gdjs.deviceSensors.motion._deactivateMotionListener = function() {
   window.removeEventListener('devicemotion', gdjs.deviceSensors.motion._handleMotion, true);
-  gdjs.deviceSensors.motion._isActive = 0;
+  gdjs.deviceSensors.motion._isActive = false;
 }
 
  /**

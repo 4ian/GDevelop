@@ -135,19 +135,6 @@ module.exports = {
 
     extension
       .addExpression(
-        "OrientationActive",
-        t("Sensor Active"),
-        t("The expression is true if the device orientation sensor is currently active"),
-        t("Sensors/Orientation")
-      )
-      .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
-      .setFunctionName("gdjs.deviceSensors.orientation.isActive");
-
-    extension
-      .addExpression(
         "OrientationAbsolute",
         t("Is Absolute"),
         t("Get if the devices orientation is absolute and not relative"),
@@ -229,7 +216,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_rotation_alpha32.png"
       )
       .addParameter("relationalOperator", t("Sign of the test"))
-      .addParameter("expression", t("Value"))
+      .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
@@ -249,7 +236,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_rotation_beta32.png"
       )
       .addParameter("relationalOperator", t("Sign of the test"))
-      .addParameter("expression", t("Value"))
+      .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
@@ -269,7 +256,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_rotation_gamma32.png"
       )
       .addParameter("relationalOperator", t("Sign of the test"))
-      .addParameter("expression", t("Value"))
+      .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
@@ -281,7 +268,7 @@ module.exports = {
         "AccelerationX",
         t("Compare the value of acceleration on X-axis"),
         t(
-          "Compare the value of acceleration on the X-axis."
+          "Compare the value of acceleration on the X-axis (m/s²)."
         ),
         t("Acceleration X is _PARAM0__PARAM1_"),
         t("Sensors/Motion"),
@@ -289,7 +276,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_acceleration_x32.png"
       )
       .addParameter("relationalOperator", t("Sign of the test"))
-      .addParameter("expression", t("Value"))
+      .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
@@ -301,7 +288,7 @@ module.exports = {
         "AccelerationY",
         t("Compare the value of acceleration on Y-axis"),
         t(
-          "Compare the value of acceleration on the Y-axis."
+          "Compare the value of acceleration on the Y-axis (m/s²)."
         ),
         t("Acceleration Y is _PARAM0__PARAM1_"),
         t("Sensors/Motion"),
@@ -309,7 +296,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_acceleration_y32.png"
       )
       .addParameter("relationalOperator", t("Sign of the test"))
-      .addParameter("expression", t("Value"))
+      .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
@@ -321,7 +308,7 @@ module.exports = {
         "AccelerationZ",
         t("Compare the value of acceleration on Z-axis"),
         t(
-          "Compare the value of acceleration on the Z-axis."
+          "Compare the value of acceleration on the Z-axis (m/s²)."
         ),
         t("Acceleration Z is _PARAM0__PARAM1_"),
         t("Sensors/Motion"),
@@ -329,7 +316,7 @@ module.exports = {
         "JsPlatform/Extensions/motion_acceleration_z32.png"
       )
       .addParameter("relationalOperator", t("Sign of the test"))
-      .addParameter("expression", t("Value"))
+      .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/DeviceSensors/devicesensortools.js"
@@ -367,19 +354,6 @@ module.exports = {
         "Extensions/DeviceSensors/devicesensortools.js"
       )
       .setFunctionName("gdjs.deviceSensors.motion.deactivateMotionSensor");
-
-    extension
-      .addExpression(
-        "MotionActive",
-        t("Sensor Active"),
-        t("The expression is true if the device motion sensor is currently active"),
-        t("Sensors/Motion")
-      )
-      .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
-      .setFunctionName("gdjs.deviceSensors.motion.isActive");
 
     extension
       .addExpression(
@@ -424,7 +398,7 @@ module.exports = {
       .addExpression(
         "AccelerationX",
         t("Acceleration X value"),
-        t("Get the devices acceleration on the X-axis"),
+        t("Get the devices acceleration on the X-axis (m/s²)"),
         t("Sensors/Motion")
       )
       .getCodeExtraInformation()
@@ -437,7 +411,7 @@ module.exports = {
       .addExpression(
         "AccelerationY",
         t("Acceleration Y value"),
-        t("Get the devices acceleration on the Y-axis"),
+        t("Get the devices acceleration on the Y-axis (m/s²)"),
         t("Sensors/Motion")
       )
       .getCodeExtraInformation()
@@ -450,7 +424,7 @@ module.exports = {
       .addExpression(
         "AccelerationZ",
         t("Acceleration Z value"),
-        t("Get the devices acceleration on the Z-axis"),
+        t("Get the devices acceleration on the Z-axis (m/s²)"),
         t("Sensors/Motion")
       )
       .getCodeExtraInformation()

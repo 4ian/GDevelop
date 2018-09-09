@@ -68,7 +68,8 @@ const contributors = [
   },
 
   // Community members:
-  { name: 'ddabrahim', description: 'Lots of examples bundled with GDevelop' },
+  { name: 'ddabrahim', description: 'Lots of examples bundled with GDevelop', link: 'https://gametemplates.itch.io/', },
+  { name: 'Gametemplates', description: 'Examples bundled with GDevelop', link: 'https://gametemplates.itch.io/', },
   { name: 'Mats', description: 'Tutorials, Examples' },
   { name: 'erdo', description: 'Tutorials, Examples' },
   { name: 'Jubileuksen3', description: 'Tutorials, Examples' },

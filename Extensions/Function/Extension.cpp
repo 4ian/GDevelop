@@ -63,7 +63,9 @@ class Extension : public ExtensionBase {
           gd::String functionName =
               instruction.GetParameter(0).GetPlainString();
 
-          if (!codeGenerator.HasProjectAndLayout()) return "/*Function generation not supported without layout*/";
+          if (!codeGenerator.HasProjectAndLayout()) {
+              return gd::String("/*Function generation not supported without layout*/");
+          }
 
           const gd::Project& project = codeGenerator.GetProject();
           const gd::Layout& layout = codeGenerator.GetLayout();

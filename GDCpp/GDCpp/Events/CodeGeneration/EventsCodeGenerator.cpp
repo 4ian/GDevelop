@@ -194,7 +194,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
 
   // Verify that object has behavior.
   vector<gd::String> behaviors =
-      gd::GetBehaviorsOfObject(GetGlobalObjectAndGroups(), GetObjectAndGroups(), objectName);
+      gd::GetBehaviorsOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Bad behavior requested" << endl;
@@ -326,7 +326,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
 
   // Verify that object has behavior.
   vector<gd::String> behaviors =
-      gd::GetBehaviorsOfObject(GetGlobalObjectAndGroups(), GetObjectAndGroups(), objectName);
+      gd::GetBehaviorsOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Bad behavior requested for an action" << endl;

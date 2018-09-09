@@ -264,7 +264,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
                            gd::EventsCodeGenerator& codeGenerator,
                            gd::EventsCodeGenerationContext& context) {
         if (!codeGenerator.HasProjectAndLayout()) {
-            return "/*Link not supported when generating code without a layout*/"
+            return gd::String("/*Link not supported when generating code without a layout*/");
         };
         gd::LinkEvent& event = dynamic_cast<gd::LinkEvent&>(event_);
 

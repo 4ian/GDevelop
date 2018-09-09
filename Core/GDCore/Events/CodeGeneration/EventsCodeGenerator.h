@@ -393,14 +393,14 @@ class GD_CORE_API EventsCodeGenerator {
    *
    * Example: "gdjs.something."
    */
-  virtual gd::String GetCodeNamespaceAccessor();
+  virtual gd::String GetCodeNamespaceAccessor() { return ""; };
 
   /**
    * \brief Get the namespace to be used to store code generated objects/values/functions.
    *
    * Example: "gdjs.something"
    */
-  virtual gd::String GetCodeNamespace();
+  virtual gd::String GetCodeNamespace() { return ""; };
  protected:
   /**
    * \brief Generate the code for a single parameter.

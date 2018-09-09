@@ -56,5 +56,5 @@ export const StripeCheckoutConfig = {
     ? 'pk_test_4N7HfDWDds6ejCkxVM7fvvLr'
     : 'pk_live_4N7H3nYlkZV4ylpKlzhmM8fN',
   image:
-    'https://raw.githubusercontent.com/4ian/GD/gh-pages/res/icon128linux.png',
+    'https://raw.githubusercontent.com/4ian/GDevelop/gh-pages/res/icon128linux.png',
 };

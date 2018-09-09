@@ -105,7 +105,7 @@ export default class LocalExamples extends React.Component<Props, State> {
   I confirm that any assets can be used freely by anybody, including for commercial usage.
   `;
     Window.openExternalURL(
-      `https://github.com/4ian/GD/issues/new?body=${encodeURIComponent(
+      `https://github.com/4ian/GDevelop/issues/new?body=${encodeURIComponent(
         body
       )}&title=New%20example`
     );

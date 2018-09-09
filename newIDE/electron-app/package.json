@@ -6,7 +6,7 @@
   "author": "Florian Rival",
   "license": "MIT",
   "homepage": "http://gdevelop-app.com",
-  "repository": "github:4ian/GD",
+  "repository": "github:4ian/GDevelop",
   "private": true,
   "scripts": {
     "postinstall": "cd app && npm install",

@@ -151,7 +151,7 @@ const buildMainMenuFor = window => {
       {
         label: 'Create extensions for GDevelop',
         click() {
-          electron.shell.openExternal('https://github.com/4ian/GD/blob/master/newIDE/README-extensions.md');
+          electron.shell.openExternal('https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md');
         },
       },
     ],

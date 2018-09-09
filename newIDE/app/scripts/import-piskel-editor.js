@@ -23,7 +23,7 @@ if (shell.test('-d', '../public/External/Piskel/piskel-editor')) {
 
   var file = fs.createWriteStream(zipFilePath);
   https.get(
-    'https://github.com/4ian/GD/releases/download/v5.0.0-beta34/piskel-editor.zip',
+    'https://github.com/4ian/GDevelop/releases/download/v5.0.0-beta34/piskel-editor.zip',
     function(response) {
       if (response.statusCode !== 200) {
         shell.echo(

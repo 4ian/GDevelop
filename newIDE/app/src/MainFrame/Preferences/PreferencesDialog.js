@@ -22,7 +22,7 @@ type State = {||};
 export default class PreferencesDialog extends Component<Props, State> {
   createTheme() {
     Window.openExternalURL(
-      'https://github.com/4ian/GD/tree/master/newIDE#theming'
+      'https://github.com/4ian/GDevelop/tree/master/newIDE#theming'
     );
   }
 

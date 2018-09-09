@@ -32,19 +32,13 @@
 
     <!-- GDevelop.js core -->
     <script>
-      //Ensure module is not defined to avoid libraries to think
-      //that they are in a CommonJS environment (useful when using Electron).
+      //Ensure module is not defined to avoid GDevelop.js to think
+      //that it is in a CommonJS environment (useful when using Electron).
       if (typeof module !== "undefined") module = undefined;
+
+      //It will include itself into global.gd
     </script>
     <script src="%PUBLIC_URL%/libGD.js"></script>
-    <script>
-      //Always inject gd into the global namespace, even on environment with
-      //CommonJS support (Electron)
-      if (typeof global !== 'undefined' && !global.gd) {
-        const name = './libGD.js';
-        global.gd = require(name)();
-      }
-    </script>
 
     <!-- Stripe.com Checkout -->
     <script src="https://checkout.stripe.com/checkout.js"></script>

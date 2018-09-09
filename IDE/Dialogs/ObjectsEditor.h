@@ -208,7 +208,7 @@ private:
     void OnMenuAddBehaviorSelected(wxCommandEvent& event);
     //*)
     void OnHelpSelected(wxCommandEvent& event);
-    wxTreeItemId AddObjectsToList(gd::ClassWithObjects & objects, bool globalObject);
+    wxTreeItemId AddObjectsToList(gd::ObjectsContainer & objects, bool globalObject);
     wxTreeItemId AddGroupsToList(std::vector <gd::ObjectGroup> & groups, bool globalGroup);
     void UpdateGroup(wxTreeItemId groupItem);
     gd::Object * GetSelectedObject();

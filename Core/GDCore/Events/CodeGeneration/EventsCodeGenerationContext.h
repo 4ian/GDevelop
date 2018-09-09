@@ -10,9 +10,6 @@
 #include <memory>
 #include <set>
 #include "GDCore/String.h"
-namespace gd {
-class Layout;
-}
 
 namespace gd {
 

@@ -17,14 +17,8 @@
 class wxBitmap;
 namespace gd {
 class EventsList;
-}
-namespace gd {
 class BaseEvent;
-}
-namespace gd {
 class EventsCodeGenerator;
-}
-namespace gd {
 class EventsCodeGenerationContext;
 }
 

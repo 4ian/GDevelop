@@ -44,6 +44,33 @@ class GD_CORE_API ParameterMetadata {
   const gd::String &GetType() const { return type; }
 
   /**
+   * \brief Set the type of the parameter.
+   */
+  ParameterMetadata &SetType(const gd::String &type_) {
+    type = type_;
+    return *this;
+  }
+
+  /**
+   * \brief Return the name of the parameter.
+   * 
+   * Name is optional, and won't be filled for most parameters of extensions.
+   * It is useful when generating a function from events, where parameters must be named.
+   */
+  const gd::String &GetName() const { return name; }
+
+  /**
+   * \brief Set the name of the parameter.
+   * 
+   * Name is optional, and won't be filled for most parameters of extensions.
+   * It is useful when generating a function from events, where parameters must be named.
+   */
+  ParameterMetadata &SetName(const gd::String &name_) {
+    name = name_;
+    return *this;
+  }
+
+  /**
    * \brief Return an optional additional information, used for some parameters
    * with special type (For example, it can contains the type of object accepted
    * by the parameter).
@@ -51,14 +78,40 @@ class GD_CORE_API ParameterMetadata {
   const gd::String &GetExtraInfo() const { return supplementaryInformation; }
 
   /**
+   * \brief Set an optional additional information, used for some parameters
+   * with special type (For example, it can contains the type of object accepted
+   * by the parameter).
+   */
+  ParameterMetadata &SetExtraInfo(const gd::String &supplementaryInformation_) {
+    supplementaryInformation = supplementaryInformation_;
+    return *this;
+  }
+
+  /**
    * \brief Return true if the parameter is optional.
    */
   bool IsOptional() const { return optional; }
 
   /**
+   * \brief Set if the parameter is optional.
+   */
+  ParameterMetadata &SetOptional(bool optional_ = true) {
+    optional = optional_;
+    return *this;
+  }
+
+  /**
    * \brief Return the description of the parameter
    */
   const gd::String &GetDescription() const { return description; }
+
+  /**
+   * \brief Set the description of the parameter.
+   */
+  ParameterMetadata &SetDescription(const gd::String &description_) {
+    description = description_;
+    return *this;
+  }
 
   /**
    * \brief Return true if the parameter is only meant to be completed during
@@ -67,19 +120,26 @@ class GD_CORE_API ParameterMetadata {
   bool IsCodeOnly() const { return codeOnly; }
 
   /**
+   * \brief Set if the parameter is only meant to be completed during
+   * compilation and must not be displayed to the user.
+   */
+  ParameterMetadata &SetCodeOnly(bool codeOnly_ = true) {
+    codeOnly = codeOnly_;
+    return *this;
+  }
+
+  /**
    * \brief Get the default value for the parameter.
    */
   const gd::String &GetDefaultValue() const { return defaultValue; }
 
-  gd::String type;                      ///< Parameter type
-  gd::String supplementaryInformation;  ///< Used if needed
-  bool optional;                        ///< True if the parameter is optional
-
-  gd::String description;  ///< Description shown in editor
-  bool codeOnly;  ///< True if parameter is relative to code generation only,
-                  ///< i.e. must not be shown in editor
-  gd::String defaultValue;  ///< Used as a default value in editor or if an
-                            ///< optional parameter is empty.
+  /**
+   * \brief Set the default value, if the parameter is optional.
+   */
+  ParameterMetadata &SetDefaultValue(const gd::String &defaultValue_) {
+    defaultValue = defaultValue_;
+    return *this;
+  }
 
   /**
    * \brief Return true if the type of the parameter is "object", "objectPtr" or
@@ -106,6 +166,20 @@ class GD_CORE_API ParameterMetadata {
     }
     return false;
   }
+
+  // TODO: Deprecated public fields. Any direct using should be moved to
+  // getter/setter.
+  gd::String type;                      ///< Parameter type
+  gd::String supplementaryInformation;  ///< Used if needed
+  bool optional;                        ///< True if the parameter is optional
+
+  gd::String description;  ///< Description shown in editor
+  bool codeOnly;  ///< True if parameter is relative to code generation only,
+                  ///< i.e. must not be shown in editor
+  gd::String defaultValue;  ///< Used as a default value in editor or if an
+                            ///< optional parameter is empty.
+private:
+  gd::String name; ///< The name of the parameter to be used in code generation. Optional.
 };
 
 /**

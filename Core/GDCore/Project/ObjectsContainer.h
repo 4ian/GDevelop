@@ -3,18 +3,15 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_CLASSWITHOBJECTS_H
-#define GDCORE_CLASSWITHOBJECTS_H
+#ifndef GDCORE_OBJECTSCONTAINER_H
+#define GDCORE_OBJECTSCONTAINER_H
 #include <memory>
 #include <vector>
 #include "GDCore/String.h"
+#include "GDCore/Project/ObjectGroupsContainer.h"
 namespace gd {
 class Object;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class SerializerElement;
 }
 #undef GetObject  // Disable an annoying macro
@@ -35,13 +32,13 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API ClassWithObjects {
+class GD_CORE_API ObjectsContainer {
  public:
   /**
    * \brief Default constructor creating a container without any objects.
    */
-  ClassWithObjects();
-  virtual ~ClassWithObjects();
+  ObjectsContainer();
+  virtual ~ObjectsContainer();
 
   /** \name Objects management
    * Members functions related to objects management.
@@ -161,11 +158,31 @@ class GD_CORE_API ClassWithObjects {
                               const SerializerElement& element);
   ///@}
 
+  /** \name Objects groups management
+   * Members functions related to global objects groups management.
+   */
+  ///@{
+
+#if defined(GD_IDE_ONLY)
+  /**
+   * \brief Return a reference to the project's objects groups.
+   */
+  ObjectGroupsContainer& GetObjectGroups() { return objectGroups; }
+
+  /**
+   * \brief Return a const reference to the project's objects groups.
+   */
+  const ObjectGroupsContainer& GetObjectGroups() const { return objectGroups; }
+#endif
+
+  ///@}
+
  protected:
   std::vector<std::unique_ptr<gd::Object> >
       initialObjects;  ///< Objects contained.
+  gd::ObjectGroupsContainer objectGroups;
 };
 
 }  // namespace gd
 
-#endif  // GDCORE_CLASSWITHOBJECTS_H
+#endif  // GDCORE_OBJECTSCONTAINER_H

@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_CLASSWITHOBJECTS_H
-#define GDCORE_CLASSWITHOBJECTS_H
+#ifndef GDCORE_OBJECTSCONTAINER_H
+#define GDCORE_OBJECTSCONTAINER_H
 #include <memory>
 #include <vector>
 #include "GDCore/String.h"
@@ -18,7 +18,6 @@ class SerializerElement;
 
 namespace gd {
 
-//TODO: Rename to ObjectsContainer
 /**
  * \brief Used as a base class for classes that will own objects (see
  * gd::Object).
@@ -33,13 +32,13 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API ClassWithObjects {
+class GD_CORE_API ObjectsContainer {
  public:
   /**
    * \brief Default constructor creating a container without any objects.
    */
-  ClassWithObjects();
-  virtual ~ClassWithObjects();
+  ObjectsContainer();
+  virtual ~ObjectsContainer();
 
   /** \name Objects management
    * Members functions related to objects management.
@@ -186,4 +185,4 @@ class GD_CORE_API ClassWithObjects {
 
 }  // namespace gd
 
-#endif  // GDCORE_CLASSWITHOBJECTS_H
+#endif  // GDCORE_OBJECTSCONTAINER_H

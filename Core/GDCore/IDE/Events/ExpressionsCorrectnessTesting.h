@@ -40,8 +40,8 @@ namespace gd {
 class GD_CORE_API CallbacksForExpressionCorrectnessTesting
     : public gd::ParserCallbacks {
  public:
-  CallbacksForExpressionCorrectnessTesting(const gd::ClassWithObjects& project,
-                                           const gd::ClassWithObjects& layout);
+  CallbacksForExpressionCorrectnessTesting(const gd::ObjectsContainer& project,
+                                           const gd::ObjectsContainer& layout);
   virtual ~CallbacksForExpressionCorrectnessTesting(){};
 
   void OnConstantToken(gd::String text){};
@@ -55,17 +55,17 @@ class GD_CORE_API CallbacksForExpressionCorrectnessTesting
                                 const std::vector<gd::Expression>& parameters,
                                 const gd::ExpressionMetadata& expressionInfo){};
   bool OnSubMathExpression(const gd::Platform& platform,
-                           const gd::ClassWithObjects& project,
-                           const gd::ClassWithObjects& layout,
+                           const gd::ObjectsContainer& project,
+                           const gd::ObjectsContainer& layout,
                            gd::Expression& expression);
   bool OnSubTextExpression(const gd::Platform& platform,
-                           const gd::ClassWithObjects& project,
-                           const gd::ClassWithObjects& layout,
+                           const gd::ObjectsContainer& project,
+                           const gd::ObjectsContainer& layout,
                            gd::Expression& expression);
 
  private:
-  const gd::ClassWithObjects& project;
-  const gd::ClassWithObjects& layout;
+  const gd::ObjectsContainer& project;
+  const gd::ObjectsContainer& layout;
 };
 
 }  // namespace gd

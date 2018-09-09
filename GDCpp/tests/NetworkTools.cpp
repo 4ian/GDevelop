@@ -8,7 +8,7 @@
  */
 #include "GDCpp/Extensions/Builtin/NetworkTools.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCpp/Runtime/RuntimeGame.h"
 #include "GDCpp/Runtime/RuntimeScene.h"

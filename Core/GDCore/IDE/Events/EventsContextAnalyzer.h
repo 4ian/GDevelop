@@ -14,7 +14,7 @@
 namespace gd {
 class BaseEvent;
 class Platform;
-class ClassWithObjects;
+class ObjectsContainer;
 class Project;
 class Layout;
 class EventsList;
@@ -29,7 +29,7 @@ namespace gd {
  */
 class GD_CORE_API EventsContext {
  public:
-  EventsContext(gd::ClassWithObjects& project_, gd::ClassWithObjects& layout_)
+  EventsContext(gd::ObjectsContainer& project_, gd::ObjectsContainer& layout_)
       : project(project_), layout(layout_){};
   virtual ~EventsContext(){};
 
@@ -53,8 +53,8 @@ class GD_CORE_API EventsContext {
  private:
   std::set<gd::String> objectOrGroupNames;
   std::set<gd::String> objectNames;
-  gd::ClassWithObjects& project;
-  gd::ClassWithObjects& layout;
+  gd::ObjectsContainer& project;
+  gd::ObjectsContainer& layout;
 };
 
 /**
@@ -65,8 +65,8 @@ class GD_CORE_API EventsContext {
 class GD_CORE_API EventsContextAnalyzer : public ArbitraryEventsWorker {
  public:
   EventsContextAnalyzer(const gd::Platform& platform_,
-                        gd::ClassWithObjects& project_,
-                        gd::ClassWithObjects& layout_)
+                        gd::ObjectsContainer& project_,
+                        gd::ObjectsContainer& layout_)
       : platform(platform_),
         project(project_),
         layout(layout_),
@@ -79,8 +79,8 @@ class GD_CORE_API EventsContextAnalyzer : public ArbitraryEventsWorker {
   const EventsContext& GetEventsContext() { return context; }
 
   static void AnalyzeParameter(const gd::Platform& platform,
-                               const gd::ClassWithObjects& project,
-                               const gd::ClassWithObjects& layout,
+                               const gd::ObjectsContainer& project,
+                               const gd::ObjectsContainer& layout,
                                const gd::ParameterMetadata& metadata,
                                const gd::Expression& parameter,
                                EventsContext& context);
@@ -90,8 +90,8 @@ class GD_CORE_API EventsContextAnalyzer : public ArbitraryEventsWorker {
                                   bool isCondition);
 
   const gd::Platform& platform;
-  gd::ClassWithObjects& project;
-  gd::ClassWithObjects& layout;
+  gd::ObjectsContainer& project;
+  gd::ObjectsContainer& layout;
   EventsContext context;
 };
 

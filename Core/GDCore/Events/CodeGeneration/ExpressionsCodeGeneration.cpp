@@ -75,8 +75,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(
     gd::String functionName,
     const std::vector<gd::Expression>& parameters,
     const gd::ExpressionMetadata& expressionInfo) {
-  const gd::ClassWithObjects& globalObjectsAndGroups = codeGenerator.GetGlobalObjectsAndGroups();
-  const gd::ClassWithObjects& objectsAndGroups = codeGenerator.GetObjectsAndGroups();
+  const gd::ObjectsContainer& globalObjectsAndGroups = codeGenerator.GetGlobalObjectsAndGroups();
+  const gd::ObjectsContainer& objectsAndGroups = codeGenerator.GetObjectsAndGroups();
 
   codeGenerator.AddIncludeFiles(
       expressionInfo.codeExtraInformation.GetIncludeFiles());
@@ -129,8 +129,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectBehaviorFunction(
     gd::String functionName,
     const std::vector<gd::Expression>& parameters,
     const gd::ExpressionMetadata& expressionInfo) {
-  const gd::ClassWithObjects& globalObjectsAndGroups = codeGenerator.GetGlobalObjectsAndGroups();
-  const gd::ClassWithObjects& objectsAndGroups = codeGenerator.GetObjectsAndGroups();
+  const gd::ObjectsContainer& globalObjectsAndGroups = codeGenerator.GetGlobalObjectsAndGroups();
+  const gd::ObjectsContainer& objectsAndGroups = codeGenerator.GetObjectsAndGroups();
 
   codeGenerator.AddIncludeFiles(
       expressionInfo.codeExtraInformation.GetIncludeFiles());
@@ -184,8 +184,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectBehaviorFunction(
 
 bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(
     const gd::Platform& platform,
-    const gd::ClassWithObjects& globalObjectsAndGroups,
-    const gd::ClassWithObjects& objectsAndGroups,
+    const gd::ObjectsContainer& globalObjectsAndGroups,
+    const gd::ObjectsContainer& objectsAndGroups,
     gd::Expression& expression) {
   gd::String newExpression;
 
@@ -206,8 +206,8 @@ bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(
 
 bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(
     const gd::Platform& platform,
-    const gd::ClassWithObjects& globalObjectsAndGroups,
-    const gd::ClassWithObjects& objectsAndGroups,
+    const gd::ObjectsContainer& globalObjectsAndGroups,
+    const gd::ObjectsContainer& objectsAndGroups,
     gd::Expression& expression) {
   gd::String newExpression;
 

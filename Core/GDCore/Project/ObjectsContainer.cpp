@@ -3,7 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include <algorithm>
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/Object.h"
@@ -12,12 +12,12 @@
 
 namespace gd {
 
-ClassWithObjects::ClassWithObjects() {}
+ObjectsContainer::ObjectsContainer() {}
 
-ClassWithObjects::~ClassWithObjects() {}
+ObjectsContainer::~ObjectsContainer() {}
 
 #if defined(GD_IDE_ONLY)
-void ClassWithObjects::SerializeObjectsTo(SerializerElement& element) const {
+void ObjectsContainer::SerializeObjectsTo(SerializerElement& element) const {
   element.ConsiderAsArrayOf("object");
   for (std::size_t j = 0; j < initialObjects.size(); j++) {
     initialObjects[j]->SerializeTo(element.AddChild("object"));
@@ -25,7 +25,7 @@ void ClassWithObjects::SerializeObjectsTo(SerializerElement& element) const {
 }
 #endif
 
-void ClassWithObjects::UnserializeObjectsFrom(
+void ObjectsContainer::UnserializeObjectsFrom(
     gd::Project& project, const SerializerElement& element) {
   initialObjects.clear();
   element.ConsiderAsArrayOf("object", "Objet");
@@ -45,38 +45,38 @@ void ClassWithObjects::UnserializeObjectsFrom(
   }
 }
 
-bool ClassWithObjects::HasObjectNamed(const gd::String& name) const {
+bool ObjectsContainer::HasObjectNamed(const gd::String& name) const {
   return (find_if(initialObjects.begin(),
                   initialObjects.end(),
                   bind2nd(gd::ObjectHasName(), name)) != initialObjects.end());
 }
-gd::Object& ClassWithObjects::GetObject(const gd::String& name) {
+gd::Object& ObjectsContainer::GetObject(const gd::String& name) {
   return *(*find_if(initialObjects.begin(),
                     initialObjects.end(),
                     bind2nd(gd::ObjectHasName(), name)));
 }
-const gd::Object& ClassWithObjects::GetObject(const gd::String& name) const {
+const gd::Object& ObjectsContainer::GetObject(const gd::String& name) const {
   return *(*find_if(initialObjects.begin(),
                     initialObjects.end(),
                     bind2nd(gd::ObjectHasName(), name)));
 }
-gd::Object& ClassWithObjects::GetObject(std::size_t index) {
+gd::Object& ObjectsContainer::GetObject(std::size_t index) {
   return *initialObjects[index];
 }
-const gd::Object& ClassWithObjects::GetObject(std::size_t index) const {
+const gd::Object& ObjectsContainer::GetObject(std::size_t index) const {
   return *initialObjects[index];
 }
-std::size_t ClassWithObjects::GetObjectPosition(const gd::String& name) const {
+std::size_t ObjectsContainer::GetObjectPosition(const gd::String& name) const {
   for (std::size_t i = 0; i < initialObjects.size(); ++i) {
     if (initialObjects[i]->GetName() == name) return i;
   }
   return gd::String::npos;
 }
-std::size_t ClassWithObjects::GetObjectsCount() const {
+std::size_t ObjectsContainer::GetObjectsCount() const {
   return initialObjects.size();
 }
 #if defined(GD_IDE_ONLY)
-gd::Object& ClassWithObjects::InsertNewObject(gd::Project& project,
+gd::Object& ObjectsContainer::InsertNewObject(gd::Project& project,
                                               const gd::String& objectType,
                                               const gd::String& name,
                                               std::size_t position) {
@@ -89,7 +89,7 @@ gd::Object& ClassWithObjects::InsertNewObject(gd::Project& project,
 }
 #endif
 
-gd::Object& ClassWithObjects::InsertObject(const gd::Object& object,
+gd::Object& ObjectsContainer::InsertObject(const gd::Object& object,
                                            std::size_t position) {
   gd::Object& newlyCreatedObject = *(*(initialObjects.insert(
       position < initialObjects.size() ? initialObjects.begin() + position
@@ -99,7 +99,7 @@ gd::Object& ClassWithObjects::InsertObject(const gd::Object& object,
   return newlyCreatedObject;
 }
 
-void ClassWithObjects::SwapObjects(std::size_t firstObjectIndex,
+void ObjectsContainer::SwapObjects(std::size_t firstObjectIndex,
                                    std::size_t secondObjectIndex) {
   if (firstObjectIndex >= initialObjects.size() ||
       secondObjectIndex >= initialObjects.size())
@@ -109,7 +109,7 @@ void ClassWithObjects::SwapObjects(std::size_t firstObjectIndex,
                  initialObjects.begin() + secondObjectIndex);
 }
 
-void ClassWithObjects::MoveObject(std::size_t oldIndex, std::size_t newIndex) {
+void ObjectsContainer::MoveObject(std::size_t oldIndex, std::size_t newIndex) {
   if (oldIndex >= initialObjects.size() || newIndex >= initialObjects.size())
     return;
 
@@ -118,7 +118,7 @@ void ClassWithObjects::MoveObject(std::size_t oldIndex, std::size_t newIndex) {
   initialObjects.insert(initialObjects.begin() + newIndex, std::move(object));
 }
 
-void ClassWithObjects::RemoveObject(const gd::String& name) {
+void ObjectsContainer::RemoveObject(const gd::String& name) {
   std::vector<std::unique_ptr<gd::Object> >::iterator object =
       find_if(initialObjects.begin(),
               initialObjects.end(),

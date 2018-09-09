@@ -50,8 +50,8 @@ class CallbacksForSearchingVariable : public gd::ParserCallbacks {
   }
 
   virtual bool OnSubMathExpression(const gd::Platform& platform,
-                                   const gd::ClassWithObjects& project,
-                                   const gd::ClassWithObjects& layout,
+                                   const gd::ObjectsContainer& project,
+                                   const gd::ObjectsContainer& layout,
                                    gd::Expression& expression) {
     CallbacksForSearchingVariable callbacks(results, parameterType, objectName);
 
@@ -62,8 +62,8 @@ class CallbacksForSearchingVariable : public gd::ParserCallbacks {
   }
 
   virtual bool OnSubTextExpression(const gd::Platform& platform,
-                                   const gd::ClassWithObjects& project,
-                                   const gd::ClassWithObjects& layout,
+                                   const gd::ObjectsContainer& project,
+                                   const gd::ObjectsContainer& layout,
                                    gd::Expression& expression) {
     CallbacksForSearchingVariable callbacks(results, parameterType, objectName);
 

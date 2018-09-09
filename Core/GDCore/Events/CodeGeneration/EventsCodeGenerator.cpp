@@ -14,7 +14,7 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 
 using namespace std;
 
@@ -1135,8 +1135,8 @@ EventsCodeGenerator::EventsCodeGenerator(gd::Project& project_,
       maxConditionsListsSize(0){};
 
 EventsCodeGenerator::EventsCodeGenerator(const gd::Platform& platform_,
-  gd::ClassWithObjects & globalObjectsAndGroups_,
-  const gd::ClassWithObjects & objectsAndGroups_)
+  gd::ObjectsContainer & globalObjectsAndGroups_,
+  const gd::ObjectsContainer & objectsAndGroups_)
     : platform(platform_),
       globalObjectsAndGroups(globalObjectsAndGroups_),
       objectsAndGroups(objectsAndGroups_),

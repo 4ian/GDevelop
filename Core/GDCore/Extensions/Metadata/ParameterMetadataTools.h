@@ -10,7 +10,7 @@
 #include "GDCore/String.h"
 namespace gd {
 class Project;
-class ClassWithObjects;
+class ObjectsContainer;
 class ParameterMetadata;
 }  // namespace gd
 
@@ -20,7 +20,7 @@ class GD_CORE_API ParameterMetadataTools {
   static void ParametersToObjectsContainer(
       gd::Project& project,
       const std::vector<gd::ParameterMetadata>& parameters,
-      gd::ClassWithObjects& outputObjectsContainer);
+      gd::ObjectsContainer& outputObjectsContainer);
 };
 }  // namespace gd
 

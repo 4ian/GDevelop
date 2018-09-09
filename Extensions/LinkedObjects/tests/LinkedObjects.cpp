@@ -10,7 +10,7 @@ This project is released under the MIT License.
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCpp/Runtime/RuntimeScene.h"

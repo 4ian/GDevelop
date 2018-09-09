@@ -22,8 +22,8 @@ namespace gd {
 class CallbacksForListingObjects : public gd::ParserCallbacks {
  public:
   CallbacksForListingObjects(const gd::Platform& platform_,
-                             const gd::ClassWithObjects& project_,
-                             const gd::ClassWithObjects& layout_,
+                             const gd::ObjectsContainer& project_,
+                             const gd::ObjectsContainer& layout_,
                              EventsContext& context_)
       : platform(platform_),
         project(project_),
@@ -80,8 +80,8 @@ class CallbacksForListingObjects : public gd::ParserCallbacks {
   };
 
   virtual bool OnSubMathExpression(const gd::Platform& platform,
-                                   const gd::ClassWithObjects& project,
-                                   const gd::ClassWithObjects& layout,
+                                   const gd::ObjectsContainer& project,
+                                   const gd::ObjectsContainer& layout,
                                    gd::Expression& expression) {
     CallbacksForListingObjects callbacks(platform, project, layout, context);
 
@@ -91,8 +91,8 @@ class CallbacksForListingObjects : public gd::ParserCallbacks {
   }
 
   virtual bool OnSubTextExpression(const gd::Platform& platform,
-                                   const gd::ClassWithObjects& project,
-                                   const gd::ClassWithObjects& layout,
+                                   const gd::ObjectsContainer& project,
+                                   const gd::ObjectsContainer& layout,
                                    gd::Expression& expression) {
     CallbacksForListingObjects callbacks(platform, project, layout, context);
 
@@ -103,8 +103,8 @@ class CallbacksForListingObjects : public gd::ParserCallbacks {
 
  private:
   const gd::Platform& platform;
-  const gd::ClassWithObjects& project;
-  const gd::ClassWithObjects& layout;
+  const gd::ObjectsContainer& project;
+  const gd::ObjectsContainer& layout;
   EventsContext& context;
 };
 
@@ -132,8 +132,8 @@ bool EventsContextAnalyzer::DoVisitInstruction(gd::Instruction& instruction,
 
 void EventsContextAnalyzer::AnalyzeParameter(
     const gd::Platform& platform,
-    const gd::ClassWithObjects& project,
-    const gd::ClassWithObjects& layout,
+    const gd::ObjectsContainer& project,
+    const gd::ObjectsContainer& layout,
     const gd::ParameterMetadata& metadata,
     const gd::Expression& parameter,
     EventsContext& context) {

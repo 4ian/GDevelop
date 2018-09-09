@@ -435,8 +435,8 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout) {
 }
 
 #if defined(GD_IDE_ONLY)
-gd::String GD_CORE_API GetTypeOfObject(const gd::ClassWithObjects& project,
-                                       const gd::ClassWithObjects& layout,
+gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
+                                       const gd::ObjectsContainer& layout,
                                        gd::String name,
                                        bool searchInGroups) {
   gd::String type;
@@ -504,8 +504,8 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::ClassWithObjects& project,
   return type;
 }
 
-gd::String GD_CORE_API GetTypeOfBehavior(const gd::ClassWithObjects& project,
-                                         const gd::ClassWithObjects& layout,
+gd::String GD_CORE_API GetTypeOfBehavior(const gd::ObjectsContainer& project,
+                                         const gd::ObjectsContainer& layout,
                                          gd::String name,
                                          bool searchInGroups) {
   for (std::size_t i = 0; i < layout.GetObjectsCount(); ++i) {
@@ -527,8 +527,8 @@ gd::String GD_CORE_API GetTypeOfBehavior(const gd::ClassWithObjects& project,
   return "";
 }
 
-vector<gd::String> GD_CORE_API GetBehaviorsOfObject(const gd::ClassWithObjects& project,
-                                                    const gd::ClassWithObjects& layout,
+vector<gd::String> GD_CORE_API GetBehaviorsOfObject(const gd::ObjectsContainer& project,
+                                                    const gd::ObjectsContainer& layout,
                                                     gd::String name,
                                                     bool searchInGroups) {
   bool behaviorsAlreadyInserted = false;

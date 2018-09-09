@@ -4,7 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 #include "ParameterMetadataTools.h"
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
@@ -14,7 +14,7 @@ namespace gd {
 void ParameterMetadataTools::ParametersToObjectsContainer(
     gd::Project& project,
     const std::vector<gd::ParameterMetadata>& parameters,
-    gd::ClassWithObjects& outputObjectsContainer) {
+    gd::ObjectsContainer& outputObjectsContainer) {
   for (std::size_t i = 0; i < parameters.size(); ++i) {
     const auto& parameter = parameters[i];
     if (parameter.GetName().empty()) continue;

@@ -12,7 +12,7 @@
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/InstructionsList.h"
 namespace gd {
-class ClassWithObjects;
+class ObjectsContainer;
 class ObjectMetadata;
 class BehaviorMetadata;
 class InstructionMetadata;
@@ -254,8 +254,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   /**
    * \brief Construct a code generator for the specified objects and groups.
    */
-  EventsCodeGenerator(gd::ClassWithObjects& globalObjectsAndGroups,
-                      const gd::ClassWithObjects& objectsAndGroups);
+  EventsCodeGenerator(gd::ObjectsContainer& globalObjectsAndGroups,
+                      const gd::ObjectsContainer& objectsAndGroups);
   virtual ~EventsCodeGenerator();
 };
 

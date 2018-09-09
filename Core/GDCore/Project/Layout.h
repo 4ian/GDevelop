@@ -11,7 +11,7 @@
 #include <vector>
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Layer.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
@@ -37,7 +37,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Layout : public ClassWithObjects {
+class GD_CORE_API Layout : public ObjectsContainer {
  public:
   Layout();
   Layout(const Layout&);
@@ -557,8 +557,8 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout);
  *
  * @return Type of the object/group.
  */
-gd::String GD_CORE_API GetTypeOfObject(const ClassWithObjects& game,
-                                       const ClassWithObjects& layout,
+gd::String GD_CORE_API GetTypeOfObject(const ObjectsContainer& game,
+                                       const ObjectsContainer& layout,
                                        gd::String objectName,
                                        bool searchInGroups = true);
 
@@ -566,8 +566,8 @@ gd::String GD_CORE_API GetTypeOfObject(const ClassWithObjects& game,
  * \brief Get a type from a behavior name
  * @return Type of the behavior.
  */
-gd::String GD_CORE_API GetTypeOfBehavior(const ClassWithObjects& game,
-                                         const ClassWithObjects& layout,
+gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
+                                         const ObjectsContainer& layout,
                                          gd::String behaviorName,
                                          bool searchInGroups = true);
 
@@ -579,8 +579,8 @@ gd::String GD_CORE_API GetTypeOfBehavior(const ClassWithObjects& game,
  * @return Vector containing names of behaviors
  */
 std::vector<gd::String> GD_CORE_API
-GetBehaviorsOfObject(const ClassWithObjects& game,
-                     const ClassWithObjects& layout,
+GetBehaviorsOfObject(const ObjectsContainer& game,
+                     const ObjectsContainer& layout,
                      gd::String objectName,
                      bool searchInGroups = true);
 

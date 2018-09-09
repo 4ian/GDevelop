@@ -265,8 +265,8 @@ bool ExpressionParser::ValidSyntax(const gd::String& str) {
 }
 
 bool ExpressionParser::ParseMathExpression(const gd::Platform& platform,
-                                           const gd::ClassWithObjects& project,
-                                           const gd::ClassWithObjects& layout,
+                                           const gd::ObjectsContainer& project,
+                                           const gd::ObjectsContainer& layout,
                                            gd::ParserCallbacks& callbacks) {
   callbacks.SetReturnType("expression");
   gd::String expression = expressionPlainString;
@@ -525,8 +525,8 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform& platform,
 }
 
 bool ExpressionParser::ParseStringExpression(const gd::Platform& platform,
-                                             const gd::ClassWithObjects& project,
-                                             const gd::ClassWithObjects& layout,
+                                             const gd::ObjectsContainer& project,
+                                             const gd::ObjectsContainer& layout,
                                              gd::ParserCallbacks& callbacks) {
   callbacks.SetReturnType("string");
   gd::String expression = expressionPlainString;
@@ -861,8 +861,8 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform& platform,
 
 bool ExpressionParser::PrepareParameter(
     const gd::Platform& platform,
-    const gd::ClassWithObjects& project,
-    const gd::ClassWithObjects& layout,
+    const gd::ObjectsContainer& project,
+    const gd::ObjectsContainer& layout,
     ParserCallbacks& callbacks,
     gd::Expression& parameter,
     const gd::ParameterMetadata& parametersInfo,

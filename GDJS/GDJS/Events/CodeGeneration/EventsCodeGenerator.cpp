@@ -15,7 +15,7 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/Behavior.h"
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
@@ -91,8 +91,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     const std::vector<gd::ParameterMetadata>& parameters,
     const gd::EventsList& events,
     bool compilationForRuntime) {
-  gd::ClassWithObjects objectsAndGroups;
-  gd::ClassWithObjects
+  gd::ObjectsContainer objectsAndGroups;
+  gd::ObjectsContainer
       emptyObjectsAndGroups;  // As opposed to layout events, we don't have
                               // objects in the "outer" scope.
   gd::ParameterMetadataTools::ParametersToObjectsContainer(
@@ -873,8 +873,8 @@ EventsCodeGenerator::EventsCodeGenerator(gd::Project& project,
     : gd::EventsCodeGenerator(project, layout, JsPlatform::Get()) {}
 
 EventsCodeGenerator::EventsCodeGenerator(
-    gd::ClassWithObjects& globalObjectsAndGroups,
-    const gd::ClassWithObjects& objectsAndGroups)
+    gd::ObjectsContainer& globalObjectsAndGroups,
+    const gd::ObjectsContainer& objectsAndGroups)
     : gd::EventsCodeGenerator(
           JsPlatform::Get(), globalObjectsAndGroups, objectsAndGroups) {}
 

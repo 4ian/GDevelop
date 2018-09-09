@@ -12,7 +12,7 @@ class EventsList;
 class Expression;
 class Project;
 class Layout;
-class ClassWithObjects;
+class ObjectsContainer;
 class ExternalEvents;
 class ParameterMetadata;
 class ObjectMetadata;
@@ -54,8 +54,8 @@ class GD_CORE_API EventsCodeGenerator {
    * objects/groups and platform
    */
   EventsCodeGenerator(const gd::Platform& platform, 
-  gd::ClassWithObjects & globalObjectsAndGroups_,
-  const gd::ClassWithObjects & objectsAndGroups_);
+  gd::ObjectsContainer & globalObjectsAndGroups_,
+  const gd::ObjectsContainer & objectsAndGroups_);
   virtual ~EventsCodeGenerator(){};
 
   /**
@@ -286,12 +286,12 @@ class GD_CORE_API EventsCodeGenerator {
   /**
    * \brief Get the global objects/groups used for code generation.
    */
-  gd::ClassWithObjects& GetGlobalObjectsAndGroups() const { return globalObjectsAndGroups; }
+  gd::ObjectsContainer& GetGlobalObjectsAndGroups() const { return globalObjectsAndGroups; }
 
   /**
    * \brief Get the objects/groups used for code generation.
    */
-  const gd::ClassWithObjects& GetObjectsAndGroups() const { return objectsAndGroups; }
+  const gd::ObjectsContainer& GetObjectsAndGroups() const { return objectsAndGroups; }
 
   /**
    * \brief Return true if the code generation is done for a given project and layout.
@@ -632,8 +632,8 @@ class GD_CORE_API EventsCodeGenerator {
 
   const gd::Platform& platform;  ///< The platform being used.
   
-  gd::ClassWithObjects & globalObjectsAndGroups; 
-  const gd::ClassWithObjects & objectsAndGroups;
+  gd::ObjectsContainer & globalObjectsAndGroups; 
+  const gd::ObjectsContainer & objectsAndGroups;
 
   bool hasProjectAndLayout;      ///< true only if project and layout are valid references. If false, they should not be used.
   gd::Project* project;          ///< The project being used.

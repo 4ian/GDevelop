@@ -13,7 +13,7 @@ class wxPropertyGrid;
 class wxPropertyGridEvent;
 class TiXmlElement;
 #include "GDCore/Project/ChangesNotifier.h"
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
@@ -44,7 +44,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Project : public ClassWithObjects {
+class GD_CORE_API Project : public ObjectsContainer {
  public:
   Project();
   Project(const Project&);

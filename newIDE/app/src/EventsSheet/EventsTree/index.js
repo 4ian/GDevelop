@@ -224,6 +224,7 @@ export default class ThemableEventsTree extends Component {
     newEvent.delete();
 
     this.forceEventsUpdate();
+    this.props.onEventMoved();
   };
 
   _canDrop = ({ nextParent }) => {

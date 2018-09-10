@@ -371,6 +371,8 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     if (!this._keyboardShortcuts.shouldCloneInstances()) {
       this.deleteSelection(/*deleteOnlyInstructions=*/ true);
+    } else {
+      this._saveChangesToHistory();
     }
   };
 
@@ -704,6 +706,13 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
+  _onEventMoved = () => {
+    // Move of the event in the list is handled by EventsTree.
+    // This could be refactored and put here if the drag'n'drop of events
+    // is reworked at some point.
+    this._saveChangesToHistory();
+  }
+
   render() {
     const {
       project,
@@ -766,6 +775,7 @@ export default class EventsSheet extends React.Component<Props, State> {
               onOpenLayout={onOpenLayout}
               searchResults={eventsSearchResultEvents}
               searchFocusOffset={searchFocusOffset}
+              onEventMoved={this._onEventMoved}
             />
             {this.state.showSearchPanel && (
               <SearchPanel

@@ -430,7 +430,13 @@ export default class SceneEditor extends Component {
     ) {
       showWarningBox('Another object with this name already exists.');
       return false;
+    } else if (!gd.Project.validateObjectName(newName)) {
+      showWarningBox(
+        'This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your object name.'
+      );
+      return false;
     }
+
     return true;
   };
 
@@ -445,6 +451,11 @@ export default class SceneEditor extends Component {
   _onRenameObject = (objectWithContext, newName, done = () => {}) => {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
+
+    if (!gd.Project.validateObjectName()) {
+      done(false);
+      return;
+    }
 
     // Avoid triggering renaming refactoring if name has not really changed
     if (object.getName() !== newName) {

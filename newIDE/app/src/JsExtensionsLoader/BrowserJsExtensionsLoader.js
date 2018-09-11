@@ -15,6 +15,10 @@ const jsExtensions = [
     name: 'DeviceSensors',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceSensors/JsExtension.js'),
   },
+  {
+    name: 'DeviceVibration',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceVibration/JsExtension.js'),
+  },
 ];
 
 /**

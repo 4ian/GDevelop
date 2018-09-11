@@ -10,8 +10,8 @@ It uses GDevelop [core C++ classes compiled to Javascript](https://github.com/4i
 Make sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) installed. [Yarn](https://yarnpkg.com) is optional.
 
 ```bash
-git clone https://github.com/4ian/GD.git
-cd GD/newIDE/app
+git clone https://github.com/4ian/GDevelop.git
+cd GDevelop/newIDE/app
 npm install #or yarn
 ```
 

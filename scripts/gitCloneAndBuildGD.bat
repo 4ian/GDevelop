@@ -9,9 +9,10 @@ REM ===============================================================
 echo This will clone, install, and launch GDevelop development version. Please make sure you have git and Node.js installed.
 
 SET fork=4ian
+SET project=GDevelop
 
-call git clone https://github.com/%fork%/GD.git
-cd GD/newIDE/app
+call git clone https://github.com/%fork%/%project%.git
+cd %project%/newIDE/app
 call npm install
 cd ../electron-app
 call npm install

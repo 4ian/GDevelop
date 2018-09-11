@@ -6,6 +6,10 @@ import Paper from 'material-ui/Paper';
 import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
+import optionalRequire from '../Utils/OptionalRequire.js';
+const path = optionalRequire('path');
+const glob = optionalRequire('glob');
+const gd = global.gd;
 
 const styles = {
   container: {
@@ -79,6 +83,38 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
+  _scanForNewResources = () => {
+    const resourcesList = this
+    const project = this.props.project
+    const resourcesManager = project.getResourcesManager()
+    console.log('Scanning the project folder for new resources...');
+    const projectPath = path.dirname(project.getProjectFile());
+
+    const getDirectories = (src, callback) => {
+      glob(src + '/**/*.png', callback);
+    };
+    getDirectories(projectPath, function (err, res) {
+      if (err) {
+        console.log('Error loading ', err);
+      } else {
+        res.forEach((pathFound)=>{
+          // should use relative path for resource name here!
+          let fileName = String(pathFound).split('/').pop();
+          /// todo: fix gdevelop's naming of imported resources not including subfolder case
+          if (!resourcesManager.hasResource(fileName)) {
+            const imageResource = new gd.ImageResource();
+            imageResource.setFile(path.relative(projectPath, pathFound));
+            imageResource.setName(fileName);
+            resourcesManager.addResource(imageResource);
+            imageResource.delete();
+            console.log(fileName+" added to project")
+          }
+        })
+      }
+      resourcesList.forceUpdate();  
+    });
+  };
+
   _editName = (resource: ?gdResource) => {
     this.setState(
       {
@@ -130,6 +166,12 @@ export default class ResourcesList extends React.Component<Props, State> {
         label: 'Delete',
         click: () => this._deleteResource(resource),
       },
+      {
+        label: 'Scan for Images',
+        click: () => {
+          this._scanForNewResources();
+        }
+      },
     ];
   };
 
@@ -142,6 +184,8 @@ export default class ResourcesList extends React.Component<Props, State> {
       .getAllResourceNames()
       .toJSArray()
       .map(resourceName => resourcesManager.getResource(resourceName));
+    // console.log(allResourcesList)
+    // allResourcesList.map(resource => console.log(resource.getName()))
     const filteredList = filterResourcesList(allResourcesList, searchText);
 
     // Force List component to be mounted again if project or objectsContainer

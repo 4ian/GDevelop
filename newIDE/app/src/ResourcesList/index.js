@@ -84,20 +84,20 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   _scanForNewResources = () => {
-    const resourcesList = this
-    const project = this.props.project
-    const resourcesManager = project.getResourcesManager()
+    // const resourcesList = this;
+    const project = this.props.project;
+    const resourcesManager = project.getResourcesManager();
     console.log('Scanning the project folder for new resources...');
     const projectPath = path.dirname(project.getProjectFile());
 
     const getDirectories = (src, callback) => {
       glob(src + '/**/*.{png,jpg,jpeg,PNG,JPG,JPEG}', callback);
     };
-    getDirectories(projectPath, function (err, res) {
+    getDirectories(projectPath, (err, res) => {
       if (err) {
         console.log('Error loading ', err);
       } else {
-        res.forEach((pathFound)=>{
+        res.forEach(pathFound => {
           const fileName = path.relative(projectPath, pathFound);
           if (!resourcesManager.hasResource(fileName)) {
             const imageResource = new gd.ImageResource();
@@ -105,11 +105,11 @@ export default class ResourcesList extends React.Component<Props, State> {
             imageResource.setName(fileName);
             resourcesManager.addResource(imageResource);
             imageResource.delete();
-            console.log(fileName+" added to project!")
+            console.log(fileName + ' added to project!');
           }
-        })
+        });
       }
-      resourcesList.forceUpdate();
+      this.forceUpdate();
     });
   };
 
@@ -168,7 +168,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         label: 'Scan for Images',
         click: () => {
           this._scanForNewResources();
-        }
+        },
       },
     ];
   };

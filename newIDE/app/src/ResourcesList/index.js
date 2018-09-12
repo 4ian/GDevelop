@@ -98,12 +98,10 @@ export default class ResourcesList extends React.Component<Props, State> {
         console.log('Error loading ', err);
       } else {
         res.forEach((pathFound)=>{
-          // should use relative path for resource name here!
-          let fileName = String(pathFound).split('/').pop();
-          /// todo: fix gdevelop's naming of imported resources not including subfolder case
+          const fileName = path.relative(projectPath, pathFound);
           if (!resourcesManager.hasResource(fileName)) {
             const imageResource = new gd.ImageResource();
-            imageResource.setFile(path.relative(projectPath, pathFound));
+            imageResource.setFile(fileName);
             imageResource.setName(fileName);
             resourcesManager.addResource(imageResource);
             imageResource.delete();
@@ -184,8 +182,6 @@ export default class ResourcesList extends React.Component<Props, State> {
       .getAllResourceNames()
       .toJSArray()
       .map(resourceName => resourcesManager.getResource(resourceName));
-    // console.log(allResourcesList)
-    // allResourcesList.map(resource => console.log(resource.getName()))
     const filteredList = filterResourcesList(allResourcesList, searchText);
 
     // Force List component to be mounted again if project or objectsContainer

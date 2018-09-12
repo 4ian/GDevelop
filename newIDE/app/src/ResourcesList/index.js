@@ -107,11 +107,11 @@ export default class ResourcesList extends React.Component<Props, State> {
             imageResource.setName(fileName);
             resourcesManager.addResource(imageResource);
             imageResource.delete();
-            console.log(fileName+" added to project")
+            console.log(fileName+" added to project!")
           }
         })
       }
-      resourcesList.forceUpdate();  
+      resourcesList.forceUpdate();
     });
   };
 
@@ -163,7 +163,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         click: () => this._editName(resource),
       },
       {
-        label: 'Delete',
+        label: 'Remove',
         click: () => this._deleteResource(resource),
       },
       {

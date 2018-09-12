@@ -91,7 +91,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     const projectPath = path.dirname(project.getProjectFile());
 
     const getDirectories = (src, callback) => {
-      glob(src + '/**/*.png', callback);
+      glob(src + '/**/*.{png,jpg,jpeg,PNG,JPG,JPEG}', callback);
     };
     getDirectories(projectPath, function (err, res) {
       if (err) {

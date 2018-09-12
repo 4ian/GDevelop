@@ -80,7 +80,7 @@ gdjs.PanelSpriteRuntimeObject.prototype.setY = function(y) {
 /**
  * Set the texture of the panel sprite.
  * @param {string} textureName The name of the texture.
- * @param {RuntimeScene} runtimeScene The scene the object lives in.
+ * @param {gdjs.RuntimeScene} runtimeScene The scene the object lives in.
  */
 gdjs.PanelSpriteRuntimeObject.prototype.setTexture = function(textureName, runtimeScene) {
     this._renderer.setTexture(textureName, runtimeScene);

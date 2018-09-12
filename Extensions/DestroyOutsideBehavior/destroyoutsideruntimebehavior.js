@@ -40,7 +40,7 @@ gdjs.DestroyOutsideRuntimeBehavior.prototype.doStepPostEvents = function(runtime
 
 /**
  * Set an additional border to the camera viewport as a buffer before the object gets destroyed.
- * @param {number} val Border in pixel.
+ * @param {number} val Border in pixels.
  */
 gdjs.DestroyOutsideRuntimeBehavior.prototype.setExtraBorder = function(val) {
     this._extraBorder = val;
@@ -48,7 +48,7 @@ gdjs.DestroyOutsideRuntimeBehavior.prototype.setExtraBorder = function(val) {
 
 /**
  * Get the additional border of the camera viewport buffer which triggers the destruction of an object.
- * @return {number} The addidional border around the camera viewport in pixel
+ * @return {number} The additional border around the camera viewport in pixels
  */
 gdjs.DestroyOutsideRuntimeBehavior.prototype.getExtraBorder = function() {
     return this._extraBorder;

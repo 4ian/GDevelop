@@ -84,7 +84,6 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   _scanForNewResources = () => {
-    // const resourcesList = this;
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
     console.log('Scanning the project folder for new resources...');

@@ -104,7 +104,7 @@ export default class ResourcesList extends React.Component<Props, State> {
             imageResource.setName(fileName);
             resourcesManager.addResource(imageResource);
             imageResource.delete();
-            console.log(fileName + ' added to Project!');
+            console.info(`${fileName} added to project.`);
           }
         });
       }
@@ -113,12 +113,12 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   _removeAllUnusedImages = () => {
-    const project = this.props.project;
+    const { project } = this.props;
     gd.ProjectResourcesAdder
       .getAllUselessImages(project)
       .toJSArray()
-      .forEach((item, i) => {
-        console.log('Removing unused Image File: ' + item);
+      .forEach(imageName => {
+        console.info(`Removing unused image resource: ${imageName}`);
       });
     gd.ProjectResourcesAdder.removeAllUselessImages(project);
     this.forceUpdate();

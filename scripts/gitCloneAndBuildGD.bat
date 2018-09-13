@@ -11,14 +11,26 @@ echo This will clone, install, and launch GDevelop development version. Please m
 SET fork=4ian
 SET project=GDevelop
 
-call git clone https://github.com/%fork%/%project%.git
-cd %project%/newIDE/app
-call npm install
-cd ../electron-app
-call npm install
+IF exist %project%/newIDE/electron-app/node_modules (
+	echo /newIDE/electron-app/node_modules already exists. Skipping "npm install..."
+	cd %project%/newIDE/app
+	GOTO runElectronApp
+)
 
-cd ../app
-start cmd /k npm start
-cd ../electron-app
-TIMEOUT /T 40
-call node node_modules\electron\cli.js app
+ELSE (
+	call git clone https://github.com/%fork%/%project%.git
+	cd %project%/newIDE/app
+	call npm install
+	cd ../electron-app
+	call npm install
+	cd ../app
+	GOTO runElectronApp
+)
+
+:runElectronApp
+	start cmd /k npm start
+	cd ../electron-app
+	TIMEOUT /T 60
+	call node node_modules\electron\cli.js app
+goto:eof
+

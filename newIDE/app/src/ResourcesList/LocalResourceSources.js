@@ -38,7 +38,7 @@ export default [
                 const audioResource = new gd.AudioResource();
                 const projectPath = path.dirname(project.getProjectFile());
                 audioResource.setFile(path.relative(projectPath, resourcePath));
-                audioResource.setName(path.basename(resourcePath));
+                audioResource.setName(path.relative(projectPath, resourcePath));
 
                 return audioResource;
               });
@@ -85,7 +85,7 @@ export default [
                 const imageResource = new gd.ImageResource();
                 const projectPath = path.dirname(project.getProjectFile());
                 imageResource.setFile(path.relative(projectPath, resourcePath));
-                imageResource.setName(path.basename(resourcePath));
+                imageResource.setName(path.relative(projectPath, resourcePath));
 
                 return imageResource;
               });

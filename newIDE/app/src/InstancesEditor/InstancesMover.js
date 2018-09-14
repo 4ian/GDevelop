@@ -1,4 +1,4 @@
-export default class InstancesResizer {
+export default class InstancesMover {
   constructor({ instanceMeasurer, options }) {
     this.instanceMeasurer = instanceMeasurer;
     this.options = options;
@@ -17,7 +17,7 @@ export default class InstancesResizer {
 
     return (
       Math.round((x - this.options.gridOffsetX) / this.options.gridWidth) *
-        this.options.gridWidth +
+      this.options.gridWidth +
       this.options.gridOffsetX
     );
   }
@@ -28,7 +28,7 @@ export default class InstancesResizer {
 
     return (
       Math.round((y - this.options.gridOffsetY) / this.options.gridHeight) *
-        this.options.gridHeight +
+      this.options.gridHeight +
       this.options.gridOffsetY
     );
   }

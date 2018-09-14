@@ -301,7 +301,8 @@ export default class InstancesEditorContainer extends Component {
    * @param {string} objectName The name of the object for which instance must be re-rendered.
    */
   resetRenderersFor(objectName) {
-    if (this.instancesRenderer) this.instancesRenderer.resetRenderersFor(objectName);
+    if (this.instancesRenderer)
+      this.instancesRenderer.resetRenderersFor(objectName);
   }
 
   zoomBy(value) {
@@ -414,7 +415,8 @@ export default class InstancesEditorContainer extends Component {
       selectedInstances,
       sceneDeltaX,
       sceneDeltaY,
-      this.keyboardShortcuts.shouldFollowAxis()
+      this.keyboardShortcuts.shouldFollowAxis(),
+      this.keyboardShortcuts.shouldNotSnapToGrid()
     );
   };
 
@@ -545,8 +547,12 @@ export default class InstancesEditorContainer extends Component {
       <SimpleDropTarget>
         <div
           ref={canvasArea => (this.canvasArea = canvasArea)}
-          style={{ flex: 1, position: 'absolute', overflow: 'hidden' }}
-        />
+          style={{
+            flex: 1,
+            position: 'absolute',
+            overflow: 'hidden',
+          }}
+        />{' '}
       </SimpleDropTarget>
     );
   }

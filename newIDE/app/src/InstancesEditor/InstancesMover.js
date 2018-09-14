@@ -1,8 +1,5 @@
 export default class InstancesMover {
-  constructor({
-    instanceMeasurer,
-    options
-  }) {
+  constructor({ instanceMeasurer, options }) {
     this.instanceMeasurer = instanceMeasurer;
     this.options = options;
     this.instancePositions = {};
@@ -15,23 +12,33 @@ export default class InstancesMover {
   }
 
   _roundXPosition(x, noGridSnap) {
-    if (!this.options.snap || !this.options.grid || this.options.gridWidth <= 0 || noGridSnap)
+    if (
+      !this.options.snap ||
+      !this.options.grid ||
+      this.options.gridWidth <= 0 ||
+      noGridSnap
+    )
       return Math.round(x);
 
     return (
       Math.round((x - this.options.gridOffsetX) / this.options.gridWidth) *
-      this.options.gridWidth +
+        this.options.gridWidth +
       this.options.gridOffsetX
     );
   }
 
   _roundYPosition(y, noGridSnap) {
-    if (!this.options.snap || !this.options.grid || this.options.gridHeight <= 0 || noGridSnap)
+    if (
+      !this.options.snap ||
+      !this.options.grid ||
+      this.options.gridHeight <= 0 ||
+      noGridSnap
+    )
       return Math.round(y);
 
     return (
       Math.round((y - this.options.gridOffsetY) / this.options.gridHeight) *
-      this.options.gridHeight +
+        this.options.gridHeight +
       this.options.gridOffsetY
     );
   }

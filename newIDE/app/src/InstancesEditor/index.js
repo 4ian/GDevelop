@@ -1,4 +1,6 @@
-import React, { Component } from 'react';
+import React, {
+  Component
+} from 'react';
 import gesture from 'pixi-simple-gesture';
 import KeyboardShortcuts from '../UI/KeyboardShortcuts';
 import SimpleDropTarget from '../Utils/DragDropHelpers/SimpleDropTarget';
@@ -16,7 +18,10 @@ import DropHandler from './DropHandler';
 import BackgroundColor from './BackgroundColor';
 import PIXI from 'pixi.js';
 import FpsLimiter from './FpsLimiter';
-import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
+import {
+  startPIXITicker,
+  stopPIXITicker
+} from '../Utils/PIXITicker';
 
 export default class InstancesEditorContainer extends Component {
   constructor() {
@@ -542,13 +547,21 @@ export default class InstancesEditorContainer extends Component {
   render() {
     if (!this.props.project) return null;
 
-    return (
-      <SimpleDropTarget>
-        <div
-          ref={canvasArea => (this.canvasArea = canvasArea)}
-          style={{ flex: 1, position: 'absolute', overflow: 'hidden' }}
-        />
-      </SimpleDropTarget>
+    return ( <
+      SimpleDropTarget >
+      <
+      div ref = {
+        canvasArea => (this.canvasArea = canvasArea)
+      }
+      style = {
+        {
+          flex: 1,
+          position: 'absolute',
+          overflow: 'hidden'
+        }
+      }
+      /> <
+      /SimpleDropTarget>
     );
   }
 }

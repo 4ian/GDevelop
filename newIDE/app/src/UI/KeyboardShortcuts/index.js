@@ -1,4 +1,6 @@
-import { isMacLike } from '../../Utils/Platform';
+import {
+  isMacLike
+} from '../../Utils/Platform';
 
 const CTRL_KEY = 17;
 const SHIFT_KEY = 16;
@@ -179,9 +181,11 @@ export default class KeyboardShortcuts {
     if (!this.isFocused) return;
 
     if (!isMacLike()) {
-      if (evt.button === MID_MOUSE_BUTTON){
+      if (evt.button === MID_MOUSE_BUTTON) {
         this.mouseMidButtonPressed = true
-      } else {this.mouseMidButtonPressed = false}
+      } else {
+        this.mouseMidButtonPressed = false
+      }
     }
   };
 

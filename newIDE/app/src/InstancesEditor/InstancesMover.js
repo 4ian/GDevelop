@@ -1,5 +1,8 @@
 export default class InstancesMover {
-  constructor({ instanceMeasurer, options }) {
+  constructor({
+    instanceMeasurer,
+    options
+  }) {
     this.instanceMeasurer = instanceMeasurer;
     this.options = options;
     this.instancePositions = {};

@@ -65,6 +65,10 @@ export default class KeyboardShortcuts {
     return this.shiftPressed;
   }
 
+  shouldNotSnapToGrid() {
+    return this.altPressed;
+  }
+
   shouldResizeProportionally() {
     return this.shiftPressed;
   }

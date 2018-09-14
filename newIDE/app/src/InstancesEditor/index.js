@@ -414,7 +414,8 @@ export default class InstancesEditorContainer extends Component {
       selectedInstances,
       sceneDeltaX,
       sceneDeltaY,
-      this.keyboardShortcuts.shouldFollowAxis()
+      this.keyboardShortcuts.shouldFollowAxis(),
+      this.keyboardShortcuts.shouldNotSnapToGrid()
     );
   };
 

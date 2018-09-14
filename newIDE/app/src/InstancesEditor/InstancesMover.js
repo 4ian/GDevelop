@@ -11,8 +11,8 @@ export default class InstancesResizer {
     this.options = options;
   }
 
-  _roundXPosition(x) {
-    if (!this.options.snap || !this.options.grid || this.options.gridWidth <= 0)
+  _roundXPosition(x, noGridSnap) {
+    if (!this.options.snap || !this.options.grid || this.options.gridWidth <= 0 || noGridSnap)
       return Math.round(x);
 
     return (
@@ -22,12 +22,8 @@ export default class InstancesResizer {
     );
   }
 
-  _roundYPosition(y) {
-    if (
-      !this.options.snap ||
-      !this.options.grid ||
-      this.options.gridHeight <= 0
-    )
+  _roundYPosition(y, noGridSnap) {
+    if (!this.options.snap || !this.options.grid || this.options.gridHeight <= 0 || noGridSnap)
       return Math.round(y);
 
     return (
@@ -51,7 +47,7 @@ export default class InstancesResizer {
     return this.totalDeltaY;
   }
 
-  moveBy(instances, deltaX, deltaY, followAxis) {
+  moveBy(instances, deltaX, deltaY, followAxis, noGridSnap) {
     this.totalDeltaX += deltaX;
     this.totalDeltaY += deltaY;
 
@@ -68,12 +64,14 @@ export default class InstancesResizer {
 
       selectedInstance.setX(
         this._roundXPosition(
-          initialPosition.x + this._getMoveDeltaX(followAxis)
+          initialPosition.x + this._getMoveDeltaX(followAxis),
+          noGridSnap
         )
       );
       selectedInstance.setY(
         this._roundYPosition(
-          initialPosition.y + this._getMoveDeltaY(followAxis)
+          initialPosition.y + this._getMoveDeltaY(followAxis),
+          noGridSnap
         )
       );
     }

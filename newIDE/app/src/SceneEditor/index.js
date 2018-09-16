@@ -888,6 +888,10 @@ export default class SceneEditor extends Component {
               enabled: canRedo(this.state.history),
               accelerator: 'CmdOrCtrl+Shift+Z',
             },
+            {
+              label: 'Delete',
+              click: () => this.deleteSelection(),
+            },
           ]}
         />
       </div>

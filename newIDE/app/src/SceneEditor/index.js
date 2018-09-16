@@ -326,6 +326,7 @@ export default class SceneEditor extends Component {
     if (!this.instancesSelection.hasSelectedInstances()){return}
     this.setState({
       selectedObjectName: instances[0].getObjectName(),
+      selectedObjectToAddName:null,
       history: saveToHistory(this.state.history, this.props.initialInstances),
     });
 

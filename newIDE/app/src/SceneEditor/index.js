@@ -329,7 +329,6 @@ export default class SceneEditor extends Component {
     this.setState({
       selectedObjectName: instances[0].getObjectName(),
       selectedObjectToAddName: null,
-      history: saveToHistory(this.state.history, this.props.initialInstances),
     });
 
     this.forceUpdatePropertiesEditor();

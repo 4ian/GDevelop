@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 
 import ObjectsList from '../ObjectsList';
-import ObjectsGroupsList from '../ObjectsGroupsList';
+import ObjectGroupsList from '../ObjectGroupsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import InstancesEditor from '../InstancesEditor';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
@@ -10,7 +10,7 @@ import LayersList from '../LayersList';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
-import ObjectsGroupEditorDialog from '../ObjectsGroupEditor/ObjectsGroupEditorDialog';
+import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
@@ -112,7 +112,7 @@ export default class SceneEditor extends Component {
         showObjectsList={this.props.showObjectsList}
         instancesSelection={this.instancesSelection}
         openObjectsList={this.openObjectsList}
-        openObjectsGroupsList={this.openObjectsGroupsList}
+        openObjectGroupsList={this.openObjectGroupsList}
         openProperties={this.openProperties}
         deleteSelection={this.deleteSelection}
         toggleInstancesList={this.toggleInstancesList}
@@ -165,9 +165,9 @@ export default class SceneEditor extends Component {
     }
   };
 
-  openObjectsGroupsList = () => {
+  openObjectGroupsList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('objects-groups-list');
+    this.editorMosaic.openEditor('object-groups-list');
   };
 
   toggleInstancesList = () => {
@@ -702,9 +702,9 @@ export default class SceneEditor extends Component {
           />
         </MosaicWindow>
       ),
-      'objects-groups-list': (
-        <MosaicWindow title="Objects groups">
-          <ObjectsGroupsList
+      'object-groups-list': (
+        <MosaicWindow title="Object Groups">
+          <ObjectGroupsList
             project={project}
             objectsContainer={layout}
             onEditGroup={this.editGroup}
@@ -758,7 +758,7 @@ export default class SceneEditor extends Component {
             this.forceUpdateObjectsList();
           }}
         />
-        <ObjectsGroupEditorDialog
+        <ObjectGroupEditorDialog
           open={!!this.state.editedGroup}
           group={this.state.editedGroup}
           layout={layout}
@@ -867,6 +867,7 @@ export default class SceneEditor extends Component {
             {
               label: 'Edit Object',
               click: () => this.openObjectEditor(),
+              enabled: this.instancesSelection.hasSelectedInstances(),
             },
             {
               label: 'Scene properties',
@@ -908,6 +909,7 @@ export default class SceneEditor extends Component {
               label: 'Delete',
               click: () => this.deleteSelection(),
               accelerator: 'Delete',
+              enabled: this.instancesSelection.hasSelectedInstances(),
             },
           ]}
         />

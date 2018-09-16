@@ -46,8 +46,8 @@ import LayoutChooserDialog from '../MainFrame/Editors/LayoutChooserDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
-import ObjectsGroupEditor from '../ObjectsGroupEditor';
-import ObjectsGroupsList from '../ObjectsGroupsList';
+import ObjectGroupEditor from '../ObjectGroupEditor';
+import ObjectGroupsList from '../ObjectGroupsList';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
@@ -1068,20 +1068,20 @@ storiesOf('InstancePropertiesEditor', module)
     </SerializedObjectDisplay>
   ));
 
-storiesOf('ObjectsGroupEditor', module)
+storiesOf('ObjectGroupEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ObjectsGroupEditor project={project} layout={testLayout} group={group2} />
+    <ObjectGroupEditor project={project} layout={testLayout} group={group2} />
   ));
 
-storiesOf('ObjectsGroupsList', module)
+storiesOf('ObjectGroupsList', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={testLayout}>
       <div style={{ height: 250 }}>
-        <ObjectsGroupsList
+        <ObjectGroupsList
           project={project}
           objectsContainer={testLayout}
           onEditGroup={() => {}}

@@ -206,7 +206,7 @@ export default class SceneEditor extends Component {
   };
 
   openObjectEditor = () => {
-    if (!this.instanceSelection.hasSelectedInstances()) {
+    if (!this.instancesSelection.hasSelectedInstances()) {
       return;
     }
     const selectedInstanceObjectName = this.instancesSelection
@@ -295,12 +295,14 @@ export default class SceneEditor extends Component {
 
   _onObjectSelected = selectedObjectName => {
     this.setState({
+      selectedObjectToAddName: selectedObjectName,
       selectedObjectName,
     });
   };
 
   _onAddInstance = (x, y, objectName = '') => {
-    const newInstanceObjectName = objectName || this.state.selectedObjectName;
+    const newInstanceObjectName =
+      objectName || this.state.selectedObjectToAddName;
     if (!newInstanceObjectName) return;
 
     const instance = this.props.initialInstances.insertNewInitialInstance();
@@ -312,6 +314,7 @@ export default class SceneEditor extends Component {
     instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
     this.setState(
       {
+        selectedObjectToAddName: null,
         selectedObjectName: null,
         history: saveToHistory(this.state.history, this.props.initialInstances),
       },
@@ -320,6 +323,12 @@ export default class SceneEditor extends Component {
   };
 
   _onInstancesSelected = instances => {
+    if (!this.instancesSelection.hasSelectedInstances()){return}
+    this.setState({
+      selectedObjectName: instances[0].getObjectName(),
+      history: saveToHistory(this.state.history, this.props.initialInstances),
+    });
+
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
   };
@@ -895,6 +904,7 @@ export default class SceneEditor extends Component {
             {
               label: 'Delete',
               click: () => this.deleteSelection(),
+              accelerator: 'Delete',
             },
           ]}
         />

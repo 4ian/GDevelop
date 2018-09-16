@@ -552,7 +552,7 @@ export default class InstancesEditorContainer extends Component {
             position: 'absolute',
             overflow: 'hidden',
           }}
-        />{' '}
+        />
       </SimpleDropTarget>
     );
   }

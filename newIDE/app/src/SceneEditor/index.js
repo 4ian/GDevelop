@@ -205,6 +205,12 @@ export default class SceneEditor extends Component {
     this.setState({ scenePropertiesDialogOpen: open });
   };
 
+  openObjectEditor = () => {
+    if(!this.instancesSelection.getSelectedInstances()[0]) {return};
+    const selectedObjectInstanceName = this.instancesSelection.getSelectedInstances()[0].getObjectName();
+    this.editObjectByName(selectedObjectInstanceName);
+  };
+
   editInstanceVariables = instance => {
     this.setState({ variablesEditedInstance: instance });
   };
@@ -842,6 +848,10 @@ export default class SceneEditor extends Component {
         <ContextMenu
           ref={contextMenu => (this.contextMenu = contextMenu)}
           buildMenuTemplate={() => [
+            {
+              label: 'Edit Object',
+              click: () => this.openObjectEditor(),
+            },
             {
               label: 'Scene properties',
               click: () => this.openSceneProperties(true),

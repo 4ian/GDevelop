@@ -206,9 +206,13 @@ export default class SceneEditor extends Component {
   };
 
   openObjectEditor = () => {
-    if(!this.instancesSelection.getSelectedInstances()[0]) {return};
-    const selectedObjectInstanceName = this.instancesSelection.getSelectedInstances()[0].getObjectName();
-    this.editObjectByName(selectedObjectInstanceName);
+    if (!this.instanceSelection.hasSelectedInstances()) {
+      return;
+    }
+    const selectedInstanceObjectName = this.instancesSelection
+      .getSelectedInstances()[0]
+      .getObjectName();
+    this.editObjectByName(selectedInstanceObjectName);
   };
 
   editInstanceVariables = instance => {

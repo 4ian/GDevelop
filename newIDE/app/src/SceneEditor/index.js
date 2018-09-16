@@ -855,6 +855,7 @@ export default class SceneEditor extends Component {
             {
               label: 'Edit Object',
               click: () => this.openObjectEditor(),
+              enabled: this.instancesSelection.hasSelectedInstances(),
             },
             {
               label: 'Scene properties',
@@ -895,6 +896,7 @@ export default class SceneEditor extends Component {
             {
               label: 'Delete',
               click: () => this.deleteSelection(),
+              enabled: this.instancesSelection.hasSelectedInstances(),
             },
           ]}
         />

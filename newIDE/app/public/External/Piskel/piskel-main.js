@@ -207,7 +207,6 @@ function saveToGD() {
   for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
     const frame = layer.getFrameAt(i);
     let exportPath = frame.originalPath;
-    let resourceName = frame.originalName;
     const originalIndex = frame.originalIndex;
     const pathAlreadyUsed = outputResources.filter(
       resource => resource.path === exportPath
@@ -215,15 +214,13 @@ function saveToGD() {
 
     // If a frame was made in piskel (exportPath and resourceName will be null) come up with a unique path, so as not to overwrite any existing files
     // Also prevent overwriting frames that were created via duplication of imported frames or frames with same resources
-    if (!exportPath || !resourceName || pathAlreadyUsed) {
+    if (!exportPath || pathAlreadyUsed) {
       exportPath = baseExportPath + '-' + String(i + 1) + '.png';
       exportPath = makeFileNameUnique(exportPath);
-      resourceName = path.basename(exportPath);
     }
 
     outputResources.push({
       path: exportPath,
-      name: resourceName,
       originalIndex,
     });
   }

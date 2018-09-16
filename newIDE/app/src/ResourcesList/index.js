@@ -6,6 +6,10 @@ import Paper from 'material-ui/Paper';
 import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
+import optionalRequire from '../Utils/OptionalRequire.js';
+const path = optionalRequire('path');
+const glob = optionalRequire('glob');
+const gd = global.gd;
 
 const styles = {
   container: {
@@ -79,6 +83,47 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
+  _scanForNewResources = () => {
+    const project = this.props.project;
+    const resourcesManager = project.getResourcesManager();
+    console.log('Scanning the project folder for new resources...');
+    const projectPath = path.dirname(project.getProjectFile());
+
+    const getDirectories = (src, callback) => {
+      glob(src + '/**/*.{png,jpg,jpeg,PNG,JPG,JPEG}', callback);
+    };
+    getDirectories(projectPath, (err, res) => {
+      if (err) {
+        console.log('Error loading ', err);
+      } else {
+        res.forEach(pathFound => {
+          const fileName = path.relative(projectPath, pathFound);
+          if (!resourcesManager.hasResource(fileName)) {
+            const imageResource = new gd.ImageResource();
+            imageResource.setFile(fileName);
+            imageResource.setName(fileName);
+            resourcesManager.addResource(imageResource);
+            imageResource.delete();
+            console.info(`${fileName} added to project.`);
+          }
+        });
+      }
+      this.forceUpdate();
+    });
+  };
+
+  _removeAllUnusedImages = () => {
+    const { project } = this.props;
+    gd.ProjectResourcesAdder
+      .getAllUselessImages(project)
+      .toJSArray()
+      .forEach(imageName => {
+        console.info(`Removing unused image resource: ${imageName}`);
+      });
+    gd.ProjectResourcesAdder.removeAllUselessImages(project);
+    this.forceUpdate();
+  };
+
   _editName = (resource: ?gdResource) => {
     this.setState(
       {
@@ -127,8 +172,21 @@ export default class ResourcesList extends React.Component<Props, State> {
         click: () => this._editName(resource),
       },
       {
-        label: 'Delete',
+        label: 'Remove',
         click: () => this._deleteResource(resource),
+      },
+      { type: 'separator' },
+      {
+        label: 'Scan for Images',
+        click: () => {
+          this._scanForNewResources();
+        },
+      },
+      {
+        label: 'Remove All Unused Images',
+        click: () => {
+          this._removeAllUnusedImages();
+        },
       },
     ];
   };

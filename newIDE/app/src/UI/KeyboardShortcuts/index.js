@@ -65,6 +65,10 @@ export default class KeyboardShortcuts {
     return this.shiftPressed;
   }
 
+  shouldNotSnapToGrid() {
+    return this.altPressed;
+  }
+
   shouldResizeProportionally() {
     return this.shiftPressed;
   }
@@ -175,9 +179,11 @@ export default class KeyboardShortcuts {
     if (!this.isFocused) return;
 
     if (!isMacLike()) {
-      if (evt.button === MID_MOUSE_BUTTON){
-        this.mouseMidButtonPressed = true
-      } else {this.mouseMidButtonPressed = false}
+      if (evt.button === MID_MOUSE_BUTTON) {
+        this.mouseMidButtonPressed = true;
+      } else {
+        this.mouseMidButtonPressed = false;
+      }
     }
   };
 

@@ -206,7 +206,7 @@ export default class SceneEditor extends Component {
   };
 
   openObjectEditor = () => {
-    if (!this.instanceSelection.hasSelectedInstances()) {
+    if (!this.instancesSelection.hasSelectedInstances()) {
       return;
     }
     const selectedInstanceObjectName = this.instancesSelection

@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
-import ObjectsGroupEditor from '.';
+import ObjectGroupEditor from '.';
 import Dialog from '../UI/Dialog';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 const gd = global.gd;
 
-export class ObjectsGroupEditorDialog extends Component {
+export class ObjectGroupEditorDialog extends Component {
   render() {
     const { group } = this.props;
     if (!group) return null;
@@ -35,7 +35,7 @@ export class ObjectsGroupEditorDialog extends Component {
         open={this.props.open}
         title={`Edit ${group.getName()} group`}
       >
-        <ObjectsGroupEditor
+        <ObjectGroupEditor
           group={group}
           project={this.props.project}
           layout={this.props.layout}
@@ -47,7 +47,7 @@ export class ObjectsGroupEditorDialog extends Component {
   }
 }
 
-export default withSerializableObject(ObjectsGroupEditorDialog, {
+export default withSerializableObject(ObjectGroupEditorDialog, {
   newObjectCreator: () => new gd.ObjectGroup(),
   propName: 'group',
 });

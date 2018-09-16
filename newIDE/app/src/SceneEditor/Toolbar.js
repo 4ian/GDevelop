@@ -51,7 +51,7 @@ export class Toolbar extends PureComponent {
         )}
         {this.props.showObjectsList && (
           <ToolbarIcon
-            onClick={this.props.openObjectsGroupsList}
+            onClick={this.props.openObjectGroupsList}
             src={'res/ribbon_default/objectsgroups64.png'}
             tooltip={t('Open the objects groups editor')}
           />

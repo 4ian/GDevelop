@@ -13,7 +13,7 @@ const styles = {
   },
 };
 
-export default class ObjectsGroupEditor extends Component {
+export default class ObjectGroupEditor extends Component {
   state = {
     newObjectName: '',
   };

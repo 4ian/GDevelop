@@ -392,12 +392,11 @@ export default class SceneEditor extends Component {
   };
 
   _onInstancesSelected = instances => {
-    if (!this.instancesSelection.hasSelectedInstances()) {
-      return;
+    if (this.instancesSelection.hasSelectedInstances()) {
+      this.setState({
+        selectedObjectName: instances[0].getObjectName(),
+      });
     }
-    this.setState({
-      selectedObjectName: instances[0].getObjectName(),
-    });
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
   };

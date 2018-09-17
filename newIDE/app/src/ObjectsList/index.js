@@ -59,7 +59,7 @@ class ObjectsList extends Component<*, *> {
   }
 
   render() {
-    let { height, width, fullList, project, selectedObjectName } = this.props;
+    let { height, width, fullList, project, selectedObjectNames } = this.props;
 
     return (
       <List
@@ -122,9 +122,8 @@ class ObjectsList extends Component<*, *> {
               editingName={nameBeingEdited}
               getThumbnail={this.props.getThumbnail}
               selected={
-                objectWithContext.object.getName() === selectedObjectName
+                selectedObjectNames.indexOf(objectWithContext.object.getName()) !== -1
               }
-              onObjectSelected={this.props.onObjectSelected}
             />
           );
         }}
@@ -183,7 +182,7 @@ export default class ObjectsListContainer extends React.Component<
     )
       return true;
 
-    if (this.props.selectedObjectName !== nextProps.selectedObjectName)
+    if (this.props.selectedObjectNames !== nextProps.selectedObjectNames)
       return true;
 
     if (
@@ -453,8 +452,7 @@ export default class ObjectsListContainer extends React.Component<
                 height={height}
                 renamedObjectWithScope={this.state.renamedObjectWithScope}
                 getThumbnail={this.props.getThumbnail}
-                selectedObjectName={this.props.selectedObjectName}
-                onObjectSelected={this.props.onObjectSelected}
+                selectedObjectNames={this.props.selectedObjectNames}
                 onEditObject={this.props.onEditObject}
                 onCopyObject={this._copyObject}
                 onCutObject={this._cutObject}

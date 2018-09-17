@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import uniq from 'lodash/uniq';
 import ObjectsList from '../ObjectsList';
 import ObjectGroupsList from '../ObjectGroupsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
@@ -79,7 +79,7 @@ export default class SceneEditor extends Component {
       layerRemoved: null,
       editedObjectWithContext: { object: null, global: null },
       variablesEditedInstance: null,
-      selectedObjectName: null,
+      selectedObjectNames: [],
 
       editedGroup: null,
 
@@ -366,12 +366,6 @@ export default class SceneEditor extends Component {
     );
   };
 
-  _onObjectSelected = selectedObjectName => {
-    this.setState({
-      selectedObjectName,
-    });
-  };
-
   _addInstance = (x, y, objectName) => {
     if (!objectName) return;
 
@@ -384,7 +378,7 @@ export default class SceneEditor extends Component {
     instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
     this.setState(
       {
-        selectedObjectName: null,
+        selectedObjectNames: [],
         history: saveToHistory(this.state.history, this.props.initialInstances),
       },
       () => this.updateToolbar()
@@ -392,11 +386,9 @@ export default class SceneEditor extends Component {
   };
 
   _onInstancesSelected = instances => {
-    if (this.instancesSelection.hasSelectedInstances()) {
-      this.setState({
-        selectedObjectName: instances[0].getObjectName(),
-      });
-    }
+    this.setState({
+      selectedObjectNames: uniq(instances.map(instance => instance.getObjectName())),
+    });
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
   };
@@ -744,9 +736,9 @@ export default class SceneEditor extends Component {
       'objects-list': (
         <MosaicWindow
           title="Objects"
-          selectedObjectName={
+          selectedObjectNames={
             this.state
-              .selectedObjectName /*Ensure MosaicWindow content is updated when selectedObjectName changes*/
+              .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/
           }
           canDropDraggedObject={
             this.state
@@ -759,8 +751,7 @@ export default class SceneEditor extends Component {
             )}
             project={project}
             objectsContainer={layout}
-            selectedObjectName={this.state.selectedObjectName}
-            onObjectSelected={this._onObjectSelected}
+            selectedObjectNames={this.state.selectedObjectNames}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             canRenameObject={(
@@ -885,7 +876,7 @@ export default class SceneEditor extends Component {
         </Drawer>
         <InfoBar
           message="Drag and Drop the object to the scene to add an instance."
-          show={!!this.state.selectedObjectName}
+          show={!!this.state.selectedObjectNames.length}
         />
         <InfoBar
           message="Objects panel is already opened: use it to add and edit objects."

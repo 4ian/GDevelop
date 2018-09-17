@@ -82,7 +82,7 @@ export default class SceneEditor extends Component {
       selectedObjectName: null,
 
       editedGroup: null,
-      
+
       // State for "drag'n'dropping" from the objects list to the instances editor:
       objectDraggedFromList: null,
       canDropDraggedObject: false,
@@ -278,7 +278,7 @@ export default class SceneEditor extends Component {
         objectDraggedFromList: null,
       });
     }
-  }
+  };
 
   _onPointerOverInstancesEditor = () => {
     // If an object is dragged, and cursor is over the instances editor,
@@ -373,11 +373,11 @@ export default class SceneEditor extends Component {
   };
 
   _addInstance = (x, y, objectName = '') => {
-    const newInstanceObjectName = objectName || this.state.selectedObjectName;
-    if (!newInstanceObjectName) return;
+    // const newInstanceObjectName = objectName;
+    if (!objectName) return;
 
     const instance = this.props.initialInstances.insertNewInitialInstance();
-    instance.setObjectName(newInstanceObjectName);
+    instance.setObjectName(objectName);
     instance.setX(x);
     instance.setY(y);
 
@@ -393,6 +393,12 @@ export default class SceneEditor extends Component {
   };
 
   _onInstancesSelected = instances => {
+    if (!this.instancesSelection.hasSelectedInstances()) {
+      return;
+    }
+    this.setState({
+      selectedObjectName: instances[0].getObjectName(),
+    });
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
   };
@@ -880,7 +886,7 @@ export default class SceneEditor extends Component {
           />
         </Drawer>
         <InfoBar
-          message="Touch/click on the scene to add the object"
+          message="Drag and Drop the object to the scene to add an instance."
           show={!!this.state.selectedObjectName}
         />
         <InfoBar

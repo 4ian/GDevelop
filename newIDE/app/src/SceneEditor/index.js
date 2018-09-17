@@ -83,6 +83,10 @@ export default class SceneEditor extends Component {
 
       editedGroup: null,
 
+      // State for "drag'n'dropping" from the objects list to the instances editor:
+      objectDraggedFromList: null,
+      canDropDraggedObject: false,
+
       uiSettings: props.initialUiSettings,
       history: getHistoryInitialState(props.initialInstances, {
         historyMaxSize: 50,
@@ -250,6 +254,75 @@ export default class SceneEditor extends Component {
       this.editObject(project.getObject(objectName));
   };
 
+  /**
+   * Called when an object is started to be dragged from the object list.
+   * See `_onPointerOverInstancesEditor`, `_onPointerOutInstancesEditor` and
+   * `_onPointerUpInstancesEditor` for the drag'n'drop workflow.
+   */
+  _onStartDraggingObjectFromList = object => {
+    // "Hijack" the name of the object that is dragged in the objects list.
+    // We'll then listen to "pointer over" events to see if the object
+    // is the dragged on the instances editor.
+    this.setState({
+      objectDraggedFromList: object,
+    });
+  };
+
+  _onEndDraggingObjectFromList = () => {
+    // If the dragged object is not being dropped on the instances editor,
+    // clear the dragged object so that we don't keep it the state (otherwise
+    // we could think later that a dragging is still occuring when cursor
+    // is over the instances editor).
+    if (!this.state.canDropDraggedObject) {
+      this.setState({
+        objectDraggedFromList: null,
+      });
+    }
+  };
+
+  _onPointerOverInstancesEditor = () => {
+    // If an object is dragged, and cursor is over the instances editor,
+    // mark in the state that we can drop an instance of this object.
+    if (this.state.objectDraggedFromList && !this.state.canDropDraggedObject) {
+      this.setState({
+        canDropDraggedObject: true,
+      });
+    }
+  };
+
+  _onPointerOutInstancesEditor = () => {
+    // If cursor is going out of the instances editor,
+    // mark in the state that we cannot drop an instance anymore.
+    if (this.state.canDropDraggedObject) {
+      this.setState({
+        canDropDraggedObject: false,
+      });
+    }
+  };
+
+  _onPointerUpInstancesEditor = () => {
+    if (this.state.canDropDraggedObject) {
+      if (this.editor && this.state.objectDraggedFromList) {
+        const cursorPosition = this.editor.getLastCursorPosition();
+        this._addInstance(
+          cursorPosition[0],
+          cursorPosition[1],
+          this.state.objectDraggedFromList.getName()
+        );
+      }
+      // Wait 30ms after dropping the object before reseting the canDropDraggedObject state boolean
+      // to ensure ObjectsList will be prevented to actually move object in the list.
+      setTimeout(
+        () =>
+          this.setState({
+            canDropDraggedObject: false,
+            objectDraggedFromList: null,
+          }),
+        30 // This value is very conservative, and timeout may not be needed at all
+      );
+    }
+  };
+
   editGroup = group => {
     this.setState({ editedGroup: group });
   };
@@ -299,12 +372,12 @@ export default class SceneEditor extends Component {
     });
   };
 
-  _onAddInstance = (x, y, objectName = '') => {
-    const newInstanceObjectName = objectName || this.state.selectedObjectName;
-    if (!newInstanceObjectName) return;
+  _addInstance = (x, y, objectName = '') => {
+    // const newInstanceObjectName = objectName;
+    if (!objectName) return;
 
     const instance = this.props.initialInstances.insertNewInitialInstance();
-    instance.setObjectName(newInstanceObjectName);
+    instance.setObjectName(objectName);
     instance.setX(x);
     instance.setY(y);
 
@@ -320,6 +393,12 @@ export default class SceneEditor extends Component {
   };
 
   _onInstancesSelected = instances => {
+    if (!this.instancesSelection.hasSelectedInstances()) {
+      return;
+    }
+    this.setState({
+      selectedObjectName: instances[0].getObjectName(),
+    });
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
   };
@@ -640,7 +719,7 @@ export default class SceneEditor extends Component {
           project={project}
           layout={layout}
           initialInstances={initialInstances}
-          onAddInstance={this._onAddInstance}
+          onAddInstance={this._addInstance}
           options={this.state.uiSettings}
           onChangeOptions={this.setUiSettings}
           instancesSelection={this.instancesSelection}
@@ -648,6 +727,9 @@ export default class SceneEditor extends Component {
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
           onInstancesResized={this._onInstancesResized}
+          onPointerUp={this._onPointerUpInstancesEditor}
+          onPointerOver={this._onPointerOverInstancesEditor}
+          onPointerOut={this._onPointerOutInstancesEditor}
           onContextMenu={this._onContextMenu}
           onCopy={() => this.copySelection({ useLastCursorPosition: true })}
           onCut={() => this.cutSelection({ useLastCursorPosition: true })}
@@ -656,6 +738,7 @@ export default class SceneEditor extends Component {
           onRedo={this.redo}
           onZoomOut={this.zoomOut}
           onZoomIn={this.zoomIn}
+          showDropCursor={this.state.canDropDraggedObject}
           wrappedEditorRef={editor => (this.editor = editor)}
           pauseRendering={!isActive}
         />
@@ -666,6 +749,10 @@ export default class SceneEditor extends Component {
           selectedObjectName={
             this.state
               .selectedObjectName /*Ensure MosaicWindow content is updated when selectedObjectName changes*/
+          }
+          canDropDraggedObject={
+            this.state
+              .canDropDraggedObject /*Ensure MosaicWindow content is updated when canDropDraggedObject changes*/
           }
         >
           <ObjectsList
@@ -686,6 +773,9 @@ export default class SceneEditor extends Component {
             }}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
+            onStartDraggingObject={this._onStartDraggingObjectFromList}
+            onEndDraggingObject={this._onEndDraggingObjectFromList}
+            canMoveObjects={!this.state.canDropDraggedObject}
             ref={objectsList => (this._objectsList = objectsList)}
           />
         </MosaicWindow>
@@ -796,7 +886,7 @@ export default class SceneEditor extends Component {
           />
         </Drawer>
         <InfoBar
-          message="Touch/click on the scene to add the object"
+          message="Drag and Drop the object to the scene to add an instance."
           show={!!this.state.selectedObjectName}
         />
         <InfoBar

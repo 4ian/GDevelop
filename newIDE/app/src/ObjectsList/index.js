@@ -471,7 +471,7 @@ export default class ObjectsListContainer extends React.Component<
                   this._move(oldIndex, newIndex);
                 }}
                 helperClass="sortable-helper"
-                distance={30}
+                distance={20}
               />
             )}
           </AutoSizer>

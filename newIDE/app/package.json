@@ -41,7 +41,7 @@
     "react-color": "2.13.8",
     "react-dnd": "2.5.4",
     "react-dnd-html5-backend": "2.5.4",
-    "react-dom": "^16.2.0",
+    "react-dom": "16.5.1",
     "react-error-boundary": "^1.2.0",
     "react-i18next": "6.2.0",
     "react-json-view": "^1.16.1",

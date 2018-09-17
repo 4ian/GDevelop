@@ -579,6 +579,7 @@ export default class SceneEditor extends Component {
 
     this.setState(
       {
+        selectedObjectNames: [],
         history: saveToHistory(this.state.history, this.props.initialInstances),
       },
       () => {

@@ -51,9 +51,6 @@ export default class InstancesEditorContainer extends Component {
 
       return false;
     });
-    this.pixiRenderer.view.addEventListener('click', e => {
-      this._onClick(e.offsetX, e.offsetY);
-    });
     this.pixiRenderer.view.addEventListener('pointerup', event => {
       this.props.onPointerUp();
     });
@@ -459,13 +456,6 @@ export default class InstancesEditorContainer extends Component {
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesResized(selectedInstances);
-  };
-
-  _onClick = (x, y) => {
-    const newPos = this.viewPosition.toSceneCoordinates(x, y);
-    if (this.props.onAddInstance) {
-      this.props.onAddInstance(newPos[0], newPos[1]);
-    }
   };
 
   _onDrop = (x, y, objectName) => {

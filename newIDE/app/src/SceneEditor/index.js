@@ -372,8 +372,7 @@ export default class SceneEditor extends Component {
     });
   };
 
-  _addInstance = (x, y, objectName = '') => {
-    // const newInstanceObjectName = objectName;
+  _addInstance = (x, y, objectName) => {
     if (!objectName) return;
 
     const instance = this.props.initialInstances.insertNewInitialInstance();
@@ -890,11 +889,11 @@ export default class SceneEditor extends Component {
           show={!!this.state.selectedObjectName}
         />
         <InfoBar
-          message="Objects panel is already opened: Use it to add and edit objects."
+          message="Objects panel is already opened: use it to add and edit objects."
           show={!!this.state.showObjectsListInfoBar}
         />
         <InfoBar
-          message="Properties panel is already opened"
+          message="Properties panel is already opened."
           show={!!this.state.showPropertiesInfoBar}
         />
         <SetupGridDialog

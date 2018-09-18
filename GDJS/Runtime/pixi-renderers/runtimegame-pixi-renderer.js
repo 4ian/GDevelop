@@ -366,7 +366,7 @@ gdjs.RuntimeGamePixiRenderer.getScreenHeight = function() {
 /**
  * Open the given URL in the system browser (or a new tab)
  */
-gdjs.RuntimeGamePixiRenderer.prototype.openURL = function() {
+gdjs.RuntimeGamePixiRenderer.prototype.openURL = function(url) {
     // Try to detect the environment to use the most adapted
     // way of opening an URL.
     if (typeof Cocoon !== "undefined" && Cocoon.App && Cocoon.App.openURL) {

@@ -193,6 +193,7 @@ type Props = {|
   onAddExternalLayout: () => void,
   onOpenPlatformSpecificAssets: () => void,
   onChangeSubscription: () => void,
+  freezeUpdate: boolean,
 |};
 
 type State = {|
@@ -211,6 +212,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     projectPropertiesDialogOpen: false,
     variablesEditorOpen: false,
   };
+
+  shouldComponentUpdate(nextProps: Props) {
+    // Rendering the component is (super) costly (~20ms) as it iterates over
+    // every project layouts/external layouts/external events, 
+    // so the prop freezeUpdate allow to ask the component to stop
+    // updating, for example when hidden.
+    return !nextProps.freezeUpdate;
+  }
 
   _onEditName = (kind: ?string, name: string) => {
     this.setState({

@@ -1027,6 +1027,7 @@ export default class MainFrame extends React.Component<Props, State> {
                 onOpenPlatformSpecificAssets={() =>
                   this.openPlatformSpecificAssets()}
                 onChangeSubscription={() => this.openSubscription(true)}
+                freezeUpdate={!projectManagerOpen}
               />
             )}
           </Drawer>

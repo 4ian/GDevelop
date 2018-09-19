@@ -18,6 +18,11 @@ import PIXI from 'pixi.js';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 
+const styles = {
+  canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
+  dropCursor: { cursor: 'copy' },
+};
+
 export default class InstancesEditorContainer extends Component {
   constructor() {
     super();
@@ -46,8 +51,14 @@ export default class InstancesEditorContainer extends Component {
 
       return false;
     });
-    this.pixiRenderer.view.addEventListener('click', e => {
-      this._onClick(e.offsetX, e.offsetY);
+    this.pixiRenderer.view.addEventListener('pointerup', event => {
+      this.props.onPointerUp();
+    });
+    this.pixiRenderer.view.addEventListener('pointerover', event => {
+      this.props.onPointerOver();
+    });
+    this.pixiRenderer.view.addEventListener('pointerout', event => {
+      this.props.onPointerOut();
     });
     this.pixiRenderer.view.onmousewheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
@@ -447,13 +458,6 @@ export default class InstancesEditorContainer extends Component {
     this.props.onInstancesResized(selectedInstances);
   };
 
-  _onClick = (x, y) => {
-    const newPos = this.viewPosition.toSceneCoordinates(x, y);
-    if (this.props.onAddInstance) {
-      this.props.onAddInstance(newPos[0], newPos[1]);
-    }
-  };
-
   _onDrop = (x, y, objectName) => {
     const newPos = this.viewPosition.toSceneCoordinates(x, y);
     if (this.props.onAddInstance) {
@@ -548,9 +552,8 @@ export default class InstancesEditorContainer extends Component {
         <div
           ref={canvasArea => (this.canvasArea = canvasArea)}
           style={{
-            flex: 1,
-            position: 'absolute',
-            overflow: 'hidden',
+            ...styles.canvasArea,
+            ...(this.props.showDropCursor ? styles.dropCursor : undefined),
           }}
         />
       </SimpleDropTarget>

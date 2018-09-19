@@ -302,7 +302,7 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
                 onSortEnd={({ oldIndex, newIndex }) =>
                   this._onMove(oldIndex, newIndex)}
                 helperClass="sortable-helper"
-                distance={30}
+                distance={20}
               />
             )}
           </AutoSizer>

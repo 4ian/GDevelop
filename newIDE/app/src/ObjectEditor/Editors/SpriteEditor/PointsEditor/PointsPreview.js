@@ -106,7 +106,7 @@ export default class PointsPreview extends React.Component<Props, State> {
         }}
         alt=""
         key={name}
-        onMouseDown={() => {
+        onPointerDown={() => {
           this._onStartDragPoint(point, kind);
         }}
       />
@@ -133,8 +133,8 @@ export default class PointsPreview extends React.Component<Props, State> {
     return (
       <div
         style={styles.container}
-        onMouseMove={this._onMouseMove}
-        onMouseUp={this._onEndDragPoint}
+        onPointerMove={this._onMouseMove}
+        onPointerUp={this._onEndDragPoint}
         ref={container => (this._container = container)}
       >
         {points}

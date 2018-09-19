@@ -151,19 +151,12 @@ class ThemableObjectRow extends React.Component {
         primaryText={label}
         leftIcon={<ListIcon src={this.props.getThumbnail(project, object)} />}
         rightIconButton={this._renderObjectMenu(object)}
-        onClick={() => {
-          if (!this.props.onObjectSelected) return;
-          if (this.props.editingName) return;
-
-          this.props.onObjectSelected(selected ? '' : objectName);
-        }}
         onDoubleClick={(event) => {
           if (event.button !== LEFT_MOUSE_BUTTON) return;
           if (!this.props.onEdit) return;
           if (this.props.editingName) return;
 
           this.props.onEdit(object);
-          this.props.onObjectSelected('');
         }}
       />
     );

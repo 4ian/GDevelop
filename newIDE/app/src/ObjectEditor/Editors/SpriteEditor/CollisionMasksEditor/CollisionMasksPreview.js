@@ -63,7 +63,7 @@ export default class CollisionMasksPreview extends React.Component<
    * If custom zoom is added, this should be adapted to properly set vertex coordinates.
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
-  _onMouseMove = (event: any) => {
+  _onPointerMove = (event: any) => {
     const { draggedVertex } = this.state;
     if (!draggedVertex) return;
 
@@ -117,7 +117,7 @@ export default class CollisionMasksPreview extends React.Component<
           const vertices = polygon.getVertices();
           return mapVector(vertices, (vertex, j) => (
             <circle
-              onMouseDown={event => this._onStartDragVertex(vertex)}
+              onPointerDown={event => this._onStartDragVertex(vertex)}
               key={`polygon-${i}-vertex-${j}`}
               fill="rgba(255,0,0,0.75)"
               strokeWidth={1}
@@ -137,8 +137,8 @@ export default class CollisionMasksPreview extends React.Component<
 
     return (
       <svg
-        onMouseMove={this._onMouseMove}
-        onMouseUp={this._onEndDragVertex}
+        onPointerMove={this._onPointerMove}
+        onPointerUp={this._onEndDragVertex}
         width={this.props.imageWidth}
         height={this.props.imageHeight}
         style={styles.svg}

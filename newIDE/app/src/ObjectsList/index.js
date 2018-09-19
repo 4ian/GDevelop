@@ -59,7 +59,7 @@ class ObjectsList extends Component<*, *> {
   }
 
   render() {
-    let { height, width, fullList, project, selectedObjectName } = this.props;
+    let { height, width, fullList, project, selectedObjectNames } = this.props;
 
     return (
       <List
@@ -122,9 +122,8 @@ class ObjectsList extends Component<*, *> {
               editingName={nameBeingEdited}
               getThumbnail={this.props.getThumbnail}
               selected={
-                objectWithContext.object.getName() === selectedObjectName
+                selectedObjectNames.indexOf(objectWithContext.object.getName()) !== -1
               }
-              onObjectSelected={this.props.onObjectSelected}
             />
           );
         }}
@@ -183,7 +182,7 @@ export default class ObjectsListContainer extends React.Component<
     )
       return true;
 
-    if (this.props.selectedObjectName !== nextProps.selectedObjectName)
+    if (this.props.selectedObjectNames !== nextProps.selectedObjectNames)
       return true;
 
     if (
@@ -343,6 +342,8 @@ export default class ObjectsListContainer extends React.Component<
   };
 
   _move = (oldIndex: number, newIndex: number) => {
+    if (!this.props.canMoveObjects) return;
+
     const { project, objectsContainer } = this.props;
 
     const isInContainerObjectsList =
@@ -363,6 +364,20 @@ export default class ObjectsListContainer extends React.Component<
     }
 
     this.forceUpdateList();
+  };
+
+  _onStartDraggingObject = ({index}: {index: number}) => {
+    const { project, objectsContainer } = this.props;
+
+    const isInContainerObjectsList =
+      index < this.containerObjectsList.length;
+    if (isInContainerObjectsList) {
+      this.props.onStartDraggingObject(objectsContainer.getObjectAt(index));
+    } else {
+      const projectIndex = index - this.containerObjectsList.length;
+
+      this.props.onStartDraggingObject(project.getObjectAt(projectIndex));
+    }
   };
 
   _setAsGlobalObject = (objectWithContext: ObjectWithContext) => {
@@ -437,8 +452,7 @@ export default class ObjectsListContainer extends React.Component<
                 height={height}
                 renamedObjectWithScope={this.state.renamedObjectWithScope}
                 getThumbnail={this.props.getThumbnail}
-                selectedObjectName={this.props.selectedObjectName}
-                onObjectSelected={this.props.onObjectSelected}
+                selectedObjectNames={this.props.selectedObjectNames}
                 onEditObject={this.props.onEditObject}
                 onCopyObject={this._copyObject}
                 onCutObject={this._cutObject}
@@ -451,10 +465,13 @@ export default class ObjectsListContainer extends React.Component<
                 onEditVariables={this._editVariables}
                 onDelete={this._deleteObject}
                 onRename={this._rename}
-                onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)}
+                onSortStart={this._onStartDraggingObject}
+                onSortEnd={({ oldIndex, newIndex }) => {
+                  this.props.onEndDraggingObject();
+                  this._move(oldIndex, newIndex);
+                }}
                 helperClass="sortable-helper"
-                distance={30}
+                distance={20}
               />
             )}
           </AutoSizer>

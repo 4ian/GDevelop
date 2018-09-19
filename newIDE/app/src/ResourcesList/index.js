@@ -224,9 +224,9 @@ export default class ResourcesList extends React.Component<Props, State> {
                 onRename={this._rename}
                 onSortEnd={({ oldIndex, newIndex }) =>
                   this._move(oldIndex, newIndex)}
-                helperClass="sortable-helper"
-                distance={30}
                 buildMenuTemplate={this._renderResourceMenuTemplate}
+                helperClass="sortable-helper"
+                distance={20}
               />
             )}
           </AutoSizer>

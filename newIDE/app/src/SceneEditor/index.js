@@ -366,6 +366,32 @@ export default class SceneEditor extends Component {
     );
   };
 
+  _onObjectSelected = selectedObjectName => {
+    this.setState({
+      selectedObjectNames: [selectedObjectName],
+    });
+  };
+
+  _onAddInstanceUnderCursor = () => {
+    const objectSelected = this.state.selectedObjectNames[0];
+    const cursorPosition = this.editor.getLastCursorPosition();
+    this._addInstance(cursorPosition[0], cursorPosition[1], objectSelected);
+    this.setState({
+      selectedObjectNames: [objectSelected],
+    });
+  };
+
+  shortenedString = (inputString: string, maxlength: number) => {
+    if (!inputString) {
+      return '';
+    }
+    let resultString = inputString;
+    if (resultString.length > maxlength) {
+      resultString = resultString.substring(0, maxlength) + '...';
+    }
+    return resultString;
+  };
+
   _addInstance = (x, y, objectName) => {
     if (!objectName) return;
 
@@ -387,7 +413,9 @@ export default class SceneEditor extends Component {
 
   _onInstancesSelected = instances => {
     this.setState({
-      selectedObjectNames: uniq(instances.map(instance => instance.getObjectName())),
+      selectedObjectNames: uniq(
+        instances.map(instance => instance.getObjectName())
+      ),
     });
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
@@ -761,6 +789,7 @@ export default class SceneEditor extends Component {
             ) => {
               return this._canObjectUseNewName(objectWithContext, newName);
             }}
+            onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
             onStartDraggingObject={this._onStartDraggingObjectFromList}
@@ -933,9 +962,19 @@ export default class SceneEditor extends Component {
           ref={contextMenu => (this.contextMenu = contextMenu)}
           buildMenuTemplate={() => [
             {
+              label:
+                'Add an Instance of ' +
+                this.shortenedString(this.state.selectedObjectNames[0], 7),
+              click: () => this._onAddInstanceUnderCursor(),
+              visible:
+                // !this.instancesSelection.hasSelectedInstances() &&
+                this.state.selectedObjectNames.length > 0,
+            },
+            {
               label: 'Edit Object',
               click: () => this.openObjectEditor(),
-              enabled: this.instancesSelection.hasSelectedInstances(),
+              visible:
+                this.instancesSelection.hasSelectedInstances(),
             },
             {
               label: 'Scene properties',

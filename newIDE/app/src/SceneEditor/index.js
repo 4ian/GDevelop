@@ -966,15 +966,12 @@ export default class SceneEditor extends Component {
                 'Add an Instance of ' +
                 this.shortenedString(this.state.selectedObjectNames[0], 7),
               click: () => this._onAddInstanceUnderCursor(),
-              visible:
-                // !this.instancesSelection.hasSelectedInstances() &&
-                this.state.selectedObjectNames.length > 0,
+              visible: this.state.selectedObjectNames.length > 0,
             },
             {
               label: 'Edit Object',
               click: () => this.openObjectEditor(),
-              visible:
-                this.instancesSelection.hasSelectedInstances(),
+              visible: this.instancesSelection.hasSelectedInstances(),
             },
             {
               label: 'Scene properties',

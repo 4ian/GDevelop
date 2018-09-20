@@ -970,7 +970,7 @@ export default class SceneEditor extends Component {
             },
             {
               label: 'Edit Object ' +
-              this.shortenedString(this.state.selectedObjectNames[0], 7),
+              this.shortenedString(this.state.selectedObjectNames[0], 14),
               click: () => this.openObjectEditor(),
               visible: this.instancesSelection.hasSelectedInstances(),
             },

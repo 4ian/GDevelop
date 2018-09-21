@@ -31,6 +31,7 @@ import EditorBar from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import { shortenString } from '../Utils/StringHelpers';
 
 import {
   undo,
@@ -373,23 +374,13 @@ export default class SceneEditor extends Component {
   };
 
   _onAddInstanceUnderCursor = () => {
+    if (!this.state.selectedObjectNames.length) return;
     const objectSelected = this.state.selectedObjectNames[0];
     const cursorPosition = this.editor.getLastCursorPosition();
     this._addInstance(cursorPosition[0], cursorPosition[1], objectSelected);
     this.setState({
       selectedObjectNames: [objectSelected],
     });
-  };
-
-  shortenedString = (inputString: string, maxlength: number) => {
-    if (!inputString) {
-      return '';
-    }
-    let resultString = inputString;
-    if (resultString.length > maxlength) {
-      resultString = resultString.substring(0, maxlength) + '...';
-    }
-    return resultString;
   };
 
   _addInstance = (x, y, objectName) => {
@@ -905,7 +896,7 @@ export default class SceneEditor extends Component {
           />
         </Drawer>
         <InfoBar
-          message="Drag and Drop the object to the scene to add an instance."
+          message="Drag and Drop the object to the scene or use the right click menu to add an instance of it."
           show={!!this.state.selectedObjectNames.length}
         />
         <InfoBar
@@ -962,17 +953,21 @@ export default class SceneEditor extends Component {
           ref={contextMenu => (this.contextMenu = contextMenu)}
           buildMenuTemplate={() => [
             {
-              label:
-                'Add an Instance of ' +
-                this.shortenedString(this.state.selectedObjectNames[0], 7),
+              label: this.state.selectedObjectNames.length
+                ? 'Add an Instance of ' +
+                  shortenString(this.state.selectedObjectNames[0], 7)
+                : '',
               click: () => this._onAddInstanceUnderCursor(),
               visible: this.state.selectedObjectNames.length > 0,
             },
             {
-              label: 'Edit Object ' +
-              this.shortenedString(this.state.selectedObjectNames[0], 14),
-              click: () => this.openObjectEditor(),
-              visible: this.instancesSelection.hasSelectedInstances(),
+              label: this.state.selectedObjectNames.length
+                ? 'Edit Object ' +
+                  shortenString(this.state.selectedObjectNames[0], 14)
+                : '',
+              click: () =>
+                this.editObjectByName(this.state.selectedObjectNames[0]),
+              visible: this.state.selectedObjectNames.length > 0,
             },
             {
               label: 'Scene properties',

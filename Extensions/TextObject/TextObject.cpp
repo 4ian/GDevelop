@@ -41,7 +41,9 @@ TextObject::TextObject(gd::String name_)
       underlined(false),
       colorR(255),
       colorG(255),
-      colorB(255)
+      colorB(255),
+      wrapping(false),
+      wrappingWidth(256)
 #if defined(GD_IDE_ONLY)
       ,
       font(NULL)
@@ -66,6 +68,8 @@ void TextObject::DoUnserializeFrom(gd::Project& project,
   bold = element.GetBoolAttribute("bold");
   italic = element.GetBoolAttribute("italic");
   underlined = element.GetBoolAttribute("underlined");
+  wrapping = element.GetBoolAttribute("wrapping");
+  wrappingWidth = element.GetDoubleAttribute("wrappingWidth", 256);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -130,6 +134,8 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("bold", bold);
   element.SetAttribute("italic", italic);
   element.SetAttribute("underlined", underlined);
+  element.SetAttribute("wrapping", wrapping);
+  element.SetAttribute("wrappingWidth", wrappingWidth);
 }
 
 void TextObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {

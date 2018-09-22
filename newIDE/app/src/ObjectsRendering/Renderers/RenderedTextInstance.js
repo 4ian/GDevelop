@@ -62,11 +62,15 @@ RenderedTextInstance.prototype.update = function() {
   if (
     textObject.isItalic() !== this._isItalic ||
     textObject.isBold() !== this._isBold ||
-    textObject.getCharacterSize() !== this._characterSize
+    textObject.getCharacterSize() !== this._characterSize ||
+    textObject.isWrapping() !== this._wrapping ||
+    (textObject.getWrappingWidth() !== this._wrappingWidth && this._wrapping)
   ) {
     this._isItalic = textObject.isItalic();
     this._isBold = textObject.isBold();
     this._characterSize = textObject.getCharacterSize();
+    this._wrapping = textObject.isWrapping();
+    this._wrappingWidth = textObject.getWrappingWidth();
     this._styleFontDirty = true;
   }
 
@@ -93,6 +97,8 @@ RenderedTextInstance.prototype.update = function() {
     font += this._characterSize + 'px ' + (this._fontFamily || 'Arial');
 
     this._pixiObject.style.font = font;
+    this._pixiObject.style.wordWrap = this._wrapping;
+    this._pixiObject.style.wordWrapWidth = this._wrappingWidth;
 
     // Manually ask the PIXI object to re-render as we changed a style property
     // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/

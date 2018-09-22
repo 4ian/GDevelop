@@ -109,6 +109,12 @@ class GD_EXTENSION_API TextObject : public gd::Object {
   unsigned int GetColorG() const { return colorG; };
   unsigned int GetColorB() const { return colorB; };
 
+  void SetWrapping(bool enable) { wrapping = enable; };
+  bool IsWrapping() const { return wrapping; };
+
+  void SetWrappingWidth(float width) { wrappingWidth = width; };
+  float GetWrappingWidth() const { return wrappingWidth; };
+
  private:
   virtual void DoUnserializeFrom(gd::Project& project,
                                  const gd::SerializerElement& element);
@@ -124,6 +130,8 @@ class GD_EXTENSION_API TextObject : public gd::Object {
   unsigned int colorR;
   unsigned int colorG;
   unsigned int colorB;
+  bool wrapping;
+  float wrappingWidth;
 #if defined(GD_IDE_ONLY)
   const sf::Font*
       font;  ///< The font used to render the object in the IDE. This is just a

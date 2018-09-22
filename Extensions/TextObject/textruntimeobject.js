@@ -20,6 +20,8 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     this._italic = objectData.italic;
     this._underlined = objectData.underlined;
     this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
+    this._wrapping = objectData.wrapping;
+    this._wrappingWidth = objectData.wrappingWidth;
 
     this._str = objectData.string;
 
@@ -185,5 +187,39 @@ gdjs.TextRuntimeObject.prototype.setColor = function(str) {
     this._color[0] = parseInt(color[0], 10);
     this._color[1] = parseInt(color[1], 10);
     this._color[2] = parseInt(color[2], 10);
+    this._renderer.updateStyle();
+};
+
+
+/**
+ * Return true if word wrapping is enabled for your text.
+ */
+gdjs.TextRuntimeObject.prototype.isWrapping = function() {
+    return this._wrapping;
+};
+
+/**
+ * Set word wrapping for your object text.
+ * @param enable {Boolean} Set it to true to enable word wrapping, false to disable it.
+ */
+gdjs.TextRuntimeObject.prototype.setWrapping = function(enable) {
+    this._wrapping = enable;
+    this._renderer.updateStyle();
+};
+
+/**
+ * Get the word wrapping width for your text object.
+ */
+gdjs.TextRuntimeObject.prototype.getWrappingWidth = function() {
+    return this._wrappingWidth;
+};
+
+/**
+ * Set the word wrapping width for your text object.
+ * @param {number} width The new width to set.
+ */
+gdjs.TextRuntimeObject.prototype.setWrappingWidth = function(width) {
+    if (width <= 1) width = 1;
+    this._wrappingWidth = width;
     this._renderer.updateStyle();
 };

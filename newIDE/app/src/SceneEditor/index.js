@@ -31,6 +31,7 @@ import EditorBar from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import { shortenString } from '../Utils/StringHelpers';
 
 import {
   undo,
@@ -366,6 +367,28 @@ export default class SceneEditor extends Component {
     );
   };
 
+  _onObjectSelected = (selectedObjectName: string) => {
+    if (!selectedObjectName) {
+      this.setState({
+        selectedObjectNames: [],
+      });
+    } else {
+      this.setState({
+        selectedObjectNames: [selectedObjectName],
+      });
+    }
+  };
+
+  _onAddInstanceUnderCursor = () => {
+    if (!this.state.selectedObjectNames.length) return;
+    const objectSelected = this.state.selectedObjectNames[0];
+    const cursorPosition = this.editor.getLastCursorPosition();
+    this._addInstance(cursorPosition[0], cursorPosition[1], objectSelected);
+    this.setState({
+      selectedObjectNames: [objectSelected],
+    });
+  };
+
   _addInstance = (x, y, objectName) => {
     if (!objectName) return;
 
@@ -387,7 +410,9 @@ export default class SceneEditor extends Component {
 
   _onInstancesSelected = instances => {
     this.setState({
-      selectedObjectNames: uniq(instances.map(instance => instance.getObjectName())),
+      selectedObjectNames: uniq(
+        instances.map(instance => instance.getObjectName())
+      ),
     });
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
@@ -761,6 +786,7 @@ export default class SceneEditor extends Component {
             ) => {
               return this._canObjectUseNewName(objectWithContext, newName);
             }}
+            onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
             onStartDraggingObject={this._onStartDraggingObjectFromList}
@@ -876,7 +902,7 @@ export default class SceneEditor extends Component {
           />
         </Drawer>
         <InfoBar
-          message="Drag and Drop the object to the scene to add an instance."
+          message="Drag and Drop the object to the scene or use the right click menu to add an instance of it."
           show={!!this.state.selectedObjectNames.length}
         />
         <InfoBar
@@ -933,9 +959,21 @@ export default class SceneEditor extends Component {
           ref={contextMenu => (this.contextMenu = contextMenu)}
           buildMenuTemplate={() => [
             {
-              label: 'Edit Object',
-              click: () => this.openObjectEditor(),
-              enabled: this.instancesSelection.hasSelectedInstances(),
+              label: this.state.selectedObjectNames.length
+                ? 'Add an Instance of ' +
+                  shortenString(this.state.selectedObjectNames[0], 7)
+                : '',
+              click: () => this._onAddInstanceUnderCursor(),
+              visible: this.state.selectedObjectNames.length > 0,
+            },
+            {
+              label: this.state.selectedObjectNames.length
+                ? 'Edit Object ' +
+                  shortenString(this.state.selectedObjectNames[0], 14)
+                : '',
+              click: () =>
+                this.editObjectByName(this.state.selectedObjectNames[0]),
+              visible: this.state.selectedObjectNames.length > 0,
             },
             {
               label: 'Scene properties',

@@ -121,8 +121,11 @@ class ObjectsList extends Component<*, *> {
               onAddNewObject={this.props.onAddNewObject}
               editingName={nameBeingEdited}
               getThumbnail={this.props.getThumbnail}
+              onObjectSelected={this.props.onObjectSelected}
               selected={
-                selectedObjectNames.indexOf(objectWithContext.object.getName()) !== -1
+                selectedObjectNames.indexOf(
+                  objectWithContext.object.getName()
+                ) !== -1
               }
             />
           );
@@ -366,11 +369,10 @@ export default class ObjectsListContainer extends React.Component<
     this.forceUpdateList();
   };
 
-  _onStartDraggingObject = ({index}: {index: number}) => {
+  _onStartDraggingObject = ({ index }: { index: number }) => {
     const { project, objectsContainer } = this.props;
 
-    const isInContainerObjectsList =
-      index < this.containerObjectsList.length;
+    const isInContainerObjectsList = index < this.containerObjectsList.length;
     if (isInContainerObjectsList) {
       this.props.onStartDraggingObject(objectsContainer.getObjectAt(index));
     } else {
@@ -453,6 +455,7 @@ export default class ObjectsListContainer extends React.Component<
                 renamedObjectWithScope={this.state.renamedObjectWithScope}
                 getThumbnail={this.props.getThumbnail}
                 selectedObjectNames={this.props.selectedObjectNames}
+                onObjectSelected={this.props.onObjectSelected}
                 onEditObject={this.props.onEditObject}
                 onCopyObject={this._copyObject}
                 onCutObject={this._cutObject}

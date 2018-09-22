@@ -43,6 +43,17 @@ gdjs.TextRuntimeObject.prototype.update = function() {
 };
 
 /**
+ * Initialize the extra parameters that could be set for an instance.
+ * @private
+ */
+gdjs.TextRuntimeObject.prototype.extraInitializationFromInitialInstance = function(initialInstanceData) {
+    if ( initialInstanceData.customSize ) {
+        this.setWrapping(true);
+        this.setWrappingWidth(initialInstanceData.width);
+    }
+};
+
+/**
  * Update the position object's.
  * @private
  */

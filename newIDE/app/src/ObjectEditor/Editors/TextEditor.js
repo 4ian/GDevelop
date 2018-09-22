@@ -78,24 +78,6 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             }}
             style={styles.checkbox}
           />
-          <Checkbox
-            label="Wrapping"
-            checked={textObject.isWrapping()}
-            onCheck={(e, checked) => {
-              textObject.setWrapping(checked);
-              this.forceUpdate();
-            }}
-            style={styles.checkbox}
-          />
-          <p style={styles.toolbarText}>Wrapping width:</p>
-          <TextField
-            type="number"
-            value={textObject.getWrappingWidth()}
-            onChange={(e, value) => {
-              textObject.setWrappingWidth(parseInt(value, 10));
-              this.forceUpdate();
-            }}
-          />
           <TextField
             hintText="Font"
             fullWidth

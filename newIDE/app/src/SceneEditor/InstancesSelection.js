@@ -24,7 +24,7 @@ export default class InstancesSelection {
     this.selection.length = 0;
   }
 
-  selectInstance(instance: gdInitialInstance, multiselect: boolean) {
+  selectInstance(instance: gdInitialInstance, multiselect: boolean = false) {
     if (this.isInstanceSelected(instance)) {
       if (multiselect) this.unselectInstance(instance);
 

@@ -15,7 +15,7 @@ const styles = {
 };
 
 export default class ExternalLayoutEditor extends BaseEditor {
-  editor: ?typeof SceneEditor;
+  editor: ?SceneEditor;
   state = {
     layoutChooserOpen: false,
   };

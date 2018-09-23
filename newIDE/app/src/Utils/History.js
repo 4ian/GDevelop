@@ -1,13 +1,24 @@
+// @flow
 import { serializeToJSObject, unserializeFromJSObject } from './Serializer';
 
 // Tools function to keep track of the history of changes made
 // on a serializable object from libGD.js
 
+export type HistoryState = {|
+  undoHistory: Array<Object>,
+  current: Object,
+  redoHistory: Array<Object>,
+  maxSize: number,
+|};
+
 /**
  * Return the initial state of the history
  * @param {*} serializableObject
  */
-export const getHistoryInitialState = (serializableObject, {historyMaxSize}) => {
+export const getHistoryInitialState = (
+  serializableObject: gdSerializable,
+  { historyMaxSize }: { historyMaxSize: number }
+): HistoryState => {
   return {
     undoHistory: [],
     current: serializeToJSObject(serializableObject),
@@ -20,7 +31,7 @@ export const getHistoryInitialState = (serializableObject, {historyMaxSize}) => 
  * Return true if redo can be applied for the given history
  * @param {*} history
  */
-export const canRedo = history => {
+export const canRedo = (history: HistoryState): boolean => {
   return !!history.redoHistory.length;
 };
 
@@ -28,7 +39,7 @@ export const canRedo = history => {
  * Return true if undo can be applied for the given history
  * @param {*} history
  */
-export const canUndo = history => {
+export const canUndo = (history: HistoryState): boolean => {
   return !!history.undoHistory.length;
 };
 
@@ -37,17 +48,20 @@ export const canUndo = history => {
  * @param {*} history
  * @param {*} serializableObject
  */
-export const saveToHistory = (history, serializableObject) => {
+export const saveToHistory = (
+  history: HistoryState,
+  serializableObject: gdSerializable
+): HistoryState => {
   const newUndoHistory = [...history.undoHistory, history.current];
   if (newUndoHistory.length > history.maxSize) {
-    newUndoHistory.splice(0, newUndoHistory.length - history.maxSize)
+    newUndoHistory.splice(0, newUndoHistory.length - history.maxSize);
   }
 
   return {
-    ...history,
     undoHistory: newUndoHistory,
     current: serializeToJSObject(serializableObject),
     redoHistory: [],
+    maxSize: history.maxSize,
   };
 };
 
@@ -59,7 +73,11 @@ export const saveToHistory = (history, serializableObject) => {
  * @param {*} history
  * @param {*} serializableObject
  */
-export const undo = (history, serializableObject, project = undefined) => {
+export const undo = (
+  history: HistoryState,
+  serializableObject: gdSerializable,
+  project: ?gdProject = undefined
+): HistoryState => {
   if (!history.undoHistory.length) {
     return history;
   }
@@ -73,10 +91,10 @@ export const undo = (history, serializableObject, project = undefined) => {
   );
 
   return {
-    ...history,
     undoHistory: history.undoHistory.slice(0, -1),
     current: newCurrent,
     redoHistory: [...history.redoHistory, history.current],
+    maxSize: history.maxSize,
   };
 };
 
@@ -88,7 +106,11 @@ export const undo = (history, serializableObject, project = undefined) => {
  * @param {*} history
  * @param {*} serializableObject
  */
-export const redo = (history, serializableObject, project = undefined) => {
+export const redo = (
+  history: HistoryState,
+  serializableObject: gdSerializable,
+  project: ?gdProject = undefined
+): HistoryState => {
   if (!history.redoHistory.length) {
     return history;
   }
@@ -102,9 +124,9 @@ export const redo = (history, serializableObject, project = undefined) => {
   );
 
   return {
-    ...history,
     undoHistory: [...history.undoHistory, history.current],
     current: newCurrent,
     redoHistory: history.redoHistory.slice(0, -1),
+    maxSize: history.maxSize,
   };
 };

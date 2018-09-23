@@ -102,6 +102,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
 import i18n from '../UI/i18n';
 import ObjectField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectField';
+import { getInitialSelection } from '../EventsSheet/SelectionHandler';
 
 const gd = global.gd;
 const {
@@ -860,8 +861,27 @@ storiesOf('EventsTree', module)
       <div className="gd-events-sheet" style={{ height: 500, display: 'flex' }}>
         <EventsTree
           events={testLayout.getEvents()}
-          selectedEvents={[]}
-          selectedInstructions={[]}
+          project={project}
+          layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          selection={getInitialSelection()}
+          onAddNewInstruction={action('add new instruction')}
+          onMoveToInstruction={action('move to instruction')}
+          onMoveToInstructionsList={action('move instruction to list')}
+          onInstructionClick={action('instruction click')}
+          onInstructionDoubleClick={action('instruction double click')}
+          onInstructionContextMenu={action('instruction context menu')}
+          onInstructionsListContextMenu={action('instruction list context menu')}
+          onParameterClick={action('parameter click')}
+          onEventClick={action('event click')}
+          onEventContextMenu={action('event context menu')}
+          onAddNewEvent={action('add new event')}
+          onOpenExternalEvents={action('open external events')}
+          onOpenLayout={action('open layout')}
+          searchResults={null}
+          searchFocusOffset={null}
+          onEventMoved={() => {}}
         />
       </div>
     </DragDropContextProvider>

@@ -33,6 +33,7 @@ import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterField
 import LayerField from '../EventsSheet/InstructionEditor/ParameterFields/LayerField';
 import MouseField from '../EventsSheet/InstructionEditor/ParameterFields/MouseField';
 import SceneVariableField from '../EventsSheet/InstructionEditor/ParameterFields/SceneVariableField';
+import ObjectVariableField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectVariableField';
 import KeyField from '../EventsSheet/InstructionEditor/ParameterFields/KeyField';
 import ExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/InstructionEditor/ParameterFields/StringField';
@@ -100,6 +101,7 @@ import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
 import i18n from '../UI/i18n';
+import ObjectField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectField';
 
 const gd = global.gd;
 const {
@@ -161,15 +163,21 @@ storiesOf('UI Building Blocks/DragHandle', module)
   .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
 
-  storiesOf('UI Building Blocks/EmptyMessage', module)
-    .addDecorator(paperDecorator)
-    .addDecorator(muiDecorator)
-    .add('default', () => <EmptyMessage>Hello World, this is an empty message, which is centered.</EmptyMessage>);
-  
-    storiesOf('UI Building Blocks/BackgroundText', module)
-    .addDecorator(paperDecorator)
-    .addDecorator(muiDecorator)
-    .add('default', () => <BackgroundText>Hello World, this is a background text</BackgroundText>);
+storiesOf('UI Building Blocks/EmptyMessage', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <EmptyMessage>
+      Hello World, this is an empty message, which is centered.
+    </EmptyMessage>
+  ));
+
+storiesOf('UI Building Blocks/BackgroundText', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <BackgroundText>Hello World, this is a background text</BackgroundText>
+  ));
 
 storiesOf('UI Building Blocks/ColorField', module)
   .addDecorator(paperDecorator)
@@ -326,6 +334,19 @@ storiesOf('ParameterFields', module)
       )}
     />
   ))
+  .add('ObjectField', () => (
+    <ValueStateHolder
+      initialValue={'MySpriteObject'}
+      render={(value, onChange) => (
+        <ObjectField
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+        />
+      )}
+    />
+  ))
   .add('ExternalEventsField', () => (
     <ValueStateHolder
       initialValue={'Test'}
@@ -335,6 +356,14 @@ storiesOf('ParameterFields', module)
           value={value}
           onChange={onChange}
         />
+      )}
+    />
+  ))
+  .add('ExternalEventsField (without project)', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <ExternalEventsField value={value} onChange={onChange} />
       )}
     />
   ))
@@ -348,6 +377,14 @@ storiesOf('ParameterFields', module)
           value={value}
           onChange={onChange}
         />
+      )}
+    />
+  ))
+  .add('LayerField (without project and layout)', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <LayerField value={value} onChange={onChange} />
       )}
     />
   ))
@@ -377,6 +414,22 @@ storiesOf('ParameterFields', module)
           value={value}
           onChange={onChange}
         />
+      )}
+    />
+  ))
+  .add('SceneVariableField (without layout and project)', () => (
+    <ValueStateHolder
+      initialValue={'Variable1'}
+      render={(value, onChange) => (
+        <SceneVariableField value={value} onChange={onChange} />
+      )}
+    />
+  ))
+  .add('ObjectVariableField (without expression, layout and project)', () => (
+    <ValueStateHolder
+      initialValue={'Variable1'}
+      render={(value, onChange) => (
+        <ObjectVariableField value={value} onChange={onChange} />
       )}
     />
   ));
@@ -1032,26 +1085,38 @@ storiesOf('ObjectSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('without groups', () => (
-    <ObjectSelector
-      project={project}
-      layout={testLayout}
-      value=""
-      onChoose={action('onChoose in ObjectSelector')}
-      noGroups
-      hintText="Choose an object to add to the group"
-      fullWidth
-      openOnFocus
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <ObjectSelector
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+          onChoose={action('onChoose in ObjectSelector')}
+          noGroups
+          hintText="Choose an object to add to the group"
+          fullWidth
+          openOnFocus
+        />
+      )}
     />
   ))
   .add('with groups', () => (
-    <ObjectSelector
-      project={project}
-      layout={testLayout}
-      value=""
-      onChoose={action('onChoose in ObjectSelector')}
-      hintText="Choose an object or a group"
-      fullWidth
-      openOnFocus
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <ObjectSelector
+          project={project}
+          layout={testLayout}
+          value={value}
+          onChange={onChange}
+          onChoose={action('onChoose in ObjectSelector')}
+          hintText="Choose an object or a group"
+          fullWidth
+          openOnFocus
+        />
+      )}
     />
   ));
 

@@ -1,16 +1,43 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import { enumerateObjectsAndGroups } from './EnumerateObjects';
 import { defaultAutocompleteProps } from '../UI/AutocompleteProps';
 
-export default class ObjectSelector extends Component {
+type Props = {|
+  project: gdProject,
+  layout: gdLayout,
+  allowedObjectType?: ?string,
+  noGroups?: boolean,
+  onChoose: string => void,
+  onChange: string => void,
+  value: string,
+  onBlur?: (event: any) => void,
+
+  fullWidth?: boolean,
+  floatingLabelText?: ?string,
+  errorText?: ?string,
+  openOnFocus?: boolean,
+  hintText?: ?string,
+  autoCompleteStyle?: Object,
+|};
+
+type State = {|
+  focused: boolean,
+  text: ?string,
+|};
+
+export default class ObjectSelector extends React.Component<Props, State> {
   state = {
     focused: false,
     text: null,
-  }
+  };
 
-  constructor(props) {
+  _field: ?AutoComplete;
+  fullList: Array<{ text: string, value: React.Node }>;
+
+  constructor(props: Props) {
     super(props);
 
     const { project, layout } = this.props;
@@ -39,7 +66,7 @@ export default class ObjectSelector extends Component {
 
   componentWillUnmount() {
     if (this.state.focused) {
-      this.props.onChange(this.state.text);
+      this.props.onChange(this.state.text || '');
     }
   }
 

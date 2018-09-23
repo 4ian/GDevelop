@@ -9,6 +9,7 @@ type EmscriptenObject = Object & {
 declare type gdPlatform = EmscriptenObject;
 declare type gdPlatformExtension = EmscriptenObject;
 
+declare type gdObjectsContainer = EmscriptenObject;
 declare type gdProject = EmscriptenObject;
 declare type gdLayout = EmscriptenObject;
 declare type gdExternalLayout = EmscriptenObject;
@@ -27,6 +28,7 @@ declare type gdInstruction = EmscriptenObject;
 declare type gdInstructionMetadata = EmscriptenObject;
 declare type gdInstructionsList = EmscriptenObject;
 declare type gdParameterMetadata = EmscriptenObject;
+declare type gdExpression = EmscriptenObject;
 
 declare type gdVariable = EmscriptenObject;
 declare type gdVariablesContainer = EmscriptenObject;

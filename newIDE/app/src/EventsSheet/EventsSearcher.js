@@ -28,8 +28,8 @@ type State = {|
 |};
 
 type Props = {|
-  project: gdProject,
-  layout: gdLayout,
+  globalObjectsContainer: gdProject,
+  objectsContainer: gdLayout,
   events: gdEventsList,
   selection: SelectionState,
   children: (props: {|
@@ -78,7 +78,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     searchInConditions,
     searchInActions,
   }: ReplaceInEventsInputs) => {
-    const { project, layout, events } = this.props;
+    const { globalObjectsContainer, objectsContainer, events } = this.props;
 
     if (searchInSelection) {
       // Replace in selection is a bit tricky to implement as it requires to have a list
@@ -88,8 +88,8 @@ export default class EventsSearcher extends React.Component<Props, State> {
     }
 
     gd.EventsRefactorer.replaceStringInEvents(
-      project,
-      layout,
+      globalObjectsContainer,
+      objectsContainer,
       events,
       searchText,
       replaceText,
@@ -109,7 +109,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
     }: SearchInEventsInputs,
     cb: () => void
   ) => {
-    const { project, layout, events } = this.props;
+    const { globalObjectsContainer, objectsContainer, events } = this.props;
 
     if (searchInSelection) {
       // Search in selection is a bit tricky to implement as it requires to have a list
@@ -119,8 +119,8 @@ export default class EventsSearcher extends React.Component<Props, State> {
     }
 
     const newEventsSearchResults = gd.EventsRefactorer.searchInEvents(
-      project,
-      layout,
+      globalObjectsContainer,
+      objectsContainer,
       events,
       searchText,
       matchCase,

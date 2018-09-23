@@ -6,8 +6,8 @@ import { enumerateObjectsAndGroups } from './EnumerateObjects';
 import { defaultAutocompleteProps } from '../UI/AutocompleteProps';
 
 type Props = {|
-  project: gdProject,
-  layout: gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   allowedObjectType?: ?string,
   noGroups?: boolean,
   onChoose: string => void,
@@ -40,10 +40,10 @@ export default class ObjectSelector extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const { project, layout } = this.props;
+    const { globalObjectsContainer, objectsContainer } = this.props;
     const list = enumerateObjectsAndGroups(
-      project,
-      layout,
+      globalObjectsContainer,
+      objectsContainer,
       this.props.allowedObjectType || undefined
     );
     const objects = list.allObjectsList.map(({ object }) => {
@@ -86,8 +86,8 @@ export default class ObjectSelector extends React.Component<Props, State> {
       value,
       onChange,
       onChoose,
-      project,
-      layout,
+      globalObjectsContainer,
+      objectsContainer,
       allowedObjectType,
       noGroups,
       onBlur,

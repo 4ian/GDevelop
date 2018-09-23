@@ -106,8 +106,8 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
         </List>
         <ObjectSelector
           autoCompleteStyle={styles.newObjectSelector}
-          project={project}
-          layout={layout}
+          globalObjectsContainer={project}
+          objectsContainer={layout}
           value={this.state.newObjectName}
           onChange={name => this.setState({ newObjectName: name })}
           onChoose={this.addObject}

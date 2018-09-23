@@ -831,6 +831,8 @@ storiesOf('EventsSheet', module)
         <EventsSheet
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           events={testLayout.getEvents()}
           onOpenExternalEvents={action('Open external events')}
           resourceSources={[]}
@@ -855,6 +857,8 @@ storiesOf('EventsSheet', module)
         <EventsSheet
           project={project}
           layout={emptyLayout}
+          globalObjectsContainer={project}
+          objectsContainer={emptyLayout}
           events={emptyLayout.getEvents()}
           onOpenExternalEvents={action('Open external events')}
           resourceSources={[]}
@@ -1089,8 +1093,8 @@ storiesOf('ObjectSelector', module)
       initialValue={''}
       render={(value, onChange) => (
         <ObjectSelector
-          project={project}
-          layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
           onChoose={action('onChoose in ObjectSelector')}
@@ -1107,8 +1111,8 @@ storiesOf('ObjectSelector', module)
       initialValue={''}
       render={(value, onChange) => (
         <ObjectSelector
-          project={project}
-          layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
           onChoose={action('onChoose in ObjectSelector')}

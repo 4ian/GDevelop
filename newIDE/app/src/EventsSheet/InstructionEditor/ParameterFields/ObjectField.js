@@ -55,14 +55,21 @@ export default class ObjectField extends React.Component<
   };
 
   render() {
+    if (!this.props.project || !this.props.layout) {
+      console.error(
+        'Missing project or layout for ObjectField'
+      );
+      return null;
+    }
+
     return (
       <ObjectSelector
         value={this.props.value}
         onChange={this._onChange}
         onChoose={this._onChange}
         allowedObjectType={this._allowedObjectType}
-        project={this.props.project}
-        layout={this.props.layout}
+        globalObjectsContainer={this.props.project}
+        objectsContainer={this.props.layout}
         floatingLabelText={this._description}
         fullWidth
         errorText={this.state.errorText}

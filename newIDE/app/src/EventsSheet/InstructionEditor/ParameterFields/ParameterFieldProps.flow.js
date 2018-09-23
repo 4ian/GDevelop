@@ -7,7 +7,7 @@ import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExte
 
 export type ParameterFieldProps = {|
   parameterMetadata?: gdParameterMetadata,
-  project: gdProject,
+  project?: gdProject,
   layout?: gdLayout,
   onChange: string => void,
   value: string,
@@ -19,4 +19,5 @@ export type ParameterFieldProps = {|
   resourceSources?: Array<ResourceSource>,
   onChooseResource?: ChooseResourceFunction,
   resourceExternalEditors?: Array<ResourceExternalEditor>,
+  instructionOrExpression?: ?gdInstruction | ?gdExpression,
 |};

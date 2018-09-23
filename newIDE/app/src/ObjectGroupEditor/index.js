@@ -1,4 +1,5 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import { List, ListItem } from 'material-ui/List';
 import IconButton from 'material-ui/IconButton';
 import Remove from 'material-ui/svg-icons/content/remove';
@@ -13,12 +14,23 @@ const styles = {
   },
 };
 
-export default class ObjectGroupEditor extends Component {
+type Props = {|
+  group: gdObjectGroup,
+  project: gdProject,
+  layout: gdLayout,
+  onSizeUpdated?: () => void,
+|};
+
+type State = {|
+  newObjectName: string,
+|};
+
+export default class ObjectGroupEditor extends React.Component<Props, State> {
   state = {
     newObjectName: '',
   };
 
-  removeObject = objectName => {
+  removeObject = (objectName: string) => {
     const { group, onSizeUpdated } = this.props;
 
     group.removeObject(objectName);
@@ -27,7 +39,7 @@ export default class ObjectGroupEditor extends Component {
     if (onSizeUpdated) onSizeUpdated();
   };
 
-  addObject = objectName => {
+  addObject = (objectName: string) => {
     const { group, onSizeUpdated } = this.props;
 
     group.addObject(objectName);
@@ -93,7 +105,7 @@ export default class ObjectGroupEditor extends Component {
             })}
         </List>
         <ObjectSelector
-          style={styles.newObjectSelector}
+          autoCompleteStyle={styles.newObjectSelector}
           project={project}
           layout={layout}
           value={this.state.newObjectName}

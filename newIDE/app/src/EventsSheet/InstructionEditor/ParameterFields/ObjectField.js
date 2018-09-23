@@ -1,8 +1,21 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import ObjectSelector from '../../../ObjectsList/ObjectSelector';
+import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
-export default class ObjectField extends Component {
-  constructor(props) {
+type State = {|
+  errorText: ?string,
+|};
+
+export default class ObjectField extends React.Component<
+  ParameterFieldProps,
+  State
+> {
+  _description: ?string;
+  _allowedObjectType: ?string;
+  _field: ?ObjectSelector;
+
+  constructor(props: ParameterFieldProps) {
     super(props);
     this.state = { errorText: null };
 
@@ -36,10 +49,10 @@ export default class ObjectField extends Component {
     this.setState({ errorText: this._getError() });
   };
 
-  _onChange = value => {
+  _onChange = (value: string) => {
     this.setState({ errorText: null });
     this.props.onChange(value);
-  }
+  };
 
   render() {
     return (

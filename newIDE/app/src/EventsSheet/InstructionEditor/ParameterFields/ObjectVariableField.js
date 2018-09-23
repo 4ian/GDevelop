@@ -1,8 +1,18 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import VariableField from './VariableField';
 import VariablesEditorDialog from '../../../VariablesList/VariablesEditorDialog';
+import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
-export default class ObjectVariableField extends Component {
+type State = {|
+  editorOpen: boolean,
+|};
+
+export default class ObjectVariableField extends React.Component<
+  ParameterFieldProps,
+  State
+> {
+  _field: ?VariableField;
   state = {
     editorOpen: false,
   };
@@ -20,9 +30,9 @@ export default class ObjectVariableField extends Component {
       instructionOrExpression.getParametersCount() > 0
     ) {
       const objectName = instructionOrExpression.getParameter(0);
-      if (layout.hasObjectNamed(objectName)) {
+      if (layout && layout.hasObjectNamed(objectName)) {
         variablesContainer = layout.getObject(objectName).getVariables();
-      } else if (project.hasObjectNamed(objectName)) {
+      } else if (project && project.hasObjectNamed(objectName)) {
         variablesContainer = project.getObject(objectName).getVariables();
       }
     }
@@ -38,17 +48,18 @@ export default class ObjectVariableField extends Component {
           ref={field => (this._field = field)}
           onOpenDialog={() => this.setState({ editorOpen: true })}
         />
-        {this.state.editorOpen && (
-          <VariablesEditorDialog
-            open={this.state.editorOpen}
-            variablesContainer={variablesContainer}
-            onCancel={() => this.setState({ editorOpen: false })}
-            onApply={() => {
-              this.setState({ editorOpen: false });
-              if (this._field) this._field.forceUpdateVariables();
-            }}
-          />
-        )}
+        {this.state.editorOpen &&
+          variablesContainer && (
+            <VariablesEditorDialog
+              open={this.state.editorOpen}
+              variablesContainer={variablesContainer}
+              onCancel={() => this.setState({ editorOpen: false })}
+              onApply={() => {
+                this.setState({ editorOpen: false });
+                if (this._field) this._field.forceUpdateVariables();
+              }}
+            />
+          )}
       </div>
     );
   }

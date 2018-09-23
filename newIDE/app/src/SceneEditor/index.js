@@ -32,6 +32,7 @@ import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
+import { gridSnapVal } from '../Utils/Grid';
 
 import {
   undo,
@@ -381,6 +382,7 @@ export default class SceneEditor extends Component {
 
   _onAddInstanceUnderCursor = () => {
     if (!this.state.selectedObjectNames.length) return;
+    
     const objectSelected = this.state.selectedObjectNames[0];
     const cursorPosition = this.editor.getLastCursorPosition();
     this._addInstance(cursorPosition[0], cursorPosition[1], objectSelected);
@@ -394,9 +396,12 @@ export default class SceneEditor extends Component {
 
     const instance = this.props.initialInstances.insertNewInitialInstance();
     instance.setObjectName(objectName);
+    if (this.state.uiSettings.grid){
+      x = gridSnapVal(x,this.state.uiSettings.gridWidth,this.state.uiSettings.gridOffsetX)
+      y = gridSnapVal(y,this.state.uiSettings.gridHeight,this.state.uiSettings.gridOffsetY)
+    };
     instance.setX(x);
     instance.setY(y);
-
     this.props.initialInstances.iterateOverInstances(this.zOrderFinder);
     instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
     this.setState(

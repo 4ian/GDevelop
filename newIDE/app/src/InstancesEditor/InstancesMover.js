@@ -1,3 +1,5 @@
+import { gridSnapVal } from '../Utils/Grid';
+
 export default class InstancesMover {
   constructor({ instanceMeasurer, options }) {
     this.instanceMeasurer = instanceMeasurer;
@@ -20,11 +22,7 @@ export default class InstancesMover {
     )
       return Math.round(x);
 
-    return (
-      Math.round((x - this.options.gridOffsetX) / this.options.gridWidth) *
-        this.options.gridWidth +
-      this.options.gridOffsetX
-    );
+    return gridSnapVal(x, this.options.gridWidth, this.options.gridOffsetX);
   }
 
   _roundYPosition(y, noGridSnap) {
@@ -36,11 +34,7 @@ export default class InstancesMover {
     )
       return Math.round(y);
 
-    return (
-      Math.round((y - this.options.gridOffsetY) / this.options.gridHeight) *
-        this.options.gridHeight +
-      this.options.gridOffsetY
-    );
+    return gridSnapVal(y, this.options.gridHeight, this.options.gridOffsetY);
   }
 
   _getMoveDeltaX(followAxis) {

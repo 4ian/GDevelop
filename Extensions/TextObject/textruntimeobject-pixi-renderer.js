@@ -40,6 +40,10 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
         this._object._color[1],
         this._object._color[2]
     );
+    style.wordWrap = this._object._wrapping;
+    style.wordWrapWidth = this._object._wrappingWidth;
+    style.breakWords = true;
+    this.updatePosition();
 
     // Manually ask the PIXI object to re-render as we changed a style property
     // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/

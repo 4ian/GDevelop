@@ -313,6 +313,8 @@ storiesOf('ParameterFields', module)
         <ExpressionField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
           parameterRenderingService={ParameterRenderingService}
@@ -327,6 +329,8 @@ storiesOf('ParameterFields', module)
         <StringField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
           parameterRenderingService={ParameterRenderingService}
@@ -341,6 +345,8 @@ storiesOf('ParameterFields', module)
         <ObjectField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
         />
@@ -353,6 +359,8 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ExternalEventsField
           project={project}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
         />
@@ -363,7 +371,12 @@ storiesOf('ParameterFields', module)
     <ValueStateHolder
       initialValue={'Test'}
       render={(value, onChange) => (
-        <ExternalEventsField value={value} onChange={onChange} />
+        <ExternalEventsField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
       )}
     />
   ))
@@ -374,6 +387,8 @@ storiesOf('ParameterFields', module)
         <LayerField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
         />
@@ -384,7 +399,12 @@ storiesOf('ParameterFields', module)
     <ValueStateHolder
       initialValue={'Test'}
       render={(value, onChange) => (
-        <LayerField value={value} onChange={onChange} />
+        <LayerField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
       )}
     />
   ))
@@ -392,7 +412,13 @@ storiesOf('ParameterFields', module)
     <ValueStateHolder
       initialValue={'Space'}
       render={(value, onChange) => (
-        <KeyField project={project} value={value} onChange={onChange} />
+        <KeyField
+          project={project}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
       )}
     />
   ))
@@ -400,7 +426,13 @@ storiesOf('ParameterFields', module)
     <ValueStateHolder
       initialValue={'Left'}
       render={(value, onChange) => (
-        <MouseField project={project} value={value} onChange={onChange} />
+        <MouseField
+          project={project}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
       )}
     />
   ))
@@ -411,6 +443,8 @@ storiesOf('ParameterFields', module)
         <SceneVariableField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
         />
@@ -421,7 +455,12 @@ storiesOf('ParameterFields', module)
     <ValueStateHolder
       initialValue={'Variable1'}
       render={(value, onChange) => (
-        <SceneVariableField value={value} onChange={onChange} />
+        <SceneVariableField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
       )}
     />
   ))
@@ -429,7 +468,12 @@ storiesOf('ParameterFields', module)
     <ValueStateHolder
       initialValue={'Variable1'}
       render={(value, onChange) => (
-        <ObjectVariableField value={value} onChange={onChange} />
+        <ObjectVariableField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
       )}
     />
   ));
@@ -947,8 +991,32 @@ storiesOf('InstructionEditor', module)
     <InstructionEditor
       project={project}
       layout={testLayout}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
       isCondition
       instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
+  ))
+  .add('without layout', () => (
+    <InstructionEditor
+      project={project}
+      layout={null}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
     />
   ));
 

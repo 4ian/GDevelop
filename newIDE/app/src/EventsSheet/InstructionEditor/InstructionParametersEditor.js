@@ -1,10 +1,16 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import Divider from 'material-ui/Divider';
 import Toggle from 'material-ui/Toggle';
 import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from './ParameterRenderingService';
 import HelpButton from '../../UI/HelpButton';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 const gd = global.gd;
 
 const styles = {
@@ -36,7 +42,25 @@ const styles = {
   },
 };
 
-export default class InstructionParametersEditor extends Component {
+type Props = {|
+  project: gdProject,
+  layout: ?gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  instruction: gdInstruction,
+  isCondition: boolean,
+  focusOnMount?: boolean,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  style?: Object,
+|};
+type State = {||};
+
+export default class InstructionParametersEditor extends React.Component<
+  Props,
+  State
+> {
   _firstVisibleField: ?any = {};
 
   componentDidMount() {
@@ -49,7 +73,9 @@ export default class InstructionParametersEditor extends Component {
 
   focus() {
     // Verify that there is a field to focus.
-    if (this._getNonCodeOnlyParametersCount(this._getInstructionMetadata()) !== 0) {
+    if (
+      this._getNonCodeOnlyParametersCount(this._getInstructionMetadata()) !== 0
+    ) {
       if (this._firstVisibleField && this._firstVisibleField.focus) {
         this._firstVisibleField.focus();
       }
@@ -60,6 +86,8 @@ export default class InstructionParametersEditor extends Component {
     if (!instructionMetadata) return 0;
 
     return mapFor(0, instructionMetadata.getParametersCount(), i => {
+      if (!instructionMetadata) return false;
+
       const parameterMetadata = instructionMetadata.getParameter(i);
       return !parameterMetadata.isCodeOnly();
     }).filter(isVisible => isVisible).length;
@@ -94,7 +122,13 @@ export default class InstructionParametersEditor extends Component {
   }
 
   render() {
-    const { instruction, project, layout } = this.props;
+    const {
+      instruction,
+      project,
+      layout,
+      globalObjectsContainer,
+      objectsContainer,
+    } = this.props;
 
     const type = instruction.getType();
     const instructionMetadata = this._getInstructionMetadata();
@@ -144,6 +178,8 @@ export default class InstructionParametersEditor extends Component {
                 parameterMetadata={parameterMetadata}
                 project={project}
                 layout={layout}
+                globalObjectsContainer={globalObjectsContainer}
+                objectsContainer={objectsContainer}
                 value={instruction.getParameter(i)}
                 instructionOrExpression={instruction}
                 key={i}

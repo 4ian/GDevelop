@@ -11,6 +11,7 @@ import ExpressionParametersEditorDialog, {
 } from './ExpressionParametersEditorDialog';
 import { formatExpressionCall } from './FormatExpressionCall';
 import { type InstructionOrExpressionInformation } from '../../InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
+import { type ParameterFieldProps } from '../ParameterFieldProps.flow';
 const gd = global.gd;
 
 const styles = {
@@ -46,7 +47,12 @@ type State = {|
   errorText: ?string,
 |};
 
-export default class ExpressionField extends Component<*, State> {
+type Props = {|
+  expressionType: 'number' | 'string',
+  ...ParameterFieldProps,
+|};
+
+export default class ExpressionField extends Component<Props, State> {
   _field: ?any = null;
   _fieldElement: ?any = null;
   _inputElement = null;
@@ -100,7 +106,9 @@ export default class ExpressionField extends Component<*, State> {
     event.preventDefault();
   };
 
-  _handleExpressionChosen = (expressionInfo: InstructionOrExpressionInformation) => {
+  _handleExpressionChosen = (
+    expressionInfo: InstructionOrExpressionInformation
+  ) => {
     this.setState({
       popoverOpen: false,
       parametersDialogOpen: true,
@@ -138,11 +146,12 @@ export default class ExpressionField extends Component<*, State> {
   };
 
   _getError = (value?: string) => {
-    const { project, layout, expressionType } = this.props;
+    const { project, globalObjectsContainer, objectsContainer, expressionType } = this.props;
+    if (!project) return null;
 
     const callbacks = new gd.CallbacksForExpressionCorrectnessTesting(
-      project,
-      layout
+      globalObjectsContainer,
+      objectsContainer
     );
     const parser = new gd.ExpressionParser(
       value === undefined ? this.props.value : value
@@ -157,7 +166,7 @@ export default class ExpressionField extends Component<*, State> {
       parser,
       project.getCurrentPlatform(),
       project,
-      layout,
+      objectsContainer,
       callbacks
     );
     const error = parser.getFirstError();
@@ -178,6 +187,8 @@ export default class ExpressionField extends Component<*, State> {
       parameterMetadata,
       project,
       layout,
+      globalObjectsContainer,
+      objectsContainer,
       parameterRenderingService,
     } = this.props;
     const description = parameterMetadata
@@ -245,6 +256,8 @@ export default class ExpressionField extends Component<*, State> {
               open={true}
               project={project}
               layout={layout}
+              globalObjectsContainer={globalObjectsContainer}
+              objectsContainer={objectsContainer}
               expressionMetadata={this.state.selectedExpressionInfo.metadata}
               onDone={parameterValues => {
                 if (!this.state.selectedExpressionInfo) return;

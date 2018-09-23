@@ -1,7 +1,13 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import Paper from 'material-ui/Paper';
 import InstructionSelector from './InstructionOrExpressionSelector/InstructionSelector.js';
 import InstructionParametersEditor from './InstructionParametersEditor.js';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 
 const styles = {
   container: {
@@ -21,7 +27,21 @@ const styles = {
   },
 };
 
-export default class InstructionEditor extends Component {
+type Props = {|
+  project: gdProject,
+  layout: ?gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  instruction: gdInstruction,
+  isCondition: boolean,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  style?: Object,
+|};
+type State = {||};
+
+export default class InstructionEditor extends React.Component<Props, State> {
   _instructionParametersEditor: ?InstructionParametersEditor;
 
   chooseType = (type: string) => {
@@ -35,7 +55,14 @@ export default class InstructionEditor extends Component {
   };
 
   render() {
-    const { instruction, isCondition, project, layout } = this.props;
+    const {
+      instruction,
+      isCondition,
+      project,
+      layout,
+      globalObjectsContainer,
+      objectsContainer,
+    } = this.props;
 
     return (
       <div style={styles.container}>
@@ -50,6 +77,8 @@ export default class InstructionEditor extends Component {
           <InstructionParametersEditor
             project={project}
             layout={layout}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
             isCondition={isCondition}
             instruction={instruction}
             resourceSources={this.props.resourceSources}

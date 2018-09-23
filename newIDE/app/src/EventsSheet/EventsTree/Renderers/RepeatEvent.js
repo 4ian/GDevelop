@@ -120,6 +120,8 @@ state = {
         >
           <DefaultField
             project={this.props.project}
+            globalObjectsContainer={this.props.globalObjectsContainer}
+            objectsContainer={this.props.objectsContainer}
             layout={this.props.layout}
             value={expression}
             onChange={text => {

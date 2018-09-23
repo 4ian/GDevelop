@@ -34,6 +34,8 @@ export default class SceneVariableField extends React.Component<
           isInline={this.props.isInline}
           ref={field => (this._field = field)}
           onOpenDialog={() => this.setState({ editorOpen: true })}
+          globalObjectsContainer={this.props.globalObjectsContainer}
+          objectsContainer={this.props.objectsContainer}
         />
         {this.state.editorOpen &&
           layout && (

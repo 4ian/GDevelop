@@ -121,6 +121,8 @@ export default class ForEachEvent extends React.Component<EventRendererProps, *>
           <ObjectField
             project={this.props.project}
             layout={this.props.layout}
+            globalObjectsContainer={this.props.globalObjectsContainer}
+            objectsContainer={this.props.objectsContainer}
             value={objectName}
             onChange={text => {
               forEachEvent.setObjectToPick(text);

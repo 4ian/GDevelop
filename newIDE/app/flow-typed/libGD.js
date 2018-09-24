@@ -15,9 +15,11 @@ declare type gdExternalLayout = EmscriptenObject;
 declare type gdExternalEvents = EmscriptenObject;
 declare type gdSerializerElement = EmscriptenObject;
 declare type gdInitialInstance = EmscriptenObject;
+declare type gdInitialInstancesContainer = EmscriptenObject;
 declare type gdBaseEvent = EmscriptenObject;
 declare type gdResource = EmscriptenObject;
 declare type gdObject = EmscriptenObject;
+declare type gdObjectGroup = EmscriptenObject;
 declare type gdResourcesManager = EmscriptenObject;
 declare type gdEventsList = EmscriptenObject;
 

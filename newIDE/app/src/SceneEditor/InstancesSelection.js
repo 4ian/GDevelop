@@ -39,9 +39,7 @@ export default class InstancesSelection {
 
     if (!layersVisibility) {
       this.selection.push(instance);
-      return;
-    }
-    if (layersVisibility[instance.getLayer()]) {
+    } else if (layersVisibility[instance.getLayer()]) {
       this.selection.push(instance);
     }
   }

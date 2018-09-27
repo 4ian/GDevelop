@@ -521,7 +521,8 @@ export default class SceneEditor extends React.Component<Props, State> {
   ) => {
     this.instancesSelection.clearSelection();
     instances.forEach(instance =>
-      this.instancesSelection.selectInstance(instance)
+      this.instancesSelection.selectInstance(instance),
+      true
     );
 
     if (centerView) {

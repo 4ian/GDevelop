@@ -33,6 +33,8 @@ import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
+import { roundPosition } from '../Utils/GridHelpers';
+
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -466,9 +468,20 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const instance = this.props.initialInstances.insertNewInitialInstance();
     instance.setObjectName(objectName);
+    if (this.state.uiSettings.grid) {
+      x = roundPosition(
+        x,
+        this.state.uiSettings.gridWidth,
+        this.state.uiSettings.gridOffsetX
+      );
+      y = roundPosition(
+        y,
+        this.state.uiSettings.gridHeight,
+        this.state.uiSettings.gridOffsetY
+      );
+    }
     instance.setX(x);
     instance.setY(y);
-
     this.props.initialInstances.iterateOverInstances(this.zOrderFinder);
     if (this.zOrderFinder) {
       instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);

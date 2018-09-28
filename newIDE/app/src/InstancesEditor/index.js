@@ -361,12 +361,26 @@ export default class InstancesEditorContainer extends Component {
     }
   };
 
+  _getLayersVisibility = () => {
+    const { layout } = this.props;
+    const layersVisibility = {};
+    for (let i = 0; i < layout.getLayersCount(); i++) {
+      layersVisibility[layout.getLayerAt(i).getName()] = layout
+        .getLayerAt(i)
+        .getVisibility();
+    }
+    return layersVisibility;
+  };
+
   _onEndSelectionRectangle = () => {
-    const instancesSelected = this.selectionRectangle.endSelectionRectangle();
+    let instancesSelected = this.selectionRectangle.endSelectionRectangle();
+
     this.props.instancesSelection.selectInstances(
       instancesSelected,
-      this.keyboardShortcuts.shouldMultiSelect()
+      this.keyboardShortcuts.shouldMultiSelect(),
+      this._getLayersVisibility()
     );
+    instancesSelected = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesSelected(instancesSelected);
   };
 
@@ -388,7 +402,8 @@ export default class InstancesEditorContainer extends Component {
     } else {
       this.props.instancesSelection.selectInstance(
         instance,
-        this.keyboardShortcuts.shouldMultiSelect()
+        this.keyboardShortcuts.shouldMultiSelect(),
+        this._getLayersVisibility()
       );
 
       if (this.props.onInstancesSelected) {

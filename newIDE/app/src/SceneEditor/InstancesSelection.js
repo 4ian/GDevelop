@@ -24,7 +24,11 @@ export default class InstancesSelection {
     this.selection.length = 0;
   }
 
-  selectInstance(instance: gdInitialInstance, multiselect: boolean = false) {
+  selectInstance(
+    instance: gdInitialInstance,
+    multiselect: boolean,
+    layersVisibility: ?{ [string]: boolean } = null
+  ) {
     if (this.isInstanceSelected(instance)) {
       if (multiselect) this.unselectInstance(instance);
 
@@ -32,13 +36,22 @@ export default class InstancesSelection {
     }
 
     if (!multiselect) this.clearSelection();
-    this.selection.push(instance);
+
+    if (!layersVisibility || layersVisibility[instance.getLayer()]) {
+      this.selection.push(instance);
+    }
   }
 
-  selectInstances(instances: [gdInitialInstance], multiselect: boolean) {
+  selectInstances(
+    instances: [gdInitialInstance],
+    multiselect: boolean,
+    layersVisibility: ?{ [string]: boolean } = null
+  ) {
     if (!multiselect) this.clearSelection();
 
-    instances.forEach(instance => this.selectInstance(instance, true));
+    instances.forEach(instance =>
+      this.selectInstance(instance, true, layersVisibility)
+    );
   }
 
   unselectInstance(instance: gdInitialInstance) {

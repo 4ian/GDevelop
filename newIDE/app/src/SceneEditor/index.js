@@ -532,10 +532,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     instances: Array<gdInitialInstance>,
     centerView: boolean = true
   ) => {
-    this.instancesSelection.clearSelection();
-    instances.forEach(instance =>
-      this.instancesSelection.selectInstance(instance, true)
-    );
+    this.instancesSelection.selectInstances(instances, false);
 
     if (centerView) {
       if (this.editor) this.editor.centerViewOn(instances);

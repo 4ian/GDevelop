@@ -43,7 +43,7 @@ export default class InstancesSelection {
   }
 
   selectInstances(
-    instances: [gdInitialInstance],
+    instances: Array<gdInitialInstance>,
     multiselect: boolean,
     layersVisibility: ?{ [string]: boolean } = null
   ) {

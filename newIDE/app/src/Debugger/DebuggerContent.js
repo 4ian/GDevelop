@@ -192,7 +192,6 @@ export default class DebuggerContent extends React.Component<Props, State> {
           second: 'profiler',
           splitPercentage: 65,
         }}
-        initialSplitPercentage={32}
       />
     );
   }

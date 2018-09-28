@@ -23,6 +23,7 @@ declare type gdObject = EmscriptenObject;
 declare type gdObjectGroup = EmscriptenObject;
 declare type gdResourcesManager = EmscriptenObject;
 declare type gdEventsList = EmscriptenObject;
+declare type gdEventsFunction = EmscriptenObject;
 
 declare type gdInstruction = EmscriptenObject;
 declare type gdInstructionMetadata = EmscriptenObject;
@@ -43,6 +44,8 @@ declare type gdSprite = EmscriptenObject;
 declare type gdDirection = EmscriptenObject;
 declare type gdAnimation = EmscriptenObject;
 declare type gdPoint = EmscriptenObject;
+
+declare type gdEventsFunctionsExtension = EmscriptenObject;
 
 declare type gdVectorEventsSearchResult = EmscriptenObject;
 declare type gdMapStringPropertyDescriptor = EmscriptenObject;

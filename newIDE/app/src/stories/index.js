@@ -103,6 +103,7 @@ import BackgroundText from '../UI/BackgroundText';
 import i18n from '../UI/i18n';
 import ObjectField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectField';
 import { getInitialSelection } from '../EventsSheet/SelectionHandler';
+import EventsFunctionEditor from '../EventsFunctionEditor';
 
 const gd = global.gd;
 const {
@@ -119,6 +120,7 @@ const {
   spriteObjectWithBehaviors,
   group2,
   emptyLayout,
+  testEventsFunction,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -872,7 +874,9 @@ storiesOf('EventsTree', module)
           onInstructionClick={action('instruction click')}
           onInstructionDoubleClick={action('instruction double click')}
           onInstructionContextMenu={action('instruction context menu')}
-          onInstructionsListContextMenu={action('instruction list context menu')}
+          onInstructionsListContextMenu={action(
+            'instruction list context menu'
+          )}
           onParameterClick={action('parameter click')}
           onEventClick={action('event click')}
           onEventContextMenu={action('event context menu')}
@@ -1550,4 +1554,17 @@ storiesOf('ResourcesList', module)
         )}
       />
     </div>
+  ));
+
+storiesOf('EventsFunctionEditor', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 500, display: 'flex' }}>
+        <EventsFunctionEditor
+          project={project}
+          eventsFunction={testEventsFunction}
+        />
+      </div>
+    </DragDropContextProvider>
   ));

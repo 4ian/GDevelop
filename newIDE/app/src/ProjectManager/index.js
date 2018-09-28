@@ -617,6 +617,58 @@ export default class ProjectManager extends React.Component<Props, State> {
                 />
               )}
           />
+
+          <ProjectStructureItem
+            primaryText="Functions/Extensions"
+            leftIcon={
+              <ListIcon src="res/ribbon_default/function32.png" />
+            }
+            initiallyOpen={false}
+            open={forceOpen}
+            primaryTogglesNestedList={true}
+            autoGenerateNestedIndicator={!forceOpen}
+            // nestedItems={filterProjectItemsList(
+            //   enumerateExternalLayouts(project),
+            //   searchText
+            // )
+            //   .map((externalLayout, i) => {
+            //     const name = externalLayout.getName();
+            //     return (
+            //       <Item
+            //         key={i}
+            //         primaryText={name}
+            //         editingName={
+            //           renamedItemKind === 'external-layout' &&
+            //           renamedItemName === name
+            //         }
+            //         onEdit={() => this.props.onOpenExternalLayout(name)}
+            //         onDelete={() =>
+            //           this.props.onDeleteExternalLayout(externalLayout)}
+            //         onRename={newName => {
+            //           this.props.onRenameExternalLayout(name, newName);
+            //           this._onEditName(null, '');
+            //         }}
+            //         onEditName={() => this._onEditName('external-layout', name)}
+            //         onCopy={() => this._copyExternalLayout(externalLayout)}
+            //         onCut={() => this._cutExternalLayout(externalLayout)}
+            //         onPaste={() => this._pasteExternalLayout(i)}
+            //         canPaste={() =>
+            //           Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)}
+            //         canMoveUp={i !== 0}
+            //         onMoveUp={() => this._moveUpExternalLayout(i)}
+            //         canMoveDown={i !== project.getExternalLayoutsCount() - 1}
+            //         onMoveDown={() => this._moveDownExternalLayout(i)}
+            //       />
+            //     );
+            //   })
+            //   .concat(
+            //     <AddItem
+            //       key={'add-external-layout'}
+            //       primaryText="Click to add an external layout"
+            //       onClick={this.props.onAddExternalLayout}
+            //     />
+            //   )}
+          />
         </List>
         <SearchBar
           value={searchText}

@@ -994,6 +994,7 @@ export default class MainFrame extends React.Component<Props, State> {
           <Drawer
             open={projectManagerOpen}
             containerStyle={styles.drawerContent}
+            width={320}
           >
             <EditorBar
               title={currentProject ? currentProject.getName() : 'No project'}

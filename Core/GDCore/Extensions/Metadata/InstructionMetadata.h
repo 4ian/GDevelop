@@ -22,6 +22,7 @@ class Project;
 class Layout;
 class EventsCodeGenerator;
 class EventsCodeGenerationContext;
+class SerializerElement;
 }  // namespace gd
 
 namespace gd {
@@ -166,6 +167,20 @@ class GD_CORE_API ParameterMetadata {
     }
     return false;
   }
+
+  /** \name Serialization
+   */
+  ///@{
+  /**
+   * \brief Serialize the ParameterMetadata to the specified element
+   */
+  void SerializeTo(gd::SerializerElement& element) const;
+
+  /**
+   * \brief Load the ParameterMetadata from the specified element
+   */
+  void UnserializeFrom(const gd::SerializerElement& element);
+  ///@}
 
   // TODO: Deprecated public fields. Any direct using should be moved to
   // getter/setter.

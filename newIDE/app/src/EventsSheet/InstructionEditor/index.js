@@ -57,7 +57,6 @@ export default class InstructionEditor extends Component {
             resourceExternalEditors={this.props.resourceExternalEditors}
             ref={instructionParametersEditor =>
               (this._instructionParametersEditor = instructionParametersEditor)}
-            focusOnMount={instruction.getType()}
           />
         </Paper>
       </div>

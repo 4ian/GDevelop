@@ -21,7 +21,7 @@ const styles = {
   },
 };
 
-export default class EventsFunctionEditor extends React.Component<
+export default class ParametersEditor extends React.Component<
   Props,
   State
 > {

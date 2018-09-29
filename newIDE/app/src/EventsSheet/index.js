@@ -72,7 +72,6 @@ type Props = {|
   objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
-  updateToolbar: () => void,
   showPreviewButton: boolean,
   showNetworkPreviewButton: boolean,
   onPreview: (options: PreviewOptions) => void,

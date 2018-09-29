@@ -16,6 +16,7 @@ import {
   enumerateLayouts,
   enumerateExternalEvents,
   enumerateExternalLayouts,
+  enumerateEventsFunctionsExtensions,
   filterProjectItemsList,
 } from './EnumerateProjectItems';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -28,6 +29,7 @@ import {
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
+const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
 
 const styles = {
   container: {
@@ -177,12 +179,15 @@ type Props = {|
   onDeleteLayout: gdLayout => void,
   onDeleteExternalEvents: gdExternalEvents => void,
   onDeleteExternalLayout: gdExternalLayout => void,
+  onDeleteEventsFunctionsExtension: gdEventsFunctionsExtension => void,
   onRenameLayout: (string, string) => void,
   onRenameExternalEvents: (string, string) => void,
   onRenameExternalLayout: (string, string) => void,
+  onRenameEventsFunctionsExtension: (string, string) => void,
   onOpenLayout: string => void,
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
+  onOpenEventsFunctionsExtension: string => void,
   onSaveProject: () => void,
   onCloseProject: () => void,
   onExportProject: () => void,
@@ -191,6 +196,7 @@ type Props = {|
   onAddLayout: () => void,
   onAddExternalEvents: () => void,
   onAddExternalLayout: () => void,
+  onAddEventsFunctionsExtension: () => void,
   onOpenPlatformSpecificAssets: () => void,
   onChangeSubscription: () => void,
   freezeUpdate: boolean,
@@ -215,7 +221,7 @@ export default class ProjectManager extends React.Component<Props, State> {
 
   shouldComponentUpdate(nextProps: Props) {
     // Rendering the component is (super) costly (~20ms) as it iterates over
-    // every project layouts/external layouts/external events, 
+    // every project layouts/external layouts/external events,
     // so the prop freezeUpdate allow to ask the component to stop
     // updating, for example when hidden.
     return !nextProps.freezeUpdate;
@@ -378,6 +384,65 @@ export default class ProjectManager extends React.Component<Props, State> {
     if (index >= project.getExternalLayoutsCount() - 1) return;
 
     project.swapExternalLayouts(index, index + 1);
+    this.forceUpdate();
+  };
+
+  _copyEventsFunctionsExtension = (
+    externalLayout: gdEventsFunctionsExtension
+  ) => {
+    Clipboard.set(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND, {
+      externalLayout: serializeToJSObject(externalLayout),
+      name: externalLayout.getName(),
+    });
+  };
+
+  _cutEventsFunctionsExtension = (
+    externalLayout: gdEventsFunctionsExtension
+  ) => {
+    this._copyEventsFunctionsExtension(externalLayout);
+    this.props.onDeleteEventsFunctionsExtension(externalLayout);
+  };
+
+  _pasteEventsFunctionsExtension = (index: number) => {
+    if (!Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)) return;
+
+    const {
+      externalLayout: copiedEventsFunctionsExtension,
+      name,
+    } = Clipboard.get(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND);
+    const { project } = this.props;
+
+    const newName = newNameGenerator('CopyOf' + name, name =>
+      project.hasEventsFunctionsExtensionNamed(name)
+    );
+
+    const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      newName,
+      index
+    );
+
+    unserializeFromJSObject(
+      newEventsFunctionsExtension,
+      copiedEventsFunctionsExtension
+    );
+    newEventsFunctionsExtension.setName(newName);
+
+    this.forceUpdate();
+  };
+
+  _moveUpEventsFunctionsExtension = (index: number) => {
+    const { project } = this.props;
+    if (index <= 0) return;
+
+    project.swapEventsFunctionsExtensions(index, index - 1);
+    this.forceUpdate();
+  };
+
+  _moveDownEventsFunctionsExtension = (index: number) => {
+    const { project } = this.props;
+    if (index >= project.getEventsFunctionsExtensionsCount() - 1) return;
+
+    project.swapEventsFunctionsExtensions(index, index + 1);
     this.forceUpdate();
   };
 
@@ -620,54 +685,67 @@ export default class ProjectManager extends React.Component<Props, State> {
 
           <ProjectStructureItem
             primaryText="Functions/Extensions"
-            leftIcon={
-              <ListIcon src="res/ribbon_default/function32.png" />
-            }
+            leftIcon={<ListIcon src="res/ribbon_default/function32.png" />}
             initiallyOpen={false}
             open={forceOpen}
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={!forceOpen}
-            // nestedItems={filterProjectItemsList(
-            //   enumerateExternalLayouts(project),
-            //   searchText
-            // )
-            //   .map((externalLayout, i) => {
-            //     const name = externalLayout.getName();
-            //     return (
-            //       <Item
-            //         key={i}
-            //         primaryText={name}
-            //         editingName={
-            //           renamedItemKind === 'external-layout' &&
-            //           renamedItemName === name
-            //         }
-            //         onEdit={() => this.props.onOpenExternalLayout(name)}
-            //         onDelete={() =>
-            //           this.props.onDeleteExternalLayout(externalLayout)}
-            //         onRename={newName => {
-            //           this.props.onRenameExternalLayout(name, newName);
-            //           this._onEditName(null, '');
-            //         }}
-            //         onEditName={() => this._onEditName('external-layout', name)}
-            //         onCopy={() => this._copyExternalLayout(externalLayout)}
-            //         onCut={() => this._cutExternalLayout(externalLayout)}
-            //         onPaste={() => this._pasteExternalLayout(i)}
-            //         canPaste={() =>
-            //           Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)}
-            //         canMoveUp={i !== 0}
-            //         onMoveUp={() => this._moveUpExternalLayout(i)}
-            //         canMoveDown={i !== project.getExternalLayoutsCount() - 1}
-            //         onMoveDown={() => this._moveDownExternalLayout(i)}
-            //       />
-            //     );
-            //   })
-            //   .concat(
-            //     <AddItem
-            //       key={'add-external-layout'}
-            //       primaryText="Click to add an external layout"
-            //       onClick={this.props.onAddExternalLayout}
-            //     />
-            //   )}
+            nestedItems={filterProjectItemsList(
+              enumerateEventsFunctionsExtensions(project),
+              searchText
+            )
+              .map((eventsFunctionsExtension, i) => {
+                const name = eventsFunctionsExtension.getName();
+                return (
+                  <Item
+                    key={i}
+                    primaryText={name}
+                    editingName={
+                      renamedItemKind === 'events-functions-extension' &&
+                      renamedItemName === name
+                    }
+                    onEdit={() =>
+                      this.props.onOpenEventsFunctionsExtension(name)}
+                    onDelete={() =>
+                      this.props.onDeleteEventsFunctionsExtension(
+                        eventsFunctionsExtension
+                      )}
+                    onRename={newName => {
+                      this.props.onRenameEventsFunctionsExtension(
+                        name,
+                        newName
+                      );
+                      this._onEditName(null, '');
+                    }}
+                    onEditName={() =>
+                      this._onEditName('events-functions-extension', name)}
+                    onCopy={() =>
+                      this._copyEventsFunctionsExtension(
+                        eventsFunctionsExtension
+                      )}
+                    onCut={() =>
+                      this._cutEventsFunctionsExtension(
+                        eventsFunctionsExtension
+                      )}
+                    onPaste={() => this._pasteEventsFunctionsExtension(i)}
+                    canPaste={() =>
+                      Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)}
+                    canMoveUp={i !== 0}
+                    onMoveUp={() => this._moveUpEventsFunctionsExtension(i)}
+                    canMoveDown={
+                      i !== project.getEventsFunctionsExtensionsCount() - 1
+                    }
+                    onMoveDown={() => this._moveDownEventsFunctionsExtension(i)}
+                  />
+                );
+              })
+              .concat(
+                <AddItem
+                  key={'add-events-functions-extension'}
+                  primaryText="Click to add functions"
+                  onClick={this.props.onAddEventsFunctionsExtension}
+                />
+              )}
           />
         </List>
         <SearchBar

@@ -202,7 +202,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       .map(resourceName => resourcesManager.getResource(resourceName));
     const filteredList = filterResourcesList(allResourcesList, searchText);
 
-    // Force List component to be mounted again if project or objectsContainer
+    // Force List component to be mounted again if project
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = project.ptr;

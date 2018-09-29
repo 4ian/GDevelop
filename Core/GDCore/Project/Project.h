@@ -13,9 +13,9 @@ class wxPropertyGrid;
 class wxPropertyGridEvent;
 class TiXmlElement;
 #include "GDCore/Project/ChangesNotifier.h"
-#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/VariablesContainer.h"
@@ -25,6 +25,7 @@ class Layout;
 class ExternalEvents;
 class ResourcesManager;
 class ExternalLayout;
+class EventsFunctionsExtension;
 class Object;
 class VariablesContainer;
 class ArbitraryResourceWorker;
@@ -34,7 +35,7 @@ class Behavior;
 class BehaviorsSharedData;
 class BaseEvent;
 class SerializerElement;
-}
+}  // namespace gd
 #undef GetObject  // Disable an annoying macro
 #undef CreateEvent
 
@@ -68,7 +69,8 @@ class GD_CORE_API Project : public ObjectsContainer {
 
   /**
    * \brief Change the version of the project.
-   * This can be freely set, but should follow "X.Y.Z" format for compatibility with some exporters.
+   * This can be freely set, but should follow "X.Y.Z" format for compatibility
+   * with some exporters.
    */
   void SetVersion(const gd::String& version_) { version = version_; };
 
@@ -456,13 +458,13 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::size_t GetLayoutsCount() const;
 
   /**
-   * \brief Must add a new empty layout called "name" at the specified position
-   * in the layout list.
+   * \brief \brief Adds a new empty layout called "name" at the specified
+   * position in the layout list.
    */
   gd::Layout& InsertNewLayout(const gd::String& name, std::size_t position);
 
   /**
-   * \brief Must add a new layout constructed from the layout passed as
+   * \brief \brief Adds a new layout constructed from the layout passed as
    * parameter. \note No pointer or reference must be kept on the layout passed
    * as parameter. \param layout The layout that must be copied and inserted
    * into the project \param position Insertion position. Even if the position
@@ -565,15 +567,15 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::size_t GetExternalEventsCount() const;
 
   /**
-   * Must add a new empty external events sheet called "name" at the specified
-   * position in the layout list.
+   * \brief Adds a new empty external events sheet called "name" at the
+   * specified position in the layout list.
    */
   ExternalEvents& InsertNewExternalEvents(const gd::String& name,
                                           std::size_t position);
 
   /**
-   * Must add a new external events sheet constructed from the layout passed as
-   * parameter. \note No pointer or reference must be kept on the external
+   * \brief Adds a new external events sheet constructed from the layout passed
+   * as parameter. \note No pointer or reference must be kept on the external
    * events passed as parameter. \param externalEvents The external events that
    * must be copied and inserted into the project \param position Insertion
    * position. Even if the position is invalid, the external events must be
@@ -642,19 +644,23 @@ class GD_CORE_API Project : public ObjectsContainer {
   std::size_t GetExternalLayoutsCount() const;
 
   /**
-   * Must add a new empty external layout called "name" at the specified
+   * \brief Adds a new empty external layout called "name" at the specified
    * position in the layout list.
    */
   gd::ExternalLayout& InsertNewExternalLayout(const gd::String& name,
                                               std::size_t position);
 
   /**
-   * Must add a new external layout constructed from the layout passed as
-   * parameter. \note No pointer or reference must be kept on the external
-   * layout passed as parameter. \param externalLayout The external layout that
-   * must be copied and inserted into the project \param position Insertion
-   * position. Even if the position is invalid, the external layout must be
-   * inserted at the end of the external layout list.
+   * \brief Adds a new external layout constructed from the layout passed as
+   * parameter.
+   *
+   * \note No pointer or reference must be kept on the external
+   * layout passed as parameter.
+   *
+   * \param externalLayout The external layout that
+   * must be copied and inserted into the projects
+   * \param position Insertion position. Even if the position is invalid, the
+   * external layout must be inserted at the end of the external layout list.
    */
   gd::ExternalLayout& InsertExternalLayout(const ExternalLayout& externalLayout,
                                            std::size_t position);
@@ -674,6 +680,81 @@ class GD_CORE_API Project : public ObjectsContainer {
    */
   const gd::String& GetFirstLayout() { return firstLayout; }
 
+///@}
+
+/** \name Events functions extensions management
+ */
+///@{
+#if defined(GD_IDE_ONLY)
+  /**
+   * Return true if events functions extension called "name" exists.
+   */
+  bool HasEventsFunctionsExtensionNamed(const gd::String& name) const;
+
+  /**
+   * Return a reference to the events functions extension called "name".
+   */
+  EventsFunctionsExtension& GetEventsFunctionsExtension(const gd::String& name);
+
+  /**
+   * Return a reference to the events functions extension called "name".
+   */
+  const EventsFunctionsExtension& GetEventsFunctionsExtension(
+      const gd::String& name) const;
+
+  /**
+   * Return a reference to the events functions extension at position "index" in
+   * the list
+   */
+  EventsFunctionsExtension& GetEventsFunctionsExtension(std::size_t index);
+
+  /**
+   * Return a reference to the events functions extension at position "index" in
+   * the list
+   */
+  const EventsFunctionsExtension& GetEventsFunctionsExtension(
+      std::size_t index) const;
+
+  /**
+   * Return the position of the events functions extension called "name" in the
+   * list
+   */
+  std::size_t GetEventsFunctionsExtensionPosition(const gd::String& name) const;
+
+  /**
+   * \brief Swap the specified events functions extensions.
+   *
+   * Do nothing if indexes are not correct.
+   */
+  void SwapEventsFunctionsExtensions(std::size_t first, std::size_t second);
+
+  /**
+   * Return the number of events functions extension.
+   */
+  std::size_t GetEventsFunctionsExtensionsCount() const;
+
+  /**
+   * \brief Adds a new empty events functions extension called "name" at the
+   * specified position in the list.
+   */
+  gd::EventsFunctionsExtension& InsertNewEventsFunctionsExtension(
+      const gd::String& name, std::size_t position);
+
+  /**
+   * \brief Adds a new events functions extension constructed from the layout
+   * passed as parameter.
+   *
+   * \note No pointer or reference must be kept on the extension passed as
+   * parameter.
+   */
+  gd::EventsFunctionsExtension& InsertEventsFunctionsExtension(
+      const EventsFunctionsExtension& externalLayout, std::size_t position);
+
+  /**
+   * Must delete the events functions extension named "name".
+   */
+  void RemoveEventsFunctionsExtension(const gd::String& name);
+#endif
   ///@}
 
   /** \name Resources management
@@ -857,6 +938,8 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::VariablesContainer variables;  ///< Initial global variables
   std::vector<std::unique_ptr<gd::ExternalLayout> >
       externalLayouts;  ///< List of all externals layouts
+  std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >
+      eventsFunctionsExtensions;
   gd::ResourcesManager
       resourcesManager;  ///< Contains all resources used by the project
   std::shared_ptr<gd::ImageManager>
@@ -870,10 +953,10 @@ class GD_CORE_API Project : public ObjectsContainer {
   bool useExternalSourceFiles;  ///< True if game used external source files.
   std::vector<std::unique_ptr<gd::SourceFile> >
       externalSourceFiles;  ///< List of external source files used.
-  gd::String author;                       ///< Game author name
-  gd::String packageName;                  ///< Game package name
-  gd::String orientation;  ///< Lock game orientation (on mobile devices).
-                           ///< "default", "landscape" or "portrait".
+  gd::String author;        ///< Game author name
+  gd::String packageName;   ///< Game package name
+  gd::String orientation;   ///< Lock game orientation (on mobile devices).
+                            ///< "default", "landscape" or "portrait".
   bool
       folderProject;  ///< True if folder project, false if single file project.
   gd::String gameFile;                    ///< File of the game

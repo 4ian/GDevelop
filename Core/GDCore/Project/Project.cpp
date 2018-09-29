@@ -12,6 +12,7 @@
 #include <map>
 #include <vector>
 #include "GDCore/CommonTools.h"
+#include "GDCore/Extensions/EventsFunctionsExtension.h"  //TODO: Move to Project?
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
@@ -433,6 +434,104 @@ void Project::RemoveExternalLayout(const gd::String& name) {
 
   externalLayouts.erase(externalLayout);
 }
+
+#if defined(GD_IDE_ONLY)
+void Project::SwapEventsFunctionsExtensions(std::size_t first,
+                                            std::size_t second) {
+  if (first >= eventsFunctionsExtensions.size() ||
+      second >= eventsFunctionsExtensions.size())
+    return;
+
+  std::iter_swap(eventsFunctionsExtensions.begin() + first,
+                 eventsFunctionsExtensions.begin() + second);
+}
+bool Project::HasEventsFunctionsExtensionNamed(const gd::String& name) const {
+  return (
+      find_if(
+          eventsFunctionsExtensions.begin(),
+          eventsFunctionsExtensions.end(),
+          [&name](
+              const std::unique_ptr<gd::EventsFunctionsExtension>& extension) {
+            return extension->GetName() == name;
+          }) != eventsFunctionsExtensions.end());
+}
+gd::EventsFunctionsExtension& Project::GetEventsFunctionsExtension(
+    const gd::String& name) {
+  return *(*find_if(
+      eventsFunctionsExtensions.begin(),
+      eventsFunctionsExtensions.end(),
+      [&name](const std::unique_ptr<gd::EventsFunctionsExtension>& extension) {
+        return extension->GetName() == name;
+      }));
+}
+const gd::EventsFunctionsExtension& Project::GetEventsFunctionsExtension(
+    const gd::String& name) const {
+  return *(*find_if(
+      eventsFunctionsExtensions.begin(),
+      eventsFunctionsExtensions.end(),
+      [&name](const std::unique_ptr<gd::EventsFunctionsExtension>& extension) {
+        return extension->GetName() == name;
+      }));
+}
+gd::EventsFunctionsExtension& Project::GetEventsFunctionsExtension(
+    std::size_t index) {
+  return *eventsFunctionsExtensions[index];
+}
+const gd::EventsFunctionsExtension& Project::GetEventsFunctionsExtension(
+    std::size_t index) const {
+  return *eventsFunctionsExtensions[index];
+}
+std::size_t Project::GetEventsFunctionsExtensionPosition(
+    const gd::String& name) const {
+  for (std::size_t i = 0; i < eventsFunctionsExtensions.size(); ++i) {
+    if (eventsFunctionsExtensions[i]->GetName() == name) return i;
+  }
+  return gd::String::npos;
+}
+
+std::size_t Project::GetEventsFunctionsExtensionsCount() const {
+  return eventsFunctionsExtensions.size();
+}
+
+gd::EventsFunctionsExtension& Project::InsertNewEventsFunctionsExtension(
+    const gd::String& name, std::size_t position) {
+  gd::EventsFunctionsExtension& newlyInsertedEventsFunctionsExtension =
+      *(*(eventsFunctionsExtensions.emplace(
+          position < eventsFunctionsExtensions.size()
+              ? eventsFunctionsExtensions.begin() + position
+              : eventsFunctionsExtensions.end(),
+          new gd::EventsFunctionsExtension())));
+
+  newlyInsertedEventsFunctionsExtension.SetName(name);
+  return newlyInsertedEventsFunctionsExtension;
+}
+
+gd::EventsFunctionsExtension& Project::InsertEventsFunctionsExtension(
+    const gd::EventsFunctionsExtension& extension, std::size_t position) {
+  gd::EventsFunctionsExtension& newlyInsertedEventsFunctionsExtension =
+      *(*(eventsFunctionsExtensions.emplace(
+          position < eventsFunctionsExtensions.size()
+              ? eventsFunctionsExtensions.begin() + position
+              : eventsFunctionsExtensions.end(),
+          new gd::EventsFunctionsExtension(extension))));
+
+  return newlyInsertedEventsFunctionsExtension;
+}
+
+void Project::RemoveEventsFunctionsExtension(const gd::String& name) {
+  std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >::iterator
+      eventsFunctionExtension = find_if(
+          eventsFunctionsExtensions.begin(),
+          eventsFunctionsExtensions.end(),
+          [&name](
+              const std::unique_ptr<gd::EventsFunctionsExtension>& extension) {
+            return extension->GetName() == name;
+          });
+  if (eventsFunctionExtension == eventsFunctionsExtensions.end()) return;
+
+  eventsFunctionsExtensions.erase(eventsFunctionExtension);
+}
+#endif
 
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 // Compatibility with GD2.x

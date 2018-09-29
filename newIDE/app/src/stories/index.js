@@ -103,7 +103,7 @@ import BackgroundText from '../UI/BackgroundText';
 import i18n from '../UI/i18n';
 import ObjectField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectField';
 import { getInitialSelection } from '../EventsSheet/SelectionHandler';
-import EventsFunctionEditor from '../EventsFunctionEditor';
+import ParametersEditor from '../EventsFunctionsExtensionEditor/ParametersEditor';
 
 const gd = global.gd;
 const {
@@ -908,7 +908,6 @@ storiesOf('EventsSheet', module)
             action('Choose resource from source', source)}
           resourceExternalEditors={[]}
           onOpenDebugger={action('open debugger')}
-          updateToolbar={() => {}}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
           onPreview={action('preview')}
@@ -934,7 +933,6 @@ storiesOf('EventsSheet', module)
             action('Choose resource from source', source)}
           resourceExternalEditors={[]}
           onOpenDebugger={action('open debugger')}
-          updateToolbar={() => {}}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
           onPreview={action('preview')}
@@ -1556,15 +1554,13 @@ storiesOf('ResourcesList', module)
     </div>
   ));
 
-storiesOf('EventsFunctionEditor', module)
+storiesOf('ParametersEditor', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <DragDropContextProvider>
-      <div style={{ height: 500, display: 'flex' }}>
-        <EventsFunctionEditor
-          project={project}
-          eventsFunction={testEventsFunction}
-        />
-      </div>
-    </DragDropContextProvider>
+    <div style={{ height: 500, display: 'flex' }}>
+      <ParametersEditor
+        eventsFunction={testEventsFunction}
+        onParametersUpdated={() => {}}
+      />
+    </div>
   ));

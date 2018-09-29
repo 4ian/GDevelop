@@ -36,6 +36,7 @@ import {
   closeLayoutTabs,
   closeExternalLayoutTabs,
   closeExternalEventsTabs,
+  closeEventsFunctionsExtensionTabs,
   type EditorTabsState,
   type EditorTab,
 } from './EditorTabsHandler';
@@ -50,6 +51,7 @@ import EventsEditor from './Editors/EventsEditor';
 import ExternalEventsEditor from './Editors/ExternalEventsEditor';
 import SceneEditor from './Editors/SceneEditor';
 import ExternalLayoutEditor from './Editors/ExternalLayoutEditor';
+import EventsFunctionsExtensionEditor from './Editors/EventsFunctionsExtensionEditor';
 import StartPage from './Editors/StartPage';
 import ResourcesEditor from './Editors/ResourcesEditor';
 import ErrorBoundary from '../UI/ErrorBoundary';
@@ -362,6 +364,20 @@ export default class MainFrame extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  addEventsFunctionsExtension = () => {
+    const { currentProject } = this.state;
+    if (!currentProject) return;
+
+    const name = newNameGenerator('NewEventsFunctionsExtension', name =>
+      currentProject.hasEventsFunctionsExtensionNamed(name)
+    );
+    currentProject.insertNewEventsFunctionsExtension(
+      name,
+      currentProject.getEventsFunctionsExtensionsCount()
+    );
+    this.forceUpdate();
+  };
+
   deleteLayout = (layout: gdLayout) => {
     const { currentProject } = this.state;
     if (!currentProject) return;
@@ -431,6 +447,30 @@ export default class MainFrame extends React.Component<Props, State> {
     );
   };
 
+  deleteEventsFunctionsExtension = (externalLayout: gdEventsFunctionsExtension) => {
+    const { currentProject } = this.state;
+    if (!currentProject) return;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      "Are you sure you want to remove this extension? This can't be undone."
+    );
+    if (!answer) return;
+
+    this.setState(
+      {
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          this.state.editorTabs,
+          externalLayout
+        ),
+      },
+      () => {
+        currentProject.removeEventsFunctionsExtension(externalLayout.getName());
+        this.forceUpdate();
+      }
+    );
+  };
+
   renameLayout = (oldName: string, newName: string) => {
     const { currentProject } = this.state;
     if (!currentProject) return;
@@ -486,6 +526,27 @@ export default class MainFrame extends React.Component<Props, State> {
       },
       () => {
         externalEvents.setName(newName);
+        this.forceUpdate();
+      }
+    );
+  };
+
+  renameEventsFunctionsExtension = (oldName: string, newName: string) => {
+    const { currentProject } = this.state;
+    if (!currentProject) return;
+
+    if (!currentProject.hasEventsFunctionsExtensionNamed(oldName)) return;
+
+    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(oldName);
+    this.setState(
+      {
+        editorTabs: closeEventsFunctionsExtensionTabs(
+          this.state.editorTabs,
+          eventsFunctionsExtension
+        ),
+      },
+      () => {
+        eventsFunctionsExtension.setName(newName);
         this.forceUpdate();
       }
     );
@@ -662,6 +723,30 @@ export default class MainFrame extends React.Component<Props, State> {
             />
           ),
           key: 'external layout ' + name,
+        }),
+      },
+      () => this.updateToolbar()
+    );
+  };
+
+  openEventsFunctionsExtension = (name: string) => {
+    this.setState(
+      {
+        editorTabs: openEditorTab(this.state.editorTabs, {
+          name,
+          renderEditor: ({ isActive, editorRef }) => (
+            <EventsFunctionsExtensionEditor
+              project={this.state.currentProject}
+              eventsFunctionsExtensionName={name}
+              setToolbar={this.setEditorToolbar}
+              resourceSources={this.props.resourceSources}
+              onChooseResource={this._onChooseResource}
+              resourceExternalEditors={this.props.resourceExternalEditors}
+              isActive={isActive}
+              ref={editorRef}
+            />
+          ),
+          key: 'events functions extension ' + name,
         }),
       },
       () => this.updateToolbar()
@@ -1011,14 +1096,18 @@ export default class MainFrame extends React.Component<Props, State> {
                 onOpenExternalEvents={this.openExternalEvents}
                 onOpenLayout={this.openLayout}
                 onOpenExternalLayout={this.openExternalLayout}
+                onOpenEventsFunctionsExtension={this.openEventsFunctionsExtension}
                 onAddLayout={this.addLayout}
                 onAddExternalLayout={this.addExternalLayout}
+                onAddEventsFunctionsExtension={this.addEventsFunctionsExtension}
                 onAddExternalEvents={this.addExternalEvents}
                 onDeleteLayout={this.deleteLayout}
                 onDeleteExternalLayout={this.deleteExternalLayout}
+                onDeleteEventsFunctionsExtension={this.deleteEventsFunctionsExtension}
                 onDeleteExternalEvents={this.deleteExternalEvents}
                 onRenameLayout={this.renameLayout}
                 onRenameExternalLayout={this.renameExternalLayout}
+                onRenameEventsFunctionsExtension={this.renameEventsFunctionsExtension}
                 onRenameExternalEvents={this.renameExternalEvents}
                 onSaveProject={this.save}
                 onCloseProject={this.askToCloseProject}

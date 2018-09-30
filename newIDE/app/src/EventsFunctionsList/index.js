@@ -2,20 +2,15 @@
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
-import Paper from 'material-ui/Paper';
 import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import Background from '../UI/Background';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapVector } from '../Utils/MapFor';
+import { filterProjectItemsList } from '../ProjectManager/EnumerateProjectItems';
 const gd = global.gd;
 
 const styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    height: '100%',
-    flexDirection: 'column',
-  },
   listContainer: {
     flex: 1,
   },
@@ -144,9 +139,15 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     } = this.props;
     const { searchText } = this.state; //TODO - Search
 
-    const list = [...mapVector(eventsFunctions, eventsFunction => eventsFunction), {
-        key: 'add-item-row'
-    }];
+    const list = [
+      ...filterProjectItemsList(
+        mapVector(eventsFunctions, eventsFunction => eventsFunction),
+        searchText
+      ),
+      {
+        key: 'add-item-row',
+      },
+    ];
 
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could
@@ -154,7 +155,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     const listKey = project.ptr + ';' + eventsFunctions.ptr;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -179,15 +180,15 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
             )}
           </AutoSizer>
         </div>
-        {/* <SearchBar //TODO - Search
+        <SearchBar
           value={searchText}
           onRequestSearch={() => {}}
           onChange={text =>
             this.setState({
               searchText: text,
             })}
-        /> */}
-      </Paper>
+        />
+      </Background>
     );
   }
 }

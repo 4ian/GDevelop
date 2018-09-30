@@ -104,6 +104,8 @@ import i18n from '../UI/i18n';
 import ObjectField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectField';
 import { getInitialSelection } from '../EventsSheet/SelectionHandler';
 import ParametersEditor from '../EventsFunctionsExtensionEditor/ParametersEditor';
+import EventsFunctionsList from '../EventsFunctionsList';
+import EventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor';
 
 const gd = global.gd;
 const {
@@ -121,6 +123,7 @@ const {
   group2,
   emptyLayout,
   testEventsFunction,
+  testEventsFunctionsExtension,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -1563,4 +1566,35 @@ storiesOf('ParametersEditor', module)
         onParametersUpdated={() => {}}
       />
     </div>
+  ));
+
+storiesOf('EventsFunctionsList', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <div style={{ height: 500, display: 'flex' }}>
+      <EventsFunctionsList
+        project={project}
+        eventsFunctions={testEventsFunctionsExtension.getEventsFunctions()}
+        selectedEventsFunction={testEventsFunctionsExtension
+          .getEventsFunctions()
+          .at(1)}
+        onSelectEventsFunction={action('select')}
+        onDeleteEventsFunction={action('delete')}
+        onRenameEventsFunction={(resource, newName, cb) => cb(false)}
+      />
+    </div>
+  ));
+
+storiesOf('EventsFunctionsExtensionEditor', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 500, display: 'flex' }}>
+        <EventsFunctionsExtensionEditor
+          project={project}
+          eventsFunctionsExtension={testEventsFunctionsExtension}
+          setToolbar={() => {}}
+        />
+      </div>
+    </DragDropContextProvider>
   ));

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import EventsSheet from '../EventsSheet';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
+import EmptyMessage from '../UI/EmptyMessage';
 import ParametersEditor from './ParametersEditor';
 import EventsFunctionsList from '../EventsFunctionsList';
 import Paper from 'material-ui/Paper';
@@ -63,7 +64,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     this._loadEventsFunctionFrom(this.props.project, selectedEventsFunction);
     this.setState({
       selectedEventsFunction,
-    });
+    }, () => this.updateToolbar());
   };
 
   _renameEventsFunction = (
@@ -103,7 +104,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   />
                 </Paper>
               ) : (
-                <div>TODO</div>
+                <EmptyMessage>Choose a function to set the parameters that it accepts.</EmptyMessage>
               )}
             </MosaicWindow>
           ),
@@ -143,7 +144,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onOpenSettings={() => {}}
               />
             ) : (
-              <div>TODO</div>
+              <EmptyMessage>Choose a function to edit its events.</EmptyMessage>
             ),
           'functions-list': (
             <MosaicWindow

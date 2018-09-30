@@ -776,7 +776,7 @@ export default class EventsSheet extends React.Component<Props, State> {
               searchResults={eventsSearchResultEvents}
               searchFocusOffset={searchFocusOffset}
               onEventMoved={this._onEventMoved}
-            />
+            /> 
             {this.state.showSearchPanel && (
               <SearchPanel
                 ref={searchPanel => (this._searchPanel = searchPanel)}
@@ -842,15 +842,27 @@ export default class EventsSheet extends React.Component<Props, State> {
                   enabled: Clipboard.has(CLIPBOARD_KIND),
                   accelerator: 'CmdOrCtrl+V',
                 },
-                { type: 'separator' },
-                {
-                  label: 'Toggle disabled',
-                  click: () => this.toggleDisabled(),
-                },
                 {
                   label: 'Delete',
                   click: () => this.deleteSelection(),
                   accelerator: 'Delete',
+                },
+                {
+                  label: 'Toggle disabled',
+                  click: () => this.toggleDisabled(),
+                },
+                { type: 'separator' },
+                {
+                  label: 'Add New Event Below',
+                  click: () => this.addNewEvent('BuiltinCommonInstructions::Standard'),
+                },
+                {
+                  label: 'Add Sub Event',
+                  click: () => this.addSubEvents(),
+                },
+                {
+                  label: 'Add Comment Below',
+                  click: () => this.addNewEvent('BuiltinCommonInstructions::Comment'),
                 },
                 { type: 'separator' },
                 {

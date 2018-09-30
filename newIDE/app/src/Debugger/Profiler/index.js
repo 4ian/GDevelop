@@ -1,20 +1,14 @@
 // @flow
 import * as React from 'react';
-import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton';
 import MeasuresTable from './MeasuresTable';
 import { type ProfilerOutput } from '..';
 import EmptyMessage from '../../UI/EmptyMessage';
 import { Line } from '../../UI/Grid';
+import Background from '../../UI/Background';
 import LinearProgress from 'material-ui/LinearProgress';
 
 const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    flex: 1,
-    width: '100%',
-  },
   tableContainer: {
     flex: 1,
   },
@@ -37,7 +31,7 @@ export default class Profiler extends React.Component<Props, void> {
     } = this.props;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         <Line alignItems="center" justifyContent="center">
           {!profilingInProgress && profilerOutput && (<p>Last run collected on {profilerOutput.stats.framesCount} frames.</p>)
           }
@@ -61,7 +55,7 @@ export default class Profiler extends React.Component<Props, void> {
             </EmptyMessage>
           )}
         </div>
-      </Paper>
+      </Background>
     );
   }
 }

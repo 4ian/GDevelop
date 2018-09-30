@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
-import Paper from 'material-ui/Paper';
+import Background from '../UI/Background';
 import get from 'lodash/get';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Column, Line } from '../UI/Grid';
@@ -39,10 +39,6 @@ type State = {|
   selectedInspectorFullPath: Array<string>,
   rawMode: boolean,
 |};
-
-const styles = {
-  container: { flex: 1, display: 'flex' },
-};
 
 /**
  * The debugger interface: show the list of inspectors for a game, along with the
@@ -88,7 +84,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
               toolbarControls={[]}
               gameData={gameData}
             >
-              <Paper style={styles.container}>
+              <Background>
                 <Column expand noMargin>
                   <Line justifyContent="center">
                     <RaisedButton label="Refresh" onClick={onRefresh} primary />
@@ -108,7 +104,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
                     />
                   </Line>
                 </Column>
-              </Paper>
+              </Background>
             </MosaicWindow>
           ),
           'selected-inspector': (

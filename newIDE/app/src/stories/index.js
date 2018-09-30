@@ -13,6 +13,7 @@ import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
+import Background from '../UI/Background';
 import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
@@ -131,6 +132,10 @@ const Placeholder = () => <div>Placeholder component</div>;
 storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
 ));
+
+storiesOf('UI Building Blocks/Background', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => <Background>Hello world</Background>);
 
 storiesOf('UI Building Blocks/LoaderModal', module)
   .addDecorator(paperDecorator)
@@ -286,6 +291,7 @@ storiesOf('UI Building Blocks/Tabs', module)
             project={project}
             objectsContainer={testLayout}
             onEditObject={action('On edit object')}
+            selectedObjectNames={[]}
           />
         </Tab>
         <Tab label="Tab 3" onClose={action('Close tab 3')}>
@@ -1173,6 +1179,7 @@ storiesOf('ObjectsList', module)
           project={project}
           objectsContainer={testLayout}
           onEditObject={action('On edit object')}
+          selectedObjectNames={[]}
         />
       </div>
     </SerializedObjectDisplay>

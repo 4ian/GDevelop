@@ -5,7 +5,7 @@ import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import ParametersEditor from './ParametersEditor';
 import EventsFunctionsList from '../EventsFunctionsList';
-import Paper from 'material-ui/Paper';
+import Background from '../UI/Background';
 const gd = global.gd;
 
 type Props = {|
@@ -17,10 +17,6 @@ type Props = {|
 type State = {|
   selectedEventsFunction: ?gdEventsFunction,
 |};
-
-const styles = {
-  container: { flex: 1, display: 'flex' },
-};
 
 export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
@@ -62,9 +58,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _selectEventsFunction = (selectedEventsFunction: gdEventsFunction) => {
     this._loadEventsFunctionFrom(this.props.project, selectedEventsFunction);
-    this.setState({
-      selectedEventsFunction,
-    }, () => this.updateToolbar());
+    this.setState(
+      {
+        selectedEventsFunction,
+      },
+      () => this.updateToolbar()
+    );
   };
 
   _renameEventsFunction = (
@@ -90,8 +89,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               toolbarControls={[]}
               selectedEventsFunction={selectedEventsFunction}
             >
-              {selectedEventsFunction ? (
-                <Paper style={styles.container}>
+              <Background>
+                {selectedEventsFunction ? (
                   <ParametersEditor
                     eventsFunction={selectedEventsFunction}
                     onParametersUpdated={() => {
@@ -102,10 +101,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       this.forceUpdate();
                     }}
                   />
-                </Paper>
-              ) : (
-                <EmptyMessage>Choose a function to set the parameters that it accepts.</EmptyMessage>
-              )}
+                ) : (
+                  <EmptyMessage>
+                    Choose a function to set the parameters that it accepts.
+                  </EmptyMessage>
+                )}
+              </Background>
             </MosaicWindow>
           ),
           //TODO
@@ -144,7 +145,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 onOpenSettings={() => {}}
               />
             ) : (
-              <EmptyMessage>Choose a function to edit its events.</EmptyMessage>
+              <Background>
+                <EmptyMessage>
+                  Choose a function to edit its events.
+                </EmptyMessage>
+              </Background>
             ),
           'functions-list': (
             <MosaicWindow

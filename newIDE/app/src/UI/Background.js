@@ -12,7 +12,7 @@ const styles = {
 };
 
 type Props = {|
-  children: React.Node,
+  children: ?React.Node,
 |};
 
 /**

@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
-import Paper from 'material-ui/Paper';
+import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-
-const styles = {
-  container: { display: 'flex', flexDirection: 'column', flex: 1 },
-};
 
 export default class InstancePropertiesEditor extends Component {
   constructor() {
@@ -142,11 +138,11 @@ export default class InstancePropertiesEditor extends Component {
     const { instances } = this.props;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         {!instances || !instances.length
           ? this._renderEmpty()
           : this._renderInstancesProperties()}
-      </Paper>
+      </Background>
     );
   }
 }

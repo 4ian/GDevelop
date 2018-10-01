@@ -127,7 +127,7 @@ export default class EventsSheet extends React.Component<Props, State> {
   eventContextMenu: ContextMenu;
   instructionContextMenu: ContextMenu;
   instructionsListContextMenu: ContextMenu;
-  allEventsMetadata: ContextMenu;
+  allEventsMetadata: Array<{type: string, fullName: string, description: string}>;
 
   constructor(props: Props) {
     super(props);

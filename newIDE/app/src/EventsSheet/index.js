@@ -55,6 +55,8 @@ import EventsSearcher, {
   type SearchInEventsInputs,
 } from './EventsSearcher';
 import { containsSubInstructions } from './ContainsSubInstruction';
+import flatten from 'lodash/flatten';
+import { mapFor } from '../Utils/MapFor';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -178,6 +180,31 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   }
 
+  componentWillMount() {
+    const allExtensions = gd
+      .asPlatform(gd.JsPlatform.get())
+      .getAllPlatformExtensions();
+
+    this.allEventsMetadata = flatten(
+      mapFor(0, allExtensions.size(), i => {
+        const extension = allExtensions.get(i);
+        const extensionEvents = extension.getAllEvents();
+
+        return extensionEvents
+          .keys()
+          .toJSArray()
+          .map(type => {
+            const metadata = extensionEvents.get(type);
+            return {
+              type,
+              fullName: metadata.getFullName(),
+              description: metadata.getDescription(),
+            };
+          });
+      })
+    );
+  }
+
   componentWillUnmount() {
     this._keyboardShortcuts.unmount();
   }
@@ -187,6 +214,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     this.props.setToolbar(
       <Toolbar
+        allEventsMetadata={this.allEventsMetadata}
         onAddStandardEvent={() =>
           this.addNewEvent('BuiltinCommonInstructions::Standard')}
         onAddSubEvent={this.addSubEvents}
@@ -711,7 +739,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     // This could be refactored and put here if the drag'n'drop of events
     // is reworked at some point.
     this._saveChangesToHistory();
-  }
+  };
 
   render() {
     const {
@@ -776,7 +804,7 @@ export default class EventsSheet extends React.Component<Props, State> {
               searchResults={eventsSearchResultEvents}
               searchFocusOffset={searchFocusOffset}
               onEventMoved={this._onEventMoved}
-            /> 
+            />
             {this.state.showSearchPanel && (
               <SearchPanel
                 ref={searchPanel => (this._searchPanel = searchPanel)}
@@ -854,15 +882,21 @@ export default class EventsSheet extends React.Component<Props, State> {
                 { type: 'separator' },
                 {
                   label: 'Add New Event Below',
-                  click: () => this.addNewEvent('BuiltinCommonInstructions::Standard'),
+                  click: () =>
+                    this.addNewEvent('BuiltinCommonInstructions::Standard'),
                 },
                 {
                   label: 'Add Sub Event',
                   click: () => this.addSubEvents(),
                 },
                 {
-                  label: 'Add Comment Below',
-                  click: () => this.addNewEvent('BuiltinCommonInstructions::Comment'),
+                  label: 'Add Other',
+                  submenu: this.allEventsMetadata.map(metadata => {
+                    return {
+                      label: metadata.fullName,
+                      click: () => this.addNewEvent(metadata.type),
+                    };
+                  }),
                 },
                 { type: 'separator' },
                 {

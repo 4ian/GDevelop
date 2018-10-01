@@ -37,6 +37,9 @@ class GD_CORE_API EventsFunction {
   const gd::String & GetFullName() const { return fullName; };
   EventsFunction& SetFullName(const gd::String & fullName_) { fullName = fullName_; return *this; }
 
+  const gd::String & GetSentence() const { return sentence; };
+  EventsFunction& SetSentence(const gd::String & sentence_) { sentence = sentence_; return *this; }
+
   /**
    * \brief Return the events.
    */
@@ -80,6 +83,7 @@ class GD_CORE_API EventsFunction {
   gd::String name;
   gd::String fullName;
   gd::String description;
+  gd::String sentence;
   gd::EventsList events;
   std::vector<gd::ParameterMetadata> parameters;
 };

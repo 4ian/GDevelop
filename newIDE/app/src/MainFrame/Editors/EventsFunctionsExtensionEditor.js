@@ -2,6 +2,7 @@
 import * as React from 'react';
 import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor';
 import BaseEditor from './BaseEditor';
+import { loadProjectEventsFunctionsExtensions } from '../../EventsFunctionsExtensionsLoader';
 
 const styles = {
   container: {
@@ -17,9 +18,28 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
     if (this.editor) this.editor.updateToolbar();
   }
 
+  shouldComponentUpdate(nextProps: *) {
+    console.log(nextProps);
+    // This optimization is a bit more cautious than the one is BaseEditor,
+    // to still be notified when isActive goes from true to false.
+    if (!this.props.isActive && !nextProps.isActive) {
+      return false;
+    }
+
+    return true;
+  }
+
+  componentDidUpdate(prevProps: *) {
+    if (prevProps.isActive && !this.props.isActive) {
+      loadProjectEventsFunctionsExtensions(this.props.project, this.props.eventsFunctionWriter);
+    }
+  }
+
   getEventsFunctionsExtension(): ?gdEventsFunctionsExtension {
     const { project, eventsFunctionsExtensionName } = this.props;
-    if (!project.hasEventsFunctionsExtensionNamed(eventsFunctionsExtensionName)) {
+    if (
+      !project.hasEventsFunctionsExtensionNamed(eventsFunctionsExtensionName)
+    ) {
       return null;
     }
     return project.getEventsFunctionsExtension(eventsFunctionsExtensionName);
@@ -31,7 +51,9 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
 
     if (!eventsFunctionsExtension) {
       //TODO: Error component
-      return <div>No extension called {eventsFunctionsExtensionName} found!</div>;
+      return (
+        <div>No extension called {eventsFunctionsExtensionName} found!</div>
+      );
     }
 
     return (

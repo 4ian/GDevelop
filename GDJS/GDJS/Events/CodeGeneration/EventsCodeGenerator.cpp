@@ -8,6 +8,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
+#include "GDCore/Extensions/EventsFunction.h"
 #include "GDCore/Extensions/Metadata/EventMetadata.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
@@ -15,10 +16,10 @@
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/Behavior.h"
-#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDJS/Events/CodeGeneration/VariableParserCallbacks.h"
@@ -88,15 +89,16 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     gd::Project& project,
-    const std::vector<gd::ParameterMetadata>& parameters,
-    const gd::EventsList& events,
+    const gd::EventsFunction& eventsFunction,
+    const gd::String& codeNamespace,
+    std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
   gd::ObjectsContainer objectsAndGroups;
   gd::ObjectsContainer
       emptyObjectsAndGroups;  // As opposed to layout events, we don't have
                               // objects in the "outer" scope.
   gd::ParameterMetadataTools::ParametersToObjectsContainer(
-      project, parameters, objectsAndGroups);
+      project, eventsFunction.GetParameters(), objectsAndGroups);
 
   // Prepare the global context
   unsigned int maxDepthLevelReached = 0;
@@ -106,8 +108,9 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   // Generate whole events code
   // Preprocessing then code generation can make changes to the events, so we
   // need to do the work on a copy of the events.
-  gd::EventsList generatedEvents = events;
+  gd::EventsList generatedEvents = eventsFunction.GetEvents();
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+  codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.PreprocessEventList(generatedEvents);
   gd::String wholeEventsCode =
       codeGenerator.GenerateEventsListCode(generatedEvents, context);
@@ -136,13 +139,16 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator.GetCustomCodeOutsideMain() + "\n\n" +
       codeGenerator.GetCodeNamespaceAccessor() + "func = function(" +
       codeGenerator.GenerateEventsFunctionParameterDeclarationsList(
-          parameters) +
-      ") {\n" + codeGenerator.GenerateEventsFunctionContext(parameters) + "\n" +
-      globalObjectListsReset + "\n" + codeGenerator.GetCustomCodeInMain() +
-      wholeEventsCode + "\n" + "return;\n" + "}\n";
+          eventsFunction.GetParameters()) +
+      ") {\n" +
+      codeGenerator.GenerateEventsFunctionContext(
+          eventsFunction.GetParameters()) +
+      "\n" + globalObjectListsReset + "\n" +
+      codeGenerator.GetCustomCodeInMain() + wholeEventsCode + "\n" +
+      "return;\n" + "}\n";
 
-  // includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
-  //                     codeGenerator.GetIncludeFiles().end());
+  includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
+                      codeGenerator.GetIncludeFiles().end());
   return output;
 }
 
@@ -847,8 +853,10 @@ gd::String EventsCodeGenerator::GetCodeNamespace() {
     return "gdjs." +
            gd::SceneNameMangler::GetMangledSceneName(GetLayout().GetName()) +
            "Code";
+  } else if (!codeNamespace.empty()) {
+    return codeNamespace;
   } else {
-    return "gdjs.events" + gd::String::From(&objectsAndGroups) + "Code";
+    return "gdjs.unspecifiednamespacethisisprobablyanerrorincodegeneratorsetup";
   }
 }
 

@@ -65,6 +65,7 @@ import {
 import { type ResourceSource } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
+import { type EventsFunctionWriter } from '../EventsFunctionsExtensionsLoader';
 import {
   getUpdateNotificationTitle,
   getUpdateNotificationBody,
@@ -122,6 +123,7 @@ type Props = {
   authentification: Authentification,
   extensionsLoader?: JsExtensionsLoader,
   initialPathsOrURLsToOpen: ?Array<string>,
+  eventsFunctionWriter?: EventsFunctionWriter,
 };
 
 export default class MainFrame extends React.Component<Props, State> {
@@ -730,6 +732,8 @@ export default class MainFrame extends React.Component<Props, State> {
   };
 
   openEventsFunctionsExtension = (name: string) => {
+    if (!this.props.eventsFunctionWriter) return
+
     this.setState(
       {
         editorTabs: openEditorTab(this.state.editorTabs, {
@@ -743,6 +747,7 @@ export default class MainFrame extends React.Component<Props, State> {
               onChooseResource={this._onChooseResource}
               resourceExternalEditors={this.props.resourceExternalEditors}
               isActive={isActive}
+              eventsFunctionWriter={this.props.eventsFunctionWriter}
               ref={editorRef}
             />
           ),
@@ -1117,6 +1122,7 @@ export default class MainFrame extends React.Component<Props, State> {
                 onOpenPlatformSpecificAssets={() =>
                   this.openPlatformSpecificAssets()}
                 onChangeSubscription={() => this.openSubscription(true)}
+                showEventsFunctionsExtensions={!!this.props.eventsFunctionWriter}
                 freezeUpdate={!projectManagerOpen}
               />
             )}

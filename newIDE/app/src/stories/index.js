@@ -104,7 +104,7 @@ import BackgroundText from '../UI/BackgroundText';
 import i18n from '../UI/i18n';
 import ObjectField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectField';
 import { getInitialSelection } from '../EventsSheet/SelectionHandler';
-import ParametersEditor from '../EventsFunctionsExtensionEditor/ParametersEditor';
+import EventsFunctionConfigurationEditor from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor';
 import EventsFunctionsList from '../EventsFunctionsList';
 import EventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor';
 
@@ -1564,11 +1564,11 @@ storiesOf('ResourcesList', module)
     </div>
   ));
 
-storiesOf('ParametersEditor', module)
+storiesOf('EventsFunctionConfigurationEditor', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <div style={{ height: 500, display: 'flex' }}>
-      <ParametersEditor
+      <EventsFunctionConfigurationEditor
         eventsFunction={testEventsFunction}
         onParametersUpdated={() => {}}
       />

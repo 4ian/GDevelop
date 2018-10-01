@@ -3,7 +3,7 @@ import * as React from 'react';
 import EventsSheet from '../EventsSheet';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
-import ParametersEditor from './ParametersEditor';
+import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
 import EventsFunctionsList from '../EventsFunctionsList';
 import Background from '../UI/Background';
 const gd = global.gd;
@@ -85,13 +85,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
         editors={{
           parameters: (
             <MosaicWindow
-              title="Function Parameters"
+              title="Function Configuration"
               toolbarControls={[]}
               selectedEventsFunction={selectedEventsFunction}
             >
               <Background>
                 {selectedEventsFunction ? (
-                  <ParametersEditor
+                  <EventsFunctionConfigurationEditor
                     eventsFunction={selectedEventsFunction}
                     onParametersUpdated={() => {
                       this._loadEventsFunctionFrom(
@@ -179,7 +179,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
             splitPercentage: 25,
           },
           second: 'functions-list',
-          splitPercentage: 75,
+          splitPercentage: 66,
         }}
       />
     );

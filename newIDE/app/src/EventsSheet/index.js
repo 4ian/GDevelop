@@ -55,8 +55,7 @@ import EventsSearcher, {
   type SearchInEventsInputs,
 } from './EventsSearcher';
 import { containsSubInstructions } from './ContainsSubInstruction';
-import flatten from 'lodash/flatten';
-import { mapFor } from '../Utils/MapFor';
+import { enumerateEventsMetadata } from './EnumerateEventsMetadata';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -109,6 +108,12 @@ type State = {|
   showSearchPanel: boolean,
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
+
+  allEventsMetadata: Array<{
+    type: string,
+    fullName: string,
+    description: string,
+  }>,
 |};
 
 const styles = {
@@ -127,7 +132,6 @@ export default class EventsSheet extends React.Component<Props, State> {
   eventContextMenu: ContextMenu;
   instructionContextMenu: ContextMenu;
   instructionsListContextMenu: ContextMenu;
-  allEventsMetadata: Array<{type: string, fullName: string, description: string}>;
 
   constructor(props: Props) {
     super(props);
@@ -160,6 +164,8 @@ export default class EventsSheet extends React.Component<Props, State> {
       showSearchPanel: false,
       searchResults: null,
       searchFocusOffset: null,
+
+      allEventsMetadata: [{ type: '', fullName: '', description: '' }],
     };
 
     this._keyboardShortcuts = new KeyboardShortcuts({
@@ -181,29 +187,8 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   }
 
-  componentWillMount() {
-    const allExtensions = gd
-      .asPlatform(gd.JsPlatform.get())
-      .getAllPlatformExtensions();
-
-    this.allEventsMetadata = flatten(
-      mapFor(0, allExtensions.size(), i => {
-        const extension = allExtensions.get(i);
-        const extensionEvents = extension.getAllEvents();
-
-        return extensionEvents
-          .keys()
-          .toJSArray()
-          .map(type => {
-            const metadata = extensionEvents.get(type);
-            return {
-              type,
-              fullName: metadata.getFullName(),
-              description: metadata.getDescription(),
-            };
-          });
-      })
-    );
+  componentDidMount() {
+    this.setState({ allEventsMetadata: enumerateEventsMetadata() });
   }
 
   componentWillUnmount() {
@@ -215,7 +200,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     this.props.setToolbar(
       <Toolbar
-        allEventsMetadata={this.allEventsMetadata}
+        allEventsMetadata={this.state.allEventsMetadata}
         onAddStandardEvent={() =>
           this.addNewEvent('BuiltinCommonInstructions::Standard')}
         onAddSubEvent={this.addSubEvents}
@@ -892,7 +877,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                 },
                 {
                   label: 'Add Other',
-                  submenu: this.allEventsMetadata.map(metadata => {
+                  submenu: this.state.allEventsMetadata.map(metadata => {
                     return {
                       label: metadata.fullName,
                       click: () => this.addNewEvent(metadata.type),

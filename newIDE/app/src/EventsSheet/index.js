@@ -32,7 +32,7 @@ import {
   hasSomethingSelected,
   hasEventSelected,
   hasInstructionSelected,
-  hasSelectedAtleastOneCondition,
+  hasSelectedAtLeastOneCondition,
   hasInstructionsListSelected,
   getSelectedEvents,
   getSelectedInstructions,
@@ -962,7 +962,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                 {
                   label: 'Invert Condition',
                   click: () => this._invertSelectedConditions(),
-                  visible: hasSelectedAtleastOneCondition(this.state.selection),
+                  visible: hasSelectedAtLeastOneCondition(this.state.selection),
                 },
               ]}
             />

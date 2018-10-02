@@ -105,17 +105,16 @@ export const hasInstructionSelected = (selection: SelectionState): boolean => {
   return !!Object.keys(selection.selectedInstructions).length;
 };
 
-export const hasSelectedAtleastOneCondition = (
+export const hasSelectedAtLeastOneCondition = (
   selection: SelectionState
 ): boolean => {
-  let hasCondition = false;
-  for (var instructionContext of getSelectedInstructionsContexts(selection)) {
+  for (let instructionContext of getSelectedInstructionsContexts(selection)) {
     if (instructionContext.isCondition) {
-      hasCondition = true;
+      return true;
       break;
     }
   }
-  return hasCondition;
+  return false;
 };
 
 export const hasInstructionsListSelected = (

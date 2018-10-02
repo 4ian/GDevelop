@@ -55,7 +55,7 @@ import EventsSearcher, {
   type SearchInEventsInputs,
 } from './EventsSearcher';
 import { containsSubInstructions } from './ContainsSubInstruction';
-import { enumerateEventsMetadata } from './EnumerateEventsMetadata';
+import { enumerateEventsMetadata, type EventMetadata } from './EnumerateEventsMetadata';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -109,11 +109,7 @@ type State = {|
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
 
-  allEventsMetadata: Array<{
-    type: string,
-    fullName: string,
-    description: string,
-  }>,
+  allEventsMetadata: Array<EventMetadata>,
 |};
 
 const styles = {
@@ -165,7 +161,7 @@ export default class EventsSheet extends React.Component<Props, State> {
       searchResults: null,
       searchFocusOffset: null,
 
-      allEventsMetadata: [{ type: '', fullName: '', description: '' }],
+      allEventsMetadata: [],
     };
 
     this._keyboardShortcuts = new KeyboardShortcuts({

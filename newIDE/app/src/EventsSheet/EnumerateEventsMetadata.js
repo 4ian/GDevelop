@@ -1,8 +1,16 @@
+// @flow
+
 import flatten from 'lodash/flatten';
 import { mapFor } from '../Utils/MapFor';
 const gd = global.gd;
 
-export const enumerateEventsMetadata = () => {
+export type EventMetadata = {|
+  type: string,
+  fullName: string,
+  description: string,
+|};
+
+export const enumerateEventsMetadata = (): Array<EventMetadata> => {
   const allExtensions = gd
     .asPlatform(gd.JsPlatform.get())
     .getAllPlatformExtensions();

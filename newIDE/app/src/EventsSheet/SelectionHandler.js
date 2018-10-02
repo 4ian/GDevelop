@@ -111,7 +111,6 @@ export const hasSelectedAtLeastOneCondition = (
   for (let instructionContext of getSelectedInstructionsContexts(selection)) {
     if (instructionContext.isCondition) {
       return true;
-      break;
     }
   }
   return false;

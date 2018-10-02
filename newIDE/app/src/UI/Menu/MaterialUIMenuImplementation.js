@@ -2,6 +2,7 @@ import React from 'react';
 import MenuItem from 'material-ui/MenuItem';
 import Divider from 'material-ui/Divider';
 import { adaptAcceleratorString } from '../AcceleratorString';
+import ArrowDropRight from 'material-ui/svg-icons/navigation-arrow-drop-right';
 
 /**
  * Construct items for material-ui's Menu, using a template which
@@ -14,6 +15,7 @@ import { adaptAcceleratorString } from '../AcceleratorString';
  *  - accelerator
  *  - enabled
  *  - checked (when `type` is 'checkbox')
+ *  - submenu
  */
 export default class MaterialUIMenuImplementation {
   constructor({ onClose }) {
@@ -38,9 +40,15 @@ export default class MaterialUIMenuImplementation {
             insetChildren={!item.checked}
             disabled={item.enabled === false}
             onClick={() => {
-              item.click();
-              this._onClose();
+              if (item.click) {
+                item.click();
+                this._onClose();
+              }
             }}
+            rightIcon={item.submenu ? <ArrowDropRight /> : undefined}
+            menuItems={
+              item.submenu ? this.buildFromTemplate(item.submenu) : undefined
+            }
           />
         );
       } else {
@@ -55,9 +63,15 @@ export default class MaterialUIMenuImplementation {
             }
             disabled={item.enabled === false}
             onClick={() => {
-              item.click();
-              this._onClose();
+              if (item.click) {
+                item.click();
+                this._onClose();
+              }
             }}
+            rightIcon={item.submenu ? <ArrowDropRight /> : undefined}
+            menuItems={
+              item.submenu ? this.buildFromTemplate(item.submenu) : undefined
+            }
           />
         );
       }

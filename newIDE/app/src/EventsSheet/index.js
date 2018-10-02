@@ -32,6 +32,7 @@ import {
   hasSomethingSelected,
   hasEventSelected,
   hasInstructionSelected,
+  hasSelectedAtLeastOneCondition,
   hasInstructionsListSelected,
   getSelectedEvents,
   getSelectedInstructions,
@@ -55,7 +56,10 @@ import EventsSearcher, {
   type SearchInEventsInputs,
 } from './EventsSearcher';
 import { containsSubInstructions } from './ContainsSubInstruction';
-import { enumerateEventsMetadata, type EventMetadata } from './EnumerateEventsMetadata';
+import {
+  enumerateEventsMetadata,
+  type EventMetadata,
+} from './EnumerateEventsMetadata';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -616,6 +620,22 @@ export default class EventsSheet extends React.Component<Props, State> {
       this.pasteInstructions();
   };
 
+  _invertSelectedConditions = () => {
+    getSelectedInstructionsContexts(
+      this.state.selection
+    ).forEach(instructionContext => {
+      if (instructionContext.isCondition) {
+        instructionContext.instruction.setInverted(
+          !instructionContext.instruction.isInverted()
+        );
+      }
+    });
+
+    this._saveChangesToHistory(() => {
+      this._eventsTree.forceEventsUpdate();
+    });
+  };
+
   _saveChangesToHistory = (cb: ?Function) => {
     this.setState(
       {
@@ -938,6 +958,11 @@ export default class EventsSheet extends React.Component<Props, State> {
                   click: this.redo,
                   enabled: canRedo(this.state.history),
                   accelerator: 'CmdOrCtrl+Shift+Z',
+                },
+                {
+                  label: 'Invert Condition',
+                  click: () => this._invertSelectedConditions(),
+                  visible: hasSelectedAtLeastOneCondition(this.state.selection),
                 },
               ]}
             />

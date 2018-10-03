@@ -1565,6 +1565,7 @@ storiesOf('ResourcesList', module)
   ));
 
 storiesOf('EventsFunctionConfigurationEditor', module)
+  .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <div style={{ height: 500, display: 'flex' }}>

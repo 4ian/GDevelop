@@ -10,13 +10,29 @@
 
 namespace gd {
 
-EventsFunction::EventsFunction() {}
+EventsFunction::EventsFunction() : functionType(Action) {
+  ParameterMetadata runtimeSceneParameter;
+  runtimeSceneParameter.SetCodeOnly()
+      .SetType("currentScene")
+      .SetName("runtimeScene");
+  parameters.push_back(runtimeSceneParameter);
+}
 
 void EventsFunction::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
   element.SetAttribute("description", description);
+  element.SetAttribute("sentence", sentence);
   events.SerializeTo(element.AddChild("events"));
+
+  gd::String functionTypeStr = "Action";
+  if (functionType == Condition)
+    functionTypeStr = "Condition";
+  else if (functionType == Expression)
+    functionTypeStr = "Expression";
+  else if (functionType == StringExpression)
+    functionTypeStr = "StringExpression";
+  element.SetAttribute("functionType", functionTypeStr);
 
   gd::SerializerElement& parametersElement = element.AddChild("parameters");
   parametersElement.ConsiderAsArrayOf("parameter");
@@ -30,7 +46,18 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
   description = element.GetStringAttribute("description");
+  sentence = element.GetStringAttribute("sentence");
   events.UnserializeFrom(project, element.GetChild("events"));
+
+  gd::String functionTypeStr = element.GetStringAttribute("functionType");
+  if (functionTypeStr == "Condition")
+    functionType = Condition;
+  else if (functionTypeStr == "Expression")
+    functionType = Expression;
+  else if (functionTypeStr == "StringExpression")
+    functionType = StringExpression;
+  else
+    functionType = Action;
 
   const gd::SerializerElement& parametersElement =
       element.GetChild("parameters");

@@ -1,6 +1,7 @@
 // @flow
 import { mapVector } from '../Utils/MapFor';
 import { mapFor } from '../Utils/MapFor';
+import slugs from 'slugs';
 
 const gd = global.gd;
 
@@ -9,6 +10,10 @@ export type EventsFunctionWriter = {|
   writeFunctionCode: (functionName: string, code: string) => Promise<void>,
 |};
 
+const mangleName = (name: string) => {
+  return slugs(name, '_', []);
+};
+
 /**
  * Load all events functions of a project in extensions
  */
@@ -16,13 +21,15 @@ export const loadProjectEventsFunctionsExtensions = (
   project: gdProject,
   eventsFunctionWriter: EventsFunctionWriter
 ): Promise<void> => {
-  return Promise.all(mapFor(0, project.getEventsFunctionsExtensionsCount(), i => {
-    return loadProjectEventsFunctionsExtension(
-      project,
-      project.getEventsFunctionsExtensionAt(i),
-      eventsFunctionWriter
-    );
-  }));
+  return Promise.all(
+    mapFor(0, project.getEventsFunctionsExtensionsCount(), i => {
+      return loadProjectEventsFunctionsExtension(
+        project,
+        project.getEventsFunctionsExtensionAt(i),
+        eventsFunctionWriter
+      );
+    })
+  );
 };
 
 export const loadProjectEventsFunctionsExtension = (
@@ -62,31 +69,71 @@ export const generateEventsFunctionExtension = (
     mapVector(
       eventsFunctionsExtension.getEventsFunctions(),
       (eventsFunction: gdEventsFunction) => {
-        const isCondition = false; //TODO
-        const instruction = extension.addAction(
-          eventsFunction.getName(),
-          eventsFunction.getFullName(),
-          eventsFunction.getDescription(),
-          eventsFunction.getSentence(),
-          eventsFunction.getName(),
-          'res/function.png',
-          'res/function24.png'
-        );
+        const functionType = eventsFunction.getFunctionType();
+        let instructionOrExpression;
+        if (functionType === gd.EventsFunction.Expression) {
+          instructionOrExpression = extension.addExpression(
+            eventsFunction.getName(),
+            eventsFunction.getFullName() || 'Unnamed expression',
+            eventsFunction.getDescription(),
+            eventsFunctionsExtension.getFullName() || 'Unnamed extension',
+            'res/function.png'
+          );
+        } else if (functionType === gd.EventsFunction.StringExpression) {
+          instructionOrExpression = extension.addStrExpression(
+            eventsFunction.getName(),
+            eventsFunction.getFullName() || 'Unnamed string expression',
+            eventsFunction.getDescription(),
+            eventsFunctionsExtension.getFullName() || 'Unnamed extension',
+            'res/function.png'
+          );
+        } else if (functionType === gd.EventsFunction.Condition) {
+          instructionOrExpression = extension.addCondition(
+            eventsFunction.getName(),
+            eventsFunction.getFullName() || 'Unnamed condition',
+            eventsFunction.getDescription(),
+            eventsFunction.getSentence(),
+            eventsFunctionsExtension.getFullName() || 'Unnamed extension',
+            'res/function.png',
+            'res/function24.png'
+          );
+        } else {
+          instructionOrExpression = extension.addAction(
+            eventsFunction.getName(),
+            eventsFunction.getFullName() || 'Unnamed action',
+            eventsFunction.getDescription(),
+            eventsFunction.getSentence(),
+            eventsFunctionsExtension.getFullName() || 'Unnamed extension',
+            'res/function.png',
+            'res/function24.png'
+          );
+        }
 
         mapVector(
           eventsFunction.getParameters(),
           (parameter: gdParameterMetadata) => {
-            instruction.addParameter(
-              parameter.getType(),
-              parameter.getDescription(),
-              parameter.getExtraInfo(),
-              parameter.isOptional()
-            );
+            if (!parameter.isCodeOnly()) {
+              instructionOrExpression.addParameter(
+                parameter.getType(),
+                parameter.getDescription(),
+                parameter.getExtraInfo(),
+                parameter.isOptional()
+              );
+            } else {
+              instructionOrExpression.addCodeOnlyParameter(
+                parameter.getType(),
+                parameter.getExtraInfo(),
+              );
+            }
           }
         );
 
         const includeFiles = new gd.SetString();
-        const codeNamespace = 'gdjs.TODO';
+        const codeNamespace =
+          'gdjs.eventsFunction__' +
+          mangleName(eventsFunctionsExtension.getName()) +
+          '__' +
+          mangleName(eventsFunction.getName());
         const functionName = codeNamespace + '.func';
         const code = gd.EventsCodeGenerator.generateEventsFunctionCode(
           project,
@@ -96,8 +143,8 @@ export const generateEventsFunctionExtension = (
           true //TODO
         );
 
-        instruction
-          .getCodeExtraInformation()
+        const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
+        codeExtraInformation
           .setIncludeFile(eventsFunctionWriter.getIncludeFileFor(functionName))
           .setFunctionName(functionName);
 
@@ -108,7 +155,7 @@ export const generateEventsFunctionExtension = (
           .toNewVectorString()
           .toJSArray()
           .forEach((includeFile: string) => {
-            instruction.getCodeExtraInformation().addIncludeFile(includeFile);
+            codeExtraInformation.addIncludeFile(includeFile);
           });
 
         includeFiles.delete();

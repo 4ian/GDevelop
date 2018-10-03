@@ -831,8 +831,20 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         GetExternalEventsCount());
     externalEvents.UnserializeFrom(*this, externalEventElement);
   }
-#endif
 
+  eventsFunctionsExtensions.clear();
+  const SerializerElement& eventsFunctionsExtensionsElement = element.GetChild("eventsFunctionsExtensions");
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf("eventsFunctionsExtension");
+  for (std::size_t i = 0; i < eventsFunctionsExtensionsElement.GetChildrenCount(); ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+
+    gd::EventsFunctionsExtension& newEventsFunctionsExtension =
+        InsertNewEventsFunctionsExtension("", GetEventsFunctionsExtensionsCount());
+    newEventsFunctionsExtension.UnserializeFrom(*this, eventsFunctionsExtensionElement);
+  }
+#endif
+  
   externalLayouts.clear();
   const SerializerElement& externalLayoutsElement =
       element.GetChild("externalLayouts", 0, "ExternalLayouts");
@@ -946,6 +958,13 @@ void Project::SerializeTo(SerializerElement& element) const {
   for (std::size_t i = 0; i < GetExternalEventsCount(); ++i)
     GetExternalEvents(i).SerializeTo(
         externalEventsElement.AddChild("externalEvents"));
+
+  SerializerElement& eventsFunctionsExtensionsElement =
+      element.AddChild("eventsFunctionsExtensions");
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf("eventsFunctionsExtension");
+  for (std::size_t i = 0; i < eventsFunctionsExtensions.size(); ++i)
+    eventsFunctionsExtensions[i]->SerializeTo(
+        eventsFunctionsExtensionsElement.AddChild("eventsFunctionsExtension"));
 
   SerializerElement& externalLayoutsElement =
       element.AddChild("externalLayouts");
@@ -1242,6 +1261,7 @@ void Project::Init(const gd::Project& game) {
 #endif
 
   externalLayouts = gd::Clone(game.externalLayouts);
+  eventsFunctionsExtensions = gd::Clone(game.eventsFunctionsExtensions);
 
 #if defined(GD_IDE_ONLY)
   useExternalSourceFiles = game.useExternalSourceFiles;

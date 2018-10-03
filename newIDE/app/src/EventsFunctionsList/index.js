@@ -84,9 +84,9 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   };
 
   _move = (oldIndex: number, newIndex: number) => {
-    const { project, eventsFunctions } = this.props;
-
+    // const { project, eventsFunctions } = this.props;
     // TODO
+
     this.forceUpdateList();
   };
 

@@ -27,6 +27,11 @@ class GD_CORE_API EventsFunctionsExtension {
   EventsFunctionsExtension();
   virtual ~EventsFunctionsExtension(){};
 
+  /**
+   * \brief Return a pointer to a new EventsFunctionsExtension constructed from this one.
+   */
+  EventsFunctionsExtension* Clone() const { return new EventsFunctionsExtension(*this); };
+
   const gd::String & GetVersion() const { return version; };
   EventsFunctionsExtension& SetVersion(const gd::String & version_) { version = version_; return *this; }
 

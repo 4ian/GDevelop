@@ -28,17 +28,36 @@ class GD_CORE_API EventsFunction {
   EventsFunction();
   virtual ~EventsFunction(){};
 
-  const gd::String & GetDescription() const { return description; };
-  EventsFunction& SetDescription(const gd::String & description_) { description = description_; return *this; }
+  const gd::String& GetDescription() const { return description; };
+  EventsFunction& SetDescription(const gd::String& description_) {
+    description = description_;
+    return *this;
+  }
 
-  const gd::String & GetName() const { return name; };
-  EventsFunction& SetName(const gd::String & name_) { name = name_; return *this; }
+  const gd::String& GetName() const { return name; };
+  EventsFunction& SetName(const gd::String& name_) {
+    name = name_;
+    return *this;
+  }
 
-  const gd::String & GetFullName() const { return fullName; };
-  EventsFunction& SetFullName(const gd::String & fullName_) { fullName = fullName_; return *this; }
+  const gd::String& GetFullName() const { return fullName; };
+  EventsFunction& SetFullName(const gd::String& fullName_) {
+    fullName = fullName_;
+    return *this;
+  }
 
-  const gd::String & GetSentence() const { return sentence; };
-  EventsFunction& SetSentence(const gd::String & sentence_) { sentence = sentence_; return *this; }
+  const gd::String& GetSentence() const { return sentence; };
+  EventsFunction& SetSentence(const gd::String& sentence_) {
+    sentence = sentence_;
+    return *this;
+  }
+
+  enum FunctionType { Action, Condition, Expression, StringExpression };
+  EventsFunction& SetFunctionType(FunctionType type) {
+    functionType = type;
+    return *this;
+  };
+  FunctionType GetFunctionType() const { return functionType; };
 
   /**
    * \brief Return the events.
@@ -60,9 +79,7 @@ class GD_CORE_API EventsFunction {
   /**
    * \brief Return the parameters.
    */
-  std::vector<gd::ParameterMetadata>& GetParameters() {
-    return parameters;
-  };
+  std::vector<gd::ParameterMetadata>& GetParameters() { return parameters; };
 
   /** \name Serialization
    */
@@ -85,6 +102,7 @@ class GD_CORE_API EventsFunction {
   gd::String description;
   gd::String sentence;
   gd::EventsList events;
+  FunctionType functionType;
   std::vector<gd::ParameterMetadata> parameters;
 };
 

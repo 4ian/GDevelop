@@ -5,6 +5,10 @@ import slugs from 'slugs';
 const os = optionalRequire('os');
 const fs = optionalRequire('fs');
 
+/**
+ * Create the EventsFunctionWriter that writes generated code for events functions
+ * to local files.
+ */
 export const makeLocalEventsFunctionWriter = (): EventsFunctionWriter => {
   const outputDir = os.tmpdir() + '/GDGeneratedEventsFunctions';
   fs.mkdir(outputDir, err => {

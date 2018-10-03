@@ -163,17 +163,10 @@ gdjs.ParticleEmitterObjectCocosRenderer = function(runtimeScene, runtimeObject, 
         plist.finishParticleSizeVariance = plist.startParticleSizeVariance;
     }
 
-    if(objectData.angleParam === "Mutable"){
-        plist.rotationStart = objectData.particleAngle1 + (objectData.particleAngleRandomness1 + objectData.particleAngleRandomness2)/2.0;
-        plist.rotationEnd = objectData.particleAngle2 + (objectData.particleAngleRandomness1 + objectData.particleAngleRandomness2)/2.0;
-        plist.rotationStartVariance = Math.abs(objectData.particleAngleRandomness2 - objectData.particleAngleRandomness1)/2.0;
-        plist.rotationEndVariance = plist.rotationStartVariance;
-    }
-    else{
-        plist.rotationStart = plist.rotationEnd = (objectData.particleAngleRandomness1 + objectData.particleAngleRandomness2)/2.0;
-        plist.rotationStartVariance = Math.abs(objectData.particleAngleRandomness2 - objectData.particleAngleRandomness1)/2.0;
-        plist.rotationEndVariance = plist.rotationStartVariance;
-    }
+    plist.rotationStart = objectData.particleAngle1 + (objectData.particleAngleRandomness1 + objectData.particleAngleRandomness2)/2.0;
+    plist.rotationEnd = objectData.particleAngle2 + (objectData.particleAngleRandomness1 + objectData.particleAngleRandomness2)/2.0;
+    plist.rotationStartVariance = Math.abs(objectData.particleAngleRandomness2 - objectData.particleAngleRandomness1)/2.0;
+    plist.rotationEndVariance = plist.rotationStartVariance;
 
     this.renderer = new cc.ParticleSystem(plist);
     this.renderer.setTexture(texture);

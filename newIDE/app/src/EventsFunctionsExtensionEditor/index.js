@@ -6,6 +6,7 @@ import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
 import EventsFunctionsList from '../EventsFunctionsList';
 import Background from '../UI/Background';
+import OptionsEditorDialog from './OptionsEditorDialog';
 const gd = global.gd;
 
 type Props = {|
@@ -16,6 +17,7 @@ type Props = {|
 
 type State = {|
   selectedEventsFunction: ?gdEventsFunction,
+  editOptionsDialogOpen: boolean,
 |};
 
 export default class EventsFunctionsExtensionEditor extends React.Component<
@@ -24,6 +26,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 > {
   state = {
     selectedEventsFunction: null,
+    editOptionsDialogOpen: false,
   };
   editor: ?EventsSheet;
   _editors: ?EditorMosaic;
@@ -75,113 +78,129 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     cb(false);
   };
 
+  _editOptions = (open: boolean = true) => {
+    this.setState({
+      editOptionsDialogOpen: open,
+    });
+  };
+
   render() {
     const { project, eventsFunctionsExtension } = this.props;
-    const { selectedEventsFunction } = this.state;
+    const { selectedEventsFunction, editOptionsDialogOpen } = this.state;
 
+    console.log(editOptionsDialogOpen);
     return (
-      <EditorMosaic
-        ref={editors => (this._editors = editors)}
-        editors={{
-          parameters: (
-            <MosaicWindow
-              title="Function Configuration"
-              toolbarControls={[]}
-              selectedEventsFunction={selectedEventsFunction}
-            >
-              <Background>
-                {selectedEventsFunction ? (
-                  <EventsFunctionConfigurationEditor
-                    eventsFunction={selectedEventsFunction}
-                    onParametersUpdated={() => {
-                      this._loadEventsFunctionFrom(
-                        project,
-                        selectedEventsFunction
-                      );
-                      this.forceUpdate();
-                    }}
-                  />
-                ) : (
-                  <EmptyMessage>
-                    Choose a function to set the parameters that it accepts.
-                  </EmptyMessage>
-                )}
-              </Background>
-            </MosaicWindow>
-          ),
-          //TODO
-          'events-sheet':
-            selectedEventsFunction &&
-            this._globalObjectsContainer &&
-            this._objectsContainer ? (
-              <EventsSheet
-                ref={editor => (this.editor = editor)}
-                project={project}
-                layout={null}
-                globalObjectsContainer={this._globalObjectsContainer}
-                objectsContainer={this._objectsContainer}
-                events={selectedEventsFunction.getEvents()}
-                showPreviewButton={false}
-                onPreview={options => {
-                  /*TODO*/
-                }}
-                showNetworkPreviewButton={false}
-                onOpenExternalEvents={() => {
-                  /*TODO*/
-                }}
-                onOpenLayout={() => {
-                  /*TODO*/
-                }}
-                resourceSources={[]}
-                onChooseResource={() => {
-                  /*TODO*/
-                  return Promise.reject(new Error('Unimplemented'));
-                }}
-                resourceExternalEditors={[]}
-                setToolbar={this.props.setToolbar}
-                onOpenDebugger={() => {
-                  /*TODO*/
-                }}
-                onOpenSettings={() => {}}
-              />
-            ) : (
-              <Background>
-                <EmptyMessage>
-                  Choose a function to edit its events.
-                </EmptyMessage>
-              </Background>
-            ),
-          'functions-list': (
-            <MosaicWindow
-              title="Functions list"
-              toolbarControls={[]}
-              selectedEventsFunction={selectedEventsFunction}
-            >
-              <EventsFunctionsList
-                project={project}
-                eventsFunctions={eventsFunctionsExtension.getEventsFunctions()}
+      <React.Fragment>
+        <EditorMosaic
+          ref={editors => (this._editors = editors)}
+          editors={{
+            parameters: (
+              <MosaicWindow
+                title="Function Configuration"
+                toolbarControls={[]}
                 selectedEventsFunction={selectedEventsFunction}
-                onSelectEventsFunction={this._selectEventsFunction}
-                onDeleteEventsFunction={() => {
-                  /*TODO*/
-                }}
-                onRenameEventsFunction={this._renameEventsFunction}
-              />
-            </MosaicWindow>
-          ),
-        }}
-        initialNodes={{
-          direction: 'row',
-          first: {
-            direction: 'column',
-            first: 'parameters',
-            second: 'events-sheet',
-            splitPercentage: 25,
-          },
-          second: 'functions-list',
-          splitPercentage: 66,
-        }}
-      />
+              >
+                <Background>
+                  {selectedEventsFunction ? (
+                    <EventsFunctionConfigurationEditor
+                      eventsFunction={selectedEventsFunction}
+                      onParametersUpdated={() => {
+                        this._loadEventsFunctionFrom(
+                          project,
+                          selectedEventsFunction
+                        );
+                        this.forceUpdate();
+                      }}
+                    />
+                  ) : (
+                    <EmptyMessage>
+                      Choose a function to set the parameters that it accepts.
+                    </EmptyMessage>
+                  )}
+                </Background>
+              </MosaicWindow>
+            ),
+            'events-sheet':
+              selectedEventsFunction &&
+              this._globalObjectsContainer &&
+              this._objectsContainer ? (
+                <EventsSheet
+                  ref={editor => (this.editor = editor)}
+                  project={project}
+                  layout={null}
+                  globalObjectsContainer={this._globalObjectsContainer}
+                  objectsContainer={this._objectsContainer}
+                  events={selectedEventsFunction.getEvents()}
+                  showPreviewButton={false}
+                  onPreview={options => {
+                    /*TODO*/
+                  }}
+                  showNetworkPreviewButton={false}
+                  onOpenExternalEvents={() => {
+                    /*TODO*/
+                  }}
+                  onOpenLayout={() => {
+                    /*TODO*/
+                  }}
+                  resourceSources={[]}
+                  onChooseResource={() => {
+                    /*TODO*/
+                    return Promise.reject(new Error('Unimplemented'));
+                  }}
+                  resourceExternalEditors={[]}
+                  setToolbar={this.props.setToolbar}
+                  onOpenDebugger={() => {
+                    /*TODO*/
+                  }}
+                  onOpenSettings={() => {}}
+                />
+              ) : (
+                <Background>
+                  <EmptyMessage>
+                    Choose a function to edit its events.
+                  </EmptyMessage>
+                </Background>
+              ),
+            'functions-list': (
+              <MosaicWindow
+                title="Functions list"
+                toolbarControls={[]}
+                selectedEventsFunction={selectedEventsFunction}
+              >
+                <EventsFunctionsList
+                  project={project}
+                  eventsFunctions={eventsFunctionsExtension.getEventsFunctions()}
+                  selectedEventsFunction={selectedEventsFunction}
+                  onSelectEventsFunction={this._selectEventsFunction}
+                  onDeleteEventsFunction={() => {
+                    /*TODO*/
+                  }}
+                  onRenameEventsFunction={this._renameEventsFunction}
+                  onEditOptions={this._editOptions}
+                />
+              </MosaicWindow>
+            ),
+          }}
+          initialNodes={{
+            direction: 'row',
+            first: {
+              direction: 'column',
+              first: 'parameters',
+              second: 'events-sheet',
+              splitPercentage: 25,
+            },
+            second: 'functions-list',
+            splitPercentage: 66,
+          }}
+        />
+        {editOptionsDialogOpen && (
+          <OptionsEditorDialog
+            eventsFunctionsExtension={eventsFunctionsExtension}
+            open
+            onClose={() => this._editOptions(false)}
+          />
+        )}
+      </React.Fragment>
     );
   }
 }

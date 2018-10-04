@@ -65,7 +65,10 @@ import {
 import { type ResourceSource } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import { type JsExtensionsLoader } from '../JsExtensionsLoader';
-import { type EventsFunctionWriter } from '../EventsFunctionsExtensionsLoader';
+import {
+  type EventsFunctionWriter,
+  loadProjectEventsFunctionsExtensions,
+} from '../EventsFunctionsExtensionsLoader';
 import {
   getUpdateNotificationTitle,
   getUpdateNotificationBody,
@@ -231,6 +234,15 @@ export default class MainFrame extends React.Component<Props, State> {
           currentProject: project,
         },
         () => {
+          // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
+          // their editor will take care of reloading them.
+          if (this.props.eventsFunctionWriter && this.state.currentProject) {
+            loadProjectEventsFunctionsExtensions(
+              this.state.currentProject,
+              this.props.eventsFunctionWriter
+            );
+          }
+
           cb();
         }
       );
@@ -449,7 +461,9 @@ export default class MainFrame extends React.Component<Props, State> {
     );
   };
 
-  deleteEventsFunctionsExtension = (externalLayout: gdEventsFunctionsExtension) => {
+  deleteEventsFunctionsExtension = (
+    externalLayout: gdEventsFunctionsExtension
+  ) => {
     const { currentProject } = this.state;
     if (!currentProject) return;
 
@@ -539,7 +553,9 @@ export default class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasEventsFunctionsExtensionNamed(oldName)) return;
 
-    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(oldName);
+    const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+      oldName
+    );
     this.setState(
       {
         editorTabs: closeEventsFunctionsExtensionTabs(
@@ -732,7 +748,7 @@ export default class MainFrame extends React.Component<Props, State> {
   };
 
   openEventsFunctionsExtension = (name: string) => {
-    if (!this.props.eventsFunctionWriter) return
+    if (!this.props.eventsFunctionWriter) return;
 
     this.setState(
       {
@@ -1101,18 +1117,24 @@ export default class MainFrame extends React.Component<Props, State> {
                 onOpenExternalEvents={this.openExternalEvents}
                 onOpenLayout={this.openLayout}
                 onOpenExternalLayout={this.openExternalLayout}
-                onOpenEventsFunctionsExtension={this.openEventsFunctionsExtension}
+                onOpenEventsFunctionsExtension={
+                  this.openEventsFunctionsExtension
+                }
                 onAddLayout={this.addLayout}
                 onAddExternalLayout={this.addExternalLayout}
                 onAddEventsFunctionsExtension={this.addEventsFunctionsExtension}
                 onAddExternalEvents={this.addExternalEvents}
                 onDeleteLayout={this.deleteLayout}
                 onDeleteExternalLayout={this.deleteExternalLayout}
-                onDeleteEventsFunctionsExtension={this.deleteEventsFunctionsExtension}
+                onDeleteEventsFunctionsExtension={
+                  this.deleteEventsFunctionsExtension
+                }
                 onDeleteExternalEvents={this.deleteExternalEvents}
                 onRenameLayout={this.renameLayout}
                 onRenameExternalLayout={this.renameExternalLayout}
-                onRenameEventsFunctionsExtension={this.renameEventsFunctionsExtension}
+                onRenameEventsFunctionsExtension={
+                  this.renameEventsFunctionsExtension
+                }
                 onRenameExternalEvents={this.renameExternalEvents}
                 onSaveProject={this.save}
                 onCloseProject={this.askToCloseProject}
@@ -1122,7 +1144,9 @@ export default class MainFrame extends React.Component<Props, State> {
                 onOpenPlatformSpecificAssets={() =>
                   this.openPlatformSpecificAssets()}
                 onChangeSubscription={() => this.openSubscription(true)}
-                showEventsFunctionsExtensions={!!this.props.eventsFunctionWriter}
+                showEventsFunctionsExtensions={
+                  !!this.props.eventsFunctionWriter
+                }
                 freezeUpdate={!projectManagerOpen}
               />
             )}

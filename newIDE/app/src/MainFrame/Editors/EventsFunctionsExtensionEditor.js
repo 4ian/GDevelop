@@ -19,7 +19,6 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
   }
 
   shouldComponentUpdate(nextProps: *) {
-    console.log(nextProps);
     // This optimization is a bit more cautious than the one is BaseEditor,
     // to still be notified when isActive goes from true to false.
     if (!this.props.isActive && !nextProps.isActive) {

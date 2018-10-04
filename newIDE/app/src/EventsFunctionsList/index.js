@@ -8,6 +8,9 @@ import Background from '../UI/Background';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import { mapVector } from '../Utils/MapFor';
 import { filterProjectItemsList } from '../ProjectManager/EnumerateProjectItems';
+import FlatButton from 'material-ui/FlatButton';
+import { Line } from '../UI/Grid';
+import Divider from 'material-ui/Divider';
 const gd = global.gd;
 
 const styles = {
@@ -32,6 +35,7 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onEditOptions: () => void,
 |};
 
 export default class EventsFunctionsList extends React.Component<Props, State> {
@@ -156,6 +160,14 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
     return (
       <Background>
+        <Line justifyContent="center">
+          <FlatButton
+            label="Edit extension options"
+            primary
+            onClick={() => this.props.onEditOptions()}
+          />
+        </Line>
+        <Divider />
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (

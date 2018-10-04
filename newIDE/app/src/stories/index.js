@@ -107,6 +107,7 @@ import { getInitialSelection } from '../EventsSheet/SelectionHandler';
 import EventsFunctionConfigurationEditor from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor';
 import EventsFunctionsList from '../EventsFunctionsList';
 import EventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor';
+import OptionsEditorDialog from '../EventsFunctionsExtensionEditor/OptionsEditorDialog';
 
 const gd = global.gd;
 const {
@@ -1589,11 +1590,12 @@ storiesOf('EventsFunctionsList', module)
         onSelectEventsFunction={action('select')}
         onDeleteEventsFunction={action('delete')}
         onRenameEventsFunction={(resource, newName, cb) => cb(false)}
+        onEditOptions={action('edit options')}
       />
     </div>
   ));
 
-storiesOf('EventsFunctionsExtensionEditor', module)
+storiesOf('EventsFunctionsExtensionEditor/index', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <DragDropContextProvider>
@@ -1605,4 +1607,14 @@ storiesOf('EventsFunctionsExtensionEditor', module)
         />
       </div>
     </DragDropContextProvider>
+  ));
+
+  storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <OptionsEditorDialog
+      eventsFunctionsExtension={testEventsFunctionsExtension}
+      open
+      onClose={action('close')}
+    />
   ));

@@ -126,7 +126,6 @@ CppPlatform::CppPlatform() : gd::Platform() {
   std::cout.flush();
   AddExtension(std::make_shared<ExternalLayoutsExtension>());
   std::cout.flush();
-  std::cout << "done." << std::endl;
 }
 
 bool CppPlatform::AddExtension(

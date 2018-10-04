@@ -32,7 +32,7 @@ export const loadProjectEventsFunctionsExtensions = (
   );
 };
 
-export const loadProjectEventsFunctionsExtension = (
+const loadProjectEventsFunctionsExtension = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsFunctionWriter: EventsFunctionWriter
@@ -50,7 +50,7 @@ export const loadProjectEventsFunctionsExtension = (
 /**
  * Generate the code for the given events functions
  */
-export const generateEventsFunctionExtension = (
+const generateEventsFunctionExtension = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsFunctionWriter: EventsFunctionWriter
@@ -122,7 +122,7 @@ export const generateEventsFunctionExtension = (
             } else {
               instructionOrExpression.addCodeOnlyParameter(
                 parameter.getType(),
-                parameter.getExtraInfo(),
+                parameter.getExtraInfo()
               );
             }
           }
@@ -164,4 +164,19 @@ export const generateEventsFunctionExtension = (
       }
     )
   ).then(() => extension);
+};
+
+/**
+ * Unload all extensions providing events functions of a project
+ */
+export const unloadProjectEventsFunctionsExtensions = (
+  project: gdProject
+): Promise<void> => {
+  return Promise.all(
+    mapFor(0, project.getEventsFunctionsExtensionsCount(), i => {
+      gd.JsPlatform
+        .get()
+        .removeExtension(project.getEventsFunctionsExtensionAt(i).getName());
+    })
+  );
 };

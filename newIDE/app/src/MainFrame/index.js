@@ -68,6 +68,7 @@ import { type JsExtensionsLoader } from '../JsExtensionsLoader';
 import {
   type EventsFunctionWriter,
   loadProjectEventsFunctionsExtensions,
+  unloadProjectEventsFunctionsExtensions,
 } from '../EventsFunctionsExtensionsLoader';
 import {
   getUpdateNotificationTitle,
@@ -283,18 +284,20 @@ export default class MainFrame extends React.Component<Props, State> {
   };
 
   closeProject = (cb: Function) => {
-    if (!this.state.currentProject) return cb();
+    const { currentProject } = this.state;
+    if (!currentProject) return cb();
 
     this.openProjectManager(false);
     this.setState(
       {
         editorTabs: closeProjectTabs(
           this.state.editorTabs,
-          this.state.currentProject
+          currentProject
         ),
       },
       () => {
-        if (this.state.currentProject) this.state.currentProject.delete();
+        unloadProjectEventsFunctionsExtensions(currentProject);
+        currentProject.delete();
         this.setState(
           {
             currentProject: null,

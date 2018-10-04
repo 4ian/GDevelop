@@ -799,8 +799,11 @@ class GD_CORE_API Project : public ObjectsContainer {
 
   /**
    * \brief Called ( e.g. during compilation ) so as to inventory internal
-   * resources and sometimes update their filename.
+   * resources, sometimes update their filename or any other work or resources.
    *
+   * See WholeProjectRefactorer for the same thing for events.
+   * 
+   * \see WholeProjectRefactorer
    * \see ArbitraryResourceWorker
    */
   void ExposeResources(gd::ArbitraryResourceWorker& worker);

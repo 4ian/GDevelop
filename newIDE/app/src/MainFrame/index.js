@@ -290,10 +290,7 @@ export default class MainFrame extends React.Component<Props, State> {
     this.openProjectManager(false);
     this.setState(
       {
-        editorTabs: closeProjectTabs(
-          this.state.editorTabs,
-          currentProject
-        ),
+        editorTabs: closeProjectTabs(this.state.editorTabs, currentProject),
       },
       () => {
         unloadProjectEventsFunctionsExtensions(currentProject);
@@ -567,6 +564,21 @@ export default class MainFrame extends React.Component<Props, State> {
         ),
       },
       () => {
+        // Refactor the project to update the instructions (and later expressions)
+        // of this extension:
+        gd.WholeProjectRefactorer.renameEventsFunctionsExtension(
+          currentProject,
+          eventsFunctionsExtension,
+          oldName,
+          newName
+        );
+        if (this.props.eventsFunctionWriter) {
+          loadProjectEventsFunctionsExtensions(
+            currentProject,
+            this.props.eventsFunctionWriter
+          );
+        }
+
         eventsFunctionsExtension.setName(newName);
         this.forceUpdate();
       }

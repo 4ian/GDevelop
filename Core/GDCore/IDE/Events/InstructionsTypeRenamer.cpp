@@ -3,7 +3,7 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "GDCore/IDE/Events/EventsTypesLister.h"
+#include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
 #include <map>
 #include <memory>
 #include <vector>
@@ -15,22 +15,15 @@
 
 namespace gd {
 
-bool EventsTypesLister::DoVisitEvent(gd::BaseEvent& event) {
-  allEventsTypes.push_back(event.GetType());
-
-  return false;
-}
-
-bool EventsTypesLister::DoVisitInstruction(gd::Instruction& instruction,
+bool InstructionsTypeRenamer::DoVisitInstruction(gd::Instruction& instruction,
                                            bool isCondition) {
-  if (isCondition)
-    allConditionsTypes.push_back(instruction.GetType());
-  else
-    allActionsTypes.push_back(instruction.GetType());
-
+  if (instruction.GetType() == oldType) {
+    instruction.SetType(newType);
+  }
+  
   return false;
 }
 
-EventsTypesLister::~EventsTypesLister() {}
+InstructionsTypeRenamer::~InstructionsTypeRenamer() {}
 
 }  // namespace gd

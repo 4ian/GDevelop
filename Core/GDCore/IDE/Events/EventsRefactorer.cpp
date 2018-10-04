@@ -103,6 +103,8 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks {
                                    const gd::ObjectsContainer& project,
                                    const gd::ObjectsContainer& layout,
                                    gd::Expression& expression) {
+    // TODO: Add support for renaming in sub expressions. This is not working
+    // as the parser does not handle change made to the expression.
     gd::String newExpression;
 
     CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
@@ -111,7 +113,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks {
     if (!parser.ParseMathExpression(platform, project, layout, callbacks))
       return false;
 
-    expression = gd::Expression(newExpression);
+    expression = gd::Expression(newExpression); // This change won't be picked up by the parser
     return true;
   }
 
@@ -119,6 +121,8 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks {
                                    const gd::ObjectsContainer& project,
                                    const gd::ObjectsContainer& layout,
                                    gd::Expression& expression) {
+    // TODO: Add support for renaming in sub expressions. This is not working
+    // as the parser does not handle change made to the expression.
     gd::String newExpression;
 
     CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
@@ -127,7 +131,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks {
     if (!parser.ParseStringExpression(platform, project, layout, callbacks))
       return false;
 
-    expression = gd::Expression(newExpression);
+    expression = gd::Expression(newExpression); // This change won't be picked up by the parser
     return true;
   }
 

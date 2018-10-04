@@ -1505,7 +1505,8 @@ void EditExpressionDialog::OnAddPropBtClick(wxCommandEvent& event) {
                                             .parameters[i]
                                             .supplementaryInformation);
         if (dialog.DeduceBehavior() || dialog.ShowModal() == 1)
-          behaviorStr = dialog.GetChosenBehavior() + "::";
+          behaviorStr = dialog.GetChosenBehavior() +
+                        gd::PlatformExtension::GetNamespaceSeparator();
       } else {
         if (!parametersStr.empty()) parametersStr += ",";
         parametersStr += ShowParameterDialog(

@@ -450,9 +450,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Platform& platform,
                                   parameters[i],
                                   instructionInfos.parameters[i],
                                   functionNameEnd))
-              return false;  // TODO : Boarf, param�tres optionels sont rajout�s
-                             // et �valu�s : Probl�me avec les calques par
-                             // exemple ( Au minimum, il faut "" )
+              return false;
           }
         } else {
           firstErrorPos = functionNameEnd;

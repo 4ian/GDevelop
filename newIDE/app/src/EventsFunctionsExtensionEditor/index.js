@@ -70,12 +70,19 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   _renameEventsFunction = (
-    resource: gdEventsFunction,
+    eventsFunction: gdEventsFunction,
     newName: string,
     cb: boolean => void
   ) => {
-    // TODO
-    cb(false);
+    const { project, eventsFunctionsExtension } = this.props;
+    gd.WholeProjectRefactorer.renameEventsFunction(
+      project,
+      eventsFunctionsExtension,
+      eventsFunction.getName(),
+      newName
+    );
+
+    cb(true);
   };
 
   _editOptions = (open: boolean = true) => {

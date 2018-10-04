@@ -833,18 +833,24 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   }
 
   eventsFunctionsExtensions.clear();
-  const SerializerElement& eventsFunctionsExtensionsElement = element.GetChild("eventsFunctionsExtensions");
-  eventsFunctionsExtensionsElement.ConsiderAsArrayOf("eventsFunctionsExtension");
-  for (std::size_t i = 0; i < eventsFunctionsExtensionsElement.GetChildrenCount(); ++i) {
+  const SerializerElement& eventsFunctionsExtensionsElement =
+      element.GetChild("eventsFunctionsExtensions");
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
+  for (std::size_t i = 0;
+       i < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++i) {
     const SerializerElement& eventsFunctionsExtensionElement =
         eventsFunctionsExtensionsElement.GetChild(i);
 
     gd::EventsFunctionsExtension& newEventsFunctionsExtension =
-        InsertNewEventsFunctionsExtension("", GetEventsFunctionsExtensionsCount());
-    newEventsFunctionsExtension.UnserializeFrom(*this, eventsFunctionsExtensionElement);
+        InsertNewEventsFunctionsExtension("",
+                                          GetEventsFunctionsExtensionsCount());
+    newEventsFunctionsExtension.UnserializeFrom(
+        *this, eventsFunctionsExtensionElement);
   }
 #endif
-  
+
   externalLayouts.clear();
   const SerializerElement& externalLayoutsElement =
       element.GetChild("externalLayouts", 0, "ExternalLayouts");
@@ -961,7 +967,8 @@ void Project::SerializeTo(SerializerElement& element) const {
 
   SerializerElement& eventsFunctionsExtensionsElement =
       element.AddChild("eventsFunctionsExtensions");
-  eventsFunctionsExtensionsElement.ConsiderAsArrayOf("eventsFunctionsExtension");
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
   for (std::size_t i = 0; i < eventsFunctionsExtensions.size(); ++i)
     eventsFunctionsExtensions[i]->SerializeTo(
         eventsFunctionsExtensionsElement.AddChild("eventsFunctionsExtension"));
@@ -996,6 +1003,10 @@ gd::String Project::GetBadObjectNameWarning() {
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+  // See also gd::WholeProjectRefactorer::ExposeProjectEvents for a method that traverse the whole
+  // project (this time for events).
+  // Ideally, this method could be moved outside of gd::Project.
+
   // Add project resources
   worker.ExposeResources(&GetResourcesManager());
   platformSpecificAssets.ExposeResources(worker);
@@ -1015,6 +1026,13 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   for (std::size_t s = 0; s < GetExternalEventsCount(); s++) {
     LaunchResourceWorkerOnEvents(
         *this, GetExternalEvents(s).GetEvents(), worker);
+  }
+  // Add events functions extensions resources
+  for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
+    auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
+    for (auto& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
+      LaunchResourceWorkerOnEvents(*this, eventsFunction.GetEvents(), worker);
+    }
   }
 #if !defined(GD_NO_WX_GUI)
   gd::SafeYield::Do();

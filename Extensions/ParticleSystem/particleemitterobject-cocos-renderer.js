@@ -27,6 +27,7 @@ gdjs.ParticleEmitterObjectCocosRenderer = function(runtimeScene, runtimeObject, 
     }
     else{
         if(objectData.textureParticleName){
+            // Read the comment at gdjs.ParticleEmitterObjectCocosRenderer.prototype.setTexture
             var imageManager = runtimeScene.getGame().getImageManager();
             var sprite = new cc.Sprite(imageManager.getTexture(objectData.textureParticleName));
             this.originalSize = Math.max(sprite.width, sprite.height);
@@ -269,14 +270,23 @@ gdjs.ParticleEmitterObjectCocosRenderer.prototype.isTextureValid = function(text
 gdjs.ParticleEmitterObjectCocosRenderer.prototype.setTexture = function(texture, runtimeScene){
     var texture = runtimeScene.getGame().getImageManager().getTexture(texture);
     if(texture._textureLoaded){
-        var sprite = new cc.Sprite(texture);
-        this.originalSize = Math.max(sprite.width, sprite.height);
-        sprite.setPosition(this.originalSize/2.0,  this.originalSize/2.0);
-        var renderTexture = new cc.RenderTexture(this.originalSize,  this.originalSize);
-        renderTexture.begin();
-        sprite.visit();
-        renderTexture.end();
-        this.renderer.setTexture(renderTexture.getSprite().getTexture());
+        if(texture.width === texture.height){
+            this.originalSize = texture.width;
+            this.renderer.setTexture(texture);
+        }
+        // Cocos particles are always square, so if the new texture is not squared we have to
+        // render it over a squared renderTexture object, this way we keep the original
+        // texture's aspect ratio
+        else{
+            var sprite = new cc.Sprite(texture);
+            this.originalSize = Math.max(sprite.width, sprite.height);
+            sprite.setPosition(this.originalSize/2.0,  this.originalSize/2.0);
+            var renderTexture = new cc.RenderTexture(this.originalSize,  this.originalSize);
+            renderTexture.begin();
+            sprite.visit();
+            renderTexture.end();
+            this.renderer.setTexture(renderTexture.getSprite().getTexture());
+        }
     }
 };
 

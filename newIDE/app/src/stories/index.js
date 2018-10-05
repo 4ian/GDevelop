@@ -33,6 +33,7 @@ import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterField
 import LayerField from '../EventsSheet/InstructionEditor/ParameterFields/LayerField';
 import MouseField from '../EventsSheet/InstructionEditor/ParameterFields/MouseField';
 import SceneVariableField from '../EventsSheet/InstructionEditor/ParameterFields/SceneVariableField';
+import ObjectVariableField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectVariableField';
 import KeyField from '../EventsSheet/InstructionEditor/ParameterFields/KeyField';
 import ExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/InstructionEditor/ParameterFields/StringField';
@@ -100,6 +101,8 @@ import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
 import i18n from '../UI/i18n';
+import ObjectField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectField';
+import { getInitialSelection } from '../EventsSheet/SelectionHandler';
 
 const gd = global.gd;
 const {
@@ -161,15 +164,21 @@ storiesOf('UI Building Blocks/DragHandle', module)
   .addDecorator(muiDecorator)
   .add('default', () => <DragHandle />);
 
-  storiesOf('UI Building Blocks/EmptyMessage', module)
-    .addDecorator(paperDecorator)
-    .addDecorator(muiDecorator)
-    .add('default', () => <EmptyMessage>Hello World, this is an empty message, which is centered.</EmptyMessage>);
-  
-    storiesOf('UI Building Blocks/BackgroundText', module)
-    .addDecorator(paperDecorator)
-    .addDecorator(muiDecorator)
-    .add('default', () => <BackgroundText>Hello World, this is a background text</BackgroundText>);
+storiesOf('UI Building Blocks/EmptyMessage', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <EmptyMessage>
+      Hello World, this is an empty message, which is centered.
+    </EmptyMessage>
+  ));
+
+storiesOf('UI Building Blocks/BackgroundText', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <BackgroundText>Hello World, this is a background text</BackgroundText>
+  ));
 
 storiesOf('UI Building Blocks/ColorField', module)
   .addDecorator(paperDecorator)
@@ -305,6 +314,8 @@ storiesOf('ParameterFields', module)
         <ExpressionField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
           parameterRenderingService={ParameterRenderingService}
@@ -319,9 +330,26 @@ storiesOf('ParameterFields', module)
         <StringField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
           parameterRenderingService={ParameterRenderingService}
+        />
+      )}
+    />
+  ))
+  .add('ObjectField', () => (
+    <ValueStateHolder
+      initialValue={'MySpriteObject'}
+      render={(value, onChange) => (
+        <ObjectField
+          project={project}
+          layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
         />
       )}
     />
@@ -332,8 +360,23 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ExternalEventsField
           project={project}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('ExternalEventsField (without project)', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <ExternalEventsField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
         />
       )}
     />
@@ -345,8 +388,23 @@ storiesOf('ParameterFields', module)
         <LayerField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('LayerField (without project and layout)', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <LayerField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
         />
       )}
     />
@@ -355,7 +413,13 @@ storiesOf('ParameterFields', module)
     <ValueStateHolder
       initialValue={'Space'}
       render={(value, onChange) => (
-        <KeyField project={project} value={value} onChange={onChange} />
+        <KeyField
+          project={project}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
       )}
     />
   ))
@@ -363,7 +427,13 @@ storiesOf('ParameterFields', module)
     <ValueStateHolder
       initialValue={'Left'}
       render={(value, onChange) => (
-        <MouseField project={project} value={value} onChange={onChange} />
+        <MouseField
+          project={project}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
       )}
     />
   ))
@@ -374,8 +444,36 @@ storiesOf('ParameterFields', module)
         <SceneVariableField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('SceneVariableField (without layout and project)', () => (
+    <ValueStateHolder
+      initialValue={'Variable1'}
+      render={(value, onChange) => (
+        <SceneVariableField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
+      )}
+    />
+  ))
+  .add('ObjectVariableField (without expression, layout and project)', () => (
+    <ValueStateHolder
+      initialValue={'Variable1'}
+      render={(value, onChange) => (
+        <ObjectVariableField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
         />
       )}
     />
@@ -763,8 +861,27 @@ storiesOf('EventsTree', module)
       <div className="gd-events-sheet" style={{ height: 500, display: 'flex' }}>
         <EventsTree
           events={testLayout.getEvents()}
-          selectedEvents={[]}
-          selectedInstructions={[]}
+          project={project}
+          layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          selection={getInitialSelection()}
+          onAddNewInstruction={action('add new instruction')}
+          onMoveToInstruction={action('move to instruction')}
+          onMoveToInstructionsList={action('move instruction to list')}
+          onInstructionClick={action('instruction click')}
+          onInstructionDoubleClick={action('instruction double click')}
+          onInstructionContextMenu={action('instruction context menu')}
+          onInstructionsListContextMenu={action('instruction list context menu')}
+          onParameterClick={action('parameter click')}
+          onEventClick={action('event click')}
+          onEventContextMenu={action('event context menu')}
+          onAddNewEvent={action('add new event')}
+          onOpenExternalEvents={action('open external events')}
+          onOpenLayout={action('open layout')}
+          searchResults={null}
+          searchFocusOffset={null}
+          onEventMoved={() => {}}
         />
       </div>
     </DragDropContextProvider>
@@ -778,6 +895,8 @@ storiesOf('EventsSheet', module)
         <EventsSheet
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           events={testLayout.getEvents()}
           onOpenExternalEvents={action('Open external events')}
           resourceSources={[]}
@@ -802,6 +921,8 @@ storiesOf('EventsSheet', module)
         <EventsSheet
           project={project}
           layout={emptyLayout}
+          globalObjectsContainer={project}
+          objectsContainer={emptyLayout}
           events={emptyLayout.getEvents()}
           onOpenExternalEvents={action('Open external events')}
           resourceSources={[]}
@@ -890,8 +1011,32 @@ storiesOf('InstructionEditor', module)
     <InstructionEditor
       project={project}
       layout={testLayout}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
       isCondition
       instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
+  ))
+  .add('without layout', () => (
+    <InstructionEditor
+      project={project}
+      layout={null}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
     />
   ));
 
@@ -1032,26 +1177,38 @@ storiesOf('ObjectSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('without groups', () => (
-    <ObjectSelector
-      project={project}
-      layout={testLayout}
-      value=""
-      onChoose={action('onChoose in ObjectSelector')}
-      noGroups
-      hintText="Choose an object to add to the group"
-      fullWidth
-      openOnFocus
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <ObjectSelector
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+          onChoose={action('onChoose in ObjectSelector')}
+          noGroups
+          hintText="Choose an object to add to the group"
+          fullWidth
+          openOnFocus
+        />
+      )}
     />
   ))
   .add('with groups', () => (
-    <ObjectSelector
-      project={project}
-      layout={testLayout}
-      value=""
-      onChoose={action('onChoose in ObjectSelector')}
-      hintText="Choose an object or a group"
-      fullWidth
-      openOnFocus
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <ObjectSelector
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+          onChoose={action('onChoose in ObjectSelector')}
+          hintText="Choose an object or a group"
+          fullWidth
+          openOnFocus
+        />
+      )}
     />
   ));
 

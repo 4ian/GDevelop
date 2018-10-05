@@ -7,13 +7,18 @@ import Dialog from '../../../../UI/Dialog';
 export type ParameterValues = Array<string>;
 
 type Props = {
-  project: Object,
-  layout: Object,
+  project?: gdProject,
+  layout?: ?gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   expressionMetadata: Object,
   onDone: ParameterValues => void,
   onRequestClose: () => void,
   open: boolean,
-  parameterRenderingService: Object,
+  parameterRenderingService?: {
+    components: any,
+    getParameterComponent: (type: string) => any,
+  },
 };
 
 type State = {
@@ -40,6 +45,8 @@ export default class ExpressionParametersEditorDialog extends Component<
     const {
       project,
       layout,
+      globalObjectsContainer,
+      objectsContainer,
       expressionMetadata,
       parameterRenderingService,
     } = this.props;
@@ -62,6 +69,8 @@ export default class ExpressionParametersEditorDialog extends Component<
         <ExpressionParametersEditor
           project={project}
           layout={layout}
+          globalObjectsContainer={globalObjectsContainer}
+          objectsContainer={objectsContainer}
           expressionMetadata={expressionMetadata}
           parameterValues={this.state.parameterValues}
           onChangeParameter={(editedIndex, value) => {

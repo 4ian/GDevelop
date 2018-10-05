@@ -102,6 +102,8 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
         >
           <ExternalEventsField
             project={this.props.project}
+            globalObjectsContainer={this.props.globalObjectsContainer}
+            objectsContainer={this.props.objectsContainer}
             value={target}
             onChange={text => {
               linkEvent.setTarget(text);

@@ -16,9 +16,10 @@ const styles = {
   },
 };
 
-type Props = ParameterFieldProps & {
+type Props = {
+  ...ParameterFieldProps,
   variablesContainer: ?gdVariablesContainer,
-  onOpenDialog: () => void,
+  onOpenDialog: ?() => void,
 };
 
 type State = {|

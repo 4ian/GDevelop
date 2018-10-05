@@ -12,8 +12,8 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
-#include "GDCore/Project/Layout.h"
-#include "GDCore/Project/Project.h"
+#include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Events/EventsList.h"
 
 using namespace std;
 
@@ -201,8 +201,8 @@ class CallbacksForRemovingObject : public gd::ParserCallbacks {
 };
 
 bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
-                                             gd::Project& project,
-                                             gd::Layout& layout,
+                                             gd::ObjectsContainer& project,
+                                             gd::ObjectsContainer& layout,
                                              gd::InstructionsList& actions,
                                              gd::String oldName,
                                              gd::String newName) {
@@ -265,8 +265,8 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
 
 bool EventsRefactorer::RenameObjectInConditions(
     const gd::Platform& platform,
-    gd::Project& project,
-    gd::Layout& layout,
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
     gd::InstructionsList& conditions,
     gd::String oldName,
     gd::String newName) {
@@ -325,8 +325,8 @@ bool EventsRefactorer::RenameObjectInConditions(
 }
 
 void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
-                                            gd::Project& project,
-                                            gd::Layout& layout,
+                                            gd::ObjectsContainer& project,
+                                            gd::ObjectsContainer& layout,
                                             gd::EventsList& events,
                                             gd::String oldName,
                                             gd::String newName) {
@@ -362,8 +362,8 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
 }
 
 bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
-                                             gd::Project& project,
-                                             gd::Layout& layout,
+                                             gd::ObjectsContainer& project,
+                                             gd::ObjectsContainer& layout,
                                              gd::InstructionsList& actions,
                                              gd::String name) {
   bool somethingModified = false;
@@ -426,8 +426,8 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
 
 bool EventsRefactorer::RemoveObjectInConditions(
     const gd::Platform& platform,
-    gd::Project& project,
-    gd::Layout& layout,
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
     gd::InstructionsList& conditions,
     gd::String name) {
   bool somethingModified = false;
@@ -489,8 +489,8 @@ bool EventsRefactorer::RemoveObjectInConditions(
 }
 
 void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
-                                            gd::Project& project,
-                                            gd::Layout& layout,
+                                            gd::ObjectsContainer& project,
+                                            gd::ObjectsContainer& layout,
                                             gd::EventsList& events,
                                             gd::String name) {
   for (std::size_t i = 0; i < events.size(); ++i) {
@@ -520,8 +520,8 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
   }
 }
 
-void EventsRefactorer::ReplaceStringInEvents(gd::Project& project,
-                                             gd::Layout& layout,
+void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
+                                             gd::ObjectsContainer& layout,
                                              gd::EventsList& events,
                                              gd::String toReplace,
                                              gd::String newString,
@@ -590,8 +590,8 @@ gd::String ReplaceAllOccurencesCaseUnsensitive(gd::String context,
   return context;
 }
 
-bool EventsRefactorer::ReplaceStringInActions(gd::Project& project,
-                                              gd::Layout& layout,
+bool EventsRefactorer::ReplaceStringInActions(gd::ObjectsContainer& project,
+                                              gd::ObjectsContainer& layout,
                                               gd::InstructionsList& actions,
                                               gd::String toReplace,
                                               gd::String newString,
@@ -632,8 +632,8 @@ bool EventsRefactorer::ReplaceStringInActions(gd::Project& project,
 }
 
 bool EventsRefactorer::ReplaceStringInConditions(
-    gd::Project& project,
-    gd::Layout& layout,
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
     gd::InstructionsList& conditions,
     gd::String toReplace,
     gd::String newString,
@@ -675,8 +675,8 @@ bool EventsRefactorer::ReplaceStringInConditions(
 }
 
 vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
-    gd::Project& project,
-    gd::Layout& layout,
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
     gd::EventsList& events,
     gd::String search,
     bool matchCase,
@@ -734,8 +734,8 @@ vector<EventsSearchResult> EventsRefactorer::SearchInEvents(
   return results;
 }
 
-bool EventsRefactorer::SearchStringInActions(gd::Project& project,
-                                             gd::Layout& layout,
+bool EventsRefactorer::SearchStringInActions(gd::ObjectsContainer& project,
+                                             gd::ObjectsContainer& layout,
                                              gd::InstructionsList& actions,
                                              gd::String search,
                                              bool matchCase) {
@@ -766,8 +766,8 @@ bool EventsRefactorer::SearchStringInActions(gd::Project& project,
 }
 
 bool EventsRefactorer::SearchStringInConditions(
-    gd::Project& project,
-    gd::Layout& layout,
+    gd::ObjectsContainer& project,
+    gd::ObjectsContainer& layout,
     gd::InstructionsList& conditions,
     gd::String search,
     bool matchCase) {

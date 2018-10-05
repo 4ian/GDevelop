@@ -1,6 +1,9 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import { mapFor } from '../../../../Utils/MapFor';
 import EmptyMessage from '../../../../UI/EmptyMessage';
+
+export type ParameterValues = Array<string>;
 
 const styles = {
   container: {
@@ -10,8 +13,28 @@ const styles = {
   },
 };
 
-export default class ExpressionParametersEditor extends Component {
-  static getNonCodeOnlyParametersCount(expressionMetadata) {
+type Props = {|
+  project?: gdProject,
+  layout?: ?gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  expressionMetadata: gdExpressionMetadata,
+  parameterValues: ParameterValues,
+  onChangeParameter: (index: number, value: string) => void,
+  parameterRenderingService?: {
+    components: any,
+    getParameterComponent: (type: string) => any,
+  },
+|};
+type State = {||};
+
+export default class ExpressionParametersEditor extends React.Component<
+  Props,
+  State
+> {
+  static getNonCodeOnlyParametersCount(
+    expressionMetadata: gdExpressionMetadata
+  ) {
     return mapFor(0, expressionMetadata.getParametersCount(), i => {
       const parameterMetadata = expressionMetadata.getParameter(i);
       return !parameterMetadata.isCodeOnly();
@@ -24,8 +47,17 @@ export default class ExpressionParametersEditor extends Component {
       parameterValues,
       project,
       layout,
+      globalObjectsContainer,
+      objectsContainer,
       parameterRenderingService,
     } = this.props;
+
+    if (!parameterRenderingService) {
+      console.error(
+        'Missing parameterRenderingService for ExpressionParametersEditor'
+      );
+      return null;
+    }
 
     // Create an object mimicking Instruction interface so that it can be used by
     // ParameterFields components.
@@ -51,6 +83,8 @@ export default class ExpressionParametersEditor extends Component {
               parameterMetadata={parameterMetadata}
               project={project}
               layout={layout}
+              globalObjectsContainer={globalObjectsContainer}
+              objectsContainer={objectsContainer}
               value={parameterValues[i]}
               instructionOrExpression={expression}
               key={i}

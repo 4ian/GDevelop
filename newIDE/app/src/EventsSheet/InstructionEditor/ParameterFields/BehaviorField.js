@@ -1,12 +1,27 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
+import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 const gd = global.gd;
 
-export default class BehaviorField extends Component {
-  state = { errorText: null, focused: false, text: null };
+type State = {|
+  errorText: ?string,
+  focused: boolean,
+  text: ?string,
+|};
 
-  constructor(props) {
+export default class BehaviorField extends React.Component<
+ParameterFieldProps,
+State
+> {
+  state = { errorText: null, focused: false, text: null };
+  _description: ?string;
+  _behaviorTypeAllowed: ?string;
+  _behaviorNames: Array<string> = [];
+  _field: ?AutoComplete;
+
+  constructor(props: ParameterFieldProps) {
     super(props);
 
     const { parameterMetadata } = this.props;
@@ -30,8 +45,8 @@ export default class BehaviorField extends Component {
     const objectName = instructionOrExpression.getParameter(0);
     this._behaviorNames = gd
       .getBehaviorsOfObject(
-        this.props.project,
-        this.props.layout,
+        this.props.globalObjectsContainer,
+        this.props.objectsContainer,
         objectName,
         true
       )
@@ -40,8 +55,8 @@ export default class BehaviorField extends Component {
         return (
           !this._behaviorTypeAllowed ||
           gd.getTypeOfBehavior(
-            this.props.project,
-            this.props.layout,
+            this.props.globalObjectsContainer,
+            this.props.objectsContainer,
             behaviorName
           ) === this._behaviorTypeAllowed
         );

@@ -29,14 +29,14 @@ export default class TrueFalseField extends Component {
         <RaisedButton
           style={styles.button}
           label="True"
-          primary={this.props.value === 'true'}
-          onClick={() => this.props.onChange('true')}
+          primary={this.props.value === 'True'}
+          onClick={() => this.props.onChange('True')}
         />
         <RaisedButton
           style={styles.button}
           label="False"
-          primary={this.props.value !== 'true'}
-          onClick={() => this.props.onChange('false')}
+          primary={this.props.value !== 'True'}
+          onClick={() => this.props.onChange('False')}
         />
       </div>
     );

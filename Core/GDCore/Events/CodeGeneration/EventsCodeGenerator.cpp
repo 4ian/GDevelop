@@ -643,6 +643,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput += (parameter == "yes" || parameter == "oui") ? GenerateTrue()
                                                             : GenerateFalse();
   } else if (metadata.type == "trueorfalse") {
+    // This is duplicated in AdvancedExtension.cpp for GDJS
     argOutput += (parameter == "True" || parameter == "Vrai") ? GenerateTrue()
                                                               : GenerateFalse();
   }

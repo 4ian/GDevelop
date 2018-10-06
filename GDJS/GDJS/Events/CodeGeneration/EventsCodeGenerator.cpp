@@ -145,7 +145,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
           eventsFunction.GetParameters()) +
       "\n" + globalObjectListsReset + "\n" +
       codeGenerator.GetCustomCodeInMain() + wholeEventsCode + "\n" +
-      "return;\n" + "}\n";
+      codeGenerator.GenerateEventsFunctionReturn(eventsFunction) + "\n" + "}\n";
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),
                       codeGenerator.GetIncludeFiles().end());
@@ -187,6 +187,21 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  },\n" +
          "  getArgument: function(argName) {\n" + argumentsGetters +
          "    return \"\";" + "  }\n" + "};\n";
+}
+
+gd::String EventsCodeGenerator::GenerateEventsFunctionReturn(
+    const gd::EventsFunction& eventsFunction) {
+  if (eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+    return "return !!eventsFunctionContext.returnValue;";
+  } else if (eventsFunction.GetFunctionType() ==
+             gd::EventsFunction::Expression) {
+    return "return Number(eventsFunctionContext.returnValue) || 0;";
+  } else if (eventsFunction.GetFunctionType() ==
+             gd::EventsFunction::StringExpression) {
+    return "return \"\" + eventsFunctionContext.returnValue;";
+  }
+
+  return "return;";
 }
 
 std::pair<gd::String, gd::String>

@@ -56,10 +56,22 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   };
 
   updateToolbar() {
-    if (this.editor) this.editor.updateToolbar();
+    if (this.editor) {
+      this.editor.updateToolbar();
+    } else {
+      this.props.setToolbar(<div />);
+    }
   }
 
-  _selectEventsFunction = (selectedEventsFunction: gdEventsFunction) => {
+  _selectEventsFunction = (selectedEventsFunction: ?gdEventsFunction) => {
+    if (!selectedEventsFunction) {
+      this.setState({
+        selectedEventsFunction: null,
+      },
+      () => this.updateToolbar())
+      return;
+    }
+
     this._loadEventsFunctionFrom(this.props.project, selectedEventsFunction);
     this.setState(
       {

@@ -28,10 +28,10 @@ type Props = {|
   project: gdProject,
   eventsFunctions: gdVectorEventsFunction,
   selectedEventsFunction: ?gdEventsFunction,
-  onSelectEventsFunction: (resource: gdEventsFunction) => void,
-  onDeleteEventsFunction: (resource: gdEventsFunction) => void,
+  onSelectEventsFunction: (eventsFunction: ?gdEventsFunction) => void,
+  onDeleteEventsFunction: (eventsFunction: gdEventsFunction) => void,
   onRenameEventsFunction: (
-    resource: gdEventsFunction,
+    eventsFunction: gdEventsFunction,
     newName: string,
     cb: (boolean) => void
   ) => void,
@@ -40,10 +40,10 @@ type Props = {|
 
 export default class EventsFunctionsList extends React.Component<Props, State> {
   static defaultProps = {
-    onDeleteEventsFunction: (resource: gdEventsFunction, cb: boolean => void) =>
+    onDeleteEventsFunction: (eventsFunction: gdEventsFunction, cb: boolean => void) =>
       cb(true),
     onRenameEventsFunction: (
-      resource: gdEventsFunction,
+      eventsFunction: gdEventsFunction,
       newName: string,
       cb: boolean => void
     ) => cb(true),

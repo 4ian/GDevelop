@@ -258,6 +258,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const std::vector<gd::ParameterMetadata>& parameters);
   gd::String GenerateEventsFunctionContext(
       const std::vector<gd::ParameterMetadata>& parameters);
+  gd::String GenerateEventsFunctionReturn(
+      const gd::EventsFunction & eventFunction);
 
   /**
    * \brief Construct a code generator for the specified project and layout.

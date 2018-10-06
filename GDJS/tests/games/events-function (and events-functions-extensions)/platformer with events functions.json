@@ -12,7 +12,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "/Users/florianrival/GDevelop projects/My project952/platformer.json",
+    "projectFile": "/Users/florian/Projects/F/GD/GDJS/tests/games/events-function (and events-functions-extensions)/platformer with events functions.json",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
@@ -3638,7 +3638,18 @@
           "disabled": false,
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "RotaterExtension::AlwaysTrue"
+              },
+              "parameters": [
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
           "actions": [
             {
               "type": {
@@ -3661,7 +3672,8 @@
               },
               "parameters": [
                 "",
-                "Platform"
+                "Platform",
+                "35"
               ],
               "subInstructions": []
             }
@@ -5208,7 +5220,7 @@
           "fullName": "t",
           "functionType": "Action",
           "name": "RotatePlease",
-          "sentence": "Rotate the _PARAM1_",
+          "sentence": "Rotate the _PARAM1_ at speed _PARAM2_deg/sec",
           "events": [
             {
               "disabled": false,
@@ -5223,7 +5235,7 @@
                   },
                   "parameters": [
                     "Hello",
-                    "15",
+                    "GetArgumentAsNumber(\"Speed\")",
                     ""
                   ],
                   "subInstructions": []
@@ -5250,6 +5262,93 @@
               "optional": false,
               "supplementaryInformation": "",
               "type": "objectList"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Rotation speed",
+              "name": "Speed",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "expression"
+            }
+          ]
+        },
+        {
+          "description": "Always true",
+          "fullName": "Always true",
+          "functionType": "Condition",
+          "name": "AlwaysTrue",
+          "sentence": "Always true",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetReturnBoolean"
+                  },
+                  "parameters": [
+                    "True"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": true,
+              "defaultValue": "",
+              "description": "",
+              "name": "runtimeScene",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "currentScene"
+            }
+          ]
+        },
+        {
+          "description": "Return a speed of rotation",
+          "fullName": "Speed of rotation",
+          "functionType": "Expression",
+          "name": "GetSpeed",
+          "sentence": "",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetReturnNumber"
+                  },
+                  "parameters": [
+                    "25"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": true,
+              "defaultValue": "",
+              "description": "",
+              "name": "runtimeScene",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "currentScene"
             }
           ]
         }

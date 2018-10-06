@@ -107,7 +107,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     const { project, eventsFunctionsExtension } = this.props;
     const { selectedEventsFunction, editOptionsDialogOpen } = this.state;
 
-    console.log(editOptionsDialogOpen);
     return (
       <React.Fragment>
         <EditorMosaic

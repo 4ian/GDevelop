@@ -6,6 +6,9 @@ const buttonSize = 10;
 const smallButtonSize = 8;
 const buttonPadding = 5;
 
+const RECTANGLE_BUTTON_SHAPE = 0;
+const CIRCLE_BUTTON_SHAPE = 1;
+
 export default class InstancesSelection {
   constructor({
     instancesSelection,
@@ -90,7 +93,7 @@ export default class InstancesSelection {
     return this.pixiContainer;
   }
 
-  _renderButton(show, buttonObject, canvasPosition, size, shape = 0) {
+  _renderButton(show, buttonObject, canvasPosition, size, shape = RECTANGLE_BUTTON_SHAPE) {
     buttonObject.clear();
     if (!show) {
       buttonObject.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
@@ -100,9 +103,9 @@ export default class InstancesSelection {
     buttonObject.beginFill(0xffffff);
     buttonObject.lineStyle(1, 0x6868e8, 1);
     buttonObject.fillAlpha = 0.9;
-    if (shape === 0) {
+    if (shape === RECTANGLE_BUTTON_SHAPE) {
       buttonObject.drawRect(canvasPosition[0], canvasPosition[1], size, size);
-    } else {
+    } else if (shape === CIRCLE_BUTTON_SHAPE) {
       buttonObject.drawCircle(
         canvasPosition[0] + size / 2,
         canvasPosition[1] + size / 2,
@@ -189,7 +192,7 @@ export default class InstancesSelection {
 
     const rotateButtonPos = this.toCanvasCoordinates(x1 + (x2 - x1) / 2, y1);
     rotateButtonPos[0] -= -smallButtonSize / 2;
-    rotateButtonPos[1] -= buttonPadding * 3;
+    rotateButtonPos[1] -= buttonPadding * 4;
 
     this._renderButton(show, this.resizeButton, resizeButtonPos, buttonSize);
     this._renderButton(

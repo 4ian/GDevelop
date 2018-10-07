@@ -1,6 +1,5 @@
 export default class InstancesRotator {
-  constructor({ options }) {
-    this.options = options;
+  constructor() {
     this.instanceAngles = {};
     this.totalDeltaX = 0;
     this.totalDeltaY = 0;
@@ -10,13 +9,11 @@ export default class InstancesRotator {
     this.options = options;
   }
 
-  _getAngleDelta(proportional, initialAngle) {
-    let deg = Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180 / Math.PI;
-    deg += initialAngle;
-    if (proportional) {
-      return (deg = Math.round(deg / 45) * 45);
-    }
-    return deg;
+  _getNewAngle(proportional: boolean, initialAngle: number) {
+    const angle =
+      Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180 / Math.PI +
+      initialAngle;
+    return proportional ? Math.round(angle / 45) * 45 : angle;
   }
 
   rotateBy(instances, deltaX, deltaY, proportional) {
@@ -26,13 +23,12 @@ export default class InstancesRotator {
     for (let i = 0; i < instances.length; i++) {
       const selectedInstance = instances[i];
       let initialAngle = this.instanceAngles[selectedInstance.ptr];
-      if (!initialAngle) {
+      if (initialAngle === undefined) {
         initialAngle = this.instanceAngles[
           selectedInstance.ptr
         ] = selectedInstance.getAngle();
       }
-      let newAngle = this._getAngleDelta(proportional, initialAngle);
-      selectedInstance.setAngle(newAngle);
+      selectedInstance.setAngle(this._getNewAngle(proportional, initialAngle));
     }
   }
 

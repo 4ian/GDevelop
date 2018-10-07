@@ -663,7 +663,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
-    if (!gd.Project.validateObjectName()) {
+    if (!gd.Project.validateObjectName(newName)) {
       done(false);
       return;
     }

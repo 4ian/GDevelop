@@ -8,6 +8,7 @@ import SelectedInstances from './SelectedInstances';
 import HighlightedInstance from './HighlightedInstance';
 import SelectionRectangle from './SelectionRectangle';
 import InstancesResizer from './InstancesResizer';
+import InstancesRotator from './InstancesRotator';
 import InstancesMover from './InstancesMover';
 import Grid from './Grid';
 import WindowBorder from './WindowBorder';
@@ -212,6 +213,8 @@ export default class InstancesEditorContainer extends Component {
       instancesSelection: this.props.instancesSelection,
       onResize: this._onResize,
       onResizeEnd: this._onResizeEnd,
+      onRotate: this._onRotate,
+      onRotateEnd: this._onRotateEnd,
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
@@ -220,6 +223,10 @@ export default class InstancesEditorContainer extends Component {
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
     this.instancesResizer = new InstancesResizer({
+      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
+      options: this.props.options,
+    });
+    this.instancesRotator = new InstancesRotator({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       options: this.props.options,
     });
@@ -283,6 +290,7 @@ export default class InstancesEditorContainer extends Component {
       this.grid.setOptions(nextProps.options);
       this.instancesMover.setOptions(nextProps.options);
       this.instancesResizer.setOptions(nextProps.options);
+      this.instancesRotator.setOptions(nextProps.options);
       this.windowMask.setOptions(nextProps.options);
       this.viewPosition.setOptions(nextProps.options);
     }
@@ -471,6 +479,26 @@ export default class InstancesEditorContainer extends Component {
 
     const selectedInstances = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesResized(selectedInstances);
+  };
+
+  _onRotate = (deltaX, deltaY) => {
+    const sceneDeltaX = deltaX / this.getZoomFactor();
+    const sceneDeltaY = deltaY / this.getZoomFactor();
+
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    this.instancesRotator.rotateBy(
+      selectedInstances,
+      sceneDeltaX,
+      sceneDeltaY,
+      this.keyboardShortcuts.shouldResizeProportionally()
+    );
+  };
+
+  _onRotateEnd = () => {
+    this.instancesRotator.endRotate();
+
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    this.props.onInstancesRotated(selectedInstances);
   };
 
   _onDrop = (x, y, objectName) => {

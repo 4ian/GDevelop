@@ -523,6 +523,15 @@ export default class SceneEditor extends React.Component<Props, State> {
     );
   };
 
+  _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
+    this.setState(
+      {
+        history: saveToHistory(this.state.history, this.props.initialInstances),
+      },
+      () => this.forceUpdatePropertiesEditor()
+    );
+  };
+
   _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
@@ -852,6 +861,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
           onInstancesResized={this._onInstancesResized}
+          onInstancesRotated={this._onInstancesRotated}
           onPointerUp={this._onPointerUpInstancesEditor}
           onPointerOver={this._onPointerOverInstancesEditor}
           onPointerOut={this._onPointerOutInstancesEditor}

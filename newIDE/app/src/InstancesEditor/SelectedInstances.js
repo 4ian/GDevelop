@@ -12,11 +12,15 @@ export default class InstancesSelection {
     instanceMeasurer,
     onResize,
     onResizeEnd,
+    onRotate,
+    onRotateEnd,
     toCanvasCoordinates,
   }) {
     this.instanceMeasurer = instanceMeasurer;
     this.onResize = onResize;
     this.onResizeEnd = onResizeEnd;
+    this.onRotate = onRotate;
+    this.onRotateEnd = onRotateEnd;
     this.toCanvasCoordinates = toCanvasCoordinates;
     this.instancesSelection = instancesSelection;
 
@@ -29,6 +33,7 @@ export default class InstancesSelection {
     this.resizeIcon = new PIXI.Sprite.fromImage('res/actions/direction.png');
     this.rightResizeButton = new PIXI.Graphics();
     this.bottomResizeButton = new PIXI.Graphics();
+    this.rotateButton = new PIXI.Graphics();
     this._makeButton(
       this.resizeButton,
       event => {
@@ -59,6 +64,16 @@ export default class InstancesSelection {
       },
       'ns-resize'
     );
+    this._makeButton(
+      this.rotateButton,
+      event => {
+        this.onRotate(event.deltaX, event.deltaY);
+      },
+      () => {
+        this.onRotateEnd();
+      },
+      'url("res/actions/rotate24.png"),auto'
+    );
   }
 
   _makeButton(objectButton, onMove, onEnd, cursor) {
@@ -75,7 +90,7 @@ export default class InstancesSelection {
     return this.pixiContainer;
   }
 
-  _renderButton(show, buttonObject, canvasPosition, size) {
+  _renderButton(show, buttonObject, canvasPosition, size, shape = 0) {
     buttonObject.clear();
     if (!show) {
       buttonObject.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
@@ -85,7 +100,16 @@ export default class InstancesSelection {
     buttonObject.beginFill(0xffffff);
     buttonObject.lineStyle(1, 0x6868e8, 1);
     buttonObject.fillAlpha = 0.9;
-    buttonObject.drawRect(canvasPosition[0], canvasPosition[1], size, size);
+    if (shape === 0) {
+      buttonObject.drawRect(canvasPosition[0], canvasPosition[1], size, size);
+    } else {
+      buttonObject.drawCircle(
+        canvasPosition[0] + size / 2,
+        canvasPosition[1] + size / 2,
+        size / 2
+      );
+    }
+
     buttonObject.endFill();
     buttonObject.hitArea = new PIXI.Rectangle(
       canvasPosition[0],
@@ -163,6 +187,10 @@ export default class InstancesSelection {
     bottomResizeButtonPos[0] -= -smallButtonSize / 2;
     bottomResizeButtonPos[1] += buttonPadding;
 
+    const rotateButtonPos = this.toCanvasCoordinates(x1 + (x2 - x1) / 2, y1);
+    rotateButtonPos[0] -= -smallButtonSize / 2;
+    rotateButtonPos[1] -= buttonPadding * 3;
+
     this._renderButton(show, this.resizeButton, resizeButtonPos, buttonSize);
     this._renderButton(
       show,
@@ -175,6 +203,13 @@ export default class InstancesSelection {
       this.bottomResizeButton,
       bottomResizeButtonPos,
       smallButtonSize
+    );
+    this._renderButton(
+      show,
+      this.rotateButton,
+      rotateButtonPos,
+      smallButtonSize,
+      1
     );
   }
 }

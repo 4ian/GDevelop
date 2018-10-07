@@ -1,6 +1,5 @@
 export default class InstancesRotator {
-  constructor({ instanceMeasurer, options }) {
-    this.instanceMeasurer = instanceMeasurer;
+  constructor({ options }) {
     this.options = options;
     this.instanceAngles = {};
     this.totalDeltaX = 0;
@@ -32,7 +31,7 @@ export default class InstancesRotator {
           selectedInstance.ptr
         ] = selectedInstance.getAngle();
       }
-      let newAngle = this._getAngleDelta(proportional, initialAngle,{x:0,y:0});
+      let newAngle = this._getAngleDelta(proportional, initialAngle);
       selectedInstance.setAngle(newAngle);
     }
   }

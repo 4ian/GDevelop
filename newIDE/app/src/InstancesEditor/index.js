@@ -227,7 +227,6 @@ export default class InstancesEditorContainer extends Component {
       options: this.props.options,
     });
     this.instancesRotator = new InstancesRotator({
-      instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       options: this.props.options,
     });
     this.instancesMover = new InstancesMover({

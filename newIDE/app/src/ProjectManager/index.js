@@ -144,7 +144,6 @@ class ThemableItem extends React.Component<*, *> {
           if (event.charCode === 13) {
             // enter key pressed
             if (this.textField) this.textField.blur();
-            this.props.onRename(event.target.value);
           }
         }}
         fullWidth

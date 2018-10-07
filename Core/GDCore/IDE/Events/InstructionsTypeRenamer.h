@@ -19,7 +19,8 @@ class EventsList;
 namespace gd {
 
 /**
- * \brief List the values of the parameters of events and their type.
+ * \brief Replace in events all instructions of the specified type
+ * by another type.
  *
  * \ingroup IDE
  */

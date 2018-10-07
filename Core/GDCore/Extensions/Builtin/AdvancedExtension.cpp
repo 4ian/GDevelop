@@ -40,7 +40,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Set the return value of the events function to the specified "
             "number (to be used with \"Expression\" functions)."),
           _("Set return value to number _PARAM0_"),
-          _("Advanced/Functions"),
+          _("Functions"),
           "res/function24.png",
           "res/function16.png")
       .AddParameter("expression", "The number to be returned")
@@ -53,7 +53,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
           _("Set the return value of the events function to the specified text "
             "(to be used with \"String Expression\" functions)."),
           _("Set return value to text _PARAM0_"),
-          _("Advanced/Functions"),
+          _("Functions"),
           "res/function24.png",
           "res/function16.png")
       .AddParameter("expression", "The text to be returned")
@@ -65,7 +65,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAdvancedExtension(
                  _("Set the return value of the Condition events function to "
                    "either true (condition will pass) or false."),
                  _("Set return value of the condition to _PARAM0_"),
-                 _("Advanced/Functions"),
+                 _("Functions"),
                  "res/function24.png",
                  "res/function16.png")
       .AddParameter("trueorfalse", "Should the condition be true or false?")

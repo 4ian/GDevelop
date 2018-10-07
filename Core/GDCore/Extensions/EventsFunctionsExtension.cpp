@@ -19,15 +19,17 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
 
-  gd::SerializerElement& eventsFunctionsElement = element.AddChild("eventsFunctions");
+  gd::SerializerElement& eventsFunctionsElement =
+      element.AddChild("eventsFunctions");
   eventsFunctionsElement.ConsiderAsArrayOf("eventsFunction");
   for (const auto& eventsFunction : eventsFunctions) {
-    eventsFunction.SerializeTo(eventsFunctionsElement.AddChild("eventsFunction"));
+    eventsFunction.SerializeTo(
+        eventsFunctionsElement.AddChild("eventsFunction"));
   }
 }
 
-void EventsFunctionsExtension::UnserializeFrom(gd::Project& project,
-                                     const SerializerElement& element) {
+void EventsFunctionsExtension::UnserializeFrom(
+    gd::Project& project, const SerializerElement& element) {
   version = element.GetStringAttribute("version");
   extensionNamespace = element.GetStringAttribute("extensionNamespace");
   description = element.GetStringAttribute("description");
@@ -43,6 +45,33 @@ void EventsFunctionsExtension::UnserializeFrom(gd::Project& project,
     eventsFunction.UnserializeFrom(project, eventsFunctionsElement.GetChild(i));
     eventsFunctions.push_back(eventsFunction);
   }
+}
+
+bool EventsFunctionsExtension::HasEventsFunctionNamed(
+    const gd::String& name) const {
+  return find_if(eventsFunctions.begin(),
+                 eventsFunctions.end(),
+                 [&name](const gd::EventsFunction& function) {
+                   return function.GetName() == name;
+                 }) != eventsFunctions.end();
+}
+
+gd::EventsFunction& EventsFunctionsExtension::GetEventsFunction(
+    const gd::String& name) {
+  return *find_if(eventsFunctions.begin(),
+                  eventsFunctions.end(),
+                  [&name](const gd::EventsFunction& function) {
+                    return function.GetName() == name;
+                  });
+}
+
+const gd::EventsFunction& EventsFunctionsExtension::GetEventsFunction(
+    const gd::String& name) const {
+  return *find_if(eventsFunctions.begin(),
+                  eventsFunctions.end(),
+                  [&name](const gd::EventsFunction& function) {
+                    return function.GetName() == name;
+                  });
 }
 
 }  // namespace gd

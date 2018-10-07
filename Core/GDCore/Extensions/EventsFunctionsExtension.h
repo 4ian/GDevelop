@@ -47,6 +47,12 @@ class GD_CORE_API EventsFunctionsExtension {
   const gd::String & GetFullName() const { return fullName; };
   EventsFunctionsExtension& SetFullName(const gd::String & fullName_) { fullName = fullName_; return *this; }
 
+  bool HasEventsFunctionNamed(const gd::String & name) const;
+
+  gd::EventsFunction& GetEventsFunction(const gd::String & name);
+
+  const gd::EventsFunction& GetEventsFunction(const gd::String & name) const;
+
   /**
    * \brief Return the functions.
    */

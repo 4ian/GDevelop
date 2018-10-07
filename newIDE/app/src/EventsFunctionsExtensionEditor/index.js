@@ -7,6 +7,7 @@ import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEdit
 import EventsFunctionsList from '../EventsFunctionsList';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
+import { showWarningBox } from '../UI/Messages/MessageBox';
 const gd = global.gd;
 
 type Props = {|
@@ -65,10 +66,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   _selectEventsFunction = (selectedEventsFunction: ?gdEventsFunction) => {
     if (!selectedEventsFunction) {
-      this.setState({
-        selectedEventsFunction: null,
-      },
-      () => this.updateToolbar())
+      this.setState(
+        {
+          selectedEventsFunction: null,
+        },
+        () => this.updateToolbar()
+      );
       return;
     }
 
@@ -84,8 +87,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _renameEventsFunction = (
     eventsFunction: gdEventsFunction,
     newName: string,
-    cb: boolean => void
+    done: boolean => void
   ) => {
+    if (!gd.Project.validateObjectName(newName)) {
+      showWarningBox(
+        'This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.'
+      );
+      return;
+    }
+
     const { project, eventsFunctionsExtension } = this.props;
     gd.WholeProjectRefactorer.renameEventsFunction(
       project,
@@ -94,7 +104,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       newName
     );
 
-    cb(true);
+    done(true);
   };
 
   _editOptions = (open: boolean = true) => {

@@ -75,6 +75,7 @@ import {
   getUpdateNotificationBody,
   type UpdateStatus,
 } from './UpdaterTools';
+import { showWarningBox } from '../UI/Messages/MessageBox';
 
 const gd = global.gd;
 
@@ -549,9 +550,16 @@ export default class MainFrame extends React.Component<Props, State> {
 
   renameEventsFunctionsExtension = (oldName: string, newName: string) => {
     const { currentProject } = this.state;
+    const { eventsFunctionWriter } = this.props;
     if (!currentProject) return;
 
     if (!currentProject.hasEventsFunctionsExtensionNamed(oldName)) return;
+    if (!gd.Project.validateObjectName(newName)) {
+      showWarningBox(
+        'This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your extension name.'
+      );
+      return;
+    }
 
     const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
       oldName
@@ -572,14 +580,15 @@ export default class MainFrame extends React.Component<Props, State> {
           oldName,
           newName
         );
-        if (this.props.eventsFunctionWriter) {
+        eventsFunctionsExtension.setName(newName);
+        if (eventsFunctionWriter) {
+          unloadProjectEventsFunctionsExtensions(currentProject);
           loadProjectEventsFunctionsExtensions(
             currentProject,
-            this.props.eventsFunctionWriter
+            eventsFunctionWriter
           );
         }
 
-        eventsFunctionsExtension.setName(newName);
         this.forceUpdate();
       }
     );

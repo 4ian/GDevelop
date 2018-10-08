@@ -645,7 +645,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
 
     this._saveChangesToHistory(() => {
-      this._eventsTree.forceEventsUpdate();
+      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
     });
   };
 

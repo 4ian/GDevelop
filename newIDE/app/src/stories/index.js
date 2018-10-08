@@ -1605,6 +1605,10 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           project={project}
           eventsFunctionsExtension={testEventsFunctionsExtension}
           setToolbar={() => {}}
+          resourceSources={[]}
+          onChooseResource={source =>
+            action('Choose resource from source', source)}
+          resourceExternalEditors={[]}
         />
       </div>
     </DragDropContextProvider>

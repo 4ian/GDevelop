@@ -959,6 +959,16 @@ Object {
         "fullGroupName": "Text object/Style",
         "type": "TextObject::IsItalic",
       },
+      "Wrapping": Object {
+        "displayedName": "Wrapping",
+        "fullGroupName": "Text object/Style",
+        "type": "TextObject::IsWrapping",
+      },
+      "Wrapping width": Object {
+        "displayedName": "Wrapping width",
+        "fullGroupName": "Text object/Style",
+        "type": "TextObject::WrappingWidth",
+      },
     },
   },
   "Tiled Sprite Object": Object {
@@ -1667,6 +1677,21 @@ Array [
     "type": "SetWindowTitle",
   },
   Object {
+    "displayedName": "Set condition return value",
+    "fullGroupName": "Functions",
+    "type": "SetReturnBoolean",
+  },
+  Object {
+    "displayedName": "Set number return value",
+    "fullGroupName": "Functions",
+    "type": "SetReturnNumber",
+  },
+  Object {
+    "displayedName": "Set text return value",
+    "fullGroupName": "Functions",
+    "type": "SetReturnString",
+  },
+  Object {
     "displayedName": "Create objects from an external layout",
     "fullGroupName": "External layouts",
     "type": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout",
@@ -1877,6 +1902,11 @@ Array [
     "type": "TextObject::SetItalic",
   },
   Object {
+    "displayedName": "Wrapping",
+    "fullGroupName": "Text object/Style",
+    "type": "TextObject::SetWrapping",
+  },
+  Object {
     "displayedName": "Size",
     "fullGroupName": "Text object/",
     "type": "TextObject::Size",
@@ -1885,6 +1915,11 @@ Array [
     "displayedName": "Modify the text",
     "fullGroupName": "Text object/",
     "type": "TextObject::String",
+  },
+  Object {
+    "displayedName": "Wrapping width",
+    "fullGroupName": "Text object/Style",
+    "type": "TextObject::WrappingWidth",
   },
   Object {
     "displayedName": "Angle of the spray cone",
@@ -2967,6 +3002,11 @@ Array [
     "type": "TextObject::IsItalic",
   },
   Object {
+    "displayedName": "Wrapping",
+    "fullGroupName": "Text object/Style",
+    "type": "TextObject::IsWrapping",
+  },
+  Object {
     "displayedName": "Opacity",
     "fullGroupName": "Text object/",
     "type": "TextObject::Opacity",
@@ -2980,6 +3020,11 @@ Array [
     "displayedName": "Compare the text",
     "fullGroupName": "Text object/",
     "type": "TextObject::String",
+  },
+  Object {
+    "displayedName": "Wrapping width",
+    "fullGroupName": "Text object/Style",
+    "type": "TextObject::WrappingWidth",
   },
   Object {
     "displayedName": "Angle of the spray cone",

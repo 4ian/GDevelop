@@ -287,7 +287,6 @@ export default class InstancesEditorContainer extends Component {
       this.grid.setOptions(nextProps.options);
       this.instancesMover.setOptions(nextProps.options);
       this.instancesResizer.setOptions(nextProps.options);
-      this.instancesRotator.setOptions(nextProps.options);
       this.windowMask.setOptions(nextProps.options);
       this.viewPosition.setOptions(nextProps.options);
     }

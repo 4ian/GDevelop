@@ -8,12 +8,20 @@ import EventsFunctionsList from '../EventsFunctionsList';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 const gd = global.gd;
 
 type Props = {|
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   setToolbar: (?React.Node) => void,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 
 type State = {|
@@ -161,27 +169,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   objectsContainer={this._objectsContainer}
                   events={selectedEventsFunction.getEvents()}
                   showPreviewButton={false}
-                  onPreview={options => {
-                    /*TODO*/
-                  }}
+                  onPreview={options => {}}
                   showNetworkPreviewButton={false}
-                  onOpenExternalEvents={() => {
-                    /*TODO*/
-                  }}
-                  onOpenLayout={() => {
-                    /*TODO*/
-                  }}
-                  resourceSources={[]}
-                  onChooseResource={() => {
-                    /*TODO*/
-                    return Promise.reject(new Error('Unimplemented'));
-                  }}
-                  resourceExternalEditors={[]}
+                  onOpenExternalEvents={() => {}}
+                  onOpenLayout={() => {}}
+                  resourceSources={this.props.resourceSources}
+                  onChooseResource={this.props.onChooseResource}
+                  resourceExternalEditors={this.props.resourceExternalEditors}
                   setToolbar={this.props.setToolbar}
-                  onOpenDebugger={() => {
-                    /*TODO*/
-                  }}
-                  onOpenSettings={() => {}}
+                  onOpenDebugger={() => {}}
                 />
               ) : (
                 <Background>

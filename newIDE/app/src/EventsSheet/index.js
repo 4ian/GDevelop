@@ -76,7 +76,7 @@ type Props = {|
   showNetworkPreviewButton: boolean,
   onPreview: (options: PreviewOptions) => void,
   onOpenDebugger: () => void,
-  onOpenSettings: () => void,
+  onOpenSettings?: ?() => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
   resourceSources: Array<ResourceSource>,

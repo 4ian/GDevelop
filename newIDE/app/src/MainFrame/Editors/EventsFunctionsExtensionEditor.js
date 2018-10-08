@@ -62,6 +62,9 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
           project={project}
           eventsFunctionsExtension={eventsFunctionsExtension}
           setToolbar={this.props.setToolbar}
+          resourceSources={this.props.resourceSources}
+          onChooseResource={this.props.onChooseResource}
+          resourceExternalEditors={this.props.resourceExternalEditors}
           ref={editor => (this.editor = editor)}
         />
       </div>

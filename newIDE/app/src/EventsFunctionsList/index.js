@@ -141,7 +141,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       selectedEventsFunction,
       onSelectEventsFunction,
     } = this.props;
-    const { searchText } = this.state; //TODO - Search
+    const { searchText } = this.state;
 
     const list = [
       ...filterProjectItemsList(

@@ -5,10 +5,6 @@ export default class InstancesRotator {
     this.totalDeltaY = 0;
   }
 
-  setOptions(options) {
-    this.options = options;
-  }
-
   _getNewAngle(proportional: boolean, initialAngle: number) {
     const angle =
       Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180 / Math.PI +

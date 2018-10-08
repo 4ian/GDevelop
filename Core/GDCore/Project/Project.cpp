@@ -1279,9 +1279,9 @@ void Project::Init(const gd::Project& game) {
 #endif
 
   externalLayouts = gd::Clone(game.externalLayouts);
+#if defined(GD_IDE_ONLY)
   eventsFunctionsExtensions = gd::Clone(game.eventsFunctionsExtensions);
 
-#if defined(GD_IDE_ONLY)
   useExternalSourceFiles = game.useExternalSourceFiles;
 
   externalSourceFiles = gd::Clone(game.externalSourceFiles);

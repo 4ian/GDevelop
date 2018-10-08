@@ -941,8 +941,10 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::VariablesContainer variables;  ///< Initial global variables
   std::vector<std::unique_ptr<gd::ExternalLayout> >
       externalLayouts;  ///< List of all externals layouts
+#if defined(GD_IDE_ONLY)
   std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >
       eventsFunctionsExtensions;
+#endif
   gd::ResourcesManager
       resourcesManager;  ///< Contains all resources used by the project
   std::shared_ptr<gd::ImageManager>

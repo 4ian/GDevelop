@@ -131,6 +131,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 <Background>
                   {selectedEventsFunction ? (
                     <EventsFunctionConfigurationEditor
+                      project={project}
                       eventsFunction={selectedEventsFunction}
                       onParametersUpdated={() => {
                         this._loadEventsFunctionFrom(

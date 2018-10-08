@@ -1571,6 +1571,7 @@ storiesOf('EventsFunctionConfigurationEditor', module)
   .add('default', () => (
     <div style={{ height: 500, display: 'flex' }}>
       <EventsFunctionConfigurationEditor
+        project={project}
         eventsFunction={testEventsFunction}
         onParametersUpdated={() => {}}
       />

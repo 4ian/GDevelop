@@ -116,15 +116,22 @@ const generateEventsFunctionExtension = (
               instructionOrExpression.addParameter(
                 parameter.getType(),
                 parameter.getDescription(),
-                parameter.getExtraInfo(),
+                '', // See below for adding the extra information
                 parameter.isOptional()
               );
             } else {
               instructionOrExpression.addCodeOnlyParameter(
                 parameter.getType(),
-                parameter.getExtraInfo()
+                '' // See below for adding the extra information
               );
             }
+
+            // Manually add the "extra info" without relying on addParameter (or addCodeOnlyParameter)
+            // as these methods are prefixing the value passed with the extension namespace (this
+            // was done to ease extension declarations when dealing with object).
+            instructionOrExpression
+              .getParameter(instructionOrExpression.getParametersCount() - 1)
+              .setExtraInfo(parameter.getExtraInfo());
           }
         );
 

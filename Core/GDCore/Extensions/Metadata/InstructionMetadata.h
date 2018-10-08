@@ -219,6 +219,9 @@ class GD_CORE_API InstructionMetadata {
   const gd::String &GetDescription() const { return description; }
   const gd::String &GetSentence() const { return sentence; }
   const gd::String &GetGroup() const { return group; }
+  ParameterMetadata &GetParameter(size_t i) {
+    return parameters[i];
+  }
   const ParameterMetadata &GetParameter(size_t i) const {
     return parameters[i];
   }

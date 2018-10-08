@@ -12,7 +12,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.platformer",
-    "projectFile": "/Users/florian/Projects/F/GD/GDJS/tests/games/events-function (and events-functions-extensions)/platformer with events functions.json",
+    "projectFile": "/Users/florianrival/Projects/F/GD/GDJS/tests/games/events-function (and events-functions-extensions)/platformer with events functions.json",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
@@ -3676,6 +3676,17 @@
                 "RotaterExtension::GetSpeed()"
               ],
               "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "RotaterExtension::ColorThings"
+              },
+              "parameters": [
+                "",
+                "Platform"
+              ],
+              "subInstructions": []
             }
           ],
           "events": []
@@ -5349,6 +5360,55 @@
               "optional": false,
               "supplementaryInformation": "",
               "type": "currentScene"
+            }
+          ]
+        },
+        {
+          "description": "Color the given sprite objects",
+          "fullName": "Color sprites",
+          "functionType": "Action",
+          "name": "ColorThings",
+          "sentence": "Color _PARAM1_",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangeColor"
+                  },
+                  "parameters": [
+                    "ObjectToColor",
+                    "\"0;255;50\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
+          "parameters": [
+            {
+              "codeOnly": true,
+              "defaultValue": "",
+              "description": "",
+              "name": "runtimeScene",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "currentScene"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Object to color",
+              "name": "ObjectToColor",
+              "optional": false,
+              "supplementaryInformation": "Sprite",
+              "type": "objectList"
             }
           ]
         }

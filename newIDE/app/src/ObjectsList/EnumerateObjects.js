@@ -1,25 +1,24 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
+import flatten from 'lodash/flatten';
 const gd = global.gd;
 
-//TODO: Object and Group should be moved to a common type definition file
-//for all GDevelop.js
-type Object = {
-  getName: Function,
-  setName: Function,
-};
-type Group = {
-  getName: Function,
-  setName: Function,
-};
+export type EnumeratedObjectMetadata = {|
+  extension: gdPlatformExtension,
+  objectMetadata: gdObjectMetadata,
+  name: string,
+  fullName: string,
+  description: string,
+  iconFilename: string,
+|};
 
 export type ObjectWithContext = {|
-  object: Object,
+  object: gdObject,
   global: boolean,
 |};
 
 export type GroupWithContext = {|
-  group: Group,
+  group: gdObjectGroup,
   global: boolean,
 |};
 
@@ -27,11 +26,11 @@ export type ObjectWithContextList = Array<ObjectWithContext>;
 export type GroupWithContextList = Array<GroupWithContext>;
 
 export const enumerateObjects = (
-  project: any,
-  objectsContainer: any,
+  project: gdProject,
+  objectsContainer: gdObjectsContainer,
   type: ?string = undefined
 ) => {
-  const filterObject = (object: Object): boolean => {
+  const filterObject = (object: gdObject): boolean => {
     return (
       !type ||
       gd.getTypeOfObject(project, objectsContainer, object.getName(), false) ===
@@ -45,14 +44,14 @@ export const enumerateObjects = (
     i => objectsContainer.getObjectAt(i)
   )
     .filter(filterObject)
-    .map((object: Object): ObjectWithContext => ({ object, global: false }));
+    .map((object: gdObject): ObjectWithContext => ({ object, global: false }));
 
   const projectObjectsList: ObjectWithContextList =
     project === objectsContainer
       ? []
       : mapFor(0, project.getObjectsCount(), i => project.getObjectAt(i))
           .filter(filterObject)
-          .map((object: Object): ObjectWithContext => ({
+          .map((object: gdObject): ObjectWithContext => ({
             object,
             global: true,
           }));
@@ -66,6 +65,30 @@ export const enumerateObjects = (
     projectObjectsList,
     allObjectsList,
   };
+};
+
+export const enumerateObjectTypes = (project: gdProject): Array<EnumeratedObjectMetadata> => {
+  const platform = project.getCurrentPlatform();
+  const extensionsList = platform.getAllPlatformExtensions();
+
+  return flatten(
+    mapFor(0, extensionsList.size(), i => {
+      const extension = extensionsList.at(i);
+
+      return extension
+        .getExtensionObjectsTypes()
+        .toJSArray()
+        .map(objectType => extension.getObjectMetadata(objectType))
+        .map(objectMetadata => ({
+          extension,
+          objectMetadata,
+          name: objectMetadata.getName(),
+          fullName: objectMetadata.getFullName(),
+          description: objectMetadata.getDescription(),
+          iconFilename: objectMetadata.getIconFilename(),
+        }));
+    })
+  );
 };
 
 export const filterObjectsList = (
@@ -109,18 +132,26 @@ export const enumerateObjectsAndGroups = (
   objectsContainer: gdObjectsContainer,
   type: ?string = undefined
 ) => {
-  const filterObject = (object: Object): boolean => {
+  const filterObject = (object: gdObject): boolean => {
     return (
       !type ||
-      gd.getTypeOfObject(globalObjectsContainer, objectsContainer, object.getName(), false) ===
-        type
+      gd.getTypeOfObject(
+        globalObjectsContainer,
+        objectsContainer,
+        object.getName(),
+        false
+      ) === type
     );
   };
-  const filterGroup = (group: Group): boolean => {
+  const filterGroup = (group: gdObjectGroup): boolean => {
     return (
       !type ||
-      gd.getTypeOfObject(globalObjectsContainer, objectsContainer, group.getName(), true) ===
-        type
+      gd.getTypeOfObject(
+        globalObjectsContainer,
+        objectsContainer,
+        group.getName(),
+        true
+      ) === type
     );
   };
 
@@ -144,15 +175,17 @@ export const enumerateObjectsAndGroups = (
     .map(group => ({ group, global: false }));
 
   const projectObjectsList: ObjectWithContextList =
-  globalObjectsContainer === objectsContainer
+    globalObjectsContainer === objectsContainer
       ? []
-      : mapFor(0, globalObjectsContainer.getObjectsCount(), i => globalObjectsContainer.getObjectAt(i))
+      : mapFor(0, globalObjectsContainer.getObjectsCount(), i =>
+          globalObjectsContainer.getObjectAt(i)
+        )
           .filter(filterObject)
           .map(object => ({ object, global: true }));
 
   const projectGroups = globalObjectsContainer.getObjectGroups();
   const projectGroupsList: GroupWithContextList =
-  globalObjectsContainer === objectsContainer
+    globalObjectsContainer === objectsContainer
       ? []
       : mapFor(0, projectGroups.count(), i => {
           return projectGroups.getAt(i);

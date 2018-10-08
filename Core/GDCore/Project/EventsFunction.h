@@ -9,8 +9,11 @@
 
 #include <vector>
 #include "GDCore/Events/EventsList.h"
-#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
+// TODO: In theory (for separation of concerns between Project and
+// extensions/events), this include should be removed and gd::ParameterMetadata
+// replaced by a new gd::EventsFunctionParameter class.
+#include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 namespace gd {
 class SerializerElement;
 class Project;
@@ -19,7 +22,13 @@ class Project;
 namespace gd {
 
 /**
- * \brief Events that can be generated as a stand-alone function.
+ * \brief Events that can be generated as a stand-alone function, and used
+ * as a condition, action or expression.
+ *
+ * \note The code generation can be done using gd::EventsCodeGenerator
+ *
+ * \note The conversion to an extension is not in GDCore and should be done
+ * by the IDE (see EventsFunctionsExtensionsLoader)
  *
  * \ingroup PlatformDefinition
  */
@@ -28,35 +37,76 @@ class GD_CORE_API EventsFunction {
   EventsFunction();
   virtual ~EventsFunction(){};
 
+  /**
+   * \brief Get the description of the function, that is displayed in the
+   * editor.
+   */
   const gd::String& GetDescription() const { return description; };
+
+  /**
+   * \brief Set the description of the function, to be displayed in the editor.
+   */
   EventsFunction& SetDescription(const gd::String& description_) {
     description = description_;
     return *this;
   }
 
+  /**
+   * \brief Get the name of the function, to be used for the
+   * action/condition/expression name.
+   */
   const gd::String& GetName() const { return name; };
+
+  /**
+   * \brief Set the name of the function, to be used for the
+   * action/condition/expression name.
+   */
   EventsFunction& SetName(const gd::String& name_) {
     name = name_;
     return *this;
   }
 
+  /**
+   * \brief Get the name of the function, that is displayed in the editor.
+   */
   const gd::String& GetFullName() const { return fullName; };
+
+  /**
+   * \brief Set the name of the function, to be displayed in the editor.
+   */
   EventsFunction& SetFullName(const gd::String& fullName_) {
     fullName = fullName_;
     return *this;
   }
 
+  /**
+   * \brief Get the sentence of the function, that is used for the
+   * condition/action in the Events Editor.
+   */
   const gd::String& GetSentence() const { return sentence; };
+
+  /**
+   * \brief Set the sentence of the function, to be used for the
+   * condition/action in the Events Editor.
+   */
   EventsFunction& SetSentence(const gd::String& sentence_) {
     sentence = sentence_;
     return *this;
   }
 
   enum FunctionType { Action, Condition, Expression, StringExpression };
+
+  /**
+   * \brief Set the type of the function
+   */
   EventsFunction& SetFunctionType(FunctionType type) {
     functionType = type;
     return *this;
   };
+
+  /**
+   * \brief Get the type of the function
+   */
   FunctionType GetFunctionType() const { return functionType; };
 
   /**

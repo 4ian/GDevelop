@@ -59,7 +59,8 @@ const generateEventsFunctionExtension = (
 
   extension.setExtensionInformation(
     eventsFunctionsExtension.getName(),
-    eventsFunctionsExtension.getFullName(),
+    eventsFunctionsExtension.getFullName() ||
+      eventsFunctionsExtension.getName(),
     eventsFunctionsExtension.getDescription(),
     '',
     '' //TODO - Author and license support?
@@ -74,36 +75,40 @@ const generateEventsFunctionExtension = (
         if (functionType === gd.EventsFunction.Expression) {
           instructionOrExpression = extension.addExpression(
             eventsFunction.getName(),
-            eventsFunction.getFullName() || 'Unnamed expression',
+            eventsFunction.getFullName() || eventsFunction.getName(),
             eventsFunction.getDescription(),
-            eventsFunctionsExtension.getFullName() || 'Unnamed extension',
+            eventsFunctionsExtension.getFullName() ||
+              eventsFunctionsExtension.getName(),
             'res/function.png'
           );
         } else if (functionType === gd.EventsFunction.StringExpression) {
           instructionOrExpression = extension.addStrExpression(
             eventsFunction.getName(),
-            eventsFunction.getFullName() || 'Unnamed string expression',
+            eventsFunction.getFullName() || eventsFunction.getName(),
             eventsFunction.getDescription(),
-            eventsFunctionsExtension.getFullName() || 'Unnamed extension',
+            eventsFunctionsExtension.getFullName() ||
+              eventsFunctionsExtension.getName(),
             'res/function.png'
           );
         } else if (functionType === gd.EventsFunction.Condition) {
           instructionOrExpression = extension.addCondition(
             eventsFunction.getName(),
-            eventsFunction.getFullName() || 'Unnamed condition',
+            eventsFunction.getFullName() || eventsFunction.getName(),
             eventsFunction.getDescription(),
             eventsFunction.getSentence(),
-            eventsFunctionsExtension.getFullName() || 'Unnamed extension',
+            eventsFunctionsExtension.getFullName() ||
+              eventsFunctionsExtension.getName(),
             'res/function.png',
             'res/function24.png'
           );
         } else {
           instructionOrExpression = extension.addAction(
             eventsFunction.getName(),
-            eventsFunction.getFullName() || 'Unnamed action',
+            eventsFunction.getFullName() || eventsFunction.getName(),
             eventsFunction.getDescription(),
             eventsFunction.getSentence(),
-            eventsFunctionsExtension.getFullName() || 'Unnamed extension',
+            eventsFunctionsExtension.getFullName() ||
+              eventsFunctionsExtension.getName(),
             'res/function.png',
             'res/function24.png'
           );

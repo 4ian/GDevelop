@@ -4,13 +4,13 @@
  * reserved. This project is released under the MIT License.
  */
 #include "WholeProjectRefactorer.h"
-#include "GDCore/Extensions/EventsFunctionsExtension.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
 #include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
 #include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/InitialInstancesContainer.h"

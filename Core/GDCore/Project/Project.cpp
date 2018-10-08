@@ -12,7 +12,6 @@
 #include <map>
 #include <vector>
 #include "GDCore/CommonTools.h"
-#include "GDCore/Extensions/EventsFunctionsExtension.h"  //TODO: Move to Project?
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
@@ -23,6 +22,7 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/wxTools/SafeYield.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"

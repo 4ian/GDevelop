@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY)
-#include "EventsFunction.h"
 #include <vector>
+#include "EventsFunction.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
 namespace gd {

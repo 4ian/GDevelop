@@ -4,6 +4,7 @@ import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
 import { Column } from '../UI/Grid';
 import Dialog from '../UI/Dialog';
+import HelpButton from '../UI/HelpButton';
 
 type Props = {|
   eventsFunctionsExtension: gdEventsFunctionsExtension,
@@ -27,6 +28,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
 
     return (
       <Dialog
+        secondaryActions={<HelpButton helpPagePath="/events/functions" />}
         actions={actions}
         open={this.props.open}
         title="Edit Extension Options"

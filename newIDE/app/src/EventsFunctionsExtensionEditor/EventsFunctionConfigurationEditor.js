@@ -8,13 +8,15 @@ import { mapVector } from '../Utils/MapFor';
 import FlatButton from 'material-ui/FlatButton';
 import IconButton from 'material-ui/IconButton';
 import EmptyMessage from '../UI/EmptyMessage';
-import Delete from 'material-ui/svg-icons/action/delete';
+import IconMenu from '../UI/Menu/IconMenu';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import {
   enumerateObjectTypes,
   type EnumeratedObjectMetadata,
 } from '../ObjectsList/EnumerateObjects';
 import Divider from 'material-ui/Divider';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
+import HelpButton from '../UI/HelpButton';
 const gd = global.gd;
 
 type Props = {|
@@ -136,7 +138,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               {type === gd.EventsFunction.Action ||
               type === gd.EventsFunction.Condition ? (
                 <TextField
-                  floatingLabelText="Sentence in events sheet (write _PARAMx_ for parameters, e.g: _PARAM1_)"
+                  hintText="Sentence in Events Sheet (write _PARAMx_ for parameters, e.g: _PARAM1_)"
                   fullWidth
                   value={eventsFunction.getSentence()}
                   onChange={(e, text) => {
@@ -232,7 +234,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
 
                                         return (
                                           <MenuItem
-                                          key={metadata.name}
+                                            key={metadata.name}
                                             value={metadata.name}
                                             primaryText={metadata.fullName}
                                           />
@@ -257,11 +259,19 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                               />
                             </Column>
                             <Column>
-                              <IconButton
-                                onClick={() => this._removeParameter(i)}
-                              >
-                                <Delete />
-                              </IconButton>
+                              <IconMenu
+                                iconButtonElement={
+                                  <IconButton>
+                                    <MoreVertIcon />
+                                  </IconButton>
+                                }
+                                buildMenuTemplate={() => [
+                                  {
+                                    label: 'Delete',
+                                    click: () => this._removeParameter(i),
+                                  },
+                                ]}
+                              />
                             </Column>
                           </Line>
                           <Divider />
@@ -274,7 +284,10 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                       No parameters for this function.
                     </EmptyMessage>
                   ) : null}
-                  <Line justifyContent="flex-end">
+                  <Line justifyContent="space-between">
+                    <Column>
+                      <HelpButton helpPagePath="/events/functions" />
+                    </Column>
                     <Column>
                       <FlatButton
                         label="Add a parameter"

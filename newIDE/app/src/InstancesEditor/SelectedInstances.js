@@ -212,7 +212,7 @@ export default class InstancesSelection {
       this.rotateButton,
       rotateButtonPos,
       smallButtonSize,
-      1
+      CIRCLE_BUTTON_SHAPE
     );
   }
 }

@@ -13,7 +13,7 @@ export default class InstancesRotator {
     const angle =
       Math.atan2(this.totalDeltaY, this.totalDeltaX) * 180 / Math.PI +
       initialAngle;
-    return proportional ? Math.round(angle / 45) * 45 : angle;
+    return proportional ? Math.round(angle / 15) * 15 : angle;
   }
 
   rotateBy(instances, deltaX, deltaY, proportional) {

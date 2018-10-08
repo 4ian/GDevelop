@@ -115,6 +115,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     done(true);
   };
 
+  _deleteEventsFunction = (
+    eventsFunction: gdEventsFunction,
+  ) => {
+    //eslint-disable-next-line
+    // const answer = confirm('Are you sure you want to remove this function? This can\'t be undone.');
+    //TODO - Implement events function deletion
+  }
+
   _editOptions = (open: boolean = true) => {
     this.setState({
       editOptionsDialogOpen: open,
@@ -197,9 +205,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   eventsFunctions={eventsFunctionsExtension.getEventsFunctions()}
                   selectedEventsFunction={selectedEventsFunction}
                   onSelectEventsFunction={this._selectEventsFunction}
-                  onDeleteEventsFunction={() => {
-                    /*TODO*/
-                  }}
+                  onDeleteEventsFunction={this._deleteEventsFunction}
                   onRenameEventsFunction={this._renameEventsFunction}
                   onEditOptions={this._editOptions}
                 />

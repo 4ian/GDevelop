@@ -7,6 +7,8 @@
 #include "EventStoreDialog.h"
 #include <ctime>
 #include <sstream>
+#include "GDCore/Project/Project.h"
+#include "GDCore/Project/Layout.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
 #include "GDCore/IDE/wxTools/SafeYield.h"

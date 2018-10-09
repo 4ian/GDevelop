@@ -285,9 +285,22 @@ export const makeTestProject = gd => {
   // Empty layout
   const emptyLayout = project.insertNewLayout('EmptyLayout', 1);
 
+  // Events functions extension
+  const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+    'TestExt',
+    0
+  );
+  testEventsFunctionsExtension.setNamespace('MyExt');
+  testEventsFunctionsExtension.setVersion('1.1');
+  testEventsFunctionsExtension.setName('My name');
+  testEventsFunctionsExtension.setFullName('My descriptive name');
+  testEventsFunctionsExtension.setDescription('My description');
+
   // Events function
-  const testEventsFunction = new gd.EventsFunction();
-  testEventsFunction.setName('MyTestFunction');
+  const testEventsFunction = testEventsFunctionsExtension.insertNewEventsFunction(
+    'MyTestFunction',
+    0
+  );
 
   const parameter1 = new gd.ParameterMetadata();
   parameter1.setType('objectList');
@@ -315,26 +328,7 @@ export const makeTestProject = gd => {
     .getEvents()
     .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
 
-  // Events functions extension
-  const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
-    'TestExt',
-    0
-  );
-  testEventsFunctionsExtension.setNamespace('MyExt');
-  testEventsFunctionsExtension.setVersion('1.1');
-  testEventsFunctionsExtension.setName('My name');
-  testEventsFunctionsExtension.setFullName('My descriptive name');
-  testEventsFunctionsExtension.setDescription('My description');
-
-  const testEventsFunction2 = new gd.EventsFunction();
-  testEventsFunction2.setName('MyTestFunction2');
-
-  testEventsFunctionsExtension
-    .getEventsFunctions()
-    .push_back(testEventsFunction);
-  testEventsFunctionsExtension
-    .getEventsFunctions()
-    .push_back(testEventsFunction2);
+  testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction2', 1);
 
   return {
     project,

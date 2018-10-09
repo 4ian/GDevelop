@@ -38,6 +38,12 @@ class GD_CORE_API EventsFunction {
   virtual ~EventsFunction(){};
 
   /**
+   * \brief Return a pointer to a new EventsFunction constructed from
+   * this one.
+   */
+  EventsFunction* Clone() const { return new EventsFunction(*this); };
+
+  /**
    * \brief Get the description of the function, that is displayed in the
    * editor.
    */

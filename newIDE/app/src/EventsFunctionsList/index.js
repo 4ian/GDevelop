@@ -6,12 +6,13 @@ import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import Background from '../UI/Background';
 import newNameGenerator from '../Utils/NewNameGenerator';
-import { mapVector } from '../Utils/MapFor';
-import { filterProjectItemsList } from '../ProjectManager/EnumerateProjectItems';
+import {
+  enumerateEventsFunctions,
+  filterEventFunctionsList,
+} from './EnumerateEventsFunctions';
 import FlatButton from 'material-ui/FlatButton';
 import { Line } from '../UI/Grid';
 import Divider from 'material-ui/Divider';
-const gd = global.gd;
 
 const styles = {
   listContainer: {
@@ -26,10 +27,13 @@ type State = {|
 
 type Props = {|
   project: gdProject,
-  eventsFunctions: gdVectorEventsFunction,
+  eventsFunctionsContainer: gdEventsFunctionsExtension,
   selectedEventsFunction: ?gdEventsFunction,
   onSelectEventsFunction: (eventsFunction: ?gdEventsFunction) => void,
-  onDeleteEventsFunction: (eventsFunction: gdEventsFunction) => void,
+  onDeleteEventsFunction: (
+    eventsFunction: gdEventsFunction,
+    cb: (boolean) => void
+  ) => void,
   onRenameEventsFunction: (
     eventsFunction: gdEventsFunction,
     newName: string,
@@ -40,8 +44,10 @@ type Props = {|
 
 export default class EventsFunctionsList extends React.Component<Props, State> {
   static defaultProps = {
-    onDeleteEventsFunction: (eventsFunction: gdEventsFunction, cb: boolean => void) =>
-      cb(true),
+    onDeleteEventsFunction: (
+      eventsFunction: gdEventsFunction,
+      cb: boolean => void
+    ) => cb(true),
     onRenameEventsFunction: (
       eventsFunction: gdEventsFunction,
       newName: string,
@@ -55,8 +61,21 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     searchText: '',
   };
 
-  _deleteEventsFunction = (resource: gdEventsFunction) => {
-    this.props.onDeleteEventsFunction(resource);
+  _deleteEventsFunction = (eventsFunction: gdEventsFunction) => {
+    const { eventsFunctionsContainer } = this.props;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      "Are you sure you want to remove this function? This can't be undone."
+    );
+    if (!answer) return;
+
+    this.props.onDeleteEventsFunction(eventsFunction, doRemove => {
+      if (!doRemove) return;
+
+      eventsFunctionsContainer.removeEventsFunction(eventsFunction.getName());
+      this.forceUpdate();
+    });
   };
 
   _editName = (resource: ?gdEventsFunction) => {
@@ -69,13 +88,14 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   };
 
   _rename = (eventsFunction: gdEventsFunction, newName: string) => {
+    const { eventsFunctionsContainer } = this.props;
     this.setState({
       renamedEventsFunction: null,
     });
 
     if (eventsFunction.getName() === newName) return;
 
-    if (this._hasEventsFunctionNamed(newName)) {
+    if (eventsFunctionsContainer.hasEventsFunctionNamed(newName)) {
       showWarningBox('Another function with this name already exists.');
       return;
     }
@@ -88,8 +108,8 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   };
 
   _move = (oldIndex: number, newIndex: number) => {
-    // const { project, eventsFunctions } = this.props;
-    // TODO
+    const { eventsFunctionsContainer } = this.props;
+    eventsFunctionsContainer.moveEventsFunction(oldIndex, newIndex);
 
     this.forceUpdateList();
   };
@@ -112,40 +132,31 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     ];
   };
 
-  _hasEventsFunctionNamed = (name: string) => {
-    const { eventsFunctions } = this.props;
-    return (
-      mapVector(eventsFunctions, eventsFunction =>
-        eventsFunction.getName()
-      ).indexOf(name) !== -1
-    );
-  };
-
   _addNewEventsFunction = () => {
-    const { eventsFunctions } = this.props;
+    const { eventsFunctionsContainer } = this.props;
 
-    const eventsFunction = new gd.EventsFunction();
     const name = newNameGenerator('Function', name =>
-      this._hasEventsFunctionNamed(name)
+      eventsFunctionsContainer.hasEventsFunctionNamed(name)
     );
-    eventsFunction.setName(name);
-    eventsFunctions.push_back(eventsFunction);
-    eventsFunction.delete();
+    eventsFunctionsContainer.insertNewEventsFunction(
+      name,
+      eventsFunctionsContainer.getEventsFunctionsCount()
+    );
     this.forceUpdate();
   };
 
   render() {
     const {
       project,
-      eventsFunctions,
+      eventsFunctionsContainer,
       selectedEventsFunction,
       onSelectEventsFunction,
     } = this.props;
     const { searchText } = this.state;
 
     const list = [
-      ...filterProjectItemsList(
-        mapVector(eventsFunctions, eventsFunction => eventsFunction),
+      ...filterEventFunctionsList(
+        enumerateEventsFunctions(eventsFunctionsContainer),
         searchText
       ),
       {
@@ -156,7 +167,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     // Force List component to be mounted again if project or objectsContainer
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
-    const listKey = project.ptr + ';' + eventsFunctions.ptr;
+    const listKey = project.ptr + ';' + eventsFunctionsContainer.ptr;
 
     return (
       <Background>

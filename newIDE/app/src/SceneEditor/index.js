@@ -694,7 +694,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     groupWithScope: GroupWithContext,
     done: boolean => void
   ) => {
-    //TODO
+    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer)
     done(true);
   };
 
@@ -703,7 +703,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     newName: string,
     done: boolean => void
   ) => {
-    //TODO
+    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer)
     done(true);
   };
 

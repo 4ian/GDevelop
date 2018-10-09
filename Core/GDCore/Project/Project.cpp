@@ -1030,8 +1030,8 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // Add events functions extensions resources
   for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
     auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
-    for (auto& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
-      LaunchResourceWorkerOnEvents(*this, eventsFunction.GetEvents(), worker);
+    for (auto&& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
+      LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
     }
   }
 #if !defined(GD_NO_WX_GUI)

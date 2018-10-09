@@ -1584,13 +1584,13 @@ storiesOf('EventsFunctionsList', module)
     <div style={{ height: 500, display: 'flex' }}>
       <EventsFunctionsList
         project={project}
-        eventsFunctions={testEventsFunctionsExtension.getEventsFunctions()}
-        selectedEventsFunction={testEventsFunctionsExtension
-          .getEventsFunctions()
-          .at(1)}
+        eventsFunctionsContainer={testEventsFunctionsExtension}
+        selectedEventsFunction={testEventsFunctionsExtension.getEventsFunctionAt(
+          1
+        )}
         onSelectEventsFunction={action('select')}
-        onDeleteEventsFunction={action('delete')}
-        onRenameEventsFunction={(resource, newName, cb) => cb(false)}
+        onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
+        onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
         onEditOptions={action('edit options')}
       />
     </div>
@@ -1614,7 +1614,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
     </DragDropContextProvider>
   ));
 
-  storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
+storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <OptionsEditorDialog

@@ -3,7 +3,6 @@ import { timeFunction } from '../Utils/TimeFunction.js';
 const electron = optionalRequire('electron');
 const Buffer = electron ? electron.remote.require('buffer').Buffer : null;
 
-//TODO: Update to ES6
 function Bridge() {
   this.net = optionalRequire('net');
 

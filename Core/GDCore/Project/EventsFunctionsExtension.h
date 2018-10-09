@@ -30,6 +30,8 @@ namespace gd {
 class GD_CORE_API EventsFunctionsExtension {
  public:
   EventsFunctionsExtension();
+  EventsFunctionsExtension(const EventsFunctionsExtension&);
+  EventsFunctionsExtension& operator=(const EventsFunctionsExtension& rhs);
   virtual ~EventsFunctionsExtension(){};
 
   /**
@@ -92,16 +94,45 @@ class GD_CORE_API EventsFunctionsExtension {
   const gd::EventsFunction& GetEventsFunction(const gd::String& name) const;
 
   /**
-   * \brief Return the functions.
+   * \brief Get the function at the specified index in the list.
+   *
+   * \warning Trying to access to a not existing function will result in
+   * undefined behavior.
    */
-  const std::vector<gd::EventsFunction>& GetEventsFunctions() const {
+  gd::EventsFunction& GetEventsFunction(std::size_t index);
+
+  /**
+   * \brief Get the function at the specified index in the list.
+   *
+   * \warning Trying to access to a not existing function will result in
+   * undefined behavior.
+   */
+  const gd::EventsFunction& GetEventsFunction(std::size_t index) const;
+
+  /**
+   * \brief Return the number of functions.
+   */
+  std::size_t GetEventsFunctionsCount() const;
+
+  gd::EventsFunction& InsertNewEventsFunction(const gd::String& name,
+                                              std::size_t position);
+  gd::EventsFunction& InsertEventsFunction(const gd::EventsFunction& object,
+                                           std::size_t position);
+  void RemoveEventsFunction(const gd::String& name);
+  void MoveEventsFunction(std::size_t oldIndex, std::size_t newIndex);
+
+  /**
+   * \brief Provide a raw access to the vector containing the functions.
+   */
+  const std::vector<std::unique_ptr<gd::EventsFunction>>& GetEventsFunctions()
+      const {
     return eventsFunctions;
   };
 
   /**
-   * \brief Return the functions.
+   * \brief Provide a raw access to the vector containing the functions.
    */
-  std::vector<gd::EventsFunction>& GetEventsFunctions() {
+  std::vector<std::unique_ptr<gd::EventsFunction>>& GetEventsFunctions() {
     return eventsFunctions;
   };
 
@@ -121,12 +152,18 @@ class GD_CORE_API EventsFunctionsExtension {
   ///@}
 
  private:
+  /**
+   * Initialize object using another object. Used by copy-ctor and assign-op.
+   * Don't forget to update me if members were changed!
+   */
+  void Init(const gd::EventsFunctionsExtension& other);
+
   gd::String version;
   gd::String extensionNamespace;
   gd::String description;
   gd::String name;
   gd::String fullName;
-  std::vector<gd::EventsFunction> eventsFunctions;
+  std::vector<std::unique_ptr<gd::EventsFunction>> eventsFunctions;
 };
 
 }  // namespace gd

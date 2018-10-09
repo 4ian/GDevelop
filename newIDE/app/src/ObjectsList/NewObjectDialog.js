@@ -3,8 +3,7 @@ import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import Avatar from 'material-ui/Avatar';
 import { List, ListItem } from 'material-ui/List';
-import { mapFor } from '../Utils/MapFor';
-import flatten from 'lodash/flatten';
+import { enumerateObjectTypes } from './EnumerateObjects';
 import HelpButton from '../UI/HelpButton';
 
 const styles = {
@@ -22,28 +21,8 @@ export default class NewObjectDialog extends Component {
       return { objectMetadata: [] };
     }
 
-    const platform = project.getCurrentPlatform();
-    const extensionsList = platform.getAllPlatformExtensions();
-
     return {
-      objectMetadata: flatten(
-        mapFor(0, extensionsList.size(), i => {
-          const extension = extensionsList.at(i);
-
-          return extension
-            .getExtensionObjectsTypes()
-            .toJSArray()
-            .map(objectType => extension.getObjectMetadata(objectType))
-            .map(objectMetadata => ({
-              extension,
-              objectMetadata,
-              name: objectMetadata.getName(),
-              fullName: objectMetadata.getFullName(),
-              description: objectMetadata.getDescription(),
-              iconFilename: objectMetadata.getIconFilename(),
-            }));
-        })
-      ),
+      objectMetadata: enumerateObjectTypes(project),
     };
   }
 

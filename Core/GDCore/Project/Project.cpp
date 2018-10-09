@@ -22,6 +22,7 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/wxTools/SafeYield.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -434,6 +435,104 @@ void Project::RemoveExternalLayout(const gd::String& name) {
   externalLayouts.erase(externalLayout);
 }
 
+#if defined(GD_IDE_ONLY)
+void Project::SwapEventsFunctionsExtensions(std::size_t first,
+                                            std::size_t second) {
+  if (first >= eventsFunctionsExtensions.size() ||
+      second >= eventsFunctionsExtensions.size())
+    return;
+
+  std::iter_swap(eventsFunctionsExtensions.begin() + first,
+                 eventsFunctionsExtensions.begin() + second);
+}
+bool Project::HasEventsFunctionsExtensionNamed(const gd::String& name) const {
+  return (
+      find_if(
+          eventsFunctionsExtensions.begin(),
+          eventsFunctionsExtensions.end(),
+          [&name](
+              const std::unique_ptr<gd::EventsFunctionsExtension>& extension) {
+            return extension->GetName() == name;
+          }) != eventsFunctionsExtensions.end());
+}
+gd::EventsFunctionsExtension& Project::GetEventsFunctionsExtension(
+    const gd::String& name) {
+  return *(*find_if(
+      eventsFunctionsExtensions.begin(),
+      eventsFunctionsExtensions.end(),
+      [&name](const std::unique_ptr<gd::EventsFunctionsExtension>& extension) {
+        return extension->GetName() == name;
+      }));
+}
+const gd::EventsFunctionsExtension& Project::GetEventsFunctionsExtension(
+    const gd::String& name) const {
+  return *(*find_if(
+      eventsFunctionsExtensions.begin(),
+      eventsFunctionsExtensions.end(),
+      [&name](const std::unique_ptr<gd::EventsFunctionsExtension>& extension) {
+        return extension->GetName() == name;
+      }));
+}
+gd::EventsFunctionsExtension& Project::GetEventsFunctionsExtension(
+    std::size_t index) {
+  return *eventsFunctionsExtensions[index];
+}
+const gd::EventsFunctionsExtension& Project::GetEventsFunctionsExtension(
+    std::size_t index) const {
+  return *eventsFunctionsExtensions[index];
+}
+std::size_t Project::GetEventsFunctionsExtensionPosition(
+    const gd::String& name) const {
+  for (std::size_t i = 0; i < eventsFunctionsExtensions.size(); ++i) {
+    if (eventsFunctionsExtensions[i]->GetName() == name) return i;
+  }
+  return gd::String::npos;
+}
+
+std::size_t Project::GetEventsFunctionsExtensionsCount() const {
+  return eventsFunctionsExtensions.size();
+}
+
+gd::EventsFunctionsExtension& Project::InsertNewEventsFunctionsExtension(
+    const gd::String& name, std::size_t position) {
+  gd::EventsFunctionsExtension& newlyInsertedEventsFunctionsExtension =
+      *(*(eventsFunctionsExtensions.emplace(
+          position < eventsFunctionsExtensions.size()
+              ? eventsFunctionsExtensions.begin() + position
+              : eventsFunctionsExtensions.end(),
+          new gd::EventsFunctionsExtension())));
+
+  newlyInsertedEventsFunctionsExtension.SetName(name);
+  return newlyInsertedEventsFunctionsExtension;
+}
+
+gd::EventsFunctionsExtension& Project::InsertEventsFunctionsExtension(
+    const gd::EventsFunctionsExtension& extension, std::size_t position) {
+  gd::EventsFunctionsExtension& newlyInsertedEventsFunctionsExtension =
+      *(*(eventsFunctionsExtensions.emplace(
+          position < eventsFunctionsExtensions.size()
+              ? eventsFunctionsExtensions.begin() + position
+              : eventsFunctionsExtensions.end(),
+          new gd::EventsFunctionsExtension(extension))));
+
+  return newlyInsertedEventsFunctionsExtension;
+}
+
+void Project::RemoveEventsFunctionsExtension(const gd::String& name) {
+  std::vector<std::unique_ptr<gd::EventsFunctionsExtension> >::iterator
+      eventsFunctionExtension = find_if(
+          eventsFunctionsExtensions.begin(),
+          eventsFunctionsExtensions.end(),
+          [&name](
+              const std::unique_ptr<gd::EventsFunctionsExtension>& extension) {
+            return extension->GetName() == name;
+          });
+  if (eventsFunctionExtension == eventsFunctionsExtensions.end()) return;
+
+  eventsFunctionsExtensions.erase(eventsFunctionExtension);
+}
+#endif
+
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 // Compatibility with GD2.x
 class SpriteObjectsPositionUpdater : public gd::InitialInstanceFunctor {
@@ -732,6 +831,24 @@ void Project::UnserializeFrom(const SerializerElement& element) {
         GetExternalEventsCount());
     externalEvents.UnserializeFrom(*this, externalEventElement);
   }
+
+  eventsFunctionsExtensions.clear();
+  const SerializerElement& eventsFunctionsExtensionsElement =
+      element.GetChild("eventsFunctionsExtensions");
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
+  for (std::size_t i = 0;
+       i < eventsFunctionsExtensionsElement.GetChildrenCount();
+       ++i) {
+    const SerializerElement& eventsFunctionsExtensionElement =
+        eventsFunctionsExtensionsElement.GetChild(i);
+
+    gd::EventsFunctionsExtension& newEventsFunctionsExtension =
+        InsertNewEventsFunctionsExtension("",
+                                          GetEventsFunctionsExtensionsCount());
+    newEventsFunctionsExtension.UnserializeFrom(
+        *this, eventsFunctionsExtensionElement);
+  }
 #endif
 
   externalLayouts.clear();
@@ -848,6 +965,14 @@ void Project::SerializeTo(SerializerElement& element) const {
     GetExternalEvents(i).SerializeTo(
         externalEventsElement.AddChild("externalEvents"));
 
+  SerializerElement& eventsFunctionsExtensionsElement =
+      element.AddChild("eventsFunctionsExtensions");
+  eventsFunctionsExtensionsElement.ConsiderAsArrayOf(
+      "eventsFunctionsExtension");
+  for (std::size_t i = 0; i < eventsFunctionsExtensions.size(); ++i)
+    eventsFunctionsExtensions[i]->SerializeTo(
+        eventsFunctionsExtensionsElement.AddChild("eventsFunctionsExtension"));
+
   SerializerElement& externalLayoutsElement =
       element.AddChild("externalLayouts");
   externalLayoutsElement.ConsiderAsArrayOf("externalLayout");
@@ -878,6 +1003,10 @@ gd::String Project::GetBadObjectNameWarning() {
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
+  // See also gd::WholeProjectRefactorer::ExposeProjectEvents for a method that traverse the whole
+  // project (this time for events).
+  // Ideally, this method could be moved outside of gd::Project.
+
   // Add project resources
   worker.ExposeResources(&GetResourcesManager());
   platformSpecificAssets.ExposeResources(worker);
@@ -897,6 +1026,13 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   for (std::size_t s = 0; s < GetExternalEventsCount(); s++) {
     LaunchResourceWorkerOnEvents(
         *this, GetExternalEvents(s).GetEvents(), worker);
+  }
+  // Add events functions extensions resources
+  for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
+    auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
+    for (auto& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
+      LaunchResourceWorkerOnEvents(*this, eventsFunction.GetEvents(), worker);
+    }
   }
 #if !defined(GD_NO_WX_GUI)
   gd::SafeYield::Do();
@@ -1143,8 +1279,9 @@ void Project::Init(const gd::Project& game) {
 #endif
 
   externalLayouts = gd::Clone(game.externalLayouts);
-
 #if defined(GD_IDE_ONLY)
+  eventsFunctionsExtensions = gd::Clone(game.eventsFunctionsExtensions);
+
   useExternalSourceFiles = game.useExternalSourceFiles;
 
   externalSourceFiles = gd::Clone(game.externalSourceFiles);

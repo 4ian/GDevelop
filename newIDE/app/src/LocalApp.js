@@ -19,6 +19,7 @@ import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
 import makeExtensionloader from './JsExtensionsLoader/LocalJsExtensionsLoader';
+import { makeLocalEventsFunctionWriter } from './EventsFunctionsExtensionsLoader/LocalEventsFunctionWriter';
 const gd = global.gd;
 
 export const create = (authentification: Authentification) => {
@@ -67,6 +68,7 @@ export const create = (authentification: Authentification) => {
             filterExamples: !Window.isDev(),
           })}
           initialPathsOrURLsToOpen={appArguments['_']}
+          eventsFunctionWriter={makeLocalEventsFunctionWriter()}
         />
       </ElectronEventsBridge>
     );

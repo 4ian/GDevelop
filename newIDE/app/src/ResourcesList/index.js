@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
-import Paper from 'material-ui/Paper';
+import Background from '../UI/Background';
 import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
@@ -12,12 +12,6 @@ const glob = optionalRequire('glob');
 const gd = global.gd;
 
 const styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    height: '100%',
-    flexDirection: 'column',
-  },
   listContainer: {
     flex: 1,
   },
@@ -202,13 +196,13 @@ export default class ResourcesList extends React.Component<Props, State> {
       .map(resourceName => resourcesManager.getResource(resourceName));
     const filteredList = filterResourcesList(allResourcesList, searchText);
 
-    // Force List component to be mounted again if project or objectsContainer
+    // Force List component to be mounted again if project
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = project.ptr;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -239,7 +233,7 @@ export default class ResourcesList extends React.Component<Props, State> {
               searchText: text,
             })}
         />
-      </Paper>
+      </Background>
     );
   }
 }

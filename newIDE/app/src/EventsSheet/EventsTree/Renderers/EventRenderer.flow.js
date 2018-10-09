@@ -7,7 +7,9 @@ import {
 
 export type EventRendererProps = {
   project: gdProject,
-  layout: gdLayout,
+  layout?: ?gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   event: gdBaseEvent,
   disabled: boolean,
 

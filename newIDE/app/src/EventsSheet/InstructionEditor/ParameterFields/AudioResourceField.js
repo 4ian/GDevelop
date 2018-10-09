@@ -18,10 +18,11 @@ export default class AudioResourceField extends Component<
     if (
       !this.props.resourceSources ||
       !this.props.onChooseResource ||
-      !this.props.resourceExternalEditors
+      !this.props.resourceExternalEditors ||
+      !this.props.project
     ) {
       console.error(
-        'Missing resourceSources, onChooseResource or resourceExternalEditors for AudioResourceField'
+        'Missing project, resourceSources, onChooseResource or resourceExternalEditors for AudioResourceField'
       );
       return null;
     }
@@ -38,7 +39,7 @@ export default class AudioResourceField extends Component<
         initialResourceName={this.props.value}
         onChange={this.props.onChange}
         floatingLabelText="Choose the audio file to use"
-        ref={field => this._field = field}
+        ref={field => (this._field = field)}
       />
     );
   }

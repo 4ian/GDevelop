@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { ListItem } from 'material-ui/List';
-import Paper from 'material-ui/Paper';
+import Background from '../UI/Background';
 import SearchBar from 'material-ui-search-bar';
 import ObjectRow from './ObjectRow';
 import NewObjectDialog from './NewObjectDialog';
@@ -25,12 +25,6 @@ import { CLIPBOARD_KIND } from './ClipboardKind';
 
 const listItemHeight = 48;
 const styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    height: '100%',
-    flexDirection: 'column',
-  },
   listContainer: {
     flex: 1,
   },
@@ -441,7 +435,7 @@ export default class ObjectsListContainer extends React.Component<
     const listKey = project.ptr + ';' + objectsContainer.ptr;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -508,7 +502,7 @@ export default class ObjectsListContainer extends React.Component<
             emptyExplanationSecondMessage="For example, you can have a variable called Life representing the health of the object."
           />
         )}
-      </Paper>
+      </Background>
     );
   }
 }

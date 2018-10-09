@@ -15,6 +15,7 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
     gd::Project& project,
     const std::vector<gd::ParameterMetadata>& parameters,
     gd::ObjectsContainer& outputObjectsContainer) {
+  outputObjectsContainer.GetObjects().clear();
   for (std::size_t i = 0; i < parameters.size(); ++i) {
     const auto& parameter = parameters[i];
     if (parameter.GetName().empty()) continue;

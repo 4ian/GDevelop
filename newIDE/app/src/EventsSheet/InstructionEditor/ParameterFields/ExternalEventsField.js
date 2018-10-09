@@ -46,17 +46,18 @@ export default class ExternalEventsField extends Component<
   }
 
   _loadNamesFrom(props: ParameterFieldProps) {
-    if (!props.project) {
+    const { project } = props;
+    if (!project) {
       return;
     }
 
     const externalEvents = enumerateExternalEvents(
-      props.project
+      project
     ).map(externalEvents => ({
       text: externalEvents.getName(),
       value: externalEvents.getName(),
     }));
-    const layouts = enumerateLayouts(props.project).map(layout => ({
+    const layouts = enumerateLayouts(project).map(layout => ({
       text: layout.getName(),
       value: layout.getName(),
     }));

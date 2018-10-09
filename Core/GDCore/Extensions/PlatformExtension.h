@@ -432,6 +432,12 @@ class GD_CORE_API PlatformExtension {
    */
   static std::vector<gd::String> GetBuiltinExtensionsNames();
 
+  /**
+   * \brief Get the string used to separate the name of the
+   * instruction/expression and the extension.
+   */
+  static gd::String GetNamespaceSeparator() { return "::"; }
+
  private:
   /**
    * Set the namespace ( the String each actions/conditions/expressions start

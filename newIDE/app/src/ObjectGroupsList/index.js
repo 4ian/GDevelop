@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
-import Paper from 'material-ui/Paper';
+import Background from '../UI/Background';
 import SearchBar from 'material-ui-search-bar';
 import GroupRow from './GroupRow';
 import { ListItem } from 'material-ui/List';
@@ -20,12 +20,6 @@ import type {
 
 const listItemHeight = 48;
 const styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    height: '100%',
-    flexDirection: 'column',
-  },
   listContainer: {
     flex: 1,
   },
@@ -282,7 +276,7 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
     const listKey = project.ptr + ';' + objectsContainer.ptr;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -315,7 +309,7 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
               searchText: text,
             })}
         />
-      </Paper>
+      </Background>
     );
   }
 }

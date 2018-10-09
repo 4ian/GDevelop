@@ -25,16 +25,16 @@ Platform::Platform() {}
 Platform::~Platform() {}
 
 bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
-  std::cout << extension->GetName();
-  bool loaded = false;
-  for (std::size_t i = 0; i < extensionsLoaded.size(); ++i) {
-    if (extensionsLoaded[i]->GetName() == extension->GetName()) {
-      std::cout << "(replacing existing extension)" << std::endl;
-      extensionsLoaded[i] = extension;
-      loaded = true;
-    }
+  if (!extension) return false;
+
+  std::cout << "Loading " << extension->GetName() << "...";
+  if (IsExtensionLoaded(extension->GetName())) {
+    std::cout << " (replacing existing extension)";
+    RemoveExtension(extension->GetName());
   }
-  if (!loaded) extensionsLoaded.push_back(extension);
+  std::cout << std::endl;
+
+  extensionsLoaded.push_back(extension);
 
   // Load all creation/destruction functions for objects provided by the
   // extension
@@ -44,8 +44,28 @@ bool Platform::AddExtension(std::shared_ptr<gd::PlatformExtension> extension) {
         extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
   }
 
-  std::cout << ", ";
   return true;
+}
+
+void Platform::RemoveExtension(const gd::String& name) {
+  // Unload all creation/destruction functions for objects provided by the
+  // extension
+  for (std::size_t i = 0; i < extensionsLoaded.size(); ++i) {
+    auto& extension = extensionsLoaded[i];
+    if (extension->GetName() == name) {
+      vector<gd::String> objectsTypes = extension->GetExtensionObjectsTypes();
+      for (std::size_t i = 0; i < objectsTypes.size(); ++i) {
+        creationFunctionTable.erase(objectsTypes[i]);
+      }
+    }
+  }
+
+  extensionsLoaded.erase(remove_if(extensionsLoaded.begin(),
+                                   extensionsLoaded.end(),
+                                   [&name](std::shared_ptr<PlatformExtension> extension) {
+                                     return extension->GetName() == name;
+                                   }),
+                         extensionsLoaded.end());
 }
 
 bool Platform::IsExtensionLoaded(const gd::String& name) const {

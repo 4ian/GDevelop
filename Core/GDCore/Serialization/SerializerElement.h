@@ -164,7 +164,8 @@ class GD_CORE_API SerializerElement {
    * \brief Return true if the specified attribute exists.
    * \param name The name of the attribute to find.
    */
-  bool HasAttribute(const gd::String &name);
+  bool HasAttribute(const gd::String &name) const;
+
   /**
    * \brief Return all the children of the element.
    */

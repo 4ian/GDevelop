@@ -1254,6 +1254,7 @@ void Project::Init(const gd::Project& game) {
   author = game.author;
   packageName = game.packageName;
   orientation = game.orientation;
+  adMobAppId = game.adMobAppId;
   folderProject = game.folderProject;
   latestCompilationDirectory = game.latestCompilationDirectory;
   platformSpecificAssets = game.platformSpecificAssets;

@@ -229,6 +229,14 @@ bool ExporterHelper::ExportCordovaConfigFile(const gd::Project &project,
           .FindAndReplace("GDJS_ICON_IOS_100",
                           getIconFilename("ios", "icon-100"));
 
+  if(!project.GetAdMobAppId().empty()){
+    str = str.FindAndReplace("<!-- GDJS_ADMOB_APPLICATION_ID -->",
+            "<plugin name=\"cordova-admob-plus\" spec=\"~0.0.0\">"
+            "<variable name=\"ADMOB_APPLICATION_ID\" value=\"" + project.GetAdMobAppId() + "\" />"
+            "<variable name=\"PLAY_SERVICES_VERSION\" value=\"+\" />"
+            "</plugin>");
+  }
+
   if (!fs.WriteToFile(exportDir + "/config.xml", str)) {
     lastError = "Unable to write configuration file.";
     return false;

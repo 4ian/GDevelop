@@ -26,6 +26,7 @@ type State = {|
   version: string,
   packageName: string,
   orientation: string,
+  adMobAppId: string,
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
 |};
@@ -50,6 +51,7 @@ class ProjectPropertiesDialog extends React.Component<
       version: project.getVersion(),
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
+      adMobAppId: project.getAdMobAppId(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
     };
@@ -74,6 +76,7 @@ class ProjectPropertiesDialog extends React.Component<
       version,
       packageName,
       orientation,
+      adMobAppId,
       sizeOnStartupMode,
       showGDevelopSplash,
     } = this.state;
@@ -84,6 +87,7 @@ class ProjectPropertiesDialog extends React.Component<
     project.setVersion(version);
     project.setPackageName(packageName);
     project.setOrientation(orientation);
+    project.setAdMobAppId(adMobAppId);
     project.setSizeOnStartupMode(sizeOnStartupMode);
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
 
@@ -114,6 +118,7 @@ class ProjectPropertiesDialog extends React.Component<
       version,
       packageName,
       orientation,
+      adMobAppId,
       sizeOnStartupMode,
       showGDevelopSplash,
     } = this.state;
@@ -204,6 +209,14 @@ class ProjectPropertiesDialog extends React.Component<
               primaryText="Change height to fit the screen"
             />
           </SelectField>
+          <SemiControlledTextField
+            floatingLabelText="AdMob application ID (for iOS and Android)"
+            fullWidth
+            hintText="ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY"
+            type="text"
+            value={adMobAppId}
+            onChange={value => this.setState({ adMobAppId: value })}
+          />
           <Checkbox
             label="Display GDevelop splash at startup (in exported game)"
             checked={showGDevelopSplash}

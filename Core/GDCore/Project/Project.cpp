@@ -65,6 +65,7 @@ Project::Project()
       version("1.0.0"),
       packageName("com.example.gamename"),
       orientation("landscape"),
+      adMobAppId(""),
       folderProject(false),
 #endif
       windowWidth(800),
@@ -640,6 +641,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
   SetPackageName(propElement.GetStringAttribute("packageName"));
   SetOrientation(propElement.GetStringAttribute("orientation", "default"));
+  SetAdMobAppId(propElement.GetStringAttribute("adMobAppId", ""));
   SetFolderProject(propElement.GetBoolAttribute("folderProject"));
   SetProjectFile(propElement.GetStringAttribute("projectFile"));
   SetLastCompilationDirectory(propElement
@@ -916,6 +918,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.SetAttribute("folderProject", folderProject);
   propElement.SetAttribute("packageName", packageName);
   propElement.SetAttribute("orientation", orientation);
+  propElement.SetAttribute("adMobAppId", adMobAppId);
   platformSpecificAssets.SerializeTo(
       propElement.AddChild("platformSpecificAssets"));
   loadingScreen.SerializeTo(propElement.AddChild("loadingScreen"));

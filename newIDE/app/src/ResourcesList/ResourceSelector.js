@@ -163,32 +163,83 @@ export default class ResourceSelector extends React.Component<Props, State> {
   };
 
   _editWith = (resourceExternalEditor: ResourceExternalEditor) => {
-    const { project, resourcesLoader } = this.props;
-    const { resourceName } = this.state;
-
-    const resourceNames = [];
-    if (project.getResourcesManager().hasResource(resourceName)) {
-      resourceNames.push(resourceName);
-    }
-
-    resourceExternalEditor.edit({
+     const {
       project,
       resourcesLoader,
-      singleFrame: true,
-      resourceNames,
-      extraOptions: {
-        fps: 0,
-        name: 'Image',
-        isLooping: false,
-      },
-      onChangesSaved: resources => {
-        if (!resources.length) return;
+      initialResourceName,
+      resourceKind,
+    } = this.props;
+    const { resourceName } = this.state;
+    const resourcesManager = project.getResourcesManager();
+    const initialResource = resourcesManager.getResource(initialResourceName)
+    
+    let initialResourceMetadata = {};
+    console.log(this.props);
 
-        // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-        resourcesLoader.burstUrlsCacheForResources(project, [resources[0].name]);
-        this.props.onChange(resources[0].name);
-      },
-    });
+    if(!resourcesManager.hasResource(resourceName)){
+      console.log('The resource is newly created')
+    } else { // it exists, check if it has metadata here and if so fetch it. If not - metadata will be null
+        const initialResourceMetadataRaw = initialResource.getMetadata();
+        if (initialResourceMetadataRaw) {
+          try {
+            initialResourceMetadata = JSON.parse(initialResourceMetadataRaw);
+          } catch(e) { console.error("Malformed metadata", e); }
+        }
+        console.log('resource metadata found, sending it to editor:');
+        console.log(initialResourceMetadata)
+      }
+
+    let initialResourcePath = resourcesLoader.getFullUrl(project, initialResourceName)
+    initialResourcePath = initialResourcePath.substring(
+      7,
+      initialResourcePath.lastIndexOf('?cache=')
+    );
+
+    let externalEditorOptions = null;
+    if (resourceKind === 'image') {
+      const resourceNames = [];
+      if (project.getResourcesManager().hasResource(resourceName)) {
+        resourceNames.push(resourceName);
+      }
+      externalEditorOptions = {
+        project,
+        resourcesLoader,
+        singleFrame: true,
+        resourceNames,
+        extraOptions: {
+          fps: 0,
+          name: 'Image',
+          isLooping: false,
+        },
+        onChangesSaved: resources => {
+          if (!resources.length) return;
+
+          // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
+          resourcesLoader.burstUrlsCacheForResources(project, [
+            resources[0].name,
+          ]);
+          this.props.onChange(resources[0].name);
+        },
+      };
+    } else if (resourceKind === 'audio') {
+      externalEditorOptions = {
+        project,
+        resourcesLoader,
+        initialResourceName,
+        extraOptions: {
+          initialResourceName,
+          initialResourcePath,
+          initialResourceMetadata,
+        },
+        onChangesSaved: (resourceName) => {          
+          // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
+          // resourcesLoader.burstUrlsCacheForResources(project, [resource.name]);
+          this.props.onChange(resourceName);
+        },
+      };
+    };
+
+    resourceExternalEditor.edit(externalEditorOptions);
   };
 
   render() {

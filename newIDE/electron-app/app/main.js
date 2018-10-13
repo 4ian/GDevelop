@@ -20,7 +20,7 @@ const {
 } = require('./ServeFolder');
 const { startDebuggerServer, sendMessage } = require('./DebuggerServer');
 const { buildMainMenuFor } = require('./MainMenu');
-const { loadPiskelWindow } = require('./PiskelWindow');
+const { loadModalWindow } = require('./ModalWindow');
 const throttle = require('lodash.throttle');
 
 log.info('GDevelop Electron app starting...');
@@ -122,9 +122,11 @@ app.on('ready', function () {
   });
 
   ipcMain.on('piskel-open-then-load-animation', (event, piskelData) => {
-    loadPiskelWindow({
+    loadModalWindow({
       parentWindow: mainWindow,
       devTools,
+      readyChannelName:'piskel-ready',
+      indexSubPath:'Piskel/piskel-index.html',
       onReady: piskelWindow =>
         piskelWindow.webContents.send('piskel-load-animation', piskelData),
     });
@@ -133,6 +135,24 @@ app.on('ready', function () {
   //TODO: Move in PiskelWindow? And use a callback like onReady
   ipcMain.on('piskel-changes-saved', (event, imageResources, newAnimationName) => {
     mainWindow.webContents.send('piskel-changes-saved', imageResources, newAnimationName);
+  });
+
+  // JSFX sound effect generator
+  ipcMain.on('jsfx-create-wav', (event, jsfxData) => {
+    loadModalWindow({
+      parentWindow: mainWindow,
+      devTools,
+      readyChannelName:'jsfx-ready',
+      indexSubPath:'jsfx/jsfx-index.html',
+      relWidth:0.4,
+      relHeight:0.75,
+      onReady: jsfxWindow => 
+      jsfxWindow.webContents.send('jsfx-open', jsfxData),
+    });
+  });
+
+  ipcMain.on('jsfx-changes-saved', (event, newFilePath, fileMetadata) => {
+    mainWindow.webContents.send('jsfx-changes-saved', newFilePath, fileMetadata);
   });
 
   // S3Upload events:

@@ -15,8 +15,10 @@ let fileMetadata = null
 const saveSoundEffect = () => {
   console.log('Save to:' + saveOptions.fullPath)
   updateBasePath(); // Recalculate basepathto save
-  jsfx.UpdateDownloadLink() // Update data
-  jsfx.PlayCurrent()
+  
+  editorFrameEl = document.querySelector('#jsfx-frame');
+  jsfx = editorFrameEl.contentWindow;
+  jsfx.UpdateDownloadLink() //Update base64 data
   let metaData = JSON.parse(JSON.stringify(jsfx.CurrentParams)); //store data
   let rawData = editorContentDocument.getElementById('download').href; //store params
 

@@ -174,11 +174,9 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const initialResource = resourcesManager.getResource(initialResourceName)
     
     let initialResourceMetadata = {};
-    console.log(this.props);
-
     if(!resourcesManager.hasResource(resourceName)){
       console.log('The resource is newly created')
-    } else { // it exists, check if it has metadata here and if so fetch it. If not - metadata will be null
+    } else { // it exists, check if it has metadata here and if so fetch it. If not - metadata will be empty
         const initialResourceMetadataRaw = initialResource.getMetadata();
         if (initialResourceMetadataRaw) {
           try {
@@ -224,16 +222,12 @@ export default class ResourceSelector extends React.Component<Props, State> {
     } else if (resourceKind === 'audio') {
       externalEditorOptions = {
         project,
-        resourcesLoader,
-        initialResourceName,
         extraOptions: {
           initialResourceName,
           initialResourcePath,
           initialResourceMetadata,
         },
         onChangesSaved: (resourceName) => {          
-          // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-          // resourcesLoader.burstUrlsCacheForResources(project, [resource.name]);
           this.props.onChange(resourceName);
         },
       };

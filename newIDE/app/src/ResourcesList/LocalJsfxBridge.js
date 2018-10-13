@@ -17,19 +17,14 @@ export const openJsfx = ({
   onChangesSaved,
   resourcePath,
   extraOptions,
-  // resourcesLoader,
-  resourceNames
 }: ExternalEditorOpenOptions) => {
   if (!electron || !ipcRenderer) return;
-
   const projectPath = path.dirname(project.getProjectFile());
 
-  // const jsfxData = null;// to be used in future for metadata
   const jsfxData = {
     ...extraOptions,
     resourcePath,
     projectPath,
-    resourceNames
   };
 
   ipcRenderer.removeAllListeners('jsfx-changes-saved');
@@ -43,8 +38,7 @@ export const openJsfx = ({
       const audioResource = new gd.AudioResource();
       const resourceName = path.relative(projectPath, newFilePath); // Still needed for onChangesSaved()
       audioResource.setFile(resourceName);
-      audioResource.setName(resourceName);
-      
+      audioResource.setName(resourceName); 
       audioResource.setMetadata(JSON.stringify(resourceMetadata))
       resourcesManager.addResource(audioResource);
       audioResource.delete();

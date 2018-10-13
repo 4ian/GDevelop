@@ -8,14 +8,13 @@ const {
 } = remote;
 
 // const pathEditor = require('../Utils/pathEditor'); // doesnt work for some reason- cant find the module
-
 let editorFrameEl, editorContentDocument, jsfx = null
 let fileMetadata = null
 
 const saveSoundEffect = () => {
   console.log('Save to:' + saveOptions.fullPath)
   updateBasePath(); // Recalculate basepathto save
-  
+
   editorFrameEl = document.querySelector('#jsfx-frame');
   jsfx = editorFrameEl.contentWindow;
   jsfx.UpdateDownloadLink() //Update base64 data
@@ -78,7 +77,7 @@ document.getElementById('jsfx-frame').onload = function () {
     jsfx.UpdateCurrentView()
     jsfx.PlayCurrent()
   } else { // if there is no metadata loaded, generate a random sound effect
-    console.log('Generated a random sound effect.')
+    console.log('Generated a random sound effect :)')
     presetsPanel.childNodes[11].click()
   }
 }
@@ -88,7 +87,6 @@ const closeWindow = () => {
 }
 
 ipcRenderer.on('jsfx-open', (event, receivedOptions) => {
-  console.log(receivedOptions.initialResourceMetadata)
   const pathEditorHeader = document.getElementById('path-editor-header');
   loadHeader(pathEditorHeader, document, saveSoundEffect, closeWindow, receivedOptions.projectPath, receivedOptions.initialResourcePath, '.wav')
 

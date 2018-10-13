@@ -1,13 +1,3 @@
-module.exports = {
-    func1: function (test) {
-      console.log("YAY!"+test)
-    },
-    func2: function () {
-      // func2 impl
-    }
-};
-
-
 const headerStyle = {
     saveFolderLabel: 'height:27px;color:SlateGrey;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
     nameInput: 'font-family:"Courier New";height:27px;width:90px;color:SlateGrey;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;  ',
@@ -26,8 +16,6 @@ let saveFolderLabel,
     fileExistsLabel = null
 
 let saveOptions = {}
-let baseExportPath = 'err'
-
 let projectBasePath;
 
 const loadHeader = function (parentElement, editorContentDocument, saveToGDFunction, cancelChangesFunction, projectPath, initialResourcePath, extension) {
@@ -83,9 +71,9 @@ const updateBasePath = function () {
         ''
     ); // Don't allow the user to enter any characters that would lead to an invalid path
     saveOptions.name = nameInput.value;
-    baseExportPath = saveOptions.folderPath + '/' + saveOptions.name;
+    saveOptions.baseExportPath = saveOptions.folderPath + '/' + saveOptions.name;
     saveOptions.fullPath = saveOptions.folderPath + '/' + saveOptions.name + saveOptions.extension
-    saveFolderLabel.textContent = saveOptions.folderPath + '\\';
+    saveFolderLabel.textContent = saveOptions.folderPath + '/';
     saveFolderLabel.title =
         'Click to Change path: \n' + saveOptions.folderPath;
     

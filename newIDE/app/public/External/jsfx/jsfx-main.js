@@ -1,52 +1,70 @@
+import {
+  loadHeader,
+  updateBasePath,
+  saveOptions
+} from '../Utils/pathEditor.js';
+
 const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
-// const path = require('path');
 const fs = require('fs');
 const remote = electron.remote;
-const {
-  dialog
-} = remote;
 
-// const pathEditor = require('../Utils/pathEditor'); // doesnt work for some reason- cant find the module
-let editorFrameEl, editorContentDocument, jsfx = null
-let fileMetadata = null
+let editorContentDocument, jsfx = null
+
+const loadMetaData = (metaData) => {
+  jsfx.CurrentParams = metaData;
+  jsfx.UpdateCurrentView()
+  jsfx.PlayCurrent()
+};
+
+const closeWindow = () => {
+  remote.getCurrentWindow().close();
+};
 
 const saveSoundEffect = () => {
-  console.log('Save to:' + saveOptions.fullPath)
-  updateBasePath(); // Recalculate basepathto save
-
-  editorFrameEl = document.querySelector('#jsfx-frame');
-  jsfx = editorFrameEl.contentWindow;
+  updateBasePath(); // Recalculate basepath to save
   jsfx.UpdateDownloadLink() //Update base64 data
-  let metaData = JSON.parse(JSON.stringify(jsfx.CurrentParams)); //store data
   let rawData = editorContentDocument.getElementById('download').href; //store params
-
   rawData = rawData.replace(/^data:audio\/wav;base64,/, "");
   fs.writeFile(saveOptions.fullPath, rawData, 'base64', function (err) {
-    console.log(err);
     ipcRenderer.send(
       'jsfx-changes-saved',
       saveOptions.fullPath,
-      metaData
+      jsfx.CurrentParams
     );
-    remote.getCurrentWindow().close();
+    closeWindow();
   });
-}
+};
 
-document.getElementById('jsfx-frame').onload = function () {
-  editorFrameEl = document.querySelector('#jsfx-frame');
+// we need to first declare when the window is ready to be initiated
+document.addEventListener('DOMContentLoaded', function () {
+  ipcRenderer.send('jsfx-ready')
+});
+// then trigger bellow from main
+ipcRenderer.on('jsfx-open', (event, receivedOptions) => {
+  const editorFrameEl = document.getElementById('jsfx-frame');
   jsfx = editorFrameEl.contentWindow;
+  editorContentDocument = editorFrameEl.contentDocument;
+  const presetsPanel = editorContentDocument.getElementById('presets');
 
-  editorContentDocument = document.getElementById('jsfx-frame')
-    .contentDocument;
+  // load metadata from GD if there is such
+  if ('jsfx' in receivedOptions.initialResourceMetadata) {
+    loadMetaData(receivedOptions.initialResourceMetadata.jsfx);
+  } else {
+    presetsPanel.childNodes[11].click()
+  };
 
+  // load custom header
+  const pathEditorHeader = document.getElementById('path-editor-header');
+  loadHeader(pathEditorHeader, document, saveSoundEffect, closeWindow, receivedOptions.projectPath, receivedOptions.initialResourcePath, '.wav')
+
+  // alter the interface
   editorContentDocument.getElementById('jsfx').firstChild.style = 'float:top'
   const defaultTitle = editorContentDocument.getElementsByClassName(
     'title'
   )[0].firstChild;
   defaultTitle.remove()
 
-  const presetsPanel = editorContentDocument.getElementById('presets')
   presetsPanel.className = 'description'
   presetsPanel.style = 'float:left;'
 
@@ -69,31 +87,4 @@ document.getElementById('jsfx-frame').onload = function () {
     'control'
   )
   defaultButtons.style = 'visibility:hidden;height:0px;width:0px'
-
-  if (fileMetadata) {
-    console.log('Loaded previous Metadata:')
-    console.log(fileMetadata)
-    jsfx.CurrentParams = fileMetadata;
-    jsfx.UpdateCurrentView()
-    jsfx.PlayCurrent()
-  } else { // if there is no metadata loaded, generate a random sound effect
-    console.log('Generated a random sound effect :)')
-    presetsPanel.childNodes[11].click()
-  }
-}
-
-const closeWindow = () => {
-  remote.getCurrentWindow().close();
-}
-
-ipcRenderer.on('jsfx-open', (event, receivedOptions) => {
-  const pathEditorHeader = document.getElementById('path-editor-header');
-  loadHeader(pathEditorHeader, document, saveSoundEffect, closeWindow, receivedOptions.projectPath, receivedOptions.initialResourcePath, '.wav')
-
-  if (!receivedOptions.initialResourceMetadata) {
-    return
-  }
-  if ('jsfx' in receivedOptions.initialResourceMetadata) {
-    fileMetadata = receivedOptions.initialResourceMetadata.jsfx;
-  }
 });

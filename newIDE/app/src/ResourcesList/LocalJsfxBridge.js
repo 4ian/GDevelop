@@ -1,10 +1,13 @@
-// @flow
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
+import {
+  type ExternalEditorOpenOptions
+} from './ResourceExternalEditor.flow';
+
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 const gd = global.gd;
+
 
 /**
  * Open JSFX to create wav resources.
@@ -29,18 +32,16 @@ export const openJsfx = ({
     'jsfx-changes-saved',
     (event, newFilePath, fileMetadata) => {
       const resourcesManager = project.getResourcesManager();
-      const resourceMetadata ={jsfx:fileMetadata}
-      console.log('Stored metadata:')
-      console.log(resourceMetadata)
-      const audioResource = new gd.AudioResource();
       const resourceName = path.relative(projectPath, newFilePath); // Still needed for onChangesSaved()
+      const audioResource = new gd.AudioResource();
       audioResource.setFile(resourceName);
-      audioResource.setName(resourceName); 
-      audioResource.setMetadata(JSON.stringify(resourceMetadata))
+      audioResource.setName(resourceName);
       resourcesManager.addResource(audioResource);
       audioResource.delete();
-      /// finally we will apply it below
-      onChangesSaved(resourceName);
+      const newMetadata = {
+        jsfx: fileMetadata
+      }
+      onChangesSaved(resourceName, newMetadata);
     }
   );
 

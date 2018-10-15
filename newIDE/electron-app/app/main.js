@@ -144,10 +144,10 @@ app.on('ready', function () {
       devTools,
       readyChannelName:'jsfx-ready',
       indexSubPath:'jsfx/jsfx-index.html',
-      relWidth:0.4,
-      relHeight:0.75,
+      relativeWidth:0.7,
+      relativeHeight:0.8,
       onReady: jsfxWindow => 
-      jsfxWindow.webContents.send('jsfx-open', jsfxData),
+        jsfxWindow.webContents.send('jsfx-open', jsfxData),
     });
   });
 

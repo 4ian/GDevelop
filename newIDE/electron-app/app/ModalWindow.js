@@ -12,7 +12,7 @@ let modalWindow = null;
  * Open a modal window containing an external HTML5 editor
  */
 
-const loadModalWindow = ({ onReady, devTools, parentWindow, readyChannelName, indexSubPath, relWidth=0.7, relHeight=0.9 }) => {
+const loadModalWindow = ({ onReady, devTools, parentWindow, readyChannelName, indexSubPath, relativeWidth=0.7, relativeHeight=0.9 }) => {
   if (modalWindow) {
     modalWindow.show();
     onReady(modalWindow);
@@ -20,8 +20,8 @@ const loadModalWindow = ({ onReady, devTools, parentWindow, readyChannelName, in
 
   const windowOptions = {
     parent: parentWindow,
-    width: Math.floor(parentWindow.getSize()[0] * relWidth),
-    height: Math.floor(parentWindow.getSize()[1] * relHeight),
+    width: Math.floor(parentWindow.getSize()[0] * relativeWidth),
+    height: Math.floor(parentWindow.getSize()[1] * relativeHeight),
     backgroundColor: '#000000',
     modal: true,
     center: true,
@@ -50,10 +50,6 @@ const loadModalWindow = ({ onReady, devTools, parentWindow, readyChannelName, in
     );
     if (devTools) modalWindow.openDevTools();
   }
-
-  modalWindow.webContents.on('dom-ready', () => {
-    onReady(modalWindow)
-  })
   
   modalWindow.on('closed', event => {
     modalWindow = null;

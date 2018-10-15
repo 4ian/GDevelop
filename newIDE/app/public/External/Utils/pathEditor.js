@@ -1,3 +1,10 @@
+const electron = require('electron');
+const fs = require('fs');
+const remote = electron.remote;
+const {
+    dialog
+} = remote;
+
 const headerStyle = {
     saveFolderLabel: 'height:27px;color:SlateGrey;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
     nameInput: 'font-family:"Courier New";height:27px;width:90px;color:SlateGrey;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;  ',
@@ -15,17 +22,16 @@ let saveFolderLabel,
     cancelButton,
     fileExistsLabel = null
 
-let saveOptions = {}
+export let saveOptions = {}
 let projectBasePath;
-
-const loadHeader = function (parentElement, editorContentDocument, saveToGDFunction, cancelChangesFunction, projectPath, initialResourcePath, extension) {
+export function loadHeader(parentElement, editorContentDocument, saveToGDFunction, cancelChangesFunction, projectPath, initialResourcePath, extension) {
     projectBasePath = projectPath;
-    if (fs.lstatSync(initialResourcePath).isDirectory()){
-        initialResourcePath = initialResourcePath+'/NewFile'+  extension
+    if (fs.lstatSync(initialResourcePath).isDirectory()) {
+        initialResourcePath = initialResourcePath + '/NewFile' + extension
     }
     saveOptions.folderPath = initialResourcePath.substring(0, initialResourcePath.lastIndexOf('/'));
     saveOptions.name = initialResourcePath.substring(initialResourcePath.lastIndexOf('/') + 1, initialResourcePath.lastIndexOf('.')); //todo-change with name from path
-    saveOptions.extension = initialResourcePath.substring(initialResourcePath.lastIndexOf('.'), initialResourcePath.length);       
+    saveOptions.extension = initialResourcePath.substring(initialResourcePath.lastIndexOf('.'), initialResourcePath.length);
 
     saveFolderLabel = editorContentDocument.createElement('label');
     saveFolderLabel.addEventListener('click', selectBaseFolderPath);
@@ -41,7 +47,7 @@ const loadHeader = function (parentElement, editorContentDocument, saveToGDFunct
     parentElement.appendChild(nameInput);
 
     fileExistsLabel = editorContentDocument.createElement('label');
-    fileExistsLabel.style = headerStyle.fileExistsLabel;   
+    fileExistsLabel.style = headerStyle.fileExistsLabel;
     parentElement.appendChild(fileExistsLabel);
 
     saveButton = editorContentDocument.createElement('button');
@@ -65,7 +71,7 @@ const loadHeader = function (parentElement, editorContentDocument, saveToGDFunct
     updateBasePath()
 }
 
-const updateBasePath = function () {
+export function updateBasePath() {
     nameInput.value = nameInput.value.replace(
         /[^a-zA-Z0-9_-]/g,
         ''
@@ -76,14 +82,14 @@ const updateBasePath = function () {
     saveFolderLabel.textContent = saveOptions.folderPath + '/';
     saveFolderLabel.title =
         'Click to Change path: \n' + saveOptions.folderPath;
-    
+
     nameInput.style.width = ((nameInput.value.length + 1) * 10) + 'px'
     // check if it will overwrite file
     if (fs.existsSync(saveOptions.fullPath)) {
         fileExistsLabel.style.color = 'red'
         fileExistsLabel.textContent = saveOptions.extension + '  (Overwrite)';
-    }else{
-        fileExistsLabel.style.color ='grey'
+    } else {
+        fileExistsLabel.style.color = 'grey'
         fileExistsLabel.textContent = saveOptions.extension + '  (New)';
     }
 };

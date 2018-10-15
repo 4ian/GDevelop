@@ -24,7 +24,7 @@ const closeWindow = () => {
 const saveSoundEffect = () => {
   updateBasePath(); // Recalculate basepath to save
   jsfx.UpdateDownloadLink() //Update base64 data
-  let rawData = editorContentDocument.getElementById('download').href; //store params
+  let rawData = editorContentDocument.getElementById('download').href; //store data
   rawData = rawData.replace(/^data:audio\/wav;base64,/, "");
   fs.writeFile(saveOptions.fullPath, rawData, 'base64', function (err) {
     ipcRenderer.send(
@@ -81,7 +81,7 @@ ipcRenderer.on('jsfx-open', (event, receivedOptions) => {
   const libraryPanel = editorContentDocument.getElementsByClassName(
     'panel wide'
   )[0];
-  libraryPanel.style.visibility = 'hidden'
+  libraryPanel.style = 'visibility:hidden;height:0px;width:0px'
 
   const defaultButtons = editorContentDocument.getElementById(
     'control'

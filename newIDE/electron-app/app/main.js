@@ -144,7 +144,7 @@ app.on('ready', function () {
       devTools,
       readyChannelName:'jsfx-ready',
       indexSubPath:'jsfx/jsfx-index.html',
-      relativeWidth:0.7,
+      relativeWidth:0.55,
       relativeHeight:0.8,
       onReady: jsfxWindow => 
         jsfxWindow.webContents.send('jsfx-open', jsfxData),

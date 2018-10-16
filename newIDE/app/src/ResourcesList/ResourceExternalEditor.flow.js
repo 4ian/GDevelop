@@ -11,12 +11,14 @@ export type ExternalEditorOpenOptions = {|
   singleFrame: boolean, // If set to true, edition should be limited to a single frame
   resourceNames: Array<string>,
   onChangesSaved: (
-    Array<{ path: string, name: string, originalIndex: ?number }>, newName: string
+    Array<{ path?: string, name: string, originalIndex: ?number, metadata?: Object }>, newName: string
   ) => void,
   extraOptions: {
-    name: string,
-    isLooping: boolean,
-    fps: number,
+    name?: string,
+    isLooping?: boolean,
+    fps?: number,
+    initialResourcePath?: string,
+    initialResourceMetadata?: Object,
   },
 |};
 

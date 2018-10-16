@@ -29,7 +29,7 @@
     "i18next": "^10.0.3",
     "keen-tracking": "1.1.3",
     "lodash": "4.17.4",
-    "loov-jsfx": "^1.2.0",
+    "loov-jsfx": "1.2.0",
     "material-ui": "0.20",
     "material-ui-search-bar": "0.4.1",
     "node-require-function": "^1.2.0",

@@ -22,8 +22,8 @@ export const openJsfx = ({
   const projectPath = path.dirname(project.getProjectFile());
 
   const jsfxData = {
-    ...extraOptions,
-    resourcePath,
+    resourcePath:extraOptions.initialResourcePath,
+    metadata:extraOptions.initialResourceMetadata,
     projectPath,
   };
 
@@ -32,7 +32,7 @@ export const openJsfx = ({
     'jsfx-changes-saved',
     (event, newFilePath, fileMetadata) => {
       const resourcesManager = project.getResourcesManager();
-      const resourceName = path.relative(projectPath, newFilePath); // Still needed for onChangesSaved()
+      const resourceName = path.relative(projectPath, newFilePath); //Still needed for onChangesSaved()
       const audioResource = new gd.AudioResource();
       audioResource.setFile(resourceName);
       audioResource.setName(resourceName);
@@ -41,7 +41,8 @@ export const openJsfx = ({
       const newMetadata = {
         jsfx: fileMetadata
       }
-      onChangesSaved(resourceName, newMetadata);
+      
+      onChangesSaved([{metadata:newMetadata}],resourceName);
     }
   );
 

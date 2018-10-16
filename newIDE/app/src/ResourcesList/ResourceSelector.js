@@ -166,12 +166,11 @@ export default class ResourceSelector extends React.Component<Props, State> {
      const {
       project,
       resourcesLoader,
-      initialResourceName,
       resourceKind,
     } = this.props;
     const { resourceName } = this.state;
     const resourcesManager = project.getResourcesManager();
-    const initialResource = resourcesManager.getResource(initialResourceName)
+    const initialResource = resourcesManager.getResource(resourceName)
     
     let initialResourceMetadata = {};
     const initialResourceMetadataRaw = initialResource.getMetadata();
@@ -179,15 +178,9 @@ export default class ResourceSelector extends React.Component<Props, State> {
       try {
         initialResourceMetadata = JSON.parse(initialResourceMetadataRaw);
       } catch(e) { console.error("Malformed metadata", e); }
-      console.log('resource metadata found, sending it to editor:');
-      console.log(initialResourceMetadata)
+      // console.log('resource metadata found, sending it to editor:');
+      // console.log(initialResourceMetadata)
     }
-
-    let initialResourcePath = resourcesLoader.getFullUrl(project, initialResourceName)
-    initialResourcePath = initialResourcePath.substring(
-      7,
-      initialResourcePath.lastIndexOf('?cache=')
-    );
 
     let externalEditorOptions = null;
     if (resourceKind === 'image') {
@@ -216,17 +209,21 @@ export default class ResourceSelector extends React.Component<Props, State> {
         },
       };
     } else if (resourceKind === 'audio') {
+      let initialResourcePath = resourcesLoader.getFullUrl(project, resourceName)
+      initialResourcePath = initialResourcePath.substring(
+        7,
+        initialResourcePath.lastIndexOf('?cache=')
+      );
       externalEditorOptions = {
         project,
         extraOptions: {
-          initialResourceName,
           initialResourcePath,
           initialResourceMetadata,
         },
-        onChangesSaved: (resourceName,newResourceMetadata) => {          
-          this.props.onChange(resourceName);
-          const newResource =resourcesManager.getResource(resourceName);
-          newResource.setMetadata(JSON.stringify(newResourceMetadata));
+        onChangesSaved: (newResourceData,newResourceName) => {          
+          this.props.onChange(newResourceName);
+          const newResource =resourcesManager.getResource(newResourceName);
+          newResource.setMetadata(JSON.stringify(newResourceData[0].metadata));
         },
       };
     };

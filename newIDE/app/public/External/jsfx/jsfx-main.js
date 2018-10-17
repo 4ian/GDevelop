@@ -1,7 +1,5 @@
 import {
-  createHeader,
-  renderPathEditor,
-  getSaveOptions
+  createPathEditorHeader
 } from '../Utils/pathEditor.js';
 
 const electron = require('electron');
@@ -9,16 +7,6 @@ const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
 const remote = electron.remote;
 
-const headerStyle = {
-  saveFolderLabel: 'height:27px;color:SlateGrey;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
-  nameInput: 'font-family:"Courier New";height:27px;width:90px;color:SlateGrey;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;  ',
-  fileExistsLabel: 'height:27px;color:blue;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
-  saveButton: 'height:27px;float:right;margin-left:2px;margin-right:4px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
-  cancelButton: 'height:27px;float:right;margin-right:2px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
-  setFolderButton: 'height:27px;float:right;margin-left:2px;margin-right:4px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
-};
-
-let saveOptions = {};
 let editorContentDocument,
   jsfx = null;
 
@@ -32,16 +20,14 @@ const closeWindow = () => {
   remote.getCurrentWindow().close();
 };
 
-const saveSoundEffect = () => {
-  renderPathEditor();
-  saveOptions = getSaveOptions(); // Recalculate basepath to save
+const saveSoundEffect = (pathEditor) => {
   jsfx.UpdateDownloadLink(); //Update base64 data
   let rawData = editorContentDocument.getElementById('download').href; //store data
   rawData = rawData.replace(/^data:audio\/wav;base64,/, '');
-  fs.writeFile(saveOptions.fullPath, rawData, 'base64', err => {
+  fs.writeFile(pathEditor.saveOptions.fullPath, rawData, 'base64', err => {
     ipcRenderer.send(
       'jsfx-changes-saved',
-      saveOptions.fullPath,
+      pathEditor.saveOptions.fullPath,
       jsfx.CurrentParams
     );
     closeWindow();
@@ -49,7 +35,7 @@ const saveSoundEffect = () => {
 };
 
 // we need to first declare when the window is ready to be initiated
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   ipcRenderer.send('jsfx-ready');
 });
 // then trigger bellow from main, this ensures the dom is loaded
@@ -59,17 +45,25 @@ ipcRenderer.on('jsfx-open', (event, receivedOptions) => {
   editorContentDocument = editorFrameEl.contentDocument;
   const presetsPanel = editorContentDocument.getElementById('presets');
 
-  // Load metadata
+  // Load metadata, if it exists
   if ('jsfx' in receivedOptions.metadata) {
     loadMetaData(receivedOptions.metadata.jsfx);
-  } else {
+  } else { // If not, simulate a click on the 'Lucky' button to create a random sound effect
     const generateRandomSoundEffectButton = presetsPanel.childNodes[11];
-    generateRandomSoundEffectButton.click(); // Simulate click on the 'Lucky' button to create a random sound effect
+    generateRandomSoundEffectButton.click();
   }
   // load a custom header
-  const pathEditorHeader = document.getElementById('path-editor-header');
-  createHeader({
-    parentElement: pathEditorHeader,
+  const pathEditorHeaderDiv = document.getElementById('path-editor-header');
+  const headerStyle = {
+    saveFolderLabel: 'height:27px;color:SlateGrey;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
+    nameInput: 'font-family:"Courier New";height:27px;width:90px;color:SlateGrey;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;  ',
+    fileExistsLabel: 'height:27px;color:blue;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
+    saveButton: 'height:27px;float:right;margin-left:2px;margin-right:4px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
+    cancelButton: 'height:27px;float:right;margin-right:2px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
+    setFolderButton: 'height:27px;float:right;margin-left:2px;margin-right:4px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
+  };
+  createPathEditorHeader({
+    parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
     saveToGDFunction: saveSoundEffect,
     cancelChangesFunction: closeWindow,
@@ -79,8 +73,7 @@ ipcRenderer.on('jsfx-open', (event, receivedOptions) => {
     headerStyle,
   });
 
-  // alter the interface
-  renderPathEditor();
+  // alter the interface of the external editor
   editorContentDocument.getElementById('jsfx').firstChild.style = 'float:top';
   const defaultTitle = editorContentDocument.getElementsByClassName('title')[0]
     .firstChild;

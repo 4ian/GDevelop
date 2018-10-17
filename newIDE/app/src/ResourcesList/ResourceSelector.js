@@ -182,7 +182,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
       // console.log(initialResourceMetadata)
     }
 
-    let externalEditorOptions = null;
+    let externalEditorOptions = {};
     if (resourceKind === 'image') {
       const resourceNames = [];
       if (resourcesManager.hasResource(resourceName)) {
@@ -222,7 +222,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         },
         onChangesSaved: (newResourceData,newResourceName) => {          
           this.props.onChange(newResourceName);
-          const newResource =resourcesManager.getResource(newResourceName);
+          const newResource = resourcesManager.getResource(newResourceName);
           newResource.setMetadata(JSON.stringify(newResourceData[0].metadata));
         },
       };

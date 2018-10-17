@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/change-sprite-animation/images/player_cheer1.png",
         "kind": "image",
+        "metadata": "",
         "name": "player_cheer1.png",
         "smoothed": true,
         "userAdded": true
@@ -110,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/change-sprite-animation/images/player_duck.png",
         "kind": "image",
+        "metadata": "",
         "name": "player_duck.png",
         "smoothed": true,
         "userAdded": true
@@ -693,6 +695,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

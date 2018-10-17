@@ -111,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_stand.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_stand.png",
         "smoothed": true,
         "userAdded": false
@@ -119,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_jump.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_jump.png",
         "smoothed": true,
         "userAdded": false
@@ -127,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk01.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk01.png",
         "smoothed": true,
         "userAdded": false
@@ -135,6 +138,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk02.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk02.png",
         "smoothed": true,
         "userAdded": false
@@ -143,6 +147,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk03.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk03.png",
         "smoothed": true,
         "userAdded": false
@@ -151,6 +156,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk04.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk04.png",
         "smoothed": true,
         "userAdded": false
@@ -159,6 +165,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk05.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk05.png",
         "smoothed": true,
         "userAdded": false
@@ -167,6 +174,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk06.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk06.png",
         "smoothed": true,
         "userAdded": false
@@ -175,6 +183,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk07.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk07.png",
         "smoothed": true,
         "userAdded": false
@@ -183,6 +192,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk08.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk08.png",
         "smoothed": true,
         "userAdded": false
@@ -191,6 +201,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk09.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk09.png",
         "smoothed": true,
         "userAdded": false
@@ -199,6 +210,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk10.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk10.png",
         "smoothed": true,
         "userAdded": false
@@ -207,6 +219,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/p1_walk11.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_walk11.png",
         "smoothed": true,
         "userAdded": false
@@ -215,6 +228,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/brickWall.png",
         "kind": "image",
+        "metadata": "",
         "name": "brickWall.png",
         "smoothed": true,
         "userAdded": false
@@ -223,6 +237,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/bridge.png",
         "kind": "image",
+        "metadata": "",
         "name": "bridge.png",
         "smoothed": true,
         "userAdded": false
@@ -231,6 +246,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/grassHalfMid.png",
         "kind": "image",
+        "metadata": "",
         "name": "grassHalfMid.png",
         "smoothed": true,
         "userAdded": true
@@ -239,6 +255,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/castleCenter.png",
         "kind": "image",
+        "metadata": "",
         "name": "castleCenter.png",
         "smoothed": true,
         "userAdded": true
@@ -247,6 +264,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/bridgeLogs.png",
         "kind": "image",
+        "metadata": "",
         "name": "bridgeLogs.png",
         "smoothed": true,
         "userAdded": true
@@ -255,6 +273,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/Left.png",
         "kind": "image",
+        "metadata": "",
         "name": "Left.png",
         "smoothed": true,
         "userAdded": false
@@ -263,6 +282,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/Right.png",
         "kind": "image",
+        "metadata": "",
         "name": "Right.png",
         "smoothed": true,
         "userAdded": false
@@ -271,6 +291,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/ladder_mid.png",
         "kind": "image",
+        "metadata": "",
         "name": "ladder_mid.png",
         "smoothed": true,
         "userAdded": true
@@ -279,6 +300,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/Grass.png",
         "kind": "image",
+        "metadata": "",
         "name": "grass.png",
         "smoothed": true,
         "userAdded": true
@@ -287,6 +309,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/PlayerArea.png",
         "kind": "image",
+        "metadata": "",
         "name": "PlayerArea.png",
         "smoothed": true,
         "userAdded": false
@@ -295,6 +318,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/slimeWalk1.png",
         "kind": "image",
+        "metadata": "",
         "name": "slimeWalk1.png",
         "smoothed": true,
         "userAdded": false
@@ -303,6 +327,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/slimeWalk2.png",
         "kind": "image",
+        "metadata": "",
         "name": "slimeWalk2.png",
         "smoothed": true,
         "userAdded": false
@@ -311,6 +336,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/slimeDead.png",
         "kind": "image",
+        "metadata": "",
         "name": "slimeDead.png",
         "smoothed": true,
         "userAdded": false
@@ -319,6 +345,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/flyFly1.png",
         "kind": "image",
+        "metadata": "",
         "name": "flyFly1.png",
         "smoothed": true,
         "userAdded": false
@@ -327,6 +354,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/flyFly2.png",
         "kind": "image",
+        "metadata": "",
         "name": "flyFly2.png",
         "smoothed": true,
         "userAdded": false
@@ -335,6 +363,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/flyDead.png",
         "kind": "image",
+        "metadata": "",
         "name": "flyDead.png",
         "smoothed": true,
         "userAdded": false
@@ -343,6 +372,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/cloud1.png",
         "kind": "image",
+        "metadata": "",
         "name": "cloud1.png",
         "smoothed": false,
         "userAdded": false
@@ -351,6 +381,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/cloud2.png",
         "kind": "image",
+        "metadata": "",
         "name": "cloud2.png",
         "smoothed": false,
         "userAdded": false
@@ -359,6 +390,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/cloud3.png",
         "kind": "image",
+        "metadata": "",
         "name": "cloud3.png",
         "smoothed": false,
         "userAdded": false
@@ -367,6 +399,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/bush.png",
         "kind": "image",
+        "metadata": "",
         "name": "bush.png",
         "smoothed": true,
         "userAdded": false
@@ -375,6 +408,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/cactus.png",
         "kind": "image",
+        "metadata": "",
         "name": "cactus.png",
         "smoothed": true,
         "userAdded": false
@@ -383,6 +417,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/plant.png",
         "kind": "image",
+        "metadata": "",
         "name": "plant.png",
         "smoothed": true,
         "userAdded": false
@@ -391,6 +426,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/coinGold.png",
         "kind": "image",
+        "metadata": "",
         "name": "coinGold.png",
         "smoothed": true,
         "userAdded": true
@@ -399,6 +435,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/shadedDark06.png",
         "kind": "image",
+        "metadata": "",
         "name": "shadedDark06.png",
         "smoothed": true,
         "userAdded": false
@@ -407,6 +444,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/shadedDark05.png",
         "kind": "image",
+        "metadata": "",
         "name": "shadedDark05.png",
         "smoothed": true,
         "userAdded": false
@@ -415,6 +453,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/shadedDark45.png",
         "kind": "image",
+        "metadata": "",
         "name": "shadedDark45.png",
         "smoothed": true,
         "userAdded": false
@@ -423,6 +462,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/javascript-blocks-in-platformer/shadedDark09.png",
         "kind": "image",
+        "metadata": "",
         "name": "shadedDark09.png",
         "smoothed": true,
         "userAdded": false
@@ -5212,6 +5252,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/center-object-within-another/coinGold.png",
         "kind": "image",
+        "metadata": "",
         "name": "coinGold.png",
         "smoothed": true,
         "userAdded": true
@@ -110,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/center-object-within-another/brickWall.png",
         "kind": "image",
+        "metadata": "",
         "name": "brickWall.png",
         "smoothed": true,
         "userAdded": true
@@ -496,6 +498,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

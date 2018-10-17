@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Crate.png",
         "kind": "image",
+        "metadata": "",
         "name": "Crate.png",
         "smoothed": true,
         "userAdded": false
@@ -110,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Wall-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "Wall-1.png",
         "smoothed": true,
         "userAdded": true
@@ -118,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Wall-2.png",
         "kind": "image",
+        "metadata": "",
         "name": "Wall-2.png",
         "smoothed": true,
         "userAdded": true
@@ -126,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Grass-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "Grass-1.png",
         "smoothed": true,
         "userAdded": false
@@ -134,6 +138,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Bomb_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_1.png",
         "smoothed": true,
         "userAdded": true
@@ -142,6 +147,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Bomb_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_2.png",
         "smoothed": true,
         "userAdded": true
@@ -150,6 +156,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Bomb_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_3.png",
         "smoothed": true,
         "userAdded": true
@@ -158,6 +165,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Bomb_4.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_4.png",
         "smoothed": true,
         "userAdded": true
@@ -166,6 +174,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Bomb_5.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_5.png",
         "smoothed": true,
         "userAdded": true
@@ -174,6 +183,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Bomb_6.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bomb_6.png",
         "smoothed": true,
         "userAdded": true
@@ -182,6 +192,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Flame-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "Flame-1.png",
         "smoothed": true,
         "userAdded": true
@@ -190,6 +201,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Flame-2.png",
         "kind": "image",
+        "metadata": "",
         "name": "Flame-2.png",
         "smoothed": true,
         "userAdded": true
@@ -198,6 +210,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Flame-3.png",
         "kind": "image",
+        "metadata": "",
         "name": "Flame-3.png",
         "smoothed": true,
         "userAdded": true
@@ -206,6 +219,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Flame-4.png",
         "kind": "image",
+        "metadata": "",
         "name": "Flame-4.png",
         "smoothed": true,
         "userAdded": true
@@ -214,6 +228,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Player-2.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-2.png",
         "smoothed": true,
         "userAdded": false
@@ -222,6 +237,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Player-5.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-5.png",
         "smoothed": true,
         "userAdded": true
@@ -230,6 +246,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Player-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-1.png",
         "smoothed": true,
         "userAdded": true
@@ -238,6 +255,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Player-9.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-9.png",
         "smoothed": true,
         "userAdded": true
@@ -246,6 +264,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Player-10.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-10.png",
         "smoothed": true,
         "userAdded": true
@@ -254,6 +273,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Right_Flame.png",
         "kind": "image",
+        "metadata": "",
         "name": "Right_Flame.png",
         "smoothed": true,
         "userAdded": true
@@ -262,6 +282,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Left_Flame.png",
         "kind": "image",
+        "metadata": "",
         "name": "Left_Flame.png",
         "smoothed": true,
         "userAdded": true
@@ -270,6 +291,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Up_Flame.png",
         "kind": "image",
+        "metadata": "",
         "name": "Up_Flame.png",
         "smoothed": true,
         "userAdded": true
@@ -278,6 +300,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Down_Flame.png",
         "kind": "image",
+        "metadata": "",
         "name": "Down_Flame.png",
         "smoothed": true,
         "userAdded": true
@@ -286,6 +309,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Player-7.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-7.png",
         "smoothed": true,
         "userAdded": true
@@ -294,6 +318,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Player-8.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-8.png",
         "smoothed": true,
         "userAdded": true
@@ -302,6 +327,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Player-6.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-6.png",
         "smoothed": true,
         "userAdded": true
@@ -310,6 +336,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Player-3.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-3.png",
         "smoothed": true,
         "userAdded": true
@@ -318,6 +345,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/bomb-the-crate/Assets/Player-4.png",
         "kind": "image",
+        "metadata": "",
         "name": "Player-4.png",
         "smoothed": true,
         "userAdded": true
@@ -3133,6 +3161,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

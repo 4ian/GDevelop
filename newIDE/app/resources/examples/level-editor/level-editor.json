@@ -1,0 +1,3834 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 97,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "folderProject": false,
+    "linuxExecutableFilename": "",
+    "macExecutableFilename": "",
+    "orientation": "default",
+    "packageName": "",
+    "projectFile": "/home/szoszo/Projects/gametemplates/gdevelop5/level-editor/level-editor.json",
+    "sizeOnStartupMode": "",
+    "useExternalSourceFiles": false,
+    "version": "1.0.0",
+    "winExecutableFilename": "",
+    "winExecutableIconFile": "",
+    "name": "Project",
+    "author": "",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "/home/szoszo/Desktop/export",
+    "maxFPS": 60,
+    "minFPS": 10,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      },
+      {
+        "name": "DraggableBehavior"
+      },
+      {
+        "name": "PrimitiveDrawing"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grass.png",
+        "kind": "image",
+        "name": "grass.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/bg_tile.png",
+        "kind": "image",
+        "name": "bg_tile.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grassCenter.png",
+        "kind": "image",
+        "name": "grassCenter.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grassCenter_rounded.png",
+        "kind": "image",
+        "name": "grassCenter_rounded.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grassCliffLeft.png",
+        "kind": "image",
+        "name": "grassCliffLeft.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grassCliffLeftAlt.png",
+        "kind": "image",
+        "name": "grassCliffLeftAlt.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grassCliffRight.png",
+        "kind": "image",
+        "name": "grassCliffRight.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grassCliffRightAlt.png",
+        "kind": "image",
+        "name": "grassCliffRightAlt.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grassHalf.png",
+        "kind": "image",
+        "name": "grassHalf.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grassHalfLeft.png",
+        "kind": "image",
+        "name": "grassHalfLeft.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grassHalfMid.png",
+        "kind": "image",
+        "name": "grassHalfMid.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/grassHalfRight.png",
+        "kind": "image",
+        "name": "grassHalfRight.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/box.png",
+        "kind": "image",
+        "name": "box.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/boxAlt.png",
+        "kind": "image",
+        "name": "boxAlt.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "media/tiles/brickWall.png",
+        "kind": "image",
+        "name": "brickWall.png",
+        "smoothed": true,
+        "userAdded": true
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 209,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Menu",
+      "name": "Menu",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 209,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 209,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": true,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "NewLevel",
+          "width": 0,
+          "x": 256,
+          "y": 192,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Title",
+          "width": 0,
+          "x": 209,
+          "y": 34,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "LoadLevel",
+          "width": 0,
+          "x": 256,
+          "y": 256,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "bold": false,
+          "italic": false,
+          "name": "NewLevel",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Create New Level",
+          "font": "",
+          "characterSize": 25,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "Title",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "The Ultimate Level Editor\nby gametemplates.itch.io",
+          "font": "",
+          "characterSize": 30,
+          "color": {
+            "b": 27,
+            "g": 2,
+            "r": 208
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "LoadLevel",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Load Saved Level",
+          "font": "",
+          "characterSize": 25,
+          "color": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          }
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "For more game templates and examples visit gametemplates.itch.io\nMake sure you run this scene first",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "If new game button is clicked, set global value game to new and start the editor\nalso change the color of text",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "NewLevel",
+                "",
+                "yes",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::ChangeColor"
+                  },
+                  "parameters": [
+                    "NewLevel",
+                    "\"208;2;27\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MouseButtonReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarGlobalTxt"
+                  },
+                  "parameters": [
+                    "Game",
+                    "=",
+                    "\"New\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Scene"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Editor\"",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "NewLevel",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextObject::ChangeColor"
+              },
+              "parameters": [
+                "NewLevel",
+                "\"0;0;0\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "If load game button is clicked, set global value game to load and start the editor\nthe loading process will be handled by the editor\nalso change the color of text",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "LoadLevel",
+                "",
+                "yes",
+                ""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TextObject::ChangeColor"
+                  },
+                  "parameters": [
+                    "LoadLevel",
+                    "\"208;2;27\""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MouseButtonReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "Left"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarGlobalTxt"
+                  },
+                  "parameters": [
+                    "Game",
+                    "=",
+                    "\"Load\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Scene"
+                  },
+                  "parameters": [
+                    "",
+                    "\"Editor\"",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [
+            {
+              "type": {
+                "inverted": true,
+                "value": "SourisSurObjet"
+              },
+              "parameters": [
+                "LoadLevel",
+                "",
+                "",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "BuiltinCommonInstructions::Once"
+              },
+              "parameters": [],
+              "subInstructions": []
+            }
+          ],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextObject::ChangeColor"
+              },
+              "parameters": [
+                "LoadLevel",
+                "\"0;0;0\""
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    },
+    {
+      "b": 30,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Editor",
+      "name": "Editor",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 30,
+      "standardSortMethod": false,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 30,
+      "uiSettings": {
+        "grid": true,
+        "gridB": 80,
+        "gridG": 80,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 80,
+        "gridWidth": 32,
+        "snap": true,
+        "windowMask": true,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [],
+      "variables": [
+        {
+          "name": "loadX",
+          "value": "0"
+        },
+        {
+          "name": "loadY",
+          "value": "0"
+        },
+        {
+          "name": "loadAnimation",
+          "value": "0"
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Drawer",
+          "width": 0,
+          "x": 14,
+          "y": 16,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 932,
+          "layer": "",
+          "locked": true,
+          "name": "BGTile",
+          "width": 1106,
+          "x": 0,
+          "y": 0,
+          "zOrder": 0,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "GUI",
+          "locked": false,
+          "name": "Message",
+          "width": 0,
+          "x": 4,
+          "y": 550,
+          "zOrder": 6,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 140,
+          "y": 140,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 13
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 0,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 70,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 140,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 2
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 210,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 3
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 280,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 4
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 350,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 5
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 420,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 6
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 490,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 7
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 560,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 8
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 630,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 9
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 700,
+          "y": 70,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 10
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 0,
+          "y": 140,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 11
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "SelectionTile",
+          "width": 0,
+          "x": 70,
+          "y": 140,
+          "zOrder": 7,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 12
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "TileSelection",
+          "locked": false,
+          "name": "TxtSelectAtile",
+          "width": 0,
+          "x": 327,
+          "y": 23,
+          "zOrder": 8,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "Drawer",
+          "type": "PrimitiveDrawing::Drawer",
+          "variables": [],
+          "behaviors": [],
+          "fillOpacity": 255,
+          "outlineSize": 0,
+          "outlineOpacity": 255,
+          "fillColor": {
+            "b": 89,
+            "g": 89,
+            "r": 91
+          },
+          "outlineColor": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          },
+          "absoluteCoordinates": true
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "Message",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Press left mouse button to create tiles. Press I key to open tile selection menu\nUse right mouse button to delete tiles. Press S key to save the level, Q to go back to menu",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        },
+        {
+          "name": "CursorTile",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grass.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCenter.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCenter_rounded.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffLeft.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffLeftAlt.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffRight.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffRightAlt.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalf.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalfLeft.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalfMid.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalfRight.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "box.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "boxAlt.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "brickWall.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "SelectionTile",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Draggable",
+              "type": "DraggableBehavior::Draggable"
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grass.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCenter.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCenter_rounded.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffLeft.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffLeftAlt.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffRight.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffRightAlt.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalf.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalfLeft.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalfMid.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalfRight.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "box.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "boxAlt.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "brickWall.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Tile",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grass.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCenter.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCenter_rounded.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffLeft.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffLeftAlt.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffRight.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassCliffRightAlt.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalf.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalfLeft.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalfMid.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "grassHalfRight.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "box.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "boxAlt.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 1,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "brickWall.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "height": 70,
+          "name": "BGTile",
+          "texture": "bg_tile.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 70,
+          "variables": [],
+          "behaviors": []
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "TxtSelectAtile",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Select a Tile",
+          "font": "",
+          "characterSize": 25,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        }
+      ],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "For more game templates and examples visit gametemplates.itch.io\nMake sure you run the Menu scene first",
+          "comment2": ""
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": true,
+          "name": "Level Editor",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": true,
+              "name": "Setup in-game grid",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "At the beginning, set the cell width and height of the in-game grid (it is not the grid used in the scene editor)",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DepartScene"
+                      },
+                      "parameters": [
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "cell_width",
+                        "=",
+                        "70"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "cell_height",
+                        "=",
+                        "70"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": true,
+              "name": "Show and Hide tile selection layer",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "show/hide the tile layer when the i key is pressed",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DepartScene"
+                      },
+                      "parameters": [
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "HideLayer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"TileSelection\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "KeyReleased"
+                      },
+                      "parameters": [
+                        "",
+                        "i"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "trigger",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "i"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LayerVisible"
+                          },
+                          "parameters": [
+                            "",
+                            "\"TileSelection\""
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "trigger",
+                            "=",
+                            "0"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "HideLayer"
+                          },
+                          "parameters": [
+                            "",
+                            "\"TileSelection\""
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ShowLayer"
+                          },
+                          "parameters": [
+                            "",
+                            "\"\""
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "trigger",
+                            "=",
+                            "1"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": true,
+                            "value": "LayerVisible"
+                          },
+                          "parameters": [
+                            "",
+                            "\"TileSelection\""
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "trigger",
+                            "=",
+                            "0"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ShowLayer"
+                          },
+                          "parameters": [
+                            "",
+                            "\"TileSelection\""
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "HideLayer"
+                          },
+                          "parameters": [
+                            "",
+                            "\"\""
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "trigger",
+                            "=",
+                            "1"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": true,
+              "name": "Select tile to create",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "If tiles layer is visible, check if a tile is clicked\nif clicked, get tile animation and store it inside a variable\nthen hide the layer again\nset cursorTile animation to be the animation of the selected tile",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "LayerVisible"
+                      },
+                      "parameters": [
+                        "",
+                        "\"TileSelection\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "MouseButtonReleased"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "SelectionTile",
+                                "",
+                                "",
+                                ""
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [],
+                          "events": [
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Standard",
+                              "conditions": [],
+                              "actions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "ModVarScene"
+                                  },
+                                  "parameters": [
+                                    "selectedTileAnimation",
+                                    "=",
+                                    "SelectionTile.Animation()"
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "HideLayer"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "\"TileSelection\""
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "ShowLayer"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "\"\""
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "ChangeAnimation"
+                                  },
+                                  "parameters": [
+                                    "CursorTile",
+                                    "=",
+                                    "Variable(selectedTileAnimation)"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ],
+                              "events": []
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": true,
+              "name": "Create selected tile",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "If tile selection layer is not visible, if left mouse button is down and it is not over a tile object, create a new tile object and set animation using the variable",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "LayerVisible"
+                      },
+                      "parameters": [
+                        "",
+                        "\"TileSelection\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "SourisBouton"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "BuiltinCommonInstructions::Once"
+                          },
+                          "parameters": [],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [],
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "BuiltinCommonInstructions::Not"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "SourisSurObjet"
+                                  },
+                                  "parameters": [
+                                    "Tile",
+                                    "",
+                                    "yes",
+                                    ""
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ]
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Create"
+                              },
+                              "parameters": [
+                                "",
+                                "Tile",
+                                "MouseX(\"\",0) - 35",
+                                "MouseY(\"\",0) - 35",
+                                "\"\""
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "ChangePlan"
+                              },
+                              "parameters": [
+                                "Tile",
+                                "=",
+                                "1"
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "ChangeAnimation"
+                              },
+                              "parameters": [
+                                "Tile",
+                                "=",
+                                "Variable(selectedTileAnimation)"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": [
+                            {
+                              "disabled": false,
+                              "folded": false,
+                              "type": "BuiltinCommonInstructions::Link",
+                              "include": {
+                                "includeConfig": 0
+                              },
+                              "target": "SnapTileToGrid"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": true,
+              "name": "Delete tile",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "If right mouse button is down, and the mouse is over an object, delete the object",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SourisBouton"
+                      },
+                      "parameters": [
+                        "",
+                        "Right"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "SourisSurObjet"
+                          },
+                          "parameters": [
+                            "Tile",
+                            "",
+                            "yes",
+                            ""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Delete"
+                          },
+                          "parameters": [
+                            "Tile",
+                            ""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": true,
+              "name": "CursorTile",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Create an object next to the mouse to display what tile we have selected",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DepartScene"
+                      },
+                      "parameters": [
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Create"
+                      },
+                      "parameters": [
+                        "",
+                        "CursorTile",
+                        "MouseX(\"\",0)",
+                        "MouseY(\"\",0)",
+                        "\"GUI\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ChangeScale"
+                      },
+                      "parameters": [
+                        "CursorTile",
+                        "=",
+                        "0.3"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreXY"
+                      },
+                      "parameters": [
+                        "CursorTile",
+                        "=",
+                        "MouseX(\"\",0) + 10",
+                        "=",
+                        "MouseY(\"\",0)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": true,
+              "name": "Back to menu",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "q"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Scene"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Menu\"",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": true,
+          "name": "Save level",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "if S key is pressed",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "KeyPressed"
+                  },
+                  "parameters": [
+                    "",
+                    "s"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "if save already exists, delete the save file, it is necessary to make sure new save data is not going to be mixed with the previously saved data",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "GroupExists"
+                      },
+                      "parameters": [
+                        "\"save\"",
+                        "\"Tile1PositionX\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DeleteFichier"
+                      },
+                      "parameters": [
+                        "\"save\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "generate ID value for each instance of the Tile object",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "counter",
+                        "=",
+                        "1"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::ForEach",
+                      "object": "Tile",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarObjet"
+                          },
+                          "parameters": [
+                            "Tile",
+                            "ID",
+                            "=",
+                            "Variable(counter)"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "counter",
+                            "+",
+                            "1"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "save position and animation of instance",
+                          "comment2": ""
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "EcrireFichierExp"
+                              },
+                              "parameters": [
+                                "\"save\"",
+                                "\"Tile\" + ToString(Tile.Variable(ID)) + \"PositionX\"",
+                                "Tile.X()"
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "EcrireFichierExp"
+                              },
+                              "parameters": [
+                                "\"save\"",
+                                "\"Tile\" + ToString(Tile.Variable(ID)) + \"PositionY\"",
+                                "Tile.Y()"
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "EcrireFichierExp"
+                              },
+                              "parameters": [
+                                "\"save\"",
+                                "\"Tile\" + ToString(Tile.Variable(ID)) + \"Animation\"",
+                                "Tile.Animation()"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": true,
+          "name": "Load level",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "If the text of global variable Game is Load, then load the last saved level, technically we re-create the entire level from scratch using the information we have saved",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarGlobalTxt"
+                      },
+                      "parameters": [
+                        "Game",
+                        "=",
+                        "\"Load\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "counter",
+                            "=",
+                            "1"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Comment",
+                      "color": {
+                        "b": 109,
+                        "g": 230,
+                        "r": 255,
+                        "textB": 0,
+                        "textG": 0,
+                        "textR": 0
+                      },
+                      "comment": "First we check if save of PositionX exists for the current instance (counter), if it does, then we should also have the two other values for Y position and animation.\nWe read the values from the file in to scene variables, and then we create an instance of Tile object and set position and animation using he values previously loaded\nfinally we increase the value of counter which is used to find the info of the next instance\nit is going to repeat until the condition will be false and the save does not exists for the given instance (counter value). If it does not exist that means there is no more instances to create and we should have the entire level loaded.\nIn case the loading takes a long time you may want to cover the screen with a layer displaying a loading screen and hide it when loading is done. In this case it was not necessary as the loading takes only a moment",
+                      "comment2": ""
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "infiniteLoopWarning": true,
+                      "type": "BuiltinCommonInstructions::While",
+                      "whileConditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "GroupExists"
+                          },
+                          "parameters": [
+                            "\"save\"",
+                            "\"Tile\" + ToString(Variable(counter)) + \"PositionX\""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LireFichierExp"
+                          },
+                          "parameters": [
+                            "\"save\"",
+                            "\"Tile\" + ToString(Variable(counter)) + \"PositionX\"",
+                            "",
+                            "loadX"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LireFichierExp"
+                          },
+                          "parameters": [
+                            "\"save\"",
+                            "\"Tile\" + ToString(Variable(counter)) + \"PositionY\"",
+                            "",
+                            "loadY"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "LireFichierExp"
+                          },
+                          "parameters": [
+                            "\"save\"",
+                            "\"Tile\" + ToString(Variable(counter)) + \"Animation\"",
+                            "",
+                            "loadAnimation"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Create"
+                          },
+                          "parameters": [
+                            "",
+                            "Tile",
+                            "Variable(loadX)",
+                            "Variable(loadY)",
+                            "\"\""
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ChangePlan"
+                          },
+                          "parameters": [
+                            "Tile",
+                            "=",
+                            "1"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ChangeAnimation"
+                          },
+                          "parameters": [
+                            "Tile",
+                            "=",
+                            "Variable(loadAnimation)"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "counter",
+                            "+",
+                            "1"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        },
+        {
+          "name": "TileSelection",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        },
+        {
+          "name": "GUI",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": []
+    }
+  ],
+  "externalEvents": [
+    {
+      "associatedLayout": "Scene",
+      "lastChangeTimeStamp": 0,
+      "name": "SnapTileToGrid",
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Comment",
+          "color": {
+            "b": 109,
+            "g": 230,
+            "r": 255,
+            "textB": 0,
+            "textG": 0,
+            "textR": 0
+          },
+          "comment": "Round the tile position to snap to in-game grid",
+          "comment2": ""
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "MettreXY"
+              },
+              "parameters": [
+                "Tile",
+                "=",
+                "Variable(cell_width)*round(Tile.X()/Variable(cell_width))",
+                "=",
+                "Variable(cell_height)*round(Tile.Y()/Variable(cell_height))"
+              ],
+              "subInstructions": []
+            }
+          ],
+          "events": []
+        }
+      ]
+    }
+  ],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

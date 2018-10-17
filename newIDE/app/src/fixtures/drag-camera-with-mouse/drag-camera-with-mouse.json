@@ -105,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/drag-camera-with-mouse/green_sprite.png",
         "kind": "image",
+        "metadata": "",
         "name": "green_sprite.png",
         "smoothed": true,
         "userAdded": true
@@ -113,6 +114,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/drag-camera-with-mouse/orange_sprite.png",
         "kind": "image",
+        "metadata": "",
         "name": "orange_sprite.png",
         "smoothed": true,
         "userAdded": true
@@ -2304,6 +2306,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

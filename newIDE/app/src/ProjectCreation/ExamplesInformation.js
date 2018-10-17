@@ -687,6 +687,31 @@ module.exports = {
       }
     ]
   },
+  "custom-mouse-pointer": {
+    "description": "Learn how to replace the mouse cursor by a custom image.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      }
+    ]
+  },
   "customize-keys-with-lastpressedkey": {
     "description": "This explains how to remember the last key that was pressed and customize the inputs of your game.",
     "usedExtensions": [
@@ -1198,6 +1223,63 @@ module.exports = {
       }
     ]
   },
+  "level-editor": {
+    "description": "Example showing a basic level editor, where you can save and load positions of objects put on the scene during the game.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Primitive drawing",
+        "name": "PrimitiveDrawing"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Draggable Behavior",
+        "name": "DraggableBehavior"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Storage and files",
+        "name": "BuiltinFile"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      }
+    ]
+  },
   "load-image-from-url": {
     "description": "Advanced example showing how to use JavaScript to load an image from an external URL.",
     "usedExtensions": [
@@ -1319,6 +1401,31 @@ module.exports = {
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
+      }
+    ]
+  },
+  "move-object-back-and-forth": {
+    "description": "Use events to move objects back and forth vertically or horizontally.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       }
     ]
   },

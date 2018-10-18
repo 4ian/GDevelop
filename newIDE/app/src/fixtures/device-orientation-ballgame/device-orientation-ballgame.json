@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Bois.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bois.png",
         "smoothed": true,
         "userAdded": true
@@ -110,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Noir.png",
         "kind": "image",
+        "metadata": "",
         "name": "Noir.png",
         "smoothed": true,
         "userAdded": false
@@ -118,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Bille.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bille.png",
         "smoothed": true,
         "userAdded": true
@@ -126,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-ballgame/img/Trou.png",
         "kind": "image",
+        "metadata": "",
         "name": "Trou.png",
         "smoothed": true,
         "userAdded": false
@@ -742,6 +746,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -15,12 +15,13 @@ import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sp
 import changeSpriteColor from '../fixtures/change-sprite-color/change-sprite-color.json';
 import characterSelection from '../fixtures/character-selection/character-selection.json';
 import controllerInput from '../fixtures/controller-input/controller-input.json';
-import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
-import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
-import deviceVibration from '../fixtures/device-vibration/device-vibration.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
 import customFont from '../fixtures/custom-font/custom-font.json';
 import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-lastpressedkey/customize-keys-with-lastpressedkey.json';
+import customMousePointer from '../fixtures/custom-mouse-pointer/custom-mouse-pointer.json';
+import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
+import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
+import deviceVibration from '../fixtures/device-vibration/device-vibration.json';
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
 import dropCollectItemsFromStorage from '../fixtures/drop-collect-items-from-storage/drop-collect-items-from-storage.json';
 import exitApp from '../fixtures/exit-app/exit-app.json';
@@ -32,10 +33,12 @@ import inventorySystem from '../fixtures/inventory-system/inventory-system.json'
 import isometricGame from '../fixtures/isometric-game/isometric-game.json';
 import javascriptBlocksInPlatformer from '../fixtures/javascript-blocks-in-platformer/javascript-blocks-in-platformer.json';
 import keyboardPractice from '../fixtures/keyboard-practice/keyboard-practice.json';
+import levelEditor from '../fixtures/level-editor/level-editor.json';
 import loadImageFromUrl from '../fixtures/load-image-from-url/load-image-from-url.json';
 import magnet from '../fixtures/magnet/magnet.json';
 import manipulateTextObject from '../fixtures/manipulate-text-object/manipulate-text-object.json';
 import moveCameraToPosition from '../fixtures/move-camera-to-position/move-camera-to-position.json';
+import moveObjectBackAndForth from '../fixtures/move-object-back-and-forth/move-object-back-and-forth.json';
 import moveObjectInCircle from '../fixtures/move-object-in-circle/move-object-in-circle.json';
 import moveObjectTowardPosition from '../fixtures/move-object-toward-position/move-object-toward-position.json';
 import moveObjectWithMouseJoint from '../fixtures/move-object-with-mouse-joint/move-object-with-mouse-joint.json';
@@ -81,7 +84,6 @@ import toggleMusicPlaySound from '../fixtures/toggle-music-play-sound/toggle-mus
 import typeOnTextEffect from '../fixtures/type-on-text-effect/type-on-text-effect.json';
 import zDepth from '../fixtures/z-depth/z-depth.json';
 import zombieLaser from '../fixtures/zombie-laser/zombie-laser.json';
-
 
 export default class BrowserProjectOpener {
   static readInternalFile(url) {
@@ -135,6 +137,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(customFont);
     } else if (url === 'example://customize-keys-with-lastpressedkey') {
       return Promise.resolve(customizeKeysWithLastpressedkey);
+    } else if (url === 'example://custom-mouse-pointer') {
+      return Promise.resolve(customMousePointer);
     } else if (url === 'example://drag-camera-with-mouse') {
       return Promise.resolve(dragCameraWithMouse);
     } else if (url === 'example://drop-collect-items-from-storage') {
@@ -157,6 +161,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(javascriptBlocksInPlatformer);
     } else if (url === 'example://keyboard-practice') {
       return Promise.resolve(keyboardPractice);
+    } else if (url === 'example://level-editor') {
+      return Promise.resolve(levelEditor);
     } else if (url === 'example://load-image-from-url') {
       return Promise.resolve(loadImageFromUrl);
     } else if (url === 'example://magnet') {
@@ -165,6 +171,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(manipulateTextObject);
     } else if (url === 'example://move-camera-to-position') {
       return Promise.resolve(moveCameraToPosition);
+    } else if (url === 'example://move-object-back-and-forth') {
+      return Promise.resolve(moveObjectBackAndForth);
     } else if (url === 'example://move-object-in-circle') {
       return Promise.resolve(moveObjectInCircle);
     } else if (url === 'example://move-object-toward-position') {

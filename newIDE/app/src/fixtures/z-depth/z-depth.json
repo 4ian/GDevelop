@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/player/p1_front.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1_front.png",
         "smoothed": true,
         "userAdded": false
@@ -110,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile000.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile000.png",
         "smoothed": true,
         "userAdded": false
@@ -118,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile001.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile001.png",
         "smoothed": true,
         "userAdded": false
@@ -126,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile002.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile002.png",
         "smoothed": true,
         "userAdded": true
@@ -134,6 +138,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile018.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile018.png",
         "smoothed": true,
         "userAdded": true
@@ -142,6 +147,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile019.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile019.png",
         "smoothed": true,
         "userAdded": true
@@ -150,6 +156,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile020.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile020.png",
         "smoothed": true,
         "userAdded": false
@@ -158,6 +165,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile036.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile036.png",
         "smoothed": true,
         "userAdded": true
@@ -166,6 +174,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile037.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile037.png",
         "smoothed": true,
         "userAdded": true
@@ -174,6 +183,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile038.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile038.png",
         "smoothed": true,
         "userAdded": false
@@ -182,6 +192,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile039.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile039.png",
         "smoothed": true,
         "userAdded": true
@@ -190,6 +201,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/tiles/rpgTile040.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile040.png",
         "smoothed": true,
         "userAdded": false
@@ -198,6 +210,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile175.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile175.png",
         "smoothed": true,
         "userAdded": false
@@ -206,6 +219,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile176.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile176.png",
         "smoothed": true,
         "userAdded": true
@@ -214,6 +228,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile177.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile177.png",
         "smoothed": true,
         "userAdded": true
@@ -222,6 +237,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile179.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile179.png",
         "smoothed": true,
         "userAdded": true
@@ -230,6 +246,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile178.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile178.png",
         "smoothed": true,
         "userAdded": true
@@ -238,6 +255,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile180.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile180.png",
         "smoothed": true,
         "userAdded": true
@@ -246,6 +264,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile195.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile195.png",
         "smoothed": true,
         "userAdded": true
@@ -254,6 +273,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile196.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile196.png",
         "smoothed": true,
         "userAdded": true
@@ -262,6 +282,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile197.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile197.png",
         "smoothed": true,
         "userAdded": true
@@ -270,6 +291,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile198.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile198.png",
         "smoothed": true,
         "userAdded": false
@@ -278,6 +300,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile199.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile199.png",
         "smoothed": true,
         "userAdded": false
@@ -286,6 +309,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/z-depth/assets/trees/rpgTile200.png",
         "kind": "image",
+        "metadata": "",
         "name": "rpgTile200.png",
         "smoothed": true,
         "userAdded": true
@@ -4594,6 +4618,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

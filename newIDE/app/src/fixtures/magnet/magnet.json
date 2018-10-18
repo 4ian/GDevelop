@@ -105,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/magnet/Bille.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bille.png",
         "smoothed": true,
         "userAdded": true
@@ -113,6 +114,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/magnet/Trou.png",
         "kind": "image",
+        "metadata": "",
         "name": "Trou.png",
         "smoothed": true,
         "userAdded": true
@@ -121,6 +123,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/magnet/Aimant.png",
         "kind": "image",
+        "metadata": "",
         "name": "Aimant.png",
         "smoothed": true,
         "userAdded": true
@@ -129,6 +132,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/magnet/Bois.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bois.png",
         "smoothed": true,
         "userAdded": true
@@ -137,6 +141,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/magnet/zoneperdu.png",
         "kind": "image",
+        "metadata": "",
         "name": "zoneperdu.png",
         "smoothed": true,
         "userAdded": true
@@ -1607,6 +1612,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

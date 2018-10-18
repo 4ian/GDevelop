@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/playerShip2_blue.png",
         "kind": "image",
+        "metadata": "",
         "name": "playerShip2_blue.png",
         "smoothed": true,
         "userAdded": false
@@ -110,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/meteorBrown_med1.png",
         "kind": "image",
+        "metadata": "",
         "name": "meteorBrown_med1.png",
         "smoothed": true,
         "userAdded": true
@@ -118,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserBlue03.png",
         "kind": "image",
+        "metadata": "",
         "name": "laserBlue03.png",
         "smoothed": true,
         "userAdded": true
@@ -126,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/enemyBlack1.png",
         "kind": "image",
+        "metadata": "",
         "name": "enemyBlack1.png",
         "smoothed": true,
         "userAdded": true
@@ -134,6 +138,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/enemyBlue2.png",
         "kind": "image",
+        "metadata": "",
         "name": "enemyBlue2.png",
         "smoothed": true,
         "userAdded": true
@@ -142,6 +147,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/purpleSpaceBackground.png",
         "kind": "image",
+        "metadata": "",
         "name": "purpleSpaceBackground.png",
         "smoothed": true,
         "userAdded": true
@@ -150,6 +156,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserBlue09.png",
         "kind": "image",
+        "metadata": "",
         "name": "laserBlue09.png",
         "smoothed": true,
         "userAdded": true
@@ -158,6 +165,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserBlue10.png",
         "kind": "image",
+        "metadata": "",
         "name": "laserBlue10.png",
         "smoothed": true,
         "userAdded": true
@@ -166,6 +174,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserBlue11.png",
         "kind": "image",
+        "metadata": "",
         "name": "laserBlue11.png",
         "smoothed": true,
         "userAdded": true
@@ -174,6 +183,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/enemyGreen3.png",
         "kind": "image",
+        "metadata": "",
         "name": "enemyGreen3.png",
         "smoothed": true,
         "userAdded": true
@@ -182,6 +192,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserRed16.png",
         "kind": "image",
+        "metadata": "",
         "name": "laserRed16.png",
         "smoothed": true,
         "userAdded": true
@@ -190,6 +201,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserRed09.png",
         "kind": "image",
+        "metadata": "",
         "name": "laserRed09.png",
         "smoothed": true,
         "userAdded": true
@@ -198,6 +210,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserRed10.png",
         "kind": "image",
+        "metadata": "",
         "name": "laserRed10.png",
         "smoothed": true,
         "userAdded": false
@@ -206,6 +219,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/space-shooter/laserRed11.png",
         "kind": "image",
+        "metadata": "",
         "name": "laserRed11.png",
         "smoothed": true,
         "userAdded": false
@@ -3461,6 +3475,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -105,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/multitouch/Pointer-Standard.png",
         "kind": "image",
+        "metadata": "",
         "name": "Pointer-Standard.png",
         "smoothed": true,
         "userAdded": false
@@ -431,6 +432,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

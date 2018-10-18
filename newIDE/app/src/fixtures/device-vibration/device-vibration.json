@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/device-vibration/img/blue.png",
         "kind": "image",
+        "metadata": "",
         "name": "blue.png",
         "smoothed": true,
         "userAdded": false
@@ -515,6 +516,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

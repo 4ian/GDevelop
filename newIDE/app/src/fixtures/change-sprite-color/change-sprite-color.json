@@ -105,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/change-sprite-color/Pea-Standard.png",
         "kind": "image",
+        "metadata": "",
         "name": "Pea-Standard.png",
         "smoothed": true,
         "userAdded": true
@@ -400,6 +401,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

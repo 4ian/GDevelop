@@ -105,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/particles-various-effects/ExplosionTexture.png",
         "kind": "image",
+        "metadata": "",
         "name": "Fire",
         "smoothed": true,
         "userAdded": true
@@ -691,6 +692,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

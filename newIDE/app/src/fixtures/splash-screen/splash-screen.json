@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/splash-screen/gdlogo.png",
         "kind": "image",
+        "metadata": "",
         "name": "gdlogo.png",
         "smoothed": true,
         "userAdded": true
@@ -406,6 +407,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

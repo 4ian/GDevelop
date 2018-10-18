@@ -105,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/Planeta.png",
         "kind": "image",
+        "metadata": "",
         "name": "Planeta.png",
         "smoothed": true,
         "userAdded": true
@@ -113,6 +114,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/SpaceGuy.png",
         "kind": "image",
+        "metadata": "",
         "name": "SpaceGuy.png",
         "smoothed": true,
         "userAdded": true
@@ -121,6 +123,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/flatLight22.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight22.png",
         "smoothed": true,
         "userAdded": true
@@ -129,6 +132,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/flatLight23.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight23.png",
         "smoothed": true,
         "userAdded": false
@@ -137,6 +141,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/object-gravity/flatLight34.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight34.png",
         "smoothed": true,
         "userAdded": true
@@ -965,6 +970,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": [
     {

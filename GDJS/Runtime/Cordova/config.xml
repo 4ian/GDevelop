@@ -55,5 +55,5 @@
     </platform>
     <preference name="orientation" value="GDJS_ORIENTATION" />
     <preference name="BackgroundColor" value="0xff000000"/>
-    <!-- GDJS_ADMOB_APPLICATION_ID -->
+    <!-- GDJS_ADMOB_PLUGIN_AND_APPLICATION_ID -->
 </widget>

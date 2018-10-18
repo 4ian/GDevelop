@@ -12,7 +12,7 @@
     "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/home/szoszo/Projects/gametemplates/gdevelop5/level-editor/level-editor.json",
+    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/level-editor/level-editor.json",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
@@ -2440,7 +2440,7 @@
           "colorR": 74,
           "creationTime": 0,
           "disabled": false,
-          "folded": true,
+          "folded": false,
           "name": "Level Editor",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
@@ -2921,7 +2921,7 @@
               "colorR": 74,
               "creationTime": 0,
               "disabled": false,
-              "folded": true,
+              "folded": false,
               "name": "Create selected tile",
               "source": "",
               "type": "BuiltinCommonInstructions::Group",
@@ -3053,19 +3053,20 @@
                                 "Variable(selectedTileAnimation)"
                               ],
                               "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Grid::Snap"
+                              },
+                              "parameters": [
+                                "",
+                                "Tile"
+                              ],
+                              "subInstructions": []
                             }
                           ],
-                          "events": [
-                            {
-                              "disabled": false,
-                              "folded": false,
-                              "type": "BuiltinCommonInstructions::Link",
-                              "include": {
-                                "includeConfig": 0
-                              },
-                              "target": "SnapTileToGrid"
-                            }
-                          ]
+                          "events": []
                         }
                       ]
                     }
@@ -3797,54 +3798,70 @@
       "behaviorsSharedData": []
     }
   ],
-  "externalEvents": [
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [
     {
-      "associatedLayout": "Scene",
-      "lastChangeTimeStamp": 0,
-      "name": "SnapTileToGrid",
-      "events": [
+      "description": "",
+      "extensionNamespace": "",
+      "fullName": "",
+      "name": "Grid",
+      "version": "",
+      "eventsFunctions": [
         {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Comment",
-          "color": {
-            "b": 109,
-            "g": 230,
-            "r": 255,
-            "textB": 0,
-            "textG": 0,
-            "textR": 0
-          },
-          "comment": "Round the tile position to snap to in-game grid",
-          "comment2": ""
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [],
-          "actions": [
+          "description": "Snap the objects to the grid, which has the size defined in scene variables called cell_width and cell_height",
+          "fullName": "Snap to grid",
+          "functionType": "Action",
+          "name": "Snap",
+          "sentence": "Snap _PARAM1_ to grid",
+          "events": [
             {
-              "type": {
-                "inverted": false,
-                "value": "MettreXY"
-              },
-              "parameters": [
-                "Tile",
-                "=",
-                "Variable(cell_width)*round(Tile.X()/Variable(cell_width))",
-                "=",
-                "Variable(cell_height)*round(Tile.Y()/Variable(cell_height))"
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "Tile",
+                    "=",
+                    "Variable(cell_width)*round(Tile.X()/Variable(cell_width))",
+                    "=",
+                    "Variable(cell_height)*round(Tile.Y()/Variable(cell_height))"
+                  ],
+                  "subInstructions": []
+                }
               ],
-              "subInstructions": []
+              "events": []
             }
           ],
-          "events": []
+          "parameters": [
+            {
+              "codeOnly": true,
+              "defaultValue": "",
+              "description": "",
+              "name": "runtimeScene",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "currentScene"
+            },
+            {
+              "codeOnly": false,
+              "defaultValue": "",
+              "description": "Tile object",
+              "name": "Tile",
+              "optional": false,
+              "supplementaryInformation": "",
+              "type": "objectList"
+            }
+          ]
         }
       ]
     }
   ],
-  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -108,6 +108,7 @@ import EventsFunctionConfigurationEditor from '../EventsFunctionsExtensionEditor
 import EventsFunctionsList from '../EventsFunctionsList';
 import EventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor';
 import OptionsEditorDialog from '../EventsFunctionsExtensionEditor/OptionsEditorDialog';
+import ProjectManager from '../ProjectManager';
 
 const gd = global.gd;
 const {
@@ -1621,5 +1622,86 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
       eventsFunctionsExtension={testEventsFunctionsExtension}
       open
       onClose={action('close')}
+    />
+  ));
+
+storiesOf('ProjectManager', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ProjectManager
+      project={project}
+      onOpenExternalEvents={action('onOpenExternalEvents')}
+      onOpenLayout={action('onOpenLayout')}
+      onOpenExternalLayout={action('onOpenExternalLayout')}
+      onOpenEventsFunctionsExtension={action('onOpenEventsFunctionsExtension')}
+      onAddLayout={action('onAddLayout')}
+      onAddExternalLayout={action('onAddExternalLayout')}
+      onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
+      onAddExternalEvents={action('onAddExternalEvents')}
+      onDeleteLayout={action('onDeleteLayout')}
+      onDeleteExternalLayout={action('onDeleteExternalLayout')}
+      onDeleteEventsFunctionsExtension={action(
+        'onDeleteEventsFunctionsExtension'
+      )}
+      onDeleteExternalEvents={action('onDeleteExternalEvents')}
+      onRenameLayout={action('onRenameLayout')}
+      onRenameExternalLayout={action('onRenameExternalLayout')}
+      onRenameEventsFunctionsExtension={action(
+        'onRenameEventsFunctionsExtension'
+      )}
+      onRenameExternalEvents={action('onRenameExternalEvents')}
+      onSaveProject={action('onSaveProject')}
+      onCloseProject={action('onCloseProject')}
+      onExportProject={action('onExportProject')}
+      onOpenPreferences={action('onOpenPreferences')}
+      onOpenResources={action('onOpenResources')}
+      onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
+      onChangeSubscription={action('onChangeSubscription')}
+      showEventsFunctionsExtensions={true}
+      eventsFunctionsExtensionsError={null}
+      onReloadEventsFunctionsExtensions={action(
+        'onReloadEventsFunctionsExtensions'
+      )}
+      freezeUpdate={false}
+    />
+  ))
+  .add('Error in functions', () => (
+    <ProjectManager
+      project={project}
+      onOpenExternalEvents={action('onOpenExternalEvents')}
+      onOpenLayout={action('onOpenLayout')}
+      onOpenExternalLayout={action('onOpenExternalLayout')}
+      onOpenEventsFunctionsExtension={action('onOpenEventsFunctionsExtension')}
+      onAddLayout={action('onAddLayout')}
+      onAddExternalLayout={action('onAddExternalLayout')}
+      onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
+      onAddExternalEvents={action('onAddExternalEvents')}
+      onDeleteLayout={action('onDeleteLayout')}
+      onDeleteExternalLayout={action('onDeleteExternalLayout')}
+      onDeleteEventsFunctionsExtension={action(
+        'onDeleteEventsFunctionsExtension'
+      )}
+      onDeleteExternalEvents={action('onDeleteExternalEvents')}
+      onRenameLayout={action('onRenameLayout')}
+      onRenameExternalLayout={action('onRenameExternalLayout')}
+      onRenameEventsFunctionsExtension={action(
+        'onRenameEventsFunctionsExtension'
+      )}
+      onRenameExternalEvents={action('onRenameExternalEvents')}
+      onSaveProject={action('onSaveProject')}
+      onCloseProject={action('onCloseProject')}
+      onExportProject={action('onExportProject')}
+      onOpenPreferences={action('onOpenPreferences')}
+      onOpenResources={action('onOpenResources')}
+      onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
+      onChangeSubscription={action('onChangeSubscription')}
+      showEventsFunctionsExtensions={true}
+      eventsFunctionsExtensionsError={
+        new Error('Fake error during code generation')
+      }
+      onReloadEventsFunctionsExtensions={action(
+        'onReloadEventsFunctionsExtensions'
+      )}
+      freezeUpdate={false}
     />
   ));

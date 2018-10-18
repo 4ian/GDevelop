@@ -4,6 +4,8 @@ import { List, ListItem } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 import SearchBar from 'material-ui-search-bar';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
+import WarningIcon from 'material-ui/svg-icons/alert/warning';
 import IconButton from 'material-ui/IconButton';
 import ListIcon from '../UI/ListIcon';
 import { makeAddItem } from '../UI/ListAddItem';
@@ -55,7 +57,7 @@ const styles = {
   },
 };
 
-const ProjectStructureItem = props => (
+const ProjectStructureItem = ({ onRefresh, ...props }) => (
   <ThemeConsumer>
     {muiTheme => (
       <ListItem
@@ -65,6 +67,20 @@ const ProjectStructureItem = props => (
         }}
         nestedListStyle={styles.projectStructureItemNestedList}
         {...props}
+        leftIcon={props.error ? <WarningIcon /> : props.leftIcon}
+        rightIconButton={
+          props.error ? (
+            <IconButton
+              tooltip={`An error has occured in functions. Click to reload them.`}
+              tooltipPosition="bottom-left"
+              onClick={onRefresh}
+            >
+              <RefreshIcon />
+            </IconButton>
+          ) : (
+            undefined
+          )
+        }
       />
     )}
   </ThemeConsumer>
@@ -75,7 +91,7 @@ type ItemProps = {|
   editingName: boolean,
   onEdit: () => void,
   onDelete: () => void,
-  onRename: (string) => void,
+  onRename: string => void,
   onEditName: () => void,
   onCopy: () => void,
   onCut: () => void,
@@ -87,7 +103,7 @@ type ItemProps = {|
   onMoveDown: () => void,
   rightIconButton?: ?React.Node,
   style?: ?Object,
-|}
+|};
 
 class Item extends React.Component<ItemProps, {||}> {
   textField: ?Object;
@@ -179,8 +195,7 @@ class Item extends React.Component<ItemProps, {||}> {
         {muiTheme => (
           <ListItem
             style={{
-              borderBottom: `1px solid ${muiTheme.listItem
-                .separatorColor}`,
+              borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
               ...this.props.style,
             }}
             onContextMenu={this._onContextMenu}
@@ -222,6 +237,8 @@ type Props = {|
   onOpenPlatformSpecificAssets: () => void,
   onChangeSubscription: () => void,
   showEventsFunctionsExtensions: boolean,
+  eventsFunctionsExtensionsError: ?Error,
+  onReloadEventsFunctionsExtensions: () => void,
   freezeUpdate: boolean,
 |};
 
@@ -512,7 +529,12 @@ export default class ProjectManager extends React.Component<Props, State> {
   }
 
   render() {
-    const { project, showEventsFunctionsExtensions } = this.props;
+    const {
+      project,
+      showEventsFunctionsExtensions,
+      eventsFunctionsExtensionsError,
+      onReloadEventsFunctionsExtensions,
+    } = this.props;
     const { renamedItemKind, renamedItemName, searchText } = this.state;
 
     const forceOpen = searchText !== '' ? true : undefined;
@@ -709,11 +731,15 @@ export default class ProjectManager extends React.Component<Props, State> {
           {showEventsFunctionsExtensions && (
             <ProjectStructureItem
               primaryText="Functions/Extensions"
+              error={eventsFunctionsExtensionsError}
+              onRefresh={onReloadEventsFunctionsExtensions}
               leftIcon={<ListIcon src="res/ribbon_default/function32.png" />}
               initiallyOpen={false}
               open={forceOpen}
               primaryTogglesNestedList={true}
-              autoGenerateNestedIndicator={!forceOpen}
+              autoGenerateNestedIndicator={
+                !forceOpen && !eventsFunctionsExtensionsError
+              }
               nestedItems={filterProjectItemsList(
                 enumerateEventsFunctionsExtensions(project),
                 searchText

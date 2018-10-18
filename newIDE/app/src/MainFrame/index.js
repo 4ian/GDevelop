@@ -109,6 +109,7 @@ type State = {|
   aboutDialogOpen: boolean,
   platformSpecificAssetsDialogOpen: boolean,
   helpFinderDialogOpen: boolean,
+  eventsFunctionsExtensionsError: ?Error,
 |};
 
 type Props = {
@@ -154,6 +155,7 @@ export default class MainFrame extends React.Component<Props, State> {
     aboutDialogOpen: false,
     platformSpecificAssetsDialogOpen: false,
     helpFinderDialogOpen: false,
+    eventsFunctionsExtensionsError: null,
   };
   toolbar = null;
   confirmCloseDialog: any = null;
@@ -239,17 +241,34 @@ export default class MainFrame extends React.Component<Props, State> {
         () => {
           // Load all the EventsFunctionsExtension when the game is loaded. If they are modified,
           // their editor will take care of reloading them.
-          if (this.props.eventsFunctionWriter && this.state.currentProject) {
-            loadProjectEventsFunctionsExtensions(
-              this.state.currentProject,
-              this.props.eventsFunctionWriter
-            );
-          }
-
+          this._loadProjectEventsFunctionsExtensions();
           cb();
         }
       );
     });
+  };
+
+  _loadProjectEventsFunctionsExtensions = () => {
+    if (this.props.eventsFunctionWriter && this.state.currentProject) {
+      loadProjectEventsFunctionsExtensions(
+        this.state.currentProject,
+        this.props.eventsFunctionWriter
+      )
+        .then(() =>
+          this.setState({
+            eventsFunctionsExtensionsError: null,
+          })
+        )
+        .catch((eventsFunctionsExtensionsError: Error) => {
+          this.setState({
+            eventsFunctionsExtensionsError,
+          });
+          showErrorBox(
+            `An error has occured during functions generation.\nIf GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`,
+            eventsFunctionsExtensionsError
+          );
+        });
+    }
   };
 
   openFromPathOrURL = (url: string, cb: Function) => {
@@ -584,10 +603,7 @@ export default class MainFrame extends React.Component<Props, State> {
         eventsFunctionsExtension.setName(newName);
         if (eventsFunctionWriter) {
           unloadProjectEventsFunctionsExtensions(currentProject);
-          loadProjectEventsFunctionsExtensions(
-            currentProject,
-            eventsFunctionWriter
-          );
+          this._loadProjectEventsFunctionsExtensions();
         }
 
         this.forceUpdate();
@@ -788,7 +804,9 @@ export default class MainFrame extends React.Component<Props, State> {
               onChooseResource={this._onChooseResource}
               resourceExternalEditors={this.props.resourceExternalEditors}
               isActive={isActive}
-              eventsFunctionWriter={this.props.eventsFunctionWriter}
+              onReloadEventsFunctionsExtensions={
+                this._loadProjectEventsFunctionsExtensions
+              }
               ref={editorRef}
             />
           ),
@@ -1102,6 +1120,7 @@ export default class MainFrame extends React.Component<Props, State> {
       updateStatus,
       aboutDialogOpen,
       helpFinderDialogOpen,
+      eventsFunctionsExtensionsError,
     } = this.state;
     const {
       exportDialog,
@@ -1112,6 +1131,7 @@ export default class MainFrame extends React.Component<Props, State> {
       authentification,
       previewLauncher,
       resourceExternalEditors,
+      eventsFunctionWriter,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1176,8 +1196,14 @@ export default class MainFrame extends React.Component<Props, State> {
                       this.openPlatformSpecificAssets()}
                     onChangeSubscription={() => this.openSubscription(true)}
                     showEventsFunctionsExtensions={
-                      !!this.props.eventsFunctionWriter &&
+                      !!eventsFunctionWriter &&
                       values.showEventsFunctionsExtensions
+                    }
+                    eventsFunctionsExtensionsError={
+                      eventsFunctionsExtensionsError
+                    }
+                    onReloadEventsFunctionsExtensions={
+                      this._loadProjectEventsFunctionsExtensions
                     }
                     freezeUpdate={!projectManagerOpen}
                   />

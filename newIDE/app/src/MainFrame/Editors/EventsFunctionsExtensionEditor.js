@@ -2,7 +2,6 @@
 import * as React from 'react';
 import EventsFunctionsExtensionEditor from '../../EventsFunctionsExtensionEditor';
 import BaseEditor from './BaseEditor';
-import { loadProjectEventsFunctionsExtensions } from '../../EventsFunctionsExtensionsLoader';
 
 const styles = {
   container: {
@@ -30,7 +29,7 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
 
   componentDidUpdate(prevProps: *) {
     if (prevProps.isActive && !this.props.isActive) {
-      loadProjectEventsFunctionsExtensions(this.props.project, this.props.eventsFunctionWriter);
+      this.props.onReloadEventsFunctionsExtensions();
     }
   }
 

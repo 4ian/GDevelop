@@ -12,7 +12,7 @@ const fs = optionalRequire('fs');
 export const makeLocalEventsFunctionWriter = (): EventsFunctionWriter => {
   const outputDir = os.tmpdir() + '/GDGeneratedEventsFunctions';
   fs.mkdir(outputDir, err => {
-    if (err) {
+    if (err && err.code !== 'EEXIST') {
       console.error(
         'Unable to create the directory where to output events functions generated code: ',
         err

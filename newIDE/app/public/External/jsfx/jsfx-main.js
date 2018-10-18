@@ -20,14 +20,15 @@ const closeWindow = () => {
   remote.getCurrentWindow().close();
 };
 
-const saveSoundEffect = (pathEditor) => {
+const saveSoundEffect = pathEditor => {
   jsfx.UpdateDownloadLink(); //Update base64 data
-  let rawData = editorContentDocument.getElementById('download').href; //store data
-  rawData = rawData.replace(/^data:audio\/wav;base64,/, '');
-  fs.writeFile(pathEditor.saveOptions.fullPath, rawData, 'base64', err => {
+  const rawData = editorContentDocument
+    .getElementById('download')
+    .href.replace(/^data:audio\/wav;base64,/, '');
+  fs.writeFile(pathEditor.state.fullPath, rawData, 'base64', err => {
     ipcRenderer.send(
       'jsfx-changes-saved',
-      pathEditor.saveOptions.fullPath,
+      pathEditor.state.fullPath,
       jsfx.CurrentParams
     );
     closeWindow();
@@ -48,7 +49,8 @@ ipcRenderer.on('jsfx-open', (event, receivedOptions) => {
   // Load metadata, if it exists
   if ('jsfx' in receivedOptions.metadata) {
     loadMetaData(receivedOptions.metadata.jsfx);
-  } else { // If not, simulate a click on the 'Lucky' button to create a random sound effect
+  } else {
+    // If not, simulate a click on the 'Lucky' button to create a random sound effect
     const generateRandomSoundEffectButton = presetsPanel.childNodes[11];
     generateRandomSoundEffectButton.click();
   }
@@ -65,8 +67,8 @@ ipcRenderer.on('jsfx-open', (event, receivedOptions) => {
   createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
-    saveToGDFunction: saveSoundEffect,
-    cancelChangesFunction: closeWindow,
+    onSaveToGd: saveSoundEffect,
+    onCancelChanges: closeWindow,
     projectPath: receivedOptions.projectPath,
     initialResourcePath: receivedOptions.resourcePath,
     extension: '.wav',

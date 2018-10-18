@@ -5,7 +5,6 @@ import TextField from 'material-ui/TextField';
 import SearchBar from 'material-ui-search-bar';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import IconButton from 'material-ui/IconButton';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 import ListIcon from '../UI/ListIcon';
 import { makeAddItem } from '../UI/ListAddItem';
 import Window from '../Utils/Window';
@@ -25,6 +24,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -55,20 +55,41 @@ const styles = {
   },
 };
 
-const ThemableProjectStructureItem = ({ muiTheme, ...otherProps }) => (
-  <ListItem
-    style={{
-      backgroundColor: muiTheme.listItem.groupBackgroundColor,
-      borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-    }}
-    nestedListStyle={styles.projectStructureItemNestedList}
-    {...otherProps}
-  />
+const ProjectStructureItem = props => (
+  <ThemeConsumer>
+    {muiTheme => (
+      <ListItem
+        style={{
+          backgroundColor: muiTheme.listItem.groupBackgroundColor,
+          borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+        }}
+        nestedListStyle={styles.projectStructureItemNestedList}
+        {...props}
+      />
+    )}
+  </ThemeConsumer>
 );
 
-const ProjectStructureItem = muiThemeable()(ThemableProjectStructureItem);
+type ItemProps = {|
+  primaryText: string,
+  editingName: boolean,
+  onEdit: () => void,
+  onDelete: () => void,
+  onRename: (string) => void,
+  onEditName: () => void,
+  onCopy: () => void,
+  onCut: () => void,
+  onPaste: () => void,
+  canPaste: () => boolean,
+  canMoveUp: boolean,
+  onMoveUp: () => void,
+  canMoveDown: boolean,
+  onMoveDown: () => void,
+  rightIconButton?: ?React.Node,
+  style?: ?Object,
+|}
 
-class ThemableItem extends React.Component<*, *> {
+class Item extends React.Component<ItemProps, {||}> {
   textField: ?Object;
   _iconMenu: ?Object;
 
@@ -154,22 +175,24 @@ class ThemableItem extends React.Component<*, *> {
     );
 
     return (
-      <ListItem
-        style={{
-          borderBottom: `1px solid ${this.props.muiTheme.listItem
-            .separatorColor}`,
-          ...this.props.style,
-        }}
-        onContextMenu={this._onContextMenu}
-        primaryText={label}
-        rightIconButton={rightIconButton}
-        onClick={this.props.onEdit}
-      />
+      <ThemeConsumer>
+        {muiTheme => (
+          <ListItem
+            style={{
+              borderBottom: `1px solid ${muiTheme.listItem
+                .separatorColor}`,
+              ...this.props.style,
+            }}
+            onContextMenu={this._onContextMenu}
+            primaryText={label}
+            rightIconButton={rightIconButton}
+            onClick={this.props.onEdit}
+          />
+        )}
+      </ThemeConsumer>
     );
   }
 }
-
-const Item = muiThemeable()(ThemableItem);
 
 const AddItem = makeAddItem(ListItem);
 

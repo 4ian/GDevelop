@@ -57,7 +57,19 @@ const styles = {
   },
 };
 
-const ProjectStructureItem = ({ onRefresh, ...props }) => (
+type ProjectStructureItemProps = {|
+  autoGenerateNestedIndicator: boolean,
+  initiallyOpen: boolean,
+  leftIcon: React$Element<any>,
+  nestedItems: Array<React$Element<any>>,
+  primaryText: string,
+  primaryTogglesNestedList: boolean,
+  error?: ?Error,
+  onRefresh?: () => void,
+  open?: boolean,
+|};
+
+const ProjectStructureItem = ({onRefresh, ...props}: ProjectStructureItemProps) => (
   <ThemeConsumer>
     {muiTheme => (
       <ListItem

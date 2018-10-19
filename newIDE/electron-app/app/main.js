@@ -127,6 +127,7 @@ app.on('ready', function () {
       devTools,
       readyChannelName:'piskel-ready',
       indexSubPath:'Piskel/piskel-index.html',
+      backgroundColor: 'black',
       onReady: piskelWindow =>
         piskelWindow.webContents.send('piskel-load-animation', piskelData),
     });
@@ -146,6 +147,8 @@ app.on('ready', function () {
       indexSubPath:'jsfx/jsfx-index.html',
       relativeWidth:0.55,
       relativeHeight:0.8,
+      backgroundColor: 'white',
+      showAfterLoaded: true,
       onReady: jsfxWindow => 
         jsfxWindow.webContents.send('jsfx-open', jsfxData),
     });

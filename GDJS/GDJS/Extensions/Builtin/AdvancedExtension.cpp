@@ -39,7 +39,9 @@ AdvancedExtension::AdvancedExtension() {
             expressionCode = "0";
         }
 
-        return "eventsFunctionContext.returnValue = " + expressionCode + ";";
+        return "if (typeof eventsFunctionContext !== 'undefined') { "
+               "eventsFunctionContext.returnValue = " +
+               expressionCode + "; }";
       });
 
   GetAllActions()["SetReturnString"]
@@ -62,7 +64,9 @@ AdvancedExtension::AdvancedExtension() {
             expressionCode = "\"\"";
         }
 
-        return "eventsFunctionContext.returnValue = " + expressionCode + ";";
+        return "if (typeof eventsFunctionContext !== 'undefined') { "
+               "eventsFunctionContext.returnValue = " +
+               expressionCode + "; }";
       });
 
   GetAllActions()["SetReturnBoolean"]
@@ -75,7 +79,9 @@ AdvancedExtension::AdvancedExtension() {
         gd::String booleanCode =
             (parameter == "True" || parameter == "Vrai") ? "true" : "false";
 
-        return "eventsFunctionContext.returnValue = " + booleanCode + ";";
+        return "if (typeof eventsFunctionContext !== 'undefined') { "
+               "eventsFunctionContext.returnValue = " +
+               booleanCode + "; }";
       });
 
   auto generateParameterNameCode =
@@ -109,8 +115,9 @@ AdvancedExtension::AdvancedExtension() {
         gd::String parameterNameCode =
             generateParameterNameCode(parameters, codeGenerator, context);
 
-        return "(Number(eventsFunctionContext.getArgument(" +
-               parameterNameCode + ")) || 0)";
+        return "(typeof eventsFunctionContext !== 'undefined' ? "
+               "Number(eventsFunctionContext.getArgument(" +
+               parameterNameCode + ")) || 0 : 0)";
       });
 
   GetAllExpressions()["GetArgumentAsString"]
@@ -122,8 +129,9 @@ AdvancedExtension::AdvancedExtension() {
         gd::String parameterNameCode =
             generateParameterNameCode(parameters, codeGenerator, context);
 
-        return "(\"\" + eventsFunctionContext.getArgument(" +
-               parameterNameCode + "))";
+        return "(typeof eventsFunctionContext !== 'undefined' ? \"\" + "
+               "eventsFunctionContext.getArgument(" +
+               parameterNameCode + ") : \"\")";
       });
 }
 

@@ -14,8 +14,8 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/IDE/SceneNameMangler.h"
-#include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/Behavior.h"
+#include "GDCore/Project/EventsFunction.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
@@ -154,11 +154,11 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
     const vector<gd::ParameterMetadata>& parameters) {
-  gd::String declaration = "";
+  gd::String declaration = "runtimeScene";
   for (const auto& parameter : parameters) {
-    if (!declaration.empty()) declaration += ", ";
-    declaration += parameter.GetName().empty() ? "_" : parameter.GetName();
+    declaration += ", " + (parameter.GetName().empty() ? "_" : parameter.GetName());
   }
+  declaration += ", parentEventsFunctionContext";
 
   return declaration;
 }
@@ -166,14 +166,32 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
 gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     const vector<gd::ParameterMetadata>& parameters) {
   gd::String objectsGetters;
+  gd::String objectsCreators;
   gd::String argumentsGetters;
   for (const auto& parameter : parameters) {
     if (parameter.GetName().empty()) continue;
 
     if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
+      // Generate getter that will be used to get the lists of objects passed
+      // as parameters
       objectsGetters +=
           "if (objectName === " + ConvertToStringExplicit(parameter.GetName()) +
-          ") return gdjs.objectsListsToArray(" + parameter.GetName() + ");\n";
+          "&& !!" + parameter.GetName() + ") return gdjs.objectsListsToArray(" +
+          parameter.GetName() + ");\n";
+
+      // Generate creator functions that will be used to create new objects. We
+      // need to check if the function was given the context of the calling
+      // function (parentEventsFunctionContext). If this is the case, use it to
+      // create the new object as the object names used in the function are not
+      // the same as the objects available in the scene.
+      gd::String objectNameCode = parameter.GetName() + ".firstKey()";
+      objectsCreators +=
+          "if (objectName === " + ConvertToStringExplicit(parameter.GetName()) +
+          "&& !!" + parameter.GetName() +
+          ") return parentEventsFunctionContext ? "
+          "parentEventsFunctionContext.createObject(" +
+          objectNameCode + ") : runtimeScene.createObject(" + objectNameCode +
+          ");\n";
     } else {
       argumentsGetters +=
           "if (argName === " + ConvertToStringExplicit(parameter.GetName()) +
@@ -185,8 +203,11 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
          "  getObjects: function(objectName) {\n" + objectsGetters +
          "    return [];"
          "  },\n" +
-         "  getArgument: function(argName) {\n" + argumentsGetters +
-         "    return \"\";" + "  }\n" + "};\n";
+         "  createObject: function(objectName) {\n" + objectsCreators +
+         "    return null;\n" +
+         "  },\n"
+         "  getArgument: function(argName) {\n" +
+         argumentsGetters + "    return \"\";\n" + "  }\n" + "};\n";
 }
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionReturn(
@@ -744,6 +765,18 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   // Code only parameter type
   if (metadata.type == "currentScene") {
     argOutput = "runtimeScene";
+  }
+  // Code only parameter type
+  else if (metadata.type == "objectsContext") {
+    argOutput =
+        "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
+        ": runtimeScene)";
+  }
+  // Code only parameter type
+  else if (metadata.type == "eventsFunctionContext") {
+    argOutput =
+        "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
+        ": undefined)";
   }
   // Code only parameter type
   else if (metadata.type == "objectList") {

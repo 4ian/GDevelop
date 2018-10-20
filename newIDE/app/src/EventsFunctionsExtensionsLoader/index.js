@@ -68,75 +68,12 @@ const generateEventsFunctionExtension = (
   return Promise.all(
     mapFor(0, eventsFunctionsExtension.getEventsFunctionsCount(), i => {
       const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(i);
-      const functionType = eventsFunction.getFunctionType();
-      let instructionOrExpression;
-      if (functionType === gd.EventsFunction.Expression) {
-        instructionOrExpression = extension.addExpression(
-          eventsFunction.getName(),
-          eventsFunction.getFullName() || eventsFunction.getName(),
-          eventsFunction.getDescription(),
-          eventsFunctionsExtension.getFullName() ||
-            eventsFunctionsExtension.getName(),
-          'res/function.png'
-        );
-      } else if (functionType === gd.EventsFunction.StringExpression) {
-        instructionOrExpression = extension.addStrExpression(
-          eventsFunction.getName(),
-          eventsFunction.getFullName() || eventsFunction.getName(),
-          eventsFunction.getDescription(),
-          eventsFunctionsExtension.getFullName() ||
-            eventsFunctionsExtension.getName(),
-          'res/function.png'
-        );
-      } else if (functionType === gd.EventsFunction.Condition) {
-        instructionOrExpression = extension.addCondition(
-          eventsFunction.getName(),
-          eventsFunction.getFullName() || eventsFunction.getName(),
-          eventsFunction.getDescription(),
-          eventsFunction.getSentence(),
-          eventsFunctionsExtension.getFullName() ||
-            eventsFunctionsExtension.getName(),
-          'res/function.png',
-          'res/function24.png'
-        );
-      } else {
-        instructionOrExpression = extension.addAction(
-          eventsFunction.getName(),
-          eventsFunction.getFullName() || eventsFunction.getName(),
-          eventsFunction.getDescription(),
-          eventsFunction.getSentence(),
-          eventsFunctionsExtension.getFullName() ||
-            eventsFunctionsExtension.getName(),
-          'res/function.png',
-          'res/function24.png'
-        );
-      }
-
-      mapVector(
-        eventsFunction.getParameters(),
-        (parameter: gdParameterMetadata) => {
-          if (!parameter.isCodeOnly()) {
-            instructionOrExpression.addParameter(
-              parameter.getType(),
-              parameter.getDescription(),
-              '', // See below for adding the extra information
-              parameter.isOptional()
-            );
-          } else {
-            instructionOrExpression.addCodeOnlyParameter(
-              parameter.getType(),
-              '' // See below for adding the extra information
-            );
-          }
-
-          // Manually add the "extra info" without relying on addParameter (or addCodeOnlyParameter)
-          // as these methods are prefixing the value passed with the extension namespace (this
-          // was done to ease extension declarations when dealing with object).
-          instructionOrExpression
-            .getParameter(instructionOrExpression.getParametersCount() - 1)
-            .setExtraInfo(parameter.getExtraInfo());
-        }
+      const instructionOrExpression = generateInstructionOrExpression(
+        extension,
+        eventsFunction,
+        eventsFunctionsExtension
       );
+      addEventsFunctionParameters(eventsFunction, instructionOrExpression);
 
       const includeFiles = new gd.SetString();
       const codeNamespace =
@@ -153,7 +90,7 @@ const generateEventsFunctionExtension = (
         // For now, always generate functions for runtime (this disables
         // generation of profiling for groups (see EventsCodeGenerator))
         // as extensions generated can be used either for preview or export.
-        true 
+        true
       );
 
       const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
@@ -192,3 +129,94 @@ export const unloadProjectEventsFunctionsExtensions = (
     })
   );
 };
+
+/**
+ * Declare the instruction (action/condition) or expression for the given
+ * events function.
+ */
+const generateInstructionOrExpression = (
+  extension: gdPlatformExtension,
+  eventsFunction: gdEventsFunction,
+  eventsFunctionsExtension: gdEventsFunctionsExtension
+): gdInstructionMetadata | gdExpressionMetadata => {
+  const functionType = eventsFunction.getFunctionType();
+  if (functionType === gd.EventsFunction.Expression) {
+    return extension.addExpression(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription(),
+      eventsFunctionsExtension.getFullName() ||
+        eventsFunctionsExtension.getName(),
+      'res/function.png'
+    );
+  } else if (functionType === gd.EventsFunction.StringExpression) {
+    return extension.addStrExpression(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription(),
+      eventsFunctionsExtension.getFullName() ||
+        eventsFunctionsExtension.getName(),
+      'res/function.png'
+    );
+  } else if (functionType === gd.EventsFunction.Condition) {
+    return extension.addCondition(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription(),
+      eventsFunction.getSentence(),
+      eventsFunctionsExtension.getFullName() ||
+        eventsFunctionsExtension.getName(),
+      'res/function.png',
+      'res/function24.png'
+    );
+  } else {
+    return extension.addAction(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription(),
+      eventsFunction.getSentence(),
+      eventsFunctionsExtension.getFullName() ||
+        eventsFunctionsExtension.getName(),
+      'res/function.png',
+      'res/function24.png'
+    );
+  }
+};
+
+/**
+ * Add to the instruction (action/condition) or expression the parameters
+ * expected by the events function.
+ */
+const addEventsFunctionParameters = (eventsFunction: gdEventsFunction, instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata) => {
+  // By convention, first parameter is always the Runtime Scene.
+  instructionOrExpression.addCodeOnlyParameter('currentScene', '');
+
+  mapVector(
+    eventsFunction.getParameters(),
+    (parameter: gdParameterMetadata) => {
+      if (!parameter.isCodeOnly()) {
+        instructionOrExpression.addParameter(
+          parameter.getType(),
+          parameter.getDescription(),
+          '', // See below for adding the extra information
+          parameter.isOptional()
+        );
+      } else {
+        instructionOrExpression.addCodeOnlyParameter(
+          parameter.getType(),
+          '' // See below for adding the extra information
+        );
+      }
+      // Manually add the "extra info" without relying on addParameter (or addCodeOnlyParameter)
+      // as these methods are prefixing the value passed with the extension namespace (this
+      // was done to ease extension declarations when dealing with object).
+      instructionOrExpression
+        .getParameter(instructionOrExpression.getParametersCount() - 1)
+        .setExtraInfo(parameter.getExtraInfo());
+    }
+  );
+
+  // By convention, latest parameter is always the eventsFunctionContext of the calling function
+  // (if any).
+  instructionOrExpression.addCodeOnlyParameter('eventsFunctionContext', '');
+}

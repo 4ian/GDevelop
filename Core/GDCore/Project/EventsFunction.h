@@ -126,7 +126,11 @@ class GD_CORE_API EventsFunction {
   gd::EventsList& GetEvents() { return events; };
 
   /**
-   * \brief Return the parameters.
+   * \brief Return the parameters of the function.
+   * 
+   * \note During code/extension generation, new parameters are added
+   * to the generated function, like "runtimeScene" and "eventsFunctionContext".
+   * This should be transparent to the user.
    */
   const std::vector<gd::ParameterMetadata>& GetParameters() const {
     return parameters;

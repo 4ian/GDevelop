@@ -4,19 +4,13 @@
  * reserved. This project is released under the MIT License.
  */
 #if defined(GD_IDE_ONLY)
-#include <vector>
 #include "EventsFunction.h"
+#include <vector>
 #include "GDCore/Serialization/SerializerElement.h"
 
 namespace gd {
 
-EventsFunction::EventsFunction() : functionType(Action) {
-  ParameterMetadata runtimeSceneParameter;
-  runtimeSceneParameter.SetCodeOnly()
-      .SetType("currentScene")
-      .SetName("runtimeScene");
-  parameters.push_back(runtimeSceneParameter);
-}
+EventsFunction::EventsFunction() : functionType(Action) {}
 
 void EventsFunction::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);

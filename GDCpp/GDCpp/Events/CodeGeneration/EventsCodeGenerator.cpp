@@ -351,7 +351,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   gd::String argOutput;
 
   // Code only parameter type
-  if (metadata.type == "currentScene") {
+  if (metadata.type == "currentScene" || metadata.type == "objectsContext") {
     argOutput += "*runtimeContext->scene";
   }
   // Code only parameter type

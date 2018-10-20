@@ -878,7 +878,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  _("Objects"),
                  "res/actions/create24.png",
                  "res/actions/create.png")
-      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectListWithoutPicking", _("Object to create"))
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
@@ -896,7 +896,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  _("Objects"),
                  "res/actions/create24.png",
                  "res/actions/create.png")
-      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter(
           "objectListWithoutPicking",
           _("Groups containing objects that can be created by the action"))
@@ -916,7 +916,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                  _("Objects"),
                  "res/actions/add24.png",
                  "res/actions/add.png")
-      .AddCodeOnlyParameter("currentScene", "")
+      .AddCodeOnlyParameter("objectsContext", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsAdvanced();
 

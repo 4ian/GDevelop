@@ -160,124 +160,113 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 >
                   {mapVector(
                     parameters,
-                    (parameter: gdParameterMetadata, i: number) => {
-                      if (i === 0) {
-                        // By convention, first parameter is always the runtimeScene
-                        // and is not shown in editor.
-                        return null;
-                      }
-
-                      return (
-                        <React.Fragment key={i}>
-                          <Column>
-                            <Line noMargin expand>
-                              <Column noMargin expand>
-                                <TextField
-                                  hintText="Parameter name"
-                                  value={parameter.getName()}
-                                  onChange={(e, text) => {
-                                    parameter.setName(text);
-                                    this.forceUpdate();
-                                  }}
-                                  onBlur={() => {
-                                    this.props.onParametersUpdated();
-                                  }}
-                                  fullWidth
+                    (parameter: gdParameterMetadata, i: number) => (
+                      <React.Fragment key={i}>
+                        <Column>
+                          <Line noMargin expand>
+                            <Column noMargin expand>
+                              <TextField
+                                hintText="Parameter name"
+                                value={parameter.getName()}
+                                onChange={(e, text) => {
+                                  parameter.setName(text);
+                                  this.forceUpdate();
+                                }}
+                                onBlur={() => {
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
+                              />
+                            </Column>
+                            <Column noMargin expand>
+                              <SelectField
+                                hintText="Type"
+                                value={parameter.getType()}
+                                onChange={(e, i, value) => {
+                                  parameter.setType(value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
+                              >
+                                <MenuItem
+                                  value="objectList"
+                                  primaryText="Objects"
                                 />
-                              </Column>
+                                <MenuItem
+                                  value="expression"
+                                  primaryText="Number"
+                                />
+                                <MenuItem
+                                  value="string"
+                                  primaryText="String (text)"
+                                />
+                              </SelectField>
+                            </Column>
+                            {parameter.getType() === 'objectList' && (
                               <Column noMargin expand>
                                 <SelectField
-                                  hintText="Type"
-                                  value={parameter.getType()}
+                                  value={parameter.getExtraInfo()}
                                   onChange={(e, i, value) => {
-                                    parameter.setType(value);
+                                    parameter.setExtraInfo(value);
                                     this.forceUpdate();
                                     this.props.onParametersUpdated();
                                   }}
                                   fullWidth
                                 >
-                                  <MenuItem
-                                    value="objectList"
-                                    primaryText="Objects"
-                                  />
-                                  <MenuItem
-                                    value="expression"
-                                    primaryText="Number"
-                                  />
-                                  <MenuItem
-                                    value="string"
-                                    primaryText="String (text)"
-                                  />
+                                  <MenuItem value="" primaryText="Any object" />
+                                  {objectMetadata.map(
+                                    (metadata: EnumeratedObjectMetadata) => {
+                                      if (metadata.name === '') {
+                                        // Base object is an "abstract" object
+                                        return null;
+                                      }
+
+                                      return (
+                                        <MenuItem
+                                          key={metadata.name}
+                                          value={metadata.name}
+                                          primaryText={metadata.fullName}
+                                        />
+                                      );
+                                    }
+                                  )}
                                 </SelectField>
                               </Column>
-                              {parameter.getType() === 'objectList' && (
-                                <Column noMargin expand>
-                                  <SelectField
-                                    value={parameter.getExtraInfo()}
-                                    onChange={(e, i, value) => {
-                                      parameter.setExtraInfo(value);
-                                      this.forceUpdate();
-                                      this.props.onParametersUpdated();
-                                    }}
-                                    fullWidth
-                                  >
-                                    <MenuItem
-                                      value=""
-                                      primaryText="Any object"
-                                    />
-                                    {objectMetadata.map(
-                                      (metadata: EnumeratedObjectMetadata) => {
-                                        if (metadata.name === '') {
-                                          // Base object is an "abstract" object
-                                          return null;
-                                        }
-
-                                        return (
-                                          <MenuItem
-                                            key={metadata.name}
-                                            value={metadata.name}
-                                            primaryText={metadata.fullName}
-                                          />
-                                        );
-                                      }
-                                    )}
-                                  </SelectField>
-                                </Column>
-                              )}
-                            </Line>
-                          </Column>
-                          <Line expand noMargin>
-                            <Column expand>
-                              <TextField
-                                hintText="Description"
-                                value={parameter.getDescription()}
-                                onChange={(e, text) => {
-                                  parameter.setDescription(text);
-                                  this.forceUpdate();
-                                }}
-                                fullWidth
-                              />
-                            </Column>
-                            <Column>
-                              <IconMenu
-                                iconButtonElement={
-                                  <IconButton>
-                                    <MoreVertIcon />
-                                  </IconButton>
-                                }
-                                buildMenuTemplate={() => [
-                                  {
-                                    label: 'Delete',
-                                    click: () => this._removeParameter(i),
-                                  },
-                                ]}
-                              />
-                            </Column>
+                            )}
                           </Line>
-                          <Divider />
-                        </React.Fragment>
-                      );
-                    }
+                        </Column>
+                        <Line expand noMargin>
+                          <Column expand>
+                            <TextField
+                              hintText="Description"
+                              value={parameter.getDescription()}
+                              onChange={(e, text) => {
+                                parameter.setDescription(text);
+                                this.forceUpdate();
+                              }}
+                              fullWidth
+                            />
+                          </Column>
+                          <Column>
+                            <IconMenu
+                              iconButtonElement={
+                                <IconButton>
+                                  <MoreVertIcon />
+                                </IconButton>
+                              }
+                              buildMenuTemplate={() => [
+                                {
+                                  label: 'Delete',
+                                  click: () => this._removeParameter(i),
+                                },
+                              ]}
+                            />
+                          </Column>
+                        </Line>
+                        <Divider />
+                      </React.Fragment>
+                    )
                   )}
                   {parameters.size() <= 1 ? (
                     <EmptyMessage>

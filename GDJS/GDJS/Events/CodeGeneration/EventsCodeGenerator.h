@@ -254,10 +254,23 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    */
   void AddAllObjectsIncludeFiles();
 
+  /**
+   * \brief Generate the list of parameters of a function.
+   * 
+   * \note runtimeScene is always added as the first parameter, and
+   * parentEventsFunctionContext as the last parameter.
+   */
   gd::String GenerateEventsFunctionParameterDeclarationsList(
       const std::vector<gd::ParameterMetadata>& parameters);
+  
+  /**
+   * \brief Generate the "eventsFunctionContext" object that allow a function
+   * to provides access objects, object creation and access to arguments from
+   * the rest of the events.
+   */
   gd::String GenerateEventsFunctionContext(
       const std::vector<gd::ParameterMetadata>& parameters);
+
   gd::String GenerateEventsFunctionReturn(
       const gd::EventsFunction & eventFunction);
 

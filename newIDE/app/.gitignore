@@ -23,6 +23,7 @@ public/libGD.js
 public/External/Piskel/piskel-editor
 public/External/Piskel/piskel-editor.zip
 public/External/monaco-editor-min
+public/External/jsfx/loov-jsfx/
 
 # Resources
 public/res

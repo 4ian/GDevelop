@@ -1,6 +1,4 @@
-import {
-  createPathEditorHeader
-} from '../Utils/pathEditor.js';
+import { createPathEditorHeader } from '../Utils/pathEditor.js';
 
 const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
@@ -35,11 +33,14 @@ const saveSoundEffect = pathEditor => {
   });
 };
 
-// we need to first declare when the window is ready to be initiated
-document.addEventListener('DOMContentLoaded', function () {
+// Wait for the window to be fully initialized before sending the 
+// ready event. Don't use DOMContentLoaded as it was observed to be fired
+// even if jsfx DOM/scripts are not yet loaded.
+window.addEventListener('load', function() {
   ipcRenderer.send('jsfx-ready');
 });
-// then trigger bellow from main, this ensures the dom is loaded
+
+// Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jsfx-open', (event, receivedOptions) => {
   const editorFrameEl = document.getElementById('jsfx-frame');
   jsfx = editorFrameEl.contentWindow;
@@ -57,12 +58,18 @@ ipcRenderer.on('jsfx-open', (event, receivedOptions) => {
   // load a custom header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const headerStyle = {
-    saveFolderLabel: 'height:27px;color:SlateGrey;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
-    nameInput: 'font-family:"Courier New";height:27px;width:90px;color:SlateGrey;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;  ',
-    fileExistsLabel: 'height:27px;color:blue;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
-    saveButton: 'height:27px;float:right;margin-left:2px;margin-right:4px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
-    cancelButton: 'height:27px;float:right;margin-right:2px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
-    setFolderButton: 'height:27px;float:right;margin-left:2px;margin-right:4px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
+    saveFolderLabel:
+      'height:27px;color:SlateGrey;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
+    nameInput:
+      'font-family:"Courier New";height:27px;width:90px;color:SlateGrey;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;  ',
+    fileExistsLabel:
+      'height:27px;color:blue;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
+    saveButton:
+      'height:27px;float:right;margin-left:2px;margin-right:4px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
+    cancelButton:
+      'height:27px;float:right;margin-right:2px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
+    setFolderButton:
+      'height:27px;float:right;margin-left:2px;margin-right:4px;border: 2px solid DeepSkyBlue;border-radius: 1px;margin-top: 5px;background-color:white;',
   };
   createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,

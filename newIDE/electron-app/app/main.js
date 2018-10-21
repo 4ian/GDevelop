@@ -127,13 +127,15 @@ app.on('ready', function () {
       devTools,
       readyChannelName:'piskel-ready',
       indexSubPath:'Piskel/piskel-index.html',
-      backgroundColor: 'black',
-      onReady: piskelWindow =>
+      backgroundColor: '#000000',
+      show: false,
+      onReady: piskelWindow => {
         piskelWindow.webContents.send('piskel-load-animation', piskelData),
+        piskelWindow.show();
+      }
     });
   });
 
-  //TODO: Move in PiskelWindow? And use a callback like onReady
   ipcMain.on('piskel-changes-saved', (event, imageResources, newAnimationName) => {
     mainWindow.webContents.send('piskel-changes-saved', imageResources, newAnimationName);
   });
@@ -148,9 +150,11 @@ app.on('ready', function () {
       relativeWidth:0.55,
       relativeHeight:0.8,
       backgroundColor: 'white',
-      showAfterLoaded: true,
-      onReady: jsfxWindow => 
-        jsfxWindow.webContents.send('jsfx-open', jsfxData),
+      show: false,
+      onReady: jsfxWindow =>  {
+        jsfxWindow.webContents.send('jsfx-open', jsfxData);
+        jsfxWindow.show();
+      }
     });
   });
 

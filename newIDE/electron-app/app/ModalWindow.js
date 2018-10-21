@@ -21,10 +21,10 @@ const loadModalWindow = ({
   relativeWidth = 0.7,
   relativeHeight = 0.9,
   backgroundColor = "white",
-  showAfterLoaded = false,
+  show = true,
 }) => {
   if (modalWindow) {
-    if (!showAfterLoaded) {
+    if (show) {
       modalWindow.show();
     }
     onReady(modalWindow);
@@ -34,10 +34,10 @@ const loadModalWindow = ({
     parent: parentWindow,
     width: Math.floor(parentWindow.getSize()[0] * relativeWidth),
     height: Math.floor(parentWindow.getSize()[1] * relativeHeight),
-    backgroundColor: backgroundColor,
+    backgroundColor,
     modal: true,
     center: true,
-    show: !showAfterLoaded,
+    show,
     webPreferences: {
       webSecurity: false
     }
@@ -49,13 +49,6 @@ const loadModalWindow = ({
   ipcMain.removeAllListeners(readyChannelName);
   ipcMain.on(readyChannelName, event => {
     onReady(modalWindow);
-  });
-
-  // If set so, show the window after it has been loaded
-  modalWindow.webContents.on("did-finish-load", function() {
-    if (showAfterLoaded) {
-      modalWindow.show();
-    }
   });
 
   // Load the index.html of the app.

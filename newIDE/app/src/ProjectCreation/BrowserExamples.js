@@ -86,6 +86,7 @@ const exampleNames = [
   'shooting-bullets-explanation',
   'snap-object-to-grid',
   'space-shooter',
+  'space-shooter-with-functions',
   'splash-screen',
   'sprite-fade-in-out',
   'text-entry-object',

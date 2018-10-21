@@ -12,7 +12,7 @@
     "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florian/Projects/F/GD/newIDE/app/resources/examples/level-editor/level-editor.json",
+    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/level-editor/level-editor.json",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",
@@ -3839,15 +3839,6 @@
             }
           ],
           "parameters": [
-            {
-              "codeOnly": true,
-              "defaultValue": "",
-              "description": "",
-              "name": "runtimeScene",
-              "optional": false,
-              "supplementaryInformation": "",
-              "type": "currentScene"
-            },
             {
               "codeOnly": false,
               "defaultValue": "",

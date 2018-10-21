@@ -13,7 +13,6 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import Toolbar from './Toolbar';
 import ProjectTitlebar from './ProjectTitlebar';
 import PreferencesDialog from './Preferences/PreferencesDialog';
-import ConfirmCloseDialog from './ConfirmCloseDialog';
 import AboutDialog from './AboutDialog';
 import ProjectManager from '../ProjectManager';
 import PlatformSpecificAssetsDialog from '../PlatformSpecificAssetsEditor/PlatformSpecificAssetsDialog';
@@ -158,7 +157,6 @@ export default class MainFrame extends React.Component<Props, State> {
     eventsFunctionsExtensionsError: null,
   };
   toolbar = null;
-  confirmCloseDialog: any = null;
   _resourceSourceDialogs = {};
   _previewLauncher: ?PreviewLauncher = null;
   _providers = null;
@@ -319,8 +317,11 @@ export default class MainFrame extends React.Component<Props, State> {
         this.setState(
           {
             currentProject: null,
-          },
-          cb
+          }, 
+          () => {
+            this.updateToolbar();
+            cb();
+          }
         );
       }
     );
@@ -942,13 +943,14 @@ export default class MainFrame extends React.Component<Props, State> {
   askToCloseProject = (cb: ?Function) => {
     if (!this.state.currentProject) return;
 
-    this.confirmCloseDialog.show(closeProject => {
-      if (!closeProject || !this.state.currentProject) return;
+    //eslint-disable-next-line
+    const answer = confirm(
+      'Close the project? Any changes that have not been saved will be lost.'
+    );
+    if (!answer) return;
 
-      const noop = () => {};
-      const callback = cb || noop;
-      this.closeProject(callback);
-    });
+    const noop = () => {};
+    this.closeProject(cb || noop);
   };
 
   openSceneOrProjectManager = () => {
@@ -1249,10 +1251,6 @@ export default class MainFrame extends React.Component<Props, State> {
               <HelpFinder
                 open={helpFinderDialogOpen}
                 onClose={() => this.openHelpFinderDialog(false)}
-              />
-              <ConfirmCloseDialog
-                ref={confirmCloseDialog =>
-                  (this.confirmCloseDialog = confirmCloseDialog)}
               />
               <Snackbar
                 open={this.state.snackMessageOpen}

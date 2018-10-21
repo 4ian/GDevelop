@@ -13,7 +13,7 @@ const buildMainMenuFor = window => {
     label: 'File',
     submenu: [
       {
-        label: 'Create a new project...',
+        label: 'Create a New Project...',
         accelerator: 'CommandOrControl+N',
         click() {
           window.webContents.send('main-menu-create');
@@ -51,7 +51,7 @@ const buildMainMenuFor = window => {
       },
       { type: 'separator' },
       {
-        label: 'Close',
+        label: 'Close Project',
         accelerator: 'CommandOrControl+W',
         click() {
           window.webContents.send('main-menu-close');
@@ -63,7 +63,7 @@ const buildMainMenuFor = window => {
     fileTemplate.submenu.push(
       { type: 'separator' },
       {
-        label: 'My profile',
+        label: 'My Profile',
         click() {
           window.webContents.send('main-menu-open-profile');
         },
@@ -130,13 +130,13 @@ const buildMainMenuFor = window => {
       },
       { type: 'separator' },
       {
-        label: 'Community forums',
+        label: 'Community Forums',
         click() {
           electron.shell.openExternal('http://forum.compilgames.net');
         },
       },
       {
-        label: 'Community Discord chat',
+        label: 'Community Discord Chat',
         click() {
           electron.shell.openExternal('https://discord.gg/JWcfHEB');
         },
@@ -149,7 +149,7 @@ const buildMainMenuFor = window => {
         },
       },
       {
-        label: 'Create extensions for GDevelop',
+        label: 'Create Extensions for GDevelop',
         click() {
           electron.shell.openExternal('https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md');
         },
@@ -188,7 +188,7 @@ const buildMainMenuFor = window => {
         },
         { type: 'separator' },
         {
-          label: 'My profile',
+          label: 'My Profile',
           click() {
             window.webContents.send('main-menu-open-profile');
           },
@@ -219,7 +219,6 @@ const buildMainMenuFor = window => {
     );
 
     windowTemplate.submenu = [
-      { role: 'close' },
       { role: 'minimize' },
       { role: 'zoom' },
       { type: 'separator' },

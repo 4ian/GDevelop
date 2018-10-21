@@ -21,25 +21,43 @@ export const loadProjectEventsFunctionsExtensions = (
   eventsFunctionWriter: EventsFunctionWriter
 ): Promise<void> => {
   return Promise.all(
+    // First pass: generate extensions from the events functions extensions,
+    // without writing code for the functions. This is useful as events in functions
+    // could be using other functions, which would not yet be available as
+    // extensions.
     mapFor(0, project.getEventsFunctionsExtensionsCount(), i => {
       return loadProjectEventsFunctionsExtension(
         project,
         project.getEventsFunctionsExtensionAt(i),
-        eventsFunctionWriter
+        eventsFunctionWriter,
+        {skipCodeGeneration: true}
       );
     })
+  ).then(() =>
+    Promise.all(
+      // Second pass: generate extensions, including code.
+      mapFor(0, project.getEventsFunctionsExtensionsCount(), i => {
+        return loadProjectEventsFunctionsExtension(
+          project,
+          project.getEventsFunctionsExtensionAt(i),
+          eventsFunctionWriter
+        );
+      })
+    )
   );
 };
 
 const loadProjectEventsFunctionsExtension = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
-  eventsFunctionWriter: EventsFunctionWriter
+  eventsFunctionWriter: EventsFunctionWriter,
+  options: {skipCodeGeneration?: boolean} = {}
 ): Promise<void> => {
   return generateEventsFunctionExtension(
     project,
     eventsFunctionsExtension,
-    eventsFunctionWriter
+    eventsFunctionWriter,
+    options
   ).then(extension => {
     gd.JsPlatform.get().addNewExtension(extension);
     extension.delete();
@@ -52,7 +70,8 @@ const loadProjectEventsFunctionsExtension = (
 const generateEventsFunctionExtension = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
-  eventsFunctionWriter: EventsFunctionWriter
+  eventsFunctionWriter: EventsFunctionWriter,
+  {skipCodeGeneration}: {skipCodeGeneration?: boolean} = {}
 ): Promise<gdEventsFunctionsExtension> => {
   const extension = new gd.PlatformExtension();
 
@@ -75,42 +94,50 @@ const generateEventsFunctionExtension = (
       );
       addEventsFunctionParameters(eventsFunction, instructionOrExpression);
 
-      const includeFiles = new gd.SetString();
       const codeNamespace =
         'gdjs.eventsFunction__' +
         mangleName(eventsFunctionsExtension.getName()) +
         '__' +
         mangleName(eventsFunction.getName());
       const functionName = codeNamespace + '.func';
-      const code = gd.EventsCodeGenerator.generateEventsFunctionCode(
-        project,
-        eventsFunction,
-        codeNamespace,
-        includeFiles,
-        // For now, always generate functions for runtime (this disables
-        // generation of profiling for groups (see EventsCodeGenerator))
-        // as extensions generated can be used either for preview or export.
-        true
-      );
 
       const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
       codeExtraInformation
         .setIncludeFile(eventsFunctionWriter.getIncludeFileFor(functionName))
         .setFunctionName(functionName);
-
-      // Add any include file required by the function to the list
-      // of include files for this function (so that when used, the "dependencies"
-      // are transitively included).
-      includeFiles
-        .toNewVectorString()
-        .toJSArray()
-        .forEach((includeFile: string) => {
-          codeExtraInformation.addIncludeFile(includeFile);
-        });
-
-      includeFiles.delete();
-
-      return eventsFunctionWriter.writeFunctionCode(functionName, code);
+      
+      if (!skipCodeGeneration) {
+        const includeFiles = new gd.SetString();
+        const code = gd.EventsCodeGenerator.generateEventsFunctionCode(
+          project,
+          eventsFunction,
+          codeNamespace,
+          includeFiles,
+          // For now, always generate functions for runtime (this disables
+          // generation of profiling for groups (see EventsCodeGenerator))
+          // as extensions generated can be used either for preview or export.
+          true
+        );
+      
+        // Add any include file required by the function to the list
+        // of include files for this function (so that when used, the "dependencies"
+        // are transitively included).
+        includeFiles
+          .toNewVectorString()
+          .toJSArray()
+          .forEach((includeFile: string) => {
+            codeExtraInformation.addIncludeFile(includeFile);
+          });
+      
+        includeFiles.delete();
+      
+        return eventsFunctionWriter.writeFunctionCode(functionName, code);
+      } else {
+        // Skip code generation if no events function writer is provided.
+        // This is the case during the "first pass", where all events functions extensions
+        // are loaded as extensions but not code generated, as events in functions could
+        // themselves be using functions that are not yet available in extensions.
+      }
     })
   ).then(() => extension);
 };
@@ -187,7 +214,10 @@ const generateInstructionOrExpression = (
  * Add to the instruction (action/condition) or expression the parameters
  * expected by the events function.
  */
-const addEventsFunctionParameters = (eventsFunction: gdEventsFunction, instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata) => {
+const addEventsFunctionParameters = (
+  eventsFunction: gdEventsFunction,
+  instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
+) => {
   // By convention, first parameter is always the Runtime Scene.
   instructionOrExpression.addCodeOnlyParameter('currentScene', '');
 
@@ -219,4 +249,4 @@ const addEventsFunctionParameters = (eventsFunction: gdEventsFunction, instructi
   // By convention, latest parameter is always the eventsFunctionContext of the calling function
   // (if any).
   instructionOrExpression.addCodeOnlyParameter('eventsFunctionContext', '');
-}
+};

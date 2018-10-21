@@ -69,7 +69,10 @@ type ProjectStructureItemProps = {|
   open?: boolean,
 |};
 
-const ProjectStructureItem = ({onRefresh, ...props}: ProjectStructureItemProps) => (
+const ProjectStructureItem = ({
+  onRefresh,
+  ...props
+}: ProjectStructureItemProps) => (
   <ThemeConsumer>
     {muiTheme => (
       <ListItem
@@ -739,78 +742,78 @@ export default class ProjectManager extends React.Component<Props, State> {
                 />
               )}
           />
-
-          {showEventsFunctionsExtensions && (
-            <ProjectStructureItem
-              primaryText="Functions/Extensions"
-              error={eventsFunctionsExtensionsError}
-              onRefresh={onReloadEventsFunctionsExtensions}
-              leftIcon={<ListIcon src="res/ribbon_default/function32.png" />}
-              initiallyOpen={false}
-              open={forceOpen}
-              primaryTogglesNestedList={true}
-              autoGenerateNestedIndicator={
-                !forceOpen && !eventsFunctionsExtensionsError
-              }
-              nestedItems={filterProjectItemsList(
-                enumerateEventsFunctionsExtensions(project),
-                searchText
-              )
-                .map((eventsFunctionsExtension, i) => {
-                  const name = eventsFunctionsExtension.getName();
-                  return (
-                    <Item
-                      key={i}
-                      primaryText={name}
-                      editingName={
-                        renamedItemKind === 'events-functions-extension' &&
-                        renamedItemName === name
-                      }
-                      onEdit={() =>
-                        this.props.onOpenEventsFunctionsExtension(name)}
-                      onDelete={() =>
-                        this.props.onDeleteEventsFunctionsExtension(
-                          eventsFunctionsExtension
-                        )}
-                      onRename={newName => {
-                        this.props.onRenameEventsFunctionsExtension(
-                          name,
-                          newName
-                        );
-                        this._onEditName(null, '');
-                      }}
-                      onEditName={() =>
-                        this._onEditName('events-functions-extension', name)}
-                      onCopy={() =>
-                        this._copyEventsFunctionsExtension(
-                          eventsFunctionsExtension
-                        )}
-                      onCut={() =>
-                        this._cutEventsFunctionsExtension(
-                          eventsFunctionsExtension
-                        )}
-                      onPaste={() => this._pasteEventsFunctionsExtension(i)}
-                      canPaste={() =>
-                        Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)}
-                      canMoveUp={i !== 0}
-                      onMoveUp={() => this._moveUpEventsFunctionsExtension(i)}
-                      canMoveDown={
-                        i !== project.getEventsFunctionsExtensionsCount() - 1
-                      }
-                      onMoveDown={() =>
-                        this._moveDownEventsFunctionsExtension(i)}
+          {(showEventsFunctionsExtensions ||
+            !!project.getEventsFunctionsExtensionsCount()) && (
+              <ProjectStructureItem
+                primaryText="Functions/Extensions"
+                error={eventsFunctionsExtensionsError}
+                onRefresh={onReloadEventsFunctionsExtensions}
+                leftIcon={<ListIcon src="res/ribbon_default/function32.png" />}
+                initiallyOpen={false}
+                open={forceOpen}
+                primaryTogglesNestedList={true}
+                autoGenerateNestedIndicator={
+                  !forceOpen && !eventsFunctionsExtensionsError
+                }
+                nestedItems={filterProjectItemsList(
+                  enumerateEventsFunctionsExtensions(project),
+                  searchText
+                )
+                  .map((eventsFunctionsExtension, i) => {
+                    const name = eventsFunctionsExtension.getName();
+                    return (
+                      <Item
+                        key={i}
+                        primaryText={name}
+                        editingName={
+                          renamedItemKind === 'events-functions-extension' &&
+                          renamedItemName === name
+                        }
+                        onEdit={() =>
+                          this.props.onOpenEventsFunctionsExtension(name)}
+                        onDelete={() =>
+                          this.props.onDeleteEventsFunctionsExtension(
+                            eventsFunctionsExtension
+                          )}
+                        onRename={newName => {
+                          this.props.onRenameEventsFunctionsExtension(
+                            name,
+                            newName
+                          );
+                          this._onEditName(null, '');
+                        }}
+                        onEditName={() =>
+                          this._onEditName('events-functions-extension', name)}
+                        onCopy={() =>
+                          this._copyEventsFunctionsExtension(
+                            eventsFunctionsExtension
+                          )}
+                        onCut={() =>
+                          this._cutEventsFunctionsExtension(
+                            eventsFunctionsExtension
+                          )}
+                        onPaste={() => this._pasteEventsFunctionsExtension(i)}
+                        canPaste={() =>
+                          Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)}
+                        canMoveUp={i !== 0}
+                        onMoveUp={() => this._moveUpEventsFunctionsExtension(i)}
+                        canMoveDown={
+                          i !== project.getEventsFunctionsExtensionsCount() - 1
+                        }
+                        onMoveDown={() =>
+                          this._moveDownEventsFunctionsExtension(i)}
+                      />
+                    );
+                  })
+                  .concat(
+                    <AddItem
+                      key={'add-events-functions-extension'}
+                      primaryText="Click to add functions"
+                      onClick={this.props.onAddEventsFunctionsExtension}
                     />
-                  );
-                })
-                .concat(
-                  <AddItem
-                    key={'add-events-functions-extension'}
-                    primaryText="Click to add functions"
-                    onClick={this.props.onAddEventsFunctionsExtension}
-                  />
-                )}
-            />
-          )}
+                  )}
+              />
+            )}
         </List>
         <SearchBar
           value={searchText}

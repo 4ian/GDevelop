@@ -1,4 +1,4 @@
-import { createPathEditorHeader } from '../Utils/pathEditor.js';
+import { createPathEditorHeader } from '../utils/path-editor.js';
 
 const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;

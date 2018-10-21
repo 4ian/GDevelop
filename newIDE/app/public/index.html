@@ -48,7 +48,7 @@
       // Monaco editor is using amd require. Save the Node.js require if it exists (Electron)
       nodeRequire = typeof require !== "undefined" ? require : undefined;
     </script>
-    <script src="%PUBLIC_URL%/External/monaco-editor-min/vs/loader.js"></script>
+    <script src="%PUBLIC_URL%/external/monaco-editor-min/vs/loader.js"></script>
     <script>
       // Restore back the Node.js require (Electron) and delete "define" which can
       // trick some libraries into thinking they are in an AMD (RequireJS) environment.
@@ -64,7 +64,7 @@
       });
       window.MonacoEnvironment = {
         getWorkerUrl: function (workerId, label) {
-          return "External/monaco-editor-min/vs/base/worker/workerMain.js";
+          return "external/monaco-editor-min/vs/base/worker/workerMain.js";
         }
       };
     </script>

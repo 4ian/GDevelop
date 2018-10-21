@@ -2,6 +2,7 @@ const electron = require("electron");
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const isDev = require("electron-is").dev();
 const ipcMain = electron.ipcMain;
+const { load } = require('./Utils/UrlLoader');
 
 // Generic function to load external editors in a modal window.
 // Keep a global reference of the window object, if you don't, the window will
@@ -52,17 +53,12 @@ const loadModalWindow = ({
   });
 
   // Load the index.html of the app.
-  if (isDev) {
-    // Development (server hosted by npm run start)
-    modalWindow.loadURL("http://localhost:3000/External/" + indexSubPath);
-    modalWindow.openDevTools();
-  } else {
-    // Production (with npm run build)
-    modalWindow.loadURL(
-      "file://" + __dirname + "/www/External/" + indexSubPath
-    );
-    if (devTools) modalWindow.openDevTools();
-  }
+  load({
+    window: modalWindow,
+    isDev,
+    path: "/external/" + indexSubPath,
+    devTools
+  });
 
   modalWindow.on("closed", event => {
     modalWindow = null;

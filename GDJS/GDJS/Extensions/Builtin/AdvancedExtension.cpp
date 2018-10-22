@@ -120,7 +120,7 @@ AdvancedExtension::AdvancedExtension() {
                parameterNameCode + ")) || 0 : 0)";
       });
 
-  GetAllExpressions()["GetArgumentAsString"]
+  GetAllStrExpressions()["GetArgumentAsString"]
       .GetCodeExtraInformation()
       .SetCustomCodeGenerator([&generateParameterNameCode](
                                   const std::vector<gd::Expression>& parameters,

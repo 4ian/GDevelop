@@ -29,7 +29,6 @@
     "i18next": "^10.0.3",
     "keen-tracking": "1.1.3",
     "lodash": "4.17.4",
-    "loov-jsfx": "1.2.0",
     "material-ui": "0.20",
     "material-ui-search-bar": "0.4.1",
     "node-require-function": "^1.2.0",
@@ -61,7 +60,7 @@
   },
   "scripts": {
     "postinstall": "npm run import-resources",
-    "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js && node import-piskel-editor.js && node import-monaco-editor.js && node import-jsfx-editor.js",
+    "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js && node import-piskel-editor.js && node import-monaco-editor.js",
     "start": "npm run import-resources && react-scripts start",
     "build": "npm run import-resources && react-scripts build",
     "format": "prettier --write \"src/**/*.js\"",

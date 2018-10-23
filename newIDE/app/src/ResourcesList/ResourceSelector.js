@@ -215,6 +215,11 @@ export default class ResourceSelector extends React.Component<Props, State> {
           this.props.onChange(newResourceName);
           const newResource = resourcesManager.getResource(newResourceName);
           newResource.setMetadata(JSON.stringify(newResourceData[0].metadata));
+
+          resourcesLoader.burstUrlsCacheForResources(project, [
+            newResourceName,
+          ]);
+
         },
       };
       resourceExternalEditor.edit(externalEditorOptions);

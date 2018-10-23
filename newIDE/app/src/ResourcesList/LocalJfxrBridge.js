@@ -7,9 +7,9 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 const gd = global.gd;
 
 /**
- * Open JSFX to create wav resources.
+ * Open JFXR to create wav resources.
  */
-export const openJsfx = ({
+export const openJfxr = ({
   project,
   resourcesLoader,
   resourceNames,
@@ -27,27 +27,29 @@ export const openJsfx = ({
     initialResourcePath.lastIndexOf('?cache=')
   );
 
-  const jsfxData = {
+  const jfxrData = {
     resourcePath: initialResourcePath,
     metadata: extraOptions.initialResourceMetadata,
     projectPath,
   };
 
-  ipcRenderer.removeAllListeners('jsfx-changes-saved');
-  ipcRenderer.on('jsfx-changes-saved', (event, newFilePath, fileMetadata) => {
+  ipcRenderer.removeAllListeners('jfxr-changes-saved');
+  ipcRenderer.on('jfxr-changes-saved', (event, newFilePath, fileMetadata) => {
     const resourcesManager = project.getResourcesManager();
     const resourceName = path.relative(projectPath, newFilePath); //Still needed for onChangesSaved()
+    console.log(resourceName)
     const audioResource = new gd.AudioResource();
     audioResource.setFile(resourceName);
     audioResource.setName(resourceName);
     resourcesManager.addResource(audioResource);
+    console.log(audioResource)
     audioResource.delete();
     const newMetadata = {
-      jsfx: fileMetadata,
+      jfxr: fileMetadata,
     };
 
     onChangesSaved([{ metadata: newMetadata }], resourceName);
   });
 
-  ipcRenderer.send('jsfx-create-wav', jsfxData);
+  ipcRenderer.send('jfxr-create-wav', jfxrData);
 };

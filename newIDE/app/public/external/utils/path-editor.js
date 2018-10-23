@@ -1,9 +1,7 @@
 const electron = require('electron');
 const fs = require('fs');
 const remote = electron.remote;
-const {
-  dialog
-} = remote;
+const { dialog } = remote;
 
 export const createPathEditorHeader = ({
   parentElement,
@@ -15,8 +13,12 @@ export const createPathEditorHeader = ({
   extension,
   headerStyle,
 }) => {
-  if (fs.lstatSync(initialResourcePath).isDirectory()) {
-    initialResourcePath = initialResourcePath + '/NewFile' + extension;
+  if (fs.existsSync(initialResourcePath)) {
+    if (fs.lstatSync(initialResourcePath).isDirectory()) {
+      initialResourcePath = initialResourcePath + '/NewFile' + extension;
+    }
+  } else {
+    initialResourcePath = projectPath + '/NewFile' + extension;
   }
 
   const headerObject = {
@@ -84,6 +86,7 @@ export const createPathEditorHeader = ({
     selectBaseFolderPath(headerObject);
   });
   render(headerObject);
+  return headerObject;
 };
 
 const render = headerObject => {
@@ -124,15 +127,17 @@ const selectBaseFolderPath = headerObject => {
   if (!selectedDir) {
     return;
   }
-  if (!selectedDir.toString().startsWith(state.projectBasePath)) {
+  const selectedDirClean = selectedDir[0].replace(/\\/gi,'/')
+  state.projectBasePath = state.projectBasePath.replace(/\\/gi,'/')
+  if (!selectedDirClean.startsWith(state.projectBasePath)) {
     alert(
       'Please select a folder inside your project path!\n' +
-      state.projectBasePath +
-      '\n\nSelected:\n' +
-      selectedDir
+        state.projectBasePath +
+        '\n\nSelected:\n' +
+        selectedDirClean
     );
     return;
   }
-  state.folderPath = selectedDir;
+  state.folderPath = selectedDirClean;
   render(headerObject);
 };

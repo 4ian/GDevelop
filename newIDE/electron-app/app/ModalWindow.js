@@ -22,13 +22,13 @@ const loadModalWindow = ({
   relativeWidth = 0.7,
   relativeHeight = 0.9,
   backgroundColor = "white",
-  show = true,
+  show = false,
+  muted = false,
 }) => {
+  //Prevent from loading the same window multiple times
   if (modalWindow) {
-    if (show) {
-      modalWindow.show();
-    }
-    onReady(modalWindow);
+    modalWindow.destroy();
+    modalWindow = null;
   }
 
   const windowOptions = {
@@ -47,10 +47,20 @@ const loadModalWindow = ({
   modalWindow = new BrowserWindow(windowOptions);
   modalWindow.setMenu(null);
 
+  if (modalWindow) {
+    if (show) {
+      modalWindow.show();
+    }
+    onReady(modalWindow);
+  }
+
   ipcMain.removeAllListeners(readyChannelName);
   ipcMain.on(readyChannelName, event => {
     onReady(modalWindow);
   });
+
+  // Mute in advance if chosen to do so.
+  modalWindow.webContents.setAudioMuted(muted);
 
   // Load the index.html of the app.
   load({
@@ -58,6 +68,22 @@ const loadModalWindow = ({
     isDev,
     path: "/external/" + indexSubPath,
     devTools
+  });
+
+  //Prevent any navigation inside the modal window.
+  modalWindow.webContents.on("will-navigate", (e, url) => {
+    if (url !== modalWindow.webContents.getURL()) {
+      console.info("Opening in browser (because of will-navigate):", url);
+      e.preventDefault();
+      electron.shell.openExternal(url);
+    }
+  });
+
+  //Prevent opening any website or url inside Electron.
+  modalWindow.webContents.on("new-window", (e, url) => {
+    console.info("Opening in browser (because of new-window): ", url);
+    e.preventDefault();
+    electron.shell.openExternal(url);
   });
 
   modalWindow.on("closed", event => {

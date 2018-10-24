@@ -103,6 +103,7 @@ describe('gdjs.runtimeObject', function() {
 		object.getCenterY = function() { return 0 };
 		object.setPosition(15, 20);
 
+		//TODO: Factor benchmark/use benchmark.js
 		var benchmarkTiming = {};
 		var benchmarkCount = 60;
 		var repeatInBenchmark = 60000;

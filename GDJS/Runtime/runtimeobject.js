@@ -601,8 +601,9 @@ gdjs.RuntimeObject.prototype.addForce = function(x,y, clearing) {
  * @param {number} clearing Set the force clearing
  */
 gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, clearing) {
-    var forceX = Math.cos(angle/180*3.14159)*len;
-    var forceY = Math.sin(angle/180*3.14159)*len;
+    var angleInRadians = angle/180*3.14159; //TODO: Benchmark with Math.PI
+    var forceX = Math.cos(angleInRadians)*len;
+    var forceY = Math.sin(angleInRadians)*len;
 
     this._forces.push(this._getRecycledForce(forceX, forceY, clearing));
 };

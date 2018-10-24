@@ -3,6 +3,64 @@
  * See README.md for more information.
  */
 
+ const makeSpriteRuntimeObjectWithCustomHitBox = (runtimeScene) => new gdjs.SpriteRuntimeObject(runtimeScene, {
+	"name": "obj1",
+	"type": "Sprite",
+	"updateIfNotVisible": false,
+	"variables": [],
+	"behaviors": [],
+	"animations": [
+		{
+		"name": "NewObject2",
+		"useMultipleDirections": false,
+		"directions": [
+			{
+			"looping": false,
+			"timeBetweenFrames": 1,
+			"sprites": [
+				{
+				"hasCustomCollisionMask": true,
+				"image": "NewObject2-2.png",
+				"points": [],
+				"originPoint": {
+					"name": "origine",
+					"x": 32,
+					"y": 16
+				},
+				"centerPoint": {
+					"automatic": false,
+					"name": "centre",
+					"x": 64,
+					"y": 31
+				},
+				"customCollisionMask": [
+					[
+					{
+						"x": 12.5,
+						"y": 1
+					},
+					{
+						"x": 41.5,
+						"y": 2
+					},
+					{
+						"x": 55.5,
+						"y": 31
+					},
+					{
+						"x": 24.5,
+						"y": 30
+					}
+					]
+				]
+				}
+			]
+			}
+		]
+		}
+	]
+});
+
 describe('gdjs.SpriteRuntimeObject', function() {
 	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
 	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
@@ -64,63 +122,7 @@ describe('gdjs.SpriteRuntimeObject', function() {
 
 	it('should properly compute hitboxes', function(){
 		// Create an object with a custom hitbox
-		var object = new gdjs.SpriteRuntimeObject(runtimeScene, {
-			"name": "obj1",
-			"type": "Sprite",
-			"updateIfNotVisible": false,
-			"variables": [],
-			"behaviors": [],
-			"animations": [
-				{
-				"name": "NewObject2",
-				"useMultipleDirections": false,
-				"directions": [
-					{
-					"looping": false,
-					"timeBetweenFrames": 1,
-					"sprites": [
-						{
-						"hasCustomCollisionMask": true,
-						"image": "NewObject2-2.png",
-						"points": [],
-						"originPoint": {
-							"name": "origine",
-							"x": 32,
-							"y": 16
-						},
-						"centerPoint": {
-							"automatic": false,
-							"name": "centre",
-							"x": 64,
-							"y": 31
-						},
-						"customCollisionMask": [
-							[
-							{
-								"x": 12.5,
-								"y": 1
-							},
-							{
-								"x": 41.5,
-								"y": 2
-							},
-							{
-								"x": 55.5,
-								"y": 31
-							},
-							{
-								"x": 24.5,
-								"y": 30
-							}
-							]
-						]
-						}
-					]
-					}
-				]
-				}
-			]
-		});
+		const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
 
 		// Check the hitboxes without any rotation (only the non default origin
 		// which is at 32;16 is to be used).
@@ -134,5 +136,48 @@ describe('gdjs.SpriteRuntimeObject', function() {
 		expect(object.getHitBoxes()[0].vertices[0][1]).to.be.within(-36.5001, -36.49999);
 		expect(object.getHitBoxes()[0].vertices[2][0]).to.be.within(31.999, 32.0001);
 		expect(object.getHitBoxes()[0].vertices[2][1]).to.be.within(6.4999, 6.5001);
+	});
+
+	it('benchmark getAABB of rotated vs non rotated sprite, with custom hitboxes, origin and center', function(){ //TODO: Run in firefox too
+		this.timeout(6000);
+		const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
+
+		//TODO: Factor benchmark/use benchmark.js
+		var benchmarkTiming = {};
+		var benchmarkCount = 60;
+		var repeatInBenchmark = 60000;
+		for(var benchmarkIndex = 0;benchmarkIndex < benchmarkCount;benchmarkIndex++) {
+			
+			{
+				var title = repeatInBenchmark + 'x getAABB of a non rotated sprite, with custom hitboxes, origin and center';
+				object.setAngle(0);
+				var start = performance.now();
+				for(var i = 0;i<repeatInBenchmark;i++) {
+					object.setX(i);
+					object.getAABB();
+				}
+				benchmarkTiming[title] = benchmarkTiming[title] || [];
+				benchmarkTiming[title].push(performance.now() - start);
+			}
+
+			{
+				var title = repeatInBenchmark + 'x getAABB of a rotated sprite, with custom hitboxes, origin and center';
+				object.setAngle(90);
+				var start = performance.now();
+				for(var i = 0;i<repeatInBenchmark;i++) {
+					object.setX(i);
+					object.getAABB();
+				}
+				benchmarkTiming[title] = benchmarkTiming[title] || [];
+				benchmarkTiming[title].push(performance.now() - start);
+			}
+		}
+
+		var results = {};
+		for(var benchmarkName in benchmarkTiming) {
+			results[benchmarkName] = benchmarkTiming[benchmarkName].reduce((sum, value) => sum+value, 0) / benchmarkCount;
+		}
+		console.log(results);
+		// console.log(benchmarkTiming);
 	});
 });

@@ -112,10 +112,12 @@ gdjs.LayerCocosRenderer.prototype.updatePosition = function() {
 	this._cocosLayer.setRotation(-this._layer.getCameraRotation());
 	this._cocosLayer.setScale(zoomFactor, zoomFactor);
 
-	var centerX = (this._layer.getCameraX()-this._layer.getWidth()/2)*Math.cos(-angle)
-        - (this._layer.getCameraY()-this._layer.getHeight()/2)*Math.sin(-angle);
-	var centerY = (this._layer.getCameraX()-this._layer.getWidth()/2)*Math.sin(-angle)
-        + (this._layer.getCameraY()-this._layer.getHeight()/2)*Math.cos(-angle);
+    var cosValue = Math.cos(-angle);
+    var sinValue = Math.sin(-angle);
+	var centerX = (this._layer.getCameraX()-this._layer.getWidth()/2)*cosValue
+        - (this._layer.getCameraY()-this._layer.getHeight()/2)*sinValue;
+	var centerY = (this._layer.getCameraX()-this._layer.getWidth()/2)*sinValue
+        + (this._layer.getCameraY()-this._layer.getHeight()/2)*cosValue;
 
 	this._cocosLayer.setPositionX(-centerX);
 	this._cocosLayer.setPositionY(+centerY);

@@ -16,6 +16,10 @@ import IconMenu from '../UI/Menu/IconMenu';
 import ResourcesLoader from '../ResourcesLoader';
 import { defaultAutocompleteProps } from '../UI/AutocompleteProps';
 
+import optionalRequire from '../Utils/OptionalRequire.js';
+const path = optionalRequire('path');
+const gd = global.gd;
+
 type Props = {|
   project: gdProject,
   resourceSources: Array<ResourceSource>,
@@ -211,15 +215,21 @@ export default class ResourceSelector extends React.Component<Props, State> {
         extraOptions: {
           initialResourceMetadata,
         },
-        onChangesSaved: (newResourceData, newResourceName) => {
-          this.props.onChange(newResourceName);
-          const newResource = resourcesManager.getResource(newResourceName);
+        onChangesSaved: (newResourceData, newFilePath) => {
+          const projectPath = path.dirname(project.getProjectFile());
+          const resourceName = path.relative(projectPath, newFilePath);
+          if (resourcesManager.hasResource(resourceName)) {
+            resourcesManager.removeResource(resourceName)
+          }
+          const audioResource = new gd.AudioResource();
+          audioResource.setFile(resourceName);
+          audioResource.setName(resourceName);
+          resourcesManager.addResource(audioResource);
+          audioResource.delete();
+
+          this.props.onChange(resourceName);
+          const newResource = resourcesManager.getResource(resourceName);
           newResource.setMetadata(JSON.stringify(newResourceData[0].metadata));
-
-          resourcesLoader.burstUrlsCacheForResources(project, [
-            newResourceName,
-          ]);
-
         },
       };
       resourceExternalEditor.edit(externalEditorOptions);

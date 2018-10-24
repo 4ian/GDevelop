@@ -1,5 +1,6 @@
 const electron = require('electron');
 const fs = require('fs');
+const path = require('path');
 const remote = electron.remote;
 const { dialog } = remote;
 
@@ -15,27 +16,28 @@ export const createPathEditorHeader = ({
 }) => {
   if (fs.existsSync(initialResourcePath)) {
     if (fs.lstatSync(initialResourcePath).isDirectory()) {
-      initialResourcePath = initialResourcePath + '/NewFile' + extension;
+      initialResourcePath = initialResourcePath + '\\NewFile' + extension;
     }
   } else {
-    initialResourcePath = projectPath + '/NewFile' + extension;
+    initialResourcePath = projectPath + '\\NewFile' + extension;
   }
 
+  initialResourcePath = path.normalize(initialResourcePath)
   const headerObject = {
     state: {
       folderPath: initialResourcePath.substring(
         0,
-        initialResourcePath.lastIndexOf('/')
+        initialResourcePath.lastIndexOf('\\')
       ),
       name: initialResourcePath.substring(
-        initialResourcePath.lastIndexOf('/') + 1,
+        initialResourcePath.lastIndexOf('\\') + 1,
         initialResourcePath.lastIndexOf('.')
       ),
       extension: initialResourcePath.substring(
         initialResourcePath.lastIndexOf('.'),
         initialResourcePath.length
       ),
-      projectBasePath: projectPath,
+      projectBasePath: path.normalize(projectPath),
     },
   };
 
@@ -96,9 +98,9 @@ const render = headerObject => {
   ); // Don't allow the user to enter any characters that would lead to an invalid path
   const state = headerObject.state;
   state.name = headerObject.nameInput.value;
-  state.baseExportPath = state.folderPath + '/' + state.name;
-  state.fullPath = state.folderPath + '/' + state.name + state.extension;
-  headerObject.saveFolderLabel.textContent = state.folderPath + '/';
+  state.baseExportPath = state.folderPath + '\\' + state.name;
+  state.fullPath = state.folderPath + '\\' + state.name + state.extension;
+  headerObject.saveFolderLabel.textContent = state.folderPath + '\\';
   headerObject.saveFolderLabel.title =
     'Click to change path: \n' + state.folderPath;
 
@@ -127,17 +129,16 @@ const selectBaseFolderPath = headerObject => {
   if (!selectedDir) {
     return;
   }
-  const selectedDirClean = selectedDir[0].replace(/\\/gi,'/')
-  state.projectBasePath = state.projectBasePath.replace(/\\/gi,'/')
-  if (!selectedDirClean.startsWith(state.projectBasePath)) {
+  const selectedDirPath = selectedDir[0];
+  if (!selectedDirPath.startsWith(state.projectBasePath)) {
     alert(
       'Please select a folder inside your project path!\n' +
         state.projectBasePath +
         '\n\nSelected:\n' +
-        selectedDirClean
+        selectedDirPath
     );
     return;
   }
-  state.folderPath = selectedDirClean;
+  state.folderPath = selectedDirPath;
   render(headerObject);
 };

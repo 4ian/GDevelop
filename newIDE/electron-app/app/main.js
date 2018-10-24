@@ -161,7 +161,6 @@ app.on("ready", function() {
       relativeHeight: 0.8,
       backgroundColor: "#000000",
       show: false,
-      muted: true,
       onReady: jfxrWindow => {
         jfxrWindow.webContents.send("jfxr-open", jfxrData);
         jfxrWindow.show();

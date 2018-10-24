@@ -2,7 +2,9 @@ const electron = require("electron");
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const isDev = require("electron-is").dev();
 const ipcMain = electron.ipcMain;
-const { load } = require('./Utils/UrlLoader');
+const {
+  load
+} = require('./Utils/UrlLoader');
 
 // Generic function to load external editors in a modal window.
 // Keep a global reference of the window object, if you don't, the window will
@@ -23,13 +25,12 @@ const loadModalWindow = ({
   relativeHeight = 0.9,
   backgroundColor = "white",
   show = false,
-  muted = false,
 }) => {
+
   //Prevent from loading the same window multiple times
   if (modalWindow) {
-    modalWindow.destroy();
-    modalWindow = null;
-  }
+    return
+  };
 
   const windowOptions = {
     parent: parentWindow,
@@ -52,15 +53,12 @@ const loadModalWindow = ({
       modalWindow.show();
     }
     onReady(modalWindow);
-  }
+  };
 
   ipcMain.removeAllListeners(readyChannelName);
   ipcMain.on(readyChannelName, event => {
     onReady(modalWindow);
   });
-
-  // Mute in advance if chosen to do so.
-  modalWindow.webContents.setAudioMuted(muted);
 
   // Load the index.html of the app.
   load({

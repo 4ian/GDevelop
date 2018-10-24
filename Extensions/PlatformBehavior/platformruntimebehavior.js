@@ -152,10 +152,6 @@ gdjs.PlatformRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) 
 gdjs.PlatformRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 };
 
-gdjs.PlatformRuntimeBehavior.prototype.getAABB = function(){
-    return this.owner.getAABB();
-};
-
 gdjs.PlatformRuntimeBehavior.prototype.onActivate = function() {
     if (this._registeredInManager) return;
 

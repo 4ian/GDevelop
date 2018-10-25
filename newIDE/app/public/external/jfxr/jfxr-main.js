@@ -1,6 +1,4 @@
-import {
-  createPathEditorHeader
-} from '../utils/path-editor.js';
+import { createPathEditorHeader } from '../utils/path-editor.js';
 
 const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
@@ -19,7 +17,10 @@ const saveSoundEffect = pathEditor => {
   jfxr.createLink();
   const metadata = {
     name: headerObject.nameInput.value,
-    url: jfxr.link.substring(jfxr.link.indexOf('/index.html#') + 11, jfxr.link.length),
+    url: jfxr.link.substring(
+      jfxr.link.indexOf('/index.html#') + 11,
+      jfxr.link.length
+    ),
   };
 
   jfxr.synth.run().then(data => {
@@ -27,7 +28,7 @@ const saveSoundEffect = pathEditor => {
       type: 'audio/wav',
     });
     var fileReader = new FileReader();
-    fileReader.onload = function () {
+    fileReader.onload = function() {
       fs.writeFileSync(
         pathEditor.state.fullPath,
         Buffer(new Uint8Array(this.result))
@@ -46,7 +47,7 @@ const saveSoundEffect = pathEditor => {
 // Wait for the window to be fully initialized before sending the
 // ready event. Don't use DOMContentLoaded as it was observed to be fired
 // even if jfxr DOM/scripts are not yet loaded.
-window.addEventListener('load', function () {
+window.addEventListener('load', function() {
   ipcRenderer.send('jfxr-ready');
 });
 
@@ -55,7 +56,8 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
   // wait for iframe to load
   const editorFrameEl = document.getElementById('jfxr-frame');
 
-  editorFrameEl.onload = function () {
+  editorFrameEl.onload = function() {
+    // Initiate when jfxr's iframe loads
     // gain access to control elements
     editorContentDocument = editorFrameEl.contentDocument;
     jfxr = editorFrameEl.contentWindow.angular
@@ -65,12 +67,18 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
     // load a custom save file(s) header
     const pathEditorHeaderDiv = document.getElementById('path-editor-header');
     const headerStyle = {
-      saveFolderLabel: 'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
-      nameInput: 'font-family:"Courier New";height:27px;width:90px;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
-      saveButton: 'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-      cancelButton: 'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-      setFolderButton: 'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-      fileExistsLabel: 'height:27px;color:blue;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
+      saveFolderLabel:
+        'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
+      nameInput:
+        'font-family:"Courier New";height:27px;width:90px;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
+      saveButton:
+        'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+      cancelButton:
+        'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+      setFolderButton:
+        'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+      fileExistsLabel:
+        'height:27px;color:blue;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
     };
     headerObject = createPathEditorHeader({
       parentElement: pathEditorHeaderDiv,
@@ -90,17 +98,21 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
     if ('jfxr' in receivedOptions.metadata) {
       jfxr.getSound().name = receivedOptions.metadata.jfxr.name;
       if (!jfxr.isPlaying()) {
-        jfxr.togglePlay()
+        jfxr.togglePlay();
       }
-    } else { //play a random effect if there was no metadata
+    } else {
+      //play a random effect if there was no metadata
       jfxr.applyPreset(jfxr.presets[1]);
-    };
+    }
   };
 
-  // load metadata if found
-  if ('jfxr' in receivedOptions.metadata && receivedOptions.metadata.jfxr.url !== undefined) {
-    editorFrameEl.src = 'jfxr/index.html' + receivedOptions.metadata.jfxr.url;
+  // load jfxr's iframe, append metadata to its url if found
+  if (
+    'jfxr' in receivedOptions.metadata &&
+    receivedOptions.metadata.jfxr.url !== undefined
+  ) {
+    editorFrameEl.src = 'jfxr-editor/index.html' + receivedOptions.metadata.jfxr.url;
   } else {
-    editorFrameEl.src = 'jfxr/index.html';
+    editorFrameEl.src = 'jfxr-editor/index.html';
   }
 });

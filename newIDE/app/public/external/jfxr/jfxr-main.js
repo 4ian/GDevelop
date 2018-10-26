@@ -21,7 +21,7 @@ const loadMetaData = metaData => {
     jfxr.togglePlay();
   } else {
     jfxr.applyPreset(jfxr.presets[1]);
-  };  
+  };
 };
 
 const saveSoundEffect = pathEditor => {
@@ -62,14 +62,8 @@ window.addEventListener('load', function () {
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
   const editorFrameEl = document.getElementById('jfxr-frame');
-  // Initiate when jfxr's iframe loads
-  // gain access to control elements
+
   editorContentDocument = editorFrameEl.contentDocument;
-  jfxr = editorFrameEl.contentWindow.angular
-    .element(editorContentDocument.getElementsByClassName('ng-scope')[0])
-    .scope().ctrl;
-  loadMetaData(receivedOptions.metadata);
-  
   // alter the interface of the external editor
   editorContentDocument.getElementsByClassName('github')[0].remove();
   // load a custom save file(s) header
@@ -92,4 +86,10 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
     extension: '.wav',
     headerStyle,
   });
+
+  // gain access to control elements
+  jfxr = editorFrameEl.contentWindow.angular
+    .element(editorContentDocument.getElementsByClassName('ng-scope')[0])
+    .scope().ctrl;
+  loadMetaData(receivedOptions.metadata);
 });

@@ -88,7 +88,6 @@ export const createPathEditorHeader = ({
     selectBaseFolderPath(headerObject);
   });
   render(headerObject);
-  return headerObject;
 };
 
 const render = headerObject => {

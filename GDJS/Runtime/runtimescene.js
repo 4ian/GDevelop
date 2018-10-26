@@ -240,7 +240,14 @@ gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
 	this._updateObjectsVisibility();
 	if (this._profiler) this._profiler.end("objects (visibility)");
 	
-    if (this._profiler) this._profiler.begin("render");
+	if (this._profiler) this._profiler.begin("render");
+
+	// Uncomment to enable debug rendering (look for the implementation in the renderer
+	// to see what is rendered)
+	// if (this._layersCameraCoordinates) {
+	// 	this.getRenderer().renderDebugDraw(this._allInstancesList, this._layersCameraCoordinates); //TODO
+	// }
+
 	this.render();
 	if (this._profiler) this._profiler.end("render");
 	

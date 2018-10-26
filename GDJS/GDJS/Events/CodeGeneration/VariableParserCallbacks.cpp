@@ -52,10 +52,16 @@ void VariableCodeGenerationCallbacks::OnRootVariable(gd::String variableName) {
   const gd::VariablesContainer* variables = NULL;
   if (scope == LAYOUT_VARIABLE) {
     output = "runtimeScene.getVariables()";
-    variables = &codeGenerator.GetLayout().GetVariables();
+
+    if (codeGenerator.HasProjectAndLayout()) {
+      variables = &codeGenerator.GetLayout().GetVariables();
+    }
   } else if (scope == PROJECT_VARIABLE) {
     output = "runtimeScene.getGame().getVariables()";
-    variables = &codeGenerator.GetProject().GetVariables();
+
+    if (codeGenerator.HasProjectAndLayout()) {
+      variables = &codeGenerator.GetProject().GetVariables();
+    }
   } else {
     std::vector<gd::String> realObjects =
         codeGenerator.ExpandObjectsName(object, context);
@@ -77,12 +83,15 @@ void VariableCodeGenerationCallbacks::OnRootVariable(gd::String variableName) {
                  "[0].getVariables())";
     }
 
-    if (codeGenerator.GetLayout().HasObjectNamed(
-            object))  // We check first layout's objects' list.
-      variables = &codeGenerator.GetLayout().GetObject(object).GetVariables();
-    else if (codeGenerator.GetProject().HasObjectNamed(
-                 object))  // Then the global objects list.
-      variables = &codeGenerator.GetProject().GetObject(object).GetVariables();
+    if (codeGenerator.HasProjectAndLayout()) {
+      if (codeGenerator.GetLayout().HasObjectNamed(
+              object))  // We check first layout's objects' list.
+        variables = &codeGenerator.GetLayout().GetObject(object).GetVariables();
+      else if (codeGenerator.GetProject().HasObjectNamed(
+                   object))  // Then the global objects list.
+        variables =
+            &codeGenerator.GetProject().GetObject(object).GetVariables();
+    }
   }
 
   // Optimize the lookup of the variable when the variable is declared.
@@ -111,8 +120,8 @@ void VariableCodeGenerationCallbacks::OnChildSubscript(
 
   gd::ExpressionParser parser(stringExpression);
   if (!parser.ParseStringExpression(codeGenerator.GetPlatform(),
-                                    codeGenerator.GetProject(),
-                                    codeGenerator.GetLayout(),
+                                    codeGenerator.GetGlobalObjectsAndGroups(),
+                                    codeGenerator.GetObjectsAndGroups(),
                                     callbacks)) {
     cout << "Error in text expression" << parser.GetFirstError() << endl;
     argumentCode = "\"\"";

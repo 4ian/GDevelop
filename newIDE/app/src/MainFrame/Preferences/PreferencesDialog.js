@@ -22,7 +22,7 @@ type State = {||};
 export default class PreferencesDialog extends Component<Props, State> {
   createTheme() {
     Window.openExternalURL(
-      'https://github.com/4ian/GD/tree/master/newIDE#theming'
+      'https://github.com/4ian/GDevelop/tree/master/newIDE#theming'
     );
   }
 
@@ -45,6 +45,7 @@ export default class PreferencesDialog extends Component<Props, State> {
             setThemeName,
             setCodeEditorThemeName,
             setAutoDownloadUpdates,
+            setShowEventsFunctionsExtensions,
           }) => (
             <Column noMargin>
               <Line noMargin>
@@ -90,6 +91,14 @@ export default class PreferencesDialog extends Component<Props, State> {
                   toggled={values.autoDownloadUpdates}
                   labelPosition="right"
                   label="Auto download and install updates (recommended)"
+                />
+              </Line>
+              <Line>
+                <Toggle
+                  onToggle={(e, check) => setShowEventsFunctionsExtensions(check)}
+                  toggled={values.showEventsFunctionsExtensions}
+                  labelPosition="right"
+                  label="Activate events functions (alpha, please report any bugs)"
                 />
               </Line>
             </Column>

@@ -8,6 +8,7 @@ import SelectedInstances from './SelectedInstances';
 import HighlightedInstance from './HighlightedInstance';
 import SelectionRectangle from './SelectionRectangle';
 import InstancesResizer from './InstancesResizer';
+import InstancesRotator from './InstancesRotator';
 import InstancesMover from './InstancesMover';
 import Grid from './Grid';
 import WindowBorder from './WindowBorder';
@@ -17,6 +18,11 @@ import BackgroundColor from './BackgroundColor';
 import PIXI from 'pixi.js';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
+
+const styles = {
+  canvasArea: { flex: 1, position: 'absolute', overflow: 'hidden' },
+  dropCursor: { cursor: 'copy' },
+};
 
 export default class InstancesEditorContainer extends Component {
   constructor() {
@@ -46,8 +52,14 @@ export default class InstancesEditorContainer extends Component {
 
       return false;
     });
-    this.pixiRenderer.view.addEventListener('click', e => {
-      this._onClick(e.offsetX, e.offsetY);
+    this.pixiRenderer.view.addEventListener('pointerup', event => {
+      this.props.onPointerUp();
+    });
+    this.pixiRenderer.view.addEventListener('pointerover', event => {
+      this.props.onPointerOver();
+    });
+    this.pixiRenderer.view.addEventListener('pointerout', event => {
+      this.props.onPointerOut();
     });
     this.pixiRenderer.view.onmousewheel = event => {
       if (this.keyboardShortcuts.shouldZoom()) {
@@ -201,6 +213,8 @@ export default class InstancesEditorContainer extends Component {
       instancesSelection: this.props.instancesSelection,
       onResize: this._onResize,
       onResizeEnd: this._onResizeEnd,
+      onRotate: this._onRotate,
+      onRotateEnd: this._onRotateEnd,
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       toCanvasCoordinates: this.viewPosition.toCanvasCoordinates,
     });
@@ -212,6 +226,7 @@ export default class InstancesEditorContainer extends Component {
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       options: this.props.options,
     });
+    this.instancesRotator = new InstancesRotator();
     this.instancesMover = new InstancesMover({
       instanceMeasurer: this.instancesRenderer.getInstanceMeasurer(),
       options: this.props.options,
@@ -301,7 +316,8 @@ export default class InstancesEditorContainer extends Component {
    * @param {string} objectName The name of the object for which instance must be re-rendered.
    */
   resetRenderersFor(objectName) {
-    if (this.instancesRenderer) this.instancesRenderer.resetRenderersFor(objectName);
+    if (this.instancesRenderer)
+      this.instancesRenderer.resetRenderersFor(objectName);
   }
 
   zoomBy(value) {
@@ -349,12 +365,26 @@ export default class InstancesEditorContainer extends Component {
     }
   };
 
+  _getLayersVisibility = () => {
+    const { layout } = this.props;
+    const layersVisibility = {};
+    for (let i = 0; i < layout.getLayersCount(); i++) {
+      layersVisibility[layout.getLayerAt(i).getName()] = layout
+        .getLayerAt(i)
+        .getVisibility();
+    }
+    return layersVisibility;
+  };
+
   _onEndSelectionRectangle = () => {
-    const instancesSelected = this.selectionRectangle.endSelectionRectangle();
+    let instancesSelected = this.selectionRectangle.endSelectionRectangle();
+
     this.props.instancesSelection.selectInstances(
       instancesSelected,
-      this.keyboardShortcuts.shouldMultiSelect()
+      this.keyboardShortcuts.shouldMultiSelect(),
+      this._getLayersVisibility()
     );
+    instancesSelected = this.props.instancesSelection.getSelectedInstances();
     this.props.onInstancesSelected(instancesSelected);
   };
 
@@ -376,7 +406,8 @@ export default class InstancesEditorContainer extends Component {
     } else {
       this.props.instancesSelection.selectInstance(
         instance,
-        this.keyboardShortcuts.shouldMultiSelect()
+        this.keyboardShortcuts.shouldMultiSelect(),
+        this._getLayersVisibility()
       );
 
       if (this.props.onInstancesSelected) {
@@ -414,7 +445,8 @@ export default class InstancesEditorContainer extends Component {
       selectedInstances,
       sceneDeltaX,
       sceneDeltaY,
-      this.keyboardShortcuts.shouldFollowAxis()
+      this.keyboardShortcuts.shouldFollowAxis(),
+      this.keyboardShortcuts.shouldNotSnapToGrid()
     );
   };
 
@@ -445,11 +477,24 @@ export default class InstancesEditorContainer extends Component {
     this.props.onInstancesResized(selectedInstances);
   };
 
-  _onClick = (x, y) => {
-    const newPos = this.viewPosition.toSceneCoordinates(x, y);
-    if (this.props.onAddInstance) {
-      this.props.onAddInstance(newPos[0], newPos[1]);
-    }
+  _onRotate = (deltaX, deltaY) => {
+    const sceneDeltaX = deltaX / this.getZoomFactor();
+    const sceneDeltaY = deltaY / this.getZoomFactor();
+
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    this.instancesRotator.rotateBy(
+      selectedInstances,
+      sceneDeltaX,
+      sceneDeltaY,
+      this.keyboardShortcuts.shouldResizeProportionally()
+    );
+  };
+
+  _onRotateEnd = () => {
+    this.instancesRotator.endRotate();
+
+    const selectedInstances = this.props.instancesSelection.getSelectedInstances();
+    this.props.onInstancesRotated(selectedInstances);
   };
 
   _onDrop = (x, y, objectName) => {
@@ -545,7 +590,10 @@ export default class InstancesEditorContainer extends Component {
       <SimpleDropTarget>
         <div
           ref={canvasArea => (this.canvasArea = canvasArea)}
-          style={{ flex: 1, position: 'absolute', overflow: 'hidden' }}
+          style={{
+            ...styles.canvasArea,
+            ...(this.props.showDropCursor ? styles.dropCursor : undefined),
+          }}
         />
       </SimpleDropTarget>
     );

@@ -2,18 +2,16 @@
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
-import Paper from 'material-ui/Paper';
+import Background from '../UI/Background';
 import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
+import optionalRequire from '../Utils/OptionalRequire.js';
+const path = optionalRequire('path');
+const glob = optionalRequire('glob');
+const gd = global.gd;
 
 const styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    height: '100%',
-    flexDirection: 'column',
-  },
   listContainer: {
     flex: 1,
   },
@@ -79,6 +77,47 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
+  _scanForNewResources = () => {
+    const project = this.props.project;
+    const resourcesManager = project.getResourcesManager();
+    console.log('Scanning the project folder for new resources...');
+    const projectPath = path.dirname(project.getProjectFile());
+
+    const getDirectories = (src, callback) => {
+      glob(src + '/**/*.{png,jpg,jpeg,PNG,JPG,JPEG}', callback);
+    };
+    getDirectories(projectPath, (err, res) => {
+      if (err) {
+        console.log('Error loading ', err);
+      } else {
+        res.forEach(pathFound => {
+          const fileName = path.relative(projectPath, pathFound);
+          if (!resourcesManager.hasResource(fileName)) {
+            const imageResource = new gd.ImageResource();
+            imageResource.setFile(fileName);
+            imageResource.setName(fileName);
+            resourcesManager.addResource(imageResource);
+            imageResource.delete();
+            console.info(`${fileName} added to project.`);
+          }
+        });
+      }
+      this.forceUpdate();
+    });
+  };
+
+  _removeAllUnusedImages = () => {
+    const { project } = this.props;
+    gd.ProjectResourcesAdder
+      .getAllUselessImages(project)
+      .toJSArray()
+      .forEach(imageName => {
+        console.info(`Removing unused image resource: ${imageName}`);
+      });
+    gd.ProjectResourcesAdder.removeAllUselessImages(project);
+    this.forceUpdate();
+  };
+
   _editName = (resource: ?gdResource) => {
     this.setState(
       {
@@ -127,8 +166,21 @@ export default class ResourcesList extends React.Component<Props, State> {
         click: () => this._editName(resource),
       },
       {
-        label: 'Delete',
+        label: 'Remove',
         click: () => this._deleteResource(resource),
+      },
+      { type: 'separator' },
+      {
+        label: 'Scan for Images',
+        click: () => {
+          this._scanForNewResources();
+        },
+      },
+      {
+        label: 'Remove All Unused Images',
+        click: () => {
+          this._removeAllUnusedImages();
+        },
       },
     ];
   };
@@ -144,13 +196,13 @@ export default class ResourcesList extends React.Component<Props, State> {
       .map(resourceName => resourcesManager.getResource(resourceName));
     const filteredList = filterResourcesList(allResourcesList, searchText);
 
-    // Force List component to be mounted again if project or objectsContainer
+    // Force List component to be mounted again if project
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = project.ptr;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -166,9 +218,9 @@ export default class ResourcesList extends React.Component<Props, State> {
                 onRename={this._rename}
                 onSortEnd={({ oldIndex, newIndex }) =>
                   this._move(oldIndex, newIndex)}
-                helperClass="sortable-helper"
-                distance={30}
                 buildMenuTemplate={this._renderResourceMenuTemplate}
+                helperClass="sortable-helper"
+                distance={20}
               />
             )}
           </AutoSizer>
@@ -181,7 +233,7 @@ export default class ResourcesList extends React.Component<Props, State> {
               searchText: text,
             })}
         />
-      </Paper>
+      </Background>
     );
   }
 }

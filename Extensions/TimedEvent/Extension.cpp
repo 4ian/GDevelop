@@ -66,8 +66,8 @@ class Extension : public ExtensionBase {
               timeOutCode, codeGenerator, context);
           gd::ExpressionParser parser(event.GetTimeoutExpression());
           if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                          codeGenerator.GetProject(),
-                                          codeGenerator.GetLayout(),
+                                          codeGenerator.GetGlobalObjectsAndGroups(),
+                                          codeGenerator.GetObjectsAndGroups(),
                                           callbacks) ||
               timeOutCode.empty())
             timeOutCode = "0";

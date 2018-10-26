@@ -111,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/blue_racer.png",
         "kind": "image",
+        "metadata": "",
         "name": "blue_racer.png",
         "smoothed": true,
         "userAdded": true
@@ -119,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/road_straight.png",
         "kind": "image",
+        "metadata": "",
         "name": "road_straight.png",
         "smoothed": true,
         "userAdded": true
@@ -127,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/road_bent.png",
         "kind": "image",
+        "metadata": "",
         "name": "road_bent.png",
         "smoothed": true,
         "userAdded": true
@@ -135,6 +138,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/finishline.png",
         "kind": "image",
+        "metadata": "",
         "name": "finishline.png",
         "smoothed": true,
         "userAdded": true
@@ -143,6 +147,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/plant_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "plant_1.png",
         "smoothed": true,
         "userAdded": true
@@ -151,6 +156,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/plant_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "plant_2.png",
         "smoothed": true,
         "userAdded": true
@@ -159,6 +165,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/plants.png",
         "kind": "image",
+        "metadata": "",
         "name": "plants.png",
         "smoothed": true,
         "userAdded": true
@@ -167,6 +174,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/tire_stack.png",
         "kind": "image",
+        "metadata": "",
         "name": "tire_stack.png",
         "smoothed": true,
         "userAdded": true
@@ -175,6 +183,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/tire_stacks.png",
         "kind": "image",
+        "metadata": "",
         "name": "tire_stacks.png",
         "smoothed": true,
         "userAdded": true
@@ -183,6 +192,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/Camera.png",
         "kind": "image",
+        "metadata": "",
         "name": "Camera.png",
         "smoothed": true,
         "userAdded": true
@@ -191,6 +201,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/LargeGrass.png",
         "kind": "image",
+        "metadata": "",
         "name": "LargeGrass.png",
         "smoothed": true,
         "userAdded": true
@@ -199,6 +210,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/DirectionIndactor.png",
         "kind": "image",
+        "metadata": "",
         "name": "DirectionIndactor.png",
         "smoothed": true,
         "userAdded": true
@@ -207,6 +219,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/red_racer.png",
         "kind": "image",
+        "metadata": "",
         "name": "red_racer.png",
         "smoothed": true,
         "userAdded": true
@@ -215,6 +228,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/green_racer.png",
         "kind": "image",
+        "metadata": "",
         "name": "green_racer.png",
         "smoothed": true,
         "userAdded": true
@@ -223,6 +237,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/pink_racer.png",
         "kind": "image",
+        "metadata": "",
         "name": "pink_racer.png",
         "smoothed": true,
         "userAdded": true
@@ -230,6 +245,7 @@
       {
         "file": "https://df5lqcdudryde.cloudfront.net/examples/racing-game/vroom.wav",
         "kind": "audio",
+        "metadata": "",
         "name": "vroom.wav",
         "userAdded": false
       }
@@ -8735,6 +8751,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

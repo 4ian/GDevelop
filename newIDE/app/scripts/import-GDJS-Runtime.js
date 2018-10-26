@@ -7,10 +7,10 @@ var destFolder2 = path.join(process.cwd(), '..', 'node_modules', 'GDJS-for-web-a
 var gdjsScriptsFolder = '../../../GDJS/scripts';
 
 if (isWin) {
-  shell.exec('CopyRuntimeToGD.bat ' + destFolder, {
+  shell.exec('CopyRuntimeToGD.bat ' + "\"" + destFolder + "\"", {
     cwd: gdjsScriptsFolder,
   });
-  shell.exec('CopyRuntimeToGD.bat ' + destFolder2, {
+  shell.exec('CopyRuntimeToGD.bat ' + "\"" + destFolder2 + "\"", {
     cwd: gdjsScriptsFolder,
   });
 } else {

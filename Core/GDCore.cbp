@@ -406,8 +406,8 @@
 		<Unit filename="GDCore/Project/BehaviorsSharedData.h" />
 		<Unit filename="GDCore/Project/ChangesNotifier.cpp" />
 		<Unit filename="GDCore/Project/ChangesNotifier.h" />
-		<Unit filename="GDCore/Project/ClassWithObjects.cpp" />
-		<Unit filename="GDCore/Project/ClassWithObjects.h" />
+		<Unit filename="GDCore/Project/ObjectsContainer.cpp" />
+		<Unit filename="GDCore/Project/ObjectsContainer.h" />
 		<Unit filename="GDCore/Project/ExternalEvents.cpp" />
 		<Unit filename="GDCore/Project/ExternalEvents.h" />
 		<Unit filename="GDCore/Project/ExternalLayout.cpp" />

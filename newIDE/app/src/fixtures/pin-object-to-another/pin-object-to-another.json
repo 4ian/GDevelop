@@ -108,6 +108,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pin-object-to-another/parent.png",
         "kind": "image",
+        "metadata": "",
         "name": "parent.png",
         "smoothed": true,
         "userAdded": true
@@ -116,6 +117,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pin-object-to-another/child.png",
         "kind": "image",
+        "metadata": "",
         "name": "child.png",
         "smoothed": true,
         "userAdded": true
@@ -683,6 +685,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

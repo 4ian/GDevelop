@@ -27,7 +27,8 @@ class LayoutEditorCanvas;
 class ProjectExporter;
 }  // namespace gd
 
-typedef std::function<std::unique_ptr<gd::Object>(gd::String name)> CreateFunPtr;
+typedef std::function<std::unique_ptr<gd::Object>(gd::String name)>
+    CreateFunPtr;
 
 #undef CreateEvent
 
@@ -85,7 +86,7 @@ class GD_CORE_API Platform {
   virtual gd::String GetExtensionCreateFunctionName() { return ""; }
 
   /**
-   * \brief Add an extension to the manager.
+   * \brief Add an extension to the platform.
    * \note This method is virtual and can be redefined by platforms if they want
    * to do special work when an extension is loaded. \see gd::ExtensionsLoader
    */
@@ -111,6 +112,13 @@ class GD_CORE_API Platform {
     return extensionsLoaded;
   };
 
+  /**
+   * \brief Remove an extension from the platform.
+   *
+   * Events, objects, behaviors provided by the extension won't be available
+   * anymore.
+   */
+  virtual void RemoveExtension(const gd::String& name);
   ///@}
 
   /** \name Factory method

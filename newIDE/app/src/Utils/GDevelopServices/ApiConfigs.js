@@ -1,4 +1,5 @@
 // @flow
+const awsS3 = require('aws-sdk/clients/s3');
 const isDev = process.env.NODE_ENV === 'development';
 
 export const GDevelopHostingApi = {
@@ -10,7 +11,7 @@ export const GDevelopHostingApi = {
 const gdevelopGamesPreviewRegion = 'eu-west-1';
 const gdevelopGamesPreviewBucket = 'gd-games-preview';
 
-export const GDevelopGamesPreview = {
+const gdevelopGamesPreviewOptions = {
   destinationBucket: gdevelopGamesPreviewBucket,
   accessKeyId: process.env.REACT_APP_PREVIEW_S3_ACCESS_KEY_ID,
   secretAccessKey: process.env.REACT_APP_PREVIEW_S3_SECRET_ACCESS_KEY,
@@ -18,9 +19,19 @@ export const GDevelopGamesPreview = {
   destinationBucketBaseUrl: `https://s3-${gdevelopGamesPreviewRegion}.amazonaws.com/${gdevelopGamesPreviewBucket}/`,
 };
 
+export const GDevelopGamesPreview = {
+  options: gdevelopGamesPreviewOptions,
+  awsS3Client: new awsS3({
+    accessKeyId: gdevelopGamesPreviewOptions.accessKeyId,
+    secretAccessKey: gdevelopGamesPreviewOptions.secretAccessKey,
+    region: gdevelopGamesPreviewOptions.region,
+    correctClockSkew: true,
+  })
+}
+
 if (
-  !GDevelopGamesPreview.accessKeyId ||
-  !GDevelopGamesPreview.secretAccessKey
+  !gdevelopGamesPreviewOptions.accessKeyId ||
+  !gdevelopGamesPreviewOptions.secretAccessKey
 ) {
   console.warn(
     "Either REACT_APP_PREVIEW_S3_ACCESS_KEY_ID or REACT_APP_PREVIEW_S3_SECRET_ACCESS_KEY are not defined. Preview in browsers won't be working"
@@ -56,5 +67,5 @@ export const StripeCheckoutConfig = {
     ? 'pk_test_4N7HfDWDds6ejCkxVM7fvvLr'
     : 'pk_live_4N7H3nYlkZV4ylpKlzhmM8fN',
   image:
-    'https://raw.githubusercontent.com/4ian/GD/gh-pages/res/icon128linux.png',
+    'https://raw.githubusercontent.com/4ian/GDevelop/gh-pages/res/icon128linux.png',
 };

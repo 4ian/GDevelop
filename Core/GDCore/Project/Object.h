@@ -16,27 +16,15 @@
 
 namespace gd {
 class PropertyDescriptor;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class MainFrameWrapper;
-}
-namespace gd {
 class ArbitraryResourceWorker;
-}
-namespace gd {
 class InitialInstance;
-}
+class SerializerElement;
+}  // namespace gd
 namespace sf {
 class RenderTarget;
-}
-namespace sf {
-class SerializerElement;
 }
 class wxWindow;
 class wxBitmap;
@@ -77,7 +65,10 @@ class GD_CORE_API Object {
   /**
    * Must return a pointer to a copy of the object. A such method is needed to
    * do polymorphic copies. Just redefine this method in your derived object
-   * class like this: \code return new MyObject(*this); \endcode
+   * class like this:
+   * \code
+   * return gd::make_unique<MyObject>(*this);
+   * \endcode
    */
   virtual std::unique_ptr<gd::Object> Clone() const {
     return gd::make_unique<gd::Object>(*this);

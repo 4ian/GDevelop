@@ -63,6 +63,7 @@
     border-right: 1px solid black;
     padding-left: 5px;
     padding-right: 5px;
+    min-width: 0; /* Prevent container to growing outside its parent */
 }
 
 .gd-events-sheet-dark-theme .actions-container {
@@ -70,6 +71,7 @@
     color: rgb(209, 209, 209);
     padding-left: 5px;
     padding-right: 5px;
+    min-width: 0; /* Prevent container to growing outside its parent */
 }
 
 .gd-events-sheet-dark-theme .sub-instructions-container {
@@ -129,4 +131,25 @@
 .gd-events-sheet-dark-theme .rst__rowSearchFocus {
     outline: none;
     border-left: solid 5px #18DCF2;
+}
+
+/**
+* Drag'n'drop indicator (events)
+*/
+.gd-events-sheet-dark-theme .drop-indicator {
+    border-top: 2px solid #18DCF2;
+    height: 0;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    width: '100%';
+    box-sizing: 'border-box';
+}
+
+.gd-events-sheet-dark-theme .cant-drop-indicator {
+    border-top: 2px solid #FF5C5C;
+    height: 0;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    width: '100%';
+    box-sizing: 'border-box';
 }

@@ -46,17 +46,18 @@ export default class ExternalEventsField extends Component<
   }
 
   _loadNamesFrom(props: ParameterFieldProps) {
-    if (!props.project) {
+    const { project } = props;
+    if (!project) {
       return;
     }
 
     const externalEvents = enumerateExternalEvents(
-      props.project
+      project
     ).map(externalEvents => ({
       text: externalEvents.getName(),
       value: externalEvents.getName(),
     }));
-    const layouts = enumerateLayouts(props.project).map(layout => ({
+    const layouts = enumerateLayouts(project).map(layout => ({
       text: layout.getName(),
       value: layout.getName(),
     }));
@@ -100,6 +101,7 @@ export default class ExternalEventsField extends Component<
           } else if (typeof data.value === 'string') {
             this.props.onChange(data.value);
           }
+          this.focus(); // Keep the focus after choosing an item
         }}
         dataSource={this._fullList}
         openOnFocus={!this.props.isInline}

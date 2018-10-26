@@ -244,7 +244,7 @@ export default class VariablesList extends Component<Props, State> {
 
   render() {
     const { variablesContainer } = this.props;
-    if (!variablesContainer) return;
+    if (!variablesContainer) return null;
 
     const containerVariablesTree = mapFor(
       0,

@@ -27,12 +27,13 @@ gdjs.ParticleEmitterObjectCocosRenderer = function(runtimeScene, runtimeObject, 
     }
     else{
         if(objectData.textureParticleName){
+            // Read the comment at gdjs.ParticleEmitterObjectCocosRenderer.prototype.setTexture
             var imageManager = runtimeScene.getGame().getImageManager();
             var sprite = new cc.Sprite(imageManager.getTexture(objectData.textureParticleName));
             this.originalSize = Math.max(sprite.width, sprite.height);
-            sprite.setPosition( this.originalSize/2.0,  this.originalSize/2.0);
+            sprite.setPosition(this.originalSize/2.0,  this.originalSize/2.0);
             drawer.addChild(sprite);
-            renderTexture = new cc.RenderTexture( this.originalSize,  this.originalSize);
+            renderTexture = new cc.RenderTexture(this.originalSize,  this.originalSize);
         }
         else{
             drawer.drawRect(cc.p((this.originalSize - objectData.rendererParam1)/2.0,
@@ -163,17 +164,13 @@ gdjs.ParticleEmitterObjectCocosRenderer = function(runtimeScene, runtimeObject, 
         plist.finishParticleSizeVariance = plist.startParticleSizeVariance;
     }
 
-    if(objectData.angleParam === "Mutable"){
-        plist.rotationStart = objectData.particleAngle1 + (objectData.particleAngleRandomness1 + objectData.particleAngleRandomness2)/2.0;
-        plist.rotationEnd = objectData.particleAngle2 + (objectData.particleAngleRandomness1 + objectData.particleAngleRandomness2)/2.0;
-        plist.rotationStartVariance = Math.abs(objectData.particleAngleRandomness2 - objectData.particleAngleRandomness1)/2.0;
-        plist.rotationEndVariance = plist.rotationStartVariance;
-    }
-    else{
-        plist.rotationStart = plist.rotationEnd = (objectData.particleAngleRandomness1 + objectData.particleAngleRandomness2)/2.0;
-        plist.rotationStartVariance = Math.abs(objectData.particleAngleRandomness2 - objectData.particleAngleRandomness1)/2.0;
-        plist.rotationEndVariance = plist.rotationStartVariance;
-    }
+    var mediumLifetime = (objectData.particleLifeTimeMin + objectData.particleLifeTimeMax)/2.0;
+    plist.rotationStart = 0.0;
+    plist.rotationStartVariance = 0.0;
+    plist.rotationEnd = (objectData.particleAngle1 + objectData.particleAngle2)/2.0 * mediumLifetime;
+    plist.rotationEndVariance = (Math.max(objectData.particleAngle1, objectData.particleAngle2) -
+                                 Math.min(objectData.particleAngle1, objectData.particleAngle2)) *
+                                mediumLifetime / 2.0;
 
     this.renderer = new cc.ParticleSystem(plist);
     this.renderer.setTexture(texture);
@@ -273,7 +270,23 @@ gdjs.ParticleEmitterObjectCocosRenderer.prototype.isTextureValid = function(text
 gdjs.ParticleEmitterObjectCocosRenderer.prototype.setTexture = function(texture, runtimeScene){
     var texture = runtimeScene.getGame().getImageManager().getTexture(texture);
     if(texture._textureLoaded){
-        this.renderer.setTexture(texture);
+        if(texture.width === texture.height){
+            this.originalSize = texture.width;
+            this.renderer.setTexture(texture);
+        }
+        // Cocos particles are always square, so if the new texture is not squared we have to
+        // render it over a squared renderTexture object, this way we keep the original
+        // texture's aspect ratio
+        else{
+            var sprite = new cc.Sprite(texture);
+            this.originalSize = Math.max(sprite.width, sprite.height);
+            sprite.setPosition(this.originalSize/2.0,  this.originalSize/2.0);
+            var renderTexture = new cc.RenderTexture(this.originalSize,  this.originalSize);
+            renderTexture.begin();
+            sprite.visit();
+            renderTexture.end();
+            this.renderer.setTexture(renderTexture.getSprite().getTexture());
+        }
     }
 };
 

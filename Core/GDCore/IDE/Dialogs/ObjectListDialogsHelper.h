@@ -20,7 +20,7 @@ namespace gd {
 class Object;
 }
 namespace gd {
-class ClassWithObjects;
+class ObjectsContainer;
 }
 namespace gd {
 class ObjectGroupsContainer;
@@ -135,7 +135,7 @@ class GD_CORE_API ObjectListDialogsHelper {
 #if !defined(GD_NO_WX_GUI)
   wxTreeItemId AddObjectsToList(wxTreeCtrl* tree,
                                 wxTreeItemId rootItem,
-                                const gd::ClassWithObjects& objects,
+                                const gd::ObjectsContainer& objects,
                                 bool globalObjects);
   wxTreeItemId AddGroupsToList(wxTreeCtrl* tree,
                                wxTreeItemId rootItem,

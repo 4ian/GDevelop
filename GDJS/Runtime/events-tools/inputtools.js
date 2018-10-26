@@ -148,6 +148,7 @@ gdjs.evtTools.input.keysNameToCode = {
     "Home": 36,
     "Delete": 46,
     "Insert": 45,
+    "Escape": 27,
 
     "Add": 107,
     "Subtract": 109,

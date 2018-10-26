@@ -16,9 +16,10 @@ const styles = {
   },
 };
 
-type Props = ParameterFieldProps & {
+type Props = {
+  ...ParameterFieldProps,
   variablesContainer: ?gdVariablesContainer,
-  onOpenDialog: () => void,
+  onOpenDialog: ?() => void,
 };
 
 type State = {|
@@ -95,6 +96,7 @@ export default class VariableField extends Component<Props, State> {
             } else if (typeof data.value === 'string') {
               this.props.onChange(data.value);
             }
+            this.focus(); // Keep the focus after choosing an item
           }}
           dataSource={this._variableNames.map(variableName => ({
             text: variableName,

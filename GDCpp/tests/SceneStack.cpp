@@ -8,7 +8,7 @@
  */
 #include "GDCpp/Runtime/SceneStack.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCpp/Runtime/RuntimeGame.h"

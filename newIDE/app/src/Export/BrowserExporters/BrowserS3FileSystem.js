@@ -1,11 +1,10 @@
 import path from 'path';
+import { uploadObject } from '../../Utils/GDevelopServices/Preview';
 const gd = global.gd;
 
 export default class BrowserS3FileSystem {
-  constructor({ filesContent, awsS3Client, bucket, prefix, bucketBaseUrl }) {
+  constructor({ filesContent, prefix, bucketBaseUrl }) {
     this.filesContent = filesContent;
-    this.awsS3Client = awsS3Client;
-    this.bucket = bucket;
     this.prefix = prefix;
     this.bucketBaseUrl = bucketBaseUrl;
 
@@ -19,7 +18,7 @@ export default class BrowserS3FileSystem {
   }
 
   uploadPendingObjects = () => {
-    return Promise.all(this._pendingUploadObjects.map(this._uploadObject)).then(
+    return Promise.all(this._pendingUploadObjects.map(uploadObject)).then(
       result => {
         console.log('Uploaded all objects:', result);
         this._pendingUploadObjects = [];
@@ -29,16 +28,6 @@ export default class BrowserS3FileSystem {
         throw error;
       }
     );
-  };
-
-  _uploadObject = params => {
-    return new Promise((resolve, reject) => {
-      this.awsS3Client.putObject(params, (err, data) => {
-        if (err) return reject(err);
-
-        resolve(data);
-      });
-    });
   };
 
   mkDir = path => {
@@ -116,7 +105,6 @@ export default class BrowserS3FileSystem {
     // Defer real upload until it's triggered by calling
     // uploadPendingObjects.
     this._pendingUploadObjects.push({
-      Bucket: this.bucket,
       Key: key,
       Body: contents,
       ContentType: mime[fileExtension],

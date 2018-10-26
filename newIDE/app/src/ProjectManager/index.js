@@ -4,8 +4,9 @@ import { List, ListItem } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 import SearchBar from 'material-ui-search-bar';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
+import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
+import WarningIcon from 'material-ui/svg-icons/alert/warning';
 import IconButton from 'material-ui/IconButton';
-import muiThemeable from 'material-ui/styles/muiThemeable';
 import ListIcon from '../UI/ListIcon';
 import { makeAddItem } from '../UI/ListAddItem';
 import Window from '../Utils/Window';
@@ -16,6 +17,7 @@ import {
   enumerateLayouts,
   enumerateExternalEvents,
   enumerateExternalLayouts,
+  enumerateEventsFunctionsExtensions,
   filterProjectItemsList,
 } from './EnumerateProjectItems';
 import newNameGenerator from '../Utils/NewNameGenerator';
@@ -24,10 +26,12 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
 const EXTERNAL_EVENTS_CLIPBOARD_KIND = 'External events';
+const EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND = 'Events Functions Extension';
 
 const styles = {
   container: {
@@ -53,20 +57,70 @@ const styles = {
   },
 };
 
-const ThemableProjectStructureItem = ({ muiTheme, ...otherProps }) => (
-  <ListItem
-    style={{
-      backgroundColor: muiTheme.listItem.groupBackgroundColor,
-      borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-    }}
-    nestedListStyle={styles.projectStructureItemNestedList}
-    {...otherProps}
-  />
+type ProjectStructureItemProps = {|
+  autoGenerateNestedIndicator: boolean,
+  initiallyOpen: boolean,
+  leftIcon: React$Element<any>,
+  nestedItems: Array<React$Element<any>>,
+  primaryText: string,
+  primaryTogglesNestedList: boolean,
+  error?: ?Error,
+  onRefresh?: () => void,
+  open?: boolean,
+|};
+
+const ProjectStructureItem = ({
+  onRefresh,
+  ...props
+}: ProjectStructureItemProps) => (
+  <ThemeConsumer>
+    {muiTheme => (
+      <ListItem
+        style={{
+          backgroundColor: muiTheme.listItem.groupBackgroundColor,
+          borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+        }}
+        nestedListStyle={styles.projectStructureItemNestedList}
+        {...props}
+        leftIcon={props.error ? <WarningIcon /> : props.leftIcon}
+        rightIconButton={
+          props.error ? (
+            <IconButton
+              tooltip={`An error has occured in functions. Click to reload them.`}
+              tooltipPosition="bottom-left"
+              onClick={onRefresh}
+            >
+              <RefreshIcon />
+            </IconButton>
+          ) : (
+            undefined
+          )
+        }
+      />
+    )}
+  </ThemeConsumer>
 );
 
-const ProjectStructureItem = muiThemeable()(ThemableProjectStructureItem);
+type ItemProps = {|
+  primaryText: string,
+  editingName: boolean,
+  onEdit: () => void,
+  onDelete: () => void,
+  onRename: string => void,
+  onEditName: () => void,
+  onCopy: () => void,
+  onCut: () => void,
+  onPaste: () => void,
+  canPaste: () => boolean,
+  canMoveUp: boolean,
+  onMoveUp: () => void,
+  canMoveDown: boolean,
+  onMoveDown: () => void,
+  rightIconButton?: ?React.Node,
+  style?: ?Object,
+|};
 
-class ThemableItem extends React.Component<*, *> {
+class Item extends React.Component<ItemProps, {||}> {
   textField: ?Object;
   _iconMenu: ?Object;
 
@@ -142,7 +196,6 @@ class ThemableItem extends React.Component<*, *> {
           if (event.charCode === 13) {
             // enter key pressed
             if (this.textField) this.textField.blur();
-            this.props.onRename(event.target.value);
           }
         }}
         fullWidth
@@ -153,22 +206,23 @@ class ThemableItem extends React.Component<*, *> {
     );
 
     return (
-      <ListItem
-        style={{
-          borderBottom: `1px solid ${this.props.muiTheme.listItem
-            .separatorColor}`,
-          ...this.props.style,
-        }}
-        onContextMenu={this._onContextMenu}
-        primaryText={label}
-        rightIconButton={rightIconButton}
-        onClick={this.props.onEdit}
-      />
+      <ThemeConsumer>
+        {muiTheme => (
+          <ListItem
+            style={{
+              borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+              ...this.props.style,
+            }}
+            onContextMenu={this._onContextMenu}
+            primaryText={label}
+            rightIconButton={rightIconButton}
+            onClick={this.props.onEdit}
+          />
+        )}
+      </ThemeConsumer>
     );
   }
 }
-
-const Item = muiThemeable()(ThemableItem);
 
 const AddItem = makeAddItem(ListItem);
 
@@ -177,12 +231,15 @@ type Props = {|
   onDeleteLayout: gdLayout => void,
   onDeleteExternalEvents: gdExternalEvents => void,
   onDeleteExternalLayout: gdExternalLayout => void,
+  onDeleteEventsFunctionsExtension: gdEventsFunctionsExtension => void,
   onRenameLayout: (string, string) => void,
   onRenameExternalEvents: (string, string) => void,
   onRenameExternalLayout: (string, string) => void,
+  onRenameEventsFunctionsExtension: (string, string) => void,
   onOpenLayout: string => void,
   onOpenExternalEvents: string => void,
   onOpenExternalLayout: string => void,
+  onOpenEventsFunctionsExtension: string => void,
   onSaveProject: () => void,
   onCloseProject: () => void,
   onExportProject: () => void,
@@ -191,8 +248,13 @@ type Props = {|
   onAddLayout: () => void,
   onAddExternalEvents: () => void,
   onAddExternalLayout: () => void,
+  onAddEventsFunctionsExtension: () => void,
   onOpenPlatformSpecificAssets: () => void,
   onChangeSubscription: () => void,
+  showEventsFunctionsExtensions: boolean,
+  eventsFunctionsExtensionsError: ?Error,
+  onReloadEventsFunctionsExtensions: () => void,
+  freezeUpdate: boolean,
 |};
 
 type State = {|
@@ -211,6 +273,14 @@ export default class ProjectManager extends React.Component<Props, State> {
     projectPropertiesDialogOpen: false,
     variablesEditorOpen: false,
   };
+
+  shouldComponentUpdate(nextProps: Props) {
+    // Rendering the component is (super) costly (~20ms) as it iterates over
+    // every project layouts/external layouts/external events,
+    // so the prop freezeUpdate allow to ask the component to stop
+    // updating, for example when hidden.
+    return !nextProps.freezeUpdate;
+  }
 
   _onEditName = (kind: ?string, name: string) => {
     this.setState({
@@ -372,6 +442,65 @@ export default class ProjectManager extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  _copyEventsFunctionsExtension = (
+    externalLayout: gdEventsFunctionsExtension
+  ) => {
+    Clipboard.set(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND, {
+      externalLayout: serializeToJSObject(externalLayout),
+      name: externalLayout.getName(),
+    });
+  };
+
+  _cutEventsFunctionsExtension = (
+    externalLayout: gdEventsFunctionsExtension
+  ) => {
+    this._copyEventsFunctionsExtension(externalLayout);
+    this.props.onDeleteEventsFunctionsExtension(externalLayout);
+  };
+
+  _pasteEventsFunctionsExtension = (index: number) => {
+    if (!Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)) return;
+
+    const {
+      externalLayout: copiedEventsFunctionsExtension,
+      name,
+    } = Clipboard.get(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND);
+    const { project } = this.props;
+
+    const newName = newNameGenerator('CopyOf' + name, name =>
+      project.hasEventsFunctionsExtensionNamed(name)
+    );
+
+    const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+      newName,
+      index
+    );
+
+    unserializeFromJSObject(
+      newEventsFunctionsExtension,
+      copiedEventsFunctionsExtension
+    );
+    newEventsFunctionsExtension.setName(newName);
+
+    this.forceUpdate();
+  };
+
+  _moveUpEventsFunctionsExtension = (index: number) => {
+    const { project } = this.props;
+    if (index <= 0) return;
+
+    project.swapEventsFunctionsExtensions(index, index - 1);
+    this.forceUpdate();
+  };
+
+  _moveDownEventsFunctionsExtension = (index: number) => {
+    const { project } = this.props;
+    if (index >= project.getEventsFunctionsExtensionsCount() - 1) return;
+
+    project.swapEventsFunctionsExtensions(index, index + 1);
+    this.forceUpdate();
+  };
+
   _renderMenu() {
     // If there is already a main menu (as the native one made with
     // Electron), don't show it in the Project Manager.
@@ -415,7 +544,12 @@ export default class ProjectManager extends React.Component<Props, State> {
   }
 
   render() {
-    const { project } = this.props;
+    const {
+      project,
+      showEventsFunctionsExtensions,
+      eventsFunctionsExtensionsError,
+      onReloadEventsFunctionsExtensions,
+    } = this.props;
     const { renamedItemKind, renamedItemName, searchText } = this.state;
 
     const forceOpen = searchText !== '' ? true : undefined;
@@ -608,6 +742,78 @@ export default class ProjectManager extends React.Component<Props, State> {
                 />
               )}
           />
+          {(showEventsFunctionsExtensions ||
+            !!project.getEventsFunctionsExtensionsCount()) && (
+              <ProjectStructureItem
+                primaryText="Functions/Extensions"
+                error={eventsFunctionsExtensionsError}
+                onRefresh={onReloadEventsFunctionsExtensions}
+                leftIcon={<ListIcon src="res/ribbon_default/function32.png" />}
+                initiallyOpen={false}
+                open={forceOpen}
+                primaryTogglesNestedList={true}
+                autoGenerateNestedIndicator={
+                  !forceOpen && !eventsFunctionsExtensionsError
+                }
+                nestedItems={filterProjectItemsList(
+                  enumerateEventsFunctionsExtensions(project),
+                  searchText
+                )
+                  .map((eventsFunctionsExtension, i) => {
+                    const name = eventsFunctionsExtension.getName();
+                    return (
+                      <Item
+                        key={i}
+                        primaryText={name}
+                        editingName={
+                          renamedItemKind === 'events-functions-extension' &&
+                          renamedItemName === name
+                        }
+                        onEdit={() =>
+                          this.props.onOpenEventsFunctionsExtension(name)}
+                        onDelete={() =>
+                          this.props.onDeleteEventsFunctionsExtension(
+                            eventsFunctionsExtension
+                          )}
+                        onRename={newName => {
+                          this.props.onRenameEventsFunctionsExtension(
+                            name,
+                            newName
+                          );
+                          this._onEditName(null, '');
+                        }}
+                        onEditName={() =>
+                          this._onEditName('events-functions-extension', name)}
+                        onCopy={() =>
+                          this._copyEventsFunctionsExtension(
+                            eventsFunctionsExtension
+                          )}
+                        onCut={() =>
+                          this._cutEventsFunctionsExtension(
+                            eventsFunctionsExtension
+                          )}
+                        onPaste={() => this._pasteEventsFunctionsExtension(i)}
+                        canPaste={() =>
+                          Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)}
+                        canMoveUp={i !== 0}
+                        onMoveUp={() => this._moveUpEventsFunctionsExtension(i)}
+                        canMoveDown={
+                          i !== project.getEventsFunctionsExtensionsCount() - 1
+                        }
+                        onMoveDown={() =>
+                          this._moveDownEventsFunctionsExtension(i)}
+                      />
+                    );
+                  })
+                  .concat(
+                    <AddItem
+                      key={'add-events-functions-extension'}
+                      primaryText="Click to add functions"
+                      onClick={this.props.onAddEventsFunctionsExtension}
+                    />
+                  )}
+              />
+            )}
         </List>
         <SearchBar
           value={searchText}

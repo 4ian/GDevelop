@@ -28,7 +28,7 @@ module.exports = function(config) {
       '../Runtime/runtimegame.js',
       '../Runtime/variable.js',
       '../Runtime/variablescontainer.js',
-      '../Runtime/eventscontext.js',
+      '../Runtime/oncetriggers.js',
       '../Runtime/runtimescene.js',
       '../Runtime/runtimebehavior.js',
       '../Runtime/runtimeobject.js',

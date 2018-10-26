@@ -189,7 +189,8 @@ BaseObjectExtension::BaseObjectExtension() {
       "getAverageForce().getLength");  // Deprecated
   objectExpressions["Distance"].SetFunctionName("getDistanceToObject");
   objectExpressions["SqDistance"].SetFunctionName("getSqDistanceToObject");
-  objectExpressions["ObjectTimerElapsedTime"].SetFunctionName("getTimerElapsedTimeInSeconds");
+  objectExpressions["ObjectTimerElapsedTime"].SetFunctionName(
+      "getTimerElapsedTimeInSeconds");
   objectStrExpressions["ObjectName"].SetFunctionName("getName");
 
   GetAllActions()["Create"].SetFunctionName(
@@ -274,10 +275,11 @@ BaseObjectExtension::BaseObjectExtension() {
                 expression1Code, codeGenerator, context);
             gd::ExpressionParser parser(
                 instruction.GetParameters()[2].GetPlainString());
-            if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetProject(),
-                                            codeGenerator.GetLayout(),
-                                            callbacks) ||
+            if (!parser.ParseMathExpression(
+                    codeGenerator.GetPlatform(),
+                    codeGenerator.GetGlobalObjectsAndGroups(),
+                    codeGenerator.GetObjectsAndGroups(),
+                    callbacks) ||
                 expression1Code.empty())
               expression1Code = "0";
           }
@@ -288,10 +290,11 @@ BaseObjectExtension::BaseObjectExtension() {
                 expression2Code, codeGenerator, context);
             gd::ExpressionParser parser(
                 instruction.GetParameters()[4].GetPlainString());
-            if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetProject(),
-                                            codeGenerator.GetLayout(),
-                                            callbacks) ||
+            if (!parser.ParseMathExpression(
+                    codeGenerator.GetPlatform(),
+                    codeGenerator.GetGlobalObjectsAndGroups(),
+                    codeGenerator.GetObjectsAndGroups(),
+                    callbacks) ||
                 expression2Code.empty())
               expression2Code = "0";
           }

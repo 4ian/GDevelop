@@ -60,6 +60,6 @@ gdjs.evtTools.window.getCanvasHeight = function(runtimeScene) {
 	return runtimeScene.getGame().getRenderer().getCurrentHeight();
 };
 
-gdjs.evtTools.window.openURL = function(url) {
+gdjs.evtTools.window.openURL = function(url, runtimeScene) {
 	return runtimeScene.getGame().getRenderer().openURL(url);
 };

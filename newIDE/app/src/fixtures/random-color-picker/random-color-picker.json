@@ -105,6 +105,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/random-color-picker/white.png",
         "kind": "image",
+        "metadata": "",
         "name": "white.png",
         "smoothed": true,
         "userAdded": true
@@ -2274,6 +2275,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

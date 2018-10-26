@@ -63,7 +63,7 @@ ${componentStack || 'No component stack found'}
 \`\`\`
         `;
         Window.openExternalURL(
-          `https://github.com/4ian/GD/issues/new?body=${encodeURIComponent(
+          `https://github.com/4ian/GDevelop/issues/new?body=${encodeURIComponent(
             body
           )}&title=Crash%20while%20using%20an%20editor`
         );

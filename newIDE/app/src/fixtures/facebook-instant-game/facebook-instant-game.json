@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Save.png",
         "kind": "image",
+        "metadata": "",
         "name": "Save.png",
         "smoothed": true,
         "userAdded": true
@@ -110,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Add_lives.png",
         "kind": "image",
+        "metadata": "",
         "name": "Add_lives.png",
         "smoothed": true,
         "userAdded": false
@@ -118,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Remove_live.png",
         "kind": "image",
+        "metadata": "",
         "name": "Remove_live.png",
         "smoothed": true,
         "userAdded": true
@@ -126,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Add_score.png",
         "kind": "image",
+        "metadata": "",
         "name": "Add_score.png",
         "smoothed": true,
         "userAdded": true
@@ -134,6 +138,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/facebook-instant-game/Remove_score.png",
         "kind": "image",
+        "metadata": "",
         "name": "Remove_score.png",
         "smoothed": true,
         "userAdded": false
@@ -1433,6 +1438,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

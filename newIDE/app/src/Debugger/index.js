@@ -6,7 +6,7 @@ import DebuggerSelector from './DebuggerSelector';
 import { Column } from '../UI/Grid';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
-import Paper from 'material-ui/Paper';
+import Background from '../UI/Background';
 import optionalRequire from '../Utils/OptionalRequire';
 import EmptyMessage from '../UI/EmptyMessage';
 const electron = optionalRequire('electron');
@@ -43,10 +43,6 @@ type State = {|
   profilingInProgress: { [DebuggerId]: boolean },
   selectedId: DebuggerId,
 |};
-
-const styles = {
-  container: { flex: 1, display: 'flex' },
-};
 
 /**
  * Start the debugger server, listen to commands received and issue commands to it.
@@ -304,7 +300,7 @@ export default class Debugger extends React.Component<Props, State> {
     } = this.state;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         {!debuggerServerStarted &&
           !debuggerServerError && (
             <PlaceholderMessage>
@@ -354,7 +350,7 @@ export default class Debugger extends React.Component<Props, State> {
             )}
           </Column>
         )}
-      </Paper>
+      </Background>
     );
   }
 }

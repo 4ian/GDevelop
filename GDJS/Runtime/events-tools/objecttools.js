@@ -19,13 +19,18 @@ gdjs.evtTools.object = gdjs.evtTools.object || {};
  * @param runtimeObject {gdjs.RuntimeObject} The object to keep in the lists
  */
 gdjs.evtTools.object.pickOnly = function(objectsLists, runtimeObject) {
-    var lists = gdjs.staticArray(gdjs.evtTools.object.pickOnly);
-    objectsLists.values(lists);
+    for (var listName in objectsLists.items) {
+        if (objectsLists.items.hasOwnProperty(listName)) {
+            var list = objectsLists.items[listName];
 
-    for(var i = 0, len = lists.length;i<len;++i)
-        lists[i].length = 0; //Be sure not to lose the reference to the original array
-
-    objectsLists.get(runtimeObject.getName()).push(runtimeObject);
+            if (list.indexOf(runtimeObject) === -1) {
+                list.length = 0; //Be sure not to lose the reference to the original array
+            } else {
+                list.length = 0; //Be sure not to lose the reference to the original array
+                list.push(runtimeObject);
+            }
+        }
+    }
 };
 
 /**
@@ -237,11 +242,11 @@ gdjs.evtTools.object.turnedTowardTest = function(objectsLists1, objectsLists2, t
         objectsLists1, objectsLists2, inverted, tolerance);
 };
 
-gdjs.evtTools.object.pickAllObjects = function(runtimeScene, objectsLists) {
+gdjs.evtTools.object.pickAllObjects = function(objectsContext, objectsLists) {
 
     for (var name in objectsLists.items) {
         if (objectsLists.items.hasOwnProperty(name)) {
-            var allObjects = runtimeScene.getObjects(name);
+            var allObjects = objectsContext.getObjects(name);
             var objectsList = objectsLists.items[name];
             objectsList.length = 0;
             objectsList.push.apply(objectsList, allObjects);
@@ -252,29 +257,39 @@ gdjs.evtTools.object.pickAllObjects = function(runtimeScene, objectsLists) {
 };
 
 gdjs.evtTools.object.pickRandomObject = function(runtimeScene, objectsLists) {
-
-    //Create a list with all the objects
-    //and clear the lists of picked objects.
-    var objects = gdjs.staticArray(gdjs.evtTools.object.pickRandomObject);
-    objects.length = 0;
-
-    var lists = gdjs.staticArray2(gdjs.evtTools.object.pickRandomObject);
-    objectsLists.values(lists);
-    for(var i = 0, len = lists.length;i<len;++i) {
-        objects.push.apply(objects, lists[i]);
-        lists[i].length = 0; //Be sure not to lose the reference to the original array
+    // Compute one many objects we have
+    var objectsCount = 0;
+    for (var listName in objectsLists.items) {
+        if (objectsLists.items.hasOwnProperty(listName)) {
+            var list = objectsLists.items[listName];
+            objectsCount += list.length;
+        }
     }
-
-    //Pick only one object
-    if ( objects.length === 0 )
+    
+    if (objectsCount === 0) 
         return false;
+    
+    // Pick one random object
+    var index = Math.floor(Math.random()*objectsCount);
+    if (index >= objectsCount) index = objectsCount-1; //Should never happen.
 
-    var id = Math.floor(Math.random()*objects.length);
-    if (id >= objects.length) id = objects.length-1; //Should never happen.
-    var theChosenOne = objects[id];
+    // Find the object
+    var startIndex = 0;
+    var theChosenOne = null;
+    for (var listName in objectsLists.items) {
+        if (objectsLists.items.hasOwnProperty(listName)) {
+            var list = objectsLists.items[listName];
 
-    objectsLists.get(theChosenOne.getName()).push(theChosenOne);
+            if (index - startIndex < list.length) {
+                theChosenOne = list[index - startIndex];
+                break;
+            }
 
+            startIndex += list.length;
+        }
+    }
+    
+    gdjs.evtTools.object.pickOnly(objectsLists, theChosenOne);
     return true;
 };
 
@@ -360,10 +375,12 @@ gdjs.evtTools.object.raycastObjectToPosition = function(objectsLists, x, y, endX
  * Do the work of creating a new object
  * @private
  */
-gdjs.evtTools.object.doCreateObjectOnScene = function(runtimeScene, objectName, objectsLists, x, y, layer) {
-
-    //Let's ask the RuntimeScene to create the object
-    var obj = runtimeScene.createObject(objectName);
+gdjs.evtTools.object.doCreateObjectOnScene = function(objectsContext, objectName, objectsLists, x, y, layer) {
+    // objectsContext will either be the gdjs.RuntimeScene or, in an events function, the
+    // eventsFunctionContext. We can't directly use runtimeScene because the object name could
+    // be different than the real object name (this is the case in a function. The eventsFunctionContext
+    // will take care of this in createObject).
+    var obj = objectsContext.createObject(objectName);
 
     if ( obj !== null ) {
         //Do some extra setup
@@ -381,16 +398,16 @@ gdjs.evtTools.object.doCreateObjectOnScene = function(runtimeScene, objectName, 
  * Allows events to create a new object on a scene.
  * @private
  */
-gdjs.evtTools.object.createObjectOnScene = function(runtimeScene, objectsLists, x, y, layer) {
-    gdjs.evtTools.object.doCreateObjectOnScene(runtimeScene, objectsLists.firstKey(), objectsLists, x, y, layer);
+gdjs.evtTools.object.createObjectOnScene = function(objectsContext, objectsLists, x, y, layer) {
+    gdjs.evtTools.object.doCreateObjectOnScene(objectsContext, objectsLists.firstKey(), objectsLists, x, y, layer);
 };
 
 /**
  * Allows events to create a new object on a scene.
  * @private
  */
-gdjs.evtTools.object.createObjectFromGroupOnScene = function(runtimeScene, objectsLists, objectName, x, y, layer) {
-    gdjs.evtTools.object.doCreateObjectOnScene(runtimeScene, objectName, objectsLists, x, y, layer);
+gdjs.evtTools.object.createObjectFromGroupOnScene = function(objectsContext, objectsLists, objectName, x, y, layer) {
+    gdjs.evtTools.object.doCreateObjectOnScene(objectsContext, objectName, objectsLists, x, y, layer);
 };
 
 /**

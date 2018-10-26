@@ -76,6 +76,21 @@ class TextObjectJsExtension : public gd::PlatformExtension {
         .SetFunctionName("isItalic")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
 
+    GetAllActionsForObject("TextObject::Text")["TextObject::SetWrapping"]
+        .SetFunctionName("setWrapping")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::IsWrapping"]
+        .SetFunctionName("isWrapping")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+
+    GetAllActionsForObject("TextObject::Text")["TextObject::WrappingWidth"]
+        .SetFunctionName("setWrappingWidth")
+        .SetGetter("getWrappingWidth")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+    GetAllConditionsForObject("TextObject::Text")["TextObject::WrappingWidth"]
+        .SetFunctionName("getWrappingWidth")
+        .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");
+
     GetAllExpressionsForObject("TextObject::Text")["Opacity"]
         .SetFunctionName("getOpacity")
         .SetIncludeFile("Extensions/TextObject/textruntimeobject.js");

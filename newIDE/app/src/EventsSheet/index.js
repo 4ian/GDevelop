@@ -13,6 +13,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import {
+  type HistoryState,
   undo,
   redo,
   canUndo,
@@ -32,6 +33,7 @@ import {
   hasSomethingSelected,
   hasEventSelected,
   hasInstructionSelected,
+  hasSelectedAtLeastOneCondition,
   hasInstructionsListSelected,
   getSelectedEvents,
   getSelectedInstructions,
@@ -55,21 +57,26 @@ import EventsSearcher, {
   type SearchInEventsInputs,
 } from './EventsSearcher';
 import { containsSubInstructions } from './ContainsSubInstruction';
+import {
+  enumerateEventsMetadata,
+  type EventMetadata,
+} from './EnumerateEventsMetadata';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
 
 type Props = {|
   project: gdProject,
-  layout: gdLayout,
+  layout: ?gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   events: gdEventsList,
   setToolbar: (?React.Node) => void,
-  updateToolbar: () => void,
   showPreviewButton: boolean,
   showNetworkPreviewButton: boolean,
   onPreview: (options: PreviewOptions) => void,
   onOpenDebugger: () => void,
-  onOpenSettings: () => void,
+  onOpenSettings?: ?() => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
   resourceSources: Array<ResourceSource>,
@@ -77,7 +84,7 @@ type Props = {|
   resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 type State = {|
-  history: any, // TODO: Add typing for history (HistoryState<...>)
+  history: HistoryState,
 
   editedInstruction: {
     //TODO: This could be adapted to be a InstructionContext
@@ -107,6 +114,8 @@ type State = {|
   showSearchPanel: boolean,
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
+
+  allEventsMetadata: Array<EventMetadata>,
 |};
 
 const styles = {
@@ -119,7 +128,7 @@ const styles = {
 
 export default class EventsSheet extends React.Component<Props, State> {
   _keyboardShortcuts: KeyboardShortcuts;
-  _eventsTree: EventsTree;
+  _eventsTree: ?EventsTree;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanel;
   eventContextMenu: ContextMenu;
@@ -157,6 +166,8 @@ export default class EventsSheet extends React.Component<Props, State> {
       showSearchPanel: false,
       searchResults: null,
       searchFocusOffset: null,
+
+      allEventsMetadata: [],
     };
 
     this._keyboardShortcuts = new KeyboardShortcuts({
@@ -173,7 +184,13 @@ export default class EventsSheet extends React.Component<Props, State> {
       onCut: this.cutSelection,
       onPaste: this.pasteEventsOrInstructions,
       onSearch: this._toggleSearchPanel,
+      onUndo: this.undo,
+      onRedo: this.redo,
     });
+  }
+
+  componentDidMount() {
+    this.setState({ allEventsMetadata: enumerateEventsMetadata() });
   }
 
   componentWillUnmount() {
@@ -185,6 +202,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     this.props.setToolbar(
       <Toolbar
+        allEventsMetadata={this.state.allEventsMetadata}
         onAddStandardEvent={() =>
           this.addNewEvent('BuiltinCommonInstructions::Standard')}
         onAddSubEvent={this.addSubEvents}
@@ -248,7 +266,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
 
     this._saveChangesToHistory(() => {
-      this._eventsTree.forceEventsUpdate();
+      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
     });
   };
 
@@ -289,9 +307,12 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
 
     this._saveChangesToHistory(() => {
-      this._eventsTree.forceEventsUpdate(() => {
+      const eventsTree = this._eventsTree;
+      if (!eventsTree) return;
+
+      eventsTree.forceEventsUpdate(() => {
         if (!context && !hasEventsSelected) {
-          this._eventsTree.scrollToEvent(newEvents[0]);
+          eventsTree.scrollToEvent(newEvents[0]);
         }
       });
     });
@@ -369,6 +390,8 @@ export default class EventsSheet extends React.Component<Props, State> {
 
     if (!this._keyboardShortcuts.shouldCloneInstances()) {
       this.deleteSelection(/*deleteOnlyInstructions=*/ true);
+    } else {
+      this._saveChangesToHistory();
     }
   };
 
@@ -478,7 +501,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     getSelectedEvents(this.state.selection).forEach(event =>
       event.setDisabled(!event.isDisabled())
     );
-    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
+    this._saveChangesToHistory(() => {
+      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    });
   };
 
   deleteSelection = (deleteOnlyInstructions: boolean = false) => {
@@ -499,7 +524,9 @@ export default class EventsSheet extends React.Component<Props, State> {
       inlineEditing: false,
       inlineEditingAnchorEl: null,
     });
-    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
+    this._saveChangesToHistory(() => {
+      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    });
   };
 
   copySelection = () => {
@@ -551,7 +578,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
     eventsList.delete();
 
-    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
+    this._saveChangesToHistory(() => {
+      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    });
   };
 
   pasteInstructions = () => {
@@ -591,7 +620,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
     instructionsList.delete();
 
-    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
+    this._saveChangesToHistory(() => {
+      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    });
   };
 
   pasteEventsOrInstructions = () => {
@@ -600,6 +631,22 @@ export default class EventsSheet extends React.Component<Props, State> {
       this.pasteInstructions();
     else if (hasInstructionsListSelected(this.state.selection))
       this.pasteInstructions();
+  };
+
+  _invertSelectedConditions = () => {
+    getSelectedInstructionsContexts(
+      this.state.selection
+    ).forEach(instructionContext => {
+      if (instructionContext.isCondition) {
+        instructionContext.instruction.setInverted(
+          !instructionContext.instruction.isInverted()
+        );
+      }
+    });
+
+    this._saveChangesToHistory(() => {
+      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    });
   };
 
   _saveChangesToHistory = (cb: ?Function) => {
@@ -615,35 +662,39 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   undo = () => {
+    if (!canUndo(this.state.history)) return;
+
     const { events, project } = this.props;
     const newHistory = undo(this.state.history, events, project);
 
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
-    this._eventsTree.forceEventsUpdate();
+    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
     this.setState({ history: newHistory }, () => this.updateToolbar());
   };
 
   redo = () => {
+    if (!canRedo(this.state.history)) return;
+
     const { events, project } = this.props;
     const newHistory = redo(this.state.history, events, project);
 
     // /!\ Events were changed, so any reference to an existing event can now
     // be invalid. Make sure to immediately trigger a forced update before
     // any re-render that could use a deleted/invalid event.
-    this._eventsTree.forceEventsUpdate();
+    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
 
     this.setState({ history: newHistory }, () => this.updateToolbar());
   };
 
   _openEventsContextAnalyzer = () => {
-    const { project, layout } = this.props;
+    const { globalObjectsContainer, objectsContainer } = this.props;
     const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
       gd.JsPlatform.get(),
-      project,
-      layout
+      globalObjectsContainer,
+      objectsContainer
     );
 
     const eventsList = new gd.EventsList();
@@ -686,7 +737,9 @@ export default class EventsSheet extends React.Component<Props, State> {
     inputs: ReplaceInEventsInputs
   ) => {
     doReplaceInEvents(inputs);
-    this._saveChangesToHistory(() => this._eventsTree.forceEventsUpdate());
+    this._saveChangesToHistory(() => {
+      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+    });
   };
 
   _searchInEvents = (
@@ -694,8 +747,17 @@ export default class EventsSheet extends React.Component<Props, State> {
     inputs: SearchInEventsInputs
   ) => {
     doSearchInEvents(inputs, () => {
-      this.forceUpdate(() => this._eventsTree.forceEventsUpdate());
+      this.forceUpdate(() => {
+        if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+      });
     });
+  };
+
+  _onEventMoved = () => {
+    // Move of the event in the list is handled by EventsTree.
+    // This could be refactored and put here if the drag'n'drop of events
+    // is reworked at some point.
+    this._saveChangesToHistory();
   };
 
   render() {
@@ -705,6 +767,8 @@ export default class EventsSheet extends React.Component<Props, State> {
       events,
       onOpenExternalEvents,
       onOpenLayout,
+      globalObjectsContainer,
+      objectsContainer,
     } = this.props;
     if (!project) return null;
 
@@ -713,8 +777,8 @@ export default class EventsSheet extends React.Component<Props, State> {
         key={events.ptr}
         ref={eventSearcher => (this._eventSearcher = eventSearcher)}
         events={events}
-        project={project}
-        layout={layout}
+        globalObjectsContainer={globalObjectsContainer}
+        objectsContainer={objectsContainer}
         selection={this.state.selection}
       >
         {({
@@ -738,6 +802,8 @@ export default class EventsSheet extends React.Component<Props, State> {
               events={events}
               project={project}
               layout={layout}
+              globalObjectsContainer={globalObjectsContainer}
+              objectsContainer={objectsContainer}
               selection={this.state.selection}
               onInstructionClick={this.selectInstruction}
               onInstructionDoubleClick={this.openInstructionEditor}
@@ -760,6 +826,7 @@ export default class EventsSheet extends React.Component<Props, State> {
               onOpenLayout={onOpenLayout}
               searchResults={eventsSearchResultEvents}
               searchFocusOffset={searchFocusOffset}
+              onEventMoved={this._onEventMoved}
             />
             {this.state.showSearchPanel && (
               <SearchPanel
@@ -788,6 +855,8 @@ export default class EventsSheet extends React.Component<Props, State> {
               onRequestClose={this.closeParameterEditor}
               project={project}
               layout={layout}
+              globalObjectsContainer={globalObjectsContainer}
+              objectsContainer={objectsContainer}
               isCondition={this.state.editedParameter.isCondition}
               instruction={this.state.editedParameter.instruction}
               parameterIndex={this.state.editedParameter.parameterIndex}
@@ -826,15 +895,33 @@ export default class EventsSheet extends React.Component<Props, State> {
                   enabled: Clipboard.has(CLIPBOARD_KIND),
                   accelerator: 'CmdOrCtrl+V',
                 },
-                { type: 'separator' },
-                {
-                  label: 'Toggle disabled',
-                  click: () => this.toggleDisabled(),
-                },
                 {
                   label: 'Delete',
                   click: () => this.deleteSelection(),
                   accelerator: 'Delete',
+                },
+                {
+                  label: 'Toggle disabled',
+                  click: () => this.toggleDisabled(),
+                },
+                { type: 'separator' },
+                {
+                  label: 'Add New Event Below',
+                  click: () =>
+                    this.addNewEvent('BuiltinCommonInstructions::Standard'),
+                },
+                {
+                  label: 'Add Sub Event',
+                  click: () => this.addSubEvents(),
+                },
+                {
+                  label: 'Add Other',
+                  submenu: this.state.allEventsMetadata.map(metadata => {
+                    return {
+                      label: metadata.fullName,
+                      click: () => this.addNewEvent(metadata.type),
+                    };
+                  }),
                 },
                 { type: 'separator' },
                 {
@@ -895,6 +982,11 @@ export default class EventsSheet extends React.Component<Props, State> {
                   enabled: canRedo(this.state.history),
                   accelerator: 'CmdOrCtrl+Shift+Z',
                 },
+                {
+                  label: 'Invert Condition',
+                  click: () => this._invertSelectedConditions(),
+                  visible: hasSelectedAtLeastOneCondition(this.state.selection),
+                },
               ]}
             />
             <ContextMenu
@@ -926,7 +1018,10 @@ export default class EventsSheet extends React.Component<Props, State> {
               <InstructionEditorDialog
                 project={project}
                 layout={layout}
-                {...this.state.editedInstruction}
+                globalObjectsContainer={globalObjectsContainer}
+                objectsContainer={objectsContainer}
+                instruction={this.state.editedInstruction.instruction}
+                isCondition={this.state.editedInstruction.isCondition}
                 isNewInstruction={
                   this.state.editedInstruction.indexInList === undefined
                 }
@@ -950,7 +1045,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
                   this.closeInstructionEditor(true);
                   ensureSingleOnceInstructions(instrsList);
-                  this._eventsTree.forceEventsUpdate();
+                  if (this._eventsTree) this._eventsTree.forceEventsUpdate();
                 }}
                 resourceSources={this.props.resourceSources}
                 onChooseResource={this.props.onChooseResource}

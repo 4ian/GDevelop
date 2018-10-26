@@ -8,7 +8,7 @@
  * ⚠️ If you make a change and the extension is not loaded, open the developer console
  * and search for any errors.
  *
- * More information on https://github.com/4ian/GD/blob/master/newIDE/README-extensions.md
+ * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
   createExtension: function(t, gd) {

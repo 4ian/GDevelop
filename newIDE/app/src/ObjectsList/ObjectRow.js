@@ -154,16 +154,15 @@ class ThemableObjectRow extends React.Component {
         onClick={() => {
           if (!this.props.onObjectSelected) return;
           if (this.props.editingName) return;
-
           this.props.onObjectSelected(selected ? '' : objectName);
         }}
-        onDoubleClick={(event) => {
+        onDoubleClick={event => {
           if (event.button !== LEFT_MOUSE_BUTTON) return;
           if (!this.props.onEdit) return;
           if (this.props.editingName) return;
 
-          this.props.onEdit(object);
           this.props.onObjectSelected('');
+          this.props.onEdit(object);
         }}
       />
     );

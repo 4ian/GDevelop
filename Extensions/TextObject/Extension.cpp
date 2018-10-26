@@ -283,6 +283,53 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
+  obj.AddAction("SetWrapping",
+                _("Wrapping"),
+                _("De/activate word wrapping. Note that word wrapping is a graphical option,\nyou can't get the number of lines displayed"),
+                _("Set word wrapping style of _PARAM0_: _PARAM1_"),
+                _("Style"),
+                "res/actions/wordWrap24.png",
+                "res/actions/wordWrap.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("yesorno", _("Wrapping"));
+
+  obj.AddCondition("IsWrapping",
+                   _("Wrapping"),
+                   _("Test if the word wrapping style of an object is set."),
+                   _("_PARAM0_ word wrapping style is activated"),
+                   _("Style"),
+                   "res/conditions/wordWrap24.png",
+                   "res/conditions/wordWrap.png")
+
+      .AddParameter("object", _("Object"), "Text");
+
+  obj.AddAction("WrappingWidth",
+                _("Wrapping width"),
+                _("Modify the word wrapping width of a Text object."),
+                _("Do _PARAM1__PARAM2_ to the wrapping width of _PARAM0_"),
+                _("Style"),
+                "res/actions/wordWrap24.png",
+                "res/actions/wordWrap.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value"))
+      .SetManipulatedType("number");
+
+  obj.AddCondition("WrappingWidth",
+                   _("Wrapping width"),
+                   _("Test the word wrapping width of a Text object."),
+                   _("The wrapping width of _PARAM0_ is _PARAM1__PARAM2_"),
+                   _("Style"),
+                   "res/conditions/wordWrap24.png",
+                   "res/conditions/wordWrap.png")
+
+      .AddParameter("object", _("Object"), "Text")
+      .AddParameter("relationalOperator", _("Sign of the test"))
+      .AddParameter("expression", _("Value to test"))
+      .SetManipulatedType("number");
+
   obj.AddExpression("Opacity",
                     _("Opacity"),
                     _("Opacity"),

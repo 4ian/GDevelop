@@ -23,10 +23,10 @@ export default ({ profile }: Props) =>
     <Column>
       <Line alignItems="center">
         <Avatar src={getGravatarUrl(profile.email || '', { size: 40 })} />
-        <span style={styles.title}>You are connect as {profile.email}</span>
+        <span style={styles.title}>You are connected as {profile.email}</span>
       </Line>
       <Line>
-        <p>With your account, you can access to GDevelop online services.</p>
+        <p>An account allows you to access GDevelop services online.</p>
       </Line>
     </Column>
   ) : (

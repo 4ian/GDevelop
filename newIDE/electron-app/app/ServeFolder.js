@@ -1,4 +1,5 @@
 const liveServer = require('live-server');
+const httpsConfiguration = require('./Utils/DevServerHttpsConfiguration.js');
 const os = require('os');
 const net = require('net');
 
@@ -27,7 +28,7 @@ module.exports = {
   /**
    * Start a server to serve a folder
    */
-  serveFolder: ({ root }, onDone) => {
+  serveFolder: ({ root, useHttps }, onDone) => {
     if (currentServerParams && currentServerParams.root === root)
     {
       onDone(null, currentServerParams);
@@ -41,6 +42,7 @@ module.exports = {
         root,
         open: false,
         wait: 1000,
+        https: useHttps ? httpsConfiguration : undefined,
       };
       liveServer.start(currentServerParams);
       onDone(null, currentServerParams);

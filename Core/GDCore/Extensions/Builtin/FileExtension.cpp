@@ -174,6 +174,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsFileExtension(
                  "res/actions/launchFile24.png",
                  "res/actions/launchFile.png")
       .AddParameter("string", _("URL (or filename)"))
+      .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
   extension

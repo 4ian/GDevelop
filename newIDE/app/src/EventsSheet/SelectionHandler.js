@@ -105,6 +105,17 @@ export const hasInstructionSelected = (selection: SelectionState): boolean => {
   return !!Object.keys(selection.selectedInstructions).length;
 };
 
+export const hasSelectedAtLeastOneCondition = (
+  selection: SelectionState
+): boolean => {
+  for (let instructionContext of getSelectedInstructionsContexts(selection)) {
+    if (instructionContext.isCondition) {
+      return true;
+    }
+  }
+  return false;
+};
+
 export const hasInstructionsListSelected = (
   selection: SelectionState
 ): boolean => {
@@ -164,7 +175,8 @@ export const selectInstructionsList = (
   instructionsListContext: InstructionsListContext,
   multiSelection: boolean = false
 ): SelectionState => {
-  const instructionsList: gdInstructionsList = instructionsListContext.instrsList;
+  const instructionsList: gdInstructionsList =
+    instructionsListContext.instrsList;
   if (isInstructionsListSelected(selection, instructionsList)) return selection;
 
   const existingSelection = multiSelection ? selection : clearSelection();

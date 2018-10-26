@@ -20,7 +20,8 @@ SceneExtension::SceneExtension() {
   GetAllExpressions()["Random"].SetFunctionName("gdjs.random");
   GetAllExpressions()["RandomInRange"].SetFunctionName("gdjs.randomInRange");
   GetAllExpressions()["RandomFloat"].SetFunctionName("gdjs.randomFloat");
-  GetAllExpressions()["RandomFloatInRange"].SetFunctionName("gdjs.randomFloatInRange");
+  GetAllExpressions()["RandomFloatInRange"].SetFunctionName(
+      "gdjs.randomFloatInRange");
   GetAllExpressions()["RandomWithStep"].SetFunctionName("gdjs.randomWithStep");
   GetAllStrExpressions()["CurrentSceneName"].SetFunctionName(
       "gdjs.evtTools.runtimeScene.getSceneName");
@@ -48,10 +49,11 @@ SceneExtension::SceneExtension() {
               value1Code, codeGenerator, context);
           gd::ExpressionParser parser(
               instruction.GetParameters()[0].GetPlainString());
-          if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                          codeGenerator.GetProject(),
-                                          codeGenerator.GetLayout(),
-                                          callbacks) ||
+          if (!parser.ParseMathExpression(
+                  codeGenerator.GetPlatform(),
+                  codeGenerator.GetGlobalObjectsAndGroups(),
+                  codeGenerator.GetObjectsAndGroups(),
+                  callbacks) ||
               value1Code.empty())
             value1Code = "0";
         }
@@ -62,10 +64,11 @@ SceneExtension::SceneExtension() {
               value2Code, codeGenerator, context);
           gd::ExpressionParser parser(
               instruction.GetParameters()[2].GetPlainString());
-          if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                          codeGenerator.GetProject(),
-                                          codeGenerator.GetLayout(),
-                                          callbacks) ||
+          if (!parser.ParseMathExpression(
+                  codeGenerator.GetPlatform(),
+                  codeGenerator.GetGlobalObjectsAndGroups(),
+                  codeGenerator.GetObjectsAndGroups(),
+                  callbacks) ||
               value2Code.empty())
             value2Code = "0";
         }

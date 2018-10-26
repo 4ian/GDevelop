@@ -10,8 +10,6 @@
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
-}
-namespace gd {
 class ArbitraryResourceWorker;
 }
 

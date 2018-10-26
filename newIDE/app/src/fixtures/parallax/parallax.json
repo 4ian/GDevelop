@@ -102,6 +102,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax/Vegetation_(middle_layer).png",
         "kind": "image",
+        "metadata": "",
         "name": "Vegetation_(middle_layer).png",
         "smoothed": true,
         "userAdded": true
@@ -110,6 +111,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax/Ground_(front_layer).png",
         "kind": "image",
+        "metadata": "",
         "name": "Ground_(front_layer).png",
         "smoothed": true,
         "userAdded": true
@@ -118,6 +120,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax/Sky_back_layer.png",
         "kind": "image",
+        "metadata": "",
         "name": "Sky_back_layer.png",
         "smoothed": true,
         "userAdded": true
@@ -126,6 +129,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/parallax/Elisa_standing.png",
         "kind": "image",
+        "metadata": "",
         "name": "Elisa_standing.png",
         "smoothed": true,
         "userAdded": true
@@ -762,6 +766,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

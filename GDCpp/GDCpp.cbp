@@ -808,7 +808,7 @@
 		<Unit filename="GDCpp/Project/Object.cpp" />
 		<Unit filename="GDCpp/Project/Object.h" />
 		<Unit filename="GDCpp/RuntimeObjectHelpers.h" />
-		<Unit filename="GDCpp/Project/ClassWithObjects.cpp" />
+		<Unit filename="GDCpp/Project/ObjectsContainer.cpp" />
 		<Unit filename="GDCpp/Point.cpp" />
 		<Unit filename="GDCpp/Point.h" />
 		<Unit filename="GDCpp/Polygon.cpp" />

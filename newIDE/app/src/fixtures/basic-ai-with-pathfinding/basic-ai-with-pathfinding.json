@@ -114,6 +114,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/bordure2.png",
         "kind": "image",
+        "metadata": "",
         "name": "bordure2.png",
         "smoothed": true,
         "userAdded": true
@@ -122,6 +123,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV1.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank1",
         "smoothed": false,
         "userAdded": true
@@ -130,6 +132,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV2.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank2",
         "smoothed": false,
         "userAdded": true
@@ -138,6 +141,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV3.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank3",
         "smoothed": false,
         "userAdded": true
@@ -146,6 +150,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV4.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank4",
         "smoothed": false,
         "userAdded": true
@@ -154,6 +159,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV5.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank5",
         "smoothed": false,
         "userAdded": true
@@ -162,6 +168,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV6.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank6",
         "smoothed": false,
         "userAdded": true
@@ -170,6 +177,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV7.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank7",
         "smoothed": false,
         "userAdded": true
@@ -178,6 +186,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/bordure.png",
         "kind": "image",
+        "metadata": "",
         "name": "bordure.png",
         "smoothed": false,
         "userAdded": true
@@ -186,6 +195,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/TankB1.png",
         "kind": "image",
+        "metadata": "",
         "name": "TankB1.png",
         "smoothed": false,
         "userAdded": true
@@ -194,6 +204,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/alert.png",
         "kind": "image",
+        "metadata": "",
         "name": "alert.png",
         "smoothed": true,
         "userAdded": false
@@ -202,6 +213,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-ai-with-pathfinding/tankV1.png",
         "kind": "image",
+        "metadata": "",
         "name": "tankV1.png",
         "smoothed": true,
         "userAdded": true
@@ -2155,6 +2167,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

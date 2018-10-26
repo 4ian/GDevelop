@@ -23,11 +23,11 @@ Refer to the [GDevelop IDE Readme](./README.md) for more information about the i
 
 ## Development
 
-- First, run [GDevelop with Electron](https://github.com/4ian/GD/blob/master/newIDE/README.md#development-of-the-standalone-app).
+- First, run [GDevelop with Electron](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md#development-of-the-standalone-app).
 
   When GDevelop is started, the developer console should be opened. Search for the message `Loaded x JS extensions.` that indicates the loading of extensions.
 
-- You can now open an extensions contained in the folder _Extensions_ at the root of the repository. For example, you can open [Extensions/FacebookInstantGames](https://github.com/4ian/GD/tree/master/Extensions/FacebookInstantGames). Edit the JsExtension.js file or a runtime file. After any change, you must import them in GDevelop:
+- You can now open an extensions contained in the folder _Extensions_ at the root of the repository. For example, you can open [Extensions/FacebookInstantGames](https://github.com/4ian/GDevelop/tree/master/Extensions/FacebookInstantGames). Edit the JsExtension.js file or a runtime file. After any change, you must import them in GDevelop:
 
   ```bash
   cd scripts
@@ -148,4 +148,4 @@ Declaring extensions in JavaScript is still new, and enhancements are possible t
 ## Development of extensions declared in C++ (`JsExtension.cpp` or `Extension.cpp`)
 
 The majority of extensions are still declared in C++ for being compatible with GDevelop 4.
-Check the sources in [Extensions folder](https://github.com/4ian/GD/tree/master/Extensions) and install [GDevelop.js](https://github.com/4ian/GDevelop.js). You'll then be able to make changes in C++ source files and have this reflected in the editor.
+Check the sources in [Extensions folder](https://github.com/4ian/GDevelop/tree/master/Extensions) and install [GDevelop.js](https://github.com/4ian/GDevelop.js). You'll then be able to make changes in C++ source files and have this reflected in the editor.

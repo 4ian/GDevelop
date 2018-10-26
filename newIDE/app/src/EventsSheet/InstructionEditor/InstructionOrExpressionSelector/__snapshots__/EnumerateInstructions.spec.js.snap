@@ -217,6 +217,18 @@ Object {
         "type": "Distance",
       },
     },
+    "Timers": Object {
+      "Timer paused": Object {
+        "displayedName": "Timer paused",
+        "fullGroupName": "Common conditions for all objects/Timers",
+        "type": "ObjectTimerPaused",
+      },
+      "Value of a timer": Object {
+        "displayedName": "Value of a timer",
+        "fullGroupName": "Common conditions for all objects/Timers",
+        "type": "ObjectTimer",
+      },
+    },
     "Variables": Object {
       "Structures": Object {
         "Child existence": Object {
@@ -947,6 +959,16 @@ Object {
         "fullGroupName": "Text object/Style",
         "type": "TextObject::IsItalic",
       },
+      "Wrapping": Object {
+        "displayedName": "Wrapping",
+        "fullGroupName": "Text object/Style",
+        "type": "TextObject::IsWrapping",
+      },
+      "Wrapping width": Object {
+        "displayedName": "Wrapping width",
+        "fullGroupName": "Text object/Style",
+        "type": "TextObject::WrappingWidth",
+      },
     },
   },
   "Tiled Sprite Object": Object {
@@ -976,8 +998,8 @@ Object {
     },
   },
   "Timers and time": Object {
-    "State of a timer": Object {
-      "displayedName": "State of a timer",
+    "Scene timer paused": Object {
+      "displayedName": "Scene timer paused",
       "fullGroupName": "Timers and time",
       "type": "TimerPaused",
     },
@@ -986,8 +1008,8 @@ Object {
       "fullGroupName": "Timers and time",
       "type": "TimeScale",
     },
-    "Value of a timer": Object {
-      "displayedName": "Value of a timer",
+    "Value of a scene timer": Object {
+      "displayedName": "Value of a scene timer",
       "fullGroupName": "Timers and time",
       "type": "Timer",
     },
@@ -1210,6 +1232,21 @@ Array [
     "type": "ObjectVariableRemoveChild",
   },
   Object {
+    "displayedName": "Pause a timer",
+    "fullGroupName": "Common action for all objects/Timers",
+    "type": "PauseObjectTimer",
+  },
+  Object {
+    "displayedName": "Delete a timer",
+    "fullGroupName": "Common action for all objects/Timers",
+    "type": "RemoveObjectTimer",
+  },
+  Object {
+    "displayedName": "Start (or reset) a timer",
+    "fullGroupName": "Common action for all objects/Timers",
+    "type": "ResetObjectTimer",
+  },
+  Object {
     "displayedName": "Rotate",
     "fullGroupName": "Common action for all objects/Angle",
     "type": "Rotate",
@@ -1233,6 +1270,11 @@ Array [
     "displayedName": "Angle",
     "fullGroupName": "Common action for all objects/Angle",
     "type": "SetAngle",
+  },
+  Object {
+    "displayedName": "Unpause a timer",
+    "fullGroupName": "Common action for all objects/Timers",
+    "type": "UnPauseObjectTimer",
   },
   Object {
     "displayedName": "Change the animation",
@@ -1395,22 +1437,22 @@ Array [
     "type": "ChangeTimeScale",
   },
   Object {
-    "displayedName": "Pause a timer",
+    "displayedName": "Pause a scene timer",
     "fullGroupName": "Timers and time",
     "type": "PauseTimer",
   },
   Object {
-    "displayedName": "Delete a timer",
+    "displayedName": "Delete a scene timer",
     "fullGroupName": "Timers and time",
     "type": "RemoveTimer",
   },
   Object {
-    "displayedName": "Reset a timer",
+    "displayedName": "Start (or reset) a scene timer",
     "fullGroupName": "Timers and time",
     "type": "ResetTimer",
   },
   Object {
-    "displayedName": "Unpause a timer",
+    "displayedName": "Unpause a scene timer",
     "fullGroupName": "Timers and time",
     "type": "UnPauseTimer",
   },
@@ -1635,6 +1677,21 @@ Array [
     "type": "SetWindowTitle",
   },
   Object {
+    "displayedName": "Set condition return value",
+    "fullGroupName": "Functions",
+    "type": "SetReturnBoolean",
+  },
+  Object {
+    "displayedName": "Set number return value",
+    "fullGroupName": "Functions",
+    "type": "SetReturnNumber",
+  },
+  Object {
+    "displayedName": "Set text return value",
+    "fullGroupName": "Functions",
+    "type": "SetReturnString",
+  },
+  Object {
     "displayedName": "Create objects from an external layout",
     "fullGroupName": "External layouts",
     "type": "BuiltinExternalLayouts::CreateObjectsFromExternalLayout",
@@ -1845,6 +1902,11 @@ Array [
     "type": "TextObject::SetItalic",
   },
   Object {
+    "displayedName": "Wrapping",
+    "fullGroupName": "Text object/Style",
+    "type": "TextObject::SetWrapping",
+  },
+  Object {
     "displayedName": "Size",
     "fullGroupName": "Text object/",
     "type": "TextObject::Size",
@@ -1853,6 +1915,11 @@ Array [
     "displayedName": "Modify the text",
     "fullGroupName": "Text object/",
     "type": "TextObject::String",
+  },
+  Object {
+    "displayedName": "Wrapping width",
+    "fullGroupName": "Text object/Style",
+    "type": "TextObject::WrappingWidth",
   },
   Object {
     "displayedName": "Angle of the spray cone",
@@ -2415,6 +2482,16 @@ Array [
     "type": "Layer",
   },
   Object {
+    "displayedName": "Value of a timer",
+    "fullGroupName": "Common conditions for all objects/Timers",
+    "type": "ObjectTimer",
+  },
+  Object {
+    "displayedName": "Timer paused",
+    "fullGroupName": "Common conditions for all objects/Timers",
+    "type": "ObjectTimerPaused",
+  },
+  Object {
     "displayedName": "Child existence",
     "fullGroupName": "Common conditions for all objects/Variables/Structures",
     "type": "ObjectVariableChildExists",
@@ -2655,12 +2732,12 @@ Array [
     "type": "TimeScale",
   },
   Object {
-    "displayedName": "Value of a timer",
+    "displayedName": "Value of a scene timer",
     "fullGroupName": "Timers and time",
     "type": "Timer",
   },
   Object {
-    "displayedName": "State of a timer",
+    "displayedName": "Scene timer paused",
     "fullGroupName": "Timers and time",
     "type": "TimerPaused",
   },
@@ -2925,6 +3002,11 @@ Array [
     "type": "TextObject::IsItalic",
   },
   Object {
+    "displayedName": "Wrapping",
+    "fullGroupName": "Text object/Style",
+    "type": "TextObject::IsWrapping",
+  },
+  Object {
     "displayedName": "Opacity",
     "fullGroupName": "Text object/",
     "type": "TextObject::Opacity",
@@ -2938,6 +3020,11 @@ Array [
     "displayedName": "Compare the text",
     "fullGroupName": "Text object/",
     "type": "TextObject::String",
+  },
+  Object {
+    "displayedName": "Wrapping width",
+    "fullGroupName": "Text object/Style",
+    "type": "TextObject::WrappingWidth",
   },
   Object {
     "displayedName": "Angle of the spray cone",

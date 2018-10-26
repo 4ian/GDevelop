@@ -25,7 +25,7 @@ window.gdjs = {
 
 /**
  * Convert a rgb color value to a hex string.
- * 
+ *
  * No "#" or "0x" are added.
  */
 gdjs.rgbToHex = function(r, g, b) {
@@ -229,6 +229,25 @@ gdjs.staticArray2 = function(owner) {
 gdjs.staticObject = function(owner) {
   owner._staticObject = owner._staticObject || {};
   return owner._staticObject;
+};
+
+/**
+ * Return a new array of objects that is the concatenation of all the objects passed
+ * as parameters.
+ * @param objectsLists
+ */
+gdjs.objectsListsToArray = function(objectsLists) {
+  var lists = gdjs.staticArray(gdjs.objectsListsToArray);
+  objectsLists.values(lists);
+
+  var result = [];
+  for (var i = 0; i < lists.length; ++i) {
+    var arr = lists[i];
+    for (var k = 0; k < arr.length; ++k) {
+      result.push(arr[k]);
+    }
+  }
+  return result;
 };
 
 Array.prototype.remove = function(from) {

@@ -3,7 +3,9 @@ import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 
 export default class OperatorField extends Component {
-  focus() {}
+  focus() {
+    if (this._field && this._field.focus) this._field.focus();
+  }
 
   render() {
     const { parameterMetadata } = this.props;

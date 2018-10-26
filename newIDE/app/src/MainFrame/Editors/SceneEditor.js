@@ -6,7 +6,7 @@ import BaseEditor from './BaseEditor';
 import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 
 export default class SceneEditorContainer extends BaseEditor {
-  editor: ?typeof SceneEditor;
+  editor: ?SceneEditor;
 
   shouldComponentUpdate(nextProps: *) {
     // This optimization is a bit more cautious than the one is BaseEditor, to still allow

@@ -3,15 +3,15 @@
 This is the GDevelop 5 editor. It is based on [React](https://facebook.github.io/react/), [Material-UI](http://www.material-ui.com), [Pixi.js](https://github.com/pixijs/pixi.js) and [Electron](https://electron.atom.io/).
 It uses GDevelop [core C++ classes compiled to Javascript](https://github.com/4ian/GDevelop.js) to work with GDevelop games.
 
-![GDevelop editor](https://raw.githubusercontent.com/4ian/GD/master/newIDE/gd-ide-screenshot.png "GDevelop editor")
+![GDevelop editor](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/gd-ide-screenshot.png "GDevelop editor")
 
 ## Installation
 
 Make sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) installed. [Yarn](https://yarnpkg.com) is optional.
 
 ```bash
-git clone https://github.com/4ian/GD.git
-cd GD/newIDE/app
+git clone https://github.com/4ian/GDevelop.git
+cd GDevelop/newIDE/app
 npm install #or yarn
 ```
 
@@ -47,6 +47,13 @@ node node_modules\electron\cli.js app
 ./node_modules/electron/dist/electron app
 ```
 
+### Quick Install and Run
+
+There is a script file that automates cloning this repository, building the newIde and running it
+
+* For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GDevelop/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GD to be cloned to, then simply run it.
+
+
 ### Development of UI components
 
 You can run a [storybook](https://github.com/storybooks/storybook) that is used as a playground for rapid UI component development and testing:
@@ -68,7 +75,7 @@ npm run flow #or yarn flow
 
 ### Theming
 
-It's possible to create new themes for the UI. See [this file](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/index.js) to declare a new theme. You can take a look at the [default theme](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/index.js), including the [styling of the Events Sheets](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/EventsSheet.css).
+It's possible to create new themes for the UI. See [this file](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/UI/Theme/index.js) to declare a new theme. You can take a look at the [default theme](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/index.js), including the [styling of the Events Sheets](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/UI/Theme/DefaultTheme/EventsSheet.css).
 
 ### Development of the game engine or extensions.
 
@@ -76,7 +83,7 @@ Make sure to have the standalone app running with Electron.
 
 * If you want create/modify *a extensions*, check the [README about extensions](./README-extensions.md) for a step-by-step explanations to get started in 5 minutes.
 
-* The *game engine core* ([GDJS](https://github.com/4ian/GD/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GD/tree/master/GDJS/Runtime). If you modify anything, run the `import-GDJS-Runtime.js` script:
+* The *game engine core* ([GDJS](https://github.com/4ian/GDevelop/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GDevelop/tree/master/GDJS/Runtime). If you modify anything, run the `import-GDJS-Runtime.js` script:
 
   ```bash
   cd newIDE/app
@@ -84,7 +91,7 @@ Make sure to have the standalone app running with Electron.
   node import-GDJS-Runtime.js
   ```
 
-  You can then launch a preview in GDevelop (again, be sure to be using [the standalone app running with Electron](https://github.com/4ian/GD/blob/master/newIDE/README.md#development-of-the-standalone-app) to be sure to have your changes reflected immediately).
+  You can then launch a preview in GDevelop (again, be sure to be using [the standalone app running with Electron](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md#development-of-the-standalone-app) to be sure to have your changes reflected immediately).
 
 ### Recommended tools for development
 
@@ -125,11 +132,11 @@ yarn deploy #or npm run deploy
 
 This new editor is always in development. Check the [the roadmap for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap). For example:
 
-- [ ] Support for translations (See an [example of a component that can be translated](https://github.com/4ian/GD/blob/master/newIDE/app/src/MainFrame/Toolbar.js#L44))
+- [ ] Support for translations (See an [example of a component that can be translated](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/MainFrame/Toolbar.js#L44))
 - [ ] Support for native games
-- [ ] More [examples](https://github.com/4ian/GD/blob/master/newIDE/app/src/ProjectCreation/BrowserExamples.js)
+- [ ] More [examples](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/ProjectCreation/BrowserExamples.js)
 - [ ] More [tutorials](http://wiki.compilgames.net/doku.php/gdevelop5/start)
-- [ ] Add more [keyboard shortcuts](https://github.com/4ian/GD/blob/master/newIDE/app/src/UI/KeyboardShortcuts/index.js)
+- [ ] Add more [keyboard shortcuts](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/UI/KeyboardShortcuts/index.js)
 - [ ] Make [drawers movable/draggable like the properties panel and the objects editor](https://trello.com/c/GOdj2Lk5/132-allow-panels-to-be-dragged-in-a-separate-window-in-addition-to-the-main-window).
 
 You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.

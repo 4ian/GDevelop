@@ -15,11 +15,13 @@ import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sp
 import changeSpriteColor from '../fixtures/change-sprite-color/change-sprite-color.json';
 import characterSelection from '../fixtures/character-selection/character-selection.json';
 import controllerInput from '../fixtures/controller-input/controller-input.json';
-import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
-import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
 import customFont from '../fixtures/custom-font/custom-font.json';
 import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-lastpressedkey/customize-keys-with-lastpressedkey.json';
+import customMousePointer from '../fixtures/custom-mouse-pointer/custom-mouse-pointer.json';
+import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
+import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
+import deviceVibration from '../fixtures/device-vibration/device-vibration.json';
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
 import dropCollectItemsFromStorage from '../fixtures/drop-collect-items-from-storage/drop-collect-items-from-storage.json';
 import exitApp from '../fixtures/exit-app/exit-app.json';
@@ -27,21 +29,24 @@ import facebookInstantGame from '../fixtures/facebook-instant-game/facebook-inst
 import findDiagonals from '../fixtures/find-diagonals/find-diagonals.json';
 import healthBar from '../fixtures/health-bar/health-bar.json';
 import infiniteScrollingBackground from '../fixtures/infinite-scrolling-background/infinite-scrolling-background.json';
-import instanceTimer from '../fixtures/instance-timer/instance-timer.json';
 import inventorySystem from '../fixtures/inventory-system/inventory-system.json';
 import isometricGame from '../fixtures/isometric-game/isometric-game.json';
 import javascriptBlocksInPlatformer from '../fixtures/javascript-blocks-in-platformer/javascript-blocks-in-platformer.json';
 import keyboardPractice from '../fixtures/keyboard-practice/keyboard-practice.json';
+import levelEditor from '../fixtures/level-editor/level-editor.json';
 import loadImageFromUrl from '../fixtures/load-image-from-url/load-image-from-url.json';
 import magnet from '../fixtures/magnet/magnet.json';
 import manipulateTextObject from '../fixtures/manipulate-text-object/manipulate-text-object.json';
 import moveCameraToPosition from '../fixtures/move-camera-to-position/move-camera-to-position.json';
+import moveObjectBackAndForth from '../fixtures/move-object-back-and-forth/move-object-back-and-forth.json';
 import moveObjectInCircle from '../fixtures/move-object-in-circle/move-object-in-circle.json';
 import moveObjectTowardPosition from '../fixtures/move-object-toward-position/move-object-toward-position.json';
+import moveObjectWithMouseJoint from '../fixtures/move-object-with-mouse-joint/move-object-with-mouse-joint.json';
 import moveObjectWithPhysics from '../fixtures/move-object-with-physics/move-object-with-physics.json';
 import multitouch from '../fixtures/multitouch/multitouch.json';
 import objectGravity from '../fixtures/object-gravity/object-gravity.json';
 import objectSelection from '../fixtures/object-selection/object-selection.json';
+import objectsTimers from '../fixtures/objects-timers/objects-timers.json';
 import openUrlInBrowser from '../fixtures/open-url-in-browser/open-url-in-browser.json';
 import parallax from '../fixtures/parallax/parallax.json';
 import parallaxScrolling from '../fixtures/parallax-scrolling/parallax-scrolling.json';
@@ -70,6 +75,7 @@ import shootBullets from '../fixtures/shoot-bullets/shoot-bullets.json';
 import shootingBulletsExplanation from '../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
 import snapObjectToGrid from '../fixtures/snap-object-to-grid/snap-object-to-grid.json';
 import spaceShooter from '../fixtures/space-shooter/space-shooter.json';
+import spaceShooterWithFunctions from '../fixtures/space-shooter-with-functions/space-shooter-with-functions.json';
 import splashScreen from '../fixtures/splash-screen/splash-screen.json';
 import spriteFadeInOut from '../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
 import textEntryObject from '../fixtures/text-entry-object/text-entry-object.json';
@@ -79,7 +85,6 @@ import toggleMusicPlaySound from '../fixtures/toggle-music-play-sound/toggle-mus
 import typeOnTextEffect from '../fixtures/type-on-text-effect/type-on-text-effect.json';
 import zDepth from '../fixtures/z-depth/z-depth.json';
 import zombieLaser from '../fixtures/zombie-laser/zombie-laser.json';
-
 
 export default class BrowserProjectOpener {
   static readInternalFile(url) {
@@ -125,12 +130,16 @@ export default class BrowserProjectOpener {
       return Promise.resolve(deviceOrientationBallgame);
     } else if (url === 'example://device-orientation-compass') {
       return Promise.resolve(deviceOrientationCompass);
+    } else if (url === 'example://device-vibration') {
+      return Promise.resolve(deviceVibration);
     } else if (url === 'example://create-object-with-mouseclick') {
       return Promise.resolve(createObjectWithMouseclick);
     } else if (url === 'example://custom-font') {
       return Promise.resolve(customFont);
     } else if (url === 'example://customize-keys-with-lastpressedkey') {
       return Promise.resolve(customizeKeysWithLastpressedkey);
+    } else if (url === 'example://custom-mouse-pointer') {
+      return Promise.resolve(customMousePointer);
     } else if (url === 'example://drag-camera-with-mouse') {
       return Promise.resolve(dragCameraWithMouse);
     } else if (url === 'example://drop-collect-items-from-storage') {
@@ -145,8 +154,6 @@ export default class BrowserProjectOpener {
       return Promise.resolve(healthBar);
     } else if (url === 'example://infinite-scrolling-background') {
       return Promise.resolve(infiniteScrollingBackground);
-    } else if (url === 'example://instance-timer') {
-      return Promise.resolve(instanceTimer);
     } else if (url === 'example://inventory-system') {
       return Promise.resolve(inventorySystem);
     } else if (url === 'example://isometric-game') {
@@ -155,6 +162,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(javascriptBlocksInPlatformer);
     } else if (url === 'example://keyboard-practice') {
       return Promise.resolve(keyboardPractice);
+    } else if (url === 'example://level-editor') {
+      return Promise.resolve(levelEditor);
     } else if (url === 'example://load-image-from-url') {
       return Promise.resolve(loadImageFromUrl);
     } else if (url === 'example://magnet') {
@@ -163,10 +172,14 @@ export default class BrowserProjectOpener {
       return Promise.resolve(manipulateTextObject);
     } else if (url === 'example://move-camera-to-position') {
       return Promise.resolve(moveCameraToPosition);
+    } else if (url === 'example://move-object-back-and-forth') {
+      return Promise.resolve(moveObjectBackAndForth);
     } else if (url === 'example://move-object-in-circle') {
       return Promise.resolve(moveObjectInCircle);
     } else if (url === 'example://move-object-toward-position') {
       return Promise.resolve(moveObjectTowardPosition);
+    } else if (url === 'example://move-object-with-mouse-joint') {
+      return Promise.resolve(moveObjectWithMouseJoint);
     } else if (url === 'example://move-object-with-physics') {
       return Promise.resolve(moveObjectWithPhysics);
     } else if (url === 'example://multitouch') {
@@ -175,6 +188,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(objectGravity);
     } else if (url === 'example://object-selection') {
       return Promise.resolve(objectSelection);
+    } else if (url === 'example://objects-timers') {
+      return Promise.resolve(objectsTimers);
     } else if (url === 'example://open-url-in-browser') {
       return Promise.resolve(openUrlInBrowser);
     } else if (url === 'example://parallax') {
@@ -227,6 +242,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(snapObjectToGrid);
     } else if (url === 'example://space-shooter') {
       return Promise.resolve(spaceShooter);
+    } else if (url === 'example://space-shooter-with-functions') {
+      return Promise.resolve(spaceShooterWithFunctions);
     } else if (url === 'example://splash-screen') {
       return Promise.resolve(splashScreen);
     } else if (url === 'example://sprite-fade-in-out') {

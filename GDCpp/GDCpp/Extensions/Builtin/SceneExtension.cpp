@@ -72,8 +72,8 @@ SceneExtension::SceneExtension() {
           gd::ExpressionParser parser(
               instruction.GetParameters()[0].GetPlainString());
           if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                          codeGenerator.GetProject(),
-                                          codeGenerator.GetLayout(),
+                                          codeGenerator.GetGlobalObjectsAndGroups(),
+                                          codeGenerator.GetObjectsAndGroups(),
                                           callbacks) ||
               value1Code.empty())
             value1Code = "0";
@@ -86,8 +86,8 @@ SceneExtension::SceneExtension() {
           gd::ExpressionParser parser(
               instruction.GetParameters()[2].GetPlainString());
           if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                          codeGenerator.GetProject(),
-                                          codeGenerator.GetLayout(),
+                                          codeGenerator.GetGlobalObjectsAndGroups(),
+                                          codeGenerator.GetObjectsAndGroups(),
                                           callbacks) ||
               value2Code.empty())
             value2Code = "0";

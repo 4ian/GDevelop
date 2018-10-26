@@ -687,6 +687,31 @@ module.exports = {
       }
     ]
   },
+  "custom-mouse-pointer": {
+    "description": "Learn how to replace the mouse cursor by a custom image.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      }
+    ]
+  },
   "customize-keys-with-lastpressedkey": {
     "description": "This explains how to remember the last key that was pressed and customize the inputs of your game.",
     "usedExtensions": [
@@ -771,6 +796,27 @@ module.exports = {
       {
         "fullName": "Base object",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "device-vibration": {
+    "description": "Show how to make the device vibrate.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Device vibration",
+        "name": "DeviceVibration"
       }
     ]
   },
@@ -993,27 +1039,6 @@ module.exports = {
       }
     ]
   },
-  "instance-timer": {
-    "description": "Learn how to have your objects on the scene have their own timers.",
-    "usedExtensions": [
-      {
-        "fullName": "Text object",
-        "name": "TextObject"
-      },
-      {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
-      },
-      {
-        "fullName": "Base object",
-        "name": "BuiltinObject"
-      }
-    ]
-  },
   "inventory-system": {
     "description": "Learn how to display an inventory, with object that can be addded or removed, and how to persist it in storage.",
     "usedExtensions": [
@@ -1198,6 +1223,67 @@ module.exports = {
       }
     ]
   },
+  "level-editor": {
+    "description": "Example showing a basic level editor, where you can save and load positions of objects put on the scene during the game. Also shows how to use simple functions.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Primitive drawing",
+        "name": "PrimitiveDrawing"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Draggable Behavior",
+        "name": "DraggableBehavior"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Storage and files",
+        "name": "BuiltinFile"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      }
+    ]
+  },
   "load-image-from-url": {
     "description": "Advanced example showing how to use JavaScript to load an image from an external URL.",
     "usedExtensions": [
@@ -1322,6 +1408,31 @@ module.exports = {
       }
     ]
   },
+  "move-object-back-and-forth": {
+    "description": "Use events to move objects back and forth vertically or horizontally.\n",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      }
+    ]
+  },
   "move-object-in-circle": {
     "description": "This shows how to make an object move in circle around some point.",
     "usedExtensions": [
@@ -1369,6 +1480,35 @@ module.exports = {
       {
         "fullName": "Base object",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "move-object-with-mouse-joint": {
+    "description": "Show how to use physics engine to move an object around with the mouse and realistic movements.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Physics behavior",
+        "name": "PhysicsBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
       }
     ]
   },
@@ -1477,6 +1617,35 @@ module.exports = {
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
+      }
+    ]
+  },
+  "objects-timers": {
+    "description": "Example showing various usage of objects timers (timers that are stored into instances of objects on the scene, as opposed to scene timers which are stored by the scene).",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       }
     ]
   },
@@ -2373,6 +2542,67 @@ module.exports = {
       {
         "fullName": "Audio",
         "name": "BuiltinAudio"
+      }
+    ]
+  },
+  "space-shooter-with-functions": {
+    "description": "The space shooter example with some events rewritten to be reusable functions (custom conditions/actions or expressions).",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Top-down movement",
+        "name": "TopDownMovementBehavior"
+      },
+      {
+        "fullName": "Destroy Outside Screen Behavior",
+        "name": "DestroyOutsideBehavior"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "",
+        "name": ""
       }
     ]
   },

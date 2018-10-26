@@ -1,10 +1,16 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
 import Divider from 'material-ui/Divider';
 import Toggle from 'material-ui/Toggle';
 import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
 import ParameterRenderingService from './ParameterRenderingService';
 import HelpButton from '../../UI/HelpButton';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 const gd = global.gd;
 
 const styles = {
@@ -36,13 +42,72 @@ const styles = {
   },
 };
 
-export default class InstructionParametersEditor extends Component {
-  _getNonCodeOnlyParametersCount(instructionMetadata) {
+type Props = {|
+  project: gdProject,
+  layout: ?gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  instruction: gdInstruction,
+  isCondition: boolean,
+  focusOnMount?: boolean,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  style?: Object,
+|};
+type State = {||};
+
+export default class InstructionParametersEditor extends React.Component<
+  Props,
+  State
+> {
+  _firstVisibleField: ?any = {};
+
+  componentDidMount() {
+    if (this.props.focusOnMount) {
+      setTimeout(() => {
+        this.focus();
+      }, 300); // Let the time to the dialog that is potentially containing the InstructionParametersEditor to finish its transition.
+    }
+  }
+
+  focus() {
+    // Verify that there is a field to focus.
+    if (
+      this._getNonCodeOnlyParametersCount(this._getInstructionMetadata()) !== 0
+    ) {
+      if (this._firstVisibleField && this._firstVisibleField.focus) {
+        this._firstVisibleField.focus();
+      }
+    }
+  }
+
+  _getNonCodeOnlyParametersCount(instructionMetadata: ?gdInstructionMetadata) {
+    if (!instructionMetadata) return 0;
+
     return mapFor(0, instructionMetadata.getParametersCount(), i => {
+      if (!instructionMetadata) return false;
+
       const parameterMetadata = instructionMetadata.getParameter(i);
       return !parameterMetadata.isCodeOnly();
     }).filter(isVisible => isVisible).length;
   }
+
+  _getInstructionMetadata = (): ?gdInstructionMetadata => {
+    const { instruction, isCondition, project } = this.props;
+    const type = instruction.getType();
+    if (!type) return null;
+
+    return isCondition
+      ? gd.MetadataProvider.getConditionMetadata(
+          project.getCurrentPlatform(),
+          type
+        )
+      : gd.MetadataProvider.getActionMetadata(
+          project.getCurrentPlatform(),
+          type
+        );
+  };
 
   _renderEmpty() {
     return (
@@ -57,24 +122,24 @@ export default class InstructionParametersEditor extends Component {
   }
 
   render() {
-    const { instruction, isCondition, project, layout } = this.props;
-    const type = instruction.getType();
-    if (!type) return this._renderEmpty();
+    const {
+      instruction,
+      project,
+      layout,
+      globalObjectsContainer,
+      objectsContainer,
+    } = this.props;
 
-    const instructionMetadata = isCondition
-      ? gd.MetadataProvider.getConditionMetadata(
-          project.getCurrentPlatform(),
-          type
-        )
-      : gd.MetadataProvider.getActionMetadata(
-          project.getCurrentPlatform(),
-          type
-        );
+    const type = instruction.getType();
+    const instructionMetadata = this._getInstructionMetadata();
+    if (!instructionMetadata) return this._renderEmpty();
+
     const helpPage = instructionMetadata.getHelpPath();
 
     //TODO?
     instruction.setParametersCount(instructionMetadata.getParametersCount());
 
+    let parameterFieldIndex = 0;
     return (
       <div style={styles.container}>
         <div style={styles.instructionHeader}>
@@ -103,11 +168,18 @@ export default class InstructionParametersEditor extends Component {
               return null;
             }
 
+            // Track the field count on screen, to affect the ref to the
+            // first visible field.
+            const isFirstVisibleParameterField = parameterFieldIndex === 0;
+            parameterFieldIndex++;
+
             return (
               <ParameterComponent
                 parameterMetadata={parameterMetadata}
                 project={project}
                 layout={layout}
+                globalObjectsContainer={globalObjectsContainer}
+                objectsContainer={objectsContainer}
                 value={instruction.getParameter(i)}
                 instructionOrExpression={instruction}
                 key={i}
@@ -119,6 +191,11 @@ export default class InstructionParametersEditor extends Component {
                 resourceSources={this.props.resourceSources}
                 onChooseResource={this.props.onChooseResource}
                 resourceExternalEditors={this.props.resourceExternalEditors}
+                ref={field => {
+                  if (isFirstVisibleParameterField) {
+                    this._firstVisibleField = field;
+                  }
+                }}
               />
             );
           })}

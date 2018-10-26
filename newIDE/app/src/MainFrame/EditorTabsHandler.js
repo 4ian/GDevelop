@@ -186,3 +186,23 @@ export const closeExternalEventsTabs = (
     state.currentTab
   );
 };
+
+export const closeEventsFunctionsExtensionTabs = (
+  state: EditorTabsState,
+  eventsFunctionsExtension: gdEventsFunctionsExtension
+) => {
+  return changeCurrentTab(
+    {
+      ...state,
+      editors: state.editors.filter(editorTab => {
+        return (
+          !editorTab.editorRef ||
+          !editorTab.editorRef.getEventsFunctionsExtension ||
+          !editorTab.editorRef.getEventsFunctionsExtension() ||
+          editorTab.editorRef.getEventsFunctionsExtension() !== eventsFunctionsExtension
+        );
+      }),
+    },
+    state.currentTab
+  );
+};

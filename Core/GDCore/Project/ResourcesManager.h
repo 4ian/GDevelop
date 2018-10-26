@@ -10,14 +10,8 @@
 #include "GDCore/String.h"
 namespace gd {
 class Project;
-}
-namespace gd {
 class ResourceFolder;
-}
-namespace gd {
 class SerializerElement;
-}
-namespace gd {
 class PropertyDescriptor;
 }
 class wxPaintDC;
@@ -48,7 +42,7 @@ class GD_CORE_API Resource {
    */
   virtual void SetKind(const gd::String& newKind) { kind = newKind; }
 
-  /** \brief Return the name of the object.
+  /** \brief Return the kind of the resource.
    */
   virtual const gd::String& GetKind() const { return kind; }
 
@@ -90,6 +84,18 @@ class GD_CORE_API Resource {
    * the resource.
    */
   gd::String GetAbsoluteFile(const gd::Project& game) const;
+
+  /**
+   * \brief Set the metadata (any string) associated to the resource.
+   * \note Can be used by external editors to store extra information, for
+   * example the configuration used to produce a sound.
+   */
+  virtual void SetMetadata(const gd::String& metadata_) { metadata = metadata_; }
+
+  /**
+   * \brief Return the (optional) metadata associated to the resource
+   */
+  virtual const gd::String& GetMetadata() const { return metadata; }
 
 #if !defined(GD_NO_WX_GUI)
   /**
@@ -150,6 +156,7 @@ class GD_CORE_API Resource {
  private:
   gd::String kind;
   gd::String name;
+  gd::String metadata;
   bool userAdded;  ///< True if the resource was added by the user, and not
                    ///< automatically by GDevelop.
 

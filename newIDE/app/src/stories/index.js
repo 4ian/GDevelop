@@ -7,11 +7,13 @@ import { linkTo } from '@storybook/addon-links';
 
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
+import HelpIcon from '../UI/HelpIcon';
 import StartPage from '../MainFrame/Editors/StartPage';
 import AboutDialog from '../MainFrame/AboutDialog';
 import CreateProjectDialog from '../ProjectCreation/CreateProjectDialog';
 import { Tabs, Tab } from '../UI/Tabs';
 import DragHandle from '../UI/DragHandle';
+import Background from '../UI/Background';
 import HelpFinder from '../HelpFinder';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
 import LocalFilePicker from '../UI/LocalFilePicker';
@@ -32,6 +34,7 @@ import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterField
 import LayerField from '../EventsSheet/InstructionEditor/ParameterFields/LayerField';
 import MouseField from '../EventsSheet/InstructionEditor/ParameterFields/MouseField';
 import SceneVariableField from '../EventsSheet/InstructionEditor/ParameterFields/SceneVariableField';
+import ObjectVariableField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectVariableField';
 import KeyField from '../EventsSheet/InstructionEditor/ParameterFields/KeyField';
 import ExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/InstructionEditor/ParameterFields/StringField';
@@ -45,8 +48,8 @@ import LayoutChooserDialog from '../MainFrame/Editors/LayoutChooserDialog';
 import InstructionEditor from '../EventsSheet/InstructionEditor';
 import EventsSheet from '../EventsSheet';
 import BehaviorsEditor from '../BehaviorsEditor';
-import ObjectsGroupEditor from '../ObjectsGroupEditor';
-import ObjectsGroupsList from '../ObjectsGroupsList';
+import ObjectGroupEditor from '../ObjectGroupEditor';
+import ObjectGroupsList from '../ObjectGroupsList';
 import muiDecorator from './MuiDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
@@ -91,7 +94,21 @@ import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
 import { I18nextProvider } from 'react-i18next';
+import PlaceholderMessage from '../UI/PlaceholderMessage';
+import PlaceholderLoader from '../UI/PlaceholderLoader';
+import InlineCheckbox from '../UI/InlineCheckbox';
+import LoaderModal from '../UI/LoaderModal';
+import ColorField from '../UI/ColorField';
+import EmptyMessage from '../UI/EmptyMessage';
+import BackgroundText from '../UI/BackgroundText';
 import i18n from '../UI/i18n';
+import ObjectField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectField';
+import { getInitialSelection } from '../EventsSheet/SelectionHandler';
+import EventsFunctionConfigurationEditor from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor';
+import EventsFunctionsList from '../EventsFunctionsList';
+import EventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor';
+import OptionsEditorDialog from '../EventsFunctionsExtensionEditor/OptionsEditorDialog';
+import ProjectManager from '../ProjectManager';
 
 const gd = global.gd;
 const {
@@ -108,6 +125,8 @@ const {
   spriteObjectWithBehaviors,
   group2,
   emptyLayout,
+  testEventsFunction,
+  testEventsFunctionsExtension,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -116,47 +135,183 @@ storiesOf('Welcome', module).add('to Storybook', () => (
   <Welcome showApp={linkTo('Button')} />
 ));
 
-storiesOf('Tabs', module)
+storiesOf('UI Building Blocks/Background', module)
   .addDecorator(muiDecorator)
-  .add('3 tabs', () => (
-    <Tabs>
-      <Tab label="Tab 1" onClose={action('Close tab 1')}>
-        <div>Tab 1 content</div>
-      </Tab>
-      <Tab label="Tab 2" onClose={action('Close tab 2')}>
-        <div>Tab 2 content</div>
-      </Tab>
-      <Tab label="Tab 3 with a long label" onClose={action('Close tab 3')}>
-        <div>Tab 3 content</div>
-      </Tab>
-    </Tabs>
-  ))
-  .add('long labels', () => (
-    <Tabs>
-      <Tab
-        label="Tab 1 with a very very long label"
-        onClose={action('Close tab 1')}
-      >
-        <div>Tab 1 content</div>
-      </Tab>
-      <Tab label="Small 2" onClose={action('Close tab 2')}>
-        <div>Tab 2 content</div>
-      </Tab>
-      <Tab
-        label="Tab 3 with a very very loooong label"
-        onClose={action('Close tab 3')}
-      >
-        <div>Tab 3 content</div>
-      </Tab>
-      <Tab label="Small 4" onClose={action('Close tab 4')}>
-        <div>Tab 4 content</div>
-      </Tab>
-    </Tabs>
+  .add('default', () => <Background>Hello world</Background>);
+
+storiesOf('UI Building Blocks/LoaderModal', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <LoaderModal show />);
+
+storiesOf('UI Building Blocks/InlineCheckbox', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <div style={{ display: 'flex' }}>
+      <InlineCheckbox label={'My label'} checked={true} />
+      <InlineCheckbox label={'My label 2'} checked={false} />
+    </div>
   ));
 
-storiesOf('HelpButton', module)
+storiesOf('UI Building Blocks/PlaceholderMessage', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <PlaceholderMessage>
+      <p>
+        Neque porro quisquam est qui dolorem ipsum quia dolor sit amet,
+        consectetur, adipisci velit
+      </p>
+    </PlaceholderMessage>
+  ));
+
+storiesOf('UI Building Blocks/PlaceholderLoader', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <PlaceholderLoader />);
+
+storiesOf('UI Building Blocks/DragHandle', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => <DragHandle />);
+
+storiesOf('UI Building Blocks/EmptyMessage', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <EmptyMessage>
+      Hello World, this is an empty message, which is centered.
+    </EmptyMessage>
+  ));
+
+storiesOf('UI Building Blocks/BackgroundText', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <BackgroundText>Hello World, this is a background text</BackgroundText>
+  ));
+
+storiesOf('UI Building Blocks/ColorField', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <div>
+      <ColorField
+        floatingLabelText="Particles start color"
+        disableAlpha
+        fullWidth
+        color={{
+          r: 100,
+          g: 100,
+          b: 200,
+          a: 255,
+        }}
+        onChangeComplete={() => {}}
+      />
+      <ColorField
+        floatingLabelText="This is not full width"
+        disableAlpha
+        color={{
+          r: 100,
+          g: 100,
+          b: 200,
+          a: 255,
+        }}
+        onChangeComplete={() => {}}
+      />
+    </div>
+  ));
+
+storiesOf('UI Building Blocks/Tabs', module)
+  .addDecorator(muiDecorator)
+  .add('3 tabs', () => (
+    <div style={{ height: 400, display: 'flex' }}>
+      <Tabs>
+        <Tab label="Tab 1" onClose={action('Close tab 1')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 1 content
+          </div>
+        </Tab>
+        <Tab label="Tab 2" onClose={action('Close tab 2')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 2 content
+          </div>
+        </Tab>
+        <Tab label="Tab 3 with a long label" onClose={action('Close tab 3')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 3 content
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
+  ))
+  .add('long labels', () => (
+    <div style={{ height: 400, display: 'flex' }}>
+      <Tabs>
+        <Tab
+          label="Tab 1 with a very very long label"
+          onClose={action('Close tab 1')}
+        >
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 1 content
+          </div>
+        </Tab>
+        <Tab label="Small 2" onClose={action('Close tab 2')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 2 content
+          </div>
+        </Tab>
+        <Tab
+          label="Tab 3 with a very very loooong label"
+          onClose={action('Close tab 3')}
+        >
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 3 content
+          </div>
+        </Tab>
+        <Tab label="Small 4" onClose={action('Close tab 4')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 4 content
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
+  ))
+  .add('with ObjectsList (to check scrolling)', () => (
+    <div style={{ height: 400, display: 'flex' }}>
+      <Tabs>
+        <Tab label="Tab 1" onClose={action('Close tab 1')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            The second tab has a list of objects. Check that the scrolling
+            position is maintained while navigating between tabs.
+          </div>
+        </Tab>
+        <Tab label="Tab 2" onClose={action('Close tab 2')}>
+          <ObjectsList
+            getThumbnail={() => 'res/unknown32.png'}
+            project={project}
+            objectsContainer={testLayout}
+            onEditObject={action('On edit object')}
+            selectedObjectNames={[]}
+          />
+        </Tab>
+        <Tab label="Tab 3" onClose={action('Close tab 3')}>
+          <div style={{ backgroundColor: 'green', height: '100%' }}>
+            Tab 3 content
+          </div>
+        </Tab>
+      </Tabs>
+    </div>
+  ));
+
+storiesOf('UI Building Blocks/HelpButton', module)
   .addDecorator(muiDecorator)
   .add('default', () => <HelpButton helpPagePath="/test" />);
+
+storiesOf('UI Building Blocks/HelpIcon', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => <HelpIcon helpPagePath="/test" />);
 
 storiesOf('HelpFinder', module)
   .addDecorator(muiDecorator)
@@ -172,6 +327,8 @@ storiesOf('ParameterFields', module)
         <ExpressionField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
           parameterRenderingService={ParameterRenderingService}
@@ -186,9 +343,26 @@ storiesOf('ParameterFields', module)
         <StringField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
           parameterRenderingService={ParameterRenderingService}
+        />
+      )}
+    />
+  ))
+  .add('ObjectField', () => (
+    <ValueStateHolder
+      initialValue={'MySpriteObject'}
+      render={(value, onChange) => (
+        <ObjectField
+          project={project}
+          layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
         />
       )}
     />
@@ -199,8 +373,23 @@ storiesOf('ParameterFields', module)
       render={(value, onChange) => (
         <ExternalEventsField
           project={project}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('ExternalEventsField (without project)', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <ExternalEventsField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
         />
       )}
     />
@@ -212,8 +401,23 @@ storiesOf('ParameterFields', module)
         <LayerField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('LayerField (without project and layout)', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <LayerField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
         />
       )}
     />
@@ -222,7 +426,13 @@ storiesOf('ParameterFields', module)
     <ValueStateHolder
       initialValue={'Space'}
       render={(value, onChange) => (
-        <KeyField project={project} value={value} onChange={onChange} />
+        <KeyField
+          project={project}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
       )}
     />
   ))
@@ -230,7 +440,13 @@ storiesOf('ParameterFields', module)
     <ValueStateHolder
       initialValue={'Left'}
       render={(value, onChange) => (
-        <MouseField project={project} value={value} onChange={onChange} />
+        <MouseField
+          project={project}
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
       )}
     />
   ))
@@ -241,8 +457,36 @@ storiesOf('ParameterFields', module)
         <SceneVariableField
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           value={value}
           onChange={onChange}
+        />
+      )}
+    />
+  ))
+  .add('SceneVariableField (without layout and project)', () => (
+    <ValueStateHolder
+      initialValue={'Variable1'}
+      render={(value, onChange) => (
+        <SceneVariableField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
+      )}
+    />
+  ))
+  .add('ObjectVariableField (without expression, layout and project)', () => (
+    <ValueStateHolder
+      initialValue={'Variable1'}
+      render={(value, onChange) => (
+        <ObjectVariableField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
         />
       )}
     />
@@ -623,11 +867,6 @@ storiesOf('LayoutChooserDialog', module)
   .addDecorator(muiDecorator)
   .add('default', () => <LayoutChooserDialog open project={project} />);
 
-storiesOf('DragHandle', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => <DragHandle />);
-
 storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
@@ -635,8 +874,29 @@ storiesOf('EventsTree', module)
       <div className="gd-events-sheet" style={{ height: 500, display: 'flex' }}>
         <EventsTree
           events={testLayout.getEvents()}
-          selectedEvents={[]}
-          selectedInstructions={[]}
+          project={project}
+          layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          selection={getInitialSelection()}
+          onAddNewInstruction={action('add new instruction')}
+          onMoveToInstruction={action('move to instruction')}
+          onMoveToInstructionsList={action('move instruction to list')}
+          onInstructionClick={action('instruction click')}
+          onInstructionDoubleClick={action('instruction double click')}
+          onInstructionContextMenu={action('instruction context menu')}
+          onInstructionsListContextMenu={action(
+            'instruction list context menu'
+          )}
+          onParameterClick={action('parameter click')}
+          onEventClick={action('event click')}
+          onEventContextMenu={action('event context menu')}
+          onAddNewEvent={action('add new event')}
+          onOpenExternalEvents={action('open external events')}
+          onOpenLayout={action('open layout')}
+          searchResults={null}
+          searchFocusOffset={null}
+          onEventMoved={() => {}}
         />
       </div>
     </DragDropContextProvider>
@@ -650,6 +910,8 @@ storiesOf('EventsSheet', module)
         <EventsSheet
           project={project}
           layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
           events={testLayout.getEvents()}
           onOpenExternalEvents={action('Open external events')}
           resourceSources={[]}
@@ -657,7 +919,6 @@ storiesOf('EventsSheet', module)
             action('Choose resource from source', source)}
           resourceExternalEditors={[]}
           onOpenDebugger={action('open debugger')}
-          updateToolbar={() => {}}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
           onPreview={action('preview')}
@@ -674,6 +935,8 @@ storiesOf('EventsSheet', module)
         <EventsSheet
           project={project}
           layout={emptyLayout}
+          globalObjectsContainer={project}
+          objectsContainer={emptyLayout}
           events={emptyLayout.getEvents()}
           onOpenExternalEvents={action('Open external events')}
           resourceSources={[]}
@@ -681,7 +944,6 @@ storiesOf('EventsSheet', module)
             action('Choose resource from source', source)}
           resourceExternalEditors={[]}
           onOpenDebugger={action('open debugger')}
-          updateToolbar={() => {}}
           onOpenLayout={action('open layout')}
           onOpenSettings={action('open settings')}
           onPreview={action('preview')}
@@ -728,18 +990,20 @@ storiesOf('SearchPanel', module)
 
 storiesOf('ExpressionSelector', module)
   .addDecorator(muiDecorator)
-  .add('number', () => (
+  .add('number (with focusOnMount)', () => (
     <ExpressionSelector
       selectedType=""
       expressionType="number"
       onChoose={action('Expression chosen')}
+      focusOnMount
     />
   ))
-  .add('string', () => (
+  .add('string (with focusOnMount)', () => (
     <ExpressionSelector
       selectedType=""
       expressionType="string"
       onChoose={action('(String) Expression chosen')}
+      focusOnMount
     />
   ));
 
@@ -760,8 +1024,32 @@ storiesOf('InstructionEditor', module)
     <InstructionEditor
       project={project}
       layout={testLayout}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
       isCondition
       instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
+    />
+  ))
+  .add('without layout', () => (
+    <InstructionEditor
+      project={project}
+      layout={null}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      isCondition
+      instruction={testInstruction}
+      resourceExternalEditors={[]}
+      onChooseResource={() => {
+        action('onChooseResource');
+        return Promise.reject();
+      }}
+      resourceSources={[]}
     />
   ));
 
@@ -893,6 +1181,7 @@ storiesOf('ObjectsList', module)
           project={project}
           objectsContainer={testLayout}
           onEditObject={action('On edit object')}
+          selectedObjectNames={[]}
         />
       </div>
     </SerializedObjectDisplay>
@@ -902,26 +1191,38 @@ storiesOf('ObjectSelector', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('without groups', () => (
-    <ObjectSelector
-      project={project}
-      layout={testLayout}
-      value=""
-      onChoose={action('onChoose in ObjectSelector')}
-      noGroups
-      hintText="Choose an object to add to the group"
-      fullWidth
-      openOnFocus
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <ObjectSelector
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+          onChoose={action('onChoose in ObjectSelector')}
+          noGroups
+          hintText="Choose an object to add to the group"
+          fullWidth
+          openOnFocus
+        />
+      )}
     />
   ))
   .add('with groups', () => (
-    <ObjectSelector
-      project={project}
-      layout={testLayout}
-      value=""
-      onChoose={action('onChoose in ObjectSelector')}
-      hintText="Choose an object or a group"
-      fullWidth
-      openOnFocus
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <ObjectSelector
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+          onChoose={action('onChoose in ObjectSelector')}
+          hintText="Choose an object or a group"
+          fullWidth
+          openOnFocus
+        />
+      )}
     />
   ));
 
@@ -938,20 +1239,20 @@ storiesOf('InstancePropertiesEditor', module)
     </SerializedObjectDisplay>
   ));
 
-storiesOf('ObjectsGroupEditor', module)
+storiesOf('ObjectGroupEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ObjectsGroupEditor project={project} layout={testLayout} group={group2} />
+    <ObjectGroupEditor project={project} layout={testLayout} group={group2} />
   ));
 
-storiesOf('ObjectsGroupsList', module)
+storiesOf('ObjectGroupsList', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <SerializedObjectDisplay object={testLayout}>
       <div style={{ height: 250 }}>
-        <ObjectsGroupsList
+        <ObjectGroupsList
           project={project}
           objectsContainer={testLayout}
           onEditGroup={() => {}}
@@ -1263,4 +1564,144 @@ storiesOf('ResourcesList', module)
         )}
       />
     </div>
+  ));
+
+storiesOf('EventsFunctionConfigurationEditor', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <div style={{ height: 500, display: 'flex' }}>
+      <EventsFunctionConfigurationEditor
+        project={project}
+        eventsFunction={testEventsFunction}
+        onParametersUpdated={() => {}}
+      />
+    </div>
+  ));
+
+storiesOf('EventsFunctionsList', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <div style={{ height: 500, display: 'flex' }}>
+      <EventsFunctionsList
+        project={project}
+        eventsFunctionsContainer={testEventsFunctionsExtension}
+        selectedEventsFunction={testEventsFunctionsExtension.getEventsFunctionAt(
+          1
+        )}
+        onSelectEventsFunction={action('select')}
+        onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
+        onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
+        onEditOptions={action('edit options')}
+      />
+    </div>
+  ));
+
+storiesOf('EventsFunctionsExtensionEditor/index', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <DragDropContextProvider>
+      <div style={{ height: 500, display: 'flex' }}>
+        <EventsFunctionsExtensionEditor
+          project={project}
+          eventsFunctionsExtension={testEventsFunctionsExtension}
+          setToolbar={() => {}}
+          resourceSources={[]}
+          onChooseResource={source =>
+            action('Choose resource from source', source)}
+          resourceExternalEditors={[]}
+        />
+      </div>
+    </DragDropContextProvider>
+  ));
+
+storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <OptionsEditorDialog
+      eventsFunctionsExtension={testEventsFunctionsExtension}
+      open
+      onClose={action('close')}
+    />
+  ));
+
+storiesOf('ProjectManager', module)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <ProjectManager
+      project={project}
+      onOpenExternalEvents={action('onOpenExternalEvents')}
+      onOpenLayout={action('onOpenLayout')}
+      onOpenExternalLayout={action('onOpenExternalLayout')}
+      onOpenEventsFunctionsExtension={action('onOpenEventsFunctionsExtension')}
+      onAddLayout={action('onAddLayout')}
+      onAddExternalLayout={action('onAddExternalLayout')}
+      onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
+      onAddExternalEvents={action('onAddExternalEvents')}
+      onDeleteLayout={action('onDeleteLayout')}
+      onDeleteExternalLayout={action('onDeleteExternalLayout')}
+      onDeleteEventsFunctionsExtension={action(
+        'onDeleteEventsFunctionsExtension'
+      )}
+      onDeleteExternalEvents={action('onDeleteExternalEvents')}
+      onRenameLayout={action('onRenameLayout')}
+      onRenameExternalLayout={action('onRenameExternalLayout')}
+      onRenameEventsFunctionsExtension={action(
+        'onRenameEventsFunctionsExtension'
+      )}
+      onRenameExternalEvents={action('onRenameExternalEvents')}
+      onSaveProject={action('onSaveProject')}
+      onCloseProject={action('onCloseProject')}
+      onExportProject={action('onExportProject')}
+      onOpenPreferences={action('onOpenPreferences')}
+      onOpenResources={action('onOpenResources')}
+      onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
+      onChangeSubscription={action('onChangeSubscription')}
+      showEventsFunctionsExtensions={true}
+      eventsFunctionsExtensionsError={null}
+      onReloadEventsFunctionsExtensions={action(
+        'onReloadEventsFunctionsExtensions'
+      )}
+      freezeUpdate={false}
+    />
+  ))
+  .add('Error in functions', () => (
+    <ProjectManager
+      project={project}
+      onOpenExternalEvents={action('onOpenExternalEvents')}
+      onOpenLayout={action('onOpenLayout')}
+      onOpenExternalLayout={action('onOpenExternalLayout')}
+      onOpenEventsFunctionsExtension={action('onOpenEventsFunctionsExtension')}
+      onAddLayout={action('onAddLayout')}
+      onAddExternalLayout={action('onAddExternalLayout')}
+      onAddEventsFunctionsExtension={action('onAddEventsFunctionsExtension')}
+      onAddExternalEvents={action('onAddExternalEvents')}
+      onDeleteLayout={action('onDeleteLayout')}
+      onDeleteExternalLayout={action('onDeleteExternalLayout')}
+      onDeleteEventsFunctionsExtension={action(
+        'onDeleteEventsFunctionsExtension'
+      )}
+      onDeleteExternalEvents={action('onDeleteExternalEvents')}
+      onRenameLayout={action('onRenameLayout')}
+      onRenameExternalLayout={action('onRenameExternalLayout')}
+      onRenameEventsFunctionsExtension={action(
+        'onRenameEventsFunctionsExtension'
+      )}
+      onRenameExternalEvents={action('onRenameExternalEvents')}
+      onSaveProject={action('onSaveProject')}
+      onCloseProject={action('onCloseProject')}
+      onExportProject={action('onExportProject')}
+      onOpenPreferences={action('onOpenPreferences')}
+      onOpenResources={action('onOpenResources')}
+      onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
+      onChangeSubscription={action('onChangeSubscription')}
+      showEventsFunctionsExtensions={true}
+      eventsFunctionsExtensionsError={
+        new Error('Fake error during code generation')
+      }
+      onReloadEventsFunctionsExtensions={action(
+        'onReloadEventsFunctionsExtensions'
+      )}
+      freezeUpdate={false}
+    />
   ));

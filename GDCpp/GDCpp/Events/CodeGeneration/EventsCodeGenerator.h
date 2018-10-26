@@ -14,14 +14,8 @@
 #include "GDCore/Events/Event.h"
 namespace gd {
 class ObjectMetadata;
-}
-namespace gd {
 class BehaviorMetadata;
-}
-namespace gd {
 class InstructionMetadata;
-}
-namespace gd {
 class ExpressionCodeGenerationInformation;
 }
 
@@ -63,6 +57,17 @@ class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
    * profiling.
    */
   void PreprocessEventList(gd::EventsList& listEvent);
+
+  /**
+   * \note This is unused for C++ code generation.
+   */
+  virtual gd::String GetCodeNamespaceAccessor() { return ""; };
+
+  /**
+   * \brief Get the namespace to be used to store code generated objects/values/functions.
+   * \note This is unused for C++ code generation.
+   */
+  virtual gd::String GetCodeNamespace() { return ""; };
 
  protected:
   virtual gd::String GenerateParameterCodes(

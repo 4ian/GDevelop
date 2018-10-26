@@ -9,12 +9,12 @@ var https = require('follow-redirects').https;
 var fs = require('fs');
 var unzip2 = require('unzip2');
 
-const zipFilePath = '../public/External/Piskel/piskel-editor.zip';
+const zipFilePath = '../public/external/piskel/piskel-editor.zip';
 
-if (shell.test('-d', '../public/External/Piskel/piskel-editor')) {
+if (shell.test('-d', '../public/external/piskel/piskel-editor')) {
   //Nothing to do
   shell.echo(
-    '✅ piskel-editor already existing in public/External/Piskel folder - skipping download'
+    '✅ piskel-editor already existing in public/external/piskel folder - skipping download'
   );
 } else {
   shell.echo(
@@ -23,7 +23,7 @@ if (shell.test('-d', '../public/External/Piskel/piskel-editor')) {
 
   var file = fs.createWriteStream(zipFilePath);
   https.get(
-    'https://github.com/4ian/GD/releases/download/v5.0.0-beta34/piskel-editor.zip',
+    'https://github.com/4ian/GDevelop/releases/download/v5.0.0-beta34/piskel-editor.zip',
     function(response) {
       if (response.statusCode !== 200) {
         shell.echo(
@@ -35,20 +35,20 @@ if (shell.test('-d', '../public/External/Piskel/piskel-editor')) {
 
       response.pipe(file).on('finish', function() {
         shell.echo(
-          '📂 Extracting piskel-editor.zip to public/External/Piskel folder'
+          '📂 Extracting piskel-editor.zip to public/external/piskel folder'
         );
 
         try {
           fs
             .createReadStream(zipFilePath)
-            .pipe(unzip2.Extract({ path: '../public/External/Piskel' }))
+            .pipe(unzip2.Extract({ path: '../public/external/piskel' }))
             .on('close', function() {
               shell.echo(
-                '✅ Extracted piskel-editor.zip to public/External/Piskel folder'
+                '✅ Extracted piskel-editor.zip to public/external/piskel folder'
               );
               shell.rm(zipFilePath);
               if (
-                !shell.test('-d', '../public/External/Piskel/piskel-editor')
+                !shell.test('-d', '../public/external/piskel/piskel-editor')
               ) {
                 shell.echo(
                   "❌ Can't verify that piskel-editor exists. Was the piskel-editor.zip file malformed?"
@@ -57,7 +57,7 @@ if (shell.test('-d', '../public/External/Piskel/piskel-editor')) {
             });
         } catch (e) {
           shell.echo(
-            '❌ Error while extracting piskel-editor.zip to public/External/Piskel folder:',
+            '❌ Error while extracting piskel-editor.zip to public/external/piskel folder:',
             e.message
           );
         }

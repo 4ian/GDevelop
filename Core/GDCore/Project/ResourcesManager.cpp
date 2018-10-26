@@ -487,9 +487,11 @@ void ResourcesManager::UnserializeFrom(const SerializerElement& element) {
     const SerializerElement& resourceElement = resourcesElement.GetChild(i);
     gd::String kind = resourceElement.GetStringAttribute("kind");
     gd::String name = resourceElement.GetStringAttribute("name");
+    gd::String metadata = resourceElement.GetStringAttribute("metadata", "");
 
     std::shared_ptr<Resource> resource = CreateResource(kind);
     resource->SetName(name);
+    resource->SetMetadata(metadata);
     resource->UnserializeFrom(resourceElement);
 
     resources.push_back(resource);
@@ -519,6 +521,7 @@ void ResourcesManager::SerializeTo(SerializerElement& element) const {
     SerializerElement& resourceElement = resourcesElement.AddChild("resource");
     resourceElement.SetAttribute("kind", resources[i]->GetKind());
     resourceElement.SetAttribute("name", resources[i]->GetName());
+    resourceElement.SetAttribute("metadata", resources[i]->GetMetadata());
 
     resources[i]->SerializeTo(resourceElement);
   }

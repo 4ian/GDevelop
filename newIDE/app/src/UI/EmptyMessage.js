@@ -1,12 +1,8 @@
 import * as React from 'react';
 import ThemeConsumer from './Theme/ThemeConsumer';
+import BackgroundText from './BackgroundText';
 
 const styles = {
-  messageStyle: {
-    opacity: 0.4,
-    textAlign: 'center',
-    fontSize: '13px',
-  },
   containerStyle: {
     display: 'flex',
     alignItems: 'center',
@@ -26,16 +22,11 @@ const EmptyMessage = (props: Props) => (
   <ThemeConsumer>
     {muiTheme => (
       <div style={{ ...styles.containerStyle, ...props.style }}>
-        <span
-          style={{
-            ...styles.messageStyle,
-            textShadow: `1px 1px 0px ${muiTheme.emptyMessage
-              .shadowColor}`,
-            ...props.messageStyle,
-          }}
+        <BackgroundText
+          style={props.messageStyle}
         >
           {props.children}
-        </span>
+        </BackgroundText>
       </div>
     )}
   </ThemeConsumer>

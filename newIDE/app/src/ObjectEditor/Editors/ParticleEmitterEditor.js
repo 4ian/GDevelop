@@ -415,6 +415,32 @@ export default class ParticleEmitterEditor extends React.Component<
             />
           </Column>
         </Line>
+        <Line>
+          <Column expand noMargin>
+            <SemiControlledTextField
+              floatingLabelText="Particle minimum rotation speed (degreed/second)"
+              fullWidth
+              type="number"
+              value={particleEmitterObject.getParticleAngle1()}
+              onChange={value => {
+                particleEmitterObject.setParticleAngle1(parseFloat(value));
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+          <Column expand noMargin>
+            <SemiControlledTextField
+              floatingLabelText="Particle maximum rotation speed (degreed/second)"
+              fullWidth
+              type="number"
+              value={particleEmitterObject.getParticleAngle2()}
+              onChange={value => {
+                particleEmitterObject.setParticleAngle2(parseFloat(value));
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+        </Line>
       </Column>
     );
   }

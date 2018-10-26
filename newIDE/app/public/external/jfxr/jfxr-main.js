@@ -17,7 +17,6 @@ const closeWindow = () => {
 const loadMetaData = metaData => {
   if ('jfxr' in metaData) {
     jfxr.getSound().parse(metaData.jfxr.data);
-    jfxr.getSound().name = metaData.jfxr.name;
     jfxr.togglePlay();
   } else {
     jfxr.applyPreset(jfxr.presets[1]);

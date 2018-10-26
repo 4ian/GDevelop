@@ -131,7 +131,6 @@ app.on("ready", function() {
       readyChannelName: "piskel-ready",
       indexSubPath: "piskel/piskel-index.html",
       backgroundColor: "#000000",
-      show: false,
       onReady: piskelWindow => {
         piskelWindow.webContents.send("piskel-load-animation", piskelData),
           piskelWindow.show();
@@ -160,7 +159,6 @@ app.on("ready", function() {
       relativeWidth: 0.55,
       relativeHeight: 0.8,
       backgroundColor: "#000000",
-      show: false,
       onReady: jfxrWindow => {
         jfxrWindow.webContents.send("jfxr-open", jfxrData);
         jfxrWindow.show();

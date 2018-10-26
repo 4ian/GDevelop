@@ -2,7 +2,9 @@ const electron = require('electron');
 const fs = require('fs');
 const path = require('path');
 const remote = electron.remote;
-const { dialog } = remote;
+const {
+  dialog
+} = remote;
 
 export const createPathEditorHeader = ({
   parentElement,
@@ -132,9 +134,9 @@ const selectBaseFolderPath = headerObject => {
   if (!selectedDirPath.startsWith(state.projectBasePath)) {
     alert(
       'Please select a folder inside your project path!\n' +
-        state.projectBasePath +
-        '\n\nSelected:\n' +
-        selectedDirPath
+      state.projectBasePath +
+      '\n\nSelected:\n' +
+      selectedDirPath
     );
     return;
   }

@@ -27,10 +27,10 @@ const loadModalWindow = ({
   show = false,
 }) => {
 
-  //Prevent from loading the same window multiple times
   if (modalWindow) {
-    return
-  };
+    modalWindow.show();
+    onReady(modalWindow);
+  }
 
   const windowOptions = {
     parent: parentWindow,
@@ -39,7 +39,6 @@ const loadModalWindow = ({
     backgroundColor,
     modal: true,
     center: true,
-    show,
     webPreferences: {
       webSecurity: false
     }
@@ -47,13 +46,6 @@ const loadModalWindow = ({
 
   modalWindow = new BrowserWindow(windowOptions);
   modalWindow.setMenu(null);
-
-  if (modalWindow) {
-    if (show) {
-      modalWindow.show();
-    }
-    onReady(modalWindow);
-  };
 
   ipcMain.removeAllListeners(readyChannelName);
   ipcMain.on(readyChannelName, event => {

@@ -14,14 +14,21 @@ const closeWindow = () => {
   remote.getCurrentWindow().close();
 };
 
+const loadMetaData = metaData => {
+  if ('jfxr' in metaData) {
+    jfxr.getSound().parse(metaData.jfxr.data);
+    jfxr.getSound().name = metaData.jfxr.name;
+    jfxr.togglePlay();
+  } else {
+    jfxr.applyPreset(jfxr.presets[1]);
+  };  
+};
+
 const saveSoundEffect = pathEditor => {
   jfxr.createLink();
   const metadata = {
+    data: jfxr.getSound().serialize(),
     name: pathEditor.state.name,
-    url: jfxr.link.substring(
-      jfxr.link.indexOf('/index.html#') + 11,
-      jfxr.link.length
-    ),
   };
 
   jfxr.synth.run().then(data => {
@@ -54,7 +61,17 @@ window.addEventListener('load', function () {
 
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
-
+  const editorFrameEl = document.getElementById('jfxr-frame');
+  // Initiate when jfxr's iframe loads
+  // gain access to control elements
+  editorContentDocument = editorFrameEl.contentDocument;
+  jfxr = editorFrameEl.contentWindow.angular
+    .element(editorContentDocument.getElementsByClassName('ng-scope')[0])
+    .scope().ctrl;
+  loadMetaData(receivedOptions.metadata);
+  
+  // alter the interface of the external editor
+  editorContentDocument.getElementsByClassName('github')[0].remove();
   // load a custom save file(s) header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const headerStyle = {
@@ -75,39 +92,4 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
     extension: '.wav',
     headerStyle,
   });
-
-  // wait for iframe to load
-  const editorFrameEl = document.getElementById('jfxr-frame');
-  editorFrameEl.onload = function () {
-    // Initiate when jfxr's iframe loads
-    // gain access to control elements
-    editorContentDocument = editorFrameEl.contentDocument;
-    jfxr = editorFrameEl.contentWindow.angular
-      .element(editorContentDocument.getElementsByClassName('ng-scope')[0])
-      .scope().ctrl;
-
-    // alter the interface of the external editor
-    editorContentDocument.getElementsByClassName('github')[0].remove();
-
-    //finaly play the sound effect
-    if ('jfxr' in receivedOptions.metadata) {
-      jfxr.getSound().name = receivedOptions.metadata.jfxr.name;
-      if (!jfxr.isPlaying()) {
-        jfxr.togglePlay();
-      }
-    } else {
-      //play a random effect if there was no metadata
-      jfxr.applyPreset(jfxr.presets[1]);
-    }
-  };
-
-  // load jfxr's iframe, append metadata to its url if found
-  if (
-    'jfxr' in receivedOptions.metadata &&
-    receivedOptions.metadata.jfxr.url !== undefined
-  ) {
-    editorFrameEl.src = 'jfxr-editor/index.html' + receivedOptions.metadata.jfxr.url;
-  } else {
-    editorFrameEl.src = 'jfxr-editor/index.html';
-  }
 });

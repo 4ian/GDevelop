@@ -137,47 +137,4 @@ describe('gdjs.SpriteRuntimeObject', function() {
 		expect(object.getHitBoxes()[0].vertices[2][0]).to.be.within(31.999, 32.0001);
 		expect(object.getHitBoxes()[0].vertices[2][1]).to.be.within(6.4999, 6.5001);
 	});
-
-	it('benchmark getAABB of rotated vs non rotated sprite, with custom hitboxes, origin and center', function(){ //TODO: Run in firefox too
-		this.timeout(6000);
-		const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
-
-		//TODO: Factor benchmark/use benchmark.js
-		var benchmarkTiming = {};
-		var benchmarkCount = 60;
-		var repeatInBenchmark = 60000;
-		for(var benchmarkIndex = 0;benchmarkIndex < benchmarkCount;benchmarkIndex++) {
-			
-			{
-				var title = repeatInBenchmark + 'x getAABB of a non rotated sprite, with custom hitboxes, origin and center';
-				object.setAngle(0);
-				var start = performance.now();
-				for(var i = 0;i<repeatInBenchmark;i++) {
-					object.setX(i);
-					object.getAABB();
-				}
-				benchmarkTiming[title] = benchmarkTiming[title] || [];
-				benchmarkTiming[title].push(performance.now() - start);
-			}
-
-			{
-				var title = repeatInBenchmark + 'x getAABB of a rotated sprite, with custom hitboxes, origin and center';
-				object.setAngle(90);
-				var start = performance.now();
-				for(var i = 0;i<repeatInBenchmark;i++) {
-					object.setX(i);
-					object.getAABB();
-				}
-				benchmarkTiming[title] = benchmarkTiming[title] || [];
-				benchmarkTiming[title].push(performance.now() - start);
-			}
-		}
-
-		var results = {};
-		for(var benchmarkName in benchmarkTiming) {
-			results[benchmarkName] = benchmarkTiming[benchmarkName].reduce((sum, value) => sum+value, 0) / benchmarkCount;
-		}
-		console.log(results);
-		// console.log(benchmarkTiming);
-	});
 });

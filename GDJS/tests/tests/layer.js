@@ -26,44 +26,4 @@ describe('gdjs.Layer', function() {
 		expect(layer.convertInverseCoords(350, 450, 0)[0]).to.be.within(649.999, 650.001);
 		expect(layer.convertInverseCoords(350, 450, 0)[1]).to.be.within(49.9999, 50.001);
 	});
-
-	it('benchmark convertCoords and convertInverseCoords', function(){ //TODO: Run in firefox too
-		this.timeout(6000);
-		var layer = new gdjs.Layer({name: 'My layer', visibility: true, effects:[]}, runtimeScene)
-		layer.setCameraX(100, 0);
-		layer.setCameraY(200, 0);
-		layer.setCameraRotation(90, 0);
-
-		//TODO: Factor benchmark/use benchmark.js
-		var benchmarkTiming = {};
-		var benchmarkCount = 1000;
-		var repeatInBenchmark = 100000;
-		for(var benchmarkIndex = 0;benchmarkIndex < benchmarkCount;benchmarkIndex++) {
-			{
-				var title = repeatInBenchmark + 'x convertCoords';
-				var start = performance.now();
-				for(var i = 0;i<repeatInBenchmark;i++) {
-					layer.convertCoords(350, 450, 0);
-				}
-				benchmarkTiming[title] = benchmarkTiming[title] || [];
-				benchmarkTiming[title].push(performance.now() - start);
-			}
-			{
-				var title = repeatInBenchmark + 'x convertInverseCoords';
-				var start = performance.now();
-				for(var i = 0;i<repeatInBenchmark;i++) {
-					layer.convertInverseCoords(350, 450, 0);
-				}
-				benchmarkTiming[title] = benchmarkTiming[title] || [];
-				benchmarkTiming[title].push(performance.now() - start);
-			}
-		}
-
-		var results = {};
-		for(var benchmarkName in benchmarkTiming) {
-			results[benchmarkName] = benchmarkTiming[benchmarkName].reduce((sum, value) => sum+value, 0) / benchmarkCount;
-		}
-		console.log(results);
-		// console.log(benchmarkTiming);
-	});
 });

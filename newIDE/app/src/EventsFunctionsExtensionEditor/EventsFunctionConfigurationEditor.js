@@ -202,6 +202,8 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                             value="string"
                             primaryText="String (text)"
                           />
+                          <MenuItem value="key" primaryText="Keyboard Key (text)" />
+                          <MenuItem value="mouse" primaryText="Mouse button (text)" />
                         </SelectField>
                       </Column>
                       {parameter.getType() === 'objectList' && (

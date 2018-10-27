@@ -54,7 +54,11 @@ module.exports = function(config) {
       //All tests files:
       './tests/init.js',
       '../../Extensions/**/tests/**.spec.js',
-      './tests/**/*.js'
+      './tests/**/*.js',
+
+      //All benchmark files:
+      './benchmarks/init.js',
+      './benchmarks/**/*.js'
     ]
   });
 };

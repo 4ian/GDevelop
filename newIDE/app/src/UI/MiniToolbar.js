@@ -27,4 +27,12 @@ class ThemableMiniToolbar extends Component {
   }
 }
 
+const toolbarTextStyle = {
+  marginRight: 5,
+};
+
+export const MiniToolbarText = ({ children }) => (
+  <p style={toolbarTextStyle}>{children}</p>
+);
+
 export default muiThemeable()(ThemableMiniToolbar);

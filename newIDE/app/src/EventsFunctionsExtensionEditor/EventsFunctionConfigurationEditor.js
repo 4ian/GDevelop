@@ -14,9 +14,9 @@ import {
   enumerateObjectTypes,
   type EnumeratedObjectMetadata,
 } from '../ObjectsList/EnumerateObjects';
-import Divider from 'material-ui/Divider';
-import ThemeConsumer from '../UI/Theme/ThemeConsumer';
 import HelpButton from '../UI/HelpButton';
+import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
+
 const gd = global.gd;
 
 type Props = {|
@@ -150,143 +150,125 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             </Line>
           </Column>
           <Line noMargin>
-            <ThemeConsumer>
-              {muiTheme => (
-                <div
-                  style={{
-                    ...styles.parametersContainer,
-                    backgroundColor: muiTheme.list.itemsBackgroundColor,
-                  }}
-                >
-                  {mapVector(
-                    parameters,
-                    (parameter: gdParameterMetadata, i: number) => (
-                      <React.Fragment key={i}>
-                        <Column>
-                          <Line noMargin expand>
-                            <Column noMargin expand>
-                              <TextField
-                                hintText="Parameter name"
-                                value={parameter.getName()}
-                                onChange={(e, text) => {
-                                  parameter.setName(text);
-                                  this.forceUpdate();
-                                }}
-                                onBlur={() => {
-                                  this.props.onParametersUpdated();
-                                }}
-                                fullWidth
-                              />
-                            </Column>
-                            <Column noMargin expand>
-                              <SelectField
-                                hintText="Type"
-                                value={parameter.getType()}
-                                onChange={(e, i, value) => {
-                                  parameter.setType(value);
-                                  this.forceUpdate();
-                                  this.props.onParametersUpdated();
-                                }}
-                                fullWidth
-                              >
-                                <MenuItem
-                                  value="objectList"
-                                  primaryText="Objects"
-                                />
-                                <MenuItem
-                                  value="expression"
-                                  primaryText="Number"
-                                />
-                                <MenuItem
-                                  value="string"
-                                  primaryText="String (text)"
-                                />
-                              </SelectField>
-                            </Column>
-                            {parameter.getType() === 'objectList' && (
-                              <Column noMargin expand>
-                                <SelectField
-                                  value={parameter.getExtraInfo()}
-                                  onChange={(e, i, value) => {
-                                    parameter.setExtraInfo(value);
-                                    this.forceUpdate();
-                                    this.props.onParametersUpdated();
-                                  }}
-                                  fullWidth
-                                >
-                                  <MenuItem value="" primaryText="Any object" />
-                                  {objectMetadata.map(
-                                    (metadata: EnumeratedObjectMetadata) => {
-                                      if (metadata.name === '') {
-                                        // Base object is an "abstract" object
-                                        return null;
-                                      }
-
-                                      return (
-                                        <MenuItem
-                                          key={metadata.name}
-                                          value={metadata.name}
-                                          primaryText={metadata.fullName}
-                                        />
-                                      );
-                                    }
-                                  )}
-                                </SelectField>
-                              </Column>
-                            )}
-                          </Line>
-                        </Column>
-                        <Line expand noMargin>
-                          <Column expand>
-                            <TextField
-                              hintText="Description"
-                              value={parameter.getDescription()}
-                              onChange={(e, text) => {
-                                parameter.setDescription(text);
-                                this.forceUpdate();
-                              }}
-                              fullWidth
-                            />
-                          </Column>
-                          <Column>
-                            <IconMenu
-                              iconButtonElement={
-                                <IconButton>
-                                  <MoreVertIcon />
-                                </IconButton>
-                              }
-                              buildMenuTemplate={() => [
-                                {
-                                  label: 'Delete',
-                                  click: () => this._removeParameter(i),
-                                },
-                              ]}
-                            />
-                          </Column>
-                        </Line>
-                        <Divider />
-                      </React.Fragment>
-                    )
-                  )}
-                  {parameters.size() <= 1 ? (
-                    <EmptyMessage>
-                      No parameters for this function.
-                    </EmptyMessage>
-                  ) : null}
-                  <Line justifyContent="space-between">
-                    <Column>
-                      <HelpButton helpPagePath="/events/functions" />
-                    </Column>
-                    <Column>
-                      <FlatButton
-                        label="Add a parameter"
-                        onClick={this._addParameter}
+            <div style={styles.parametersContainer}>
+              {mapVector(
+                parameters,
+                (parameter: gdParameterMetadata, i: number) => (
+                  <React.Fragment key={i}>
+                    <MiniToolbar>
+                      <MiniToolbarText>Parameter #{i + 1}:</MiniToolbarText>
+                      <Column expand noMargin>
+                        <TextField
+                          hintText="Enter the parameter name"
+                          value={parameter.getName()}
+                          onChange={(e, text) => {
+                            parameter.setName(text);
+                            this.forceUpdate();
+                          }}
+                          onBlur={() => {
+                            this.props.onParametersUpdated();
+                          }}
+                        />
+                      </Column>
+                      <IconMenu
+                        iconButtonElement={
+                          <IconButton>
+                            <MoreVertIcon />
+                          </IconButton>
+                        }
+                        buildMenuTemplate={() => [
+                          {
+                            label: 'Delete',
+                            click: () => this._removeParameter(i),
+                          },
+                        ]}
                       />
-                    </Column>
-                  </Line>
-                </div>
+                    </MiniToolbar>
+                    <Line expand noMargin>
+                      <Column expand>
+                        <SelectField
+                          floatingLabelText="Type"
+                          value={parameter.getType()}
+                          onChange={(e, i, value) => {
+                            parameter.setType(value);
+                            this.forceUpdate();
+                            this.props.onParametersUpdated();
+                          }}
+                          fullWidth
+                        >
+                          <MenuItem value="objectList" primaryText="Objects" />
+                          <MenuItem value="expression" primaryText="Number" />
+                          <MenuItem
+                            value="string"
+                            primaryText="String (text)"
+                          />
+                        </SelectField>
+                      </Column>
+                      {parameter.getType() === 'objectList' && (
+                        <Column expand>
+                          <SelectField
+                            floatingLabelText="Object type"
+                            floatingLabelFixed
+                            value={parameter.getExtraInfo()}
+                            onChange={(e, i, value) => {
+                              parameter.setExtraInfo(value);
+                              this.forceUpdate();
+                              this.props.onParametersUpdated();
+                            }}
+                            fullWidth
+                          >
+                            <MenuItem value="" primaryText="Any object" />
+                            {objectMetadata.map(
+                              (metadata: EnumeratedObjectMetadata) => {
+                                if (metadata.name === '') {
+                                  // Base object is an "abstract" object
+                                  return null;
+                                }
+
+                                return (
+                                  <MenuItem
+                                    key={metadata.name}
+                                    value={metadata.name}
+                                    primaryText={metadata.fullName}
+                                  />
+                                );
+                              }
+                            )}
+                          </SelectField>
+                        </Column>
+                      )}
+                    </Line>
+                    <Line expand noMargin>
+                      <Column expand>
+                        <TextField
+                          floatingLabelText="Description"
+                          value={parameter.getDescription()}
+                          onChange={(e, text) => {
+                            parameter.setDescription(text);
+                            this.forceUpdate();
+                          }}
+                          fullWidth
+                        />
+                      </Column>
+                    </Line>
+                  </React.Fragment>
+                )
               )}
-            </ThemeConsumer>
+              {parameters.size() === 0 ? (
+                <EmptyMessage>No parameters for this function.</EmptyMessage>
+              ) : null}
+              <Line justifyContent="space-between">
+                <Column>
+                  <HelpButton helpPagePath="/events/functions" />
+                </Column>
+                <Column>
+                  <FlatButton
+                    label="Add a parameter"
+                    onClick={this._addParameter}
+                  />
+                </Column>
+              </Line>
+            </div>
           </Line>
         </div>
       </Column>

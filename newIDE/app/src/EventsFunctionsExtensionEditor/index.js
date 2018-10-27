@@ -176,6 +176,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               this._globalObjectsContainer &&
               this._objectsContainer ? (
                 <EventsSheet
+                  key={selectedEventsFunction.ptr}
                   ref={editor => (this.editor = editor)}
                   project={project}
                   layout={null}

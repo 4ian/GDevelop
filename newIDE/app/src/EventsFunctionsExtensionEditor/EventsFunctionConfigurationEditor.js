@@ -15,7 +15,9 @@ import {
   type EnumeratedObjectMetadata,
 } from '../ObjectsList/EnumerateObjects';
 import HelpButton from '../UI/HelpButton';
+import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
+import { showWarningBox } from '../UI/Messages/MessageBox';
 
 const gd = global.gd;
 
@@ -41,6 +43,17 @@ const styles = {
     height: 32,
     marginRight: 8,
   },
+};
+
+const validateParameterName = (newName: string) => {
+  if (!gd.Project.validateObjectName(newName)) {
+    showWarningBox(
+      'This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your parameter name.'
+    );
+    return false;
+  }
+
+  return true;
 };
 
 export default class EventsFunctionConfigurationEditor extends React.Component<
@@ -158,16 +171,17 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                     <MiniToolbar>
                       <MiniToolbarText>Parameter #{i + 1}:</MiniToolbarText>
                       <Column expand noMargin>
-                        <TextField
+                        <SemiControlledTextField
                           hintText="Enter the parameter name"
                           value={parameter.getName()}
-                          onChange={(e, text) => {
+                          onChange={text => {
+                            if (!validateParameterName(text)) return;
+
                             parameter.setName(text);
                             this.forceUpdate();
-                          }}
-                          onBlur={() => {
                             this.props.onParametersUpdated();
                           }}
+                          commitOnBlur
                         />
                       </Column>
                       <IconMenu
@@ -202,8 +216,14 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                             value="string"
                             primaryText="String (text)"
                           />
-                          <MenuItem value="key" primaryText="Keyboard Key (text)" />
-                          <MenuItem value="mouse" primaryText="Mouse button (text)" />
+                          <MenuItem
+                            value="key"
+                            primaryText="Keyboard Key (text)"
+                          />
+                          <MenuItem
+                            value="mouse"
+                            primaryText="Mouse button (text)"
+                          />
                         </SelectField>
                       </Column>
                       {parameter.getType() === 'objectList' && (

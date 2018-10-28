@@ -10,8 +10,8 @@ var unzip2 = require('unzip2');
 var process = require('process')
 
 const editor = process.argv[2];
+const gitRelease = process.argv[3];
 const gitUrl = 'https://github.com/4ian/GDevelop';
-const gitRelease = 'v5.0.0-beta34';
 const basePath = '../public/external/' + editor + '/' + editor + '-editor';
 const zipFilePath = basePath + '.zip';
 
@@ -27,7 +27,7 @@ if (shell.test('-d', basePath)) {
 
   var file = fs.createWriteStream(zipFilePath);
   https.get(
-    gitUrl + '/releases/download/' + gitRelease + '/' + editor + '-editor.zip',
+    gitUrl + '/releases/download/v' + gitRelease + '/' + editor + '-editor.zip',
     function (response) {
       if (response.statusCode !== 200) {
         shell.echo(

@@ -54,14 +54,13 @@ const saveSoundEffect = pathEditor => {
 // Wait for the window to be fully initialized before sending the
 // ready event. Don't use DOMContentLoaded as it was observed to be fired
 // even if jfxr DOM/scripts are not yet loaded.
-window.addEventListener('load', function () {
+const editorFrameEl = document.getElementById('jfxr-frame');
+editorFrameEl.onload = () =>{
   ipcRenderer.send('jfxr-ready');
-});
+};
 
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
-  const editorFrameEl = document.getElementById('jfxr-frame');
-
   editorContentDocument = editorFrameEl.contentDocument;
   // alter the interface of the external editor
   editorContentDocument.getElementsByClassName('github')[0].remove();

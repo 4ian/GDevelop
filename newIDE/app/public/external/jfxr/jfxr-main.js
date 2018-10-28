@@ -51,17 +51,26 @@ const saveSoundEffect = pathEditor => {
   });
 };
 
-// Wait for the window to be fully initialized before sending the
-// ready event. Don't use DOMContentLoaded as it was observed to be fired
-// even if jfxr DOM/scripts are not yet loaded.
+// Repeatedly try to gain access to jfxr's control element and its methods
+// When succeeding, stop trying. Aggresive approach, makes sure analytics slowing 
+// the load process of the iframe doesnt affect the editor.
 const editorFrameEl = document.getElementById('jfxr-frame');
-editorFrameEl.onload = () =>{
-  ipcRenderer.send('jfxr-ready');
+const tryToGetJsfx = () => {
+  if (jfxr === null) {
+    editorContentDocument = editorFrameEl.contentDocument;
+    jfxr = editorFrameEl.contentWindow.angular
+      .element(editorContentDocument.getElementsByClassName('ng-scope')[0])
+      .scope().ctrl;
+  } else { // gained access to control elements!
+    ipcRenderer.send('jfxr-ready');
+    clearInterval(retryToGetJsfx);
+  }
 };
+let retryToGetJsfx = setInterval(tryToGetJsfx, 100);
 
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
-  editorContentDocument = editorFrameEl.contentDocument;
+  loadMetaData(receivedOptions.metadata);
   // alter the interface of the external editor
   editorContentDocument.getElementsByClassName('github')[0].remove();
   // load a custom save file(s) header
@@ -84,10 +93,4 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
     extension: '.wav',
     headerStyle,
   });
-
-  // gain access to control elements
-  jfxr = editorFrameEl.contentWindow.angular
-    .element(editorContentDocument.getElementsByClassName('ng-scope')[0])
-    .scope().ctrl;
-  loadMetaData(receivedOptions.metadata);
 });

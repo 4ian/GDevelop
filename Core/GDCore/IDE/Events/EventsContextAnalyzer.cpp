@@ -19,6 +19,7 @@
 
 namespace gd {
 
+// TODO: Replace and remove (ExpressionObjectsFinder)
 class CallbacksForListingObjects : public gd::ParserCallbacks {
  public:
   CallbacksForListingObjects(const gd::Platform& platform_,

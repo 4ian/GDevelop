@@ -16,6 +16,8 @@ class EventsCodeGenerationContext;
 
 namespace gdjs {
 
+// TODO: Replace and remove (ExpressionCodeGenerator)
+
 /**
  * \brief Callbacks called to generate the code for getting a variable.
  *

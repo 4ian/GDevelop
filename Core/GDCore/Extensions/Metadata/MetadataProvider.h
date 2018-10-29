@@ -19,8 +19,8 @@ class PlatformExtension;
 namespace gd {
 
 /**
- * \brief A container for metadata about an object/behavior/instruction/expression
- * and its associated extension.
+ * \brief A container for metadata about an
+ * object/behavior/instruction/expression and its associated extension.
  */
 template <class T>
 class ExtensionAndMetadata {
@@ -34,8 +34,7 @@ class ExtensionAndMetadata {
    * \warning Please do not use.
    * \private
    */
-  ExtensionAndMetadata()
-      : extension(nullptr), metadata(nullptr){};
+  ExtensionAndMetadata() : extension(nullptr), metadata(nullptr){};
 
   /**
    * \brief Get the associated extension.
@@ -295,6 +294,11 @@ class GD_CORE_API MetadataProvider {
   static bool HasBehaviorStrExpression(const gd::Platform& platform,
                                        gd::String behaviorType,
                                        gd::String name);
+
+  static bool IsBadExpressionMetadata(const gd::ExpressionMetadata& metadata) {
+    return &metadata == &badExpressionMetadata ||
+           &metadata == &badStrExpressionMetadata;
+  }
 
   virtual ~MetadataProvider();
 

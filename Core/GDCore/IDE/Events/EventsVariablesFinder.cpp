@@ -20,6 +20,7 @@ using namespace std;
 
 namespace gd {
 
+// TODO: Replace and remove (ExpressionParameterSearcher)
 class CallbacksForSearchingVariable : public gd::ParserCallbacks {
  public:
   CallbacksForSearchingVariable(std::set<gd::String>& results_,

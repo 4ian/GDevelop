@@ -19,6 +19,7 @@ using namespace std;
 
 namespace gd {
 
+// TODO: Replace and remove (ExpressionObjectsRenamer)
 class CallbacksForRenamingObject : public gd::ParserCallbacks {
  public:
   CallbacksForRenamingObject(gd::String& plainExpression_,
@@ -141,6 +142,7 @@ class CallbacksForRenamingObject : public gd::ParserCallbacks {
   gd::String oldName;
 };
 
+// TODO: Replace and remove (ExpressionObjectsRemover)
 class CallbacksForRemovingObject : public gd::ParserCallbacks {
  public:
   CallbacksForRemovingObject(gd::String name_)

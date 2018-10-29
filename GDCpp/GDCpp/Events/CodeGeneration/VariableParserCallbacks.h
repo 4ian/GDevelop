@@ -16,6 +16,8 @@ class EventsCodeGenerator;
 class EventsCodeGenerationContext;
 }  // namespace gd
 
+// TODO: Replace and remove (ExpressionCodeGenerator)
+
 /**
  * \brief Callbacks called to generate the code for getting a variable.
  *

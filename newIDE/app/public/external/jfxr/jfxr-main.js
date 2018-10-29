@@ -51,22 +51,21 @@ const saveSoundEffect = pathEditor => {
   });
 };
 
-// Repeatedly try to gain access to jfxr's control element and its methods
-// When succeeding, stop trying. Aggresive approach, makes sure analytics slowing 
-// the load process of the iframe doesnt affect the editor.
+// Repeatedly try to gain access to jfxr controller.
+// This is an "aggressive" approach needed because third party scripts like analytics
+// can slow down the load process - so the Angular.js controller may not be initialized.
 const editorFrameEl = document.getElementById('jfxr-frame');
-const tryToGetJsfx = () => {
-  if (jfxr === null) {
-    editorContentDocument = editorFrameEl.contentDocument;
-    jfxr = editorFrameEl.contentWindow.angular
+const tryToGetJfxr = () => {
+  editorContentDocument = editorFrameEl.contentDocument;
+  jfxr = editorFrameEl.contentWindow.angular
       .element(editorContentDocument.getElementsByClassName('ng-scope')[0])
       .scope().ctrl;
-  } else { // gained access to control elements!
+  if (jfxr !== null) {
     ipcRenderer.send('jfxr-ready');
-    clearInterval(retryToGetJsfx);
+    clearInterval(getJfxrInterval);
   }
 };
-let retryToGetJsfx = setInterval(tryToGetJsfx, 100);
+let getJfxrInterval = setInterval(tryToGetJfxr, 100);
 
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jfxr-open', (event, receivedOptions) => {

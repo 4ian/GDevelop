@@ -36,18 +36,18 @@ export const openJfxr = ({
   ipcRenderer.removeAllListeners('jfxr-changes-saved');
   ipcRenderer.on('jfxr-changes-saved', (event, newFilePath, fileMetadata) => {
 
-    const resourceName = path.relative(projectPath, newFilePath);// we could make a generic createNewResource utility function that piskel can also use?
+    const resourceName = path.relative(projectPath, newFilePath); // TODO: move into a generic createOrUpdateResource function that piskel can also use in app/src/ResourcesList/ResourceUtils.js
     const resourcesManager = project.getResourcesManager();
     if (resourcesManager.hasResource(resourceName)) {
       resourcesManager.removeResource(resourceName)
     }
-    const audioResource = new gd.AudioResource(); 
+    const audioResource = new gd.AudioResource();
     audioResource.setFile(resourceName);
     audioResource.setName(resourceName);
     resourcesManager.addResource(audioResource);
-    audioResource.delete(); // end of generic util function
+    audioResource.delete();
 
-    const newMetadata = { 
+    const newMetadata = {
       jfxr: fileMetadata,
     };
     resourcesManager.getResource(resourceName).setMetadata(JSON.stringify(newMetadata));

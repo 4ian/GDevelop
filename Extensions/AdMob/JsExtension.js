@@ -17,7 +17,7 @@ module.exports = {
       "AdMob",
       t("AdMob"),
       t(
-        "Allow the game to display AdMob banner, intersticial and reward video ads"
+        "Allow the game to display AdMob banner, interstitial and reward video ads"
       ),
       "Franco Maciel",
       "MIT"

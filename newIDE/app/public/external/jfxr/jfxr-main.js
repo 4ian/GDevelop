@@ -47,8 +47,8 @@ const editorFrameEl = document.getElementById('jfxr-frame')
 const tryToGetJfxr = () => {
   editorContentDocument = editorFrameEl.contentDocument
   jfxr = editorFrameEl.contentWindow.angular
-        .element(editorContentDocument.getElementsByClassName('ng-scope')[0])
-        .scope().ctrl
+    .element(editorContentDocument.getElementsByClassName('ng-scope')[0])
+    .scope().ctrl
   if (jfxr !== null) {
     ipcRenderer.send('jfxr-ready')
     clearInterval(getJfxrInterval)
@@ -58,11 +58,11 @@ let getJfxrInterval = setInterval(tryToGetJfxr, 100)
 
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
-  loadMetaData(receivedOptions.metadata)
-    // alter the interface of the external editor
-  editorContentDocument.getElementsByClassName('github')[0].remove()
-    // load a custom save file(s) header
-  const pathEditorHeaderDiv = document.getElementById('path-editor-header')
+  loadMetaData(receivedOptions.metadata);
+  // alter the interface of the external editor
+  editorContentDocument.getElementsByClassName('github')[0].remove();
+  // load a custom save file(s) header
+  const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const headerStyle = {
     saveFolderLabel: 'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
     nameInput: 'font-family:"Courier New";height:27px;width:90px;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
@@ -70,7 +70,7 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
     cancelButton: 'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
     setFolderButton: 'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
     fileExistsLabel: 'height:27px;color:blue;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;'
-  }
+  };
   createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
@@ -80,5 +80,7 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
     initialResourcePath: receivedOptions.resourcePath,
     extension: '.wav',
     headerStyle
-  })
+  });
+  // disable google analytics from collecting personal information, as requested by wend1go :)
+  editorFrameEl.contentWindow.ga('set', 'allowAdFeatures', false);
 })

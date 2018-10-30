@@ -81,6 +81,6 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
     extension: '.wav',
     headerStyle
   });
-  // disable google analytics from collecting personal information, as requested by wend1go :)
+  // Disable google analytics from collecting personal information
   editorFrameEl.contentWindow.ga('set', 'allowAdFeatures', false);
 })

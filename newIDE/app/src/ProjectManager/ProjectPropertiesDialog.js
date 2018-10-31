@@ -195,6 +195,7 @@ class ProjectPropertiesDialog extends React.Component<
           <SelectField
             fullWidth
             floatingLabelText="Fullscreen/game size mode"
+            floatingLabelFixed
             value={sizeOnStartupMode}
             onChange={(e, i, value) =>
               this.setState({ sizeOnStartupMode: value })}

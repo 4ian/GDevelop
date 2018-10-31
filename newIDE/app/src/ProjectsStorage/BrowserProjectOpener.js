@@ -1,3 +1,4 @@
+import admob from '../fixtures/admob/admob.json';
 import advancedShapeBasedPainter from '../fixtures/advanced-shape-based-painter/advanced-shape-based-painter.json';
 import animationSpeedScale from '../fixtures/animation-speed-scale/animation-speed-scale.json';
 import asteroids from '../fixtures/asteroids/asteroids.json';
@@ -88,7 +89,9 @@ import zombieLaser from '../fixtures/zombie-laser/zombie-laser.json';
 
 export default class BrowserProjectOpener {
   static readInternalFile(url) {
-    if (url === 'example://advanced-shape-based-painter') {
+    if (url === 'example://admob') {
+      return Promise.resolve(admob);
+    } else if (url === 'example://advanced-shape-based-painter') {
       return Promise.resolve(advancedShapeBasedPainter);
     } else if (url === 'example://animation-speed-scale') {
       return Promise.resolve(animationSpeedScale);

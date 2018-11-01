@@ -2,9 +2,7 @@ const electron = require('electron');
 const fs = require('fs');
 const path = require('path');
 const remote = electron.remote;
-const {
-  dialog
-} = remote;
+const { dialog } = remote;
 
 export const createPathEditorHeader = ({
   parentElement,
@@ -18,27 +16,18 @@ export const createPathEditorHeader = ({
 }) => {
   if (fs.existsSync(initialResourcePath)) {
     if (fs.lstatSync(initialResourcePath).isDirectory()) {
-      initialResourcePath = initialResourcePath + '\\NewFile' + extension;
+      initialResourcePath = initialResourcePath + '/NewFile' + extension;
     }
   } else {
-    initialResourcePath = projectPath + '\\NewFile' + extension;
+    initialResourcePath = projectPath + '/NewFile' + extension;
   }
 
   initialResourcePath = path.normalize(initialResourcePath)
   const headerObject = {
     state: {
-      folderPath: initialResourcePath.substring(
-        0,
-        initialResourcePath.lastIndexOf('\\')
-      ),
-      name: initialResourcePath.substring(
-        initialResourcePath.lastIndexOf('\\') + 1,
-        initialResourcePath.lastIndexOf('.')
-      ),
-      extension: initialResourcePath.substring(
-        initialResourcePath.lastIndexOf('.'),
-        initialResourcePath.length
-      ),
+      folderPath: path.dirname(initialResourcePath),
+      name: path.basename(initialResourcePath, path.extname(initialResourcePath)),
+      extension: path.extname(initialResourcePath),
       projectBasePath: path.normalize(projectPath),
     },
   };
@@ -99,9 +88,9 @@ const render = headerObject => {
   ); // Don't allow the user to enter any characters that would lead to an invalid path
   const state = headerObject.state;
   state.name = headerObject.nameInput.value;
-  state.baseExportPath = state.folderPath + '\\' + state.name;
-  state.fullPath = state.folderPath + '\\' + state.name + state.extension;
-  headerObject.saveFolderLabel.textContent = state.folderPath + '\\';
+  state.baseExportPath = state.folderPath + '/' + state.name;
+  state.fullPath = state.folderPath + '/' + state.name + state.extension;
+  headerObject.saveFolderLabel.textContent = state.folderPath + '/';
   headerObject.saveFolderLabel.title =
     'Click to change path: \n' + state.folderPath;
 

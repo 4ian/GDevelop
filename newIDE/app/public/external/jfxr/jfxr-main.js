@@ -78,10 +78,10 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
   const editorContentDocument = editorFrameEl.contentDocument;
   editorContentDocument.getElementsByClassName('github')[0].remove();
   // Disable inside iframe links - they break the embedding
-  editorContentDocument.getElementsByClassName('titlepane column-left')[0].childNodes[0].onclick = function () {
+  editorContentDocument.getElementsByClassName('titlepane column-left')[0].childNodes[0].onclick = () => {
     return false
   }
-  editorContentDocument.getElementsByClassName('titlepane column-left')[0].childNodes[1].onclick = function () {
+  editorContentDocument.getElementsByClassName('titlepane column-left')[0].childNodes[1].onclick = () => {
     return false
   }
 })

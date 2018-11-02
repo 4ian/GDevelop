@@ -1,4 +1,6 @@
-import { createPathEditorHeader } from '../utils/path-editor.js'
+import {
+  createPathEditorHeader
+} from '../utils/path-editor.js'
 
 const electron = require('electron')
 const ipcRenderer = electron.ipcRenderer
@@ -14,7 +16,6 @@ const closeWindow = () => {
 const loadMetaData = metaData => {
   if ('jfxr' in metaData) {
     jfxr.getSound().parse(metaData.jfxr.data);
-    jfxr.togglePlay();
   } else {
     jfxr.applyPreset(jfxr.presets[1])
   }
@@ -40,21 +41,13 @@ const saveSoundEffect = pathEditor => {
   })
 }
 
-// Repeatedly try to gain access to jfxr controller.
-// This is an "aggressive" approach needed because third party scripts like analytics
-// can slow down the load process - so the Angular.js controller may not be initialized.
 const editorFrameEl = document.getElementById('jfxr-frame')
-const tryToGetJfxr = () => {
-  editorContentDocument = editorFrameEl.contentDocument
-  jfxr = editorFrameEl.contentWindow.angular
-    .element(editorContentDocument.getElementsByClassName('ng-scope')[0])
-    .scope().ctrl
-  if (jfxr !== null) {
-    ipcRenderer.send('jfxr-ready')
-    clearInterval(getJfxrInterval)
-  }
-}
-let getJfxrInterval = setInterval(tryToGetJfxr, 100)
+window.addEventListener('jfxrReady', (e) => {
+  jfxr = e.mainCtrl;
+  editorContentDocument = editorFrameEl.contentDocument;
+  ipcRenderer.send('jfxr-ready');
+});
+document.getElementById('jfxr-frame').src = 'jfxr-editor/index.html'
 
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jfxr-open', (event, receivedOptions) => {

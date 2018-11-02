@@ -41,6 +41,8 @@ const saveSoundEffect = pathEditor => {
   })
 }
 
+// Gain access to JFXR controller by using the signal that the JFXR author kindly provided.
+// It gets fired upon loading of jfxr in the iframe element
 const editorFrameEl = document.getElementById('jfxr-frame')
 window.addEventListener('jfxrReady', (e) => {
   jfxr = e.mainCtrl;
@@ -52,7 +54,7 @@ editorFrameEl.src = 'jfxr-editor/index.html'
 ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
   loadMetaData(receivedOptions.metadata);
 
-  // load a custom save file(s) header
+  // Load a custom save file(s) header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const headerStyle = {
     saveFolderLabel: 'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
@@ -74,7 +76,7 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
   });
   // Disable google analytics from collecting personal information
   editorFrameEl.contentWindow.ga('set', 'allowAdFeatures', false);
-  // alter the interface of the external editor
+  // Alter the interface of the external editor
   const editorContentDocument = editorFrameEl.contentDocument;
   editorContentDocument.getElementsByClassName('github')[0].remove();
   // Disable inside iframe links - they break the embedding

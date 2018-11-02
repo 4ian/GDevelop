@@ -7,7 +7,7 @@ const ipcRenderer = electron.ipcRenderer
 const fs = require('fs')
 const remote = electron.remote
 
-let editorContentDocument, jfxr = null
+let jfxr = null
 
 const closeWindow = () => {
   remote.getCurrentWindow().close()
@@ -44,16 +44,14 @@ const saveSoundEffect = pathEditor => {
 const editorFrameEl = document.getElementById('jfxr-frame')
 window.addEventListener('jfxrReady', (e) => {
   jfxr = e.mainCtrl;
-  editorContentDocument = editorFrameEl.contentDocument;
   ipcRenderer.send('jfxr-ready');
 });
-document.getElementById('jfxr-frame').src = 'jfxr-editor/index.html'
+editorFrameEl.src = 'jfxr-editor/index.html'
 
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
   loadMetaData(receivedOptions.metadata);
-  // alter the interface of the external editor
-  editorContentDocument.getElementsByClassName('github')[0].remove();
+
   // load a custom save file(s) header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const headerStyle = {
@@ -76,4 +74,14 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
   });
   // Disable google analytics from collecting personal information
   editorFrameEl.contentWindow.ga('set', 'allowAdFeatures', false);
+  // alter the interface of the external editor
+  const editorContentDocument = editorFrameEl.contentDocument;
+  editorContentDocument.getElementsByClassName('github')[0].remove();
+  // Disable inside iframe links - they break the embedding
+  editorContentDocument.getElementsByClassName('titlepane column-left')[0].childNodes[0].onclick = function () {
+    return false
+  }
+  editorContentDocument.getElementsByClassName('titlepane column-left')[0].childNodes[1].onclick = function () {
+    return false
+  }
 })

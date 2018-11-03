@@ -212,7 +212,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
           initialResourceMetadata,
         },
         onChangesSaved: (newResourceData, newResourceName) => {
-          // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
+          // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
           resourcesLoader.burstUrlsCacheForResources(project, [
             newResourceName,
           ]);

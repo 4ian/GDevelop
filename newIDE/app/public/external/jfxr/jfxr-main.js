@@ -1,6 +1,4 @@
-import {
-  createPathEditorHeader
-} from '../utils/path-editor.js'
+import { createPathEditorHeader } from '../utils/path-editor.js'
 
 const electron = require('electron')
 const ipcRenderer = electron.ipcRenderer
@@ -48,6 +46,7 @@ window.addEventListener('jfxrReady', (e) => {
   jfxr = e.mainCtrl;
   ipcRenderer.send('jfxr-ready');
 });
+// Trigger the load of Jfxr manually, to ensure the event listener "jfxrReady" is registered already
 editorFrameEl.src = 'jfxr-editor/index.html'
 
 // Called to load a sound. Should be called after the window is fully loaded.
@@ -82,8 +81,8 @@ ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
   // Disable inside iframe links - they break the embedding
   editorContentDocument.getElementsByClassName('titlepane column-left')[0].childNodes[0].onclick = () => {
     return false
-  }
+  };
   editorContentDocument.getElementsByClassName('titlepane column-left')[0].childNodes[1].onclick = () => {
     return false
-  }
+  };
 })

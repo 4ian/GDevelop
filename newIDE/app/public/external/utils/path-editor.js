@@ -1,9 +1,8 @@
 const electron = require('electron');
 const fs = require('fs');
+const path = require('path');
 const remote = electron.remote;
-const {
-  dialog
-} = remote;
+const { dialog } = remote;
 
 export const createPathEditorHeader = ({
   parentElement,
@@ -15,25 +14,21 @@ export const createPathEditorHeader = ({
   extension,
   headerStyle,
 }) => {
-  if (fs.lstatSync(initialResourcePath).isDirectory()) {
-    initialResourcePath = initialResourcePath + '/NewFile' + extension;
+  if (fs.existsSync(initialResourcePath)) {
+    if (fs.lstatSync(initialResourcePath).isDirectory()) {
+      initialResourcePath = initialResourcePath + '/NewFile' + extension;
+    }
+  } else {
+    initialResourcePath = projectPath + '/NewFile' + extension;
   }
 
+  initialResourcePath = path.normalize(initialResourcePath)
   const headerObject = {
     state: {
-      folderPath: initialResourcePath.substring(
-        0,
-        initialResourcePath.lastIndexOf('/')
-      ),
-      name: initialResourcePath.substring(
-        initialResourcePath.lastIndexOf('/') + 1,
-        initialResourcePath.lastIndexOf('.')
-      ),
-      extension: initialResourcePath.substring(
-        initialResourcePath.lastIndexOf('.'),
-        initialResourcePath.length
-      ),
-      projectBasePath: projectPath,
+      folderPath: path.dirname(initialResourcePath),
+      name: path.basename(initialResourcePath, path.extname(initialResourcePath)),
+      extension: path.extname(initialResourcePath),
+      projectBasePath: path.normalize(projectPath),
     },
   };
 
@@ -124,15 +119,16 @@ const selectBaseFolderPath = headerObject => {
   if (!selectedDir) {
     return;
   }
-  if (!selectedDir.toString().startsWith(state.projectBasePath)) {
+  const selectedDirPath = selectedDir[0];
+  if (!selectedDirPath.startsWith(state.projectBasePath)) {
     alert(
       'Please select a folder inside your project path!\n' +
       state.projectBasePath +
       '\n\nSelected:\n' +
-      selectedDir
+      selectedDirPath
     );
     return;
   }
-  state.folderPath = selectedDir;
+  state.folderPath = selectedDirPath;
   render(headerObject);
 };

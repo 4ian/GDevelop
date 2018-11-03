@@ -131,7 +131,6 @@ app.on("ready", function() {
       readyChannelName: "piskel-ready",
       indexSubPath: "piskel/piskel-index.html",
       backgroundColor: "#000000",
-      show: false,
       onReady: piskelWindow => {
         piskelWindow.webContents.send("piskel-load-animation", piskelData),
           piskelWindow.show();
@@ -150,27 +149,26 @@ app.on("ready", function() {
     }
   );
 
-  // JSFX sound effect generator
-  ipcMain.on("jsfx-create-wav", (event, jsfxData) => {
+  // JFXR sound effect generator
+  ipcMain.on("jfxr-create-wav", (event, jfxrData) => {
     loadModalWindow({
       parentWindow: mainWindow,
       devTools,
-      readyChannelName: "jsfx-ready",
-      indexSubPath: "jsfx/jsfx-index.html",
+      readyChannelName: "jfxr-ready",
+      indexSubPath: "jfxr/jfxr-index.html",
       relativeWidth: 0.55,
       relativeHeight: 0.8,
-      backgroundColor: "white",
-      show: false,
-      onReady: jsfxWindow => {
-        jsfxWindow.webContents.send("jsfx-open", jsfxData);
-        jsfxWindow.show();
+      backgroundColor: "#000000",
+      onReady: jfxrWindow => {
+        jfxrWindow.webContents.send("jfxr-open", jfxrData);
+        jfxrWindow.show();
       }
     });
   });
 
-  ipcMain.on("jsfx-changes-saved", (event, newFilePath, fileMetadata) => {
+  ipcMain.on("jfxr-changes-saved", (event, newFilePath, fileMetadata) => {
     mainWindow.webContents.send(
-      "jsfx-changes-saved",
+      "jfxr-changes-saved",
       newFilePath,
       fileMetadata
     );

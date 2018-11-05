@@ -18,8 +18,10 @@ class AbstractFileSystem;
 namespace gd {
 
 /**
- * \brief ResourcesMergingHelper is used (mainly during compilation) so
- * as to inventory resources and change their filenames
+ * \brief ResourcesMergingHelper is used (mainly during export)
+ * to list resources and generate new filenames, to allow them to be all copied
+ * in a single directory (potentially changing the filename to avoid conflicts,
+ * but preserving extensions).
  *
  * \see ArbitraryResourceWorker
  *
@@ -82,9 +84,9 @@ class GD_CORE_API ResourcesMergingHelper : public ArbitraryResourceWorker {
                                       ///< baseDirectory, will be preserved in
                                       ///< filenames.
   bool preserveAbsoluteFilenames;  ///< If set to true, the filenames which are
-                                   ///< absolute ( C:\MyFile.png ) will not be
-                                   ///< transformed into their filenames (
-                                   ///< MyFile.png ).
+                                   ///< absolute (C:\MyFile.png  will not be
+                                   ///< transformed into a relative filename
+                                   ///< (MyFile.png).
   gd::AbstractFileSystem&
       fs;  ///< The gd::AbstractFileSystem used to manipulate files.
 };

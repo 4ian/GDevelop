@@ -6,17 +6,16 @@
 #ifndef GDCORE_DIRECTION_H
 #define GDCORE_DIRECTION_H
 #include <vector>
+#include "GDCore/String.h"
 namespace gd {
 class Sprite;
-}
-namespace gd {
 class SerializerElement;
 }
 
 namespace gd {
 
 /**
- * \brief Class defining a direction of an Animation.
+ * \brief Class defining a direction (set of frames) of an Animation.
  *
  * \see SpriteObject
  * \see Animation
@@ -32,77 +31,100 @@ class GD_CORE_API Direction {
   virtual ~Direction();
 
   /**
-   * Return true if sprites looping is activated
+   * \brief Return true if sprites looping is activated
    */
   inline bool IsLooping() const { return loop; }
 
   /**
-   * Set if the sprites must be looping or not.
+   * \brief Set if the sprites must be looping or not.
    */
   void SetLoop(bool loop_);
 
   /**
-   * Get the time between each sprite
+   * \brief Get the time between each sprite
    */
   inline float GetTimeBetweenFrames() const { return timeBetweenFrame; }
 
   /**
-   * Set the time between each sprite
+   * \brief Set the time between each sprite
+   *
    * \param time Time between each sprite, in seconds.
    */
   void SetTimeBetweenFrames(float time);
 
   /**
-   * Return a reference to a sprite of the direction.
+   * \brief Return a reference to a sprite of the direction.
+   *
    * \param nb The index of the sprite to be accessed. Bound checking is not
-   * made. \return A reference to the sprite.
+   * made.
+   *
+   * \return A reference to the sprite.
    */
   const Sprite& GetSprite(std::size_t nb) const;
 
   /**
-   * Return a reference to a sprite of the direction.
+   * \brief Return a reference to a sprite of the direction.
+   *
    * \param nb The index of the sprite to be accessed. Bound checking is not
-   * made. \return A reference to the sprite.
+   * made.
+   *
+   * \return A reference to the sprite.
    */
   Sprite& GetSprite(std::size_t nb);
 
   /**
-   * Check if the direction contains sprites.
+   * \brief Check if the direction contains sprites.
+   *
    * \return true if the direction does not have any sprite.
    */
   bool HasNoSprites() const;
 
   /**
-   * Return the number of sprite used in the direction
+   * \brief Return the number of sprite used in the direction
+   *
    * \return The number of sprite used in the direction
    */
   std::size_t GetSpritesCount() const;
 
   /**
-   * Remove the sprite at the specified position.
+   * \brief Remove the sprite at the specified position.
+   *
    * Bound-checking is made.
    */
   void RemoveSprite(std::size_t index);
 
   /**
-   * Clear the direction from all of its sprites
+   * \brief Clear the direction from all of its sprites
    */
   void RemoveAllSprites();
 
   /**
-   * Add a new sprite at the end of the list.
+   * \brief Add a new sprite at the end of the list.
    */
   void AddSprite(const Sprite& sprite);
 
   /**
-   * Swap the position of two sprites
+   * \brief Swap the position of two sprites
    */
   void SwapSprites(std::size_t firstSpriteIndex, std::size_t secondSpriteIndex);
 
   /**
-   * Change the position of the specified sprite.
+   * \brief Change the position of the specified sprite.
    */
   void MoveSprite(std::size_t oldIndex, std::size_t newIndex);
+
+#if defined(GD_IDE_ONLY)
+  /**
+   * \brief Set the metadata (any string) associated to the Direction.
+   * \note Can be used by external editors to store extra information.
+   */
+  virtual void SetMetadata(const gd::String& metadata_) { metadata = metadata_; }
+
+  /**
+   * \brief Return the (optional) metadata associated to the Direction.
+   */
+  virtual const gd::String& GetMetadata() const { return metadata; }
+#endif
 
   void UnserializeFrom(const gd::SerializerElement& element);
 #if defined(GD_IDE_ONLY)
@@ -113,6 +135,9 @@ class GD_CORE_API Direction {
   bool loop;               ///< true if the animation must loop.
   float timeBetweenFrame;  ///< The time between each sprite of the animation.
   std::vector<Sprite> sprites;  ///< The sprites of the direction.
+#if defined(GD_IDE_ONLY)
+  gd::String metadata;
+#endif
 };
 
 }  // namespace gd

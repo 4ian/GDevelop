@@ -13,6 +13,7 @@ export const createPathEditorHeader = ({
   initialResourcePath,
   extension,
   headerStyle,
+  name
 }) => {
   if (fs.existsSync(initialResourcePath)) {
     if (fs.lstatSync(initialResourcePath).isDirectory()) {
@@ -26,8 +27,8 @@ export const createPathEditorHeader = ({
   const headerObject = {
     state: {
       folderPath: path.dirname(initialResourcePath),
-      name: path.basename(initialResourcePath, path.extname(initialResourcePath)),
-      extension: path.extname(initialResourcePath),
+      name: !name ? path.basename(initialResourcePath, path.extname(initialResourcePath)) : name,
+      extension: !extension ? '/' : path.extname(initialResourcePath),
       projectBasePath: path.normalize(projectPath),
     },
   };
@@ -72,13 +73,25 @@ export const createPathEditorHeader = ({
     onSaveToGd(headerObject);
   });
   headerObject.cancelButton.addEventListener('click', onCancelChanges);
-  headerObject.saveFolderLabel.addEventListener('click', () => {
+  const selectFolderPath = () => {
     selectBaseFolderPath(headerObject);
-  });
-  headerObject.setFolderButton.addEventListener('click', () => {
-    selectBaseFolderPath(headerObject);
-  });
+  };
+  headerObject.saveFolderLabel.addEventListener('click',selectFolderPath);
+  headerObject.setFolderButton.addEventListener('click',selectFolderPath);
+
+  headerObject.disableSavePathControls = () => {
+    headerObject.saveFolderLabel.removeEventListener('click', selectFolderPath);
+    headerObject.nameInput.style.color = '#8bb0b2';
+    headerObject.nameInput.style.border = '2px solid black';
+    headerObject.nameInput.disabled = true;
+    headerObject.saveFolderLabel.style.color = '#8bb0b2';
+    headerObject.saveFolderLabel.title =
+      'Changing the path is disabled on imported GD animations!';
+    headerObject.setFolderButton.removeEventListener('click', selectFolderPath);
+    headerObject.setFolderButton.style.visibility = 'hidden';
+  };
   render(headerObject);
+  return headerObject;
 };
 
 const render = headerObject => {

@@ -1,77 +1,81 @@
+import {
+  createPathEditorHeader
+} from '../utils/path-editor.js'
 const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
 const path = require('path');
 const fs = require('fs');
 const async = require('async');
 const remote = electron.remote;
-const { dialog } = remote;
+const {
+  dialog
+} = remote;
 
 const editorContentWindow = document.getElementById('piskel-frame')
   .contentWindow;
 let baseExportPath;
 let piskelOptions; // The options received from GDevelop
 
-let saveFolderLabel,
-  setFolderButton,
-  piskelAnimationNameInput = null; // controlers for save path of new frames
+// let saveFolderLabel,
+//   setFolderButton,
+//   piskelAnimationNameInput = null; // controlers for save path of new frames
+// const headerStyle = {
+//   saveFolderLabel: 'float: left;margin-left: 2px; font-size:15px;',
+//   piskelAnimationNameInput:
+//     'float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
+//   saveButton:
+//     'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+//   cancelButton:
+//     'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+//   setFolderButton:
+//     'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+// };
 
-const headerStyle = {
-  saveFolderLabel: 'float: left;margin-left: 2px; font-size:15px;',
-  piskelAnimationNameInput:
-    'float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
-  saveButton:
-    'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-  cancelButton:
-    'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-  setFolderButton:
-    'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-};
+// const updatePiskelBasePath = function() {
+//   piskelAnimationNameInput.value = piskelAnimationNameInput.value.replace(
+//     /[^a-zA-Z0-9_-]/g,
+//     ''
+//   ); // Don't allow the user to enter any characters that would lead to an invalid path
+//   piskelOptions.name = piskelAnimationNameInput.value;
+//   baseExportPath = piskelOptions.projectPath + '/' + piskelOptions.name;
+//   saveFolderLabel.textContent = piskelOptions.projectPath + '\\';
+//   saveFolderLabel.title =
+//     'Click to Change path: \n' + piskelOptions.projectPath;
+// };
 
-const updatePiskelBasePath = function() {
-  piskelAnimationNameInput.value = piskelAnimationNameInput.value.replace(
-    /[^a-zA-Z0-9_-]/g,
-    ''
-  ); // Don't allow the user to enter any characters that would lead to an invalid path
-  piskelOptions.name = piskelAnimationNameInput.value;
-  baseExportPath = piskelOptions.projectPath + '/' + piskelOptions.name;
-  saveFolderLabel.textContent = piskelOptions.projectPath + '\\';
-  saveFolderLabel.title =
-    'Click to Change path: \n' + piskelOptions.projectPath;
-};
+// let projectBasePath;
+// const selectBaseFolderPath = function() {
+//   if (!projectBasePath) {
+//     projectBasePath = piskelOptions.projectPath;
+//   }
+//   const selectedDir = dialog.showOpenDialog(remote.getCurrentWindow(), {
+//     properties: ['openDirectory'],
+//     defaultPath: projectBasePath,
+//   });
+//   if (!selectedDir) {
+//     return;
+//   }
+//   if (!selectedDir.toString().startsWith(projectBasePath)) {
+//     alert(
+//       'Please select a folder inside your project path!\n' +
+//         projectBasePath +
+//         '\n\nSelected:\n' +
+//         selectedDir
+//     );
+//     return;
+//   }
+//   piskelOptions.projectPath = selectedDir;
+//   updatePiskelBasePath();
+// };
 
-let projectBasePath;
-const selectBaseFolderPath = function() {
-  if (!projectBasePath) {
-    projectBasePath = piskelOptions.projectPath;
-  }
-  const selectedDir = dialog.showOpenDialog(remote.getCurrentWindow(), {
-    properties: ['openDirectory'],
-    defaultPath: projectBasePath,
-  });
-  if (!selectedDir) {
-    return;
-  }
-  if (!selectedDir.toString().startsWith(projectBasePath)) {
-    alert(
-      'Please select a folder inside your project path!\n' +
-        projectBasePath +
-        '\n\nSelected:\n' +
-        selectedDir
-    );
-    return;
-  }
-  piskelOptions.projectPath = selectedDir;
-  updatePiskelBasePath();
-};
-
-const updateFrameElements = function() {
-  setTimeout(function() {
+const updateFrameElements = function () {
+  setTimeout(function () {
     const editorContentDocument = document.getElementById('piskel-frame')
       .contentDocument;
     if (piskelOptions.singleFrame) {
       editorContentDocument.getElementsByClassName(
-        'preview-list-wrapper'
-      )[0].style.display =
+          'preview-list-wrapper'
+        )[0].style.display =
         'none';
     }
 
@@ -83,61 +87,12 @@ const updateFrameElements = function() {
 if (!editorContentWindow.piskelReadyCallbacks) {
   editorContentWindow.piskelReadyCallbacks = [];
 }
-editorContentWindow.piskelReadyCallbacks.push(function() {
+editorContentWindow.piskelReadyCallbacks.push(function () {
   ipcRenderer.send('piskel-ready');
 });
 
-/**
- * Inject custom buttons in Piskel's header,
- * get rid of the new file button,
- * make animation name and path editable
- */
-document.getElementById('piskel-frame').onload = function() {
-  const editorContentDocument = document.getElementById('piskel-frame')
-    .contentDocument;
-  const newButton = editorContentDocument.getElementsByClassName(
-    'new-piskel-desktop button button-primary'
-  )[0];
-  const oldPiskelNameLabel = editorContentDocument.getElementsByClassName(
-    'piskel-name'
-  )[0];
-  newButton.style.display = 'none';
-  oldPiskelNameLabel.style.display = 'none';
 
-  const piskelAppHeader = editorContentDocument.getElementsByClassName(
-    'fake-piskelapp-header'
-  )[0];
 
-  saveFolderLabel = editorContentDocument.createElement('label');
-  saveFolderLabel.addEventListener('click', selectBaseFolderPath);
-  saveFolderLabel.style = headerStyle.saveFolderLabel;
-  piskelAppHeader.appendChild(saveFolderLabel);
-
-  piskelAnimationNameInput = editorContentDocument.createElement('input');
-  piskelOptions = { name: 'New Animation' };
-  piskelAnimationNameInput.oninput = updatePiskelBasePath;
-  piskelAnimationNameInput.type = 'text';
-  piskelAnimationNameInput.style = headerStyle.piskelAnimationNameInput;
-  piskelAppHeader.appendChild(piskelAnimationNameInput);
-
-  const saveButton = editorContentDocument.createElement('button');
-  saveButton.textContent = 'Save to GDevelop';
-  saveButton.style = headerStyle.saveButton;
-  piskelAppHeader.appendChild(saveButton);
-  saveButton.addEventListener('click', saveToGD);
-
-  const cancelButton = editorContentDocument.createElement('button');
-  cancelButton.textContent = 'Cancel';
-  cancelButton.style = headerStyle.cancelButton;
-  piskelAppHeader.appendChild(cancelButton);
-  cancelButton.addEventListener('click', cancelChanges);
-
-  setFolderButton = editorContentDocument.createElement('button');
-  setFolderButton.textContent = 'Set Folder';
-  setFolderButton.style = headerStyle.setFolderButton;
-  piskelAppHeader.appendChild(setFolderButton);
-  setFolderButton.addEventListener('click', selectBaseFolderPath);
-};
 
 function fileExists(path) {
   try {
@@ -190,18 +145,21 @@ function readBase64ImageFile(file) {
  */
 function saveToFile(content, filePath, callback) {
   const reader = new FileReader();
-  reader.onload = function() {
+  reader.onload = function () {
     const buffer = new Buffer(reader.result);
     fs.writeFile(filePath, buffer, {}, callback);
   };
   reader.readAsArrayBuffer(content);
 }
 
-function saveToGD() {
+const saveToGD = pathEditor => {
+  piskelOptions.projectPath = pathEditor.state.folderPath;
+  piskelOptions.name = pathEditor.state.name;
+
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   const layer = pskl.app.piskelController.getCurrentLayer();
-  updatePiskelBasePath(); // Recalculate basepath
+  // updatePiskelBasePath(); // Recalculate basepath
   // Generate the path of the files that will be written
   const outputResources = [];
   for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
@@ -228,13 +186,13 @@ function saveToGD() {
   // Save, asynchronously, the content of each images
   async.eachOf(
     outputResources,
-    function(path, index, callback) {
+    function (path, index, callback) {
       const canvas = pskl.app.piskelController.renderFrameAt(index, true);
-      pskl.utils.BlobUtils.canvasToBlob(canvas, function(blob) {
+      pskl.utils.BlobUtils.canvasToBlob(canvas, function (blob) {
         saveToFile(blob, path.path, callback);
       });
     },
-    function(err) {
+    function (err) {
       ipcRenderer.send(
         'piskel-changes-saved',
         outputResources,
@@ -270,7 +228,7 @@ function piskelCreateAnimation(pskl, piskelOptions) {
     piskel.description,
     true
   );
-  pskl.utils.serialization.Deserializer.deserialize(sprite, function(piskel) {
+  pskl.utils.serialization.Deserializer.deserialize(sprite, function (piskel) {
     piskel.setDescriptor(descriptor);
     pskl.app.piskelController.setPiskel(piskel);
     pskl.app.piskelController.setFPS(sprite.fps);
@@ -281,13 +239,50 @@ function piskelCreateAnimation(pskl, piskelOptions) {
   pskl.app.settingsController.settingsContainer
     .getElementsByClassName('textfield resize-size-field')[0]
     .focus();
-  updatePiskelBasePath(); //update the path label
+  // updatePiskelBasePath(); //update the path label
 }
 
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
-  piskelOptions = receivedOptions;
-  piskelAnimationNameInput.value = piskelOptions.name;
+  /**
+ * Inject custom buttons in Piskel's header,
+ * get rid of the new file button,
+ * make animation name and path editable
+ */
+  const editorContentDocument = document.getElementById('piskel-frame')
+    .contentDocument;
+  const newButton = editorContentDocument.getElementsByClassName(
+    'new-piskel-desktop button button-primary'
+  )[0];
+  const oldPiskelNameLabel = editorContentDocument.getElementsByClassName(
+    'piskel-name'
+  )[0];
+  newButton.style.display = 'none';
+  oldPiskelNameLabel.style.display = 'none';
 
+  // Load a custom save file(s) header
+  const pathEditorHeaderDiv = document.getElementById('path-editor-header');
+  const headerStyle = {
+    saveFolderLabel: 'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
+    nameInput: 'font-family:"Courier New";height:27px;width:90px;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
+    saveButton: 'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    cancelButton: 'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    setFolderButton: 'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    fileExistsLabel: 'height:27px;color:blue;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;'
+  };
+  const savePathEditor = createPathEditorHeader({
+    parentElement: pathEditorHeaderDiv,
+    editorContentDocument: document,
+    onSaveToGd: saveToGD,
+    onCancelChanges: cancelChanges,
+    projectPath: receivedOptions.projectPath,
+    initialResourcePath: (receivedOptions.resources[0] === undefined) ? '' : receivedOptions.resources[0].resourcePath,
+    extension: '',
+    headerStyle,
+    name: receivedOptions.name,
+  });
+
+  // Load images into piskel
+  piskelOptions = receivedOptions;
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   if (!pskl) return;
@@ -301,9 +296,9 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   let maxHeight = -1;
   async.each(
     piskelOptions.resources,
-    function(resource, callback) {
+    function (resource, callback) {
       const image = new Image();
-      image.onload = function() {
+      image.onload = function () {
         imageData.push(image);
         maxWidth = Math.max(image.width, maxWidth);
         maxHeight = Math.max(image.height, maxHeight);
@@ -319,7 +314,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         callback();
       }
     },
-    function(err) {
+    function (err) {
       // Finally load the image objects into piskel
       const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(
         imageData,
@@ -347,21 +342,9 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         0,
         piskelOptions.resources[0].resourcePath.lastIndexOf('/')
       );
-      updatePiskelBasePath(); //update the path label
+      // updatePiskelBasePath(); //update the path label
       // Disable changing path and naming convention by user - on animations imported from gdevelop
-      disablePiskelSavePathControls();
+      savePathEditor.disableSavePathControls();
     }
   );
 });
-
-function disablePiskelSavePathControls() {
-  saveFolderLabel.removeEventListener('click', selectBaseFolderPath);
-  piskelAnimationNameInput.style.color = '#8bb0b2';
-  piskelAnimationNameInput.style.border = '2px solid black';
-  piskelAnimationNameInput.disabled = true;
-  saveFolderLabel.style.color = '#8bb0b2';
-  saveFolderLabel.title =
-    'Changing the path is disabled on imported GD animations!';
-  setFolderButton.removeEventListener('click', selectBaseFolderPath);
-  setFolderButton.style.visibility = 'hidden';
-}

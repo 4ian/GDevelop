@@ -2,7 +2,9 @@ const electron = require("electron");
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const isDev = require("electron-is").dev();
 const ipcMain = electron.ipcMain;
-const { load } = require('./Utils/UrlLoader');
+const {
+  load
+} = require('./Utils/UrlLoader');
 
 // Generic function to load external editors in a modal window.
 // Keep a global reference of the window object, if you don't, the window will
@@ -22,12 +24,11 @@ const loadModalWindow = ({
   relativeWidth = 0.7,
   relativeHeight = 0.9,
   backgroundColor = "white",
-  show = true,
+  show = false,
 }) => {
+
   if (modalWindow) {
-    if (show) {
-      modalWindow.show();
-    }
+    modalWindow.show();
     onReady(modalWindow);
   }
 
@@ -38,7 +39,6 @@ const loadModalWindow = ({
     backgroundColor,
     modal: true,
     center: true,
-    show,
     webPreferences: {
       webSecurity: false
     }
@@ -58,6 +58,22 @@ const loadModalWindow = ({
     isDev,
     path: "/external/" + indexSubPath,
     devTools
+  });
+
+  //Prevent any navigation inside the modal window.
+  modalWindow.webContents.on("will-navigate", (e, url) => {
+    if (url !== modalWindow.webContents.getURL()) {
+      console.info("Opening in browser (because of will-navigate):", url);
+      e.preventDefault();
+      electron.shell.openExternal(url);
+    }
+  });
+
+  //Prevent opening any website or url inside Electron.
+  modalWindow.webContents.on("new-window", (e, url) => {
+    console.info("Opening in browser (because of new-window): ", url);
+    e.preventDefault();
+    electron.shell.openExternal(url);
   });
 
   modalWindow.on("closed", event => {

@@ -2,7 +2,6 @@ import RenderedUnknownInstance from './Renderers/RenderedUnknownInstance';
 import RenderedSpriteInstance from './Renderers/RenderedSpriteInstance';
 import RenderedTiledSpriteInstance from './Renderers/RenderedTiledSpriteInstance';
 import RenderedPanelSpriteInstance from './Renderers/RenderedPanelSpriteInstance';
-import RenderedAdMobInstance from './Renderers/RenderedAdMobInstance';
 import RenderedTextInstance from './Renderers/RenderedTextInstance';
 import RenderedShapePainterInstance from './Renderers/RenderedShapePainterInstance';
 import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
@@ -20,7 +19,6 @@ export default {
     Sprite: RenderedSpriteInstance,
     'TiledSpriteObject::TiledSprite': RenderedTiledSpriteInstance,
     'PanelSpriteObject::PanelSprite': RenderedPanelSpriteInstance,
-    'AdMobObject::AdMob': RenderedAdMobInstance,
     'TextObject::Text': RenderedTextInstance,
     'PrimitiveDrawing::Drawer': RenderedShapePainterInstance,
     'TextEntryObject::TextEntry': RenderedTextEntryInstance,

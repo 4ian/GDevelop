@@ -47,6 +47,33 @@ gdjs.RuntimeScenePixiRenderer.prototype._renderProfileText = function() {
   this._profilerText.text = outputs.join("\n");
 };
 
+gdjs.RuntimeScenePixiRenderer.prototype.renderDebugDraw = function(instances, layersCameraCoordinates) {
+  if (!this._debugDraw) {
+    this._debugDraw = new PIXI.Graphics();
+    this._pixiContainer.addChild(this._debugDraw);
+  }
+  /** @type PIXI.Graphics */
+  var debugDraw = this._debugDraw;
+
+  debugDraw.clear();
+  debugDraw.beginFill(0x6868e8);
+  debugDraw.lineStyle(1, 0x6868e8, 1);
+  debugDraw.fillAlpha = 0.1;
+  debugDraw.alpha = 0.8;
+
+  for(var i = 0;i < instances.length;i++) {
+    var object = instances[i];
+    var cameraCoords = layersCameraCoordinates[object.getLayer()];
+    var rendererObject = object.getRendererObject();
+
+    if (!cameraCoords || !rendererObject) continue;
+
+    var aabb = object.getAABB();
+    debugDraw.drawRect(aabb.min[0], aabb.min[1], aabb.max[0] - aabb.min[0], aabb.max[1] - aabb.min[1]);
+  }
+  debugDraw.endFill();
+};
+
 gdjs.RuntimeScenePixiRenderer.prototype.hideCursor = function() {
   this._pixiRenderer.view.style.cursor = "none";
 };

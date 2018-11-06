@@ -168,6 +168,10 @@ gdjs.RuntimeSceneCocosRenderer.prototype.makeEventListeners = function() {
     })];
 }
 
+gdjs.RuntimeSceneCocosRenderer.prototype.renderDebugDraw = function() {
+    // Not implemented
+}
+
 gdjs.RuntimeSceneCocosRenderer.prototype.hideCursor = function() {
     //TODO
 }

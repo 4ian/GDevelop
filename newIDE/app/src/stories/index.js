@@ -38,7 +38,6 @@ import ObjectVariableField from '../EventsSheet/InstructionEditor/ParameterField
 import KeyField from '../EventsSheet/InstructionEditor/ParameterFields/KeyField';
 import ExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/InstructionEditor/ParameterFields/StringField';
-import AdMobEditor from '../ObjectEditor/Editors/AdMobEditor';
 import ObjectsList from '../ObjectsList';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
@@ -114,7 +113,6 @@ const gd = global.gd;
 const {
   project,
   shapePainterObject,
-  adMobObject,
   tiledSpriteObject,
   panelSpriteObject,
   textObject,
@@ -1134,15 +1132,6 @@ storiesOf('ShapePainterEditor', module)
   .add('default', () => (
     <SerializedObjectDisplay object={shapePainterObject}>
       <ShapePainterEditor object={shapePainterObject} project={project} />
-    </SerializedObjectDisplay>
-  ));
-
-storiesOf('AdMobEditor', module)
-  .addDecorator(paperDecorator)
-  .addDecorator(muiDecorator)
-  .add('default', () => (
-    <SerializedObjectDisplay object={adMobObject}>
-      <AdMobEditor object={adMobObject} project={project} />
     </SerializedObjectDisplay>
   ));
 

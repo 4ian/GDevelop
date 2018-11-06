@@ -9,6 +9,7 @@ import ExamplesList from './ExamplesList';
 // of the example generated. Finally, add it in this list, in BrowserProjectOpener.js
 // and upload the example resources online.
 const exampleNames = [
+  'admob',
   'advanced-shape-based-painter',
   'animation-speed-scale',
   'asteroids',

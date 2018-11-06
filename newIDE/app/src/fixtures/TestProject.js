@@ -32,7 +32,6 @@ export const makeTestProject = gd => {
 
   // Create and expose some objects
   const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
-  const adMobObject = new gd.AdMobObject('MyAdMobObject');
   const textObject = new gd.TextObject('MyTextObject');
   const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
   const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
@@ -333,7 +332,6 @@ export const makeTestProject = gd => {
   return {
     project,
     shapePainterObject,
-    adMobObject,
     textObject,
     tiledSpriteObject,
     panelSpriteObject,

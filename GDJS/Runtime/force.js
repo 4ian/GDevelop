@@ -17,7 +17,7 @@ gdjs.Force = function(x,y, clearing)
 {
     this._x = x || 0;
     this._y = y || 0;
-    this._angle = Math.atan2(y,x)*180/3.14159;
+    this._angle = Math.atan2(y,x)*180/Math.PI;
     this._length = Math.sqrt(x*x+y*y);
     this._dirty = false;
     this._clearing = clearing;
@@ -67,8 +67,9 @@ gdjs.Force.prototype.setAngle = function(angle) {
 	}
 
 	this._angle = angle;
-	this._x = Math.cos(angle/180*3.14159)*this._length;
-	this._y = Math.sin(angle/180*3.14159)*this._length;
+	var angleInRadians = angle/180*Math.PI;
+	this._x = Math.cos(angleInRadians)*this._length;
+	this._y = Math.sin(angleInRadians)*this._length;
 }
 
 /**
@@ -78,13 +79,14 @@ gdjs.Force.prototype.setAngle = function(angle) {
 gdjs.Force.prototype.setLength = function(len) {
 
 	if ( this._dirty ) {
-		this._angle = Math.atan2(this._y, this._x)*180/3.14159;
+		this._angle = Math.atan2(this._y, this._x)*180/Math.PI;
 		this._dirty = false;
 	}
 
 	this._length = len;
-	this._x = Math.cos(this._angle/180*3.14159)*this._length;
-	this._y = Math.sin(this._angle/180*3.14159)*this._length;
+	var angleInRadians = this._angle/180*Math.PI;
+	this._x = Math.cos(angleInRadians)*this._length;
+	this._y = Math.sin(angleInRadians)*this._length;
 }
 
 /**
@@ -92,7 +94,7 @@ gdjs.Force.prototype.setLength = function(len) {
  */
 gdjs.Force.prototype.getAngle = function() {
 	if ( this._dirty ) {
-		this._angle = Math.atan2(this._y, this._x)*180/3.14159;
+		this._angle = Math.atan2(this._y, this._x)*180/Math.PI;
 		this._length = Math.sqrt(this._x*this._x+this._y*this._y);
 
 		this._dirty = false;
@@ -107,7 +109,7 @@ gdjs.Force.prototype.getAngle = function() {
  */
 gdjs.Force.prototype.getLength = function() {
 	if ( this._dirty ) {
-		this._angle = Math.atan2(this._y, this._x)*180/3.14159;
+		this._angle = Math.atan2(this._y, this._x)*180/Math.PI;
 		this._length = Math.sqrt(this._x*this._x+this._y*this._y);
 
 		this._dirty = false;

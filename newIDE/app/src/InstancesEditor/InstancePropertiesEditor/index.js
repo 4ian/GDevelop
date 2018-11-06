@@ -104,7 +104,7 @@ export default class InstancePropertiesEditor extends Component {
   _renderEmpty() {
     return (
       <EmptyMessage>
-        Click on an instance on the scene to display its properties
+        Click on an instance in the scene to display its properties
       </EmptyMessage>
     );
   }

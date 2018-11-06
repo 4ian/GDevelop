@@ -8,7 +8,6 @@ project(GD-Extensions)
 include(CMakeUtils.txt) #Functions to factor common tasks done in CMakeLists.txt of extensions
 
 #Add all the CMakeLists:
-ADD_SUBDIRECTORY(AdMobObject)
 ADD_SUBDIRECTORY(AnchorBehavior)
 IF (NOT EMSCRIPTEN)
 	ADD_SUBDIRECTORY(AdvancedXML)

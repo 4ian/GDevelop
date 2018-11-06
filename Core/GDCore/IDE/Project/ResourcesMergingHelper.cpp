@@ -49,11 +49,25 @@ void ResourcesMergingHelper::SetNewFilename(gd::String oldFilename,
                                             gd::String newFilename) {
   if (oldFilenames.find(oldFilename) != oldFilenames.end()) return;
 
-  // Make sure that the new filename is not already used.
-  gd::String finalFilename = gd::NewNameGenerator::Generate(
-      newFilename, [this](const gd::String& name) {
-        return newFilenames.find(name) != newFilenames.end();
-      });
+  // Extract baseName and extension from the new filename
+  size_t extensionPos = newFilename.find_last_of(".");
+  gd::String extension =
+      extensionPos != gd::String::npos
+          ? newFilename.substr(extensionPos, newFilename.length())
+          : "";
+  gd::String baseName = newFilename.substr(0, extensionPos);
+
+  // Make sure that the new filename is not already used. Generate a
+  // new filename while there is a collision.
+  // Preserving extension is important.
+  gd::String finalFilename =
+      gd::NewNameGenerator::Generate(
+          baseName,
+          [this, extension](const gd::String& newBaseName) {
+            return newFilenames.find(newBaseName + extension) !=
+                   newFilenames.end();
+          }) +
+      extension;
 
   oldFilenames[oldFilename] = finalFilename;
   newFilenames[finalFilename] = oldFilename;

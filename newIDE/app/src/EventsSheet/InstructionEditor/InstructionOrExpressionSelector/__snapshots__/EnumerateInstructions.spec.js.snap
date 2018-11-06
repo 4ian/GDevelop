@@ -2,18 +2,6 @@
 
 exports[`EnumerateInstructions can create the tree of instructions 1`] = `
 Object {
-  "AdMob banners and interstitial screens": Object {
-    "Banner is displayed": Object {
-      "displayedName": "Banner is displayed",
-      "fullGroupName": "AdMob banners and interstitial screens/",
-      "type": "AdMobObject::BannerDisplayed",
-    },
-    "Interstitial screen is ready": Object {
-      "displayedName": "Interstitial screen is ready",
-      "fullGroupName": "AdMob banners and interstitial screens/",
-      "type": "AdMobObject::InterstitialReady",
-    },
-  },
   "Advanced": Object {
     "And": Object {
       "displayedName": "And",
@@ -2376,26 +2364,6 @@ Array [
     "fullGroupName": "Physics behavior/Movement",
     "type": "PhysicsBehavior::SetStatic",
   },
-  Object {
-    "displayedName": "Hide banner ad",
-    "fullGroupName": "AdMob banners and interstitial screens/Banner",
-    "type": "AdMobObject::HideBanner",
-  },
-  Object {
-    "displayedName": "Preload interstitial screen",
-    "fullGroupName": "AdMob banners and interstitial screens/Interstitial screen",
-    "type": "AdMobObject::PreloadInterstitial",
-  },
-  Object {
-    "displayedName": "Show banner ad",
-    "fullGroupName": "AdMob banners and interstitial screens/Banner",
-    "type": "AdMobObject::ShowBanner",
-  },
-  Object {
-    "displayedName": "Show interstitial screen",
-    "fullGroupName": "AdMob banners and interstitial screens/Interstitial screen",
-    "type": "AdMobObject::ShowInterstitial",
-  },
 ]
 `;
 
@@ -3345,16 +3313,6 @@ Array [
     "displayedName": "Y component",
     "fullGroupName": "Physics behavior/Displacement",
     "type": "PhysicsBehavior::LinearVelocityY",
-  },
-  Object {
-    "displayedName": "Banner is displayed",
-    "fullGroupName": "AdMob banners and interstitial screens/",
-    "type": "AdMobObject::BannerDisplayed",
-  },
-  Object {
-    "displayedName": "Interstitial screen is ready",
-    "fullGroupName": "AdMob banners and interstitial screens/",
-    "type": "AdMobObject::InterstitialReady",
   },
 ]
 `;

@@ -168,15 +168,19 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const resourcesManager = project.getResourcesManager();
     const initialResource = resourcesManager.getResource(resourceName);
 
-    let initialResourceMetadata = {};
+    console.log(resourceName)
+    console.log(initialResource)
+    let metadata = {};
     const initialResourceMetadataRaw = initialResource.getMetadata();
     if (initialResourceMetadataRaw) {
       try {
-        initialResourceMetadata = JSON.parse(initialResourceMetadataRaw);
+        metadata = JSON.parse(initialResourceMetadataRaw);
       } catch (e) {
         console.error('Malformed metadata', e);
       }
     }
+    console.log('sending metadata:')
+    console.log(metadata)
     if (resourceKind === 'image') {
       const resourceNames = [];
       if (resourcesManager.hasResource(resourceName)) {
@@ -191,6 +195,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
           fps: 0,
           name: 'Image',
           isLooping: false,
+          metadata,
+          isTiled: true,
         },
         onChangesSaved: resources => {
           if (!resources.length) return;
@@ -209,7 +215,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         resourcesLoader,
         resourceNames: [resourceName],
         extraOptions: {
-          initialResourceMetadata,
+          initialResourceMetadata: metadata,
         },
         onChangesSaved: (newResourceData, newResourceName) => {
           // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).

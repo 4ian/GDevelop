@@ -220,6 +220,18 @@ export default class SpritesList extends Component<Props, void> {
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
+    let metadata = {};
+    const metadataRaw = direction.getMetadata();
+    if (metadataRaw) {
+      try {
+        metadata = JSON.parse(metadataRaw);
+      } catch (e) {
+        console.error('Malformed metadata', e);
+      }
+    }
+    console.log('Sending metadata:')
+    console.log(metadata)
+
     externalEditor.edit({
       project,
       resourcesLoader,
@@ -232,8 +244,12 @@ export default class SpritesList extends Component<Props, void> {
             : 1,
         name: animationName ? `${animationName}` : `${objectName}`,
         isLooping: direction.isLooping(),
+        metadata,
+        isTiled: false,
       },
-      onChangesSaved: (resources, newAnimationName) => {
+      onChangesSaved: (resources, newAnimationName, newMetadata) => {
+        console.log('received metadata:');
+        console.log(newMetadata)
         const newDirection = new gd.Direction();
         newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
         newDirection.setLoop(direction.isLooping());
@@ -256,6 +272,9 @@ export default class SpritesList extends Component<Props, void> {
           newDirection.addSprite(sprite);
           sprite.delete();
         });
+
+        // set metadata if there is such on the direction
+        newDirection.setMetadata(JSON.stringify(newMetadata))
 
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);

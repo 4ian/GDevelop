@@ -5,11 +5,7 @@ const fs = require('fs');
 const async = require('async');
 const remote = electron.remote;
 
-const editorContentWindow = document.getElementById('piskel-frame')
-  .contentWindow;
-let baseExportPath;
 let piskelOptions; // The options received from GDevelop
-
 const updateFrameElements = () => {
   setTimeout(() => {
     const editorContentDocument = document.getElementById('piskel-frame')
@@ -98,9 +94,6 @@ const saveToFile = (content, filePath, callback) => {
 };
 
 const saveToGD = pathEditor => {
-  piskelOptions.projectPath = pathEditor.state.folderPath;
-  piskelOptions.name = pathEditor.state.name;
-
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
   const layer = pskl.app.piskelController.getCurrentLayer();
@@ -118,7 +111,7 @@ const saveToGD = pathEditor => {
     // If a frame was made in piskel (exportPath and resourceName will be null) come up with a unique path, so as not to overwrite any existing files
     // Also prevent overwriting frames that were created via duplication of imported frames or frames with same resources
     if (!exportPath || pathAlreadyUsed) {
-      exportPath = baseExportPath + '-' + String(i + 1) + '.png';
+      exportPath = pathEditor.state.folderPath + '/' + pathEditor.state.name + '-' + String(i + 1) + '.png';
       exportPath = makeFileNameUnique(exportPath);
     }
 
@@ -134,8 +127,6 @@ const saveToGD = pathEditor => {
   // if more than one layer is used - use metadata for storing the data
   let metadata = {};
   const piskelData = pskl.app.piskelController.getPiskel();
-  console.log(piskelData);
-  return
   if (piskelData.layers.length > 1) { //TODO - also do if more than one palette detected
     metadata = {
       data: pskl.utils.serialization.Serializer.serialize(piskelData),
@@ -157,7 +148,7 @@ const saveToGD = pathEditor => {
       ipcRenderer.send(
         'piskel-changes-saved',
         outputResources,
-        piskelOptions.name,
+        pathEditor.state.name,
         metadata
       );
       remote.getCurrentWindow().close();
@@ -204,6 +195,7 @@ const piskelCreateAnimation = (pskl, piskelOptions) => {
 };
 
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
+  console.log(receivedOptions)
   /**
  * Inject custom buttons in Piskel's header,
  * get rid of the new file button,
@@ -223,6 +215,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
     'fake-piskelapp-header'
   )[0];
   piskelAppHeader.style.display = 'none';
+
   // Load a custom save file(s) header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const headerStyle = {
@@ -237,7 +230,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
     setFolderButton:
       'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
     fileExistsLabel:
-      'height:27px;color:blue;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
+      'height:27px;color:aqua;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
   };
   const savePathEditor = createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,
@@ -258,11 +251,9 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   piskelOptions = receivedOptions;
   const editorFrameEl = document.querySelector('#piskel-frame');
   pskl = editorFrameEl.contentWindow.pskl;
+  if (!pskl) { return }
 
-  if (!pskl) {
-    return;
-  }
-  // Set piskel to tiled mode when editing a tiled object, set FPS
+  // Set piskel to tiled mode when editing a tiled object, set FPS from GD
   pskl.UserSettings.set(pskl.UserSettings.SEAMLESS_MODE, piskelOptions.isTiled);
   pskl.app.piskelController.setFPS(piskelOptions.fps);
 
@@ -272,10 +263,9 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
     return;
   }
 
-  // If there is metadata, use that 
+  // If there is metadata, use it to load the frames with layers 
   console.log(piskelOptions.metadata);
   if ('pskl' in piskelOptions.metadata) {
-    console.log(piskelOptions.metadata);
     pskl.utils.serialization.Deserializer.deserialize(
       JSON.parse(piskelOptions.metadata.pskl.data),
       piskel => {
@@ -286,8 +276,6 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
           layer.getFrameAt(i).originalPath =
           piskelOptions.metadata.pskl.paths[i].resourcePath;
-          // layer.getFrameAt(i).originalName =
-          //   piskelOptions.resources[i].resourceName;
           layer.getFrameAt(i).originalIndex = i;
         }
       }
@@ -336,17 +324,10 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
             piskelOptions.resources[i].resourceName;
           layer.getFrameAt(i).originalIndex = i;
         }
-
-        updateFrameElements();
-        // We need this in case the user has used a subfolder -- legacy code- remove
-        // piskelOptions.projectPath = piskelOptions.resources[0].resourcePath.substring(
-        //   0,
-        //   piskelOptions.resources[0].resourcePath.lastIndexOf('/')
-        // );
-
         // Disable changing path and naming convention by user - on animations imported from gdevelop
         savePathEditor.disableSavePathControls();
       }
     );
   };
+  updateFrameElements();
 });

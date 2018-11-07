@@ -2,7 +2,9 @@ const electron = require('electron');
 const fs = require('fs');
 const path = require('path');
 const remote = electron.remote;
-const { dialog } = remote;
+const {
+  dialog
+} = remote;
 
 export const createPathEditorHeader = ({
   parentElement,
@@ -28,7 +30,7 @@ export const createPathEditorHeader = ({
     state: {
       folderPath: path.dirname(initialResourcePath),
       name: !name ? path.basename(initialResourcePath, path.extname(initialResourcePath)) : name,
-      extension: !extension ? '/' : path.extname(initialResourcePath),
+      extension: !extension ? '-' : path.extname(initialResourcePath),
       projectBasePath: path.normalize(projectPath),
     },
   };
@@ -48,6 +50,7 @@ export const createPathEditorHeader = ({
 
   headerObject.fileExistsLabel = editorContentDocument.createElement('label');
   headerObject.fileExistsLabel.style = headerStyle.fileExistsLabel;
+  headerObject.fileExistsLabel.textContent = '-';
   parentElement.appendChild(headerObject.fileExistsLabel);
 
   headerObject.saveButton = editorContentDocument.createElement('button');
@@ -76,8 +79,8 @@ export const createPathEditorHeader = ({
   const selectFolderPath = () => {
     selectBaseFolderPath(headerObject);
   };
-  headerObject.saveFolderLabel.addEventListener('click',selectFolderPath);
-  headerObject.setFolderButton.addEventListener('click',selectFolderPath);
+  headerObject.saveFolderLabel.addEventListener('click', selectFolderPath);
+  headerObject.setFolderButton.addEventListener('click', selectFolderPath);
 
   headerObject.disableSavePathControls = () => {
     headerObject.saveFolderLabel.removeEventListener('click', selectFolderPath);
@@ -110,6 +113,10 @@ const render = headerObject => {
   headerObject.nameInput.style.width =
     (headerObject.nameInput.value.length + 1) * 10 + 'px';
   // check if it will overwrite a file and notify the user in a subtle, but obvious way
+  // but don't do it if there is no extension (image sequence will be saved)
+  if (headerObject.state.extension === '-') {
+    return
+  };
   if (fs.existsSync(state.fullPath)) {
     headerObject.fileExistsLabel.style.color = 'red';
     headerObject.fileExistsLabel.textContent =
@@ -117,7 +124,7 @@ const render = headerObject => {
   } else {
     headerObject.fileExistsLabel.style.color = 'grey';
     headerObject.fileExistsLabel.textContent = state.extension + '  (New)';
-  }
+  };
 };
 
 const selectBaseFolderPath = headerObject => {

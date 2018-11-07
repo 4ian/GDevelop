@@ -35,7 +35,7 @@ export const openPiskel = ({
     return {
       resourcePath,
       resourceName,
-      originalIndex
+      originalIndex,
     };
   });
 
@@ -52,9 +52,12 @@ export const openPiskel = ({
   ipcRenderer.on(
     'piskel-changes-saved',
     (event, outputResources, newAnimationName, metadata) => {
-      const newMetadata = {
-        pskl: metadata,
-      };
+      const newMetadata =
+        'data' in metadata
+          ? {
+              pskl: metadata,
+            }
+          : {};
 
       const resourcesManager = project.getResourcesManager();
       outputResources.forEach(resource => {
@@ -68,7 +71,9 @@ export const openPiskel = ({
 
       // in case this is a single image, save the metadata in the Image  object
       if (outputResources.length === 1) {
-        resourcesManager.getResource(path.relative(projectPath, outputResources[0].path)).setMetadata(JSON.stringify(newMetadata));
+        resourcesManager
+          .getResource(path.relative(projectPath, outputResources[0].path))
+          .setMetadata(JSON.stringify(newMetadata));
       }
       // if not, the metadata will still be passed onto SpritesList.js to be set in the Direction object
       onChangesSaved(outputResources, newAnimationName, newMetadata);

@@ -140,7 +140,7 @@ app.on("ready", function() {
 
   ipcMain.on(
     "piskel-changes-saved",
-    (event, imageResources, newAnimationName,fileMetadata) => {
+    (event, imageResources, newAnimationName, fileMetadata) => {
       mainWindow.webContents.send(
         "piskel-changes-saved",
         imageResources,

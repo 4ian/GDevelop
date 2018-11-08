@@ -3,7 +3,6 @@ const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
 const async = require('async');
-const path = require('path');
 const remote = electron.remote;
 
 let piskelOptions; // The options received from GDevelop

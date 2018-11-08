@@ -7,8 +7,12 @@ import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import { createOrUpdateResource } from './ResourceUtils.js';
+
 const path = optionalRequire('path');
 const glob = optionalRequire('glob');
+const IMAGE_EXTENSIONS = 'png,jpg,jpeg,PNG,JPG,JPEG';
+const AUDIO_EXTENSIONS = 'wav,mp3,ogg,WAV,MP3,OGG';
 const gd = global.gd;
 
 const styles = {
@@ -77,29 +81,30 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
-  _scanForNewResources = () => {
+  _scanForNewResources = extensions => {
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
-    console.log('Scanning the project folder for new resources...');
     const projectPath = path.dirname(project.getProjectFile());
 
     const getDirectories = (src, callback) => {
-      glob(src + '/**/*.{png,jpg,jpeg,PNG,JPG,JPEG}', callback);
+      glob(src + '/**/*.{' + extensions + '}', callback);
     };
     getDirectories(projectPath, (err, res) => {
       if (err) {
-        console.log('Error loading ', err);
+        console.error('Error loading ', err);
       } else {
         res.forEach(pathFound => {
-          const fileName = path.relative(projectPath, pathFound);
+          const fileName = path.relative(projectPath, pathFound);  
           if (!resourcesManager.hasResource(fileName)) {
-            const imageResource = new gd.ImageResource();
-            imageResource.setFile(fileName);
-            imageResource.setName(fileName);
-            resourcesManager.addResource(imageResource);
-            imageResource.delete();
-            console.info(`${fileName} added to project.`);
-          }
+            const extension = path.extname(pathFound).replace('.','');
+            if (IMAGE_EXTENSIONS.includes(extension)) {
+              console.info(`${fileName} -images added to project.`);
+              createOrUpdateResource(project, new gd.ImageResource(), fileName);
+            } else if (AUDIO_EXTENSIONS.includes(extension)) {
+              console.info(`${fileName} -audio added to project.`);
+              createOrUpdateResource(project, new gd.AudioResource(), fileName);
+            };  
+          };
         });
       }
       this.forceUpdate();
@@ -173,7 +178,13 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: 'Scan for Images',
         click: () => {
-          this._scanForNewResources();
+          this._scanForNewResources(IMAGE_EXTENSIONS);
+        },
+      },
+      {
+        label: 'Scan for Audio',
+        click: () => {
+          this._scanForNewResources(AUDIO_EXTENSIONS);
         },
       },
       {

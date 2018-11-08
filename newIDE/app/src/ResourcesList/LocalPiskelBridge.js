@@ -1,6 +1,11 @@
 // @flow
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
+import {
+  type ExternalEditorOpenOptions
+} from './ResourceExternalEditor.flow';
+import {
+  createOrUpdateResource
+} from './ResourceUtils.js';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -53,30 +58,29 @@ export const openPiskel = ({
     'piskel-changes-saved',
     (event, outputResources, newAnimationName, metadata) => {
       const newMetadata =
-        'data' in metadata
-          ? {
-              pskl: metadata,
-            }
-          : {};
+        'data' in metadata ?
+        {
+          pskl: metadata,
+        } :
+        {};
 
       const resourcesManager = project.getResourcesManager();
       outputResources.forEach(resource => {
-        const imageResource = new gd.ImageResource();
         resource.name = path.relative(projectPath, resource.path); // Still needed for onChangesSaved()
-        imageResource.setFile(resource.name);
-        imageResource.setName(resource.name);
-        resourcesManager.addResource(imageResource);
-        imageResource.delete();
+        createOrUpdateResource(project, new gd.ImageResource(), resource.name)
       });
 
-      // in case this is a single image, save the metadata in the Image  object
-      if (outputResources.length === 1) {
+      // in case this is for a tiledSprite object, save the metadata in the Image object
+      if (metadata.isTiled) {
         resourcesManager
           .getResource(path.relative(projectPath, outputResources[0].path))
           .setMetadata(JSON.stringify(newMetadata));
-      }
-      // if not, the metadata will still be passed onto SpritesList.js to be set in the Direction object
-      onChangesSaved(outputResources, newAnimationName, newMetadata);
+      } else {
+        // if not, the metadata will still be passed onto SpritesList.js to be set in the Direction object
+        outputResources[0].metadata = newMetadata;
+      };
+
+      onChangesSaved(outputResources, newAnimationName);
     }
   );
 

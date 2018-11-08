@@ -3,6 +3,7 @@ const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
 const async = require('async');
+const path = require('path');
 const remote = electron.remote;
 
 let piskelOptions; // The options received from GDevelop
@@ -34,47 +35,6 @@ const tryToGetPiskel = () => {
   }
 };
 let retryToGetPiskel = setInterval(tryToGetPiskel, 100);
-
-const fileExists = path => {
-  try {
-    return fs.statSync(path).isFile();
-  } catch (e) {
-    if (e.code === 'ENOENT') {
-      // no such file or directory. File really does not exist
-      return false;
-    }
-    console.log('Exception fs.statSync (' + path + '): ' + e);
-    throw e; // something else went wrong, we don't have rights, ...
-  }
-};
-
-/**
- * Returns a path for a file that does not exist yet.
- * Used to avoid unwanted file overwriting.
- */
-const makeFileNameUnique = path => {
-  if (!fileExists(path)) {
-    return path;
-  }
-
-  //TODO: refactor by using `path` module and properly handle the case
-  //where the file has no extension.
-  const folderPath = path.substring(0, path.lastIndexOf('/') + 1);
-  const extension = path.substring(path.lastIndexOf('.'), path.length);
-  const oldFileName = path.substring(
-    path.lastIndexOf('/') + 1,
-    path.lastIndexOf('.')
-  );
-  let appendNumber = 0;
-  let newUniqueNamePath =
-    folderPath + oldFileName + '-' + String(appendNumber) + extension;
-  while (fileExists(newUniqueNamePath)) {
-    appendNumber += 1;
-    newUniqueNamePath =
-      folderPath + oldFileName + '-' + String(appendNumber) + extension;
-  }
-  return newUniqueNamePath;
-};
 
 const readBase64ImageFile = file => {
   const bitmap = fs.readFileSync(file);
@@ -111,29 +71,35 @@ const saveToGD = pathEditor => {
     // If a frame was made in piskel (exportPath and resourceName will be null) come up with a unique path, so as not to overwrite any existing files
     // Also prevent overwriting frames that were created via duplication of imported frames or frames with same resources
     if (!exportPath || pathAlreadyUsed) {
-      exportPath = pathEditor.state.folderPath + '/' + pathEditor.state.name + '-' + String(i + 1) + '.png';
-      exportPath = makeFileNameUnique(exportPath);
+      exportPath =
+        pathEditor.state.folderPath +
+        '/' +
+        pathEditor.state.name +
+        '-' +
+        String(i + 1) +
+        '.png';
+      exportPath = pathEditor.makeFileNameUnique(exportPath, '.png');
     }
 
     outputResources.push({
       path: exportPath,
       originalIndex,
     });
-    outputPaths.push(
-      exportPath
-    )
+    outputPaths.push(exportPath);
   }
 
   // if more than one layer is used - use metadata for storing the data
   let metadata = {};
   const piskelData = pskl.app.piskelController.getPiskel();
-  if (piskelData.layers.length > 1) { //TODO - also do if more than one palette detected
+  if (piskelData.layers.length > 1) {
+    //TODO - also do if more than one palette detected
     metadata = {
       data: pskl.utils.serialization.Serializer.serialize(piskelData),
       paths: outputPaths,
       name: pathEditor.state.name,
+      isTiled: piskelOptions.isTiled,
     };
-  };
+  }
 
   // Save, asynchronously, the content of each images
   async.eachOf(
@@ -195,7 +161,6 @@ const piskelCreateAnimation = (pskl, piskelOptions) => {
 };
 
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
-  console.log(receivedOptions)
   /**
  * Inject custom buttons in Piskel's header,
  * get rid of the new file button,
@@ -251,19 +216,24 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   piskelOptions = receivedOptions;
   const editorFrameEl = document.querySelector('#piskel-frame');
   pskl = editorFrameEl.contentWindow.pskl;
-  if (!pskl) { return }
+  if (!pskl) {
+    return;
+  }
 
   // Set piskel to tiled mode when editing a tiled object, set FPS from GD
   pskl.UserSettings.set(pskl.UserSettings.SEAMLESS_MODE, piskelOptions.isTiled);
   pskl.app.piskelController.setFPS(piskelOptions.fps);
 
   // if no resources are being loaded, create a new animation
-  if (piskelOptions.resources.length === 0 && !('pskl' in piskelOptions.metadata)) {
+  if (
+    piskelOptions.resources.length === 0 &&
+    !('pskl' in piskelOptions.metadata)
+  ) {
     piskelCreateAnimation(pskl, piskelOptions);
     return;
   }
 
-  // If there is metadata, use it to load the frames with layers 
+  // If there is metadata, use it to load the frames with layers
   console.log(piskelOptions.metadata);
   if ('pskl' in piskelOptions.metadata) {
     pskl.utils.serialization.Deserializer.deserialize(
@@ -275,12 +245,13 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         const layer = pskl.app.piskelController.getCurrentLayer();
         for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
           layer.getFrameAt(i).originalPath =
-          piskelOptions.metadata.pskl.paths[i].resourcePath;
+            piskelOptions.metadata.pskl.paths[i].resourcePath;
           layer.getFrameAt(i).originalIndex = i;
         }
       }
     );
-  } else { // Load images into piskel if there is no metadata
+  } else {
+    // Load images into piskel if there is no metadata
     const imageData = [];
     let maxWidth = -1;
     let maxHeight = -1;
@@ -328,6 +299,6 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         savePathEditor.disableSavePathControls();
       }
     );
-  };
+  }
   updateFrameElements();
 });

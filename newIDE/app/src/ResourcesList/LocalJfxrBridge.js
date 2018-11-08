@@ -1,5 +1,6 @@
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
+import { createOrUpdateResource } from './ResourceUtils.js';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -37,20 +38,16 @@ export const openJfxr = ({
   ipcRenderer.on('jfxr-changes-saved', (event, newFilePath, fileMetadata) => {
 
     const resourceName = path.relative(projectPath, newFilePath); // TODO: move into a generic createOrUpdateResource function that piskel can also use in app/src/ResourcesList/ResourceUtils.js
-    const resourcesManager = project.getResourcesManager();
-    if (resourcesManager.hasResource(resourceName)) {
-      resourcesManager.removeResource(resourceName)
-    }
-    const audioResource = new gd.AudioResource();
-    audioResource.setFile(resourceName);
-    audioResource.setName(resourceName);
-    resourcesManager.addResource(audioResource);
-    audioResource.delete();
+    createOrUpdateResource(project,new gd.AudioResource(),resourceName);
 
-    const newMetadata = {
+    const newMetadata =
+    'data' in fileMetadata ?
+    {
       jfxr: fileMetadata,
-    };
-    resourcesManager.getResource(resourceName).setMetadata(JSON.stringify(newMetadata));
+    } :
+    {};
+
+    project.getResourcesManager().getResource(resourceName).setMetadata(JSON.stringify(newMetadata));
     onChangesSaved([{ metadata: newMetadata }], resourceName);
   });
 

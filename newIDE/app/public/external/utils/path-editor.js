@@ -2,9 +2,7 @@ const electron = require('electron');
 const fs = require('fs');
 const path = require('path');
 const remote = electron.remote;
-const {
-  dialog
-} = remote;
+const { dialog } = remote;
 
 export const createPathEditorHeader = ({
   parentElement,
@@ -15,7 +13,7 @@ export const createPathEditorHeader = ({
   initialResourcePath,
   extension,
   headerStyle,
-  name
+  name,
 }) => {
   if (fs.existsSync(initialResourcePath)) {
     if (fs.lstatSync(initialResourcePath).isDirectory()) {
@@ -25,11 +23,13 @@ export const createPathEditorHeader = ({
     initialResourcePath = projectPath + '/NewFile' + extension;
   }
 
-  initialResourcePath = path.normalize(initialResourcePath)
+  initialResourcePath = path.normalize(initialResourcePath);
   const headerObject = {
     state: {
       folderPath: path.dirname(initialResourcePath),
-      name: !name ? path.basename(initialResourcePath, path.extname(initialResourcePath)) : name,
+      name: !name
+        ? path.basename(initialResourcePath, path.extname(initialResourcePath))
+        : name,
       extension: !extension ? '-' : path.extname(initialResourcePath),
       projectBasePath: path.normalize(projectPath),
     },
@@ -82,6 +82,9 @@ export const createPathEditorHeader = ({
   headerObject.saveFolderLabel.addEventListener('click', selectFolderPath);
   headerObject.setFolderButton.addEventListener('click', selectFolderPath);
 
+  /**
+ * Disables the path editor
+ */
   headerObject.disableSavePathControls = () => {
     headerObject.saveFolderLabel.removeEventListener('click', selectFolderPath);
     headerObject.nameInput.style.color = '#8bb0b2';
@@ -93,6 +96,32 @@ export const createPathEditorHeader = ({
     headerObject.setFolderButton.removeEventListener('click', selectFolderPath);
     headerObject.setFolderButton.style.visibility = 'hidden';
   };
+
+  /**
+ * Returns a path for a file that does not exist yet.
+ * Used to avoid unwanted file overwriting.
+ */
+  headerObject.makeFileNameUnique = (filePath, missingExtension) => {
+    if (!fileExists(filePath)) {
+      return filePath;
+    }
+    const folderPath = path.dirname(filePath);
+    let extension = path.extname(filePath);
+    if (!extension) {
+      extension = missingExtension;
+    }
+    const oldFileName = path.basename(filePath, extension);
+    let appendNumber = 0;
+    let newUniqueNamePath =
+      folderPath + '/' + oldFileName + '-' + String(appendNumber) + extension;
+    while (fileExists(newUniqueNamePath)) {
+      appendNumber += 1;
+      newUniqueNamePath =
+        folderPath + '/' + oldFileName + '-' + String(appendNumber) + extension;
+    }
+    return newUniqueNamePath;
+  };
+
   render(headerObject);
   return headerObject;
 };
@@ -115,8 +144,8 @@ const render = headerObject => {
   // check if it will overwrite a file and notify the user in a subtle, but obvious way
   // but don't do it if there is no extension (image sequence will be saved)
   if (headerObject.state.extension === '-') {
-    return
-  };
+    return;
+  }
   if (fs.existsSync(state.fullPath)) {
     headerObject.fileExistsLabel.style.color = 'red';
     headerObject.fileExistsLabel.textContent =
@@ -124,7 +153,20 @@ const render = headerObject => {
   } else {
     headerObject.fileExistsLabel.style.color = 'grey';
     headerObject.fileExistsLabel.textContent = state.extension + '  (New)';
-  };
+  }
+};
+
+const fileExists = path => {
+  try {
+    return fs.statSync(path).isFile();
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      // no such file or directory. File really does not exist
+      return false;
+    }
+    console.error('Exception fs.statSync (' + path + '): ' + e);
+    throw e; // something else went wrong, we don't have rights, ...
+  }
 };
 
 const selectBaseFolderPath = headerObject => {
@@ -143,9 +185,9 @@ const selectBaseFolderPath = headerObject => {
   if (!selectedDirPath.startsWith(state.projectBasePath)) {
     alert(
       'Please select a folder inside your project path!\n' +
-      state.projectBasePath +
-      '\n\nSelected:\n' +
-      selectedDirPath
+        state.projectBasePath +
+        '\n\nSelected:\n' +
+        selectedDirPath
     );
     return;
   }

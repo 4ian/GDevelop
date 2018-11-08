@@ -248,9 +248,7 @@ export default class SpritesList extends Component<Props, void> {
         metadata,
         isTiled: false,
       },
-      onChangesSaved: (resources, newAnimationName, newMetadata) => {
-        console.log('received metadata:');
-        console.log(newMetadata)
+      onChangesSaved: (resources, newAnimationName) => {
         const newDirection = new gd.Direction();
         newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
         newDirection.setLoop(direction.isLooping());
@@ -275,7 +273,7 @@ export default class SpritesList extends Component<Props, void> {
         });
 
         // set metadata if there is such on the direction
-        newDirection.setMetadata(JSON.stringify(newMetadata))
+        newDirection.setMetadata(JSON.stringify(resources[0].metadata))
 
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);

@@ -223,6 +223,7 @@ export default class SpritesList extends Component<Props, void> {
 
     let metadata = {};
     const metadataRaw = direction.getMetadata();
+    console.log(metadataRaw)
     if (metadataRaw) {
       try {
         metadata = JSON.parse(metadataRaw);

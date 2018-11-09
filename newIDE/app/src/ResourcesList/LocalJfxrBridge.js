@@ -36,18 +36,19 @@ export const openJfxr = ({
 
   ipcRenderer.removeAllListeners('jfxr-changes-saved');
   ipcRenderer.on('jfxr-changes-saved', (event, newFilePath, fileMetadata) => {
-
     const resourceName = path.relative(projectPath, newFilePath); // TODO: move into a generic createOrUpdateResource function that piskel can also use in app/src/ResourcesList/ResourceUtils.js
-    createOrUpdateResource(project,new gd.AudioResource(),resourceName);
+    createOrUpdateResource(project, new gd.AudioResource(), resourceName);
 
-    const newMetadata =
-    'data' in fileMetadata ?
-    {
-      jfxr: fileMetadata,
-    } :
-    {};
+    const newMetadata = fileMetadata.data
+      ? {
+          jfxr: fileMetadata,
+        }
+      : {};
 
-    project.getResourcesManager().getResource(resourceName).setMetadata(JSON.stringify(newMetadata));
+    project
+      .getResourcesManager()
+      .getResource(resourceName)
+      .setMetadata(JSON.stringify(newMetadata));
     onChangesSaved([{ metadata: newMetadata }], resourceName);
   });
 

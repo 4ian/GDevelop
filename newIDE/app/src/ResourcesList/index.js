@@ -81,7 +81,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
-  _scanForNewResources = extensions => {
+  _scanForNewResources = (extensions: string, resource: gdResource) => {
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
     const projectPath = path.dirname(project.getProjectFile());
@@ -94,16 +94,10 @@ export default class ResourcesList extends React.Component<Props, State> {
         console.error('Error loading ', err);
       } else {
         res.forEach(pathFound => {
-          const fileName = path.relative(projectPath, pathFound);  
+          const fileName = path.relative(projectPath, pathFound);
           if (!resourcesManager.hasResource(fileName)) {
-            const extension = path.extname(pathFound).replace('.','');
-            if (IMAGE_EXTENSIONS.includes(extension)) {
-              console.info(`${fileName} -images added to project.`);
-              createOrUpdateResource(project, new gd.ImageResource(), fileName);
-            } else if (AUDIO_EXTENSIONS.includes(extension)) {
-              console.info(`${fileName} -audio added to project.`);
-              createOrUpdateResource(project, new gd.AudioResource(), fileName);
-            };  
+            createOrUpdateResource(project, new gd.ImageResource(), fileName)
+            console.info(`${fileName} added to project.`);
           };
         });
       }
@@ -178,13 +172,13 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: 'Scan for Images',
         click: () => {
-          this._scanForNewResources(IMAGE_EXTENSIONS);
+          this._scanForNewResources(IMAGE_EXTENSIONS, new gd.ImageResource());
         },
       },
       {
         label: 'Scan for Audio',
         click: () => {
-          this._scanForNewResources(AUDIO_EXTENSIONS);
+          this._scanForNewResources(AUDIO_EXTENSIONS, new gd.AudioResource());
         },
       },
       {

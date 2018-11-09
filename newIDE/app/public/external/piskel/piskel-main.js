@@ -1,8 +1,11 @@
-import { createPathEditorHeader } from '../utils/path-editor.js';
+import {
+  createPathEditorHeader
+} from '../utils/path-editor.js';
 const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
 const async = require('async');
+const path = require('path');
 const remote = electron.remote;
 
 let piskelOptions; // The options received from GDevelop
@@ -12,8 +15,8 @@ const updateFrameElements = () => {
       .contentDocument;
     if (piskelOptions.singleFrame) {
       editorContentDocument.getElementsByClassName(
-        'preview-list-wrapper'
-      )[0].style.display =
+          'preview-list-wrapper'
+        )[0].style.display =
         'none';
     }
 
@@ -55,7 +58,7 @@ const saveToFile = (content, filePath, callback) => {
 const saveToGD = pathEditor => {
   const editorFrameEl = document.querySelector('#piskel-frame');
   const pskl = editorFrameEl.contentWindow.pskl;
-  const layer = pskl.app.piskelController.getCurrentLayer();
+  const layer = pskl.app.piskelController.getLayerAt(0);
   // Generate the path of the files that will be written
   const outputResources = [];
   const outputPaths = [];
@@ -63,13 +66,10 @@ const saveToGD = pathEditor => {
     const frame = layer.getFrameAt(i);
     let exportPath = frame.originalPath;
     const originalIndex = frame.originalIndex;
-    const pathAlreadyUsed = outputResources.filter(
-      resource => resource.path === exportPath
-    ).length;
 
     // If a frame was made in piskel (exportPath and resourceName will be null) come up with a unique path, so as not to overwrite any existing files
     // Also prevent overwriting frames that were created via duplication of imported frames or frames with same resources
-    if (!exportPath || pathAlreadyUsed) {
+    if (!exportPath) {
       exportPath =
         pathEditor.state.folderPath +
         '/' +
@@ -80,13 +80,14 @@ const saveToGD = pathEditor => {
       exportPath = pathEditor.makeFileNameUnique(exportPath, '.png');
     }
 
+    exportPath = path.normalize(exportPath);
     outputResources.push({
       path: exportPath,
       originalIndex,
     });
+
     outputPaths.push(exportPath);
   }
-
   // if more than one layer is used - use metadata for storing the data
   let metadata = {};
   const piskelData = pskl.app.piskelController.getPiskel();
@@ -105,7 +106,7 @@ const saveToGD = pathEditor => {
     outputResources,
     (path, index, callback) => {
       const canvas = pskl.app.piskelController.renderFrameAt(index, true);
-      pskl.utils.BlobUtils.canvasToBlob(canvas, function(blob) {
+      pskl.utils.BlobUtils.canvasToBlob(canvas, function (blob) {
         saveToFile(blob, path.path, callback);
       });
     },
@@ -146,7 +147,7 @@ const piskelCreateAnimation = (pskl, piskelOptions) => {
     piskel.description,
     true
   );
-  pskl.utils.serialization.Deserializer.deserialize(sprite, function(piskel) {
+  pskl.utils.serialization.Deserializer.deserialize(sprite, function (piskel) {
     piskel.setDescriptor(descriptor);
     pskl.app.piskelController.setPiskel(piskel);
     pskl.app.piskelController.setFPS(sprite.fps);
@@ -161,10 +162,10 @@ const piskelCreateAnimation = (pskl, piskelOptions) => {
 
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   /**
- * Inject custom buttons in Piskel's header,
- * get rid of the new file button,
- * make animation name and path editable
- */
+   * Inject custom buttons in Piskel's header,
+   * get rid of the new file button,
+   * make animation name and path editable
+   */
   const editorContentDocument = document.getElementById('piskel-frame')
     .contentDocument;
   const newButton = editorContentDocument.getElementsByClassName(
@@ -183,18 +184,12 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   // Load a custom save file(s) header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const headerStyle = {
-    saveFolderLabel:
-      'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
-    nameInput:
-      'font-family:"Courier New";height:27px;width:90px;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
-    saveButton:
-      'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    cancelButton:
-      'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    setFolderButton:
-      'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    fileExistsLabel:
-      'height:27px;color:aqua;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
+    saveFolderLabel: 'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
+    nameInput: 'font-family:"Courier New";height:27px;width:90px;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
+    saveButton: 'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    cancelButton: 'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    setFolderButton: 'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    fileExistsLabel: 'height:27px;color:aqua;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
   };
   const savePathEditor = createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,
@@ -202,10 +197,8 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
     onSaveToGd: saveToGD,
     onCancelChanges: cancelChanges,
     projectPath: receivedOptions.projectPath,
-    initialResourcePath:
-      receivedOptions.resources[0] === undefined
-        ? ''
-        : receivedOptions.resources[0].resourcePath,
+    initialResourcePath: receivedOptions.resources[0] === undefined ?
+      '' : receivedOptions.resources[0].resourcePath,
     extension: '',
     headerStyle,
     name: receivedOptions.name,
@@ -221,12 +214,13 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
 
   // Set piskel to tiled mode when editing a tiled object, set FPS from GD
   pskl.UserSettings.set(pskl.UserSettings.SEAMLESS_MODE, piskelOptions.isTiled);
-  pskl.app.piskelController.setFPS(piskelOptions.fps);
+  const piskelController = pskl.app.piskelController;
+  piskelController.setFPS(piskelOptions.fps);
 
   // if no resources are being loaded, create a new animation
   if (
     piskelOptions.resources.length === 0 &&
-    !('pskl' in piskelOptions.metadata)
+    !(piskelOptions.metadata.pskl)
   ) {
     piskelCreateAnimation(pskl, piskelOptions);
     return;
@@ -234,21 +228,66 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
 
   // If there is metadata, use it to load the frames with layers
   console.log(piskelOptions.metadata);
-  if ('pskl' in piskelOptions.metadata) {
+  if (piskelOptions.metadata.pskl) {
+    const metadataPaths = piskelOptions.metadata.pskl.paths;
+
+
+    // Create a Piskel Document from the metadata that GD stores
     pskl.utils.serialization.Deserializer.deserialize(
       JSON.parse(piskelOptions.metadata.pskl.data),
       piskel => {
-        pskl.app.piskelController.setPiskel(piskel);
+        piskelController.setPiskel(piskel);
 
         // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
-        const layer = pskl.app.piskelController.getCurrentLayer();
-        for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
-          layer.getFrameAt(i).originalPath =
-            piskelOptions.metadata.pskl.paths[i].resourcePath;
+        const layer = piskelController.getLayerAt(0);
+        for (let i = 0; i < piskelController.getFrameCount(); i++) {
+          layer.getFrameAt(i).originalPath = metadataPaths[i];
           layer.getFrameAt(i).originalIndex = i;
-        }
+        };
+
+        // Compare the imported frames - so as to make the layered Piskel Document
+        // the same as the changes done in Gdevelop without flattening any layers made with metadata
+        let flattenedImagePaths = [];
+        piskelOptions.resources.forEach((resource, index) => {
+          const flattenedFramePath = path.normalize(resource.resourcePath)
+          flattenedImagePaths.push(flattenedFramePath);
+          // Import frames that were added in Gdevelop - add them at the end for now
+          if (!metadataPaths.includes(flattenedFramePath)) {
+            console.log('(+) add -->' + flattenedFramePath)
+            pskl.utils.BlobUtils.dataToBlob(readBase64ImageFile(flattenedFramePath), 'image/png', imageBlob => {
+              pskl.utils.FileUtils.readImageFile(imageBlob, function (image) {
+                piskelController.setCurrentFrameIndex(piskelController.getFrameCount() - 1)
+
+                piskelController.addFrameAtCurrentIndex();
+                piskelController.selectNextFrame();
+                const currentFrameIndex = piskelController.getCurrentFrame();
+                pskl.utils.FrameUtils.addImageToFrame(currentFrameIndex, image, 0, 0);
+                layer.getCurrentFrame().originalPath = flattenedFramePath;
+              });
+            })
+          } else {
+            layer.getFrameAt(index).originalIndex = flattenedFramePath;
+          }
+        });
+
+        // remove image frames that were removed in GD
+        metadataPaths.forEach((metaFramePath, index) => {
+          if (!flattenedImagePaths.includes(metaFramePath)) {
+            console.log('(-) remove -->' + metaFramePath)
+            // todo- find out why it breaks the layer element
+            for (let i = 0; i < piskelController.getFrameCount(); i++) {
+              if (metaFramePath === layer.getFrameAt(i).originalPath) {
+                layer.removeFrameAt(i);
+              }
+            };
+          }
+        });
+        // Now that finally we  have all the frames that needed it loaded/removed, reorder the current ones
+        // TODO...
       }
     );
+
+
   } else {
     // Load images into piskel if there is no metadata
     const imageData = [];
@@ -283,11 +322,11 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
           maxHeight,
           false
         );
-        pskl.app.piskelController.setPiskel(piskelFile, {});
+        piskelController.setPiskel(piskelFile, {});
 
         // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
-        const layer = pskl.app.piskelController.getCurrentLayer();
-        for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
+        const layer = piskelController.getLayerAt(0);
+        for (let i = 0; i < piskelController.getFrameCount(); i++) {
           layer.getFrameAt(i).originalPath =
             piskelOptions.resources[i].resourcePath;
           layer.getFrameAt(i).originalName =

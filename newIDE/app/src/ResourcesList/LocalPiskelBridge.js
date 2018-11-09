@@ -1,11 +1,7 @@
 // @flow
 import optionalRequire from '../Utils/OptionalRequire.js';
-import {
-  type ExternalEditorOpenOptions
-} from './ResourceExternalEditor.flow';
-import {
-  createOrUpdateResource
-} from './ResourceUtils.js';
+import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
+import { createOrUpdateResource } from './ResourceUtils.js';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -57,17 +53,16 @@ export const openPiskel = ({
   ipcRenderer.on(
     'piskel-changes-saved',
     (event, outputResources, newAnimationName, metadata) => {
-      const newMetadata =
-        'data' in metadata ?
-        {
-          pskl: metadata,
-        } :
-        {};
+      const newMetadata = metadata.data
+        ? {
+            pskl: metadata,
+          }
+        : {};
 
       const resourcesManager = project.getResourcesManager();
       outputResources.forEach(resource => {
         resource.name = path.relative(projectPath, resource.path); // Still needed for onChangesSaved()
-        createOrUpdateResource(project, new gd.ImageResource(), resource.name)
+        createOrUpdateResource(project, new gd.ImageResource(), resource.name);
       });
 
       // in case this is for a tiledSprite object, save the metadata in the Image object
@@ -78,7 +73,7 @@ export const openPiskel = ({
       } else {
         // if not, the metadata will still be passed onto SpritesList.js to be set in the Direction object
         outputResources[0].metadata = newMetadata;
-      };
+      }
 
       onChangesSaved(outputResources, newAnimationName);
     }

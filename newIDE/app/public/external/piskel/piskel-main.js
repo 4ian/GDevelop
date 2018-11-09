@@ -246,7 +246,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         };
 
         // Compare the imported frames - so as to make the layered Piskel Document
-        // the same as the changes done in Gdevelop without flattening any layers made with metadata
+        // the same as the changes done in Gdevelop without flattening any layers
         let flattenedImagePaths = [];
         piskelOptions.resources.forEach((resource, index) => {
           const flattenedFramePath = path.normalize(resource.resourcePath)
@@ -260,8 +260,8 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
 
                 piskelController.addFrameAtCurrentIndex();
                 piskelController.selectNextFrame();
-                const currentFrameIndex = piskelController.getCurrentFrame();
-                pskl.utils.FrameUtils.addImageToFrame(currentFrameIndex, image, 0, 0);
+                const currentFrame = piskelController.getCurrentFrame();
+                pskl.utils.FrameUtils.addImageToFrame(currentFrame, image, 0, 0);
                 layer.getCurrentFrame().originalPath = flattenedFramePath;
               });
             })
@@ -274,16 +274,17 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         metadataPaths.forEach((metaFramePath, index) => {
           if (!flattenedImagePaths.includes(metaFramePath)) {
             console.log('(-) remove -->' + metaFramePath)
-            // todo- find out why it breaks the layer element
-            for (let i = 0; i < piskelController.getFrameCount(); i++) {
-              if (metaFramePath === layer.getFrameAt(i).originalPath) {
-                layer.removeFrameAt(i);
+            for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
+              if (metaFramePath === layer.getFrameAt(fi).originalPath) {
+                for (let li = 0; li < piskelController.getLayers().length; li++) {
+                  piskelController.getLayerAt(li).removeFrameAt(fi)
+                }
+                
               }
             };
           }
         });
-        // Now that finally we  have all the frames that needed it loaded/removed, reorder the current ones
-        // TODO...
+        // Now that finally reorder frames
       }
     );
 

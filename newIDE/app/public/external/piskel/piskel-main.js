@@ -294,6 +294,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
           if (moveTo !== -1){
             for (let li = 0; li < piskelController.getLayers().length; li++) {
               piskelController.getLayerAt(li).moveFrame(fi, moveTo);
+              piskelController.getLayerAt(li).getFrameAt(moveTo).originalIndex = moveTo;
             }
           }
         };

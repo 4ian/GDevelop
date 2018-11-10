@@ -248,7 +248,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         // Compare the imported frames - so as to make the layered Piskel Document
         // the same as the changes done in Gdevelop without flattening any layers
         let flattenedImagePaths = [];
-        piskelOptions.resources.forEach((resource, index) => {
+        piskelOptions.resources.forEach((resource, frameIndex) => {
           const flattenedFramePath = path.normalize(resource.resourcePath)
           flattenedImagePaths.push(flattenedFramePath);
           // Import frames that were added in Gdevelop - add them at the end for now
@@ -262,11 +262,12 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
                 piskelController.selectNextFrame();
                 const currentFrame = piskelController.getCurrentFrame();
                 pskl.utils.FrameUtils.addImageToFrame(currentFrame, image, 0, 0);
+
                 layer.getCurrentFrame().originalPath = flattenedFramePath;
               });
             })
           } else {
-            layer.getFrameAt(index).originalIndex = flattenedFramePath;
+            layer.getFrameAt(frameIndex).originalPath = flattenedFramePath;
           }
         });
 
@@ -284,7 +285,10 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
             };
           }
         });
-        // Now that finally reorder frames
+        // Now that finally have everything added/removed - put it in the same order as GD
+        for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
+          console.log(piskelController.getLayerAt(0).getFrameAt(fi).originalPath)
+        }
       }
     );
 

@@ -1,6 +1,4 @@
-import {
-  createPathEditorHeader
-} from '../utils/path-editor.js';
+import { createPathEditorHeader } from '../utils/path-editor.js';
 const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
@@ -229,6 +227,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   }
 
   // If there is metadata, use it to load the frames with layers
+  // Note that metadata will be saved only if the user has more than one layers
   if (piskelOptions.metadata.pskl) {
     const metadataPaths = piskelOptions.metadata.pskl.paths;
 
@@ -237,7 +236,12 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
       JSON.parse(piskelOptions.metadata.pskl.data),
       piskel => {
         piskelController.setPiskel(piskel);
+        // set piskel frame paths to their piskel data counterpart
         const layer = piskelController.getLayerAt(0);
+        for (let i = 0; i < piskelController.getFrameCount(); i++) {
+          layer.getFrameAt(i).originalPath = metadataPaths[i];
+          layer.getFrameAt(i).originalIndex = i;
+        };
 
         // Compare the imported frames - so as to make the layered Piskel Document
         // the same as the changes done in Gdevelop without flattening any layers
@@ -245,7 +249,8 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         piskelOptions.resources.forEach((resource, frameIndex) => {
           const flattenedFramePath = path.normalize(resource.resourcePath)
           flattenedImagePaths.push(flattenedFramePath);
-          // Import frames that were added in Gdevelop - add them at the end for now
+
+          // Import any frames that were added in Gdevelop
           if (!metadataPaths.includes(flattenedFramePath)) {
             console.log('(+) add -->' + flattenedFramePath)
             pskl.utils.BlobUtils.dataToBlob(readBase64ImageFile(flattenedFramePath), 'image/png', imageBlob => {
@@ -256,55 +261,37 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
                 piskelController.selectNextFrame();
                 const currentFrameObj = piskelController.getCurrentFrame();
                 pskl.utils.FrameUtils.addImageToFrame(currentFrameObj, image, 0, 0);
+                layer.moveFrame(piskelController.getCurrentFrameIndex(),frameIndex);
 
-                console.log(currentFrameObj)
                 pskl.tools.transform.TransformUtils.center(currentFrameObj);
                 currentFrameObj.originalPath = flattenedFramePath;
               });
-            })
-          } else {
-            layer.getFrameAt(frameIndex).originalPath = flattenedFramePath;
-          }
+            });
+          };
         });
 
-        // remove image frames that were removed in GD
+        // Remove any frames that were removed in GD
         metadataPaths.forEach((metaFramePath, index) => {
           if (!flattenedImagePaths.includes(metaFramePath)) {
-            console.log('(-) remove -->' + metaFramePath)
+            console.log('(-) remove -->' + metaFramePath)    
             for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
               if (metaFramePath === layer.getFrameAt(fi).originalPath) {
                 for (let li = 0; li < piskelController.getLayers().length; li++) {
                   piskelController.getLayerAt(li).removeFrameAt(fi)
                 }
               }
-            };
-          }
-        });
-
-        // Now that finally have everything added/removed - put it in the same order as it is in GD
-        let moveto = null;
-        for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
-          if (metadataPaths[fi] !== piskelController.getLayerAt(0).getFrameAt(fi).originalPath ) {
-            // console.log('('+fi+')'+metadataPaths[fi]+'-->'+piskelController.getLayerAt(0).getFrameAt(fi).originalPath)
-            if (moveto === null) {
-              moveto =fi   
-            } else{
-              console.log(fi+' moveto: '+moveto)
-              layer.moveFrame(fi,moveto);
-              moveto=null
             }
           }
+        });
+        
+        // Apply any moving of frames in GD to existing frames
+        for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
+          const moveTo = flattenedImagePaths.indexOf(layer.getFrameAt(fi).originalPath)
+          if (moveTo !== -1){
+            layer.moveFrame(fi,moveTo);
+          }
         };
-
-        // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
-        for (let i = 0; i < piskelController.getFrameCount(); i++) {
-          layer.getFrameAt(i).originalPath = metadataPaths[i];
-          layer.getFrameAt(i).originalIndex = i;
-        };
-      }
-    );
-
-
+    });
   } else {
     // Load images into piskel if there is no metadata
     const imageData = [];

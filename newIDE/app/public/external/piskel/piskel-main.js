@@ -236,11 +236,12 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
       JSON.parse(piskelOptions.metadata.pskl.data),
       piskel => {
         piskelController.setPiskel(piskel);
-        // set piskel frame paths to their piskel data counterpart
-        const layer = piskelController.getLayerAt(0);
-        for (let i = 0; i < piskelController.getFrameCount(); i++) {
-          layer.getFrameAt(i).originalPath = metadataPaths[i];
-          layer.getFrameAt(i).originalIndex = i;
+        // set piskel frame paths to their piskel data counterpart - on all layers
+        for (let i = 0; i < piskelController.getFrameCount(); i++) { 
+          for (let li = 0; li < piskelController.getLayers().length; li++) {
+            piskelController.getLayerAt(li).getFrameAt(i).originalPath = metadataPaths[i];
+            piskelController.getLayerAt(li).getFrameAt(i).originalIndex = i;
+          }
         };
 
         // Compare the imported frames - so as to make the layered Piskel Document
@@ -261,7 +262,10 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
                 piskelController.selectNextFrame();
                 const currentFrameObj = piskelController.getCurrentFrame();
                 pskl.utils.FrameUtils.addImageToFrame(currentFrameObj, image, 0, 0);
-                layer.moveFrame(piskelController.getCurrentFrameIndex(),frameIndex);
+
+                for (let li = 0; li < piskelController.getLayers().length; li++) {
+                  piskelController.getLayerAt(li).moveFrame(piskelController.getCurrentFrameIndex(), frameIndex);
+                };
 
                 pskl.tools.transform.TransformUtils.center(currentFrameObj);
                 currentFrameObj.originalPath = flattenedFramePath;
@@ -271,6 +275,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         });
 
         // Remove any frames that were removed in GD
+        const layer = piskelController.getLayerAt(0);
         metadataPaths.forEach((metaFramePath, index) => {
           if (!flattenedImagePaths.includes(metaFramePath)) {
             console.log('(-) remove -->' + metaFramePath)    
@@ -288,7 +293,9 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
           const moveTo = flattenedImagePaths.indexOf(layer.getFrameAt(fi).originalPath)
           if (moveTo !== -1){
-            layer.moveFrame(fi,moveTo);
+            for (let li = 0; li < piskelController.getLayers().length; li++) {
+              piskelController.getLayerAt(li).moveFrame(fi, moveTo);
+            }
           }
         };
     });

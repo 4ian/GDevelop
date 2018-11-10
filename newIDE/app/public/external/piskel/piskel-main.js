@@ -17,8 +17,6 @@ const updateFrameElements = () => {
         )[0].style.display =
         'none';
     }
-
-    //TODO: Ideally, shortcuts for duplicating a frame should also be removed.
   });
 };
 
@@ -235,6 +233,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
     pskl.utils.serialization.Deserializer.deserialize(
       JSON.parse(piskelOptions.metadata.pskl.data),
       piskel => {
+
         piskelController.setPiskel(piskel);
         // set piskel frame paths to their piskel data counterpart - on all layers
         for (let i = 0; i < piskelController.getFrameCount(); i++) { 
@@ -262,13 +261,13 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
                 piskelController.selectNextFrame();
                 const currentFrameObj = piskelController.getCurrentFrame();
                 pskl.utils.FrameUtils.addImageToFrame(currentFrameObj, image, 0, 0);
+                pskl.tools.transform.TransformUtils.center(currentFrameObj);
+                currentFrameObj.originalPath = flattenedFramePath;
+                currentFrameObj.originalIndex = frameIndex;
 
                 for (let li = 0; li < piskelController.getLayers().length; li++) {
                   piskelController.getLayerAt(li).moveFrame(piskelController.getCurrentFrameIndex(), frameIndex);
                 };
-
-                pskl.tools.transform.TransformUtils.center(currentFrameObj);
-                currentFrameObj.originalPath = flattenedFramePath;
               });
             });
           };
@@ -278,7 +277,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         const layer = piskelController.getLayerAt(0);
         metadataPaths.forEach((metaFramePath, index) => {
           if (!flattenedImagePaths.includes(metaFramePath)) {
-            console.log('(-) remove -->' + metaFramePath)    
+            console.log('(-) remove -->' + metaFramePath)
             for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
               if (metaFramePath === layer.getFrameAt(fi).originalPath) {
                 for (let li = 0; li < piskelController.getLayers().length; li++) {
@@ -300,7 +299,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         };
     });
   } else {
-    // Load images into piskel if there is no metadata
+    // Load flat images into piskel if there is no metadata - the old way
     const imageData = [];
     let maxWidth = -1;
     let maxHeight = -1;

@@ -217,6 +217,8 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   const piskelController = pskl.app.piskelController;
   piskelController.setFPS(piskelOptions.fps);
 
+  console.log(pskl)
+  console.log(piskelController)
   // if no resources are being loaded, create a new animation
   if (
     piskelOptions.resources.length === 0 &&
@@ -227,23 +229,15 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   }
 
   // If there is metadata, use it to load the frames with layers
-  console.log(piskelOptions.metadata);
   if (piskelOptions.metadata.pskl) {
     const metadataPaths = piskelOptions.metadata.pskl.paths;
-
 
     // Create a Piskel Document from the metadata that GD stores
     pskl.utils.serialization.Deserializer.deserialize(
       JSON.parse(piskelOptions.metadata.pskl.data),
       piskel => {
         piskelController.setPiskel(piskel);
-
-        // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
         const layer = piskelController.getLayerAt(0);
-        for (let i = 0; i < piskelController.getFrameCount(); i++) {
-          layer.getFrameAt(i).originalPath = metadataPaths[i];
-          layer.getFrameAt(i).originalIndex = i;
-        };
 
         // Compare the imported frames - so as to make the layered Piskel Document
         // the same as the changes done in Gdevelop without flattening any layers
@@ -260,10 +254,12 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
 
                 piskelController.addFrameAtCurrentIndex();
                 piskelController.selectNextFrame();
-                const currentFrame = piskelController.getCurrentFrame();
-                pskl.utils.FrameUtils.addImageToFrame(currentFrame, image, 0, 0);
+                const currentFrameObj = piskelController.getCurrentFrame();
+                pskl.utils.FrameUtils.addImageToFrame(currentFrameObj, image, 0, 0);
 
-                layer.getCurrentFrame().originalPath = flattenedFramePath;
+                console.log(currentFrameObj)
+                pskl.tools.transform.TransformUtils.center(currentFrameObj);
+                currentFrameObj.originalPath = flattenedFramePath;
               });
             })
           } else {
@@ -280,15 +276,31 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
                 for (let li = 0; li < piskelController.getLayers().length; li++) {
                   piskelController.getLayerAt(li).removeFrameAt(fi)
                 }
-                
               }
             };
           }
         });
-        // Now that finally have everything added/removed - put it in the same order as GD
+
+        // Now that finally have everything added/removed - put it in the same order as it is in GD
+        let moveto = null;
         for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
-          console.log(piskelController.getLayerAt(0).getFrameAt(fi).originalPath)
-        }
+          if (metadataPaths[fi] !== piskelController.getLayerAt(0).getFrameAt(fi).originalPath ) {
+            // console.log('('+fi+')'+metadataPaths[fi]+'-->'+piskelController.getLayerAt(0).getFrameAt(fi).originalPath)
+            if (moveto === null) {
+              moveto =fi   
+            } else{
+              console.log(fi+' moveto: '+moveto)
+              layer.moveFrame(fi,moveto);
+              moveto=null
+            }
+          }
+        };
+
+        // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
+        for (let i = 0; i < piskelController.getFrameCount(); i++) {
+          layer.getFrameAt(i).originalPath = metadataPaths[i];
+          layer.getFrameAt(i).originalIndex = i;
+        };
       }
     );
 

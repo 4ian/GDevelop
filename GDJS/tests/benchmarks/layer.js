@@ -6,7 +6,7 @@ describe('gdjs.Layer', function() {
   var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
 
   it('benchmark convertCoords and convertInverseCoords', function() {
-    this.timeout(6000);
+    this.timeout(20000);
     var layer = new gdjs.Layer(
       { name: 'My layer', visibility: true, effects: [] },
       runtimeScene

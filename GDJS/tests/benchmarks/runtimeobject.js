@@ -2,6 +2,7 @@ describe('gdjs.RuntimeObject', function() {
     const runtimeScene = new gdjs.RuntimeScene(null);
     
 	it('benchmark getAABB of rotated vs non rotated objects', function(){
+    this.timeout(20000);
 		var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 		object.getWidth = function() { return 10; };
 		object.getHeight = function() { return 20; };
@@ -25,6 +26,7 @@ describe('gdjs.RuntimeObject', function() {
 	});
 
 	it('benchmark getAABB of rotated vs non rotated objects, with non default center', function(){
+    this.timeout(20000);
 		var object = new gdjs.RuntimeObject(runtimeScene, {name: "obj1", type: "", behaviors: []});
 		object.getWidth = function() { return 10; };
 		object.getHeight = function() { return 20; };

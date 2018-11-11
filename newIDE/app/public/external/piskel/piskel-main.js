@@ -213,8 +213,6 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   const piskelController = pskl.app.piskelController;
   piskelController.setFPS(piskelOptions.fps);
 
-  console.log(pskl)
-  console.log(piskelController)
   // if no resources are being loaded, create a new animation
   if (
     piskelOptions.resources.length === 0 &&
@@ -252,9 +250,8 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
 
           // Import any frames that were added in Gdevelop
           if (!metadataPaths.includes(flattenedFramePath)) {
-            console.log('(+) add -->' + flattenedFramePath)
             pskl.utils.BlobUtils.dataToBlob(readBase64ImageFile(flattenedFramePath), 'image/png', imageBlob => {
-              pskl.utils.FileUtils.readImageFile(imageBlob, function (image) {
+              pskl.utils.FileUtils.readImageFile(imageBlob, image => {
                 piskelController.setCurrentFrameIndex(piskelController.getFrameCount() - 1)
 
                 piskelController.addFrameAtCurrentIndex();
@@ -277,7 +274,6 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         const layer = piskelController.getLayerAt(0);
         metadataPaths.forEach((metaFramePath, index) => {
           if (!flattenedImagePaths.includes(metaFramePath)) {
-            console.log('(-) remove -->' + metaFramePath)
             for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
               if (metaFramePath === layer.getFrameAt(fi).originalPath) {
                 for (let li = 0; li < piskelController.getLayers().length; li++) {

@@ -63,6 +63,11 @@ export const createPathEditorHeader = ({
   headerObject.cancelButton.style = headerStyle.cancelButton;
   parentElement.appendChild(headerObject.cancelButton);
 
+  headerObject.openFolderButton = editorContentDocument.createElement('button');
+  headerObject.openFolderButton.textContent = 'Locate';
+  headerObject.openFolderButton.style = headerStyle.cancelButton;
+  parentElement.appendChild(headerObject.openFolderButton);
+
   headerObject.setFolderButton = editorContentDocument.createElement('button');
   headerObject.setFolderButton.textContent = 'Set Folder';
   headerObject.setFolderButton.style = headerStyle.setFolderButton;
@@ -81,6 +86,11 @@ export const createPathEditorHeader = ({
   };
   headerObject.saveFolderLabel.addEventListener('click', selectFolderPath);
   headerObject.setFolderButton.addEventListener('click', selectFolderPath);
+
+  const openFolderPath = () => {
+    electron.shell.openItem(headerObject.state.folderPath)
+  }
+  headerObject.openFolderButton.addEventListener('click', openFolderPath);
 
   /**
  * Disables the path editor

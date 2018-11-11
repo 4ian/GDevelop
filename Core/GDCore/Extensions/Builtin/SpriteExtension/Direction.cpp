@@ -75,11 +75,11 @@ void Direction::UnserializeFrom(const gd::SerializerElement& element) {
   SetTimeBetweenFrames(
       element.GetDoubleAttribute("timeBetweenFrames", 1, "tempsEntre"));
   SetLoop(element.GetBoolAttribute("looping", false, "boucle"));
-  #if defined(GD_IDE_ONLY)
-  SetMetadata(element.HasAttribute("metadata")
+#if defined(GD_IDE_ONLY)
+  SetMetadata(element.HasAttribute("metadata") || element.HasChild("metadata")
                   ? element.GetStringAttribute("metadata")
                   : "");
-  #endif
+#endif
 
   const gd::SerializerElement& spritesElement =
       element.GetChild("sprites", 0, "Sprites");

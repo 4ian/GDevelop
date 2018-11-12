@@ -243,4 +243,5 @@ export default [
       }
     },
   },
+  //TODO: add publicFontUrlChooser
 ];

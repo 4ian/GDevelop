@@ -35,6 +35,7 @@ export default class PanelSpriteEditor extends React.Component<
               panelSpriteObject.setTexture(resourceName);
               this.forceUpdate();
             }}
+            floatingLabelText="Select an image"
           />
         </Line>
         <Line>

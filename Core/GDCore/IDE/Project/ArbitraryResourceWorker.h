@@ -65,6 +65,12 @@ class GD_CORE_API ArbitraryResourceWorker {
   virtual void ExposeAudio(gd::String &audioName);
 
   /**
+   * \brief Expose a font, which is either a reference to a "font" resource,
+   * or a filename if no resource with this name exists.
+   */
+  virtual void ExposeFont(gd::String &fontName);
+
+  /**
    * \brief Expose a shader.
    * \warn Currently unsupported.
    */

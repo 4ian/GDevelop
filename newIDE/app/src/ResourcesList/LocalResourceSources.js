@@ -100,4 +100,51 @@ export default [
       }
     },
   },
+  {
+    name: 'localFontFileOpener',
+    displayName: 'Choose a new font file',
+    kind: 'font',
+    component: class LocalFontFileOpener extends Component {
+      chooseResources = (
+        project,
+        multiSelections = true
+      ): Promise<Array<any>> => {
+        return new Promise((resolve, reject) => {
+          if (!dialog) return reject('Not supported');
+
+          const properties = ['openFile'];
+          if (multiSelections) properties.push('multiSelections');
+          const projectPath = path.dirname(project.getProjectFile());
+
+          const browserWindow = electron.remote.getCurrentWindow();
+          dialog.showOpenDialog(
+            browserWindow,
+            {
+              title: 'Choose a font file',
+              properties,
+              filters: [{ name: 'Font files', extensions: ['ttf'] }],
+              defaultPath: projectPath,
+            },
+            paths => {
+              if (!paths) return resolve([]);
+
+              const resources = paths.map(resourcePath => {
+                const fontResource = new gd.FontResource();
+                const projectPath = path.dirname(project.getProjectFile());
+                fontResource.setFile(path.relative(projectPath, resourcePath));
+                fontResource.setName(path.relative(projectPath, resourcePath));
+
+                return fontResource;
+              });
+              return resolve(resources);
+            }
+          );
+        });
+      };
+
+      render() {
+        return null;
+      }
+    },
+  },
 ];

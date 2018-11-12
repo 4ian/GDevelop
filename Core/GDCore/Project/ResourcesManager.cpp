@@ -79,6 +79,8 @@ std::shared_ptr<Resource> ResourcesManager::CreateResource(
     return std::make_shared<ImageResource>();
   else if (kind == "audio")
     return std::make_shared<AudioResource>();
+  else if (kind == "font")
+    return std::make_shared<FontResource>();
 
   std::cout << "Bad resource created (type: " << kind << ")" << std::endl;
   return std::make_shared<Resource>();
@@ -92,7 +94,7 @@ bool ResourcesManager::HasResource(const gd::String& name) const {
   return false;
 }
 
-std::vector<gd::String> ResourcesManager::GetAllResourceNames() {
+std::vector<gd::String> ResourcesManager::GetAllResourceNames() const {
   std::vector<gd::String> allResources;
   for (std::size_t i = 0; i < resources.size(); ++i)
     allResources.push_back(resources[i]->GetName());
@@ -142,6 +144,7 @@ bool ResourcesManager::AddResource(const gd::Resource& resource) {
 
     resources.push_back(newResource);
   } catch (...) {
+    //TODO: Remove this
     std::cout << "WARNING: Tried to add a resource which is not a GD C++ "
                  "Platform Resource to a GD C++ Platform project";
     std::cout << char(7);
@@ -414,6 +417,7 @@ void ResourceFolder::AddResource(const gd::String& name,
         std::dynamic_pointer_cast<Resource>(manager.GetResourceSPtr(name));
     if (resource != std::shared_ptr<Resource>()) resources.push_back(resource);
   } catch (...) {
+    //TODO: Remove this
     std::cout << "Warning: A resources manager which is not part of GD C++ "
                  "Platform was used during call to AddResource"
               << std::endl;
@@ -580,7 +584,31 @@ void AudioResource::SerializeTo(SerializerElement& element) const {
       "file", GetFile());  // Keep the resource path in the current locale (but
                            // save it in UTF8 for compatibility on other OSes)
 }
+#endif
 
+void FontResource::SetFile(const gd::String& newFile) {
+  file = newFile;
+
+  // Convert all backslash to slashs.
+  while (file.find('\\') != gd::String::npos)
+    file.replace(file.find('\\'), 1, "/");
+}
+
+void FontResource::UnserializeFrom(const SerializerElement& element) {
+  SetUserAdded(element.GetBoolAttribute("userAdded"));
+  SetFile(element.GetStringAttribute("file"));
+}
+
+#if defined(GD_IDE_ONLY)
+void FontResource::SerializeTo(SerializerElement& element) const {
+  element.SetAttribute("userAdded", IsUserAdded());
+  element.SetAttribute(
+      "file", GetFile());  // Keep the resource path in the current locale (but
+                           // save it in UTF8 for compatibility on other OSes)
+}
+#endif
+
+#if defined(GD_IDE_ONLY)
 ResourceFolder::ResourceFolder(const ResourceFolder& other) { Init(other); }
 
 ResourceFolder& ResourceFolder::operator=(const ResourceFolder& other) {

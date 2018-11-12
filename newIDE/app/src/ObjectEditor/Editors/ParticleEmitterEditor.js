@@ -116,6 +116,7 @@ export default class ParticleEmitterEditor extends React.Component<
                   particleEmitterObject.setParticleTexture(resourceName);
                   this.forceUpdate();
                 }}
+                floatingLabelText="Select an image"
               />
             </Line>
             <Line>

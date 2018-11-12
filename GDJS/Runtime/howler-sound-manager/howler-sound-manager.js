@@ -308,6 +308,10 @@ gdjs.HowlerSoundManager.prototype.clearAll = function() {
 
 gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete, resources) {
 	resources = resources || this._resources;
+	
+	//Construct the list of files to be loaded.
+	//For one loaded file, it can have one or more resources
+	//that use it.
     var files = [];
 	for(var i = 0, len = resources.length;i<len;++i) {
 		var res = resources[i];
@@ -320,13 +324,13 @@ gdjs.HowlerSoundManager.prototype.preloadAudio = function(onProgress, onComplete
         }
     }
 
-    if (files.length === 0) return onComplete();
+    if (files.length === 0) return onComplete(files.length);
 
     var loaded = 0;
     function onLoad(audioFile) {
         loaded++;
         if (loaded === files.length) {
-            return onComplete();
+            return onComplete(files.length);
         }
 
         onProgress(loaded, files.length);

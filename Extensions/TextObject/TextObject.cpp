@@ -133,7 +133,7 @@ void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
 }
 
 void TextObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  worker.ExposeFile(fontName);
+  worker.ExposeFont(fontName);
 }
 
 bool TextObject::GenerateThumbnail(const gd::Project& project,

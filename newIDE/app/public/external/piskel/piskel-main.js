@@ -88,7 +88,6 @@ const saveToGD = pathEditor => {
   let metadata = {};
   const piskelData = pskl.app.piskelController.getPiskel();
   if (piskelData.layers.length > 1) {
-    //TODO - also do if more than one palette detected
     metadata = {
       data: pskl.utils.serialization.Serializer.serialize(piskelData),
       paths: outputPaths,
@@ -234,11 +233,11 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
 
         piskelController.setPiskel(piskel);
         // set piskel frame paths to their piskel data counterpart - on all layers
-        for (let i = 0; i < piskelController.getFrameCount(); i++) { 
-          for (let li = 0; li < piskelController.getLayers().length; li++) {
-            piskelController.getLayerAt(li).getFrameAt(i).originalPath = metadataPaths[i];
-            piskelController.getLayerAt(li).getFrameAt(i).originalIndex = i;
-          }
+        for (let i = 0; i < piskelController.getFrameCount(); i++) {
+          piskelController.getLayers().forEach(layer => {
+            layer.getFrameAt(i).originalPath = metadataPaths[i];
+            layer.getFrameAt(i).originalIndex = i;
+          })
         };
 
         // Compare the imported frames - so as to make the layered Piskel Document
@@ -259,15 +258,15 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
                 const currentFrameObj = piskelController.getCurrentFrame();
                 pskl.utils.FrameUtils.addImageToFrame(currentFrameObj, image, 0, 0);
                 pskl.tools.transform.TransformUtils.center(currentFrameObj);
-                currentFrameObj.originalPath = flattenedFramePath;
-                currentFrameObj.originalIndex = frameIndex;
 
-                for (let li = 0; li < piskelController.getLayers().length; li++) {
-                  piskelController.getLayerAt(li).moveFrame(piskelController.getCurrentFrameIndex(), frameIndex);
-                };
+                piskelController.getLayers().forEach(layer => {
+                  layer.moveFrame(piskelController.getCurrentFrameIndex(), frameIndex);
+                  layer.getFrameAt(frameIndex).originalIndex = frameIndex;
+                  layer.getFrameAt(frameIndex).originalPath = flattenedFramePath;
+                })
               });
             });
-          };
+          }
         });
 
         // Remove any frames that were removed in GD
@@ -276,25 +275,22 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
           if (!flattenedImagePaths.includes(metaFramePath)) {
             for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
               if (metaFramePath === layer.getFrameAt(fi).originalPath) {
-                for (let li = 0; li < piskelController.getLayers().length; li++) {
-                  piskelController.getLayerAt(li).removeFrameAt(fi)
-                }
+                piskelController.getLayers().forEach(layer => {
+                  layer.removeFrameAt(fi)
+                })
               }
             }
           }
         });
-        
-        // Apply any moving of frames in GD to existing frames
-        for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
-          const moveTo = flattenedImagePaths.indexOf(layer.getFrameAt(fi).originalPath)
-          if (moveTo !== -1){
-            for (let li = 0; li < piskelController.getLayers().length; li++) {
-              piskelController.getLayerAt(li).moveFrame(fi, moveTo);
-              piskelController.getLayerAt(li).getFrameAt(moveTo).originalIndex = moveTo;
-            }
-          }
-        };
-    });
+
+        // Put frames in the same order as they are in GD
+        piskelController.getLayers().forEach(layer => {
+          layer.getFrames().sort((a, b) => {
+            return flattenedImagePaths.indexOf(a.originalPath) - flattenedImagePaths.indexOf(b.originalPath);
+          })
+        })
+      });
+
   } else {
     // Load flat images into piskel if there is no metadata - the old way
     const imageData = [];

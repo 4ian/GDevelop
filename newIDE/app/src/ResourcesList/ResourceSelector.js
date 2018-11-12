@@ -168,8 +168,6 @@ export default class ResourceSelector extends React.Component<Props, State> {
     const resourcesManager = project.getResourcesManager();
     const initialResource = resourcesManager.getResource(resourceName);
 
-    console.log(resourceName)
-    console.log(initialResource)
     let metadata = {};
     const initialResourceMetadataRaw = initialResource.getMetadata();
     if (initialResourceMetadataRaw) {
@@ -178,9 +176,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
       } catch (e) {
         console.error('Malformed metadata', e);
       }
-    }
-    console.log('sending metadata:')
-    console.log(metadata)
+    };
+
     if (resourceKind === 'image') {
       const resourceNames = [];
       if (resourcesManager.hasResource(resourceName)) {

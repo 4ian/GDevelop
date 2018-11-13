@@ -91,9 +91,9 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             resourcesLoader={ResourcesLoader}
             resourceKind="font"
             fullWidth
-            initialResourceName={textObject.getFontFilename()}
+            initialResourceName={textObject.getFontName()}
             onChange={resourceName => {
-              textObject.setFontFilename(resourceName);
+              textObject.setFontName(resourceName);
               this.forceUpdate();
             }}
             hintText="Choose a font"

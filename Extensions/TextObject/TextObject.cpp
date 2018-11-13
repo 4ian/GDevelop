@@ -54,7 +54,7 @@ TextObject::~TextObject(){};
 void TextObject::DoUnserializeFrom(gd::Project& project,
                                    const gd::SerializerElement& element) {
   SetString(element.GetChild("string", 0, "String").GetValue().GetString());
-  SetFontFilename(element.GetChild("font", 0, "Font").GetValue().GetString());
+  SetFontName(element.GetChild("font", 0, "Font").GetValue().GetString());
   SetCharacterSize(element.GetChild("characterSize", 0, "CharacterSize")
                        .GetValue()
                        .GetInt());
@@ -119,7 +119,7 @@ void TextObject::LoadResources(gd::Project& project, gd::Layout& layout) {
 
 void TextObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.AddChild("string").SetValue(GetString());
-  element.AddChild("font").SetValue(GetFontFilename());
+  element.AddChild("font").SetValue(GetFontName());
   element.AddChild("characterSize").SetValue(GetCharacterSize());
   element.AddChild("color")
       .SetAttribute("r", (int)GetColorR())
@@ -157,19 +157,12 @@ void TextObject::EditObject(wxWindow* parent,
 }
 #endif
 
-void TextObject::SetFontFilename(const gd::String& fontFilename) {
-  fontName = fontFilename;
-#if defined(GD_IDE_ONLY)
-  fontName = gd::AbstractFileSystem::NormalizeSeparator(fontName);
-#endif
-};
-
 /* RuntimeTextObject : */
 
 RuntimeTextObject::RuntimeTextObject(RuntimeScene& scene,
                                      const TextObject& textObject)
     : RuntimeObject(scene, textObject), opacity(255), angle(0) {
-  ChangeFont(textObject.GetFontFilename());
+  ChangeFont(textObject.GetFontName());
   SetSmooth(textObject.IsSmoothed());
   SetColor(
       textObject.GetColorR(), textObject.GetColorG(), textObject.GetColorB());
@@ -332,7 +325,7 @@ void RuntimeTextObject::GetPropertyForDebugger(std::size_t propertyNb,
     value = GetString();
   } else if (propertyNb == 1) {
     name = _("Font");
-    value = GetFontFilename();
+    value = GetFontName();
   } else if (propertyNb == 2) {
     name = _("Font Size");
     value = gd::String::From(GetCharacterSize());

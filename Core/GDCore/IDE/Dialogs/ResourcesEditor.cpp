@@ -41,7 +41,7 @@
 #include "GDCore/IDE/Dialogs/DndResourcesEditor.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Dialogs/ResourceLibraryDialog.h"
-#include "GDCore/IDE/Project/ImagesUsedInventorizer.h"
+#include "GDCore/IDE/Project/ResourcesInUseHelper.h"
 #include "GDCore/IDE/Project/ProjectResourcesAdder.h"
 #include "GDCore/IDE/wxTools/FileProperty.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
@@ -1332,7 +1332,7 @@ void ResourcesEditor::Refresh() {
 
 void ResourcesEditor::OnDeleteUnusedFiles(wxCommandEvent& event) {
   std::vector<gd::String> unusedImages =
-      gd::ProjectResourcesAdder::GetAllUselessImages(project);
+      gd::ProjectResourcesAdder::GetAllUseless(project, "image");
 
   // Construct corresponding wxArrayString with unused images
   wxArrayString imagesNotUsed;

@@ -136,20 +136,11 @@ bool ImageResource::UpdateProperty(const gd::String& name,
 bool ResourcesManager::AddResource(const gd::Resource& resource) {
   if (HasResource(resource.GetName())) return false;
 
-  try {
-    const Resource& castedResource = dynamic_cast<const Resource&>(resource);
-    std::shared_ptr<Resource> newResource =
-        std::shared_ptr<Resource>(castedResource.Clone());
-    if (newResource == std::shared_ptr<Resource>()) return false;
+  std::shared_ptr<Resource> newResource =
+      std::shared_ptr<Resource>(resource.Clone());
+  if (newResource == std::shared_ptr<Resource>()) return false;
 
-    resources.push_back(newResource);
-  } catch (...) {
-    //TODO: Remove this
-    std::cout << "WARNING: Tried to add a resource which is not a GD C++ "
-                 "Platform Resource to a GD C++ Platform project";
-    std::cout << char(7);
-  }
-
+  resources.push_back(newResource);
   return true;
 }
 
@@ -411,17 +402,8 @@ bool ResourceFolder::HasResource(const gd::String& name) const {
 
 void ResourceFolder::AddResource(const gd::String& name,
                                  gd::ResourcesManager& parentManager) {
-  try {
-    ResourcesManager& manager = dynamic_cast<ResourcesManager&>(parentManager);
-    std::shared_ptr<Resource> resource =
-        std::dynamic_pointer_cast<Resource>(manager.GetResourceSPtr(name));
-    if (resource != std::shared_ptr<Resource>()) resources.push_back(resource);
-  } catch (...) {
-    //TODO: Remove this
-    std::cout << "Warning: A resources manager which is not part of GD C++ "
-                 "Platform was used during call to AddResource"
-              << std::endl;
-  }
+  std::shared_ptr<Resource> resource = parentManager.GetResourceSPtr(name);
+  if (resource != std::shared_ptr<Resource>()) resources.push_back(resource);
 }
 
 void ResourcesManager::RenameResource(const gd::String& oldName,

@@ -87,11 +87,11 @@ TEST_CASE("Resources", "[common][resources]") {
 
       SECTION("ProjectResourcesAdder") {
         std::vector<gd::String> uselessResources =
-            gd::ProjectResourcesAdder::GetAllUselessImages(project);
+            gd::ProjectResourcesAdder::GetAllUseless(project, "image");
 
         REQUIRE(uselessResources.size() == 2);
 
-        gd::ProjectResourcesAdder::RemoveAllUselessImages(project);
+        gd::ProjectResourcesAdder::RemoveAllUseless(project, "image");
         std::vector<gd::String> remainingResources =
             project.GetResourcesManager().GetAllResourceNames();
         REQUIRE(remainingResources.size() == 2);

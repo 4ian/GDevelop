@@ -34,7 +34,7 @@ namespace gd {
  * sometimes update them.
  *
  * \see ResourcesMergingHelper
- * \see gd::ImagesUsedInventorizer
+ * \see gd::ResourcesInUseHelper
  *
  * \see gd::LaunchResourceWorkerOnEvents
  *

@@ -86,6 +86,14 @@ const publicAudioUrls = [
   'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/sfx_lose.ogg',
 ];
 
+const publicFontUrls = [
+  // Platformer fonts (see platformer.json in fixtures)
+  'https://df5lqcdudryde.cloudfront.net/examples/platformer/Bimbo_JVE.ttf',
+
+  // Space shooter fonts (see space-shooter.json in fixtures)
+  'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/kenvector_future.ttf',
+];
+
 const nameFromUrl = (url: string): string => {
   const urlParts = url.split('/');
   return urlParts[urlParts.length - 1]
@@ -225,7 +233,7 @@ export default [
     name: 'publicImageUrlChooser',
     displayName: 'Choose an image from library',
     kind: 'image',
-    component: class AudioResourceChooser extends React.Component {
+    component: class ImageResourceChooser extends React.Component {
       chooseResources = () => {
         if (this._chooser) return this._chooser.chooseResources();
       };
@@ -243,5 +251,26 @@ export default [
       }
     },
   },
-  //TODO: add publicFontUrlChooser
+  {
+    name: 'publicFontUrlChooser',
+    displayName: 'Choose a font from library',
+    kind: 'font',
+    component: class FontResourceChooser extends React.Component {
+      chooseResources = () => {
+        if (this._chooser) return this._chooser.chooseResources();
+      };
+      render() {
+        return (
+          <GenericResourcesChooser
+            {...this.props}
+            urls={publicFontUrls}
+            urlsAreImages={false}
+            createNewResource={() => new gd.FontResource()}
+            title="Choose a font from the library"
+            ref={chooser => (this._chooser = chooser)}
+          />
+        );
+      }
+    },
+  },
 ];

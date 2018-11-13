@@ -245,7 +245,7 @@ export default class SpritesList extends Component<Props, void> {
         isLooping: direction.isLooping(),
         metadata,
       },
-      onChangesSaved: (resources, newAnimationName, metadata=false) => {
+      onChangesSaved: (resources, newAnimationName, metadata) => {
         const newDirection = new gd.Direction();
         newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
         newDirection.setLoop(direction.isLooping());

@@ -119,37 +119,58 @@ export default class PixiResourcesLoader {
    */
   static loadFontFamily(
     project: gdProject,
-    fontFilename: string
+    resourceName: string
   ): Promise<string> {
     // Avoid reloading a font if it's already cached
-    if (loadedFontFamilies[fontFilename]) {
-      return Promise.resolve(loadedFontFamilies[fontFilename]);
+    if (loadedFontFamilies[resourceName]) {
+      return Promise.resolve(loadedFontFamilies[resourceName]);
     }
 
-    const fontFamily = slugs(fontFilename);
-    const fullFilename = ResourcesLoader.getFullUrl(project, fontFilename);
+    const fontFamily = slugs(resourceName);
+    let fullFilename = null;
+    if (project.getResourcesManager().hasResource(resourceName)) {
+      const resource = project.getResourcesManager().getResource(resourceName);
+      if (resource.getKind() === 'font') {
+        fullFilename = ResourcesLoader.getResourceFullUrl(
+          project,
+          resourceName
+        );
+      }
+    } else {
+      // Compatibility with GD <= 5.0-beta56
+      // Assume resourceName is just the filename to the font
+      fullFilename = ResourcesLoader.getFullUrl(project, resourceName);
+      // end of compatibility code
+    }
+
+    if (!fullFilename) {
+      // If no resource is found/resource is not a font, default to Arial,
+      // as done by the game engine too.
+      return Promise.resolve('Arial');
+    }
+
     return loadFontFace(
       fontFamily,
       `url("${fullFilename}")`,
       {}
     ).then(loadedFace => {
-      loadedFontFamilies[fontFilename] = fontFamily;
+      loadedFontFamilies[resourceName] = fontFamily;
 
       return fontFamily;
     });
   }
 
   /**
-   * Get the font family name for the given font from its url/filename.
+   * Get the font family name for the given font resource.
    * The font won't be loaded.
    * @returns The font-family to be used to render a text with the font.
    */
-  static getFontFamily(project: gdProject, fontFilename: string) {
-    if (loadedFontFamilies[fontFilename]) {
-      return loadedFontFamilies[fontFilename];
+  static getFontFamily(project: gdProject, resourceName: string) {
+    if (loadedFontFamilies[resourceName]) {
+      return loadedFontFamilies[resourceName];
     }
 
-    const fontFamily = slugs(fontFilename);
+    const fontFamily = slugs(resourceName);
     return fontFamily;
   }
 

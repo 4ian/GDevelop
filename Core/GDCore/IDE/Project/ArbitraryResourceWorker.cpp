@@ -21,7 +21,7 @@ using namespace std;
 namespace gd {
 
 void ArbitraryResourceWorker::ExposeImage(gd::String& imageName){
-    // Nothing to do, the image is a referece to a resource that
+    // Nothing to do, the image is a reference to a resource that
     // is already exposed.
 };
 
@@ -38,6 +38,21 @@ void ArbitraryResourceWorker::ExposeAudio(gd::String& audioName) {
   }
 
   ExposeFile(audioName);
+};
+
+void ArbitraryResourceWorker::ExposeFont(gd::String& fontName) {
+  for (auto resources : GetResources()) {
+    if (!resources) continue;
+
+    if (resources->HasResource(fontName) &&
+        resources->GetResource(fontName).GetKind() == "font") {
+      // Nothing to do, the font is a reference to a resource that
+      // is already exposed.
+      return;
+    }
+  }
+
+  ExposeFile(fontName);
 };
 
 void ArbitraryResourceWorker::ExposeResources(

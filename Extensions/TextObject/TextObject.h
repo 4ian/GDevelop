@@ -15,25 +15,16 @@ This project is released under the MIT License.
 class ImageManager;
 class RuntimeScene;
 namespace gd {
+class Project;
 class Object;
-}
-namespace gd {
 class ImageManager;
-}
-namespace gd {
 class InitialInstance;
 }
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
-namespace gd {
-class Project;
-}
 class wxWindow;
 namespace gd {
 class MainFrameWrapper;
-}
-namespace gd {
-class ResourcesMergingHelper;
 }
 #endif
 
@@ -82,13 +73,13 @@ class GD_EXTENSION_API TextObject : public gd::Object {
    */
   inline float GetCharacterSize() const { return characterSize; };
 
-  /** \brief Return the font filename.
+  /** \brief Return the name of the font resource used for the text.
    */
-  inline const gd::String& GetFontFilename() const { return fontName; };
+  inline const gd::String& GetFontName() const { return fontName; };
 
-  /** \brief Change the font filename.
+  /** \brief Change the font resource used for the text.
    */
-  void SetFontFilename(const gd::String& fontFilename);
+  void SetFontName(const gd::String& resourceName) { fontName = resourceName; };
 
   bool IsBold() const { return bold; };
   void SetBold(bool enable) { bold = enable; };
@@ -170,9 +161,9 @@ class GD_EXTENSION_API RuntimeTextObject : public RuntimeObject {
    */
   void ChangeFont(const gd::String& fontFilename);
 
-  /** \brief Return the font file name.
+  /** \brief Return the font resource name.
    */
-  inline gd::String GetFontFilename() const { return fontName; };
+  inline gd::String GetFontName() const { return fontName; };
 
   void SetFontStyle(int style);
   int GetFontStyle();

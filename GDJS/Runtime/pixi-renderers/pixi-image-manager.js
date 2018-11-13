@@ -96,7 +96,7 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, 
 
     var totalCount = Object.keys(files).length;
     if (totalCount === 0)
-    	return onComplete(); //Nothing to load.
+    	return onComplete(totalCount); //Nothing to load.
 
     var loadingCount = 0;
     var loader = PIXI.loader;
@@ -117,7 +117,7 @@ gdjs.PixiImageManager.prototype.loadTextures = function(onProgress, onComplete, 
     		}
     	}
 
-    	onComplete();
+    	onComplete(totalCount);
     });
     loader.on('progress', function() {
     	loadingCount++;

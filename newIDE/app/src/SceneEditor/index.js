@@ -804,10 +804,10 @@ export default class SceneEditor extends React.Component<Props, State> {
   reloadResourcesFor = (object: gdObject) => {
     const { project } = this.props;
 
-    const imagesUsedInventorizer = new gd.ImagesUsedInventorizer();
-    object.exposeResources(imagesUsedInventorizer);
-    const objectResourceNames = imagesUsedInventorizer
-      .getAllUsedImages()
+    const resourcesInUse = new gd.ResourcesInUseHelper();
+    object.exposeResources(resourcesInUse);
+    const objectResourceNames = resourcesInUse
+      .getAllImages()
       .toNewVectorString()
       .toJSArray();
 

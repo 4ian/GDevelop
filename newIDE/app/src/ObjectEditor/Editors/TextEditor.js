@@ -5,6 +5,8 @@ import TextField from 'material-ui/TextField';
 import { Line, Column } from '../../UI/Grid';
 import ColorPicker from '../../UI/ColorField/ColorPicker';
 import MiniToolbar, { MiniToolbarText } from '../../UI/MiniToolbar';
+import ResourceSelector from '../../ResourcesList/ResourceSelector';
+import ResourcesLoader from '../../ResourcesLoader';
 import { type EditorProps } from './EditorProps.flow';
 const gd = global.gd;
 
@@ -26,7 +28,13 @@ const styles = {
 
 export default class TextEditor extends React.Component<EditorProps, void> {
   render() {
-    const { object } = this.props;
+    const {
+      object,
+      project,
+      resourceSources,
+      onChooseResource,
+      resourceExternalEditors,
+    } = this.props;
     const textObject = gd.asTextObject(object);
 
     return (
@@ -75,14 +83,20 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             }}
             style={styles.checkbox}
           />
-          <TextField
-            hintText="Font"
+          <ResourceSelector
+            project={project}
+            resourceSources={resourceSources}
+            onChooseResource={onChooseResource}
+            resourceExternalEditors={resourceExternalEditors}
+            resourcesLoader={ResourcesLoader}
+            resourceKind="font"
             fullWidth
-            value={textObject.getFontFilename()}
-            onChange={(e, value) => {
-              textObject.setFontFilename(value);
+            initialResourceName={textObject.getFontName()}
+            onChange={resourceName => {
+              textObject.setFontName(resourceName);
               this.forceUpdate();
             }}
+            hintText="Choose a font"
           />
         </MiniToolbar>
         <Line noMargin>

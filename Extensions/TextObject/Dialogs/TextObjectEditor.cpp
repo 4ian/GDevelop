@@ -35,7 +35,7 @@ TextObjectEditor::TextObjectEditor(wxWindow* parent,
 
   // Update from the text object
   m_textCtrl->SetValue(object.GetString());
-  m_fontTextCtrl->SetValue(object.GetFontFilename());
+  m_fontTextCtrl->SetValue(object.GetFontName());
   m_sizeCombobox->SetValue(gd::String::From<float>(object.GetCharacterSize()));
   textColor =
       wxColour(object.GetColorR(), object.GetColorG(), object.GetColorB());
@@ -56,7 +56,7 @@ TextObjectEditor::~TextObjectEditor() {}
 void TextObjectEditor::OnOkBtClicked(wxCommandEvent& event) {
   // Update the text object
   object.SetString(m_textCtrl->GetValue());
-  object.SetFontFilename(m_fontTextCtrl->GetValue());
+  object.SetFontName(m_fontTextCtrl->GetValue());
   object.SetCharacterSize(gd::String(m_sizeCombobox->GetValue()).To<float>());
   object.SetColor(textColor.Red(), textColor.Green(), textColor.Blue());
   object.SetBold(m_toolbar->GetToolToggled(BOLD_TOOL_ID));

@@ -21,38 +21,35 @@ namespace gd {
 class GD_CORE_API ProjectResourcesAdder {
  public:
   /**
-   * \brief Update the project so that all missing images are added, with an
+   * \brief Update the project so that all missing resources are added, with an
    * filename that is equal to the missing resource name.
    *
    * \param project The project to be updated.
+   * \param resourceType The type of the resource the be searched
    *
    * \return true if no error happened
    */
-  static bool AddAllMissingImages(gd::Project& project);
+  static bool AddAllMissing(gd::Project& project, const gd::String & resourceType);
 
   /**
-   * \brief Find all resources that are
-   * not used in the project.
-   *
-   * \note For now, only images resources can be tracked and marked
-   * as not used.
+   * \brief Find all resources of the specified kind that are
+   * not used by the project.
    *
    * \param project The project to be crawled.
+   * \param resourceType The type of the resource the be searched
    *
    * \return A vector containing the name of all unused resources
    */
-  static std::vector<gd::String> GetAllUselessImages(gd::Project& project);
+  static std::vector<gd::String> GetAllUseless(gd::Project& project, const gd::String & resourceType);
 
   /**
-   * \brief Remove all resources that are not used
-   * in the project.
-   *
-   * \note For now, only images resources can be tracked and marked
-   * as not used.
+   * \brief Remove all resources of the specified kind that are not used
+   * by the project.
    *
    * \param project The project to be crawled.
+   * \param resourceType The type of the resource the be searched
    */
-  static void RemoveAllUselessImages(gd::Project& project);
+  static void RemoveAllUseless(gd::Project& project, const gd::String & resourceType);
 };
 
 }  // namespace gd

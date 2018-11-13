@@ -152,5 +152,5 @@ gdjs.CocosSoundManager.prototype.preloadAudio = function(onProgress, onComplete,
 	}
 
     //TODO: sound preloading
-    onComplete();
+    onComplete(files.length);
 }

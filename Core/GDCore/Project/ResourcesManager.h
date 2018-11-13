@@ -263,6 +263,34 @@ class GD_CORE_API AudioResource : public Resource {
 };
 
 /**
+ * \brief Describe a font file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API FontResource : public Resource {
+ public:
+  FontResource() : Resource() { SetKind("font"); };
+  virtual ~FontResource(){};
+  virtual FontResource* Clone() const override {
+    return new FontResource(*this);
+  }
+
+  virtual const gd::String& GetFile() const override { return file; };
+  virtual void SetFile(const gd::String& newFile) override;
+
+#if defined(GD_IDE_ONLY)
+  virtual bool UseFile() override { return true; }
+  void SerializeTo(SerializerElement& element) const override;
+#endif
+
+  void UnserializeFrom(const SerializerElement& element) override;
+
+ private:
+  gd::String file;
+};
+
+/**
  * \brief Inventory all resources used by a project
  *
  * \see Resource
@@ -298,7 +326,7 @@ class GD_CORE_API ResourcesManager {
   /**
    * \brief Get a list containing the names of all resources.
    */
-  std::vector<gd::String> GetAllResourceNames();
+  std::vector<gd::String> GetAllResourceNames() const;
 
 #if defined(GD_IDE_ONLY)
   /**

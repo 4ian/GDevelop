@@ -1,4 +1,6 @@
-import { createPathEditorHeader } from '../utils/path-editor.js';
+import {
+  createPathEditorHeader
+} from '../utils/path-editor.js';
 const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
@@ -24,14 +26,12 @@ const updateFrameElements = () => {
 // When succeeding, stop trying.
 let pskl = null;
 const tryToGetPiskel = () => {
-  if (pskl === null) {
-    pskl = document.querySelector('#piskel-frame').contentWindow.pskl;
-  } else {
-    // gained access to control elements!
+  pskl = document.querySelector('#piskel-frame').contentWindow.pskl;
+  if (pskl !== null) {
     ipcRenderer.send('piskel-ready');
     clearInterval(retryToGetPiskel);
   }
-};
+}
 let retryToGetPiskel = setInterval(tryToGetPiskel, 100);
 
 const readBase64ImageFile = file => {
@@ -92,7 +92,7 @@ const saveToGD = pathEditor => {
       data: pskl.utils.serialization.Serializer.serialize(piskelData),
       paths: outputPaths,
       name: pathEditor.state.name,
-      isTiled: piskelOptions.isTiled,
+      singleFrame: piskelOptions.singleFrame,
     };
   }
 
@@ -101,7 +101,7 @@ const saveToGD = pathEditor => {
     outputResources,
     (path, index, callback) => {
       const canvas = pskl.app.piskelController.renderFrameAt(index, true);
-      pskl.utils.BlobUtils.canvasToBlob(canvas, function (blob) {
+      pskl.utils.BlobUtils.canvasToBlob(canvas, blob => {
         saveToFile(blob, path.path, callback);
       });
     },
@@ -142,7 +142,7 @@ const piskelCreateAnimation = (pskl, piskelOptions) => {
     piskel.description,
     true
   );
-  pskl.utils.serialization.Deserializer.deserialize(sprite, function (piskel) {
+  pskl.utils.serialization.Deserializer.deserialize(sprite, piskel => {
     piskel.setDescriptor(descriptor);
     pskl.app.piskelController.setPiskel(piskel);
     pskl.app.piskelController.setFPS(sprite.fps);
@@ -161,6 +161,8 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
    * get rid of the new file button,
    * make animation name and path editable
    */
+  piskelOptions = receivedOptions;
+
   const editorContentDocument = document.getElementById('piskel-frame')
     .contentDocument;
   const newButton = editorContentDocument.getElementsByClassName(
@@ -182,8 +184,8 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
     saveFolderLabel: 'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
     nameInput: 'font-family:"Courier New";height:27px;width:90px;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
     saveButton: 'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    cancelButton: 'float:right;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    setFolderButton: 'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    cancelButton: 'float:right;margin-left:2px;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    setFolderButton: 'float:right;margin-left:2px;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
     fileExistsLabel: 'height:27px;color:aqua;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
   };
   const savePathEditor = createPathEditorHeader({
@@ -194,29 +196,20 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
     projectPath: receivedOptions.projectPath,
     initialResourcePath: receivedOptions.resources[0] === undefined ?
       '' : receivedOptions.resources[0].resourcePath,
-    extension: '',
     headerStyle,
     name: receivedOptions.name,
+    extension: piskelOptions.singleFrame ? '.png' : undefined,
   });
 
-  // Get controller again
-  piskelOptions = receivedOptions;
-  const editorFrameEl = document.querySelector('#piskel-frame');
-  pskl = editorFrameEl.contentWindow.pskl;
-  if (!pskl) {
-    return;
-  }
+  if (!pskl) { return }
 
-  // Set piskel to tiled mode when editing a tiled object, set FPS from GD
-  pskl.UserSettings.set(pskl.UserSettings.SEAMLESS_MODE, piskelOptions.isTiled);
+  // Set piskel to tiled mode when editing a singleFrame object, set FPS from GD
+  pskl.UserSettings.set(pskl.UserSettings.SEAMLESS_MODE, piskelOptions.singleFrame);
   const piskelController = pskl.app.piskelController;
   piskelController.setFPS(piskelOptions.fps);
 
   // if no resources are being loaded, create a new animation
-  if (
-    piskelOptions.resources.length === 0 &&
-    !(piskelOptions.metadata.pskl)
-  ) {
+  if (piskelOptions.resources.length === 0 && !piskelOptions.metadata.pskl) {
     piskelCreateAnimation(pskl, piskelOptions);
     return;
   }
@@ -230,42 +223,57 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
     pskl.utils.serialization.Deserializer.deserialize(
       JSON.parse(piskelOptions.metadata.pskl.data),
       piskel => {
-
         piskelController.setPiskel(piskel);
         // set piskel frame paths to their piskel data counterpart - on all layers
         for (let i = 0; i < piskelController.getFrameCount(); i++) {
           piskelController.getLayers().forEach(layer => {
             layer.getFrameAt(i).originalPath = metadataPaths[i];
             layer.getFrameAt(i).originalIndex = i;
-          })
-        };
+          });
+        }
 
         // Compare the imported frames - so as to make the layered Piskel Document
         // the same as the changes done in Gdevelop without flattening any layers
         let flattenedImagePaths = [];
         piskelOptions.resources.forEach((resource, frameIndex) => {
-          const flattenedFramePath = path.normalize(resource.resourcePath)
+          const flattenedFramePath = path.normalize(resource.resourcePath);
           flattenedImagePaths.push(flattenedFramePath);
 
           // Import any frames that were added in Gdevelop
           if (!metadataPaths.includes(flattenedFramePath)) {
-            pskl.utils.BlobUtils.dataToBlob(readBase64ImageFile(flattenedFramePath), 'image/png', imageBlob => {
-              pskl.utils.FileUtils.readImageFile(imageBlob, image => {
-                piskelController.setCurrentFrameIndex(piskelController.getFrameCount() - 1)
+            pskl.utils.BlobUtils.dataToBlob(
+              readBase64ImageFile(flattenedFramePath),
+              'image/png',
+              imageBlob => {
+                pskl.utils.FileUtils.readImageFile(imageBlob, image => {
+                  piskelController.setCurrentFrameIndex(
+                    piskelController.getFrameCount() - 1
+                  );
 
-                piskelController.addFrameAtCurrentIndex();
-                piskelController.selectNextFrame();
-                const currentFrameObj = piskelController.getCurrentFrame();
-                pskl.utils.FrameUtils.addImageToFrame(currentFrameObj, image, 0, 0);
-                pskl.tools.transform.TransformUtils.center(currentFrameObj);
+                  piskelController.addFrameAtCurrentIndex();
+                  piskelController.selectNextFrame();
+                  const currentFrameObj = piskelController.getCurrentFrame();
+                  pskl.utils.FrameUtils.addImageToFrame(
+                    currentFrameObj,
+                    image,
+                    0,
+                    0
+                  );
+                  pskl.tools.transform.TransformUtils.center(currentFrameObj);
 
-                piskelController.getLayers().forEach(layer => {
-                  layer.moveFrame(piskelController.getCurrentFrameIndex(), frameIndex);
-                  layer.getFrameAt(frameIndex).originalIndex = frameIndex;
-                  layer.getFrameAt(frameIndex).originalPath = flattenedFramePath;
-                })
-              });
-            });
+                  piskelController.getLayers().forEach(layer => {
+                    layer.moveFrame(
+                      piskelController.getCurrentFrameIndex(),
+                      frameIndex
+                    );
+                    layer.getFrameAt(frameIndex).originalIndex = frameIndex;
+                    layer.getFrameAt(
+                      frameIndex
+                    ).originalPath = flattenedFramePath;
+                  });
+                });
+              }
+            );
           }
         });
 
@@ -276,8 +284,8 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
             for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
               if (metaFramePath === layer.getFrameAt(fi).originalPath) {
                 piskelController.getLayers().forEach(layer => {
-                  layer.removeFrameAt(fi)
-                })
+                  layer.removeFrameAt(fi);
+                });
               }
             }
           }
@@ -286,11 +294,14 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
         // Put frames in the same order as they are in GD
         piskelController.getLayers().forEach(layer => {
           layer.getFrames().sort((a, b) => {
-            return flattenedImagePaths.indexOf(a.originalPath) - flattenedImagePaths.indexOf(b.originalPath);
-          })
-        })
-      });
-
+            return (
+              flattenedImagePaths.indexOf(a.originalPath) -
+              flattenedImagePaths.indexOf(b.originalPath)
+            );
+          });
+        });
+      }
+    );
   } else {
     // Load flat images into piskel if there is no metadata - the old way
     const imageData = [];

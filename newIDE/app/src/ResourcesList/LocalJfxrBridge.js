@@ -39,11 +39,9 @@ export const openJfxr = ({
     const resourceName = path.relative(projectPath, newFilePath); // TODO: move into a generic createOrUpdateResource function that piskel can also use in app/src/ResourcesList/ResourceUtils.js
     createOrUpdateResource(project, new gd.AudioResource(), resourceName);
 
-    const newMetadata = fileMetadata.data
-      ? {
-          jfxr: fileMetadata,
-        }
-      : {};
+    const newMetadata = {
+      jfxr: fileMetadata,
+    };
 
     project
       .getResourcesManager()

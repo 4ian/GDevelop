@@ -190,10 +190,9 @@ export default class ResourceSelector extends React.Component<Props, State> {
         resourceNames,
         extraOptions: {
           fps: 0,
-          name: 'Image',
+          name: resourceName,
           isLooping: false,
           metadata,
-          isTiled: true,
         },
         onChangesSaved: resources => {
           if (!resources.length) return;

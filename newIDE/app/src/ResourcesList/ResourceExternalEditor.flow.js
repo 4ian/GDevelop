@@ -17,7 +17,8 @@ export type ExternalEditorOpenOptions = {|
       originalIndex: ?number,
       metadata?: string,
     }>,
-    newName: string
+    newName: string,
+    metadata?: Object
   ) => void,
   extraOptions: {
     name?: string,

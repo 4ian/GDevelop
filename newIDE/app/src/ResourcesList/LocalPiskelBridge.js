@@ -65,17 +65,17 @@ export const openPiskel = ({
         createOrUpdateResource(project, new gd.ImageResource(), resource.name);
       });
 
-      // in case this is for a tiledSprite object, save the metadata in the Image object
-      if (metadata.isTiled) {
+      // in case this is for a single frame object, save the metadata in the Image object
+      if (metadata.singleFrame) {
         resourcesManager
           .getResource(path.relative(projectPath, outputResources[0].path))
           .setMetadata(JSON.stringify(newMetadata));
+
+        onChangesSaved(outputResources, newAnimationName);
       } else {
         // if not, the metadata will still be passed onto SpritesList.js to be set in the Direction object
-        outputResources[0].metadata = newMetadata;
-      }
-
-      onChangesSaved(outputResources, newAnimationName);
+        onChangesSaved(outputResources, newAnimationName, newMetadata);
+      }  
     }
   );
 

@@ -81,7 +81,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
-  _scanForNewResources = (extensions: string, resource: gdResource) => {
+  _scanForNewResources = (extensions: string, createResource: () => gdResource) => {
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
     const projectPath = path.dirname(project.getProjectFile());
@@ -96,7 +96,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         res.forEach(pathFound => {
           const fileName = path.relative(projectPath, pathFound);
           if (!resourcesManager.hasResource(fileName)) {
-            createOrUpdateResource(project, new gd.ImageResource(), fileName)
+            createOrUpdateResource(project, createResource(), fileName)
             console.info(`${fileName} added to project.`);
           };
         });
@@ -172,13 +172,13 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: 'Scan for Images',
         click: () => {
-          this._scanForNewResources(IMAGE_EXTENSIONS, new gd.ImageResource());
+          this._scanForNewResources(IMAGE_EXTENSIONS, () => new gd.ImageResource());
         },
       },
       {
         label: 'Scan for Audio',
         click: () => {
-          this._scanForNewResources(AUDIO_EXTENSIONS, new gd.AudioResource());
+          this._scanForNewResources(AUDIO_EXTENSIONS, () => new gd.AudioResource());
         },
       },
       {

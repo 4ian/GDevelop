@@ -29,8 +29,8 @@ export const createPathEditorHeader = ({
       folderPath: path.dirname(initialResourcePath),
       name: !name
         ? path.basename(initialResourcePath, path.extname(initialResourcePath))
-        : name,
-      extension: !extension ? '-' : path.extname(initialResourcePath),
+        : path.basename(name, path.extname(name)),
+      extension: !extension ? undefined : path.extname(initialResourcePath),
       projectBasePath: path.normalize(projectPath),
     },
   };
@@ -153,7 +153,7 @@ const render = headerObject => {
     (headerObject.nameInput.value.length + 1) * 10 + 'px';
   // check if it will overwrite a file and notify the user in a subtle, but obvious way
   // but don't do it if there is no extension (image sequence will be saved)
-  if (headerObject.state.extension === '-') {
+  if (!headerObject.state.extension) {
     return;
   }
   if (fs.existsSync(state.fullPath)) {

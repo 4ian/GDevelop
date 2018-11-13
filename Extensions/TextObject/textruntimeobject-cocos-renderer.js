@@ -35,7 +35,7 @@ gdjs.TextRuntimeObjectCocosRenderer.prototype.updateStyle = function() {
         (
             gdjs.CocosTools.isHTML5() ?
             this._fontManager.getFontFamily(this._object._fontName) :
-            'res/' + this._object._fontName
+            'res/' + this._fontManager.getFontFile(this._object._fontName)
         );
     this._text.setFontName(fontName);
 };

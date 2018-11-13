@@ -20,6 +20,7 @@ gdjs.FontFaceObserverFontManager = function(resources)
 {
     this._resources = resources;
     this._loadedFontFamily = {}; // Associate font resource names to the loaded font family
+    this._loadedFonts = {}; // Associate font resource names to the resources, for faster access
 };
 
 gdjs.FontManager = gdjs.FontFaceObserverFontManager; //Register the class to let the engine use it.
@@ -42,6 +43,25 @@ gdjs.FontFaceObserverFontManager.prototype.getFontFamily = function(resourceName
     return resourceName ? 
         gdjs.FontFaceObserverFontManager._getFontFamilyFromFilename(resourceName) : 
         'Arial';
+}
+
+/**
+ * Return the font file associated to the specified font resource name.
+ * The font resource must have been loaded before. If that's not the case,
+ * the resource name will be returned (to
+ * keep compatibility with GDevelop 5.0-beta56 and previous).
+ * 
+ * Should only be useful for renderers running on a non HTML5/non browser environment.
+ * 
+ * @param {string} resourceName The name of the resource to get.
+ * @returns {string} The file of the font resource.
+ */
+gdjs.FontFaceObserverFontManager.prototype.getFontFile = function(resourceName) {
+    if (this._loadedFonts[resourceName]) {
+        return this._loadedFonts[resourceName].file || '';
+    }
+
+    return resourceName;
 }
 
 /**
@@ -87,6 +107,7 @@ gdjs.FontFaceObserverFontManager.prototype.loadFonts = function(onProgress, onCo
     var onFontLoaded = function(fontFamily, resources) {
         resources.forEach(function(resource) {
             that._loadedFontFamily[resource.name] = fontFamily;
+            that._loadedFonts[resource.name] = resource;
         });
 
         loadingCount++;

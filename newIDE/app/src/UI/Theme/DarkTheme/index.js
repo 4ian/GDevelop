@@ -103,6 +103,7 @@ const theme: Theme = {
   mosaicRootClassName: 'mosaic-gd-dark-theme',
   eventsSheetRootClassName: 'gd-events-sheet-dark-theme',
   tableRootClassName: 'gd-table-dark-theme',
+  gdevelopIconsCSSFilter: '',
 };
 
 export default getMuiTheme(theme);

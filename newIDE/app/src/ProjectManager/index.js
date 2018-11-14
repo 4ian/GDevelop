@@ -509,7 +509,9 @@ export default class ProjectManager extends React.Component<Props, State> {
     return (
       <ProjectStructureItem
         primaryText="Menu"
-        leftIcon={<ListIcon src="res/ribbon_default/new32.png" />}
+        leftIcon={
+          <ListIcon isGDevelopIcon src="res/ribbon_default/new32.png" />
+        }
         initiallyOpen={true}
         primaryTogglesNestedList={true}
         autoGenerateNestedIndicator={true}
@@ -517,25 +519,33 @@ export default class ProjectManager extends React.Component<Props, State> {
           <ListItem
             key="save"
             primaryText="Save"
-            leftIcon={<ListIcon src="res/ribbon_default/save32.png" />}
+            leftIcon={
+              <ListIcon isGDevelopIcon src="res/ribbon_default/save32.png" />
+            }
             onClick={() => this.props.onSaveProject()}
           />,
           <ListItem
             key="close"
             primaryText="Close"
-            leftIcon={<ListIcon src="res/ribbon_default/close32.png" />}
+            leftIcon={
+              <ListIcon isGDevelopIcon src="res/ribbon_default/close32.png" />
+            }
             onClick={() => this.props.onCloseProject()}
           />,
           <ListItem
             key="export"
             primaryText="Export"
-            leftIcon={<ListIcon src="res/ribbon_default/export32.png" />}
+            leftIcon={
+              <ListIcon isGDevelopIcon src="res/ribbon_default/export32.png" />
+            }
             onClick={() => this.props.onExportProject()}
           />,
           <ListItem
             key="preferences"
             primaryText="Preferences"
-            leftIcon={<ListIcon src="res/ribbon_default/pref32.png" />}
+            leftIcon={
+              <ListIcon isGDevelopIcon src="res/ribbon_default/pref32.png" />
+            }
             onClick={() => this.props.onOpenPreferences()}
           />,
         ]}
@@ -561,7 +571,10 @@ export default class ProjectManager extends React.Component<Props, State> {
           <ProjectStructureItem
             primaryText="Game settings"
             leftIcon={
-              <ListIcon src="res/ribbon_default/projectManager32.png" />
+              <ListIcon
+                isGDevelopIcon
+                src="res/ribbon_default/projectManager32.png"
+              />
             }
             initiallyOpen={false}
             primaryTogglesNestedList={true}
@@ -570,33 +583,58 @@ export default class ProjectManager extends React.Component<Props, State> {
               <ListItem
                 key="properties"
                 primaryText="Properties"
-                leftIcon={<ListIcon src="res/ribbon_default/editprop32.png" />}
+                leftIcon={
+                  <ListIcon
+                    isGDevelopIcon
+                    src="res/ribbon_default/editprop32.png"
+                  />
+                }
                 onClick={() =>
                   this.setState({ projectPropertiesDialogOpen: true })}
               />,
               <ListItem
                 key="global-variables"
                 primaryText="Global variables"
-                leftIcon={<ListIcon src="res/ribbon_default/editname32.png" />}
+                leftIcon={
+                  <ListIcon
+                    isGDevelopIcon
+                    src="res/ribbon_default/editname32.png"
+                  />
+                }
                 onClick={() => this.setState({ variablesEditorOpen: true })}
               />,
               <ListItem
                 key="icons"
                 primaryText="Icons"
-                leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
+                leftIcon={
+                  <ListIcon
+                    isGDevelopIcon
+                    src="res/ribbon_default/image32.png"
+                  />
+                }
                 onClick={() => this.props.onOpenPlatformSpecificAssets()}
               />,
               <ListItem
                 key="resources"
                 primaryText="Resources"
-                leftIcon={<ListIcon src="res/ribbon_default/image32.png" />}
+                leftIcon={
+                  <ListIcon
+                    isGDevelopIcon
+                    src="res/ribbon_default/image32.png"
+                  />
+                }
                 onClick={() => this.props.onOpenResources()}
               />,
             ]}
           />
           <ProjectStructureItem
             primaryText="Scenes"
-            leftIcon={<ListIcon src="res/ribbon_default/sceneadd32.png" />}
+            leftIcon={
+              <ListIcon
+                isGDevelopIcon
+                src="res/ribbon_default/sceneadd32.png"
+              />
+            }
             initiallyOpen={true}
             open={forceOpen}
             primaryTogglesNestedList={true}
@@ -643,7 +681,10 @@ export default class ProjectManager extends React.Component<Props, State> {
           <ProjectStructureItem
             primaryText="External events"
             leftIcon={
-              <ListIcon src="res/ribbon_default/externalevents32.png" />
+              <ListIcon
+                isGDevelopIcon
+                src="res/ribbon_default/externalevents32.png"
+              />
             }
             initiallyOpen={false}
             open={forceOpen}
@@ -694,7 +735,10 @@ export default class ProjectManager extends React.Component<Props, State> {
           <ProjectStructureItem
             primaryText="External layouts"
             leftIcon={
-              <ListIcon src="res/ribbon_default/externallayout32.png" />
+              <ListIcon
+                isGDevelopIcon
+                src="res/ribbon_default/externallayout32.png"
+              />
             }
             initiallyOpen={false}
             open={forceOpen}
@@ -748,7 +792,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText="Functions/Extensions"
                 error={eventsFunctionsExtensionsError}
                 onRefresh={onReloadEventsFunctionsExtensions}
-                leftIcon={<ListIcon src="res/ribbon_default/function32.png" />}
+                leftIcon={
+                  <ListIcon
+                    isGDevelopIcon
+                    src="res/ribbon_default/function32.png"
+                  />
+                }
                 initiallyOpen={false}
                 open={forceOpen}
                 primaryTogglesNestedList={true}

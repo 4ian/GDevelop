@@ -108,12 +108,12 @@ export default class ResourcesList extends React.Component<Props, State> {
   _removeAllUnusedImages = () => {
     const { project } = this.props;
     gd.ProjectResourcesAdder
-      .getAllUselessImages(project)
+      .getAllUseless(project, 'image')
       .toJSArray()
       .forEach(imageName => {
         console.info(`Removing unused image resource: ${imageName}`);
       });
-    gd.ProjectResourcesAdder.removeAllUselessImages(project);
+    gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
     this.forceUpdate();
   };
 

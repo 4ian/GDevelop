@@ -27,6 +27,7 @@ type Props = {|
   initialResourceName: string,
   onChange: string => void,
   floatingLabelText?: string,
+  hintText?: string,
 |};
 
 type State = {|
@@ -238,7 +239,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
       <div style={styles.container}>
         <AutoComplete
           {...defaultAutocompleteProps}
-          floatingLabelText={this.props.floatingLabelText || 'Select an image'}
+          floatingLabelText={this.props.floatingLabelText}
+          hintText={this.props.hintText}
           openOnFocus
           dataSource={this.autoCompleteData || []}
           onUpdateInput={this._onUpdate}

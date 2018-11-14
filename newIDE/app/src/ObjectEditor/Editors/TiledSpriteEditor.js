@@ -34,6 +34,7 @@ export default class TiledSpriteEditor extends React.Component<
               tiledSpriteObject.setTexture(resourceName);
               this.forceUpdate();
             }}
+            floatingLabelText="Select an image"
           />
         </Line>
         <Line>

@@ -36,7 +36,7 @@ function RenderedTextInstance(
   this._styleFontDirty = true;
   this._fontFamily = this._pixiResourcesLoader.getFontFamily(
     this._project,
-    textObject.getFontFilename()
+    textObject.getFontName()
   );
   this.update();
 }
@@ -69,11 +69,11 @@ RenderedTextInstance.prototype.update = function() {
     this._styleFontDirty = true;
   }
 
-  if (this._fontFilename !== textObject.getFontFilename()) {
+  if (this._fontName !== textObject.getFontName()) {
     //Avoid calling loadFontFamily if the font didn't changed.
-    this._fontFilename = textObject.getFontFilename();
+    this._fontName = textObject.getFontName();
     this._pixiResourcesLoader
-      .loadFontFamily(this._project, textObject.getFontFilename())
+      .loadFontFamily(this._project, textObject.getFontName())
       .then(fontFamily => {
         // Once the font is loaded, we can use the given fontFamily.
         this._fontFamily = fontFamily;

@@ -108,7 +108,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
-  _removeUnusedResources = resourceType => {
+  _removeUnusedResources = (resourceType: string) => {
     const { project } = this.props;
     gd.ProjectResourcesAdder
       .getAllUseless(project, resourceType)

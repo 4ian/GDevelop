@@ -11,8 +11,11 @@ import { createOrUpdateResource } from './ResourceUtils.js';
 
 const path = optionalRequire('path');
 const glob = optionalRequire('glob');
+
 const IMAGE_EXTENSIONS = 'png,jpg,jpeg,PNG,JPG,JPEG';
 const AUDIO_EXTENSIONS = 'wav,mp3,ogg,WAV,MP3,OGG';
+const FONT_EXTENSIONS = 'ttf,ttc,TTF,TTC';
+
 const gd = global.gd;
 
 const styles = {
@@ -105,15 +108,15 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
-  _removeAllUnusedImages = () => {
+  _removeUnusedResources = resourceType => {
     const { project } = this.props;
     gd.ProjectResourcesAdder
-      .getAllUseless(project, 'image')
+      .getAllUseless(project, resourceType)
       .toJSArray()
-      .forEach(imageName => {
-        console.info(`Removing unused image resource: ${imageName}`);
+      .forEach(resourceName => {
+        console.info(`Removing unused` + resourceType + ` resource: ${resourceName}`);
       });
-    gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
+    gd.ProjectResourcesAdder.removeAllUseless(project, resourceType);
     this.forceUpdate();
   };
 
@@ -182,9 +185,28 @@ export default class ResourcesList extends React.Component<Props, State> {
         },
       },
       {
+        label: 'Scan for Fonts',
+        click: () => {
+          this._scanForNewResources(FONT_EXTENSIONS, () => new gd.FontResource());
+        },
+      },
+      { type: 'separator' },
+      {
         label: 'Remove All Unused Images',
         click: () => {
-          this._removeAllUnusedImages();
+          this._removeUnusedResources('image');
+        },
+      },
+      {
+        label: 'Remove All Unused Audio',
+        click: () => {
+          this._removeUnusedResources('audio');
+        },
+      },
+      {
+        label: 'Remove All Unused Fonts',
+        click: () => {
+          this._removeUnusedResources('font');
         },
       },
     ];

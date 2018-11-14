@@ -8,6 +8,7 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { createOrUpdateResource } from './ResourceUtils.js';
+import { type ResourceKind } from './ResourceSource.flow';
 
 const path = optionalRequire('path');
 const glob = optionalRequire('glob');
@@ -108,7 +109,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
-  _removeUnusedResources = (resourceType: string) => {
+  _removeUnusedResources = (resourceType: ResourceKind) => {
     const { project } = this.props;
     gd.ProjectResourcesAdder
       .getAllUseless(project, resourceType)

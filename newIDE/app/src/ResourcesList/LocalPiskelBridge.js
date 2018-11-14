@@ -53,7 +53,7 @@ export const openPiskel = ({
   ipcRenderer.on(
     'piskel-changes-saved',
     (event, outputResources, newAnimationName, metadata) => {
-      const newMetadata = metadata.data
+      const externalEditorData = metadata.data
         ? {
             pskl: metadata,
           }
@@ -69,12 +69,13 @@ export const openPiskel = ({
       if (metadata.singleFrame) {
         resourcesManager
           .getResource(path.relative(projectPath, outputResources[0].path))
-          .setMetadata(JSON.stringify(newMetadata));
+          .setMetadata(JSON.stringify(externalEditorData));
 
         onChangesSaved(outputResources, newAnimationName);
       } else {
-        // if not, the metadata will still be passed onto SpritesList.js to be set in the Direction object
-        onChangesSaved(outputResources, newAnimationName, newMetadata);
+        // In case there are multiple frames, pass back the metadata to the editor and let it store it at an appropriate place.
+        // (For example, for sprites, SpritesList.js will save it in the metadata of the gd.Direction).
+        onChangesSaved(outputResources, newAnimationName, externalEditorData);
       }  
     }
   );

@@ -85,10 +85,10 @@ const saveToGD = pathEditor => {
     outputPaths.push(exportPath);
   }
   // if more than one layer is used - use metadata for storing the data
-  let metadata = {};
+  let externalEditorData = {};
   const piskelData = pskl.app.piskelController.getPiskel();
   if (piskelData.layers.length > 1) {
-    metadata = {
+    externalEditorData = {
       data: pskl.utils.serialization.Serializer.serialize(piskelData),
       paths: outputPaths,
       name: pathEditor.state.name,
@@ -110,7 +110,7 @@ const saveToGD = pathEditor => {
         'piskel-changes-saved',
         outputResources,
         pathEditor.state.name,
-        metadata
+        externalEditorData
       );
       remote.getCurrentWindow().close();
     }
@@ -209,25 +209,25 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   piskelController.setFPS(piskelOptions.fps);
 
   // if no resources are being loaded, create a new animation
-  if (piskelOptions.resources.length === 0 && !piskelOptions.metadata.pskl) {
+  if (piskelOptions.resources.length === 0 && !piskelOptions.externalEditorData.pskl) {
     piskelCreateAnimation(pskl, piskelOptions);
     return;
   }
 
   // If there is metadata, use it to load the frames with layers
   // Note that metadata will be saved only if the user has more than one layers
-  if (piskelOptions.metadata.pskl) {
-    const metadataPaths = piskelOptions.metadata.pskl.paths;
+  if (piskelOptions.externalEditorData.pskl) {
+    const editorDataPaths = piskelOptions.externalEditorData.pskl.paths;
 
     // Create a Piskel Document from the metadata that GD stores
     pskl.utils.serialization.Deserializer.deserialize(
-      JSON.parse(piskelOptions.metadata.pskl.data),
+      JSON.parse(piskelOptions.externalEditorData.pskl.data),
       piskel => {
         piskelController.setPiskel(piskel);
         // set piskel frame paths to their piskel data counterpart - on all layers
         for (let i = 0; i < piskelController.getFrameCount(); i++) {
           piskelController.getLayers().forEach(layer => {
-            layer.getFrameAt(i).originalPath = metadataPaths[i];
+            layer.getFrameAt(i).originalPath = editorDataPaths[i];
             layer.getFrameAt(i).originalIndex = i;
           });
         }
@@ -240,7 +240,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
           flattenedImagePaths.push(flattenedFramePath);
 
           // Import any frames that were added in Gdevelop
-          if (!metadataPaths.includes(flattenedFramePath)) {
+          if (!editorDataPaths.includes(flattenedFramePath)) {
             pskl.utils.BlobUtils.dataToBlob(
               readBase64ImageFile(flattenedFramePath),
               'image/png',
@@ -279,7 +279,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
 
         // Remove any frames that were removed in GD
         const layer = piskelController.getLayerAt(0);
-        metadataPaths.forEach((metaFramePath, index) => {
+        editorDataPaths.forEach((metaFramePath, index) => {
           if (!flattenedImagePaths.includes(metaFramePath)) {
             for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
               if (metaFramePath === layer.getFrameAt(fi).originalPath) {

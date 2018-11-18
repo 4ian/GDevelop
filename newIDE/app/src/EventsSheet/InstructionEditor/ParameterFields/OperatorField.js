@@ -23,7 +23,7 @@ export default class OperatorField extends Component {
       >
         <MenuItem value="=" primaryText="= (set to)" />
         <MenuItem value="+" primaryText="+ (add)" />
-        <MenuItem value="-" primaryText="- (substract)" />
+        <MenuItem value="-" primaryText="- (subtract)" />
         <MenuItem value="*" primaryText="* (multiply by)" />
         <MenuItem value="/" primaryText="/ (divide by)" />
       </SelectField>

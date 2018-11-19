@@ -1,6 +1,4 @@
-import {
-  createPathEditorHeader
-} from '../utils/path-editor.js';
+import { createPathEditorHeader } from '../utils/path-editor.js';
 const electron = require('electron');
 const ipcRenderer = electron.ipcRenderer;
 const fs = require('fs');
@@ -15,11 +13,15 @@ const updateFrameElements = () => {
       .contentDocument;
     if (piskelOptions.singleFrame) {
       editorContentDocument.getElementsByClassName(
-          'preview-list-wrapper'
-        )[0].style.display =
+        'preview-list-wrapper'
+      )[0].style.display =
         'none';
     }
   });
+};
+
+const closeWindow = () => {
+  remote.getCurrentWindow().close();
 };
 
 // Repeatedly try to gain access to piskel's control element and its methods
@@ -31,7 +33,7 @@ const tryToGetPiskel = () => {
     ipcRenderer.send('piskel-ready');
     clearInterval(retryToGetPiskel);
   }
-}
+};
 let retryToGetPiskel = setInterval(tryToGetPiskel, 100);
 
 const readBase64ImageFile = file => {
@@ -112,15 +114,12 @@ const saveToGD = pathEditor => {
         pathEditor.state.name,
         externalEditorData
       );
-      remote.getCurrentWindow().close();
+      closeWindow();
     }
   );
 };
 
-const cancelChanges = () => {
-  remote.getCurrentWindow().close();
-};
-
+// Create an empty piskel document to satisfy initiation when no data is given
 const piskelCreateAnimation = (pskl, piskelOptions) => {
   const sprite = {
     modelVersion: 2,
@@ -155,6 +154,156 @@ const piskelCreateAnimation = (pskl, piskelOptions) => {
     .focus();
 };
 
+// Load flattened images into Piskel
+const loadImagesIntoPiskel = (pskl, piskelOptions) => {
+  const piskelController = pskl.app.piskelController;
+  const imageData = [];
+  let maxWidth = -1;
+  let maxHeight = -1;
+  async.each(
+    piskelOptions.resources,
+    (resource, callback) => {
+      const image = new Image();
+      image.onload = () => {
+        imageData.push(image);
+        maxWidth = Math.max(image.width, maxWidth);
+        maxHeight = Math.max(image.height, maxHeight);
+        callback();
+      };
+
+      // onload will fire after `src` is set
+      try {
+        image.src = readBase64ImageFile(resource.resourcePath);
+      } catch (error) {
+        // Unable to load the image, ignore it.
+        console.error('Unable to load ', resource, error);
+        callback();
+      }
+    },
+    err => {
+      // Finally load the image objects into piskel
+      const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(
+        imageData,
+        piskelOptions.name,
+        maxWidth,
+        maxHeight,
+        false
+      );
+      piskelController.setPiskel(piskelFile, {});
+
+      // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
+      const layer = piskelController.getLayerAt(0);
+      for (let i = 0; i < piskelController.getFrameCount(); i++) {
+        layer.getFrameAt(i).originalPath =
+          piskelOptions.resources[i].resourcePath;
+        layer.getFrameAt(i).originalName =
+          piskelOptions.resources[i].resourceName;
+        layer.getFrameAt(i).originalIndex = i;
+      }
+    }
+  );
+};
+
+// Load Layered Piskel document that was stored in GD as metadata
+const loadPiskelDataFromGd = (pskl, piskelOptions) => {
+  const piskelController = pskl.app.piskelController;
+  piskelController.setFPS(piskelOptions.fps);
+
+  const editorDataPaths = piskelOptions.externalEditorData.pskl.paths;
+  let receivedPiskelData;
+  try {
+    receivedPiskelData = JSON.parse(piskelOptions.externalEditorData.pskl.data);
+  } catch (e) {
+    console.error(e);
+    console.error('Loading layers failed. Loading flattened images instead...');
+    loadImagesIntoPiskel(pskl, piskelOptions);
+    return;
+  }
+  // Create a Piskel Document from the metadata that GD stores
+  pskl.utils.serialization.Deserializer.deserialize(
+    receivedPiskelData,
+    piskel => {
+      piskelController.setPiskel(piskel);
+      // set piskel frame paths to their piskel data counterpart - on all layers
+      for (let i = 0; i < piskelController.getFrameCount(); i++) {
+        piskelController.getLayers().forEach(layer => {
+          layer.getFrameAt(i).originalPath = editorDataPaths[i];
+          layer.getFrameAt(i).originalIndex = i;
+        });
+      }
+
+      // Compare the imported frames - so as to make the layered Piskel Document
+      // the same as the changes done in Gdevelop without flattening any layers
+      let flattenedImagePaths = [];
+      piskelOptions.resources.forEach((resource, frameIndex) => {
+        const flattenedFramePath = path.normalize(resource.resourcePath);
+        flattenedImagePaths.push(flattenedFramePath);
+
+        // Import any frames that were added in Gdevelop
+        if (!editorDataPaths.includes(flattenedFramePath)) {
+          pskl.utils.BlobUtils.dataToBlob(
+            readBase64ImageFile(flattenedFramePath),
+            'image/png',
+            imageBlob => {
+              pskl.utils.FileUtils.readImageFile(imageBlob, image => {
+                piskelController.setCurrentFrameIndex(
+                  piskelController.getFrameCount() - 1
+                );
+
+                piskelController.addFrameAtCurrentIndex();
+                piskelController.selectNextFrame();
+                const currentFrameObj = piskelController.getCurrentFrame();
+                pskl.utils.FrameUtils.addImageToFrame(
+                  currentFrameObj,
+                  image,
+                  0,
+                  0
+                );
+                pskl.tools.transform.TransformUtils.center(currentFrameObj);
+
+                piskelController.getLayers().forEach(layer => {
+                  layer.moveFrame(
+                    piskelController.getCurrentFrameIndex(),
+                    frameIndex
+                  );
+                  layer.getFrameAt(frameIndex).originalIndex = frameIndex;
+                  layer.getFrameAt(
+                    frameIndex
+                  ).originalPath = flattenedFramePath;
+                });
+              });
+            }
+          );
+        }
+      });
+
+      // Remove any frames that were removed in GD
+      const layer = piskelController.getLayerAt(0);
+      editorDataPaths.forEach((metaFramePath, index) => {
+        if (!flattenedImagePaths.includes(metaFramePath)) {
+          for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
+            if (metaFramePath === layer.getFrameAt(fi).originalPath) {
+              piskelController.getLayers().forEach(layer => {
+                layer.removeFrameAt(fi);
+              });
+            }
+          }
+        }
+      });
+
+      // Put frames in the same order as they are in GD
+      piskelController.getLayers().forEach(layer => {
+        layer.getFrames().sort((a, b) => {
+          return (
+            flattenedImagePaths.indexOf(a.originalPath) -
+            flattenedImagePaths.indexOf(b.originalPath)
+          );
+        });
+      });
+    }
+  );
+};
+
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   /**
    * Inject custom buttons in Piskel's header,
@@ -181,176 +330,61 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   // Load a custom save file(s) header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');
   const headerStyle = {
-    saveFolderLabel: 'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
-    nameInput: 'font-family:"Courier New";height:27px;width:90px;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
-    saveButton: 'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    cancelButton: 'float:right;margin-left:2px;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    setFolderButton: 'float:right;margin-left:2px;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
-    fileExistsLabel: 'height:27px;color:aqua;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
+    saveFolderLabel:
+      'float: left;margin-left: 2px; font-size:15px;margin-top: 10px;color:aqua',
+    nameInput:
+      'font-family:"Courier New";height:27px;width:90px;float:left;margin-left: 2px;padding:4px;margin-top: 4px;font-size:15px;border: 2px solid #e5cd50;border-radius: 3px;background-color:black; color: #e5cd50;',
+    saveButton:
+      'float:right;margin-left:2px;margin-right:4px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    cancelButton:
+      'float:right;margin-left:2px;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    setFolderButton:
+      'float:right;margin-left:2px;margin-right:2px;border: 2px solid white;border-radius: 1px;margin-top: 5px;background-color:white;',
+    fileExistsLabel:
+      'height:27px;color:aqua;float: left;margin-left: 2px;margin-top: 10px; font-size:15px;',
   };
   const savePathEditor = createPathEditorHeader({
     parentElement: pathEditorHeaderDiv,
     editorContentDocument: document,
     onSaveToGd: saveToGD,
-    onCancelChanges: cancelChanges,
+    onCancelChanges: closeWindow,
     projectPath: receivedOptions.projectPath,
-    initialResourcePath: receivedOptions.resources[0] === undefined ?
-      '' : receivedOptions.resources[0].resourcePath,
+    initialResourcePath:
+      receivedOptions.resources[0] === undefined
+        ? ''
+        : receivedOptions.resources[0].resourcePath,
     headerStyle,
     name: receivedOptions.name,
     extension: piskelOptions.singleFrame ? '.png' : undefined,
   });
 
-  if (!pskl) { return }
-
+  if (!pskl) {
+    return;
+  }
   // Set piskel to tiled mode when editing a singleFrame object, set FPS from GD
-  pskl.UserSettings.set(pskl.UserSettings.SEAMLESS_MODE, piskelOptions.singleFrame);
-  const piskelController = pskl.app.piskelController;
-  piskelController.setFPS(piskelOptions.fps);
+  pskl.UserSettings.set(
+    pskl.UserSettings.SEAMLESS_MODE,
+    piskelOptions.singleFrame
+  );
 
   // if no resources are being loaded, create a new animation
-  if (piskelOptions.resources.length === 0 && !piskelOptions.externalEditorData.pskl) {
+  if (
+    piskelOptions.resources.length === 0 &&
+    !piskelOptions.externalEditorData.pskl
+  ) {
     piskelCreateAnimation(pskl, piskelOptions);
     return;
   }
 
-  // If there is metadata, use it to load the frames with layers
+  // If there is metadata from GD, use it to load the pskl document with frames with layers
   // Note that metadata will be saved only if the user has more than one layers
   if (piskelOptions.externalEditorData.pskl) {
-    const editorDataPaths = piskelOptions.externalEditorData.pskl.paths;
-
-    // Create a Piskel Document from the metadata that GD stores
-    pskl.utils.serialization.Deserializer.deserialize(
-      JSON.parse(piskelOptions.externalEditorData.pskl.data),
-      piskel => {
-        piskelController.setPiskel(piskel);
-        // set piskel frame paths to their piskel data counterpart - on all layers
-        for (let i = 0; i < piskelController.getFrameCount(); i++) {
-          piskelController.getLayers().forEach(layer => {
-            layer.getFrameAt(i).originalPath = editorDataPaths[i];
-            layer.getFrameAt(i).originalIndex = i;
-          });
-        }
-
-        // Compare the imported frames - so as to make the layered Piskel Document
-        // the same as the changes done in Gdevelop without flattening any layers
-        let flattenedImagePaths = [];
-        piskelOptions.resources.forEach((resource, frameIndex) => {
-          const flattenedFramePath = path.normalize(resource.resourcePath);
-          flattenedImagePaths.push(flattenedFramePath);
-
-          // Import any frames that were added in Gdevelop
-          if (!editorDataPaths.includes(flattenedFramePath)) {
-            pskl.utils.BlobUtils.dataToBlob(
-              readBase64ImageFile(flattenedFramePath),
-              'image/png',
-              imageBlob => {
-                pskl.utils.FileUtils.readImageFile(imageBlob, image => {
-                  piskelController.setCurrentFrameIndex(
-                    piskelController.getFrameCount() - 1
-                  );
-
-                  piskelController.addFrameAtCurrentIndex();
-                  piskelController.selectNextFrame();
-                  const currentFrameObj = piskelController.getCurrentFrame();
-                  pskl.utils.FrameUtils.addImageToFrame(
-                    currentFrameObj,
-                    image,
-                    0,
-                    0
-                  );
-                  pskl.tools.transform.TransformUtils.center(currentFrameObj);
-
-                  piskelController.getLayers().forEach(layer => {
-                    layer.moveFrame(
-                      piskelController.getCurrentFrameIndex(),
-                      frameIndex
-                    );
-                    layer.getFrameAt(frameIndex).originalIndex = frameIndex;
-                    layer.getFrameAt(
-                      frameIndex
-                    ).originalPath = flattenedFramePath;
-                  });
-                });
-              }
-            );
-          }
-        });
-
-        // Remove any frames that were removed in GD
-        const layer = piskelController.getLayerAt(0);
-        editorDataPaths.forEach((metaFramePath, index) => {
-          if (!flattenedImagePaths.includes(metaFramePath)) {
-            for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
-              if (metaFramePath === layer.getFrameAt(fi).originalPath) {
-                piskelController.getLayers().forEach(layer => {
-                  layer.removeFrameAt(fi);
-                });
-              }
-            }
-          }
-        });
-
-        // Put frames in the same order as they are in GD
-        piskelController.getLayers().forEach(layer => {
-          layer.getFrames().sort((a, b) => {
-            return (
-              flattenedImagePaths.indexOf(a.originalPath) -
-              flattenedImagePaths.indexOf(b.originalPath)
-            );
-          });
-        });
-      }
-    );
+    loadPiskelDataFromGd(pskl, piskelOptions);
   } else {
-    // Load flat images into piskel if there is no metadata - the old way
-    const imageData = [];
-    let maxWidth = -1;
-    let maxHeight = -1;
-    async.each(
-      piskelOptions.resources,
-      (resource, callback) => {
-        const image = new Image();
-        image.onload = () => {
-          imageData.push(image);
-          maxWidth = Math.max(image.width, maxWidth);
-          maxHeight = Math.max(image.height, maxHeight);
-          callback();
-        };
-
-        // onload will fire after `src` is set
-        try {
-          image.src = readBase64ImageFile(resource.resourcePath);
-        } catch (error) {
-          // Unable to load the image, ignore it.
-          console.error('Unable to load ', resource, error);
-          callback();
-        }
-      },
-      err => {
-        // Finally load the image objects into piskel
-        const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(
-          imageData,
-          piskelOptions.name,
-          maxWidth,
-          maxHeight,
-          false
-        );
-        piskelController.setPiskel(piskelFile, {});
-
-        // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
-        const layer = piskelController.getLayerAt(0);
-        for (let i = 0; i < piskelController.getFrameCount(); i++) {
-          layer.getFrameAt(i).originalPath =
-            piskelOptions.resources[i].resourcePath;
-          layer.getFrameAt(i).originalName =
-            piskelOptions.resources[i].resourceName;
-          layer.getFrameAt(i).originalIndex = i;
-        }
-        // Disable changing path and naming convention by user - on animations imported from gdevelop
-        savePathEditor.disableSavePathControls();
-      }
-    );
+    // If no metadata was found, load the images that were received from GD
+    loadImagesIntoPiskel(pskl, piskelOptions);
+    // Disable changing path and naming convention by user - on animations imported from gdevelop
+    savePathEditor.disableSavePathControls();
   }
   updateFrameElements();
 });

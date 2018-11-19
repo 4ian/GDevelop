@@ -120,7 +120,7 @@ const saveToGD = pathEditor => {
 };
 
 // Create an empty piskel document to satisfy initiation when no data is given
-const piskelCreateAnimation = (pskl, piskelOptions) => {
+const piskelCreateAnimation = () => {
   const sprite = {
     modelVersion: 2,
     piskel: {
@@ -155,7 +155,7 @@ const piskelCreateAnimation = (pskl, piskelOptions) => {
 };
 
 // Load flattened images into Piskel
-const loadImagesIntoPiskel = (pskl, piskelOptions) => {
+const loadImagesIntoPiskel = () => {
   const piskelController = pskl.app.piskelController;
   const imageData = [];
   let maxWidth = -1;
@@ -205,7 +205,7 @@ const loadImagesIntoPiskel = (pskl, piskelOptions) => {
 };
 
 // Load Layered Piskel document that was stored in GD as metadata
-const loadPiskelDataFromGd = (pskl, piskelOptions) => {
+const loadPiskelDataFromGd = () => {
   const piskelController = pskl.app.piskelController;
   piskelController.setFPS(piskelOptions.fps);
 
@@ -215,7 +215,7 @@ const loadPiskelDataFromGd = (pskl, piskelOptions) => {
     receivedPiskelData = JSON.parse(piskelOptions.externalEditorData.pskl.data);
   } catch (e) {
     console.error(e);
-    console.error('Parsing json failed. Loading flattened images instead...');
+    console.info('Parsing json failed. Loading flattened images instead...');
     loadImagesIntoPiskel(pskl, piskelOptions);
     return;
   }
@@ -304,7 +304,7 @@ const loadPiskelDataFromGd = (pskl, piskelOptions) => {
     // if piskel's serializer fails to serialize, piskel will revert back to loading the flattened images
     error => {
       console.error(error);
-      console.error('Loading piskel data failed. Loading flattened images instead...');
+      console.info('Loading piskel data failed. Loading flattened images instead...');
       loadImagesIntoPiskel(pskl, piskelOptions);
     }
   );
@@ -378,17 +378,17 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
     piskelOptions.resources.length === 0 &&
     !piskelOptions.externalEditorData.pskl
   ) {
-    piskelCreateAnimation(pskl, piskelOptions);
+    piskelCreateAnimation();
     return;
   }
 
   // If there is metadata from GD, use it to load the pskl document with frames with layers
   // Note that metadata will be saved only if the user has more than one layers
   if (piskelOptions.externalEditorData.pskl) {
-    loadPiskelDataFromGd(pskl, piskelOptions);
+    loadPiskelDataFromGd();
   } else {
     // If no metadata was found, load the images that were received from GD
-    loadImagesIntoPiskel(pskl, piskelOptions);
+    loadImagesIntoPiskel();
     // Disable changing path and naming convention by user - on animations imported from gdevelop
     savePathEditor.disableSavePathControls();
   }

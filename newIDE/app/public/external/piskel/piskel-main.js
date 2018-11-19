@@ -215,7 +215,7 @@ const loadPiskelDataFromGd = (pskl, piskelOptions) => {
     receivedPiskelData = JSON.parse(piskelOptions.externalEditorData.pskl.data);
   } catch (e) {
     console.error(e);
-    console.error('Loading layers failed. Loading flattened images instead...');
+    console.error('Parsing json failed. Loading flattened images instead...');
     loadImagesIntoPiskel(pskl, piskelOptions);
     return;
   }
@@ -300,6 +300,12 @@ const loadPiskelDataFromGd = (pskl, piskelOptions) => {
           );
         });
       });
+    },
+    // if piskel's serializer fails to serialize, piskel will revert back to loading the flattened images
+    error => {
+      console.error(error);
+      console.error('Loading piskel data failed. Loading flattened images instead...');
+      loadImagesIntoPiskel(pskl, piskelOptions);
     }
   );
 };

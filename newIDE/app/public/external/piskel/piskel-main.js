@@ -53,7 +53,7 @@ const saveToGD = pathEditor => {
   const editorFrameEl = document.querySelector('#piskel-frame')
   const pskl = editorFrameEl.contentWindow.pskl
   const layer = pskl.app.piskelController.getLayerAt(0)
-    // Generate the path of the files that will be written
+  // Generate the path of the files that will be written
   const outputResources = []
   const outputPaths = []
   for (let i = 0; i < pskl.app.piskelController.getFrameCount(); i++) {
@@ -61,8 +61,8 @@ const saveToGD = pathEditor => {
     let exportPath = frame.originalPath
     const originalIndex = frame.originalIndex
 
-        // If a frame was made in piskel (exportPath and resourceName will be null) come up with a unique path, so as not to overwrite any existing files
-        // Also prevent overwriting frames that were created via duplication of imported frames or frames with same resources
+    // If a frame was made in piskel (exportPath and resourceName will be null) come up with a unique path, so as not to overwrite any existing files
+    // Also prevent overwriting frames that were created via duplication of imported frames or frames with same resources
     if (!exportPath) {
       exportPath = pathEditor.state.folderPath + '/' + pathEditor.state.name + '-' + String(i + 1) + '.png'
       exportPath = pathEditor.makeFileNameUnique(exportPath, '.png')
@@ -76,7 +76,7 @@ const saveToGD = pathEditor => {
 
     outputPaths.push(exportPath)
   }
-    // if more than one layer is used - use metadata for storing the data
+  // if more than one layer is used - use metadata for storing the data
   let externalEditorData = {}
   const piskelData = pskl.app.piskelController.getPiskel()
   if (piskelData.layers.length > 1) {
@@ -88,7 +88,7 @@ const saveToGD = pathEditor => {
     }
   }
 
-    // Save, asynchronously, the content of each images
+  // Save, asynchronously, the content of each images
   async.eachOf(
         outputResources,
         (path, index, callback) => {
@@ -155,17 +155,17 @@ const loadImagesIntoPiskel = () => {
             callback()
           }
 
-            // onload will fire after `src` is set
+          // onload will fire after `src` is set
           try {
             image.src = readBase64ImageFile(resource.resourcePath)
           } catch (error) {
-                // Unable to load the image, ignore it.
+            // Unable to load the image, ignore it.
             console.error('Unable to load ', resource, error)
             callback()
           }
         },
         err => {
-            // Finally load the image objects into piskel
+          // Finally load the image objects into piskel
           const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(
                 imageData,
                 piskelOptions.name,
@@ -175,7 +175,7 @@ const loadImagesIntoPiskel = () => {
             )
           piskelController.setPiskel(piskelFile, {})
 
-            // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
+          // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
           const layer = piskelController.getLayerAt(0)
           for (let i = 0; i < piskelController.getFrameCount(); i++) {
             layer.getFrameAt(i).originalPath = piskelOptions.resources[i].resourcePath
@@ -201,12 +201,12 @@ const loadPiskelDataFromGd = () => {
     loadImagesIntoPiskel()
     return
   }
-    // Create a Piskel Document from the metadata that GD stores
+  // Create a Piskel Document from the metadata that GD stores
   pskl.utils.serialization.Deserializer.deserialize(
         receivedPiskelData,
         piskel => {
           piskelController.setPiskel(piskel)
-            // set piskel frame paths to their piskel data counterpart - on all layers
+          // set piskel frame paths to their piskel data counterpart - on all layers
           for (let i = 0; i < piskelController.getFrameCount(); i++) {
             piskelController.getLayers().forEach(layer => {
               layer.getFrameAt(i).originalPath = editorDataPaths[i]
@@ -214,14 +214,14 @@ const loadPiskelDataFromGd = () => {
             })
           }
 
-            // Compare the imported frames - so as to make the layered Piskel Document
-            // the same as the changes done in Gdevelop without flattening any layers
+          // Compare the imported frames - so as to make the layered Piskel Document
+          // the same as the changes done in Gdevelop without flattening any layers
           let flattenedImagePaths = []
           piskelOptions.resources.forEach((resource, frameIndex) => {
             const flattenedFramePath = path.normalize(resource.resourcePath)
             flattenedImagePaths.push(flattenedFramePath)
 
-                // Import any frames that were added in Gdevelop
+            // Import any frames that were added in Gdevelop
             if (!editorDataPaths.includes(flattenedFramePath)) {
               pskl.utils.BlobUtils.dataToBlob(readBase64ImageFile(flattenedFramePath), 'image/png', imageBlob => {
                 pskl.utils.FileUtils.readImageFile(imageBlob, image => {
@@ -243,7 +243,7 @@ const loadPiskelDataFromGd = () => {
             }
           })
 
-            // Remove any frames that were removed in GD
+          // Remove any frames that were removed in GD
           const layer = piskelController.getLayerAt(0)
           editorDataPaths.forEach((metaFramePath, index) => {
             if (!flattenedImagePaths.includes(metaFramePath)) {
@@ -257,7 +257,7 @@ const loadPiskelDataFromGd = () => {
             }
           })
 
-            // Put frames in the same order as they are in GD
+          // Put frames in the same order as they are in GD
           piskelController.getLayers().forEach(layer => {
             layer.getFrames().sort((a, b) => {
               return flattenedImagePaths.indexOf(a.originalPath) - flattenedImagePaths.indexOf(b.originalPath)
@@ -316,7 +316,7 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   if (!pskl) {
     return
   }
-    // Set piskel to tiled mode when editing a singleFrame object, set FPS from GD
+  // Set piskel to tiled mode when editing a singleFrame object, set FPS from GD
   pskl.UserSettings.set(pskl.UserSettings.SEAMLESS_MODE, piskelOptions.singleFrame)
 
   // If there is metadata from GD, use it to load the pskl document with frames with layers

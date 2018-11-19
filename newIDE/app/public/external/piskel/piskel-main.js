@@ -216,7 +216,7 @@ const loadPiskelDataFromGd = () => {
   } catch (e) {
     console.error(e);
     console.info('Parsing json failed. Loading flattened images instead...');
-    loadImagesIntoPiskel(pskl, piskelOptions);
+    loadImagesIntoPiskel();
     return;
   }
   // Create a Piskel Document from the metadata that GD stores
@@ -305,7 +305,7 @@ const loadPiskelDataFromGd = () => {
     error => {
       console.error(error);
       console.info('Loading piskel data failed. Loading flattened images instead...');
-      loadImagesIntoPiskel(pskl, piskelOptions);
+      loadImagesIntoPiskel();
     }
   );
 };

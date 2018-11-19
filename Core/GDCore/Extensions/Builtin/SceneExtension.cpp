@@ -89,7 +89,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSceneExtension(
       .AddAction("Scene",
                  _("Change the scene"),
                  _("Stop this scene and start the specified one instead."),
-                 _("Change for scene _PARAM1_"),
+                 _("Change to scene _PARAM1_"),
                  _("Scene"),
                  "res/actions/replaceScene24.png",
                  "res/actions/replaceScene.png")

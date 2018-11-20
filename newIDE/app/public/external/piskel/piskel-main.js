@@ -144,44 +144,44 @@ const loadImagesIntoPiskel = () => {
   let maxWidth = -1
   let maxHeight = -1
   async.each(
-      piskelOptions.resources,
-      (resource, callback) => {
-        const image = new Image()
-        image.onload = () => {
-          imageData.push(image)
-          maxWidth = Math.max(image.width, maxWidth)
-          maxHeight = Math.max(image.height, maxHeight)
-          callback()
-        }
-
-        // onload will fire after `src` is set
-        try {
-          image.src = readBase64ImageFile(resource.resourcePath)
-        } catch (error) {
-          // Unable to load the image, ignore it.
-          console.error('Unable to load ', resource, error)
-          callback()
-        }
-      },
-      err => {
-        // Finally load the image objects into piskel
-        const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(
-              imageData,
-              piskelOptions.name,
-              maxWidth,
-              maxHeight,
-              false
-        )
-        piskelController.setPiskel(piskelFile, {})
-
-        // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
-        const layer = piskelController.getLayerAt(0)
-        for (let i = 0; i < piskelController.getFrameCount(); i++) {
-          layer.getFrameAt(i).originalPath = piskelOptions.resources[i].resourcePath
-          layer.getFrameAt(i).originalName = piskelOptions.resources[i].resourceName
-          layer.getFrameAt(i).originalIndex = i
-        }
+    piskelOptions.resources,
+    (resource, callback) => {
+      const image = new Image()
+      image.onload = () => {
+        imageData.push(image)
+        maxWidth = Math.max(image.width, maxWidth)
+        maxHeight = Math.max(image.height, maxHeight)
+        callback()
       }
+
+      // onload will fire after `src` is set
+      try {
+        image.src = readBase64ImageFile(resource.resourcePath)
+      } catch (error) {
+        // Unable to load the image, ignore it.
+        console.error('Unable to load ', resource, error)
+        callback()
+      }
+    },
+    err => {
+      // Finally load the image objects into piskel
+      const piskelFile = pskl.service.ImportService.prototype.createPiskelFromImages_(
+        imageData,
+        piskelOptions.name,
+        maxWidth,
+        maxHeight,
+        false
+      )
+      piskelController.setPiskel(piskelFile, {})
+
+      // Add original path variable to imported frame objects, so we can overwrite them later when saving changes
+      const layer = piskelController.getLayerAt(0)
+      for (let i = 0; i < piskelController.getFrameCount(); i++) {
+        layer.getFrameAt(i).originalPath = piskelOptions.resources[i].resourcePath
+        layer.getFrameAt(i).originalName = piskelOptions.resources[i].resourceName
+        layer.getFrameAt(i).originalIndex = i
+      }
+    }
   )
 }
 
@@ -200,75 +200,79 @@ const loadPiskelDataFromGd = () => {
     loadImagesIntoPiskel()
     return
   }
+
   // Create a Piskel Document from the metadata that GD stores
   pskl.utils.serialization.Deserializer.deserialize(
-      receivedPiskelData,
-      piskel => {
-        piskelController.setPiskel(piskel)
-        // set piskel frame paths to their piskel data counterpart - on all layers
-        piskelController.getLayers().forEach(layer => {
-          layer.getFrames().forEach((frame, index) => {
-            frame.originalPath = editorDataPaths[index]
-            frame.originalIndex = index
-          })
+    receivedPiskelData,
+    piskel => {
+      piskelController.setPiskel(piskel)
+
+      // set piskel frame paths to their piskel data counterpart - on all layers
+      piskelController.getLayers().forEach(layer => {
+        layer.getFrames().forEach((frame, index) => {
+          frame.originalPath = editorDataPaths[index]
+          frame.originalIndex = index
         })
+      })
 
-        // Compare the imported frames - so as to make the layered Piskel Document
-        // the same as the changes done in Gdevelop without flattening any layers
-        let flattenedImagePaths = []
-        piskelOptions.resources.forEach((resource, frameIndex) => {
-          const flattenedFramePath = path.normalize(resource.resourcePath)
-          flattenedImagePaths.push(flattenedFramePath)
+      // Compare the imported frames - so as to make the layered Piskel Document
+      // the same as the changes done in Gdevelop without flattening any layers
+      let flattenedImagePaths = []
+      piskelOptions.resources.forEach((resource, frameIndex) => {
+        const flattenedFramePath = path.normalize(resource.resourcePath)
+        flattenedImagePaths.push(flattenedFramePath)
 
-          // Import any frames that were added in Gdevelop
-          if (!editorDataPaths.includes(flattenedFramePath)) {
-            pskl.utils.BlobUtils.dataToBlob(readBase64ImageFile(flattenedFramePath), 'image/png', imageBlob => {
-              pskl.utils.FileUtils.readImageFile(imageBlob, image => {
-                piskelController.setCurrentFrameIndex(piskelController.getFrameCount() - 1)
+        // Import any frames that were added in Gdevelop
+        if (!editorDataPaths.includes(flattenedFramePath)) {
+          pskl.utils.BlobUtils.dataToBlob(readBase64ImageFile(flattenedFramePath), 'image/png', imageBlob => {
+            pskl.utils.FileUtils.readImageFile(imageBlob, image => {
+              piskelController.setCurrentFrameIndex(piskelController.getFrameCount() - 1)
 
-                piskelController.addFrameAtCurrentIndex()
-                piskelController.selectNextFrame()
-                const currentFrameObj = piskelController.getCurrentFrame()
-                pskl.utils.FrameUtils.addImageToFrame(currentFrameObj, image, 0, 0)
-                pskl.tools.transform.TransformUtils.center(currentFrameObj)
+              piskelController.addFrameAtCurrentIndex()
+              piskelController.selectNextFrame()
+              const currentFrameObj = piskelController.getCurrentFrame()
+              pskl.utils.FrameUtils.addImageToFrame(currentFrameObj, image, 0, 0)
+              pskl.tools.transform.TransformUtils.center(currentFrameObj)
 
-                piskelController.getLayers().forEach(layer => {
-                  layer.moveFrame(piskelController.getCurrentFrameIndex(), frameIndex)
-                  layer.getFrameAt(frameIndex).originalIndex = frameIndex
-                  layer.getFrameAt(frameIndex).originalPath = flattenedFramePath
-                })
+              piskelController.getLayers().forEach(layer => {
+                layer.moveFrame(piskelController.getCurrentFrameIndex(), frameIndex)
+                layer.getFrameAt(frameIndex).originalIndex = frameIndex
+                layer.getFrameAt(frameIndex).originalPath = flattenedFramePath
               })
             })
-          }
-        })
-
-        // Remove any frames that were removed in GD
-        const layer = piskelController.getLayerAt(0)
-        editorDataPaths.forEach((metaFramePath, index) => {
-          if (!flattenedImagePaths.includes(metaFramePath)) {
-            for (let fi = 0; fi < piskelController.getFrameCount(); fi++) {
-              if (metaFramePath === layer.getFrameAt(fi).originalPath) {
-                piskelController.getLayers().forEach(layer => {
-                  layer.removeFrameAt(fi)
-                })
-              }
-            }
-          }
-        })
-
-          // Put frames in the same order as they are in GD
-        piskelController.getLayers().forEach(layer => {
-          layer.getFrames().sort((a, b) => {
-            return flattenedImagePaths.indexOf(a.originalPath) - flattenedImagePaths.indexOf(b.originalPath)
           })
+        }
+      });
+
+      // Remove any frames that were removed in GD
+      let framesToDelete = [];
+      piskelController.getLayers()[0].getFrames().forEach(frame => {
+        // frame was in meta, but is not in GDframes, if so remove it
+        if (editorDataPaths.includes(frame.originalPath) && !flattenedImagePaths.includes(frame.originalPath)) {
+          framesToDelete.push(frame)
+        }
+      })
+      framesToDelete.forEach(frameToDelete => {
+        piskelController.getLayers().forEach(layer => {
+          if(layer.getFrames().indexOf(frameToDelete) > 0) {
+            layer.getFrames().splice(layer.getFrames().indexOf(frameToDelete),1)
+          }  
         })
-      },
-      // if piskel's serializer fails to serialize, piskel will revert back to loading the flattened images
-      error => {
-        console.error(error)
-        console.info('Loading piskel data failed. Loading flattened images instead...')
-        loadImagesIntoPiskel()
-      }
+      });
+
+      // Put frames in the same order as they were in GD
+      piskelController.getLayers().forEach(layer => {
+        layer.getFrames().sort((a, b) => {
+          return flattenedImagePaths.indexOf(a.originalPath) - flattenedImagePaths.indexOf(b.originalPath)
+        })
+      });
+    },
+    // if piskel's serializer fails to serialize, piskel will revert back to loading the flattened images
+    error => {
+      console.error(error)
+      console.info('Loading piskel data failed. Loading flattened images instead...')
+      loadImagesIntoPiskel()
+    }
   )
 }
 
@@ -305,8 +309,8 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
     onCancelChanges: closeWindow,
     projectPath: receivedOptions.projectPath,
     initialResourcePath: receivedOptions.resources[0] === undefined
-            ? ''
-            : receivedOptions.resources[0].resourcePath,
+      ? ''
+      : receivedOptions.resources[0].resourcePath,
     headerStyle,
     name: receivedOptions.name,
     extension: piskelOptions.singleFrame ? '.png' : undefined
@@ -321,11 +325,10 @@ ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   // if there were no resources sent by GD, create an empty piskel
   if (receivedOptions.resources.length === 0) {
     piskelCreateAnimation();
-    return
-  };
+  }
   // If there is metadata from GD, use it to load the pskl document with frames with layers
   // Note that metadata will be saved only if the user has more than one layers
-  if (piskelOptions.externalEditorData.pskl) {
+  else if (piskelOptions.externalEditorData.pskl) {
     loadPiskelDataFromGd()
   } else {
     // If there are resources, load the images that were received from GD

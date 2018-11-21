@@ -41,6 +41,10 @@ gdjs.ShapePainterRuntimeObject.prototype.stepBehaviorsPreEvents = function(runti
     gdjs.RuntimeObject.prototype.stepBehaviorsPreEvents.call(this, runtimeScene);
 };
 
+gdjs.ShapePainterRuntimeObject.prototype.getVisibilityAABB = function() {
+    return this._absoluteCoordinates ? null : this.getAABB();
+};
+
 gdjs.ShapePainterRuntimeObject.prototype.drawRectangle = function(x1, y1, x2, y2) {
     this._renderer.drawRectangle(x1, y1, x2, y2);
 };

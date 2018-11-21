@@ -315,9 +315,10 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
 			if (object.isHidden()) {
 				rendererObject.visible = false;
 			} else {
-				var aabb = object.getAABB();
-				if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
-					aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
+				var aabb = object.getVisibilityAABB();
+				if (aabb && // If no AABB is returned, the object should always be visible
+					(aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
+					aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1])) {
         			rendererObject.visible = false;
 				} else {
                     rendererObject.visible = true;

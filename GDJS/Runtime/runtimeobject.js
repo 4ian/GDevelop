@@ -780,6 +780,12 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
 };
 
 /**
+ * @typedef {Object} AABB
+ * @property {Array} min The [x,y] coordinates of the top left point
+ * @property {Array} max The [x,y] coordinates of the bottom right point
+ */
+
+/**
  * Get the AABB (axis aligned bounding box) for the object.
  * 
  * The default implementation uses either the position/size of the object (when angle is 0) or
@@ -788,7 +794,7 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
  * 
  * You should probably redefine updateAABB instead of this function.
  *
- * @return The bounding box (example: {min: [10,5], max:[20,10]})
+ * @return {AABB} The bounding box (example: `{min: [10,5], max:[20,10]}`)
  */
 gdjs.RuntimeObject.prototype.getAABB = function() {
     if ( this.hitBoxesDirty ) {
@@ -798,6 +804,21 @@ gdjs.RuntimeObject.prototype.getAABB = function() {
     }
 
     return this.aabb;
+};
+
+/**
+ * Get the AABB (axis aligned bounding box) to be used to determine if the object
+ * is visible on screen. The gdjs.RuntimeScene will hide the renderer object if
+ * the object is not visible on screen ("culling").
+ * 
+ * The default implementation uses the AABB returned by getAABB.
+ * 
+ * If `null` is returned, the object is assumed to be always visible.
+ *
+ * @return {?AABB} The bounding box (example: `{min: [10,5], max:[20,10]}`) or `null`.
+ */
+gdjs.RuntimeObject.prototype.getVisibilityAABB = function() {
+    return this.getAABB();
 };
 
 /**

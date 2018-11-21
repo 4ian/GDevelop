@@ -223,48 +223,61 @@ bool ExporterHelper::ExportCordovaConfigFile(const gd::Project &project,
     return file.empty() ? "" : "www/" + file;
   };
 
+  auto makeIconsAndroid = [&getIconFilename]() {
+    std::vector<std::pair<gd::String, gd::String>> sizes = {{"36", "ldpi"},
+                                                            {"48", "mdpi"},
+                                                            {"72", "hdpi"},
+                                                            {"96", "xhdpi"},
+                                                            {"144", "xxhdpi"},
+                                                            {"192", "xxxhdpi"}};
+
+    gd::String output;
+    for (auto &size : sizes) {
+      gd::String filename = getIconFilename("android", "icon-" + size.first);
+      output += !filename.empty() ? ("<icon src=\"" + filename +
+                                     "\" density=\"" + size.second + "\" />\n")
+                                  : "";
+    }
+
+    return output;
+  };
+
+  auto makeIconsIos = [&getIconFilename]() {
+    std::vector<gd::String> sizes = {"180",
+                                     "60",
+                                     "120",
+                                     "76",
+                                     "152",
+                                     "40",
+                                     "80",
+                                     "57",
+                                     "114",
+                                     "72",
+                                     "144",
+                                     "167",
+                                     "29",
+                                     "58",
+                                     "50",
+                                     "100"};
+
+    gd::String output;
+    for (auto &size : sizes) {
+      gd::String filename = getIconFilename("ios", "icon-" + size);
+      output += !filename.empty() ? ("<icon src=\"" + filename + "\" width=\"" +
+                                     size + "\" height=\"" + size + "\" />\n")
+                                  : "";
+    }
+
+    return output;
+  };
+
   gd::String str =
       fs.ReadFile(gdjsRoot + "/Runtime/Cordova/config.xml")
           .FindAndReplace("GDJS_PROJECTNAME", project.GetName())
           .FindAndReplace("GDJS_PACKAGENAME", project.GetPackageName())
           .FindAndReplace("GDJS_ORIENTATION", project.GetOrientation())
-          // Android icons
-          .FindAndReplace("GDJS_ICON_ANDROID_36",
-                          getIconFilename("android", "icon-36"))
-          .FindAndReplace("GDJS_ICON_ANDROID_48",
-                          getIconFilename("android", "icon-48"))
-          .FindAndReplace("GDJS_ICON_ANDROID_72",
-                          getIconFilename("android", "icon-72"))
-          .FindAndReplace("GDJS_ICON_ANDROID_96",
-                          getIconFilename("android", "icon-96"))
-          .FindAndReplace("GDJS_ICON_ANDROID_144",
-                          getIconFilename("android", "icon-144"))
-          .FindAndReplace("GDJS_ICON_ANDROID_192",
-                          getIconFilename("android", "icon-192"))
-          // iOS icons
-          .FindAndReplace("GDJS_ICON_IOS_180",
-                          getIconFilename("ios", "icon-180"))
-          .FindAndReplace("GDJS_ICON_IOS_60", getIconFilename("ios", "icon-60"))
-          .FindAndReplace("GDJS_ICON_IOS_120",
-                          getIconFilename("ios", "icon-120"))
-          .FindAndReplace("GDJS_ICON_IOS_76", getIconFilename("ios", "icon-76"))
-          .FindAndReplace("GDJS_ICON_IOS_152",
-                          getIconFilename("ios", "icon-152"))
-          .FindAndReplace("GDJS_ICON_IOS_40", getIconFilename("ios", "icon-40"))
-          .FindAndReplace("GDJS_ICON_IOS_80", getIconFilename("ios", "icon-80"))
-          .FindAndReplace("GDJS_ICON_IOS_57", getIconFilename("ios", "icon-57"))
-          .FindAndReplace("GDJS_ICON_IOS_114",
-                          getIconFilename("ios", "icon-114"))
-          .FindAndReplace("GDJS_ICON_IOS_72", getIconFilename("ios", "icon-72"))
-          .FindAndReplace("GDJS_ICON_IOS_144",
-                          getIconFilename("ios", "icon-144"))
-          .FindAndReplace("GDJS_ICON_IOS_167",
-                          getIconFilename("ios", "icon-167"))
-          .FindAndReplace("GDJS_ICON_IOS_29", getIconFilename("ios", "icon-29"))
-          .FindAndReplace("GDJS_ICON_IOS_58", getIconFilename("ios", "icon-58"))
-          .FindAndReplace("GDJS_ICON_IOS_50", getIconFilename("ios", "icon-50"))
-          .FindAndReplace("GDJS_ICON_IOS_100",
-                          getIconFilename("ios", "icon-100"));
+          .FindAndReplace("<!-- GDJS_ICONS_ANDROID -->", makeIconsAndroid())
+          .FindAndReplace("<!-- GDJS_ICONS_IOS -->", makeIconsIos());
 
   if (!project.GetAdMobAppId().empty()) {
     str = str.FindAndReplace(
@@ -520,8 +533,11 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
                  "pixi-renderers/loadingscreen-pixi-renderer.js");
     InsertUnique(includesFiles, "howler-sound-manager/howler.min.js");
     InsertUnique(includesFiles, "howler-sound-manager/howler-sound-manager.js");
-    InsertUnique(includesFiles, "fontfaceobserver-font-manager/fontfaceobserver.js");
-    InsertUnique(includesFiles, "fontfaceobserver-font-manager/fontfaceobserver-font-manager.js");
+    InsertUnique(includesFiles,
+                 "fontfaceobserver-font-manager/fontfaceobserver.js");
+    InsertUnique(
+        includesFiles,
+        "fontfaceobserver-font-manager/fontfaceobserver-font-manager.js");
   }
 
   if (cocosRenderers) {
@@ -538,8 +554,11 @@ void ExporterHelper::AddLibsInclude(bool pixiRenderers,
     InsertUnique(includesFiles,
                  "cocos-renderers/spriteruntimeobject-cocos-renderer.js");
     InsertUnique(includesFiles, "cocos-sound-manager/cocos-sound-manager.js");
-    InsertUnique(includesFiles, "fontfaceobserver-font-manager/fontfaceobserver.js");
-    InsertUnique(includesFiles, "fontfaceobserver-font-manager/fontfaceobserver-font-manager.js");
+    InsertUnique(includesFiles,
+                 "fontfaceobserver-font-manager/fontfaceobserver.js");
+    InsertUnique(
+        includesFiles,
+        "fontfaceobserver-font-manager/fontfaceobserver-font-manager.js");
   }
 }
 

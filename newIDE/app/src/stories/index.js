@@ -38,6 +38,7 @@ import ObjectVariableField from '../EventsSheet/InstructionEditor/ParameterField
 import KeyField from '../EventsSheet/InstructionEditor/ParameterFields/KeyField';
 import ExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ExpressionField';
 import StringField from '../EventsSheet/InstructionEditor/ParameterFields/StringField';
+import ColorExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ColorExpressionField';
 import ObjectsList from '../ObjectsList';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
@@ -485,6 +486,33 @@ storiesOf('ParameterFields', module)
           onChange={onChange}
           globalObjectsContainer={project}
           objectsContainer={testLayout}
+        />
+      )}
+    />
+  ))
+  .add('ParameterColorField', () => (
+    <ValueStateHolder
+      initialValue={'"123;342;345"'}
+      render={(value, onChange) => (
+        <ColorExpressionField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
+      )}
+    />
+  ))
+  .add('ParameterColorField (inline)', () => (
+    <ValueStateHolder
+      initialValue={'"123;342;345"'}
+      render={(value, onChange) => (
+        <ColorExpressionField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          isInline
         />
       )}
     />

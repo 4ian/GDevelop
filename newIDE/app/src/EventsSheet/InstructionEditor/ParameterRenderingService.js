@@ -15,6 +15,7 @@ import GlobalVariableField from './ParameterFields/GlobalVariableField';
 import ObjectVariableField from './ParameterFields/ObjectVariableField';
 import LayerField from './ParameterFields/LayerField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
+import ColorExpressionField from './ParameterFields/ColorExpressionField';
 const gd = global.gd;
 
 const components = {
@@ -36,7 +37,7 @@ const components = {
   file: DefaultField, //TODO
   musicfile: AudioResourceField,
   soundfile: AudioResourceField,
-  color: DefaultField, //TODO
+  color: ColorExpressionField,
   police: DefaultField, //TODO
   joyaxis: DefaultField, //TODO
 };

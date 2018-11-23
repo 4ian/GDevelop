@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import * as React from 'react';
 import ReactDOM from 'react-dom';
 import Popover, { PopoverAnimationVertical } from 'material-ui/Popover';
 import Functions from 'material-ui/svg-icons/editor/functions';
@@ -49,10 +49,13 @@ type State = {|
 
 type Props = {|
   expressionType: 'number' | 'string',
+  renderExtraButton?: ({|
+    style: Object,
+  |}) => React.Node,
   ...ParameterFieldProps,
 |};
 
-export default class ExpressionField extends Component<Props, State> {
+export default class ExpressionField extends React.Component<Props, State> {
   _field: ?any = null;
   _fieldElement: ?any = null;
   _inputElement = null;
@@ -146,7 +149,12 @@ export default class ExpressionField extends Component<Props, State> {
   };
 
   _getError = (value?: string) => {
-    const { project, globalObjectsContainer, objectsContainer, expressionType } = this.props;
+    const {
+      project,
+      globalObjectsContainer,
+      objectsContainer,
+      expressionType,
+    } = this.props;
     if (!project) return null;
 
     const callbacks = new gd.CallbacksForExpressionCorrectnessTesting(
@@ -238,6 +246,13 @@ export default class ExpressionField extends Component<Props, State> {
             </Popover>
           )}
         </div>
+        {!this.props.isInline &&
+          this.props.renderExtraButton &&
+          this.props.renderExtraButton({
+            style: description
+              ? styles.functionsButtonWithDescription
+              : styles.functionsButton,
+          })}
         {!this.props.isInline && (
           <RaisedButton
             icon={<Functions />}

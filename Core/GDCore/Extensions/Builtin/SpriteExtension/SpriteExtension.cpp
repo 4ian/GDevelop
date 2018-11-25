@@ -31,7 +31,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 #if defined(GD_IDE_ONLY)
   obj.AddAction("Opacity",
                 _("Change object's opacity"),
-                _("Change the opacity of an object."),
+                _("Change the opacity of an object. 0 is fully transparent, 255 is opaque (default)."),
                 _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
                 _("Visibility"),
                 "res/actions/opacity24.png",
@@ -39,7 +39,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .AddParameter("expression", _("Value (between 0 and 255)"))
       .MarkAsSimple()
       .SetManipulatedType("number");
 

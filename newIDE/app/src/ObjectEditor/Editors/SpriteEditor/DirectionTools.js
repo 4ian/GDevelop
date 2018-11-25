@@ -72,7 +72,7 @@ export default class DirectionTools extends Component<Props, State> {
   saveTimeBetweenFrames = () => {
     const { direction } = this.props;
 
-    const newTime = parseFloat(this.state.timeBetweenFrames);
+    const newTime = Math.max(parseFloat(this.state.timeBetweenFrames), 0.00001);
     const newTimeIsValid = !isNaN(newTime);
 
     if (newTimeIsValid) direction.setTimeBetweenFrames(newTime);

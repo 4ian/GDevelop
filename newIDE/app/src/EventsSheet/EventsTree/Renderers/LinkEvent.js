@@ -9,7 +9,7 @@ import {
   selectableArea,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
-import ExternalEventsField from '../../InstructionEditor/ParameterFields/ExternalEventsField';
+import ExternalEventsField from '../../ParameterFields/ExternalEventsField';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;

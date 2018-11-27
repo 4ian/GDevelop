@@ -16,6 +16,7 @@ import ObjectVariableField from './ParameterFields/ObjectVariableField';
 import LayerField from './ParameterFields/LayerField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
 import ColorExpressionField from './ParameterFields/ColorExpressionField';
+import ForceMultiplierField, {renderForceMultiplierString} from './ParameterFields/ForceMultiplierField';
 const gd = global.gd;
 
 const components = {
@@ -40,7 +41,12 @@ const components = {
   color: ColorExpressionField,
   police: DefaultField, //TODO
   joyaxis: DefaultField, //TODO
+  forceMultiplier: ForceMultiplierField,
 };
+
+const stringRenderers = {
+  forceMultiplier: renderForceMultiplierString
+}
 
 export default {
   components,
@@ -50,5 +56,8 @@ export default {
     if (components.hasOwnProperty(fieldType))
       return components[fieldType];
     else return components.default;
+  },
+  renderParameterString: (type: string, value: string) =>  {
+    return stringRenderers[type] ? stringRenderers[type](value) : value;
   },
 };

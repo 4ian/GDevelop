@@ -180,7 +180,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
                 _("Add a force"),
                 _("Add a force to an object. The object will move according to "
                   "all of the forces it has."),
-                _("Add to _PARAM0_ a force of _PARAM1_ p/s on X axis and "
+                _("Add to _PARAM0_ _PARAM3_ force of _PARAM1_ p/s on X axis and "
                   "_PARAM2_ p/s on Y axis"),
                 _("Movement"),
                 "res/actions/force24.png",
@@ -189,14 +189,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Speed on X axis (in pixels per second)"))
       .AddParameter("expression", _("Speed on Y axis (in pixels per second)"))
-      .AddParameter("expression", _("Damping (Default: 0)"));
+      .AddParameter("forceMultiplier", _("Force multiplier"));
 
   obj.AddAction("AddForceAL",
                 _("Add a force (angle)"),
                 _("Add a force to an object. The object will move according to "
                   "all of the forces it has. This action creates the force "
                   "using the specified angle and length."),
-                _("Add to _PARAM0_ a force, angle: _PARAM1_ degrees and "
+                _("Add to _PARAM0_ _PARAM3_ force, angle: _PARAM1_ degrees and "
                   "length: _PARAM2_ pixels"),
                 _("Movement"),
                 "res/actions/force24.png",
@@ -205,14 +205,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Angle"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
-      .AddParameter("expression", _("Damping (Default: 0)"))
+      .AddParameter("forceMultiplier", _("Force multiplier"))
       .MarkAsAdvanced();
 
   obj.AddAction(
          "AddForceVersPos",
          _("Add a force to move toward a position"),
          _("Add a force to an object to make it move toward a position."),
-         _("Move _PARAM0_ to _PARAM1_;_PARAM2_ with a force of _PARAM3_ "
+         _("Move _PARAM0_ to _PARAM1_;_PARAM2_ with _PARAM4_ force of _PARAM3_ "
            "pixels"),
          _("Movement"),
          "res/actions/force24.png",
@@ -222,7 +222,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("X position"))
       .AddParameter("expression", _("Y position"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
-      .AddParameter("expression", _("Damping (Default: 0)"))
+      .AddParameter("forceMultiplier", _("Force multiplier"))
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -243,13 +243,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Y position of the center"))
       .AddParameter("expression", _("Speed (in Degrees per seconds)"))
       .AddParameter("expression", _("Distance (in pixels)"))
-      .AddParameter("expression", _("Damping (Default: 0)"))
+      .AddParameter("forceMultiplier", _("Force multiplier"))
       .SetHidden();
 
   obj.AddAction("Arreter",
                 _("Stop the object"),
                 _("Stop the object by deleting all of its forces."),
-                _("Stop the object _PARAM0_"),
+                _("Stop object _PARAM0_"),
                 _("Movement"),
                 "res/actions/arreter24.png",
                 "res/actions/arreter.png")
@@ -272,7 +272,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("ChangePlan",
                 _("Z order"),
                 _("Modify the Z-order of an object"),
-                _("Do _PARAM1__PARAM2_ to z-Order of _PARAM0_"),
+                _("Do _PARAM1__PARAM2_ to Z-order of _PARAM0_"),
                 _("Z order"),
                 "res/actions/planicon24.png",
                 "res/actions/planicon.png")
@@ -554,7 +554,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   obj.AddAction("AddForceVers",
                 _("Add a force to move toward an object"),
                 _("Add a force to an object to make it move toward another."),
-                _("Move _PARAM0_ to _PARAM1_ with a force of _PARAM2_ pixels"),
+                _("Move _PARAM0_ to _PARAM1_ with _PARAM3_ force of _PARAM2_ pixels"),
                 _("Movement"),
                 "res/actions/forceVers24.png",
                 "res/actions/forceVers.png")
@@ -562,7 +562,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Target Object"))
       .AddParameter("expression", _("Speed (in pixels per second)"))
-      .AddParameter("expression", _("Damping (Default: 0)"))
+      .AddParameter("forceMultiplier", _("Force multiplier"))
       .MarkAsAdvanced();
 
   obj.AddAction(
@@ -582,7 +582,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectPtr", _("Rotate around this object"))
       .AddParameter("expression", _("Speed (in degrees per second)"))
       .AddParameter("expression", _("Distance (in pixels)"))
-      .AddParameter("expression", _("Damping (Default: 0)"))
+      .AddParameter("forceMultiplier", _("Force multiplier"))
       .MarkAsAdvanced();
 
   obj.AddAction("MettreAutour",

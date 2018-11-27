@@ -10,7 +10,7 @@ import {
   disabledText,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
-import DefaultField from '../../InstructionEditor/ParameterFields/DefaultField';
+import DefaultField from '../../ParameterFields/DefaultField';
 import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;
 

@@ -3,7 +3,7 @@ import { formatExpressionCall } from './FormatExpressionCall';
 import {
   enumerateExpressions,
   filterExpressions,
-} from '../../InstructionOrExpressionSelector/EnumerateExpressions';
+} from '../../InstructionEditor/InstructionOrExpressionSelector/EnumerateExpressions';
 
 describe('HelpButton', () => {
   const {

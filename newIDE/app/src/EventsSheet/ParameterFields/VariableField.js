@@ -4,7 +4,7 @@ import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
-import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
+import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
 
 const styles = {
   container: {

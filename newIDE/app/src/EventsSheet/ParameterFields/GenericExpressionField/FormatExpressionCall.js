@@ -1,5 +1,5 @@
 //@flow
-import { type InstructionOrExpressionInformation } from '../../InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
+import { type InstructionOrExpressionInformation } from '../../InstructionEditor/InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
 import { type ParameterValues } from './ExpressionParametersEditorDialog';
 
 const filterOutCodeOnlyParameters = (

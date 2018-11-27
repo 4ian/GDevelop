@@ -54,17 +54,19 @@ class GD_CORE_API ParameterMetadata {
 
   /**
    * \brief Return the name of the parameter.
-   * 
+   *
    * Name is optional, and won't be filled for most parameters of extensions.
-   * It is useful when generating a function from events, where parameters must be named.
+   * It is useful when generating a function from events, where parameters must
+   * be named.
    */
   const gd::String &GetName() const { return name; }
 
   /**
    * \brief Set the name of the parameter.
-   * 
+   *
    * Name is optional, and won't be filled for most parameters of extensions.
-   * It is useful when generating a function from events, where parameters must be named.
+   * It is useful when generating a function from events, where parameters must
+   * be named.
    */
   ParameterMetadata &SetName(const gd::String &name_) {
     name = name_;
@@ -159,7 +161,8 @@ class GD_CORE_API ParameterMetadata {
   static bool IsExpression(const gd::String &type,
                            const gd::String &parameterType) {
     if (type == "number") {
-      return parameterType == "expression" || parameterType == "camera";
+      return parameterType == "expression" || parameterType == "camera" ||
+             parameterType == "forceMultiplier";
     } else if (type == "string") {
       return parameterType == "string" || parameterType == "layer" ||
              parameterType == "color" || parameterType == "file" ||
@@ -174,12 +177,12 @@ class GD_CORE_API ParameterMetadata {
   /**
    * \brief Serialize the ParameterMetadata to the specified element
    */
-  void SerializeTo(gd::SerializerElement& element) const;
+  void SerializeTo(gd::SerializerElement &element) const;
 
   /**
    * \brief Load the ParameterMetadata from the specified element
    */
-  void UnserializeFrom(const gd::SerializerElement& element);
+  void UnserializeFrom(const gd::SerializerElement &element);
   ///@}
 
   // TODO: Deprecated public fields. Any direct using should be moved to
@@ -193,8 +196,9 @@ class GD_CORE_API ParameterMetadata {
                   ///< i.e. must not be shown in editor
   gd::String defaultValue;  ///< Used as a default value in editor or if an
                             ///< optional parameter is empty.
-private:
-  gd::String name; ///< The name of the parameter to be used in code generation. Optional.
+ private:
+  gd::String name;  ///< The name of the parameter to be used in code
+                    ///< generation. Optional.
 };
 
 /**
@@ -219,9 +223,7 @@ class GD_CORE_API InstructionMetadata {
   const gd::String &GetDescription() const { return description; }
   const gd::String &GetSentence() const { return sentence; }
   const gd::String &GetGroup() const { return group; }
-  ParameterMetadata &GetParameter(size_t i) {
-    return parameters[i];
-  }
+  ParameterMetadata &GetParameter(size_t i) { return parameters[i]; }
   const ParameterMetadata &GetParameter(size_t i) const {
     return parameters[i];
   }

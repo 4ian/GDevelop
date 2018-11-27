@@ -3,7 +3,7 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
 import InlinePopover from '../../InlinePopover';
-import ObjectField from '../../InstructionEditor/ParameterFields/ObjectField';
+import ObjectField from '../../ParameterFields/ObjectField';
 import {
   largeSelectedArea,
   largeSelectableArea,

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import VariableField from './VariableField';
-import VariablesEditorDialog from '../../../VariablesList/VariablesEditorDialog';
+import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
 type State = {|

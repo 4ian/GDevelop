@@ -4,13 +4,13 @@ import ReactDOM from 'react-dom';
 import Popover, { PopoverAnimationVertical } from 'material-ui/Popover';
 import Functions from 'material-ui/svg-icons/editor/functions';
 import RaisedButton from 'material-ui/RaisedButton';
-import SemiControlledTextField from '../../../../UI/SemiControlledTextField';
-import ExpressionSelector from '../../InstructionOrExpressionSelector/ExpressionSelector';
+import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import ExpressionSelector from '../../InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import ExpressionParametersEditorDialog, {
   type ParameterValues,
 } from './ExpressionParametersEditorDialog';
 import { formatExpressionCall } from './FormatExpressionCall';
-import { type InstructionOrExpressionInformation } from '../../InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
+import { type InstructionOrExpressionInformation } from '../../InstructionEditor/InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
 import { type ParameterFieldProps } from '../ParameterFieldProps.flow';
 const gd = global.gd;
 

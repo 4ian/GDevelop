@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
-import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
+import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 const gd = global.gd;
 

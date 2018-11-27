@@ -1,28 +1,20 @@
 // @flow
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
-import Divider from 'material-ui/Divider';
-import {
-  enumerateLayouts,
-  enumerateExternalEvents,
-} from '../../../ProjectManager/EnumerateProjectItems';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
-import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
+import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
 
 type State = {|
   focused: boolean,
   text: ?string,
 |};
 
-export default class ExternalEventsField extends Component<
-  ParameterFieldProps,
-  State
-> {
+export default class KeyField extends Component<ParameterFieldProps, State> {
   state = { focused: false, text: null };
 
-  _description: ?string = undefined;
-  _fullList: Array<{ text: string, value: string }> = [];
+  _description: ?string;
   _field: ?any;
+  _keyNames: Array<string> = [];
 
   constructor(props: ParameterFieldProps) {
     super(props);
@@ -32,40 +24,99 @@ export default class ExternalEventsField extends Component<
       ? parameterMetadata.getDescription()
       : undefined;
 
-    this._loadNamesFrom(props);
+    this._keyNames = [
+      'Num0',
+      'Num1',
+      'Num2',
+      'Num3',
+      'Num4',
+      'Num5',
+      'Num6',
+      'Num7',
+      'Num8',
+      'Num9',
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+      'f',
+      'g',
+      'h',
+      'i',
+      'j',
+      'k',
+      'l',
+      'm',
+      'n',
+      'o',
+      'p',
+      'q',
+      'r',
+      's',
+      't',
+      'u',
+      'v',
+      'w',
+      'x',
+      'y',
+      'z',
+      'LBracket',
+      'RBracket',
+      'SemiColon',
+      'Numpad0',
+      'Numpad1',
+      'Numpad2',
+      'Numpad3',
+      'Numpad4',
+      'Numpad5',
+      'Numpad6',
+      'Numpad7',
+      'Numpad8',
+      'Numpad9',
+      'Escape',
+      'Space',
+      'Return',
+      'Back',
+      'Tab',
+      'PageUp',
+      'PageDown',
+      'End',
+      'Home',
+      'Insert',
+      'Delete',
+      'Add',
+      'Subtract',
+      'Multiply',
+      'Divide',
+      'Left',
+      'Right',
+      'Up',
+      'Down',
+      'F1',
+      'F2',
+      'F3',
+      'F4',
+      'F5',
+      'F6',
+      'F7',
+      'F8',
+      'F9',
+      'F10',
+      'F11',
+      'F12',
+      'Pause',
+      'RControl',
+      'LControl',
+      'RAlt',
+      'LAlt',
+      'RShift',
+      'LShift',
+    ];
   }
 
   focus() {
     if (this._field) this._field.focus();
-  }
-
-  componentWillReceiveProps(newProps: ParameterFieldProps) {
-    if (newProps.project !== this.props.project) {
-      this._loadNamesFrom(newProps);
-    }
-  }
-
-  _loadNamesFrom(props: ParameterFieldProps) {
-    const { project } = props;
-    if (!project) {
-      return;
-    }
-
-    const externalEvents = enumerateExternalEvents(
-      project
-    ).map(externalEvents => ({
-      text: externalEvents.getName(),
-      value: externalEvents.getName(),
-    }));
-    const layouts = enumerateLayouts(project).map(layout => ({
-      text: layout.getName(),
-      value: layout.getName(),
-    }));
-    this._fullList = [
-      ...externalEvents,
-      { text: '', value: <Divider /> },
-      ...layouts,
-    ];
   }
 
   render() {
@@ -73,7 +124,6 @@ export default class ExternalEventsField extends Component<
       <AutoComplete
         {...defaultAutocompleteProps}
         floatingLabelText={this._description}
-        id="external-events-field"
         searchText={this.state.focused ? this.state.text : this.props.value}
         onFocus={() => {
           this.setState({
@@ -103,7 +153,10 @@ export default class ExternalEventsField extends Component<
           }
           this.focus(); // Keep the focus after choosing an item
         }}
-        dataSource={this._fullList}
+        dataSource={this._keyNames.map(keyName => ({
+          text: keyName,
+          value: keyName,
+        }))}
         openOnFocus={!this.props.isInline}
         ref={field => (this._field = field)}
       />

@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
-import Dialog from '../../../../UI/Dialog';
+import Dialog from '../../../UI/Dialog';
 
 export type ParameterValues = Array<string>;
 

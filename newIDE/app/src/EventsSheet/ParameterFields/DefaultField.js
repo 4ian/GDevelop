@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
 export default class DefaultField extends React.Component<

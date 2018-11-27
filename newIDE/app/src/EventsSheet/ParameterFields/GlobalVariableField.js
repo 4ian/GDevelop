@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react';
 import VariableField from './VariableField';
-import VariablesEditorDialog from '../../../VariablesList/VariablesEditorDialog';
+import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
 type State = {|
   editorOpen: boolean,
 |};
 
-export default class SceneVariableField extends React.Component<
+export default class GlobalVariableField extends React.Component<
   ParameterFieldProps,
   State
 > {
@@ -22,12 +22,12 @@ export default class SceneVariableField extends React.Component<
   }
 
   render() {
-    const { layout } = this.props;
+    const { project } = this.props;
 
     return (
-      <React.Fragment>
+      <div>
         <VariableField
-          variablesContainer={layout ? layout.getVariables() : null}
+          variablesContainer={project ? project.getVariables() : null}
           parameterMetadata={this.props.parameterMetadata}
           value={this.props.value}
           onChange={this.props.onChange}
@@ -38,20 +38,19 @@ export default class SceneVariableField extends React.Component<
           objectsContainer={this.props.objectsContainer}
         />
         {this.state.editorOpen &&
-          layout && (
+          project && (
             <VariablesEditorDialog
               open={this.state.editorOpen}
-              variablesContainer={layout.getVariables()}
+              variablesContainer={project.getVariables()}
               onCancel={() => this.setState({ editorOpen: false })}
               onApply={() => {
                 this.setState({ editorOpen: false });
                 if (this._field) this._field.forceUpdateVariables();
               }}
-              emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
-              emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
+              emptyExplanationMessage="Global variables are variables that are persisted across the scenes during the game."
             />
           )}
-      </React.Fragment>
+      </div>
     );
   }
 }

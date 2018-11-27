@@ -1,6 +1,6 @@
 // @flow
 import flatten from 'lodash/flatten';
-import { mapFor } from '../../../Utils/MapFor';
+import { mapFor } from '../../Utils/MapFor';
 
 export const enumerateVariables = (
   variablesContainer: ?gdVariablesContainer

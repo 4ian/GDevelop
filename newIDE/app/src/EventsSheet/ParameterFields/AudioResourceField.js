@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import ResourceSelector from '../../../ResourcesList/ResourceSelector';
-import ResourcesLoader from '../../../ResourcesLoader';
+import ResourceSelector from '../../ResourcesList/ResourceSelector';
+import ResourcesLoader from '../../ResourcesLoader';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
 export default class AudioResourceField extends Component<

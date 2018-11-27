@@ -4,7 +4,7 @@ import Divider from 'material-ui/Divider';
 import Toggle from 'material-ui/Toggle';
 import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
-import ParameterRenderingService from './ParameterRenderingService';
+import ParameterRenderingService from '../ParameterRenderingService';
 import HelpButton from '../../UI/HelpButton';
 import {
   type ResourceSource,

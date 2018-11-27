@@ -1,20 +1,21 @@
 // @flow
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
+import { mapFor } from '../../Utils/MapFor';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
-import { defaultAutocompleteProps } from '../../../UI/AutocompleteProps';
+import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
 
 type State = {|
   focused: boolean,
   text: ?string,
 |};
 
-export default class KeyField extends Component<ParameterFieldProps, State> {
+export default class LayerField extends Component<ParameterFieldProps, State> {
   state = { focused: false, text: null };
 
   _description: ?string;
   _field: ?any;
-  _keyNames: Array<string> = [];
+  _layersNames: Array<string> = [];
 
   constructor(props: ParameterFieldProps) {
     super(props);
@@ -24,99 +25,30 @@ export default class KeyField extends Component<ParameterFieldProps, State> {
       ? parameterMetadata.getDescription()
       : undefined;
 
-    this._keyNames = [
-      'Num0',
-      'Num1',
-      'Num2',
-      'Num3',
-      'Num4',
-      'Num5',
-      'Num6',
-      'Num7',
-      'Num8',
-      'Num9',
-      'a',
-      'b',
-      'c',
-      'd',
-      'e',
-      'f',
-      'g',
-      'h',
-      'i',
-      'j',
-      'k',
-      'l',
-      'm',
-      'n',
-      'o',
-      'p',
-      'q',
-      'r',
-      's',
-      't',
-      'u',
-      'v',
-      'w',
-      'x',
-      'y',
-      'z',
-      'LBracket',
-      'RBracket',
-      'SemiColon',
-      'Numpad0',
-      'Numpad1',
-      'Numpad2',
-      'Numpad3',
-      'Numpad4',
-      'Numpad5',
-      'Numpad6',
-      'Numpad7',
-      'Numpad8',
-      'Numpad9',
-      'Escape',
-      'Space',
-      'Return',
-      'Back',
-      'Tab',
-      'PageUp',
-      'PageDown',
-      'End',
-      'Home',
-      'Insert',
-      'Delete',
-      'Add',
-      'Subtract',
-      'Multiply',
-      'Divide',
-      'Left',
-      'Right',
-      'Up',
-      'Down',
-      'F1',
-      'F2',
-      'F3',
-      'F4',
-      'F5',
-      'F6',
-      'F7',
-      'F8',
-      'F9',
-      'F10',
-      'F11',
-      'F12',
-      'Pause',
-      'RControl',
-      'LControl',
-      'RAlt',
-      'LAlt',
-      'RShift',
-      'LShift',
-    ];
+    this._loadNamesFrom(props);
   }
 
   focus() {
     if (this._field) this._field.focus();
+  }
+
+  componentWillReceiveProps(newProps: ParameterFieldProps) {
+    if (newProps.layout !== this.props.layout) {
+      this._loadNamesFrom(newProps);
+    }
+  }
+
+  _loadNamesFrom(props: ParameterFieldProps) {
+    const layout = props.layout;
+    if (!layout) {
+      this._layersNames = [];
+      return;
+    }
+
+    this._layersNames = mapFor(0, layout.getLayersCount(), i => {
+      const layer = layout.getLayerAt(i);
+      return layer.getName();
+    });
   }
 
   render() {
@@ -153,9 +85,9 @@ export default class KeyField extends Component<ParameterFieldProps, State> {
           }
           this.focus(); // Keep the focus after choosing an item
         }}
-        dataSource={this._keyNames.map(keyName => ({
-          text: keyName,
-          value: keyName,
+        dataSource={this._layersNames.map(layerName => ({
+          text: layerName || '(Base layer)',
+          value: `"${layerName}"`,
         }))}
         openOnFocus={!this.props.isInline}
         ref={field => (this._field = field)}

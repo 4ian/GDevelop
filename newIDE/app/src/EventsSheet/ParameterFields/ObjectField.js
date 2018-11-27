@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import ObjectSelector from '../../../ObjectsList/ObjectSelector';
+import ObjectSelector from '../../ObjectsList/ObjectSelector';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
 type State = {|

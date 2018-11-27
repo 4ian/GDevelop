@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
-import { mapFor } from '../../../../Utils/MapFor';
-import EmptyMessage from '../../../../UI/EmptyMessage';
+import { mapFor } from '../../../Utils/MapFor';
+import EmptyMessage from '../../../UI/EmptyMessage';
 
 export type ParameterValues = Array<string>;
 

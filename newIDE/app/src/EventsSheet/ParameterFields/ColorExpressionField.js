@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 import GenericExpressionField from './GenericExpressionField';
-import ColorPicker from '../../../UI/ColorField/ColorPicker';
+import ColorPicker from '../../UI/ColorField/ColorPicker';
 
 const parseColor = (rgbColor: string) => {
   const colors = rgbColor.replace(/"/g, '').split(';');

@@ -241,7 +241,7 @@ export default class SpritesList extends Component<Props, void> {
           direction.getTimeBetweenFrames() > 0
             ? 1 / direction.getTimeBetweenFrames()
             : 1,
-        name: animationName ? `${animationName}` : `${(resourceNames.length > 0) ? path.basename(resourceNames[0], path.extname(resourceNames[0])) : objectName}`,
+            name: animationName || ((resourceNames.length > 0) ? path.basename(resourceNames[0], path.extname(resourceNames[0])) : objectName),
         isLooping: direction.isLooping(),
         externalEditorData,
       },

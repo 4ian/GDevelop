@@ -15,7 +15,7 @@ export type ExternalEditorOpenOptions = {|
       path?: string,
       name: string,
       originalIndex: ?number,
-      externalEditorData?: string,
+      externalEditorData?: Object,
     }>,
     newName: string,
     externalEditorData?: Object

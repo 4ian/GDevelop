@@ -52,12 +52,10 @@ export const openPiskel = ({
   ipcRenderer.removeAllListeners('piskel-changes-saved');
   ipcRenderer.on(
     'piskel-changes-saved',
-    (event, outputResources, newAnimationName, metadata) => {
-      const externalEditorData = metadata.data
-        ? {
-            pskl: metadata,
-          }
-        : {};
+    (event, outputResources, newAnimationName, receivedData) => {
+      const externalEditorData = {
+        pskl: receivedData,
+      }
 
       const resourcesManager = project.getResourcesManager();
       outputResources.forEach(resource => {
@@ -66,7 +64,7 @@ export const openPiskel = ({
       });
 
       // in case this is for a single frame object, save the metadata in the Image object
-      if (metadata.singleFrame) {
+      if (receivedData.singleFrame) {
         resourcesManager
           .getResource(path.relative(projectPath, outputResources[0].path))
           .setMetadata(JSON.stringify(externalEditorData));

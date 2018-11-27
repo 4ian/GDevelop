@@ -88,13 +88,13 @@ export const createPathEditorHeader = ({
   headerObject.setFolderButton.addEventListener('click', selectFolderPath);
 
   const openFolderPath = () => {
-    electron.shell.openItem(headerObject.state.folderPath)
-  }
+    electron.shell.openItem(headerObject.state.folderPath);
+  };
   headerObject.openFolderButton.addEventListener('click', openFolderPath);
 
   /**
- * Disables the path editor
- */
+  * Disables the path editor
+  */
   headerObject.disableSavePathControls = () => {
     headerObject.saveFolderLabel.removeEventListener('click', selectFolderPath);
     headerObject.nameInput.style.color = '#8bb0b2';
@@ -108,18 +108,15 @@ export const createPathEditorHeader = ({
   };
 
   /**
- * Returns a path for a file that does not exist yet.
- * Used to avoid unwanted file overwriting.
- */
+  * Returns a path for a file that does not exist yet.
+  * Used to avoid unwanted file overwriting.
+  */
   headerObject.makeFileNameUnique = (filePath, missingExtension) => {
     if (!fileExists(filePath)) {
       return filePath;
     }
     const folderPath = path.dirname(filePath);
-    let extension = path.extname(filePath);
-    if (!extension) {
-      extension = missingExtension;
-    }
+    const extension = path.extname(filePath) || missingExtension;
     const oldFileName = path.basename(filePath, extension);
     let appendNumber = 0;
     let newUniqueNamePath =

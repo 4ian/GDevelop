@@ -140,12 +140,12 @@ app.on("ready", function() {
 
   ipcMain.on(
     "piskel-changes-saved",
-    (event, imageResources, newAnimationName, fileMetadata) => {
+    (event, imageResources, newAnimationName, receivedData) => {
       mainWindow.webContents.send(
         "piskel-changes-saved",
         imageResources,
         newAnimationName,
-        fileMetadata
+        receivedData
       );
     }
   );
@@ -167,11 +167,11 @@ app.on("ready", function() {
     });
   });
 
-  ipcMain.on("jfxr-changes-saved", (event, newFilePath, fileMetadata) => {
+  ipcMain.on("jfxr-changes-saved", (event, newFilePath, receivedData) => {
     mainWindow.webContents.send(
       "jfxr-changes-saved",
       newFilePath,
-      fileMetadata
+      receivedData
     );
   });
 

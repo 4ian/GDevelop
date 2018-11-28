@@ -85,6 +85,6 @@ export default class ForceMultiplierField extends Component<
 export const renderForceMultiplierString = (value: string) => {
   if (value === '1') return 'a permanent';
   else if (value === '0' || value === '') return 'an instant';
-  
+
   return 'a (multiplier: ' + value + ')';
 };

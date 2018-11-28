@@ -47,8 +47,8 @@ class JsCodeEvent : public gd::BaseEvent {
   const gd::String& GetInlineCode() const { return inlineCode; };
   void SetInlineCode(const gd::String& code) { inlineCode = code; };
 
-  gd::String GetParameterObjects() const { return parameterObjects; };
-  void SetParameterObjects(gd::String objectName) {
+  const gd::String& GetParameterObjects() const { return parameterObjects; };
+  void SetParameterObjects(const gd::String& objectName) {
     parameterObjects = objectName;
   };
 

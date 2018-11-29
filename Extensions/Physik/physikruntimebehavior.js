@@ -1220,6 +1220,25 @@ gdjs.PhysikRuntimeBehavior.prototype.addMotorJoint = function(other, offsetX, of
     variable.setNumber(jointId);
 };
 
+gdjs.PhysikRuntimeBehavior.prototype.getJointReactionForce = function(jointId){
+    // Get the joint
+    var joint = this._sharedData.getJoint(jointId);
+    // Joint not found
+    if(joint === null) return 0;
+    // Get the reaction force
+    return joint.GetReactionForce(1 / this._sharedData.timeStep).Length();
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.getJointReactionTorque = function(jointId){
+    // Get the joint
+    var joint = this._sharedData.getJoint(jointId);
+    // Joint not found
+    if(joint === null) return 0;
+    // Get the reaction torque
+    return joint.GetReactionTorque(1 / this._sharedData.timeStep);
+};
+
+
 gdjs.PhysikRuntimeBehavior.prototype.removeJoint = function(jointId){
     // Just tell the sharedData to manage and delete the joint
     this._sharedData.removeJoint(jointId);

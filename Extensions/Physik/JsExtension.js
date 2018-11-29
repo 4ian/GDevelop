@@ -1145,7 +1145,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getPrismaticJointMotorSpeed");
+      .setFunctionName("getPrismaticJointMotorSpeed")
+      .setManipulatedType("number");
 
     aut.addAction(
       "PrismaticJointMotorSpeed",
@@ -1171,7 +1172,7 @@ module.exports = {
       t("Prismatic motor speed"),
       t("Joints"),
       "res/physics16.png")
-      .addParameter("object", t("Object"))
+      .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
@@ -1353,7 +1354,7 @@ module.exports = {
       "AddMotorJoint",
       t("Add motor joint"),
       t("Add a motor joint between two objects. The position and angle offset are relative to the first object."),
-      t("Add a motor joint between _PARAM0_ and _PARAM1_"),
+      t("Add a motor joint between _PARAM0_ and _PARAM2_"),
       t("Joints"),
       "res/physics24.png",
       "res/physics16.png")
@@ -1370,6 +1371,64 @@ module.exports = {
       .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
       .getCodeExtraInformation()
       .setFunctionName("addMotorJoint");
+
+    aut.addCondition(
+      "JointReactionForce",
+      t("Joint reaction force"),
+      t("Test a joint reaction force."),
+      t("Joint _PARAM2_ reaction force is _PARAM3__PARAM4_"),
+      t("Joints"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("relationalOperator", t("Sign of the test"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("getJointReactionForce")
+      .setManipulatedType("number");
+
+    aut.addExpression(
+      "JointReactionForce",
+      t("Joint reaction force"),
+      t("Joint reaction force"),
+      t("Joints"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getJointReactionForce");
+
+    aut.addCondition(
+      "JointReactionTorque",
+      t("Joint reaction torque"),
+      t("Test a joint reaction torque."),
+      t("Joint _PARAM2_ reaction torque is _PARAM3__PARAM4_"),
+      t("Joints"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("relationalOperator", t("Sign of the test"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("getJointReactionTorque")
+      .setManipulatedType("number");
+
+    aut.addExpression(
+      "JointReactionTorque",
+      t("Joint reaction torque"),
+      t("Joint reaction torque"),
+      t("Joints"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getJointReactionTorque");
 
     aut.addAction(
       "Remove joint",

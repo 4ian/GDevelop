@@ -95,14 +95,11 @@ gdjs.PhysikSharedData.gdjsCallbackRuntimeSceneUnloaded = function(runtimeScene) 
 
 gdjs.PhysikSharedData.prototype.clearBodyJoints = function(body){
     // Iterate through all the joints
-    for (var jointId in this.joints){
+    for(var jointId in this.joints){
         if (this.joints.hasOwnProperty(jointId)){
             // If the joint is attached to the body, delete it
             if(this.joints[jointId].GetBodyA() === body || this.joints[jointId].GetBodyB() === body){
-                // Destroy the joint is not absolutely necesary
-                this.world.DestroyJoint(this.joints[jointId]);
-                // Clear from the list
-                delete this.joints[jointId];
+                this.removeJoint(jointId);
             }
         }
     }
@@ -131,7 +128,20 @@ gdjs.PhysikSharedData.prototype.removeJoint = function(jointId){
     jointId = jointId.toString(10);
     // Delete the joint
     if(this.joints.hasOwnProperty(jointId)){
-        this.world.DestroyJoint(this.joints[jointId]);
+        var joint = this.joints[jointId];
+        // If we delete a joint attached to a gear joint, the gear will crash, so we must delete the gear joint first
+        // Search in our joints list gear joints attached to this one we want to remove
+        for(var jId in this.joints){
+            if(this.joints.hasOwnProperty(jId)){
+                if(this.joints[jId].GetType() === Box2D.e_gearJoint &&
+                    (this.joints[jId].GetJoint1() === joint || this.joints[jId].GetJoint2() === joint)){
+                        // We could pass it a string, but lets do it right
+                        this.removeJoint(parseInt(jId, 10));
+                }
+            }
+        }
+        // Remove the joint
+        this.world.DestroyJoint(joint);
         delete this.joints[jointId];
     }
 };
@@ -840,8 +850,8 @@ gdjs.PhysikRuntimeBehavior.prototype.addDistanceJoint = function(x1, y1, other, 
         length = this.b2Vec2((x2 - x1) * this._sharedData.invScaleX, (y2 - y1) * this._sharedData.invScaleY).Length();
     }
     jointDef.set_length(length);
-    jointDef.set_frequencyHz(frequency);
-    jointDef.set_dampingRatio(dampingRatio);
+    jointDef.set_frequencyHz(frequency >= 0 ? frequency : 0);
+    jointDef.set_dampingRatio(dampingRatio >= 0 ? dampingRatio : 1);
     jointDef.set_collideConnected(collideConnected);
     // Create the joint and get the id
     var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2DistanceJoint));
@@ -857,10 +867,10 @@ gdjs.PhysikRuntimeBehavior.prototype.addRevoluteJoint = function(x, y, enableLim
     }
     // Set joint settings
     var jointDef = new Box2D.b2RevoluteJointDef();
-    jointDef.set_bodyA(this._body);
-    jointDef.set_localAnchorA(this._body.GetLocalPoint(this.b2Vec2(x * this._sharedData.invScaleX, y * this._sharedData.invScaleY)));
-    jointDef.set_bodyB(this._sharedData.staticBody);
-    jointDef.set_localAnchorB(this._sharedData.staticBody.GetLocalPoint(this.b2Vec2(x * this._sharedData.invScaleX, y * this._sharedData.invScaleY)));
+    jointDef.set_bodyA(this._sharedData.staticBody);
+    jointDef.set_localAnchorA(this._sharedData.staticBody.GetLocalPoint(this.b2Vec2(x * this._sharedData.invScaleX, y * this._sharedData.invScaleY)));
+    jointDef.set_bodyB(this._body);
+    jointDef.set_localAnchorB(this._body.GetLocalPoint(this.b2Vec2(x * this._sharedData.invScaleX, y * this._sharedData.invScaleY)));
     jointDef.set_enableLimit(enableLimit);
     if(enableLimit){
         jointDef.set_referenceAngle(gdjs.toRad(referenceAngle));
@@ -1005,7 +1015,212 @@ gdjs.PhysikRuntimeBehavior.prototype.addPulleyJoint = function(x1, y1, other, x2
     jointDef.set_ratio(ratio > 0 ? ratio : 1);
     jointDef.set_collideConnected(collideConnected);
     // Create the joint and get the id
-    var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2PrismaticJoint));
+    var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2PulleyJoint));
     // Store the id in the variable
     variable.setNumber(jointId);
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.addGearJoint = function(jointId1, jointId2, ratio, collideConnected, variable){
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+        return;
+    }
+    // Get the first joint
+    var joint1 = this._sharedData.getJoint(jointId1);
+    // Joint not found or has wrong type
+    if(joint1 === null || (joint1.GetType() !== Box2D.e_revoluteJoint && joint1.GetType() !== Box2D.e_prismaticJoint)) return;
+    // Get the second joint
+    var joint2 = this._sharedData.getJoint(jointId2);
+    if(joint2 === null || (joint2.GetType() !== Box2D.e_revoluteJoint && joint2.GetType() !== Box2D.e_prismaticJoint)) return;
+    // Set joint settings
+    var jointDef = new Box2D.b2GearJointDef();
+    // Set gear joint bodies is not necessary at first, as the gear get the bodies from the two child joints
+    // But we must pass two different bodies to bypass a test inherited from b2Joint
+    jointDef.set_bodyA(this._sharedData.staticBody);
+    jointDef.set_bodyB(this._body);
+    jointDef.set_joint1(joint1);
+    jointDef.set_joint2(joint2);
+    jointDef.set_ratio(ratio !== 0 ? ratio : 1);
+    jointDef.set_collideConnected(collideConnected);
+    // Create the joint and get the id
+    var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2GearJoint));
+    // Store the id in the variable
+    variable.setNumber(jointId);
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.addMouseJoint = function(targetX, targetY, maxForce, frequency, dampingRatio, variable){
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+        return;
+    }
+    // Set joint settings
+    var jointDef = new Box2D.b2MouseJointDef();
+    jointDef.set_bodyA(this._sharedData.staticBody);
+    jointDef.set_bodyB(this._body);
+    jointDef.set_target(this.b2Vec2(targetX * this._sharedData.invScaleX, targetY * this._sharedData.invScaleY));
+    jointDef.set_maxForce(maxForce >= 0 ? maxForce : 0);
+    jointDef.set_frequencyHz(frequency > 0 ? frequency : 1);
+    jointDef.set_dampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
+    // Create the joint and get the id
+    var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2MouseJoint));
+    // Store the id in the variable
+    variable.setNumber(jointId);
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.setMouseJointTarget = function(jointId, targetX, targetY){
+    var joint = this._sharedData.getJoint(jointId);
+    // Joint not found or has wrong type
+    if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return;
+    // Set the target
+    joint.SetTarget(this.b2Vec2(targetX * this._sharedData.invScaleX, targetY * this._sharedData.invScaleY));
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.addWheelJoint = function(x1, y1, other, x2, y2, axisAngle, frequency, dampingRatio, enableMotor, motorSpeed, maxMotorForce, collideConnected, variable){
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+        return;
+    }
+    // If there is no second object or it doesn't share the behavior, return
+    if(other == null || !other.hasBehavior(this.name)) return;
+    // Get the second body
+    var otherBody = other.getBehavior(this.name).getBody();
+    // If the first and second objects/bodies are the same, return
+    if(this._body == otherBody) return;
+    // Set joint settings
+    var jointDef = new Box2D.b2WheelJointDef();
+    jointDef.set_bodyA(this._body);
+    jointDef.set_localAnchorA(this._body.GetLocalPoint(this.b2Vec2(x1 * this._sharedData.invScaleX, y1 * this._sharedData.invScaleY)));
+    jointDef.set_bodyB(otherBody);
+    jointDef.set_localAnchorB(otherBody.GetLocalPoint(this.b2Vec2(x2 * this._sharedData.invScaleX, y2 * this._sharedData.invScaleY)));
+    axisAngle = gdjs.toRad(axisAngle) - this._body.GetAngle();
+    jointDef.set_localAxisA(this.b2Vec2(Math.cos(axisAngle), Math.sin(axisAngle)));
+    jointDef.set_frequencyHz(frequency > 0 ? frequency : 1);
+    jointDef.set_dampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
+    jointDef.set_enableMotor(enableMotor);
+    if(enableMotor){
+        jointDef.set_motorSpeed(motorSpeed);
+        jointDef.set_maxMotorForce(maxMotorForce);
+    }
+    jointDef.set_collideConnected(collideConnected);
+    // Create the joint and get the id
+    var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2WheelJoint));
+    // Store the id in the variable
+    variable.setNumber(jointId);
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.addWeldJoint = function(x1, y1, other, x2, y2, referenceAngle, frequency, dampingRatio, collideConnected, variable){
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+        return;
+    }
+    // If there is no second object or it doesn't share the behavior, return
+    if(other == null || !other.hasBehavior(this.name)) return;
+    // Get the second body
+    var otherBody = other.getBehavior(this.name).getBody();
+    // If the first and second objects/bodies are the same, return
+    if(this._body == otherBody) return;
+    // Set joint settings
+    var jointDef = new Box2D.b2WeldJointDef();
+    jointDef.set_bodyA(this._body);
+    jointDef.set_localAnchorA(this._body.GetLocalPoint(this.b2Vec2(x1 * this._sharedData.invScaleX, y1 * this._sharedData.invScaleY)));
+    jointDef.set_bodyB(otherBody);
+    jointDef.set_localAnchorB(otherBody.GetLocalPoint(this.b2Vec2(x2 * this._sharedData.invScaleX, y2 * this._sharedData.invScaleY)));
+    jointDef.set_referenceAngle(gdjs.toRad(referenceAngle));
+    jointDef.set_frequencyHz(frequency > 0 ? frequency : 1);
+    jointDef.set_dampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
+    jointDef.set_collideConnected(collideConnected);
+    // Create the joint and get the id
+    var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2WeldJoint));
+    // Store the id in the variable
+    variable.setNumber(jointId);
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.addRopeJoint = function(x1, y1, other, x2, y2, maxLength, collideConnected, variable){
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+        return;
+    }
+    // If there is no second object or it doesn't share the behavior, return
+    if(other == null || !other.hasBehavior(this.name)) return;
+    // Get the second body
+    var otherBody = other.getBehavior(this.name).getBody();
+    // If the first and second objects/bodies are the same, return
+    if(this._body == otherBody) return;
+    // Set joint settings
+    var jointDef = new Box2D.b2RopeJointDef();
+    jointDef.set_bodyA(this._body);
+    jointDef.set_localAnchorA(this._body.GetLocalPoint(this.b2Vec2(x1 * this._sharedData.invScaleX, y1 * this._sharedData.invScaleY)));
+    jointDef.set_bodyB(otherBody);
+    jointDef.set_localAnchorB(otherBody.GetLocalPoint(this.b2Vec2(x2 * this._sharedData.invScaleX, y2 * this._sharedData.invScaleY)));
+    jointDef.set_maxLength(maxLength >= 0 ? maxLength * this._sharedData.invScaleX : 0);
+    jointDef.set_collideConnected(collideConnected);
+    // Create the joint and get the id
+    var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2RopeJoint));
+    // Store the id in the variable
+    variable.setNumber(jointId);
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.addFrictionJoint = function(x1, y1, other, x2, y2, maxForce, maxTorque, collideConnected, variable){
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+        return;
+    }
+    // If there is no second object or it doesn't share the behavior, return
+    if(other == null || !other.hasBehavior(this.name)) return;
+    // Get the second body
+    var otherBody = other.getBehavior(this.name).getBody();
+    // If the first and second objects/bodies are the same, return
+    if(this._body == otherBody) return;
+    // Set joint settings
+    var jointDef = new Box2D.b2FrictionJointDef();
+    jointDef.set_bodyA(this._body);
+    jointDef.set_localAnchorA(this._body.GetLocalPoint(this.b2Vec2(x1 * this._sharedData.invScaleX, y1 * this._sharedData.invScaleY)));
+    jointDef.set_bodyB(otherBody);
+    jointDef.set_localAnchorB(otherBody.GetLocalPoint(this.b2Vec2(x2 * this._sharedData.invScaleX, y2 * this._sharedData.invScaleY)));
+    jointDef.set_maxForce(maxForce >= 0 ? maxForce : 0);
+    jointDef.set_maxTorque(maxTorque >= 0 ? maxTorque : 0);
+    jointDef.set_collideConnected(collideConnected);
+    // Create the joint and get the id
+    var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2FrictionJoint));
+    // Store the id in the variable
+    variable.setNumber(jointId);
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.addMotorJoint = function(other, offsetX, offsetY, offsetAngle, maxForce, maxTorque, correctionFactor, collideConnected, variable){
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+        return;
+    }
+    // If there is no second object or it doesn't share the behavior, return
+    if(other == null || !other.hasBehavior(this.name)) return;
+    // Get the second body
+    var otherBody = other.getBehavior(this.name).getBody();
+    // If the first and second objects/bodies are the same, return
+    if(this._body == otherBody) return;
+    // Set joint settings
+    var jointDef = new Box2D.b2MotorJointDef();
+    jointDef.set_bodyA(this._body);
+    jointDef.set_bodyB(otherBody);
+    jointDef.set_linearOffset(this.b2Vec2(offsetX * this._sharedData.invScaleX, offsetY * this._sharedData.invScaleY));
+    jointDef.set_angularOffset(gdjs.toRad(offsetAngle));
+    jointDef.set_correctionFactor(correctionFactor >= 0 ? correctionFactor : 0);
+    jointDef.set_maxForce(maxForce >= 0 ? maxForce : 0);
+    jointDef.set_maxTorque(maxTorque >= 0 ? maxTorque : 0);
+    jointDef.set_collideConnected(collideConnected);
+    // Create the joint and get the id
+    var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2MotorJoint));
+    // Store the id in the variable
+    variable.setNumber(jointId);
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.removeJoint = function(jointId){
+    // Just tell the sharedData to manage and delete the joint
+    this._sharedData.removeJoint(jointId);
 };

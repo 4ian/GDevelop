@@ -341,6 +341,9 @@ module.exports = {
       .setIncludeFile("Extensions/Physik/physikruntimebehavior.js")
       .addIncludeFile("Extensions/Physik/box2d.js");
 
+
+
+    // Global
     aut.addCondition(
       "GravityX",
       t("Gravity X"),
@@ -405,6 +408,9 @@ module.exports = {
       .setManipulatedType("number")
       .setGetter("getGravityY");
 
+
+
+    // Dynamics
     aut.addCondition(
       "IsDynamic",
       t("Is dynamic"),
@@ -528,7 +534,7 @@ module.exports = {
       t("Set fixed rotation"),
       t("Enable or disable an object fixed rotation. If enabled the object won't be able to rotate."),
       t("Set _PARAM0_ fixed rotation: _PARAM2_"),
-      t("Rotation"),
+      t("Dynamics"),
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
@@ -537,6 +543,9 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("setFixedRotation");
 
+
+
+    // Body settings
     aut.addCondition(
       "Density",
       t("Density"),
@@ -729,6 +738,9 @@ module.exports = {
       .setManipulatedType("number")
       .setGetter("getGravityScale");
 
+
+
+    // Filtering
     aut.addCondition(
       "LayerEnabled",
       t("Layer enabled"),
@@ -787,6 +799,9 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("enableMask");
 
+
+
+    // Velocity
     aut.addCondition(
       "LinearVelocityX",
       t("Linear velocity X"),
@@ -898,6 +913,9 @@ module.exports = {
       .setManipulatedType("number")
       .setGetter("getAngularVelocity");
 
+
+
+    // Forces and impulses
     aut.addAction(
       "ApplyForce",
       t("Apply force"),
@@ -1030,347 +1048,84 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("applyAngularImpulse");
 
-    aut.addAction(
-      "AddDistanceJoint",
-      t("Add distance joint"),
-      t("Add a distance joint between two objects. The length is converted to meters using the world scale on X. The frequency and damping ratio are related to the joint speed of oscillation and how fast it stops."),
-      t("Add a distance joint between _PARAM0_ and _PARAM4_"),
-      t("Joints"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("Anchor X on first body"))
-      .addParameter("expression", t("Anchor Y on first body"))
-      .addParameter("objectPtr", t("Second object"), "", false)
-      .addParameter("expression", t("Anchor X on second body"))
-      .addParameter("expression", t("Anchor Y on second body"))
-      .addParameter("expression", t("Length (-1 to use current objects distance) (default: -1)"), "", true).setDefaultValue("-1")
-      .addParameter("expression", t("Frequency (Hz) (common values from 0 to 5, 0 for a rigid joint) (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Damping ratio (common values from 0 to 1, 1 for a rigid joint) (default: 1)"), "", true).setDefaultValue("1")
-      .addParameter("yesorno", t("Allow collision between connected bodies? (default: false)"), "", true).setDefaultValue("false")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
-      .getCodeExtraInformation()
-      .setFunctionName("addDistanceJoint");
 
-    aut.addAction(
-      "AddRevoluteJoint",
-      t("Add revolute joint"),
-      t("Add a revolute joint to an object at a fixed point. The object is attached as the second object in the joint, so you can use this for gear joints."),
-      t("Add a revolute joint to _PARAM0_ at _PARAM2_;_PARAM3_"),
+
+    // Joints
+    aut.addCondition(
+      "JointFirstObject",
+      t("Joint first object"),
+      t("Test if an object is the first object on a joint."),
+      t("_PARAM0_ is the first object for joint _PARAM2_"),
       t("Joints"),
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("X anchor"))
-      .addParameter("expression", t("Y anchor"))
-      .addParameter("yesorno", t("Enable angle limits? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("expression", t("Reference angle (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Minimum angle (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Maximum angle (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("yesorno", t("Enable motor? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("expression", t("Motor speed (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Motor maximum torque (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
-      .setFunctionName("addRevoluteJoint");
-
-    aut.addAction(
-      "AddRevoluteJointBetweenTwoBodies",
-      t("Add revolute joint between two bodies"),
-      t("Add a revolute joint between two objects. The reference angle determines what is considered as the initial angle at the initial state."),
-      t("Add a revolute joint between _PARAM0_ and _PARAM4_"),
-      t("Joints"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("Anchor X on first body"))
-      .addParameter("expression", t("Anchor Y on first body"))
-      .addParameter("objectPtr", t("Second object"), "", false)
-      .addParameter("expression", t("Anchor X on second body"))
-      .addParameter("expression", t("Anchor Y on second body"))
-      .addParameter("yesorno", t("Enable angle limits? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("expression", t("Reference angle (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Minimum angle (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Maximum angle (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("yesorno", t("Enable motor? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("expression", t("Motor speed (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Motor maximum torque (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
-      .getCodeExtraInformation()
-      .setFunctionName("addRevoluteJointBetweenTwoBodies");
-
-    aut.addAction(
-      "AddPrismaticJoint",
-      t("Add prismatic joint"),
-      t("Add a prismatic joint between two objects. The translation limits are converted to meters using the world scale on X."),
-      t("Add a prismatic joint between _PARAM0_ and _PARAM4_"),
-      t("Joints"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("Anchor X on first body"))
-      .addParameter("expression", t("Anchor Y on first body"))
-      .addParameter("objectPtr", t("Second object"), "", false)
-      .addParameter("expression", t("Anchor X on second body"))
-      .addParameter("expression", t("Anchor Y on second body"))
-      .addParameter("expression", t("Axis angle"))
-      .addParameter("expression", t("Reference angle (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("yesorno", t("Enable limits? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("expression", t("Minimum translation (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Maximum translation (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("yesorno", t("Enable motor? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("expression", t("Motor speed (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Motor maximum force (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
-      .getCodeExtraInformation()
-      .setFunctionName("addPrismaticJoint");
+      .setFunctionName("isJointFirstObject");
 
     aut.addCondition(
-      "PrismaticJointMotorSpeed",
-      t("Prismatic motor speed"),
-      t("Test a prismatic joint motor speed."),
-      t("Prismatic joint _PARAM2_ motor speed is _PARAM3__PARAM4_"),
+      "JointSecondObject",
+      t("Joint second object"),
+      t("Test if an object is the second object on a joint."),
+      t("_PARAM0_ is the second object for joint _PARAM2_"),
       t("Joints"),
       "res/physics24.png",
       "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
+      .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
-      .addParameter("relationalOperator", t("Sign of the test"))
-      .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getPrismaticJointMotorSpeed")
-      .setManipulatedType("number");
-
-    aut.addAction(
-      "PrismaticJointMotorSpeed",
-      t("Prismatic motor speed"),
-      t("Set a prismatic joint motor speed."),
-      t("Do _PARAM3__PARAM4_ to the prismatic joint _PARAM2_ motor speed"),
-      t("Joints"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("Joint ID"))
-      .addParameter("operator", t("Modification's sign"))
-      .addParameter("expression", t("Value"))
-      .getCodeExtraInformation()
-      .setFunctionName("setPrismaticJointMotorSpeed")
-      .setManipulatedType("number")
-      .setGetter("getPrismaticJointMotorSpeed");
+      .setFunctionName("isJointSecondObject");
 
     aut.addExpression(
-      "PrismaticJointMotorSpeed",
-      t("Prismatic motor speed"),
-      t("Prismatic motor speed"),
+      "JointFirstAnchorX",
+      t("Joint first anchor X"),
+      t("Joint first anchor X"),
       t("Joints"),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
-      .setFunctionName("getPrismaticJointMotorSpeed");
+      .setFunctionName("getJointFirstAnchorX");
 
-    aut.addAction(
-      "AddPulleyJoint",
-      t("Add pulley joint"),
-      t("Add a pulley joint between two objects. Lengths are converted to meters using the world scale on X."),
-      t("Add a pulley joint between _PARAM0_ and _PARAM4_"),
+    aut.addExpression(
+      "JointFirstAnchorY",
+      t("Joint first anchor Y"),
+      t("Joint first anchor Y"),
       t("Joints"),
-      "res/physics24.png",
       "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("Anchor X on first body"))
-      .addParameter("expression", t("Anchor Y on first body"))
-      .addParameter("objectPtr", t("Second object"), "", false)
-      .addParameter("expression", t("Anchor X on second body"))
-      .addParameter("expression", t("Anchor Y on second body"))
-      .addParameter("expression", t("Ground anchor X for first object"))
-      .addParameter("expression", t("Ground anchor Y for first object"))
-      .addParameter("expression", t("Ground anchor X for second object"))
-      .addParameter("expression", t("Ground anchor Y for second object"))
-      .addParameter("expression", t("Length for first object (-1 to use anchors positions) (default: -1)"), "", true).setDefaultValue("-1")
-      .addParameter("expression", t("Length for second object (-1 to use anchors positions) (default: -1)"), "", true).setDefaultValue("-1")
-      .addParameter("expression", t("Ratio (non-negative) (default: 1"), "", true).setDefaultValue("1")
-      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
-      .getCodeExtraInformation()
-      .setFunctionName("addPulleyJoint");
-
-    aut.addAction(
-      "AddGearJoint",
-      t("Add gear joint"),
-      t("Add a gear joint between two joints. Attention: Gear joints require the joints to be revolute or prismatic, and both of them to be attached to a static body as first object."),
-      t("Add a gear joint between joints _PARAM2_ and _PARAM3_"),
-      t("Joints"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("First joint ID"))
-      .addParameter("expression", t("Second joint ID"))
-      .addParameter("expression", t("Ratio (non-zero) (default: 1)"), "", true).setDefaultValue("1")
-      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
-      .getCodeExtraInformation()
-      .setFunctionName("addGearJoint");
-
-    aut.addAction(
-      "AddMouseJoint",
-      t("Add mouse joint"),
-      t("Add a mouse joint between two joints."),
-      t("Add a mouse joint to _PARAM0_"),
-      t("Joints"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("Target X"))
-      .addParameter("expression", t("Target Y"))
-      .addParameter("expression", t("Maximum force (N) (default: 500)"), "", true).setDefaultValue("500")
-      .addParameter("expression", t("Frequency (Hz) (positive) (default: 10)"), "", true).setDefaultValue("10")
-      .addParameter("expression", t("Damping ratio (default: 1)"), "", true).setDefaultValue("1")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
-      .getCodeExtraInformation()
-      .setFunctionName("addMouseJoint");
-
-    aut.addAction(
-      "MouseJointTarget",
-      t("Mouse joint target"),
-      t("Set a mouse joint target."),
-      t("Do _PARAM3_;_PARAM4_ to the mouse joint _PARAM2_ target position"),
-      t("Joints"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
+      .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
-      .addParameter("expression", t("Target X"))
-      .addParameter("expression", t("Target Y"))
       .getCodeExtraInformation()
-      .setFunctionName("setMouseJointTarget");
+      .setFunctionName("getJointFirstAnchorY");
 
-    aut.addAction(
-      "AddWheelJoint",
-      t("Add wheel joint"),
-      t("Add a wheel joint between two objects. Higher frequencies means higher suspensions. Damping determines oscillations, critical damping of 1 means no oscillations."),
-      t("Add a wheel joint between _PARAM0_ and _PARAM4_"),
+    aut.addExpression(
+      "JointSecondAnchorX",
+      t("Joint second anchor X"),
+      t("Joint second anchor X"),
       t("Joints"),
-      "res/physics24.png",
       "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
+      .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("Anchor X on first body"))
-      .addParameter("expression", t("Anchor Y on first body"))
-      .addParameter("objectPtr", t("Second object"), "", false)
-      .addParameter("expression", t("Anchor X on second body"))
-      .addParameter("expression", t("Anchor Y on second body"))
-      .addParameter("expression", t("Axis angle"))
-      .addParameter("expression", t("Frequency (Hz) (positive) (default: 10)"), "", true).setDefaultValue("10")
-      .addParameter("expression", t("Damping ratio (non-negative) (default: 1)"), "", true).setDefaultValue("1")
-      .addParameter("yesorno", t("Enable motor? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("expression", t("Motor speed (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Motor maximum force (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
-      .setFunctionName("addWheelJoint");
+      .setFunctionName("getJointSecondAnchorX");
 
-    aut.addAction(
-      "AddWeldJoint",
-      t("Add weld joint"),
-      t("Add a weld joint between two objects."),
-      t("Add a weld joint between _PARAM0_ and _PARAM4_"),
+    aut.addExpression(
+      "JointSecondAnchorY",
+      t("Joint second anchor Y"),
+      t("Joint second anchor Y"),
       t("Joints"),
-      "res/physics24.png",
       "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
+      .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("Anchor X on first body"))
-      .addParameter("expression", t("Anchor Y on first body"))
-      .addParameter("objectPtr", t("Second object"), "", false)
-      .addParameter("expression", t("Anchor X on second body"))
-      .addParameter("expression", t("Anchor Y on second body"))
-      .addParameter("expression", t("Reference angle (default: 0)"), "", true).setDefaultValue("0")
-      .addParameter("expression", t("Frequency (Hz) (positive) (default: 10)"), "", true).setDefaultValue("10")
-      .addParameter("expression", t("Damping ratio (non-negative) (default: 1)"), "", true).setDefaultValue("1")
-      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
-      .setFunctionName("addWeldJoint");
-
-    aut.addAction(
-      "AddRopeJoint",
-      t("Add rope joint"),
-      t("Add a rope joint between two objects. The maximum length is converted to meters using the world scale on X."),
-      t("Add a rope joint between _PARAM0_ and _PARAM4_"),
-      t("Joints"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("Anchor X on first body"))
-      .addParameter("expression", t("Anchor Y on first body"))
-      .addParameter("objectPtr", t("Second object"), "", false)
-      .addParameter("expression", t("Anchor X on second body"))
-      .addParameter("expression", t("Anchor Y on second body"))
-      .addParameter("expression", t("Maximum length (non-negative)"))
-      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
-      .getCodeExtraInformation()
-      .setFunctionName("addRopeJoint");
-
-    aut.addAction(
-      "AddFrictionJoint",
-      t("Add friction joint"),
-      t("Add a friction joint between two objects."),
-      t("Add a friction joint between _PARAM0_ and _PARAM4_"),
-      t("Joints"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("expression", t("Anchor X on first body"))
-      .addParameter("expression", t("Anchor Y on first body"))
-      .addParameter("objectPtr", t("Second object"), "", false)
-      .addParameter("expression", t("Anchor X on second body"))
-      .addParameter("expression", t("Anchor Y on second body"))
-      .addParameter("expression", t("Maximum force (non-negative)"))
-      .addParameter("expression", t("Maximum torque (non-negative)"))
-      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
-      .getCodeExtraInformation()
-      .setFunctionName("addFrictionJoint");
-
-    aut.addAction(
-      "AddMotorJoint",
-      t("Add motor joint"),
-      t("Add a motor joint between two objects. The position and angle offset are relative to the first object."),
-      t("Add a motor joint between _PARAM0_ and _PARAM2_"),
-      t("Joints"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("objectPtr", t("Second object"), "", false)
-      .addParameter("expression", t("Offset X position"))
-      .addParameter("expression", t("Offset Y position"))
-      .addParameter("expression", t("Offset Angle"))
-      .addParameter("expression", t("Maximum force (non-negative)"))
-      .addParameter("expression", t("Maximum torque (non-negative)"))
-      .addParameter("expression", t("Correction factor (default: 1)"), "", true).setDefaultValue("1")
-      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
-      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
-      .getCodeExtraInformation()
-      .setFunctionName("addMotorJoint");
+      .setFunctionName("getJointSecondAnchorY");
 
     aut.addCondition(
       "JointReactionForce",
@@ -1380,7 +1135,7 @@ module.exports = {
       t("Joints"),
       "res/physics24.png",
       "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
+      .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("relationalOperator", t("Sign of the test"))
@@ -1409,7 +1164,7 @@ module.exports = {
       t("Joints"),
       "res/physics24.png",
       "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
+      .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("relationalOperator", t("Sign of the test"))
@@ -1438,11 +1193,830 @@ module.exports = {
       t("Joints"),
       "res/physics24.png",
       "res/physics16.png")
-      .addParameter("object", t("First object"), "", false)
+      .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("removeJoint");
+
+
+
+    // Distance joint
+    aut.addAction(
+      "AddDistanceJoint",
+      t("Add distance joint"),
+      t("Add a distance joint between two objects. The length is converted to meters using the world scale on X. The frequency and damping ratio are related to the joint speed of oscillation and how fast it stops."),
+      t("Add a distance joint between _PARAM0_ and _PARAM4_"),
+      t("Joints/Distance"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Anchor X on first body"))
+      .addParameter("expression", t("Anchor Y on first body"))
+      .addParameter("objectPtr", t("Second object"), "", false)
+      .addParameter("expression", t("Anchor X on second body"))
+      .addParameter("expression", t("Anchor Y on second body"))
+      .addParameter("expression", t("Length (-1 to use current objects distance) (default: -1)"), "", true).setDefaultValue("-1")
+      .addParameter("expression", t("Frequency (Hz) (non-negative) (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Damping ratio (non-negative) (default: 1)"), "", true).setDefaultValue("1")
+      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addDistanceJoint");
+
+    aut.addAction(
+      "DistanceJointLength",
+      t("Distance joint length"),
+      t("Modify a distance joint length."),
+      t("Do _PARAM3__PARAM4_ to the length of distance joint _PARAM2_"),
+      t("Joints/Distance"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("operator", t("Modification's sign"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("setDistanceJointLength")
+      .setManipulatedType("number")
+      .setGetter("getDistanceJointLength");
+
+    aut.addExpression(
+      "DistanceJointLength",
+      t("Distance joint length"),
+      t("Distance joint length"),
+      t("Joints/Distance"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getDistanceJointLength");
+
+    aut.addAction(
+      "DistanceJointFrequency",
+      t("Distance joint frequency"),
+      t("Modify a distance joint frequency."),
+      t("Do _PARAM3__PARAM4_ to the frequency of distance joint _PARAM2_"),
+      t("Joints/Distance"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("operator", t("Modification's sign"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("setDistanceJointFrequency")
+      .setManipulatedType("number")
+      .setGetter("getDistanceJointFrequency");
+
+    aut.addExpression(
+      "DistanceJointFrequency",
+      t("Distance joint frequency"),
+      t("Distance joint frequency"),
+      t("Joints/Distance"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getDistanceJointFrequency");
+
+    aut.addAction(
+      "DistanceJointDampingRatio",
+      t("Distance joint damping ratio"),
+      t("Modify a distance joint damping ratio."),
+      t("Do _PARAM3__PARAM4_ to the damping ratio of distance joint _PARAM2_"),
+      t("Joints/Distance"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("operator", t("Modification's sign"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("setDistanceJointDampingRatio")
+      .setManipulatedType("number")
+      .setGetter("getDistanceJointDampingRatio");
+
+    aut.addExpression(
+      "DistanceJointDampingRatio",
+      t("Distance joint damping ratio"),
+      t("Distance joint damping ratio"),
+      t("Joints/Distance"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getDistanceJointDampingRatio");
+
+
+
+    // Revolute joint
+    aut.addAction(
+      "AddRevoluteJoint",
+      t("Add revolute joint"),
+      t("Add a revolute joint to an object at a fixed point. The object is attached as the second object in the joint, so you can use this for gear joints."),
+      t("Add a revolute joint to _PARAM0_ at _PARAM2_;_PARAM3_"),
+      t("Joints/Revolute"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("X anchor"))
+      .addParameter("expression", t("Y anchor"))
+      .addParameter("yesorno", t("Enable angle limits? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("expression", t("Reference angle (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Minimum angle (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Maximum angle (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("yesorno", t("Enable motor? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("expression", t("Motor speed (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Motor maximum torque (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addRevoluteJoint");
+
+    aut.addAction(
+      "AddRevoluteJointBetweenTwoBodies",
+      t("Add revolute joint between two bodies"),
+      t("Add a revolute joint between two objects. The reference angle determines what is considered as the initial angle at the initial state."),
+      t("Add a revolute joint between _PARAM0_ and _PARAM4_"),
+      t("Joints/Revolute"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Anchor X on first body"))
+      .addParameter("expression", t("Anchor Y on first body"))
+      .addParameter("objectPtr", t("Second object"), "", false)
+      .addParameter("expression", t("Anchor X on second body"))
+      .addParameter("expression", t("Anchor Y on second body"))
+      .addParameter("yesorno", t("Enable angle limits? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("expression", t("Reference angle (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Minimum angle (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Maximum angle (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("yesorno", t("Enable motor? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("expression", t("Motor speed (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Motor maximum torque (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addRevoluteJointBetweenTwoBodies");
+
+    aut.addExpression(
+      "RevoluteJointReferenceAngle",
+      t("Revolute joint reference angle"),
+      t("Revolute joint reference angle"),
+      t("Joints/Revolute"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getRevoluteJointReferenceAngle");
+
+    aut.addExpression(
+      "RevoluteJointAngle",
+      t("Revolute joint current angle"),
+      t("Revolute joint current angle"),
+      t("Joints/Revolute"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getRevoluteJointAngle");
+
+    aut.addExpression(
+      "RevoluteJointSpeed",
+      t("Revolute joint angular speed"),
+      t("Revolute joint angular speed"),
+      t("Joints/Revolute"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getRevoluteJointSpeed");
+
+    aut.addCondition(
+      "RevoluteJointLimitsEnabled",
+      t("Revolute joint limits enabled"),
+      t("Test if a revolute joint limits are enabled."),
+      t("Limits for revolute joint _PARAM2_ are enabled"),
+      t("Joints/Revolute"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("isRevoluteJointLimitsEnabled");
+
+    aut.addAction(
+      "EnableRevoluteJointLimits",
+      t("Enable revolute joint limits"),
+      t("Enable or disable a revolute joint angle limits."),
+      t("Enable limits for revolute joint _PARAM2_: _PARAM3_"),
+      t("Joints/Revolute"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("yesorno", t("Enable?"))
+      .getCodeExtraInformation()
+      .setFunctionName("enableRevoluteJointLimits");
+
+    aut.addAction(
+      "RevoluteJointLimits",
+      t("Revolute joint limits"),
+      t("Modify a revolute joint angle limits."),
+      t("Set revolute joint _PARAM2_ limits to lower: _PARAM3_, upper: _PARAM4_"),
+      t("Joints/Revolute"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("expression", t("Minimum angle"))
+      .addParameter("expression", t("Maximum angle"))
+      .getCodeExtraInformation()
+      .setFunctionName("setRevoluteJointLimits");
+
+    aut.addExpression(
+      "RevoluteJointMinAngle",
+      t("Revolute joint minimum angle"),
+      t("Revolute joint minimum angle"),
+      t("Joints/Revolute"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getRevoluteJointMinAngle");
+
+    aut.addExpression(
+      "RevoluteJointMaxAngle",
+      t("Revolute joint maximum angle"),
+      t("Revolute joint maximum angle"),
+      t("Joints/Revolute"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getRevoluteJointMaxAngle");
+
+    aut.addCondition(
+      "RevoluteJointMotorEnabled",
+      t("Revolute joint motor enabled"),
+      t("Test if a revolute joint motor is enabled."),
+      t("Motor of revolute joint _PARAM2_ is enabled"),
+      t("Joints/Revolute"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("isRevoluteJointMotorEnabled");
+
+    aut.addAction(
+      "EnableRevoluteJointMotor",
+      t("Enable revolute joint motor"),
+      t("Enable or disable a revolute joint motor."),
+      t("Enable motor for revolute joint _PARAM2_: _PARAM3_"),
+      t("Joints/Revolute"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("yesorno", t("Enable?"))
+      .getCodeExtraInformation()
+      .setFunctionName("enableRevoluteJointMotor");
+
+    aut.addAction(
+      "RevoluteJointMotorSpeed",
+      t("Revolute joint motor speed"),
+      t("Modify a revolute joint motor speed."),
+      t("Set revolute joint _PARAM2_ motor speed to _PARAM3_"),
+      t("Joints/Revolute"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("operator", t("Modification's sign"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("setRevoluteJointMotorSpeed")
+      .setManipulatedType("number")
+      .setGetter("getRevoluteJointMotorSpeed");
+
+    aut.addExpression(
+      "RevoluteJointMotorSpeed",
+      t("Revolute joint motor speed"),
+      t("Revolute joint motor speed"),
+      t("Joints/Revolute"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getRevoluteJointMotorSpeed");
+
+    aut.addAction(
+      "RevoluteJointMotorMaxTorque",
+      t("Revolute joint motor max torque"),
+      t("Modify a revolute joint motor max torque."),
+      t("Set revolute joint _PARAM2_ motor max torque to _PARAM3_"),
+      t("Joints/Revolute"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("operator", t("Modification's sign"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("setRevoluteJointMotorMaxTorque")
+      .setManipulatedType("number")
+      .setGetter("getRevoluteJointMotorMaxTorque");
+
+    aut.addExpression(
+      "RevoluteJointMotorMaxTorque",
+      t("Revolute joint motor max torque"),
+      t("Revolute joint motor max torque"),
+      t("Joints/Revolute"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getRevoluteJointMotorMaxTorque");
+
+
+
+    // Prismatic joint
+    aut.addAction(
+      "AddPrismaticJoint",
+      t("Add prismatic joint"),
+      t("Add a prismatic joint between two objects. The translation limits are converted to meters using the world scale on X."),
+      t("Add a prismatic joint between _PARAM0_ and _PARAM4_"),
+      t("Joints/Prismatic"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Anchor X on first body"))
+      .addParameter("expression", t("Anchor Y on first body"))
+      .addParameter("objectPtr", t("Second object"), "", false)
+      .addParameter("expression", t("Anchor X on second body"))
+      .addParameter("expression", t("Anchor Y on second body"))
+      .addParameter("expression", t("Axis angle"))
+      .addParameter("expression", t("Reference angle (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("yesorno", t("Enable limits? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("expression", t("Minimum translation (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Maximum translation (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("yesorno", t("Enable motor? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("expression", t("Motor speed (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Motor maximum force (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addPrismaticJoint");
+
+    aut.addExpression(
+      "PrismaticJointReferenceAngle",
+      t("Prismatic joint reference angle"),
+      t("Prismatic joint reference angle"),
+      t("Joints/Prismatic"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getPrismaticJointReferenceAngle");
+
+    aut.addExpression(
+      "PrismaticJointTranslation",
+      t("Prismatic joint current translation"),
+      t("Prismatic joint current translation"),
+      t("Joints/Prismatic"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getPrismaticJointTranslation");
+
+    aut.addExpression(
+      "PrismaticJointSpeed",
+      t("Prismatic joint current speed"),
+      t("Prismatic joint speed"),
+      t("Joints/Prismatic"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getPrismaticJointSpeed");
+
+    aut.addCondition(
+      "PrismaticJointLimitsEnabled",
+      t("Prismatic joint limits enabled"),
+      t("Test if a prismatic joint limits are enabled."),
+      t("Limits for prismatic joint _PARAM2_ are enabled"),
+      t("Joints/Prismatic"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("isPrismaticJointLimitsEnabled");
+
+    aut.addAction(
+      "EnablePrismaticJointLimits",
+      t("Enable prismatic joint limits"),
+      t("Enable or disable a prismatic joint limits."),
+      t("Enable limits for prismatic joint _PARAM2_: _PARAM3_"),
+      t("Joints/Prismatic"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("yesorno", t("Enable?"))
+      .getCodeExtraInformation()
+      .setFunctionName("enablePrismaticJointLimits");
+
+    aut.addAction(
+      "PrismaticJointLimits",
+      t("Prismatic joint limits"),
+      t("Modify a prismatic joint limits."),
+      t("Set limits for prismatic joint _PARAM2_ to lower: _PARAM3_, upper: _PARAM4_"),
+      t("Joints/Prismatic"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("expression", t("Minimum translation"))
+      .addParameter("expression", t("Maximum translation"))
+      .getCodeExtraInformation()
+      .setFunctionName("setPrismaticJointLimits");
+
+    aut.addExpression(
+      "PrismaticJointMinTranslation",
+      t("Prismatic joint minimum translation"),
+      t("Prismatic joint minimum translation"),
+      t("Joints/Prismatic"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getPrismaticJointMinTranslation");
+
+    aut.addExpression(
+      "PrismaticJointMaxTranslation",
+      t("Prismatic joint maximum translation"),
+      t("Prismatic joint maximum translation"),
+      t("Joints/Prismatic"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getPrismaticJointMaxTranslation");
+
+    aut.addCondition(
+      "PrismaticJointMotorEnabled",
+      t("Prismatic joint motor enabled"),
+      t("Test if a prismatic joint motor is enabled."),
+      t("Motor for prismatic joint _PARAM2_ is enabled"),
+      t("Joints/Prismatic"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("isPrismaticJointMotorEnabled");
+
+    aut.addAction(
+      "EnablePrismaticJointMotor",
+      t("Enable prismatic joint motor"),
+      t("Enable or disable a prismatic joint motor."),
+      t("Enable motor for prismatic joint _PARAM2_: _PARAM3_"),
+      t("Joints/Prismatic"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("yesorno", t("Enable?"))
+      .getCodeExtraInformation()
+      .setFunctionName("enablePrismaticJointMotor");
+
+    aut.addAction(
+      "PrismaticJointMotorSpeed",
+      t("Prismatic joint motor speed"),
+      t("Modify a prismatic joint motor speed."),
+      t("Set prismatic joint _PARAM2_ motor speed to _PARAM3_"),
+      t("Joints/Prismatic"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("operator", t("Modification's sign"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("setPrismaticJointMotorSpeed")
+      .setManipulatedType("number")
+      .setGetter("getPrismaticJointMotorSpeed");
+
+    aut.addExpression(
+      "PrismaticJointMotorSpeed",
+      t("Prismatic joint motor speed"),
+      t("Prismatic joint motor speed"),
+      t("Joints/Prismatic"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getPrismaticJointMotorSpeed");
+
+    aut.addAction(
+      "PrismaticJointMaxMotorForce",
+      t("Prismatic joint max motor force"),
+      t("Modify a prismatic joint maximum motor force."),
+      t("Set prismatic joint _PARAM2_ motor max force to _PARAM3_"),
+      t("Joints/Prismatic"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("operator", t("Modification's sign"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("setPrismaticJointMaxMotorForce")
+      .setManipulatedType("number")
+      .setGetter("getPrismaticJointMaxMotorForce");
+
+    aut.addExpression(
+      "PrismaticJointMaxMotorForce",
+      t("Prismatic joint max motor force"),
+      t("Prismatic joint maximum motor force"),
+      t("Joints/Prismatic"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .getCodeExtraInformation()
+      .setFunctionName("getPrismaticJointMaxMotorForce");
+
+
+
+    // Pulley joint
+    aut.addAction(
+      "AddPulleyJoint",
+      t("Add pulley joint"),
+      t("Add a pulley joint between two objects. Lengths are converted to meters using the world scale on X."),
+      t("Add a pulley joint between _PARAM0_ and _PARAM4_"),
+      t("Joints/Pulley"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Anchor X on first body"))
+      .addParameter("expression", t("Anchor Y on first body"))
+      .addParameter("objectPtr", t("Second object"), "", false)
+      .addParameter("expression", t("Anchor X on second body"))
+      .addParameter("expression", t("Anchor Y on second body"))
+      .addParameter("expression", t("Ground anchor X for first object"))
+      .addParameter("expression", t("Ground anchor Y for first object"))
+      .addParameter("expression", t("Ground anchor X for second object"))
+      .addParameter("expression", t("Ground anchor Y for second object"))
+      .addParameter("expression", t("Length for first object (-1 to use anchor positions) (default: -1)"), "", true).setDefaultValue("-1")
+      .addParameter("expression", t("Length for second object (-1 to use anchor positions) (default: -1)"), "", true).setDefaultValue("-1")
+      .addParameter("expression", t("Ratio (non-negative) (default: 1"), "", true).setDefaultValue("1")
+      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addPulleyJoint");
+
+    aut.addAction(
+      "AddGearJoint",
+      t("Add gear joint"),
+      t("Add a gear joint between two joints. Attention: Gear joints require the joints to be revolute or prismatic, and both of them to be attached to a static body as first object."),
+      t("Add a gear joint between joints _PARAM2_ and _PARAM3_"),
+      t("Joints/Gear"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("First joint ID"))
+      .addParameter("expression", t("Second joint ID"))
+      .addParameter("expression", t("Ratio (non-zero) (default: 1)"), "", true).setDefaultValue("1")
+      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addGearJoint");
+
+    aut.addAction(
+      "AddMouseJoint",
+      t("Add mouse joint"),
+      t("Add a mouse joint between two joints."),
+      t("Add a mouse joint to _PARAM0_"),
+      t("Joints/Mouse"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Target X"))
+      .addParameter("expression", t("Target Y"))
+      .addParameter("expression", t("Maximum force (N) (default: 500)"), "", true).setDefaultValue("500")
+      .addParameter("expression", t("Frequency (Hz) (positive) (default: 10)"), "", true).setDefaultValue("10")
+      .addParameter("expression", t("Damping ratio (default: 1)"), "", true).setDefaultValue("1")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addMouseJoint");
+
+    aut.addCondition(
+      "MouseJointTargetX",
+      t("Mouse joint target X"),
+      t("Test a mouse joint target X position."),
+      t("Mouse joint _PARAM2_ target X position is _PARAM3__PARAM4_"),
+      t("Joints/Mouse"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("relationalOperator", t("Sign of the test"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("getMouseJointTargetX")
+      .setManipulatedType("number");
+
+    aut.addCondition(
+      "MouseJointTargetY",
+      t("Mouse joint target Y"),
+      t("Test a mouse joint target Y position."),
+      t("Mouse joint _PARAM2_ target Y position is _PARAM3__PARAM4_"),
+      t("Joints/Mouse"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("relationalOperator", t("Sign of the test"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("getMouseJointTargetY")
+      .setManipulatedType("number");
+
+    aut.addAction(
+      "MouseJointTarget",
+      t("Mouse joint target"),
+      t("Set a mouse joint target."),
+      t("Do _PARAM3_;_PARAM4_ to the mouse joint _PARAM2_ target position"),
+      t("Joints/Mouse"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Joint ID"))
+      .addParameter("expression", t("Target X"))
+      .addParameter("expression", t("Target Y"))
+      .getCodeExtraInformation()
+      .setFunctionName("setMouseJointTarget");
+
+    aut.addAction(
+      "AddWheelJoint",
+      t("Add wheel joint"),
+      t("Add a wheel joint between two objects. Higher frequencies means higher suspensions. Damping determines oscillations, critical damping of 1 means no oscillations."),
+      t("Add a wheel joint between _PARAM0_ and _PARAM4_"),
+      t("Joints/Wheel"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Anchor X on first body"))
+      .addParameter("expression", t("Anchor Y on first body"))
+      .addParameter("objectPtr", t("Second object"), "", false)
+      .addParameter("expression", t("Anchor X on second body"))
+      .addParameter("expression", t("Anchor Y on second body"))
+      .addParameter("expression", t("Axis angle"))
+      .addParameter("expression", t("Frequency (Hz) (positive) (default: 10)"), "", true).setDefaultValue("10")
+      .addParameter("expression", t("Damping ratio (non-negative) (default: 1)"), "", true).setDefaultValue("1")
+      .addParameter("yesorno", t("Enable motor? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("expression", t("Motor speed (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Motor maximum force (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addWheelJoint");
+
+    aut.addAction(
+      "AddWeldJoint",
+      t("Add weld joint"),
+      t("Add a weld joint between two objects."),
+      t("Add a weld joint between _PARAM0_ and _PARAM4_"),
+      t("Joints/Weld"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Anchor X on first body"))
+      .addParameter("expression", t("Anchor Y on first body"))
+      .addParameter("objectPtr", t("Second object"), "", false)
+      .addParameter("expression", t("Anchor X on second body"))
+      .addParameter("expression", t("Anchor Y on second body"))
+      .addParameter("expression", t("Reference angle (default: 0)"), "", true).setDefaultValue("0")
+      .addParameter("expression", t("Frequency (Hz) (positive) (default: 10)"), "", true).setDefaultValue("10")
+      .addParameter("expression", t("Damping ratio (non-negative) (default: 1)"), "", true).setDefaultValue("1")
+      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addWeldJoint");
+
+    aut.addAction(
+      "AddRopeJoint",
+      t("Add rope joint"),
+      t("Add a rope joint between two objects. The maximum length is converted to meters using the world scale on X."),
+      t("Add a rope joint between _PARAM0_ and _PARAM4_"),
+      t("Joints/Rope"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Anchor X on first body"))
+      .addParameter("expression", t("Anchor Y on first body"))
+      .addParameter("objectPtr", t("Second object"), "", false)
+      .addParameter("expression", t("Anchor X on second body"))
+      .addParameter("expression", t("Anchor Y on second body"))
+      .addParameter("expression", t("Maximum length (-1 to use current objects distance) (default: -1)"), "", true).setDefaultValue("-1")
+      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addRopeJoint");
+
+    aut.addAction(
+      "AddFrictionJoint",
+      t("Add friction joint"),
+      t("Add a friction joint between two objects."),
+      t("Add a friction joint between _PARAM0_ and _PARAM4_"),
+      t("Joints/Friction"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("expression", t("Anchor X on first body"))
+      .addParameter("expression", t("Anchor Y on first body"))
+      .addParameter("objectPtr", t("Second object"), "", false)
+      .addParameter("expression", t("Anchor X on second body"))
+      .addParameter("expression", t("Anchor Y on second body"))
+      .addParameter("expression", t("Maximum force (non-negative)"))
+      .addParameter("expression", t("Maximum torque (non-negative)"))
+      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addFrictionJoint");
+
+    aut.addAction(
+      "AddMotorJoint",
+      t("Add motor joint"),
+      t("Add a motor joint between two objects. The position and angle offset are relative to the first object."),
+      t("Add a motor joint between _PARAM0_ and _PARAM2_"),
+      t("Joints/Motor"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("First object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("objectPtr", t("Second object"), "", false)
+      .addParameter("expression", t("Offset X position"))
+      .addParameter("expression", t("Offset Y position"))
+      .addParameter("expression", t("Offset Angle"))
+      .addParameter("expression", t("Maximum force (non-negative)"))
+      .addParameter("expression", t("Maximum torque (non-negative)"))
+      .addParameter("expression", t("Correction factor (default: 1)"), "", true).setDefaultValue("1")
+      .addParameter("yesorno", t("Allow collision between connected bodies? (default: no)"), "", true).setDefaultValue("false")
+      .addParameter("scenevar", t("Variable where to store the joint ID (default: none)"), "", true)
+      .getCodeExtraInformation()
+      .setFunctionName("addMotorJoint");
 
     return extension;
   },

@@ -233,7 +233,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
 	if (this._profiler) this._profiler.end("events");
 	
     if (this._profiler) this._profiler.begin("objects (post-events)");
-	this._updateObjects();
+	this._updateObjectsPostEvents();
 	if (this._profiler) this._profiler.end("objects (post-events)");
 	
     if (this._profiler) this._profiler.begin("objects (visibility)");
@@ -384,27 +384,9 @@ gdjs.RuntimeScene.prototype._updateObjectsPreEvents = function() {
 	//may delete the objects.
 	this._constructListOfAllInstances();
 	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
-		this._allInstancesList[i].stepBehaviorsPreEvents(this);
-	}
-
-	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
-};
-
-/**
- * Update the objects (update positions, time management...)
- * @private
- */
-gdjs.RuntimeScene.prototype._updateObjects = function() {
-	this._cacheOrClearRemovedInstances();
-
-	//It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
-	//may delete the objects.
-	this._constructListOfAllInstances();
-	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
-        var obj = this._allInstancesList[i];
-
-        var elapsedTime = obj.getElapsedTime(this);
-        if (!obj.hasNoForces()) {
+		var obj = this._allInstancesList[i];
+		var elapsedTime = obj.getElapsedTime(this);
+		if (!obj.hasNoForces()) {
             var averageForce = obj.getAverageForce();
             var elapsedTimeInSeconds = elapsedTime / 1000;
 
@@ -415,8 +397,25 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
         } else {
             obj.update(this);
         }
-		obj.stepBehaviorsPostEvents(this);
         obj.updateTimers(elapsedTime);
+		this._allInstancesList[i].stepBehaviorsPreEvents(this);
+	}
+
+	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
+};
+
+/**
+ * Update the objects (update positions, time management...)
+ * @private
+ */
+gdjs.RuntimeScene.prototype._updateObjectsPostEvents = function() {
+	this._cacheOrClearRemovedInstances();
+
+	//It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
+	//may delete the objects.
+	this._constructListOfAllInstances();
+	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
+		this._allInstancesList[i].stepBehaviorsPostEvents(this);
 	}
 
 	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.

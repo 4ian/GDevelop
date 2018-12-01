@@ -26,15 +26,15 @@ const closeWindow = () => {
 
 // Repeatedly try to gain access to piskel's control element and its methods
 // When succeeding, stop trying.
-let pskl = null;
+let pskl = document.querySelector('#piskel-frame').contentWindow.pskl;
 const tryToGetPiskel = () => {
   pskl = document.querySelector('#piskel-frame').contentWindow.pskl;
-  if (pskl !== null) {
+  if (typeof pskl === 'object') {
     ipcRenderer.send('piskel-ready');
     clearInterval(retryToGetPiskel);
   }
 };
-let retryToGetPiskel = setInterval(tryToGetPiskel, 200);
+let retryToGetPiskel = setInterval(tryToGetPiskel, 1);
 
 const readBase64ImageFile = file => {
   const bitmap = fs.readFileSync(file);

@@ -15,10 +15,10 @@ export type ExternalEditorOpenOptions = {|
       path?: string,
       name: string,
       originalIndex: ?number,
-      externalEditorData?: ?Object,
+      metadata?: ?Object,
     }>,
     newName: string,
-    externalEditorData?: ?Object
+    metadata?: ?Object
   ) => void,
   extraOptions: {
     name?: string,

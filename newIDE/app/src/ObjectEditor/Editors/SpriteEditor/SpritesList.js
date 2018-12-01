@@ -245,7 +245,7 @@ export default class SpritesList extends Component<Props, void> {
         isLooping: direction.isLooping(),
         externalEditorData,
       },
-      onChangesSaved: (resources, newAnimationName, externalEditorData) => {
+      onChangesSaved: (resources, newAnimationName, metadata) => {
         const newDirection = new gd.Direction();
         newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
         newDirection.setLoop(direction.isLooping());
@@ -270,8 +270,8 @@ export default class SpritesList extends Component<Props, void> {
         });
 
         // set metadata if there is such on the direction
-        if (externalEditorData) {
-          newDirection.setMetadata(JSON.stringify(externalEditorData))
+        if (metadata) {
+          newDirection.setMetadata(JSON.stringify(metadata))
         }
         
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).

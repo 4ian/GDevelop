@@ -41,7 +41,7 @@ export const openPiskel = ({
   });
 
   const projectPath = path.dirname(project.getProjectFile());
-  const completePiskelOptions = {
+  const externalEditorData = {
     ...extraOptions,
     resources,
     singleFrame,
@@ -52,8 +52,8 @@ export const openPiskel = ({
   ipcRenderer.removeAllListeners('piskel-changes-saved');
   ipcRenderer.on(
     'piskel-changes-saved',
-    (event, outputResources, newAnimationName, receivedData) => {
-      const externalEditorData = receivedData.data ? { pskl: receivedData } : null;
+    (event, outputResources, newAnimationName, externalEditorData) => {
+      const metadata = externalEditorData.data ? { pskl: externalEditorData } : null;
 
       const resourcesManager = project.getResourcesManager();
       outputResources.forEach(resource => {
@@ -62,21 +62,21 @@ export const openPiskel = ({
       });
 
       // in case this is for a single frame object, save the metadata in the Image object
-      if (receivedData.singleFrame) {
-        if (externalEditorData) {
+      if (externalEditorData.singleFrame) {
+        if (metadata) {
           resourcesManager
           .getResource(path.relative(projectPath, outputResources[0].path))
-          .setMetadata(JSON.stringify(externalEditorData));
+          .setMetadata(JSON.stringify(metadata));
         };
         onChangesSaved(outputResources, newAnimationName);
       } else {
         // In case there are multiple frames, pass back the metadata to the editor and let it store it at an appropriate place.
         // (For example, for sprites, SpritesList.js will save it in the metadata of the gd.Direction).
-        onChangesSaved(outputResources, newAnimationName, externalEditorData);
+        onChangesSaved(outputResources, newAnimationName, metadata);
       }  
     }
   );
 
   // Issue the event to open piskel
-  ipcRenderer.send('piskel-open-then-load-animation', completePiskelOptions);
+  ipcRenderer.send('piskel-open-then-load-animation', externalEditorData);
 };

@@ -28,27 +28,27 @@ export const openJfxr = ({
     initialResourcePath.lastIndexOf('?cache=')
   );
 
-  const jfxrData = {
+  const externalEditorData = {
     resourcePath: initialResourcePath,
     externalEditorData: extraOptions.initialResourceMetadata,
     projectPath,
   };
 
   ipcRenderer.removeAllListeners('jfxr-changes-saved');
-  ipcRenderer.on('jfxr-changes-saved', (event, newFilePath, receivedData) => {
+  ipcRenderer.on('jfxr-changes-saved', (event, newFilePath, externalEditorData) => {
 
     const resourceName = path.relative(projectPath, newFilePath);
     createOrUpdateResource(project, new gd.AudioResource(), resourceName);
 
-    const externalEditorData = {
-      jfxr: receivedData,
+    const metadata = {
+      jfxr: externalEditorData,
     };
     project
     .getResourcesManager()
     .getResource(resourceName)
-    .setMetadata(JSON.stringify(externalEditorData));
-    onChangesSaved([{ externalEditorData }], resourceName);
+    .setMetadata(JSON.stringify(metadata));
+    onChangesSaved([{ metadata }], resourceName);
   });
 
-  ipcRenderer.send('jfxr-create-wav', jfxrData);
+  ipcRenderer.send('jfxr-create-wav', externalEditorData);
 };

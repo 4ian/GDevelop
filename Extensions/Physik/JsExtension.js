@@ -546,6 +546,23 @@ module.exports = {
 
 
     // Body settings
+    aut.addAction(
+      "ShapeScale",
+      t("Shape scale"),
+      t("Modify an object shape scale. It affects custom shape dimensions and shape offset, if custom dimensions are not set the body will be scaled automatically to the object size."),
+      t("Do to _PARAM2__PARAM3_ to the shape scale of _PARAM0_"),
+      t("Body settings"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("operator", t("Modification's sign"))
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("setShapeScale")
+      .setManipulatedType("number")
+      .setGetter("getShapeScale");
+
     aut.addCondition(
       "Density",
       t("Density"),
@@ -1047,6 +1064,28 @@ module.exports = {
       .addParameter("expression", t("Angular impulse (N.m.s"))
       .getCodeExtraInformation()
       .setFunctionName("applyAngularImpulse");
+
+    aut.addExpression(
+      "MassCenterX",
+      t("Mass center X"),
+      t("Mass center X"),
+      t("Joints"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .getCodeExtraInformation()
+      .setFunctionName("getMassCenterX");
+
+    aut.addExpression(
+      "MassCenterY",
+      t("Mass center Y"),
+      t("Mass center Y"),
+      t("Joints"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .getCodeExtraInformation()
+      .setFunctionName("getMassCenterY");
 
 
 

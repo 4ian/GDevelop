@@ -180,6 +180,7 @@ gdjs.PhysikRuntimeBehavior = function(runtimeScene, behaviorData, owner)
     this.gravityScale = behaviorData.content.gravityScale;
     this.layers = behaviorData.content.layers;
     this.masks = behaviorData.content.masks;
+    this.shapeScale = 1;
     this.currentContacts = this.currentContacts || [];
     this.currentContacts.length = 0;
 
@@ -223,43 +224,50 @@ gdjs.PhysikRuntimeBehavior.prototype.ownerRemovedFromScene = function() {
     this.onDeActivate();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getBody = function() {
-    // If there is no body, set a new one
-    if (this._body === null) this.createBody();
-
-    return this._body;
-};
-
-gdjs.PhysikRuntimeBehavior.prototype.createBody = function() {
-    // Generate the shape
+gdjs.PhysikRuntimeBehavior.prototype.createShape = function() {
+    // Get the scaled offset
+    var offsetX = this.shapeOffsetX ? this.shapeOffsetX * this.shapeScale * this._sharedData.invScaleX : 0;
+    var offsetY = this.shapeOffsetY ? this.shapeOffsetY * this.shapeScale * this._sharedData.invScaleY : 0;
+    // Generate the base shape
     var shape;
     if(this.shape === "Circle"){
         shape = new Box2D.b2CircleShape();
-        var radius = this.shapeDimensionA * (this._sharedData.invScaleX + this._sharedData.invScaleY) / 2;
-        if(!this.shapeDimensionA){
-            radius = (this.owner.getWidth() * this._sharedData.invScaleX +
-                      this.owner.getHeight() * this._sharedData.invScaleY) / 4;
+        // Radius determined by the custom dimension
+        if(this.shapeDimensionA > 0){
+            shape.set_m_radius(this.shapeDimensionA * this.shapeScale * this._sharedData.invScaleX);
         }
-        shape.set_m_radius(radius > 0 ? radius : 1);
+        // Average radius from width and height
+        else{
+            var radius = (this.owner.getWidth() * this._sharedData.invScaleX +
+                          this.owner.getHeight() * this._sharedData.invScaleY) / 4;
+            shape.set_m_radius(radius > 0 ? radius : 1);
+        }
+        // Set the offset
+        shape.set_m_p(this.b2Vec2(offsetX, offsetY));
     }
     else if(this.shape === "Polygon"){
         // Needs a vertices editor
     }
     else if(this.shape === "Edge"){
         shape = new Box2D.b2EdgeShape();
-        var length = (this.shapeDimensionA > 0 ? this.shapeDimensionA :
-                        this.owner.getWidth() > 0 ? this.owner.getWidth() : 1) * this._sharedData.invScaleX;
+        // Length from the custom dimension or from the object width
+        var length = (this.shapeDimensionA > 0 ? this.shapeDimensionA * this.shapeScale :
+                      this.owner.getWidth() > 0 ? this.owner.getWidth() : 1) * this._sharedData.invScaleX;
+        // Angle from custom dimension, otherwise is 0
         var angle = this.shapeDimensionB ? gdjs.toRad(this.shapeDimensionB) : 0;
-        shape.Set(this.b2Vec2(-length/2 * Math.cos(angle), length/2 * Math.sin(angle)),
-                  this.b2Vec2Sec(length/2 * Math.cos(angle),-length/2 * Math.sin(angle)));
+        // Set the edge vertices from the length, the angle and the offset
+        shape.Set(this.b2Vec2(-length/2 * Math.cos(angle) + offsetX, -length/2 * Math.sin(angle) + offsetY),
+                  this.b2Vec2Sec(length/2 * Math.cos(angle) + offsetX, length/2 * Math.sin(angle) + offsetY));
     }
     else{ // Box
         shape = new Box2D.b2PolygonShape();
-        var width = (this.shapeDimensionA > 0 ? this.shapeDimensionA :
+        // Width and height from custom dimensions or object size
+        var width = (this.shapeDimensionA > 0 ? this.shapeDimensionA * this.shapeScale :
                         this.owner.getWidth() > 0 ? this.owner.getWidth() : 1) * this._sharedData.invScaleX;
-        var height = (this.shapeDimensionB > 0 ? this.shapeDimensionB :
+        var height = (this.shapeDimensionB > 0 ? this.shapeDimensionB * this.shapeScale :
                         this.owner.getHeight() > 0 ? this.owner.getHeight() : 1) * this._sharedData.invScaleY;
-        shape.SetAsBox(width/2, height/2);
+        // Set the shape box, the offset must be added here too
+        shape.SetAsBox(width/2, height/2, this.b2Vec2(offsetX, offsetY), 0);
     }
 
     // Generate filter data
@@ -273,17 +281,57 @@ gdjs.PhysikRuntimeBehavior.prototype.createBody = function() {
     // Set fixture settings
     fixDef.set_shape(shape);
     fixDef.set_filter(filter);
-    fixDef.set_density(this.density >= 0 ? this.density : 0);
-    fixDef.set_friction(this.friction >= 0 ? this.friction : 0);
-    fixDef.set_restitution(this.restitution >= 0 ? this.restitution : 0);
+    if(this.density < 0) this.density = 0;
+    fixDef.set_density(this.density);
+    if(this.friction < 0) this.friction = 0;
+    fixDef.set_friction(this.friction);
+    if(this.restitution < 0) this.restitution = 0;
+    fixDef.set_restitution(this.restitution);
 
+    // Return the fixture
+    return fixDef;
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.recreateShape = function() {
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+        return;
+    }
+    // Destroy the old shape
+    this._body.DestroyFixture(this._body.GetFixtureList());
+    this._body.CreateFixture(this.createShape());
+    // Update cached size
+    this._objectOldWidth = this.owner.getWidth();
+    this._objectOldHeight = this.owner.getHeight();
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.getShapeScale = function() {
+    return this.shapeScale;
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.setShapeScale = function(shapeScale) {
+    if(shapeScale !== this.shapeScale && shapeScale > 0){
+        this.shapeScale = shapeScale;
+        this.recreateShape();
+    }
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.getBody = function() {
+    // If there is no body, set a new one
+    if (this._body === null) this.createBody();
+
+    return this._body;
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.createBody = function() {
     // Generate the body definition
     var bodyDef = new Box2D.b2BodyDef();
 
     // Set the initial body transformation from the GD object
     bodyDef.set_position(this.b2Vec2(
-         (this.owner.getDrawableX() + this.owner.getWidth()/2 + this.shapeOffsetX) * this._sharedData.invScaleX,
-         (this.owner.getDrawableY() + this.owner.getHeight()/2 + this.shapeOffsetY) * this._sharedData.invScaleY));
+         (this.owner.getDrawableX() + this.owner.getWidth()/2) * this._sharedData.invScaleX,
+         (this.owner.getDrawableY() + this.owner.getHeight()/2) * this._sharedData.invScaleY));
     bodyDef.set_angle(gdjs.toRad(this.owner.getAngle()));
     
     // Set body settings
@@ -298,7 +346,7 @@ gdjs.PhysikRuntimeBehavior.prototype.createBody = function() {
 
     // Create the body
     this._body = this._sharedData.world.CreateBody(bodyDef);
-    this._body.CreateFixture(fixDef);
+    this._body.CreateFixture(this.createShape());
     this._body.gdjsAssociatedBehavior = this;
 
     // Update cached size
@@ -319,9 +367,9 @@ gdjs.PhysikRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
 
     // Copy transform from body to the GD object
     this.owner.setX(this._body.GetPosition().get_x()*this._sharedData.scaleX -
-        this.owner.getWidth()/2 + this.owner.getX() - this.owner.getDrawableX() - this.shapeOffsetX);
+        this.owner.getWidth()/2 + this.owner.getX() - this.owner.getDrawableX());
     this.owner.setY(this._body.GetPosition().get_y()*this._sharedData.scaleY -
-        this.owner.getHeight()/2 + this.owner.getY() - this.owner.getDrawableY() - this.shapeOffsetY);
+        this.owner.getHeight()/2 + this.owner.getY() - this.owner.getDrawableY());
     this.owner.setAngle(gdjs.toDegrees(this._body.GetAngle()));
 
     // Update cached transform
@@ -334,19 +382,11 @@ gdjs.PhysikRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
     // If there is no body, set a new one
     if (this._body === null) this.createBody();
 
-    // GD object size has changed, recreate body
+    // GD object size has changed, recreate shape
     if (this._objectOldWidth !== this.owner.getWidth() ||
         this._objectOldHeight !== this.owner.getHeight()){
 
-        var oldAngularVelocity = this._body.GetAngularVelocity();
-        var oldXVelocity = this._body.GetLinearVelocity().get_x();
-        var oldYVelocity = this._body.GetLinearVelocity().get_y();
-
-        this._sharedData.world.DestroyBody(this._body);
-        this.createBody();
-
-        this._body.SetAngularVelocity(oldAngularVelocity);
-        this._body.SetLinearVelocity(this.b2Vec2(oldXVelocity, oldYVelocity));
+        this.recreateShape();
     }
 
     // GD object transform has changed, update body transform
@@ -838,6 +878,24 @@ gdjs.PhysikRuntimeBehavior.prototype.applyAngularImpulse = function(angularImpul
     this._body.ApplyAngularImpulse(angularImpulse);
 };
 
+gdjs.PhysikRuntimeBehavior.prototype.getMassCenterX = function(){
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+    }
+    // Get the mass center on X
+    return this._body.GetWorldCenter().get_x();
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.getMassCenterY = function(){
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+    }
+    // Get the mass center on Y
+    return this._body.GetWorldCenter().get_y();
+};
+
 
 
 // Joints
@@ -971,12 +1029,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointLength = function(jointId){
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setDistanceJointLength = function(jointId, length){
+    // Invalid value
+    if(length < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_distanceJoint) return;
     // Set the joint length
-    joint.SetLength(length >= 0 ? length * this._sharedData.invScaleX : 0);
+    joint.SetLength(length * this._sharedData.invScaleX);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointFrequency = function(jointId){
@@ -989,12 +1049,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointFrequency = function(jointI
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setDistanceJointFrequency = function(jointId, frequency){
+    // Invalid value
+    if(frequency < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_distanceJoint) return;
     // Set the joint frequency
-    joint.SetFrequency(frequency >= 0 ? frequency : 0);
+    joint.SetFrequency(frequency);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointDampingRatio = function(jointId){
@@ -1007,12 +1069,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointDampingRatio = function(joi
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setDistanceJointDampingRatio = function(jointId, dampingRatio){
+    // Invalid value
+    if(dampingRatio < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_distanceJoint);
     // Set the joint damping ratio
-    joint.SetDampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
+    joint.SetDampingRatio(dampingRatio);
 };
 
 
@@ -1202,12 +1266,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMaxMotorTorque = function(j
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setRevoluteJointMaxMotorTorque = function(jointId, maxTorque){
+    // Invalid value
+    if(maxTorque < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_revoluteJoint) return;
     // Set the joint max motor
-    joint.SetMaxMotorTorque(maxTorque >= 0 ? maxTorque : 0);
+    joint.SetMaxMotorTorque(maxTorque);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMotorTorque = function(jointId){
@@ -1402,12 +1468,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMaxMotorForce = function(j
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setPrismaticJointMaxMotorForce = function(jointId, maxForce){
+    // Invalid value
+    if(maxForce < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_prismaticJoint) return;
     // Set the joint max motor force
-    joint.SetMaxMotorForce(maxForce >= 0 ? maxForce : 0);
+    joint.SetMaxMotorForce(maxForce);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMotorForce = function(jointId){
@@ -1641,11 +1709,13 @@ gdjs.PhysikRuntimeBehavior.prototype.getMouseJointMaxForce = function(jointId){
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setMouseJointMaxForce = function(jointId, maxForce){
+    // Invalid value
+    if(maxForce < 0) return;
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return;
     // Set the joint max force
-    joint.SetMaxForce(maxForce >= 0 ? maxForce : 0);
+    joint.SetMaxForce(maxForce);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getMouseJointFrequency = function(jointId){
@@ -1657,11 +1727,13 @@ gdjs.PhysikRuntimeBehavior.prototype.getMouseJointFrequency = function(jointId){
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setMouseJointFrequency = function(jointId, frequency){
+    // Invalid value
+    if(frequency <= 0) return;
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return;
     // Set the joint frequency
-    joint.SetFrequency(frequency > 0 ? frequency : 1);
+    joint.SetFrequency(frequency);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getMouseJointDampingRatio = function(jointId){
@@ -1673,17 +1745,19 @@ gdjs.PhysikRuntimeBehavior.prototype.getMouseJointDampingRatio = function(jointI
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setMouseJointDampingRatio = function(jointId, dampingRatio){
+    // Invalid value
+    if(dampingRatio < 0) return;
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return;
     // Set the joint damping ratio
-    joint.SetDampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
+    joint.SetDampingRatio(dampingRatio);
 };
 
 
 
 // Wheel joint
-gdjs.PhysikRuntimeBehavior.prototype.addWheelJoint = function(x1, y1, other, x2, y2, axisAngle, frequency, dampingRatio, enableMotor, motorSpeed, maxMotorForce, collideConnected, variable){
+gdjs.PhysikRuntimeBehavior.prototype.addWheelJoint = function(x1, y1, other, x2, y2, axisAngle, frequency, dampingRatio, enableMotor, motorSpeed, maxMotorTorque, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -1706,10 +1780,8 @@ gdjs.PhysikRuntimeBehavior.prototype.addWheelJoint = function(x1, y1, other, x2,
     jointDef.set_frequencyHz(frequency > 0 ? frequency : 1);
     jointDef.set_dampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
     jointDef.set_enableMotor(enableMotor);
-    if(enableMotor){
-        jointDef.set_motorSpeed(motorSpeed);
-        jointDef.set_maxMotorForce(maxMotorForce);
-    }
+    jointDef.set_motorSpeed(motorSpeed);
+    jointDef.set_maxMotorTorque(maxMotorTorque);
     jointDef.set_collideConnected(collideConnected);
     // Create the joint and get the id
     var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2WheelJoint));
@@ -1790,12 +1862,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointMaxMotorTorque = function(join
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setWheelJointMaxMotorTorque = function(jointId, maxTorque){
+    // Invalid value
+    if(maxTorque < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_wheelJoint) return;
     // Set the joint max motor torque
-    joint.SetMaxMotorTorque(maxTorque >= 0 ? maxTorque : 0);
+    joint.SetMaxMotorTorque(maxTorque);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getWheelJointMotorTorque = function(jointId){
@@ -1817,12 +1891,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointFrequency = function(jointId){
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setWheelJointFrequency = function(jointId, frequency){
+    // Invalid value
+    if(frequency < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_wheelJoint) return;
     // Set the joint frequency
-    joint.SetSpringFrequencyHz(frequency >= 0 ? frequency : 0);
+    joint.SetSpringFrequencyHz(frequency);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getWheelJointDampingRatio = function(jointId){
@@ -1835,12 +1911,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointDampingRatio = function(jointI
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setWheelJointDampingRatio = function(jointId, dampingRatio){
+    // Invalid value
+    if(dampingRatio < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_wheelJoint) return;
     // Set the joint damping ratio
-    joint.SetSpringDampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
+    joint.SetSpringDampingRatio(dampingRatio);
 };
 
 
@@ -1893,12 +1971,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getWeldJointFrequency = function(jointId){
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setWeldJointFrequency = function(jointId, frequency){
+    // Invalid value
+    if(frequency < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_weldJoint) return;
     // Set the joint frequency
-    joint.SetFrequency(frequency >= 0 ? frequency : 0);
+    joint.SetFrequency(frequency);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getWeldJointDampingRatio = function(jointId){
@@ -1911,12 +1991,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getWeldJointDampingRatio = function(jointId
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setWeldJointDampingRatio = function(jointId, dampingRatio){
+    // Invalid value
+    if(dampingRatio < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_weldJoint) return;
     // Set the joint damping ratio
-    joint.SetDampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
+    joint.SetDampingRatio(dampingRatio);
 };
 
 
@@ -1959,12 +2041,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getRopeJointMaxLength = function(jointId){
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setRopeJointMaxLength = function(jointId, maxLength){
+    // Invalid value
+    if(maxLength < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_ropeJoint) return;
     // Set the joint maximum length
-    joint.SetMaxLength(maxLength >= 0 ? maxLength : 0);
+    joint.SetMaxLength(maxLength);
 };
 
 
@@ -2007,12 +2091,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getFrictionJointMaxForce = function(jointId
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setFrictionJointMaxForce = function(jointId, maxForce){
+    // Invalid value
+    if(maxForce < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_frictionJoint) return;
     // Set the joint maximum force
-    joint.SetMaxForce(maxForce >= 0 ? maxForce : 0);
+    joint.SetMaxForce(maxForce);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getFrictionJointMaxTorque = function(jointId){
@@ -2025,12 +2111,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getFrictionJointMaxTorque = function(jointI
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setFrictionJointMaxTorque = function(jointId, maxTorque){
+    // Invalid value
+    if(maxTorque < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_frictionJoint) return;
     // Set the joint maximum torque
-    joint.SetMaxTorque(maxForce >= 0 ? maxForce : 0);
+    joint.SetMaxTorque(maxTorque);
 };
 
 
@@ -2120,12 +2208,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getMotorJointMaxForce = function(jointId){
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setMotorJointMaxForce = function(jointId, maxForce){
+    // Invalid value
+    if(maxForce < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_motorJoint) return;
     // Set the joint maximum force
-    joint.SetMaxForce(maxForce <= 0 ? maxForce : 0);
+    joint.SetMaxForce(maxForce);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getMotorJointMaxTorque = function(jointId){
@@ -2138,12 +2228,14 @@ gdjs.PhysikRuntimeBehavior.prototype.getMotorJointMaxTorque = function(jointId){
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setMotorJointMaxTorque = function(jointId, maxTorque){
+    // Invalid value
+    if(maxTorque < 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_motorJoint) return;
     // Set the joint maximum torque
-    joint.SetMaxTorque(maxTorque <= 0 ? maxTorque : 0);
+    joint.SetMaxTorque(maxTorque);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getMotorJointCorrectionFactor = function(jointId){
@@ -2156,11 +2248,12 @@ gdjs.PhysikRuntimeBehavior.prototype.getMotorJointCorrectionFactor = function(jo
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setMotorJointCorrectionFactor = function(jointId, correctionFactor){
+    // Invalid value
+    if(correctionFactor < 0 || correctionFactor > 1) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_motorJoint) return;
     // Set the joint correction factor
-    joint.SetCorrectionFactor(correctionFactor < 0 ? 0 :
-                              correctionFactor > 1 ? 1 : correctionFactor);
+    joint.SetCorrectionFactor(correctionFactor);
 };

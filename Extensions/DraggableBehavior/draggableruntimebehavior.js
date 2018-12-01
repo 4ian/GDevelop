@@ -29,6 +29,10 @@ gdjs.DraggableRuntimeBehavior.prototype.onDeActivate = function() {
     this._endDrag();
 };
 
+gdjs.DraggableRuntimeBehavior.prototype.ownerRemovedFromScene = function() {
+    this.onDeActivate();
+};
+
 gdjs.DraggableRuntimeBehavior.prototype._endDrag = function() {
     if ( this._dragged && this._mouse ) gdjs.DraggableRuntimeBehavior.mouseDraggingSomething = false;
     if ( this._dragged && this._touchId !== null ) gdjs.DraggableRuntimeBehavior.touchDraggingSomething[this._touchId] = false;

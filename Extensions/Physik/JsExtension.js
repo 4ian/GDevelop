@@ -1383,7 +1383,7 @@ module.exports = {
     aut.addAction(
       "AddRevoluteJointBetweenTwoBodies",
       t("Add revolute joint between two bodies"),
-      t("Add a revolute joint between two objects. The reference angle determines what is considered as the initial angle at the initial state."),
+      t("Add a revolute joint between two objects. The reference angle determines what is considered as the base angle at the initial state."),
       t("Add a revolute joint between _PARAM0_ and _PARAM4_"),
       t("Joints/Revolute"),
       "res/physics24.png",
@@ -1573,8 +1573,8 @@ module.exports = {
 
     aut.addAction(
       "RevoluteJointMaxMotorTorque",
-      t("Revolute joint motor max torque"),
-      t("Modify a revolute joint motor max torque."),
+      t("Revolute joint max motor torque"),
+      t("Modify a revolute joint maximum motor torque."),
       t("Do _PARAM3__PARAM4_ to the maximum motor torque for revolute joint _PARAM2_"),
       t("Joints/Revolute"),
       "res/physics24.png",
@@ -1591,8 +1591,8 @@ module.exports = {
 
     aut.addExpression(
       "RevoluteJointMaxMotorTorque",
-      t("Revolute joint motor max torque"),
-      t("Revolute joint motor max torque"),
+      t("Revolute joint max motor torque"),
+      t("Revolute joint Maximum motor torque"),
       t("Joints/Revolute"),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
@@ -1917,7 +1917,7 @@ module.exports = {
       .setFunctionName("getPulleyJointFirstGroundAnchorY");
 
     aut.addExpression(
-      "PulleyJointSecondtGroundAnchorX",
+      "PulleyJointSecondGroundAnchorX",
       t("Pulley joint second ground anchor X"),
       t("Pulley joint second ground anchor X"),
       t("Joints/Pulley"),

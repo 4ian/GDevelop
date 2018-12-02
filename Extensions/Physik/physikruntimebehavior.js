@@ -253,11 +253,12 @@ gdjs.PhysikRuntimeBehavior.prototype.createShape = function() {
         // Length from the custom dimension or from the object width
         var length = (this.shapeDimensionA > 0 ? this.shapeDimensionA * this.shapeScale :
                       this.owner.getWidth() > 0 ? this.owner.getWidth() : 1) * this._sharedData.invScaleX;
+        var height = this.owner.getHeight() > 0 ? this.owner.getHeight() * this._sharedData.invScaleY : 0;
         // Angle from custom dimension, otherwise is 0
         var angle = this.shapeDimensionB ? gdjs.toRad(this.shapeDimensionB) : 0;
         // Set the edge vertices from the length, the angle and the offset
-        shape.Set(this.b2Vec2(-length/2 * Math.cos(angle) + offsetX, -length/2 * Math.sin(angle) + offsetY),
-                  this.b2Vec2Sec(length/2 * Math.cos(angle) + offsetX, length/2 * Math.sin(angle) + offsetY));
+        shape.Set(this.b2Vec2(-length/2*Math.cos(angle) + offsetX, height/2 - length/2*Math.sin(angle) + offsetY),
+                  this.b2Vec2Sec(length/2*Math.cos(angle) + offsetX, height/2 + length/2*Math.sin(angle) + offsetY));
     }
     else{ // Box
         shape = new Box2D.b2PolygonShape();
@@ -383,9 +384,14 @@ gdjs.PhysikRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
     if (this._body === null) this.createBody();
 
     // GD object size has changed, recreate shape
-    if (this._objectOldWidth !== this.owner.getWidth() ||
-        this._objectOldHeight !== this.owner.getHeight()){
-
+    // The width has changed and there is no custom dimension A (box: width, circle: radius, edge: length) or
+    // The height has changed, the shape is not an edge (edges doesn't have height),
+    // it isn't a box with custom height or a circle with custom radius
+    if ((this._objectOldWidth !== this.owner.getWidth() && this.shapeDimensionA <= 0) ||
+        (this._objectOldHeight !== this.owner.getHeight() &&
+            this.shape !== "Edge" &&
+            !(this.shape === "Box" && this.shapeDimensionB > 0) &&
+            !(this.shape === "Ciecle" && this.shapeDimensionA > 0))){
         this.recreateShape();
     }
 
@@ -409,18 +415,26 @@ gdjs.PhysikRuntimeBehavior.prototype.getGravityX = function(){
     return this._sharedData.gravityX;
 };
 
+gdjs.PhysikRuntimeBehavior.prototype.setGravityX = function(x){
+    // Check if there is no modification
+    if(this._sharedData.gravityX === x) return;
+    // Change the gravity on X
+    this._sharedData.gravityX = x;
+    this._sharedData.world.SetGravity(this.b2Vec2(this._sharedData.gravityX, this._sharedData.gravityX));
+};
+
 gdjs.PhysikRuntimeBehavior.prototype.getGravityY = function(){
     return this._sharedData.gravityY;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setGravity = function(x, y){
+gdjs.PhysikRuntimeBehavior.prototype.setGravityY = function(y){
     // Check if there is no modification
-    if(this._sharedData.gravityX === x && this._sharedData.gravityY === y) return;
-    // Change the gravity
-    this._sharedData.gravityX = x;
+    if(this._sharedData.gravityY === y) return;
+    // Change the gravity on Y
     this._sharedData.gravityY = y;
-    this._sharedData.world.SetGravity(this.b2Vec2(x, y));
+    this._sharedData.world.SetGravity(this.b2Vec2(this._sharedData.gravityX, this._sharedData.gravityX));
 };
+
 
 gdjs.PhysikRuntimeBehavior.prototype.isDynamic = function(){
     return this.type === "Dynamic";
@@ -1030,13 +1044,16 @@ gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointLength = function(jointId){
 
 gdjs.PhysikRuntimeBehavior.prototype.setDistanceJointLength = function(jointId, length){
     // Invalid value
-    if(length < 0) return;
+    if(length <= 0) return;
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_distanceJoint) return;
     // Set the joint length
     joint.SetLength(length * this._sharedData.invScaleX);
+    // Awake the bodies
+    joint.GetBodyA().SetAwake(true);
+    joint.GetBodyB().SetAwake(true);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointFrequency = function(jointId){
@@ -1095,16 +1112,18 @@ gdjs.PhysikRuntimeBehavior.prototype.addRevoluteJoint = function(x, y, enableLim
     jointDef.set_bodyB(this._body);
     jointDef.set_localAnchorB(this._body.GetLocalPoint(this.b2Vec2(x * this._sharedData.invScaleX, y * this._sharedData.invScaleY)));
     jointDef.set_enableLimit(enableLimit);
-    if(enableLimit){
-        jointDef.set_referenceAngle(gdjs.toRad(referenceAngle));
-        jointDef.set_lowerAngle(gdjs.toRad(lowerAngle));
-        jointDef.set_upperAngle(gdjs.toRad(upperAngle));
+    jointDef.set_referenceAngle(gdjs.toRad(referenceAngle));
+    // Lower angle must be lower than upper angle
+    if(upperAngle < lowerAngle){
+        var temp = lowerAngle;
+        lowerAngle = upperAngle;
+        upperAngle = temp;
     }
+    jointDef.set_lowerAngle(gdjs.toRad(lowerAngle));
+    jointDef.set_upperAngle(gdjs.toRad(upperAngle));
     jointDef.set_enableMotor(enableMotor);
-    if(enableMotor){
-        jointDef.set_motorSpeed(motorSpeed);
-        jointDef.set_maxMotorTorque(maxMotorTorque);
-    }
+    jointDef.set_motorSpeed(motorSpeed);
+    jointDef.set_maxMotorTorque(maxMotorTorque);
     jointDef.set_collideConnected(false);
     // Create the joint and get the id
     var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2RevoluteJoint));
@@ -1131,16 +1150,18 @@ gdjs.PhysikRuntimeBehavior.prototype.addRevoluteJointBetweenTwoBodies = function
     jointDef.set_bodyB(otherBody);
     jointDef.set_localAnchorB(otherBody.GetLocalPoint(this.b2Vec2(x2 * this._sharedData.invScaleX, y2 * this._sharedData.invScaleY)));
     jointDef.set_enableLimit(enableLimit);
-    if(enableLimit){
-        jointDef.set_referenceAngle(gdjs.toRad(referenceAngle));
-        jointDef.set_lowerAngle(gdjs.toRad(lowerAngle));
-        jointDef.set_upperAngle(gdjs.toRad(upperAngle));
+    jointDef.set_referenceAngle(gdjs.toRad(referenceAngle));
+    // Lower angle must be lower than upper angle
+    if(upperAngle < lowerAngle){
+        var temp = lowerAngle;
+        lowerAngle = upperAngle;
+        upperAngle = temp;
     }
+    jointDef.set_lowerAngle(gdjs.toRad(lowerAngle));
+    jointDef.set_upperAngle(gdjs.toRad(upperAngle));
     jointDef.set_enableMotor(enableMotor);
-    if(enableMotor){
-        jointDef.set_motorSpeed(motorSpeed);
-        jointDef.set_maxMotorTorque(maxMotorTorque >= 0 ? maxMotorTorque : 0);
-    }
+    jointDef.set_motorSpeed(motorSpeed);
+    jointDef.set_maxMotorTorque(maxMotorTorque >= 0 ? maxMotorTorque : 0);
     jointDef.set_collideConnected(collideConnected);
     // Create the joint and get the id
     var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2RevoluteJoint));
@@ -1216,6 +1237,12 @@ gdjs.PhysikRuntimeBehavior.prototype.setRevoluteJointLimits = function(jointId, 
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_revoluteJoint) return;
+    // Lower angle must be lower than upper angle
+    if(upperAngle < lowerAngle){
+        var temp = lowerAngle;
+        lowerAngle = upperAngle;
+        upperAngle = temp;
+    }
     // Set the joint limits
     joint.SetLimits(gdjs.toRad(lowerAngle), gdjs.toRad(upperAngle));
 };
@@ -1310,17 +1337,15 @@ gdjs.PhysikRuntimeBehavior.prototype.addPrismaticJoint = function(x1, y1, other,
     jointDef.set_localAxisA(this.b2Vec2(Math.cos(axisAngle), Math.sin(axisAngle)));
     jointDef.set_referenceAngle(gdjs.toRad(referenceAngle));
     jointDef.set_enableLimit(enableLimit);
-    lowerTranslation *= this._sharedData.invScaleX;
-    upperTranslation *= this._sharedData.invScaleX;
+    // Lower translation must be lower than upper translation
     if(upperTranslation < lowerTranslation){
         var temp = lowerTranslation;
         lowerTranslation = upperTranslation;
         upperTranslation = temp;
     }
     // The translation range must include zero
-    if(lowerTranslation > 0) lowerTranslation = 0;
-    jointDef.set_lowerTranslation(lowerTranslation);
-    jointDef.set_upperTranslation(upperTranslation);
+    jointDef.set_lowerTranslation(lowerTranslation < 0 ? lowerTranslation * this._sharedData.invScaleX : 0);
+    jointDef.set_upperTranslation(upperTranslation > 0 ? upperTranslation * this._sharedData.invScaleX : 0);
     jointDef.set_enableMotor(enableMotor);
     jointDef.set_motorSpeed(motorSpeed);
     jointDef.set_maxMotorForce(maxMotorForce);
@@ -1337,7 +1362,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointAxisAngle = function(joint
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_prismaticJoint) return 0;
     // Get the joint axis angle
-    return gdjs.toDegrees(atan2(joint.GetLocalAxisA().get_y(),joint.GetLocalAxisA().get_x()) + joint.GetBodyA().GetAngle());
+    return gdjs.toDegrees(Math.atan2(joint.GetLocalAxisA().get_y(),joint.GetLocalAxisA().get_x()) + joint.GetBodyA().GetAngle());
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointReferenceAngle = function(jointId){
@@ -1408,18 +1433,17 @@ gdjs.PhysikRuntimeBehavior.prototype.setPrismaticJointLimits = function(jointId,
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_prismaticJoint) return;
-    // Fix limits range
-    lowerTranslation *= this._sharedData.invScaleX;
-    upperTranslation *= this._sharedData.invScaleX;
+    // Lower translation must be lower than upper translation
     if(upperTranslation < lowerTranslation){
         var temp = lowerTranslation;
         lowerTranslation = upperTranslation;
         upperTranslation = temp;
     }
     // The translation range must include zero
-    if(lowerTranslation > 0) lowerTranslation = 0;
+    lowerTranslation = lowerTranslation < 0 ? lowerTranslation : 0;
+    upperTranslation = upperTranslation > 0 ? upperTranslation : 0;
     // Set the joint limits
-    joint.SetLimits(lowerTranslation, upperTranslation);
+    joint.SetLimits(lowerTranslation * this._sharedData.invScaleX, upperTranslation * this._sharedData.invScaleX);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.isPrismaticJointMotorEnabled = function(jointId){
@@ -1601,6 +1625,8 @@ gdjs.PhysikRuntimeBehavior.prototype.addGearJoint = function(jointId1, jointId2,
     // Get the second joint
     var joint2 = this._sharedData.getJoint(jointId2);
     if(joint2 === null || (joint2.GetType() !== Box2D.e_revoluteJoint && joint2.GetType() !== Box2D.e_prismaticJoint)) return;
+    // The joints are the same
+    if(joint1 === joint2) return;
     // Set joint settings
     var jointDef = new Box2D.b2GearJointDef();
     // Set gear joint bodies is not necessary at first, as the gear get the bodies from the two child joints
@@ -1651,6 +1677,9 @@ gdjs.PhysikRuntimeBehavior.prototype.setGearJointRatio = function(jointId, ratio
     if(joint === null || joint.GetType() !== Box2D.e_gearJoint) return;
     // Set the joint ratio
     joint.SetRatio(ratio);
+    // Awake the bodies, the gear joint picks the dynamic bodies as first and second body (second bodies from the child joints)
+    joint.GetBodyA().SetAwake(true);
+    joint.GetBodyB().SetAwake(true);
 };
 
 
@@ -1698,6 +1727,8 @@ gdjs.PhysikRuntimeBehavior.prototype.setMouseJointTarget = function(jointId, tar
     if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return;
     // Set the joint target
     joint.SetTarget(this.b2Vec2(targetX * this._sharedData.invScaleX, targetY * this._sharedData.invScaleY));
+    // Awake the body
+    joint.GetBodyB().SetAwake(true);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getMouseJointMaxForce = function(jointId){
@@ -1795,7 +1826,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointAxisAngle = function(jointId){
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_wheelJoint) return 0;
     // Get the joint axis angle
-    return gdjs.toDegrees(atan2(joint.GetLocalAxisA().get_y(),joint.GetLocalAxisA().get_x()) + joint.GetBodyA().GetAngle());
+    return gdjs.toDegrees(Math.atan2(joint.GetLocalAxisA().get_y(),joint.GetLocalAxisA().get_x()) + joint.GetBodyA().GetAngle());
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getWheelJointTranslation = function(jointId){
@@ -1946,10 +1977,12 @@ gdjs.PhysikRuntimeBehavior.prototype.addWeldJoint = function(x1, y1, other, x2, 
     jointDef.set_frequencyHz(frequency > 0 ? frequency : 1);
     jointDef.set_dampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
     jointDef.set_collideConnected(collideConnected);
-    // Create the joint and get the id
-    var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2WeldJoint));
+    // Create the joint
+    var joint = Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2WeldJoint);
+    // b2WeldJoint.GetReferenceAngle() is not binded, store it manually
+    joint.referenceAngle = jointDef.get_referenceAngle();
     // Store the id in the variable
-    variable.setNumber(jointId);
+    variable.setNumber(this._sharedData.addJoint(joint));
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getWeldJointReferenceAngle = function(jointId){
@@ -1957,8 +1990,9 @@ gdjs.PhysikRuntimeBehavior.prototype.getWeldJointReferenceAngle = function(joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_weldJoint) return 0;
-    // Get the joint reference angle
-    return gdjs.toDegrees(joint.GetReferenceAngle());
+    // b2WeldJoint.GetReferenceAngle() is not binded
+    // return gdjs.toDegrees(joint.GetReferenceAngle());
+    return gdjs.toDegrees(joint.referenceAngle);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getWeldJointFrequency = function(jointId){
@@ -2022,7 +2056,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addRopeJoint = function(x1, y1, other, x2, 
     jointDef.set_localAnchorA(this._body.GetLocalPoint(this.b2Vec2(x1 * this._sharedData.invScaleX, y1 * this._sharedData.invScaleY)));
     jointDef.set_bodyB(otherBody);
     jointDef.set_localAnchorB(otherBody.GetLocalPoint(this.b2Vec2(x2 * this._sharedData.invScaleX, y2 * this._sharedData.invScaleY)));
-    jointDef.set_maxLength(maxLength > 0 ? maxLength = maxLength * this._sharedData.invScaleX :
+    jointDef.set_maxLength(maxLength > 0 ? maxLength * this._sharedData.invScaleX :
                            this.b2Vec2((x2 - x1) * this._sharedData.invScaleX, (y2 - y1) * this._sharedData.invScaleY).Length());
     jointDef.set_collideConnected(collideConnected);
     // Create the joint and get the id
@@ -2037,7 +2071,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getRopeJointMaxLength = function(jointId){
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_ropeJoint) return 0;
     // Get the joint maximum length
-    return joint.GetMaxLength();
+    return joint.GetMaxLength() * this._sharedData.scaleX;
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.setRopeJointMaxLength = function(jointId, maxLength){
@@ -2048,7 +2082,10 @@ gdjs.PhysikRuntimeBehavior.prototype.setRopeJointMaxLength = function(jointId, m
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_ropeJoint) return;
     // Set the joint maximum length
-    joint.SetMaxLength(maxLength);
+    joint.SetMaxLength(maxLength * this._sharedData.invScaleX);
+    // Awake the bodies
+    joint.GetBodyA().SetAwake(true);
+    joint.GetBodyB().SetAwake(true);
 };
 
 
@@ -2236,6 +2273,9 @@ gdjs.PhysikRuntimeBehavior.prototype.setMotorJointMaxTorque = function(jointId, 
     if(joint === null || joint.GetType() !== Box2D.e_motorJoint) return;
     // Set the joint maximum torque
     joint.SetMaxTorque(maxTorque);
+    // Awake the bodies
+    joint.GetBodyA().SetAwake(true);
+    joint.GetBodyB().SetAwake(true);
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getMotorJointCorrectionFactor = function(jointId){
@@ -2256,4 +2296,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setMotorJointCorrectionFactor = function(jo
     if(joint === null || joint.GetType() !== Box2D.e_motorJoint) return;
     // Set the joint correction factor
     joint.SetCorrectionFactor(correctionFactor);
+    // Awake the bodies
+    joint.GetBodyA().SetAwake(true);
+    joint.GetBodyB().SetAwake(true);
 };

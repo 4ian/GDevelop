@@ -1123,7 +1123,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addRevoluteJoint = function(x, y, enableLim
     jointDef.set_upperAngle(gdjs.toRad(upperAngle));
     jointDef.set_enableMotor(enableMotor);
     jointDef.set_motorSpeed(motorSpeed);
-    jointDef.set_maxMotorTorque(maxMotorTorque);
+    jointDef.set_maxMotorTorque(maxMotorTorque >= 0 ? maxMotorTorque : 0);
     jointDef.set_collideConnected(false);
     // Create the joint and get the id
     var jointId = this._sharedData.addJoint(Box2D.castObject(this._sharedData.world.CreateJoint(jointDef), Box2D.b2RevoluteJoint));

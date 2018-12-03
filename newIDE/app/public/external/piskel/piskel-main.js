@@ -34,7 +34,7 @@ const tryToGetPiskel = () => {
     clearInterval(retryToGetPiskel);
   }
 };
-let retryToGetPiskel = setInterval(tryToGetPiskel, 1);
+let retryToGetPiskel = setInterval(tryToGetPiskel, 100);
 
 const readBase64ImageFile = file => {
   const bitmap = fs.readFileSync(file);

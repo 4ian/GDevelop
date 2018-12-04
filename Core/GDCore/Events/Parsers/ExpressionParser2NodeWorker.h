@@ -8,6 +8,7 @@
 
 namespace gd {
 class ExpressionNode;
+class SubExpressionNode;
 class OperatorNode;
 class NumberNode;
 class TextNode;
@@ -32,6 +33,7 @@ namespace gd {
  */
 class GD_CORE_API ExpressionParser2NodeWorker {
   friend class ExpressionNode;
+  friend class SubExpressionNode;
   friend class OperatorNode;
   friend class NumberNode;
   friend class TextNode;
@@ -48,6 +50,7 @@ class GD_CORE_API ExpressionParser2NodeWorker {
   virtual ~ExpressionParser2NodeWorker();
 
  protected:
+  virtual void OnVisitSubExpressionNode(SubExpressionNode& node) = 0;
   virtual void OnVisitOperatorNode(OperatorNode& node) = 0;
   virtual void OnVisitNumberNode(NumberNode& node) = 0;
   virtual void OnVisitTextNode(TextNode& node) = 0;

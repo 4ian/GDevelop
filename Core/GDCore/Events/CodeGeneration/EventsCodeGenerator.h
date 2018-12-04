@@ -34,6 +34,7 @@ namespace gd {
  */
 class GD_CORE_API EventsCodeGenerator {
   friend class CallbacksForGeneratingExpressionCode;
+  friend class ExpressionCodeGenerator;
 
  public:
   /**

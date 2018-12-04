@@ -4,58 +4,13 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/Events/Parsers/ExpressionParser2.h"
+#include "DummyPlatform.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "catch.hpp"
-
-namespace {
-
-void SetupProjectWithDummyPlatform(gd::Project &project,
-                                   gd::Platform &platform) {
-  std::shared_ptr<gd::PlatformExtension> baseObjectExtension =
-      std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
-  baseObjectExtension->SetExtensionInformation(
-      "BuiltinObject", "Base Object dummy extension", "", "", "");
-  auto baseObject = baseObjectExtension->AddObject<gd::Object>(
-      "", "Dummy Base Object", "Dummy Base Object", "");
-
-  std::shared_ptr<gd::PlatformExtension> extension =
-      std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
-  extension->SetExtensionInformation(
-      "MyExtension", "My testing extension", "", "", "");
-  extension->AddExpression("GetNumber", "Get me a number", "", "", "");
-  extension
-      ->AddExpression(
-          "GetNumberWith2Params", "Get me a number with 2 params", "", "", "")
-      .AddParameter("expression", "")
-      .AddParameter("string", "");
-  extension
-      ->AddExpression("GetNumberWith3Params",
-                      "Get me a number with 3 params, 1 optional",
-                      "",
-                      "",
-                      "")
-      .AddParameter("expression", "")
-      .AddParameter("string", "")
-      .AddParameter("expression", "", "", true);
-  auto &object = extension->AddObject<gd::Object>(
-      "Sprite", "Dummy Sprite", "Dummy sprite object", "");
-  object.AddExpression("GetObjectNumber", "Get number from object", "", "", "")
-      .AddParameter("object", _("Object"), "Sprite")
-      .SetFunctionName("getObjectNumber");
-  // auto behavior = extension->AddBehavior("MyBehavior", "Dummy behavior",
-  // "MyBehavior", "", "", "","",
-  //   gd::make_unique<gd::Behavior>(),
-  //   gd::make_unique<gd::BehaviorsSharedData>());
-
-  platform.AddExtension(baseObjectExtension);
-  platform.AddExtension(extension);
-  project.AddPlatform(platform);
-}
-}  // namespace
 
 TEST_CASE("ExpressionParser2", "[common][events]") {
   gd::Project project;
@@ -187,6 +142,21 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Invalid parenthesis") {
+    {
+      auto node = parser.ParseExpression("string", "((\"hello\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 2);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "Missing a closing parenthesis. Add a closing parenthesis for each opening parenthesis.");
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+              "Missing a closing parenthesis. Add a closing parenthesis for each opening parenthesis.");
+    }
+  }
+
   SECTION("Invalid text operators") {
     {
       auto node = parser.ParseExpression("string", "\"Hello \" - \"World\"");
@@ -232,6 +202,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(node != nullptr);
       auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
       REQUIRE(numberNode.number == ".14159");
+    }
+    {
+      auto node = parser.ParseExpression("number", "-123.2");
+      REQUIRE(node != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+      REQUIRE(numberNode.number == "-123.2");
     }
     {
       auto node = parser.ParseExpression("number", "3.");
@@ -403,7 +379,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("number", "MyExtension::GetNumber()");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
-      REQUIRE(functionNode.functionFullName == "MyExtension::GetNumber");
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -414,8 +389,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "number", "MyExtension::GetNumberWith2Params(12, \"hello world\")");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
-      REQUIRE(functionNode.functionFullName ==
-              "MyExtension::GetNumberWith2Params");
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -426,8 +399,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "number", "MyExtension::GetNumberWith3Params(12, \"hello world\")");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
-      REQUIRE(functionNode.functionFullName ==
-              "MyExtension::GetNumberWith3Params");
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -439,8 +410,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "MyExtension::GetNumberWith3Params(12, \"hello world\", 34)");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
-      REQUIRE(functionNode.functionFullName ==
-              "MyExtension::GetNumberWith3Params");
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -451,7 +420,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           parser.ParseExpression("number", "MySpriteObject.GetObjectNumber()");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
-      REQUIRE(functionNode.functionFullName == "GetObjectNumber");
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -547,31 +515,37 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
       REQUIRE(variableNode.name == "myVariable");
       REQUIRE(variableNode.child != nullptr);
-      auto &childNode = dynamic_cast<gd::VariableAccessorNode &>(*variableNode.child);
+      auto &childNode =
+          dynamic_cast<gd::VariableAccessorNode &>(*variableNode.child);
       REQUIRE(childNode.name == "myChild");
     }
 
     {
-      auto node = parser.ParseExpression("variable", "myVariable[ \"My named children\"  ]");
+      auto node = parser.ParseExpression(
+          "variable", "myVariable[ \"My named children\"  ]");
       REQUIRE(node != nullptr);
       auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
       REQUIRE(variableNode.name == "myVariable");
       REQUIRE(variableNode.child != nullptr);
-      auto &childNode = dynamic_cast<gd::VariableBracketAccessorNode &>(*variableNode.child);
+      auto &childNode =
+          dynamic_cast<gd::VariableBracketAccessorNode &>(*variableNode.child);
       REQUIRE(childNode.expression != nullptr);
       auto &textNode = dynamic_cast<gd::TextNode &>(*childNode.expression);
       REQUIRE(textNode.text == "My named children");
     }
 
     {
-      auto node = parser.ParseExpression("variable", "myVariable[ \"My named children\"  ].grandChild");
+      auto node = parser.ParseExpression(
+          "variable", "myVariable[ \"My named children\"  ].grandChild");
       REQUIRE(node != nullptr);
       auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
       REQUIRE(variableNode.name == "myVariable");
       REQUIRE(variableNode.child != nullptr);
-      auto &childNode = dynamic_cast<gd::VariableBracketAccessorNode &>(*variableNode.child);
+      auto &childNode =
+          dynamic_cast<gd::VariableBracketAccessorNode &>(*variableNode.child);
       REQUIRE(childNode.child != nullptr);
-      auto &grandChildNode = dynamic_cast<gd::VariableAccessorNode &>(*childNode.child);
+      auto &grandChildNode =
+          dynamic_cast<gd::VariableAccessorNode &>(*childNode.child);
       REQUIRE(grandChildNode.name == "grandChild");
     }
   }

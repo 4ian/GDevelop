@@ -41,6 +41,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   };
 
  protected:
+  void OnVisitSubExpressionNode(SubExpressionNode& node) override {
+    ReportAnyError(node);
+    node.expression->Visit(*this);
+  }
   void OnVisitOperatorNode(OperatorNode& node) override {
     node.leftHandSide->Visit(*this);
     ReportAnyError(node);

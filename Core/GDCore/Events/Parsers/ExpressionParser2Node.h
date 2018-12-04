@@ -77,6 +77,17 @@ struct ExpressionNode {
   std::unique_ptr<ExpressionParserDiagnostic> diagnostic;
 };
 
+struct SubExpressionNode : public ExpressionNode {
+  SubExpressionNode(std::unique_ptr<ExpressionNode> expression_)
+      : expression(std::move(expression_)){};
+  virtual ~SubExpressionNode(){};
+  virtual void Visit(ExpressionParser2NodeWorker &worker) {
+    worker.OnVisitSubExpressionNode(*this);
+  };
+
+  std::unique_ptr<ExpressionNode> expression;
+};
+
 /**
  * \brief An operator node. For example: "lhs + rhs".
  */
@@ -123,9 +134,9 @@ struct VariableAccessorOrVariableBracketAccessorNode : public ExpressionNode {
 
 /**
  * \brief A variable, potentially with accessor to its children.
- * 
+ *
  * Example: MyVariable or MyVariable.MyChildren
- * 
+ *
  * \see gd::VariableAccessorNode
  * \see gd::VariableBracketAccessorNode
  */
@@ -198,17 +209,41 @@ struct FunctionOrEmptyNode : public IdentifierOrFunctionOrEmptyNode {
  * \brief A function node. For example: "MyExtension::MyFunction(1, 2)".
  */
 struct FunctionNode : public FunctionOrEmptyNode {
-  FunctionNode(const gd::String &functionFullName_,
-               std::vector<std::unique_ptr<ExpressionNode>> parameters_)
-      : functionFullName(functionFullName_),
-        parameters(std::move(parameters_)){};
+  FunctionNode(const gd::String &type_,
+               std::vector<std::unique_ptr<ExpressionNode>> parameters_,
+               const ExpressionMetadata &expressionMetadata_)
+      : type(type_),
+        parameters(std::move(parameters_)),
+        expressionMetadata(expressionMetadata_){};
+  FunctionNode(const gd::String &type_,
+               const gd::String &objectName_,
+               std::vector<std::unique_ptr<ExpressionNode>> parameters_,
+               const ExpressionMetadata &expressionMetadata_)
+      : type(type_),
+        objectName(objectName_),
+        parameters(std::move(parameters_)),
+        expressionMetadata(expressionMetadata_){};
+  FunctionNode(const gd::String &type_,
+               const gd::String &objectName_,
+               const gd::String &behaviorName_,
+               std::vector<std::unique_ptr<ExpressionNode>> parameters_,
+               const ExpressionMetadata &expressionMetadata_)
+      : type(type_),
+        objectName(objectName_),
+        behaviorName(behaviorName_),
+        parameters(std::move(parameters_)),
+        expressionMetadata(expressionMetadata_){};
   virtual ~FunctionNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitFunctionNode(*this);
   };
 
-  gd::String functionFullName;
+  gd::String type;  // This could be removed if the type ("string" or "number")
+                    // was stored in ExpressionMetadata.
+  gd::String objectName;
+  gd::String behaviorName;
   std::vector<std::unique_ptr<ExpressionNode>> parameters;
+  const ExpressionMetadata &expressionMetadata;
 };
 
 /**
@@ -216,10 +251,13 @@ struct FunctionNode : public FunctionOrEmptyNode {
  * encountered and any other node could not make sense.
  */
 struct EmptyNode : public FunctionOrEmptyNode {
+  EmptyNode(const gd::String &type_) : type(type_){};
   virtual ~EmptyNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitEmptyNode(*this);
   };
+
+  gd::String type;
 };
 
 }  // namespace gd

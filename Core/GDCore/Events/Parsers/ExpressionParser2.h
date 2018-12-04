@@ -96,7 +96,7 @@ class GD_CORE_API ExpressionParser2 {
             expressionStartPosition);
     } else if (IsAnyChar("(")) {
       SkipChar();
-      leftHandSide = Expression(type);
+      leftHandSide = SubExpression(type);
 
       if (!IsAnyChar(")")) {
         leftHandSide->diagnostic =
@@ -113,7 +113,7 @@ class GD_CORE_API ExpressionParser2 {
         leftHandSide = Identifier(type);
       }
     } else {
-      leftHandSide = gd::make_unique<EmptyNode>();
+      leftHandSide = gd::make_unique<EmptyNode>(type);
       leftHandSide->diagnostic = RaiseSyntaxError(
           _("You must enter a text, number or a valid expression call."));
     }
@@ -147,6 +147,10 @@ class GD_CORE_API ExpressionParser2 {
     }
     return leftHandSide;
   }
+
+  std::unique_ptr<SubExpressionNode> SubExpression(gd::String type) {
+    return std::move(gd::make_unique<SubExpressionNode>(Expression(type)));
+  };
 
   std::unique_ptr<IdentifierOrFunctionOrEmptyNode> Identifier(gd::String type) {
     size_t identifierStartPosition = GetCurrentPosition();
@@ -231,7 +235,7 @@ class GD_CORE_API ExpressionParser2 {
                                platform, functionFullName);
 
     auto function = gd::make_unique<FunctionNode>(
-        functionFullName, Parameters(metadata.parameters, 0));
+        type, Parameters(metadata.parameters, 0), metadata);
     function->diagnostic = ValidateFunction(type,
                                             metadata,
                                             0,
@@ -273,9 +277,11 @@ class GD_CORE_API ExpressionParser2 {
                     platform, objectType, objectFunctionOrBehaviorName);
 
       auto function = gd::make_unique<FunctionNode>(
-          objectFunctionOrBehaviorName,
+          type,
+          objectName,
           // By convention, the first parameter is the object
-          Parameters(metadata.parameters, 1));
+          Parameters(metadata.parameters, 1),
+          metadata);
       function->diagnostic = ValidateFunction(type,
                                               metadata,
                                               1,
@@ -286,7 +292,7 @@ class GD_CORE_API ExpressionParser2 {
       return std::move(function);
     }
 
-    auto node = gd::make_unique<EmptyNode>();
+    auto node = gd::make_unique<EmptyNode>(type);
     node->diagnostic = RaiseSyntaxError(
         _("An opening parenthesis (for an object expression), or double colon "
           "(::) was expected (for a behavior expression)."));
@@ -318,9 +324,12 @@ class GD_CORE_API ExpressionParser2 {
                                  platform, behaviorType, functionName);
 
       auto function = gd::make_unique<FunctionNode>(
-          functionName,
+          type,
+          objectName,
+          behaviorName,
           // By convention, the first 2 parameters are the object and behavior.
-          Parameters(metadata.parameters, 2));
+          Parameters(metadata.parameters, 2),
+          metadata);
       function->diagnostic = ValidateFunction(type,
                                               metadata,
                                               2,
@@ -330,7 +339,7 @@ class GD_CORE_API ExpressionParser2 {
 
       return std::move(function);
     } else {
-      auto node = gd::make_unique<EmptyNode>();
+      auto node = gd::make_unique<EmptyNode>(type);
       node->diagnostic = RaiseSyntaxError(
           _("An opening parenthesis was expected here to call a function."));
 
@@ -386,7 +395,7 @@ class GD_CORE_API ExpressionParser2 {
       }
     }
 
-    parameters.push_back(gd::make_unique<EmptyNode>());
+    parameters.push_back(gd::make_unique<EmptyNode>("unknown"));
     parameters.back()->diagnostic =
         RaiseSyntaxError(_("The list of parameters is not terminated. Add a "
                            "closing parenthesis to end the parameters."));

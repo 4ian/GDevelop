@@ -1298,8 +1298,8 @@ module.exports = {
       t("Add a distance joint between two objects. The length is converted to meters using the world scale on X. The frequency and damping ratio are related to the joint speed of oscillation and how fast it stops."),
       t("Add a distance joint between _PARAM0_ and _PARAM4_"),
       t("Joints/Distance"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/distance_joint24.png",
+      "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("First object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Anchor X on first body"))
@@ -1321,8 +1321,8 @@ module.exports = {
       t("Modify a distance joint length."),
       t("Do _PARAM3__PARAM4_ to the length for distance joint _PARAM2_"),
       t("Joints/Distance"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/distance_joint24.png",
+      "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1338,7 +1338,7 @@ module.exports = {
       t("Distance joint length"),
       t("Distance joint length"),
       t("Joints/Distance"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1351,8 +1351,8 @@ module.exports = {
       t("Modify a distance joint frequency."),
       t("Do _PARAM3__PARAM4_ to the frequency for distance joint _PARAM2_"),
       t("Joints/Distance"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/distance_joint24.png",
+      "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1368,7 +1368,7 @@ module.exports = {
       t("Distance joint frequency"),
       t("Distance joint frequency"),
       t("Joints/Distance"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1381,8 +1381,8 @@ module.exports = {
       t("Modify a distance joint damping ratio."),
       t("Do _PARAM3__PARAM4_ to the damping ratio for distance joint _PARAM2_"),
       t("Joints/Distance"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/distance_joint24.png",
+      "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1398,7 +1398,7 @@ module.exports = {
       t("Distance joint damping ratio"),
       t("Distance joint damping ratio"),
       t("Joints/Distance"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1414,8 +1414,8 @@ module.exports = {
       t("Add a revolute joint to an object at a fixed point. The object is attached as the second object in the joint, so you can use this for gear joints."),
       t("Add a revolute joint to _PARAM0_ at _PARAM2_;_PARAM3_"),
       t("Joints/Revolute"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint24.png",
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("X anchor"))
@@ -1437,8 +1437,8 @@ module.exports = {
       t("Add a revolute joint between two objects. The reference angle determines what is considered as the base angle at the initial state."),
       t("Add a revolute joint between _PARAM0_ and _PARAM4_"),
       t("Joints/Revolute"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint24.png",
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("First object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Anchor X on first body"))
@@ -1463,7 +1463,7 @@ module.exports = {
       t("Revolute joint reference angle"),
       t("Revolute joint reference angle"),
       t("Joints/Revolute"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1475,7 +1475,7 @@ module.exports = {
       t("Revolute joint current angle"),
       t("Revolute joint current angle"),
       t("Joints/Revolute"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1487,7 +1487,7 @@ module.exports = {
       t("Revolute joint angular speed"),
       t("Revolute joint angular speed"),
       t("Joints/Revolute"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1500,8 +1500,8 @@ module.exports = {
       t("Test if a revolute joint limits are enabled."),
       t("Limits for revolute joint _PARAM2_ are enabled"),
       t("Joints/Revolute"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint24.png",
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1514,8 +1514,8 @@ module.exports = {
       t("Enable or disable a revolute joint angle limits."),
       t("Enable limits for revolute joint _PARAM2_: _PARAM3_"),
       t("Joints/Revolute"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint24.png",
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1529,8 +1529,8 @@ module.exports = {
       t("Modify a revolute joint angle limits."),
       t("Set the limits to _PARAM3_;_PARAM4_ for revolute joint _PARAM2_"),
       t("Joints/Revolute"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint24.png",
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1544,7 +1544,7 @@ module.exports = {
       t("Revolute joint minimum angle"),
       t("Revolute joint minimum angle"),
       t("Joints/Revolute"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1556,7 +1556,7 @@ module.exports = {
       t("Revolute joint maximum angle"),
       t("Revolute joint maximum angle"),
       t("Joints/Revolute"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1569,8 +1569,8 @@ module.exports = {
       t("Test if a revolute joint motor is enabled."),
       t("Motor of revolute joint _PARAM2_ is enabled"),
       t("Joints/Revolute"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint24.png",
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1583,8 +1583,8 @@ module.exports = {
       t("Enable or disable a revolute joint motor."),
       t("Enable motor for revolute joint _PARAM2_: _PARAM3_"),
       t("Joints/Revolute"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint24.png",
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1598,8 +1598,8 @@ module.exports = {
       t("Modify a revolute joint motor speed."),
       t("Do _PARAM3__PARAM4_ to the motor speed for revolute joint _PARAM2_"),
       t("Joints/Revolute"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint24.png",
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1615,7 +1615,7 @@ module.exports = {
       t("Revolute joint motor speed"),
       t("Revolute joint motor speed"),
       t("Joints/Revolute"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1628,8 +1628,8 @@ module.exports = {
       t("Modify a revolute joint maximum motor torque."),
       t("Do _PARAM3__PARAM4_ to the maximum motor torque for revolute joint _PARAM2_"),
       t("Joints/Revolute"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint24.png",
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1645,7 +1645,7 @@ module.exports = {
       t("Revolute joint max motor torque"),
       t("Revolute joint Maximum motor torque"),
       t("Joints/Revolute"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1657,7 +1657,7 @@ module.exports = {
       t("Revolute joint motor torque"),
       t("Revolute joint motor torque"),
       t("Joints/Revolute"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1673,8 +1673,8 @@ module.exports = {
       t("Add a prismatic joint between two objects. The translation limits are converted to meters using the world scale on X."),
       t("Add a prismatic joint between _PARAM0_ and _PARAM4_"),
       t("Joints/Prismatic"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint24.png",
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("First object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Anchor X on first body"))
@@ -1700,7 +1700,7 @@ module.exports = {
       t("Prismatic joint axis angle"),
       t("Prismatic joint axis angle"),
       t("Joints/Prismatic"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1712,7 +1712,7 @@ module.exports = {
       t("Prismatic joint reference angle"),
       t("Prismatic joint reference angle"),
       t("Joints/Prismatic"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1724,7 +1724,7 @@ module.exports = {
       t("Prismatic joint current translation"),
       t("Prismatic joint current translation"),
       t("Joints/Prismatic"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1736,7 +1736,7 @@ module.exports = {
       t("Prismatic joint current speed"),
       t("Prismatic joint speed"),
       t("Joints/Prismatic"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1749,8 +1749,8 @@ module.exports = {
       t("Test if a prismatic joint limits are enabled."),
       t("Limits for prismatic joint _PARAM2_ are enabled"),
       t("Joints/Prismatic"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint24.png",
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1763,8 +1763,8 @@ module.exports = {
       t("Enable or disable a prismatic joint limits."),
       t("Enable limits for prismatic joint _PARAM2_: _PARAM3_"),
       t("Joints/Prismatic"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint24.png",
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1778,8 +1778,8 @@ module.exports = {
       t("Modify a prismatic joint limits."),
       t("Set the limits to _PARAM3_;_PARAM4_ for prismatic joint _PARAM2_"),
       t("Joints/Prismatic"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint24.png",
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1793,7 +1793,7 @@ module.exports = {
       t("Prismatic joint minimum translation"),
       t("Prismatic joint minimum translation"),
       t("Joints/Prismatic"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1805,7 +1805,7 @@ module.exports = {
       t("Prismatic joint maximum translation"),
       t("Prismatic joint maximum translation"),
       t("Joints/Prismatic"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1818,8 +1818,8 @@ module.exports = {
       t("Test if a prismatic joint motor is enabled."),
       t("Motor for prismatic joint _PARAM2_ is enabled"),
       t("Joints/Prismatic"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint24.png",
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1832,8 +1832,8 @@ module.exports = {
       t("Enable or disable a prismatic joint motor."),
       t("Enable motor for prismatic joint _PARAM2_: _PARAM3_"),
       t("Joints/Prismatic"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint24.png",
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1847,8 +1847,8 @@ module.exports = {
       t("Modify a prismatic joint motor speed."),
       t("Do _PARAM3__PARAM4_ to the motor force for prismatic joint _PARAM2_"),
       t("Joints/Prismatic"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint24.png",
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1864,7 +1864,7 @@ module.exports = {
       t("Prismatic joint motor speed"),
       t("Prismatic joint motor speed"),
       t("Joints/Prismatic"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1877,8 +1877,8 @@ module.exports = {
       t("Modify a prismatic joint maximum motor force."),
       t("Do _PARAM3__PARAM4_ to the maximum motor force for prismatic joint _PARAM2_"),
       t("Joints/Prismatic"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint24.png",
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1894,7 +1894,7 @@ module.exports = {
       t("Prismatic joint max motor force"),
       t("Prismatic joint maximum motor force"),
       t("Joints/Prismatic"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1906,7 +1906,7 @@ module.exports = {
       t("Prismatic joint motor force"),
       t("Prismatic joint motor force"),
       t("Joints/Prismatic"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1922,8 +1922,8 @@ module.exports = {
       t("Add a pulley joint between two objects. Lengths are converted to meters using the world scale on X."),
       t("Add a pulley joint between _PARAM0_ and _PARAM4_"),
       t("Joints/Pulley"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/pulley_joint24.png",
+      "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("First object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Anchor X on first body"))
@@ -1948,7 +1948,7 @@ module.exports = {
       t("Pulley joint first ground anchor X"),
       t("Pulley joint first ground anchor X"),
       t("Joints/Pulley"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1960,7 +1960,7 @@ module.exports = {
       t("Pulley joint first ground anchor Y"),
       t("Pulley joint first ground anchor Y"),
       t("Joints/Pulley"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1972,7 +1972,7 @@ module.exports = {
       t("Pulley joint second ground anchor X"),
       t("Pulley joint second ground anchor X"),
       t("Joints/Pulley"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1984,7 +1984,7 @@ module.exports = {
       t("Pulley joint second ground anchor Y"),
       t("Pulley joint second ground anchor Y"),
       t("Joints/Pulley"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -1996,7 +1996,7 @@ module.exports = {
       t("Pulley joint first length"),
       t("Pulley joint first length"),
       t("Joints/Pulley"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2008,7 +2008,7 @@ module.exports = {
       t("Pulley joint second length"),
       t("Pulley joint second length"),
       t("Joints/Pulley"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2020,7 +2020,7 @@ module.exports = {
       t("Pulley joint ratio"),
       t("Pulley joint ratio"),
       t("Joints/Pulley"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2036,8 +2036,8 @@ module.exports = {
       t("Add a gear joint between two joints. Attention: Gear joints require the joints to be revolute or prismatic, and both of them to be attached to a static body as first object."),
       t("Add a gear joint between joints _PARAM2_ and _PARAM3_"),
       t("Joints/Gear"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/gear_joint24.png",
+      "JsPlatform/Extensions/gear_joint16.png")
       .addParameter("object", t("First object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("First joint ID"))
@@ -2053,7 +2053,7 @@ module.exports = {
       t("Gear joint first joint"),
       t("Gear joint first joint"),
       t("Joints/Gear"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/gear_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2065,7 +2065,7 @@ module.exports = {
       t("Gear joint second joint"),
       t("Gear joint second joint"),
       t("Joints/Gear"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/gear_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2078,8 +2078,8 @@ module.exports = {
       t("Modify a Gear joint ratio."),
       t("Do _PARAM3__PARAM4_ to the ratio for gear joint _PARAM2_"),
       t("Joints/Gear"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/gear_joint24.png",
+      "JsPlatform/Extensions/gear_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2095,7 +2095,7 @@ module.exports = {
       t("Gear joint ratio"),
       t("Gear joint ratio"),
       t("Joints/Gear"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/gear_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2111,8 +2111,8 @@ module.exports = {
       t("Add a mouse joint between two joints."),
       t("Add a mouse joint to _PARAM0_"),
       t("Joints/Mouse"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/mouse_joint24.png",
+      "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Target X"))
@@ -2130,8 +2130,8 @@ module.exports = {
       t("Set a mouse joint target."),
       t("Do _PARAM3_;_PARAM4_ to the target position of mouse joint _PARAM2_"),
       t("Joints/Mouse"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/mouse_joint24.png",
+      "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2145,7 +2145,7 @@ module.exports = {
       t("Mouse joint target X"),
       t("Mouse joint target X"),
       t("Joints/Mouse"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2157,7 +2157,7 @@ module.exports = {
       t("Mouse joint target Y"),
       t("Mouse joint target Y"),
       t("Joints/Mouse"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2170,8 +2170,8 @@ module.exports = {
       t("Set a mouse joint maximum force."),
       t("Do _PARAM3__PARAM4_ to the maximum force for mouse joint _PARAM2_"),
       t("Joints/Mouse"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/mouse_joint24.png",
+      "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2187,7 +2187,7 @@ module.exports = {
       t("Mouse joint max force"),
       t("Mouse joint maximum force"),
       t("Joints/Mouse"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2200,8 +2200,8 @@ module.exports = {
       t("Set a mouse joint frequency."),
       t("Do _PARAM3__PARAM4_ to the frequency for mouse joint _PARAM2_"),
       t("Joints/Mouse"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/mouse_joint24.png",
+      "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2217,7 +2217,7 @@ module.exports = {
       t("Mouse joint frequency"),
       t("Mouse joint frequency"),
       t("Joints/Mouse"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2230,8 +2230,8 @@ module.exports = {
       t("Set a mouse joint damping ratio."),
       t("Do _PARAM3__PARAM4_ to the damping ratio for mouse joint _PARAM2_"),
       t("Joints/Mouse"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/mouse_joint24.png",
+      "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2247,7 +2247,7 @@ module.exports = {
       t("Mouse joint damping ratio"),
       t("Mouse joint damping ratio"),
       t("Joints/Mouse"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2263,8 +2263,8 @@ module.exports = {
       t("Add a wheel joint between two objects. Higher frequencies means higher suspensions. Damping determines oscillations, critical damping of 1 means no oscillations."),
       t("Add a wheel joint between _PARAM0_ and _PARAM4_"),
       t("Joints/Wheel"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint24.png",
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("First object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Anchor X on first body"))
@@ -2288,7 +2288,7 @@ module.exports = {
       t("Wheel joint axis angle"),
       t("Wheel joint axis angle"),
       t("Joints/Wheel"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2300,7 +2300,7 @@ module.exports = {
       t("Wheel joint current translation"),
       t("Wheel joint current translation"),
       t("Joints/Wheel"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2312,7 +2312,7 @@ module.exports = {
       t("Wheel joint current speed"),
       t("Wheel joint speed"),
       t("Joints/Wheel"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2325,8 +2325,8 @@ module.exports = {
       t("Test if a wheel joint motor is enabled."),
       t("Motor for wheel joint _PARAM2_ is enabled"),
       t("Joints/Wheel"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint24.png",
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2339,8 +2339,8 @@ module.exports = {
       t("Enable or disable a wheel joint motor."),
       t("Enable motor for wheel joint _PARAM2_: _PARAM3_"),
       t("Joints/Wheel"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint24.png",
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2354,8 +2354,8 @@ module.exports = {
       t("Modify a wheel joint motor speed."),
       t("Do _PARAM3__PARAM4_ to the motor speed for wheel joint _PARAM2_"),
       t("Joints/Wheel"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint24.png",
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2371,7 +2371,7 @@ module.exports = {
       t("Wheel joint motor speed"),
       t("Wheel joint motor speed"),
       t("Joints/Wheel"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2384,8 +2384,8 @@ module.exports = {
       t("Modify a wheel joint maximum motor torque."),
       t("Do _PARAM3__PARAM4_ to the maximum motor torque for wheel joint _PARAM2_"),
       t("Joints/Wheel"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint24.png",
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2401,7 +2401,7 @@ module.exports = {
       t("Wheel joint max motor torque"),
       t("Wheel joint maximum motor torque"),
       t("Joints/Wheel"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2413,7 +2413,7 @@ module.exports = {
       t("Wheel joint motor torque"),
       t("Wheel joint motor torque"),
       t("Joints/Wheel"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2426,8 +2426,8 @@ module.exports = {
       t("Modify a wheel joint frequency."),
       t("Do _PARAM3__PARAM4_ to the frequency for wheel joint _PARAM2_"),
       t("Joints/Wheel"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint24.png",
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2443,7 +2443,7 @@ module.exports = {
       t("Wheel joint frequency"),
       t("Wheel joint frequency"),
       t("Joints/Wheel"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2456,8 +2456,8 @@ module.exports = {
       t("Modify a wheel joint damping ratio."),
       t("Do _PARAM3__PARAM4_ to the damping ratio for wheel joint _PARAM2_"),
       t("Joints/Wheel"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint24.png",
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2473,7 +2473,7 @@ module.exports = {
       t("Wheel joint damping ratio"),
       t("Wheel joint damping ratio"),
       t("Joints/Wheel"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2489,8 +2489,8 @@ module.exports = {
       t("Add a weld joint between two objects."),
       t("Add a weld joint between _PARAM0_ and _PARAM4_"),
       t("Joints/Weld"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/weld_joint24.png",
+      "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("First object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Anchor X on first body"))
@@ -2511,7 +2511,7 @@ module.exports = {
       t("Weld joint reference angle"),
       t("Weld joint reference angle"),
       t("Joints/Weld"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2524,8 +2524,8 @@ module.exports = {
       t("Modify a weld joint frequency."),
       t("Do _PARAM3__PARAM4_ to the frequency for weld joint _PARAM2_"),
       t("Joints/Weld"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/weld_joint24.png",
+      "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2541,7 +2541,7 @@ module.exports = {
       t("Weld joint frequency"),
       t("Weld joint frequency"),
       t("Joints/Weld"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2554,8 +2554,8 @@ module.exports = {
       t("Modify a weld joint damping ratio."),
       t("Do _PARAM3__PARAM4_ to the damping ratio for weld joint _PARAM2_"),
       t("Joints/Weld"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/weld_joint24.png",
+      "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2571,7 +2571,7 @@ module.exports = {
       t("Weld joint damping ratio"),
       t("Weld joint damping ratio"),
       t("Joints/Weld"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2587,8 +2587,8 @@ module.exports = {
       t("Add a rope joint between two objects. The maximum length is converted to meters using the world scale on X."),
       t("Add a rope joint between _PARAM0_ and _PARAM4_"),
       t("Joints/Rope"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/rope_joint24.png",
+      "JsPlatform/Extensions/rope_joint16.png")
       .addParameter("object", t("First object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Anchor X on first body"))
@@ -2608,8 +2608,8 @@ module.exports = {
       t("Modify a rope joint maximum length."),
       t("Do _PARAM3__PARAM4_ to the maximum length for rope joint _PARAM2_"),
       t("Joints/Rope"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/rope_joint24.png",
+      "JsPlatform/Extensions/rope_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2625,7 +2625,7 @@ module.exports = {
       t("Rope joint max length"),
       t("Rope joint maximum length"),
       t("Joints/Rope"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/rope_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2641,8 +2641,8 @@ module.exports = {
       t("Add a friction joint between two objects."),
       t("Add a friction joint between _PARAM0_ and _PARAM4_"),
       t("Joints/Friction"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/friction_joint24.png",
+      "JsPlatform/Extensions/friction_joint16.png")
       .addParameter("object", t("First object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Anchor X on first body"))
@@ -2663,8 +2663,8 @@ module.exports = {
       t("Modify a friction joint maximum force."),
       t("Do _PARAM3__PARAM4_ to the maximum force for friction joint _PARAM2_"),
       t("Joints/Friction"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/friction_joint24.png",
+      "JsPlatform/Extensions/friction_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2680,7 +2680,7 @@ module.exports = {
       t("Friction joint max force"),
       t("Friction joint maximum force"),
       t("Joints/Friction"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/friction_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2693,8 +2693,8 @@ module.exports = {
       t("Modify a friction joint maximum torque."),
       t("Do _PARAM3__PARAM4_ to the maximum torque for friction joint _PARAM2_"),
       t("Joints/Friction"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/friction_joint24.png",
+      "JsPlatform/Extensions/friction_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2710,7 +2710,7 @@ module.exports = {
       t("Friction joint max torque"),
       t("Friction joint maximum torque"),
       t("Joints/Friction"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/friction_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2726,8 +2726,8 @@ module.exports = {
       t("Add a motor joint between two objects. The position and angle offsets are relative to the first object."),
       t("Add a motor joint between _PARAM0_ and _PARAM2_"),
       t("Joints/Motor"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint24.png",
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("First object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("objectPtr", t("Second object"), "", false)
@@ -2748,8 +2748,8 @@ module.exports = {
       t("Modify a motor joint offset."),
       t("Set offset to _PARAM3_;_PARAM4_ for motor joint _PARAM2_"),
       t("Joints/Motor"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint24.png",
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2763,7 +2763,7 @@ module.exports = {
       t("Motor joint offset X"),
       t("Motor joint offset X"),
       t("Joints/Motor"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2775,7 +2775,7 @@ module.exports = {
       t("Motor joint offset Y"),
       t("Motor joint offset Y"),
       t("Joints/Motor"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2788,8 +2788,8 @@ module.exports = {
       t("Modify a motor joint angular offset."),
       t("Do _PARAM3__PARAM4_ to the angular offset for motor joint _PARAM2_"),
       t("Joints/Motor"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint24.png",
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2805,7 +2805,7 @@ module.exports = {
       t("Motor joint angular offset"),
       t("Motor joint angular offset"),
       t("Joints/Motor"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2818,8 +2818,8 @@ module.exports = {
       t("Modify a motor joint maximum force."),
       t("Do _PARAM3__PARAM4_ to the maximum force for motor joint _PARAM2_"),
       t("Joints/Motor"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint24.png",
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2835,7 +2835,7 @@ module.exports = {
       t("Motor joint max force"),
       t("Motor joint maximum force"),
       t("Joints/Motor"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2848,8 +2848,8 @@ module.exports = {
       t("Modify a motor joint maximum torque."),
       t("Do _PARAM3__PARAM4_ to the maximum torque for motor joint _PARAM2_"),
       t("Joints/Motor"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint24.png",
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2865,7 +2865,7 @@ module.exports = {
       t("Motor joint max torque"),
       t("Motor joint maximum torque"),
       t("Joints/Motor"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2878,8 +2878,8 @@ module.exports = {
       t("Modify a motor joint correction factor."),
       t("Do _PARAM3__PARAM4_ to the correction factor for motor joint _PARAM2_"),
       t("Joints/Motor"),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint24.png",
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2895,7 +2895,7 @@ module.exports = {
       t("Motor joint correction factor"),
       t("Motor joint correction factor"),
       t("Joints/Motor"),
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("expression", t("Joint ID"))
@@ -2908,8 +2908,8 @@ module.exports = {
       t("Test if two objects collide."),
       t("_PARAM0_ is colliding with _PARAM2_"),
       t(""),
-      "res/physics24.png",
-      "res/physics16.png")
+      "JsPlatform/Extensions/motor_joint24.png",
+      "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("objectList", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "PhysikBehavior")
       .addParameter("objectList", t("Object"), "", false)

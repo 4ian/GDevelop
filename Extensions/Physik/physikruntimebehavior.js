@@ -167,6 +167,7 @@ gdjs.PhysikRuntimeBehavior = function(runtimeScene, behaviorData, owner)
     this.type = behaviorData.content.type;
     this.bullet = behaviorData.content.bullet;
     this.fixedRotation = behaviorData.content.fixedRotation;
+    this.canSleep = behaviorData.content.canSleep;
     this.shape = behaviorData.content.shape;
     this.shapeDimensionA = behaviorData.content.shapeDimensionA;
     this.shapeDimensionB = behaviorData.content.shapeDimensionB;
@@ -341,6 +342,7 @@ gdjs.PhysikRuntimeBehavior.prototype.createBody = function() {
                      Box2D.b2_dynamicBody);
     bodyDef.set_bullet(this.bullet);
     bodyDef.set_fixedRotation(this.fixedRotation);
+    bodyDef.set_allowSleep(this.canSleep);
     bodyDef.set_linearDamping(this.linearDamping);
     bodyDef.set_angularDamping(this.angularDamping);
     bodyDef.set_gravityScale(this.gravityScale);
@@ -518,8 +520,34 @@ gdjs.PhysikRuntimeBehavior.prototype.hasFixedRotation = function(){
 gdjs.PhysikRuntimeBehavior.prototype.setFixedRotation = function(enable){
     this.fixedRotation = enable;
 
-    if(this._body === null) this.createBody();
+    if(this._body === null){
+        this.createBody();
+        return;
+    }
     this._body.SetFixedRotation(this.fixedRotation);
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.isSleepingAllowed = function(){
+    return this.canSleep;
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.setSleepingAllowed = function(enable){
+    this.canSleep = enable;
+
+    if(this._body === null){
+        this.createBody();
+        return;
+    }
+    this._body.SetSleepingAllowed(this.canSleep);
+};
+
+gdjs.PhysikRuntimeBehavior.prototype.isSleeping = function(){
+    // If there is no body, set a new one
+    if(this._body === null){
+        this.createBody();
+    }
+    // Get the body sleeping state
+    return !this._body.IsAwake();
 };
 
 gdjs.PhysikRuntimeBehavior.prototype.getDensity = function(){
@@ -2299,4 +2327,21 @@ gdjs.PhysikRuntimeBehavior.prototype.setMotorJointCorrectionFactor = function(jo
     // Awake the bodies
     joint.GetBodyA().SetAwake(true);
     joint.GetBodyB().SetAwake(true);
+};
+
+gdjs.PhysikRuntimeBehavior.collisionTest = function(object1, object2, behavior){
+    console.log(object1, object2, behavior);
+    // Check if the objects exist and share the behavior
+    if(object1 === null || !object1.hasBehavior(behavior)) return false;
+    if(object2 === null || !object2.hasBehavior(behavior)) return false;
+    // Test if the second object is in the list of contacts of the first one
+    var behavior1 = object1.getBehavior(behavior);
+    for(var i=0, len=behavior1.currentContacts.length; i<len; ++i){
+        console.log("    ", behavior1.currentContacts[i].owner === object2);
+        if(behavior1.currentContacts[i].owner === object2){
+            return true;
+        }
+    }
+    // No contact found
+    return false;
 };

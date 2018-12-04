@@ -39,6 +39,10 @@ module.exports = {
         behaviorContent.fixedRotation = newValue === "1";
         return true;
       }
+      if (propertyName === "canSleep") {
+        behaviorContent.canSleep = newValue === "1";
+        return true;
+      }
       if (propertyName === "shape") {
         behaviorContent.shape = newValue;
         return true;
@@ -145,6 +149,12 @@ module.exports = {
         ).setType("Boolean")
       );
       behaviorProperties.set(
+        "canSleep",
+        new gd.PropertyDescriptor(
+          behaviorContent.canSleep ? "true" : "false"
+        ).setType("Boolean")
+      );
+      behaviorProperties.set(
         "shape",
         new gd.PropertyDescriptor(
           behaviorContent.shape
@@ -241,6 +251,7 @@ module.exports = {
         type: "Dynamic",
         bullet: false,
         fixedRotation: false,
+        canSleep: true,
         shape: "Box",
         shapeDimensionA: 0,
         shapeDimensionB: 0,
@@ -531,7 +542,7 @@ module.exports = {
 
     aut.addAction(
       "SetFixedRotation",
-      t("Set fixed rotation"),
+      t("Fixed rotation"),
       t("Enable or disable an object fixed rotation. If enabled the object won't be able to rotate."),
       t("Set _PARAM0_ fixed rotation: _PARAM2_"),
       t("Dynamics"),
@@ -542,6 +553,46 @@ module.exports = {
       .addParameter("yesorno", t("Fixed rotation?"), "", false).setDefaultValue("false")
       .getCodeExtraInformation()
       .setFunctionName("setFixedRotation");
+
+    aut.addCondition(
+      "IsSleepingAllowed",
+      t("Is sleeping allowed"),
+      t("Test if an object can sleep."),
+      t("_PARAM0_ can sleep"),
+      t("Dynamics"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .getCodeExtraInformation()
+      .setFunctionName("isSleepingAllowed");
+
+    aut.addAction(
+      "SetSleepingaAllowed",
+      t("Sleeping allowed"),
+      t("Allow or not an object to sleep. If enabled the object will be able to sleep, improving performance for non-currently-moving objects."),
+      t("Allow _PARAM0_ to sleep: _PARAM2_"),
+      t("Dynamics"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("yesorno", t("Can sleep?"), "", false).setDefaultValue("true")
+      .getCodeExtraInformation()
+      .setFunctionName("setSleepingAllowed");
+
+    aut.addCondition(
+      "IsSleeping",
+      t("Is sleeping"),
+      t("Test if an object is sleeping."),
+      t("_PARAM0_ is sleeping"),
+      t("Dynamics"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .getCodeExtraInformation()
+      .setFunctionName("isSleeping");
 
 
 
@@ -2850,6 +2901,22 @@ module.exports = {
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMotorJointCorrectionFactor");
+
+    extension.addCondition(
+      "Collision",
+      t("Collision"),
+      t("Test if two objects collide."),
+      t("_PARAM0_ is colliding with _PARAM2_"),
+      t(""),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("objectList", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("objectList", t("Object"), "", false)
+      .addCodeOnlyParameter("conditionInverted", "")
+      .getCodeExtraInformation()
+      .setIncludeFile("Extensions/Physik/physiktools.js")
+      .setFunctionName("gdjs.physik.objectsCollide");
 
     return extension;
   },

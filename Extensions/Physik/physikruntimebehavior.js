@@ -2330,14 +2330,12 @@ gdjs.PhysikRuntimeBehavior.prototype.setMotorJointCorrectionFactor = function(jo
 };
 
 gdjs.PhysikRuntimeBehavior.collisionTest = function(object1, object2, behavior){
-    console.log(object1, object2, behavior);
     // Check if the objects exist and share the behavior
     if(object1 === null || !object1.hasBehavior(behavior)) return false;
     if(object2 === null || !object2.hasBehavior(behavior)) return false;
     // Test if the second object is in the list of contacts of the first one
     var behavior1 = object1.getBehavior(behavior);
     for(var i=0, len=behavior1.currentContacts.length; i<len; ++i){
-        console.log("    ", behavior1.currentContacts[i].owner === object2);
         if(behavior1.currentContacts[i].owner === object2){
             return true;
         }

@@ -45,13 +45,35 @@ void ExpressionCodeGenerator::OnVisitTextNode(TextNode& node) {
   output += codeGenerator.ConvertToStringExplicit(node.text);
 }
 
-void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {}
+void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
+  // This "translation" from the type to an enum could be avoided
+  // if all types were moved to an enum.
+  EventsCodeGenerator::VariableScope scope =
+      node.type == "globalvar"
+          ? gd::EventsCodeGenerator::PROJECT_VARIABLE
+          : ((node.type == "scenevar")
+                 ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
+                 : gd::EventsCodeGenerator::OBJECT_VARIABLE);
+
+  output +=
+      codeGenerator.GenerateGetVariable(node.name, scope, node.objectName);
+  if (node.child) node.child->Visit(*this);
+}
 
 void ExpressionCodeGenerator::OnVisitVariableAccessorNode(
-    VariableAccessorNode& node) {}
+    VariableAccessorNode& node) {
+  output += codeGenerator.GenerateVariableAccessor(node.name);
+  if (node.child) node.child->Visit(*this);
+}
 
 void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
-    VariableBracketAccessorNode& node) {}
+    VariableBracketAccessorNode& node) {
+  ExpressionCodeGenerator generator(codeGenerator, context);
+  node.expression->Visit(generator);
+  output +=
+      codeGenerator.GenerateVariableBracketAccessor(generator.GetOutput());
+  if (node.child) node.child->Visit(*this);
+}
 
 void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
   output += codeGenerator.ConvertToStringExplicit(node.identifierName);
@@ -59,8 +81,9 @@ void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
 
 void ExpressionCodeGenerator::OnVisitFunctionNode(FunctionNode& node) {
   if (gd::MetadataProvider::IsBadExpressionMetadata(node.expressionMetadata)) {
-    output += "/* Error during generation, function not found */ " +
-              GenerateDefaultValue(node.type);
+    output += "/* Error during generation, function not found: " +
+              codeGenerator.ConvertToString(node.functionName) + " for type " +
+              node.type + " */ " + GenerateDefaultValue(node.type);
     return;
   }
 

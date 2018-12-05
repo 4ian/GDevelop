@@ -503,14 +503,14 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   SECTION("Valid variables") {
     {
-      auto node = parser.ParseExpression("variable", "myVariable");
+      auto node = parser.ParseExpression("scenevar", "myVariable");
       REQUIRE(node != nullptr);
       auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
       REQUIRE(variableNode.name == "myVariable");
     }
 
     {
-      auto node = parser.ParseExpression("variable", "myVariable.myChild");
+      auto node = parser.ParseExpression("scenevar", "myVariable.myChild");
       REQUIRE(node != nullptr);
       auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
       REQUIRE(variableNode.name == "myVariable");
@@ -522,7 +522,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     {
       auto node = parser.ParseExpression(
-          "variable", "myVariable[ \"My named children\"  ]");
+          "scenevar", "myVariable[ \"My named children\"  ]");
       REQUIRE(node != nullptr);
       auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
       REQUIRE(variableNode.name == "myVariable");
@@ -536,7 +536,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
     {
       auto node = parser.ParseExpression(
-          "variable", "myVariable[ \"My named children\"  ].grandChild");
+          "scenevar", "myVariable[ \"My named children\"  ].grandChild");
       REQUIRE(node != nullptr);
       auto &variableNode = dynamic_cast<gd::VariableNode &>(*node);
       REQUIRE(variableNode.name == "myVariable");

@@ -22,7 +22,7 @@ class EventsCodeGenerationContext;
 class ExpressionCodeGenerationInformation;
 class InstructionMetadata;
 class Platform;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -54,9 +54,9 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Construct a code generator for the specified
    * objects/groups and platform
    */
-  EventsCodeGenerator(const gd::Platform& platform, 
-  gd::ObjectsContainer & globalObjectsAndGroups_,
-  const gd::ObjectsContainer & objectsAndGroups_);
+  EventsCodeGenerator(const gd::Platform& platform,
+                      gd::ObjectsContainer& globalObjectsAndGroups_,
+                      const gd::ObjectsContainer& objectsAndGroups_);
   virtual ~EventsCodeGenerator(){};
 
   /**
@@ -183,9 +183,9 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String ConvertToString(gd::String plainString);
 
   /**
-   * \brief Convert a plain string ( with line feed, quotes ) to a string that
+   * \brief Convert a plain string (with line feed, quotes) to a string that
    can be inserted into code.
-   * The string construction must be explicit : for example, quotes must be
+   * The string construction must be explicit: for example, quotes must be
    added if the target language need quotes.
    *
    * Usage example :
@@ -279,23 +279,31 @@ class GD_CORE_API EventsCodeGenerator {
   void ReportError();
 
   /**
-   * \brief Return true if an error has occurred during code generation ( in
-   * this case, generated code is not usable )
+   * \brief Return true if an error has occurred during code generation (in
+   * this case, generated code is not usable).
+   *
+   * \todo TODO: This is actually not used and should be moved to a more
+   * complete error reporting.
    */
   bool ErrorOccurred() const { return errorOccurred; };
 
   /**
    * \brief Get the global objects/groups used for code generation.
    */
-  gd::ObjectsContainer& GetGlobalObjectsAndGroups() const { return globalObjectsAndGroups; }
+  gd::ObjectsContainer& GetGlobalObjectsAndGroups() const {
+    return globalObjectsAndGroups;
+  }
 
   /**
    * \brief Get the objects/groups used for code generation.
    */
-  const gd::ObjectsContainer& GetObjectsAndGroups() const { return objectsAndGroups; }
+  const gd::ObjectsContainer& GetObjectsAndGroups() const {
+    return objectsAndGroups;
+  }
 
   /**
-   * \brief Return true if the code generation is done for a given project and layout.
+   * \brief Return true if the code generation is done for a given project and
+   * layout.
    */
   bool HasProjectAndLayout() const { return hasProjectAndLayout; }
 
@@ -381,27 +389,34 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Generate the code to notify the profiler of the beginning of a
    * section.
    */
-  virtual gd::String GenerateProfilerSectionBegin(const gd::String& section) { return ""; };
+  virtual gd::String GenerateProfilerSectionBegin(const gd::String& section) {
+    return "";
+  };
 
   /**
    * \brief Generate the code to notify the profiler of the end of a section.
    */
-  virtual gd::String GenerateProfilerSectionEnd(const gd::String& section) { return ""; };
+  virtual gd::String GenerateProfilerSectionEnd(const gd::String& section) {
+    return "";
+  };
 
   /**
-   * \brief Get the namespace to be used to store code generated objects/values/functions,
-   * with the extra "dot" at the end to be used to access to a property/member.
+   * \brief Get the namespace to be used to store code generated
+   * objects/values/functions, with the extra "dot" at the end to be used to
+   * access to a property/member.
    *
    * Example: "gdjs.something."
    */
   virtual gd::String GetCodeNamespaceAccessor() { return ""; };
 
   /**
-   * \brief Get the namespace to be used to store code generated objects/values/functions.
+   * \brief Get the namespace to be used to store code generated
+   * objects/values/functions.
    *
    * Example: "gdjs.something"
    */
   virtual gd::String GetCodeNamespace() { return ""; };
+
  protected:
   /**
    * \brief Generate the code for a single parameter.
@@ -456,6 +471,41 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::String& previousParameter,
       std::vector<std::pair<gd::String, gd::String> >*
           supplementaryParametersTypes);
+
+  enum VariableScope { LAYOUT_VARIABLE = 0, PROJECT_VARIABLE, OBJECT_VARIABLE };
+
+  /**
+   * \brief Generate the code to get a variable.
+   */
+  virtual gd::String GenerateGetVariable(gd::String variableName,
+                                         const VariableScope& scope,
+                                         gd::String objectName) {
+    if (scope == LAYOUT_VARIABLE) {
+      return "getLayoutVariable(" + variableName + ")";
+
+    } else if (scope == PROJECT_VARIABLE) {
+      return "getProjectVariable(" + variableName + ")";
+    }
+
+    return "getVariableForObject(" + objectName + ", " + variableName + ")";
+  }
+
+  /**
+   * \brief Generate the code to get the child of a variable.
+   */
+  virtual gd::String GenerateVariableAccessor(gd::String childName) {
+    return ".getChild(" + ConvertToStringExplicit(childName) + ")";
+  };
+
+  /**
+   * \brief Generate the code to get the child of a variable, 
+   * using generated the expression.
+   */
+  virtual gd::String GenerateVariableBracketAccessor(
+      gd::String expressionCode) {
+    return ".getChild(" + expressionCode + ")";
+  };
+  // TODO: Re-implement this in GDJS and GDCpp
 
   /**
    * \brief Call a function of the current object.
@@ -614,31 +664,34 @@ class GD_CORE_API EventsCodeGenerator {
                                  std::size_t startFromArgument = 0);
 
   /**
-   * \brief Must return an expression whose value is true.
+   * \brief Return the "true" keyword in the target language.
    */
   gd::String GenerateTrue() const { return "true"; };
 
   /**
-   * \brief Must return an expression whose value is false.
+   * \brief Return the "false" keyword in the target language.
    */
   gd::String GenerateFalse() const { return "false"; };
 
   /**
    * \brief Generate the list of comma-separated arguments to be used to call a
-   * function. \param arguments The code already generated for the arguments
+   * function.
+   *
+   * \param arguments The code already generated for the arguments
    * \param startFrom Index of the first argument, the previous will be ignored.
    */
   virtual gd::String GenerateArgumentsList(
       const std::vector<gd::String>& arguments, size_t startFrom = 0);
 
   const gd::Platform& platform;  ///< The platform being used.
-  
-  gd::ObjectsContainer & globalObjectsAndGroups; 
-  const gd::ObjectsContainer & objectsAndGroups;
 
-  bool hasProjectAndLayout;      ///< true only if project and layout are valid references. If false, they should not be used.
-  gd::Project* project;          ///< The project being used.
-  const gd::Layout* scene;       ///< The scene being generated.
+  gd::ObjectsContainer& globalObjectsAndGroups;
+  const gd::ObjectsContainer& objectsAndGroups;
+
+  bool hasProjectAndLayout;  ///< true only if project and layout are valid
+                             ///< references. If false, they should not be used.
+  gd::Project* project;      ///< The project being used.
+  const gd::Layout* scene;   ///< The scene being generated.
 
   bool errorOccurred;          ///< Must be set to true if an error occured.
   bool compilationForRuntime;  ///< Is set to true if the code generation is
@@ -653,7 +706,7 @@ class GD_CORE_API EventsCodeGenerator {
   gd::String customCodeInMain;  ///< Custom code inserted before events ( in
                                 ///< main function )
   std::set<gd::String>
-      customGlobalDeclarations;      ///< Custom global C++ declarations inserted
+      customGlobalDeclarations;     ///< Custom global C++ declarations inserted
                                     ///< after includes
   size_t maxCustomConditionsDepth;  ///< The maximum depth value for all the
                                     ///< custom conditions created.

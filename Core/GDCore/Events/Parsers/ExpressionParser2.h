@@ -57,7 +57,7 @@ class GD_CORE_API ExpressionParser2 {
    * Each method is a part of the grammar.
    */
   ///@{
-  std::unique_ptr<ExpressionNode> Start(gd::String type) {
+  std::unique_ptr<ExpressionNode> Start(const gd::String &type) {
     auto expression = Expression(type);
     if (!IsEndReached() && !expression->diagnostic->IsError()) {
       expression->diagnostic = RaiseSyntaxError(
@@ -68,7 +68,8 @@ class GD_CORE_API ExpressionParser2 {
     return expression;
   }
 
-  std::unique_ptr<ExpressionNode> Expression(gd::String type) {
+  std::unique_ptr<ExpressionNode> Expression(
+      const gd::String &type, const gd::String &objectName = "") {
     SkipWhitespace();
 
     size_t expressionStartPosition = GetCurrentPosition();
@@ -96,7 +97,7 @@ class GD_CORE_API ExpressionParser2 {
             expressionStartPosition);
     } else if (IsAnyChar("(")) {
       SkipChar();
-      leftHandSide = SubExpression(type);
+      leftHandSide = SubExpression(type, objectName);
 
       if (!IsAnyChar(")")) {
         leftHandSide->diagnostic =
@@ -107,8 +108,8 @@ class GD_CORE_API ExpressionParser2 {
     } else if (IsIdentifierAllowedChar()) {
       // This is a place where the grammar differs according to the
       // type being expected.
-      if (type == "variable") {
-        leftHandSide = Variable();
+      if (gd::ParameterMetadata::IsExpression("variable", type)) {
+        leftHandSide = Variable(type, objectName);
       } else {
         leftHandSide = Identifier(type);
       }
@@ -128,7 +129,7 @@ class GD_CORE_API ExpressionParser2 {
       op->leftHandSide = std::move(leftHandSide);
       op->diagnostic = ValidateOperator(type, GetCurrentChar());
       SkipChar();
-      op->rightHandSide = Expression(type);
+      op->rightHandSide = Expression(type, objectName);
       return std::move(op);
     }
 
@@ -148,11 +149,14 @@ class GD_CORE_API ExpressionParser2 {
     return leftHandSide;
   }
 
-  std::unique_ptr<SubExpressionNode> SubExpression(gd::String type) {
-    return std::move(gd::make_unique<SubExpressionNode>(Expression(type)));
+  std::unique_ptr<SubExpressionNode> SubExpression(
+      const gd::String &type, const gd::String &objectName) {
+    return std::move(
+        gd::make_unique<SubExpressionNode>(Expression(type, objectName)));
   };
 
-  std::unique_ptr<IdentifierOrFunctionOrEmptyNode> Identifier(gd::String type) {
+  std::unique_ptr<IdentifierOrFunctionOrEmptyNode> Identifier(
+      const gd::String &type) {
     size_t identifierStartPosition = GetCurrentPosition();
     gd::String name = ReadIdentifierName();
 
@@ -186,11 +190,12 @@ class GD_CORE_API ExpressionParser2 {
     }
   }
 
-  std::unique_ptr<VariableNode> Variable() {
+  std::unique_ptr<VariableNode> Variable(const gd::String &type,
+                                         const gd::String &objectName) {
     size_t identifierStartPosition = GetCurrentPosition();
 
     gd::String name = ReadIdentifierName();
-    auto variable = gd::make_unique<VariableNode>(name);
+    auto variable = gd::make_unique<VariableNode>(type, name, objectName);
     variable->child = VariableAccessorOrVariableBracketAccessor();
 
     return std::move(variable);
@@ -223,9 +228,12 @@ class GD_CORE_API ExpressionParser2 {
     return child;
   }
 
-  std::unique_ptr<FunctionNode> FreeFunction(gd::String type,
-                                             gd::String functionFullName,
+  std::unique_ptr<FunctionNode> FreeFunction(const gd::String &type,
+                                             const gd::String &functionFullName,
                                              size_t functionStartPosition) {
+    // TODO: error if trying to use function for type != "number" && != "string"
+    // + Test for it
+
     // This could be improved to have the type passed to a single
     // GetExpressionMetadata function.
     const gd::ExpressionMetadata &metadata =
@@ -235,7 +243,7 @@ class GD_CORE_API ExpressionParser2 {
                                platform, functionFullName);
 
     auto function = gd::make_unique<FunctionNode>(
-        type, Parameters(metadata.parameters, 0), metadata);
+        type, Parameters(metadata.parameters), metadata, functionFullName);
     function->diagnostic = ValidateFunction(type,
                                             metadata,
                                             0,
@@ -247,7 +255,9 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<FunctionOrEmptyNode> ObjectFunctionOrBehaviorFunction(
-      gd::String type, gd::String objectName, size_t functionStartPosition) {
+      const gd::String &type,
+      const gd::String &objectName,
+      size_t functionStartPosition) {
     gd::String objectFunctionOrBehaviorName = ReadIdentifierName();
 
     SkipWhitespace();
@@ -279,9 +289,9 @@ class GD_CORE_API ExpressionParser2 {
       auto function = gd::make_unique<FunctionNode>(
           type,
           objectName,
-          // By convention, the first parameter is the object
-          Parameters(metadata.parameters, 1),
-          metadata);
+          Parameters(metadata.parameters, objectName),
+          metadata,
+          objectFunctionOrBehaviorName);
       function->diagnostic = ValidateFunction(type,
                                               metadata,
                                               1,
@@ -301,9 +311,9 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<FunctionOrEmptyNode> BehaviorFunction(
-      gd::String type,
-      gd::String objectName,
-      gd::String behaviorName,
+      const gd::String &type,
+      const gd::String &objectName,
+      const gd::String &behaviorName,
       size_t functionStartPosition) {
     gd::String functionName = ReadIdentifierName();
 
@@ -327,9 +337,9 @@ class GD_CORE_API ExpressionParser2 {
           type,
           objectName,
           behaviorName,
-          // By convention, the first 2 parameters are the object and behavior.
-          Parameters(metadata.parameters, 2),
-          metadata);
+          Parameters(metadata.parameters, objectName, behaviorName),
+          metadata,
+          functionName);
       function->diagnostic = ValidateFunction(type,
                                               metadata,
                                               2,
@@ -349,9 +359,15 @@ class GD_CORE_API ExpressionParser2 {
 
   std::vector<std::unique_ptr<ExpressionNode>> Parameters(
       std::vector<gd::ParameterMetadata> parameterMetadata,
-      size_t initialParameterIndex) {
+      const gd::String &objectName = "",
+      const gd::String &behaviorName = "") {
     std::vector<std::unique_ptr<ExpressionNode>> parameters;
-    size_t parameterIndex = initialParameterIndex;
+
+    // By convention, object is always the first parameter, and behavior the
+    // second one.
+    size_t parameterIndex =
+        !behaviorName.empty() ? 2 : (!objectName.empty() ? 1 : 0);
+
     while (!IsEndReached()) {
       SkipWhitespace();
 
@@ -360,20 +376,15 @@ class GD_CORE_API ExpressionParser2 {
         return std::move(parameters);
       } else {
         if (parameterIndex < parameterMetadata.size()) {
+          const gd::String &type = parameterMetadata[parameterIndex].GetType();
           if (parameterMetadata[parameterIndex].IsCodeOnly()) {
             // Do nothing, code only parameters are not written in expressions.
-          } else if (gd::ParameterMetadata::IsExpression(
-                         "number",
-                         parameterMetadata[parameterIndex].GetType())) {
+          } else if (gd::ParameterMetadata::IsExpression("number", type)) {
             parameters.push_back(Expression("number"));
-          } else if (gd::ParameterMetadata::IsExpression(
-                         "string",
-                         parameterMetadata[parameterIndex].GetType())) {
+          } else if (gd::ParameterMetadata::IsExpression("string", type)) {
             parameters.push_back(Expression("string"));
-          } else if (gd::ParameterMetadata::IsExpression(
-                         "variable",
-                         parameterMetadata[parameterIndex].GetType())) {
-            parameters.push_back(Expression("variable"));
+          } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+            parameters.push_back(Expression(type, objectName));
           } else {
             parameters.push_back(Expression("identifier"));
           }
@@ -408,15 +419,15 @@ class GD_CORE_API ExpressionParser2 {
    */
   ///@{
   std::unique_ptr<ExpressionParserDiagnostic> ValidateFunction(
-      gd::String type,
+      const gd::String &type,
       const gd::ExpressionMetadata &metadata,
       size_t skippedParametersCount,
-      gd::String functionFullName,
+      const gd::String &functionFullName,
       const std::vector<std::unique_ptr<ExpressionNode>> &parameters,
       size_t functionStartPosition);
 
   std::unique_ptr<ExpressionParserDiagnostic> ValidateOperator(
-      gd::String type, gd::String::value_type operatorChar) {
+      const gd::String &type, gd::String::value_type operatorChar) {
     if (type == "number") {
       if (operatorChar == '+' || operatorChar == '-' || operatorChar == '/' ||
           operatorChar == '*') {
@@ -464,13 +475,13 @@ class GD_CORE_API ExpressionParser2 {
     }
   }
 
-  void SkipIfIsAnyChar(gd::String allowedCharacters) {
+  void SkipIfIsAnyChar(const gd::String &allowedCharacters) {
     if (IsAnyChar(allowedCharacters)) {
       currentPosition++;
     }
   }
 
-  bool IsAnyChar(gd::String allowedCharacters) {
+  bool IsAnyChar(const gd::String &allowedCharacters) {
     if (currentPosition < expression.size() &&
         allowedCharacters.find(expression[currentPosition]) !=
             gd::String::npos) {
@@ -533,13 +544,14 @@ class GD_CORE_API ExpressionParser2 {
    * Helpers to attach errors to nodes
    */
   ///@{
-  std::unique_ptr<ExpressionParserError> RaiseSyntaxError(gd::String message) {
+  std::unique_ptr<ExpressionParserError> RaiseSyntaxError(
+      const gd::String &message) {
     return std::move(gd::make_unique<ExpressionParserError>(
         "syntax_error", message, GetCurrentPosition()));
   }
 
   std::unique_ptr<ExpressionParserError> RaiseTypeError(
-      gd::String message, size_t beginningPosition) {
+      const gd::String &message, size_t beginningPosition) {
     return std::move(gd::make_unique<ExpressionParserError>(
         "type_error", message, beginningPosition, GetCurrentPosition()));
   }

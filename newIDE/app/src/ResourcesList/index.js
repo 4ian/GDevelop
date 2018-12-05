@@ -7,8 +7,16 @@ import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import { createOrUpdateResource } from './ResourceUtils.js';
+import { type ResourceKind } from './ResourceSource.flow';
+
 const path = optionalRequire('path');
 const glob = optionalRequire('glob');
+
+const IMAGE_EXTENSIONS = 'png,jpg,jpeg,PNG,JPG,JPEG';
+const AUDIO_EXTENSIONS = 'wav,mp3,ogg,WAV,MP3,OGG';
+const FONT_EXTENSIONS = 'ttf,ttc,TTF,TTC';
+
 const gd = global.gd;
 
 const styles = {
@@ -77,44 +85,39 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
-  _scanForNewResources = () => {
+  _scanForNewResources = (extensions: string, createResource: () => gdResource) => {
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
-    console.log('Scanning the project folder for new resources...');
     const projectPath = path.dirname(project.getProjectFile());
 
     const getDirectories = (src, callback) => {
-      glob(src + '/**/*.{png,jpg,jpeg,PNG,JPG,JPEG}', callback);
+      glob(src + '/**/*.{' + extensions + '}', callback);
     };
     getDirectories(projectPath, (err, res) => {
       if (err) {
-        console.log('Error loading ', err);
+        console.error('Error loading ', err);
       } else {
         res.forEach(pathFound => {
           const fileName = path.relative(projectPath, pathFound);
           if (!resourcesManager.hasResource(fileName)) {
-            const imageResource = new gd.ImageResource();
-            imageResource.setFile(fileName);
-            imageResource.setName(fileName);
-            resourcesManager.addResource(imageResource);
-            imageResource.delete();
+            createOrUpdateResource(project, createResource(), fileName)
             console.info(`${fileName} added to project.`);
-          }
+          };
         });
       }
       this.forceUpdate();
     });
   };
 
-  _removeAllUnusedImages = () => {
+  _removeUnusedResources = (resourceType: ResourceKind) => {
     const { project } = this.props;
     gd.ProjectResourcesAdder
-      .getAllUseless(project, 'image')
+      .getAllUseless(project, resourceType)
       .toJSArray()
-      .forEach(imageName => {
-        console.info(`Removing unused image resource: ${imageName}`);
+      .forEach(resourceName => {
+        console.info(`Removing unused` + resourceType + ` resource: ${resourceName}`);
       });
-    gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
+    gd.ProjectResourcesAdder.removeAllUseless(project, resourceType);
     this.forceUpdate();
   };
 
@@ -173,13 +176,38 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: 'Scan for Images',
         click: () => {
-          this._scanForNewResources();
+          this._scanForNewResources(IMAGE_EXTENSIONS, () => new gd.ImageResource());
         },
       },
       {
+        label: 'Scan for Audio',
+        click: () => {
+          this._scanForNewResources(AUDIO_EXTENSIONS, () => new gd.AudioResource());
+        },
+      },
+      {
+        label: 'Scan for Fonts',
+        click: () => {
+          this._scanForNewResources(FONT_EXTENSIONS, () => new gd.FontResource());
+        },
+      },
+      { type: 'separator' },
+      {
         label: 'Remove All Unused Images',
         click: () => {
-          this._removeAllUnusedImages();
+          this._removeUnusedResources('image');
+        },
+      },
+      {
+        label: 'Remove All Unused Audio',
+        click: () => {
+          this._removeUnusedResources('audio');
+        },
+      },
+      {
+        label: 'Remove All Unused Fonts',
+        click: () => {
+          this._removeUnusedResources('font');
         },
       },
     ];

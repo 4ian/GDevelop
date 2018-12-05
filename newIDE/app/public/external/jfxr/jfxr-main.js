@@ -11,16 +11,16 @@ const closeWindow = () => {
   remote.getCurrentWindow().close()
 }
 
-const loadMetaData = metaData => {
-  if ('jfxr' in metaData) {
-    jfxr.getSound().parse(metaData.jfxr.data);
+const loadMetaData = externalEditorData => {
+  if ('jfxr' in externalEditorData) {
+    jfxr.getSound().parse(externalEditorData.jfxr.data);
   } else {
     jfxr.applyPreset(jfxr.presets[1])
   }
 }
 
 const saveSoundEffect = pathEditor => {
-  const metadata = {
+  const externalEditorData = {
     data: jfxr.getSound().serialize(),
     name: pathEditor.state.name
   }
@@ -32,7 +32,7 @@ const saveSoundEffect = pathEditor => {
     var fileReader = new FileReader()
     fileReader.onload = function () {
       fs.writeFileSync(pathEditor.state.fullPath, Buffer(new Uint8Array(this.result)))
-      ipcRenderer.send('jfxr-changes-saved', pathEditor.state.fullPath, metadata)
+      ipcRenderer.send('jfxr-changes-saved', pathEditor.state.fullPath, externalEditorData)
       closeWindow()
     }
     fileReader.readAsArrayBuffer(blob)
@@ -51,7 +51,7 @@ editorFrameEl.src = 'jfxr-editor/index.html'
 
 // Called to load a sound. Should be called after the window is fully loaded.
 ipcRenderer.on('jfxr-open', (event, receivedOptions) => {
-  loadMetaData(receivedOptions.metadata);
+  loadMetaData(receivedOptions.externalEditorData);
 
   // Load a custom save file(s) header
   const pathEditorHeaderDiv = document.getElementById('path-editor-header');

@@ -1,5 +1,6 @@
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
+import { createOrUpdateResource } from './ResourceUtils.js';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -27,32 +28,27 @@ export const openJfxr = ({
     initialResourcePath.lastIndexOf('?cache=')
   );
 
-  const jfxrData = {
+  const externalEditorData = {
     resourcePath: initialResourcePath,
-    metadata: extraOptions.initialResourceMetadata,
+    externalEditorData: extraOptions.initialResourceMetadata,
     projectPath,
   };
 
   ipcRenderer.removeAllListeners('jfxr-changes-saved');
-  ipcRenderer.on('jfxr-changes-saved', (event, newFilePath, fileMetadata) => {
+  ipcRenderer.on('jfxr-changes-saved', (event, newFilePath, externalEditorData) => {
 
-    const resourceName = path.relative(projectPath, newFilePath); // TODO: move into a generic createOrUpdateResource function that piskel can also use in app/src/ResourcesList/ResourceUtils.js
-    const resourcesManager = project.getResourcesManager();
-    if (resourcesManager.hasResource(resourceName)) {
-      resourcesManager.removeResource(resourceName)
-    }
-    const audioResource = new gd.AudioResource();
-    audioResource.setFile(resourceName);
-    audioResource.setName(resourceName);
-    resourcesManager.addResource(audioResource);
-    audioResource.delete();
+    const resourceName = path.relative(projectPath, newFilePath);
+    createOrUpdateResource(project, new gd.AudioResource(), resourceName);
 
-    const newMetadata = {
-      jfxr: fileMetadata,
+    const metadata = {
+      jfxr: externalEditorData,
     };
-    resourcesManager.getResource(resourceName).setMetadata(JSON.stringify(newMetadata));
-    onChangesSaved([{ metadata: newMetadata }], resourceName);
+    project
+    .getResourcesManager()
+    .getResource(resourceName)
+    .setMetadata(JSON.stringify(metadata));
+    onChangesSaved([{ metadata }], resourceName);
   });
 
-  ipcRenderer.send('jfxr-create-wav', jfxrData);
+  ipcRenderer.send('jfxr-create-wav', externalEditorData);
 };

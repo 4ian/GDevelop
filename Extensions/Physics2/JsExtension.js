@@ -14,15 +14,15 @@ module.exports = {
   createExtension: function(t, gd) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
-      "Physik",
-      "Physik behavior",
+      "Physics2",
+      "Physics2 behavior",
       "Simulate physics",
       "Florian Rival, Franco Maciel",
       "MIT"
     );
 
-    var physikBehavior = new gd.BehaviorJsImplementation();
-    physikBehavior.updateProperty = function(
+    var physics2Behavior = new gd.BehaviorJsImplementation();
+    physics2Behavior.updateProperty = function(
       behaviorContent,
       propertyName,
       newValue
@@ -124,7 +124,7 @@ module.exports = {
 
       return false;
     };
-    physikBehavior.getProperties = function(behaviorContent) {
+    physics2Behavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
       behaviorProperties.set(
@@ -246,7 +246,7 @@ module.exports = {
 
       return behaviorProperties;
     };
-    physikBehavior.setRawJSONContent(
+    physics2Behavior.setRawJSONContent(
       JSON.stringify({
         type: "Dynamic",
         bullet: false,
@@ -339,18 +339,18 @@ module.exports = {
     var aut = extension
     // extension
       .addBehavior(
-        "PhysikBehavior",
-        t("Physik behavior"),
-        "PhysikBehavior",
+        "Physics2Behavior",
+        t("Physics2 behavior"),
+        "Physics2Behavior",
         t("Simulate physics"),
         "",
         "res/physics32.png",
-        "PhysikBehavior",
-        physikBehavior,
+        "Physics2Behavior",
+        physics2Behavior,
         sharedData
       )
-      .setIncludeFile("Extensions/Physik/physikruntimebehavior.js")
-      .addIncludeFile("Extensions/Physik/box2d.js");
+      .setIncludeFile("Extensions/Physics2/physics2runtimebehavior.js")
+      .addIncludeFile("Extensions/Physics2/box2d.js");
 
 
 
@@ -359,14 +359,25 @@ module.exports = {
       "GravityX",
       t("Gravity X"),
       t("Test the world gravity on X."),
-      t("Gravity on X is _PARAM2_ _PARAM3_"),
+      t("Gravity on X is _PARAM2__PARAM3_"),
       t("Global"),
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("getGravityX");
+
+    aut.addExpression(
+      "GravityX",
+      t("Gravity X"),
+      t("Gravity X"),
+      t("Global"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("getGravityX");
 
@@ -374,50 +385,84 @@ module.exports = {
       "GravityY",
       t("Gravity Y"),
       t("Test the world gravity on Y."),
-      t("Gravity on Y is _PARAM2_ _PARAM3_"),
+      t("Gravity on Y is _PARAM2__PARAM3_"),
       t("Global"),
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
       .setFunctionName("getGravityY");
 
-    aut.addAction(
-      "GravityX",
-      t("Gravity X"),
-      t("Modify the world gravity on X."),
-      t("Do _PARAM2__PARAM3_ to the gravity on X"),
-      t("Global"),
-      "res/physics24.png",
-      "res/physics16.png")
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("operator", t("Modification's sign"))
-      .addParameter("expression", t("Value"))
-      .getCodeExtraInformation()
-      .setFunctionName("setGravityX")
-      .setManipulatedType("number")
-      .setGetter("getGravityX");
-
-    aut.addAction(
+    aut.addExpression(
       "GravityY",
       t("Gravity Y"),
-      t("Modify the world gravity on Y."),
-      t("Do _PARAM2__PARAM3_ to the gravity on Y"),
+      t("Gravity Y"),
+      t("Global"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
+      .getCodeExtraInformation()
+      .setFunctionName("getGravityY");
+
+    aut.addAction(
+      "Gravity",
+      t("Gravity"),
+      t("Modify the world gravity."),
+      t("Set the gravity to _PARAM2_;_PARAM3_"),
       t("Global"),
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
-      .addParameter("operator", t("Modification's sign"))
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
+      .addParameter("expression", t("Gravity X"))
+      .addParameter("expression", t("Gravity Y"))
+      .getCodeExtraInformation()
+      .setFunctionName("setGravity");
+
+    aut.addCondition(
+      "TimeScale",
+      t("Time scale"),
+      t("Test the world time scale."),
+      t("Time scale is _PARAM2__PARAM3_"),
+      t("Global"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
+      .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("setGravityY")
-      .setManipulatedType("number")
-      .setGetter("getGravityY");
+      .setIncludeFile("Extensions/Physics2/physics2tools.js")
+      .setFunctionName("getTimeScale");
+
+    aut.addAction(
+      "TimeScale",
+      t("Time scale"),
+      t("Modify the world time scale."),
+      t("Set the world time scale to _PARAM2_"),
+      t("Global"),
+      "res/physics24.png",
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
+      .addParameter("expression", t("Value"))
+      .getCodeExtraInformation()
+      .setIncludeFile("Extensions/Physics2/physics2tools.js")
+      .setFunctionName("setTimeScale");
+
+    aut.addExpression(
+      "TimeScale",
+      t("Time scale"),
+      t("Time scale"),
+      t("Global"),
+      "res/physics16.png")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
+      .getCodeExtraInformation()
+      .setFunctionName("getTimeScale");
 
 
 
@@ -431,7 +476,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("isDynamic");
 
@@ -444,7 +489,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("setDynamic");
 
@@ -457,7 +502,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("isStatic");
 
@@ -470,7 +515,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("setStatic");
 
@@ -483,7 +528,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("isKinematic");
 
@@ -496,7 +541,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("setKinematic");
 
@@ -509,7 +554,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("isBullet");
 
@@ -522,7 +567,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("yesorno", t("Treat as bullet?"), "", false).setDefaultValue("false")
       .getCodeExtraInformation()
       .setFunctionName("setBullet");
@@ -536,7 +581,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("hasFixedRotation");
 
@@ -549,7 +594,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("yesorno", t("Fixed rotation?"), "", false).setDefaultValue("false")
       .getCodeExtraInformation()
       .setFunctionName("setFixedRotation");
@@ -563,7 +608,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("isSleepingAllowed");
 
@@ -576,7 +621,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("yesorno", t("Can sleep?"), "", false).setDefaultValue("true")
       .getCodeExtraInformation()
       .setFunctionName("setSleepingAllowed");
@@ -590,7 +635,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("isSleeping");
 
@@ -606,7 +651,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -623,7 +668,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -638,7 +683,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value (non-negative)"))
       .getCodeExtraInformation()
@@ -655,7 +700,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -670,7 +715,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value (non-negative)"))
       .getCodeExtraInformation()
@@ -687,7 +732,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -702,7 +747,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value (non-negative)"))
       .getCodeExtraInformation()
@@ -719,7 +764,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -734,7 +779,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -751,7 +796,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -766,7 +811,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -783,7 +828,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -798,7 +843,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -818,7 +863,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Layer (1 - 16)"))
       .getCodeExtraInformation()
       .setFunctionName("layerEnabled");
@@ -832,7 +877,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Layer (1 - 16)"))
       .addParameter("yesorno", t("Enable?"), "", false).setDefaultValue("true")
       .getCodeExtraInformation()
@@ -847,7 +892,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Mask (1 - 16)"))
       .getCodeExtraInformation()
       .setFunctionName("maskEnabled");
@@ -861,7 +906,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Mask (1 - 16)"))
       .addParameter("yesorno", t("Enable?"), "", false).setDefaultValue("true")
       .getCodeExtraInformation()
@@ -879,7 +924,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -894,7 +939,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value (pixels/second)"))
       .getCodeExtraInformation()
@@ -911,7 +956,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -926,7 +971,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value (pixels/second)"))
       .getCodeExtraInformation()
@@ -943,7 +988,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -958,7 +1003,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
@@ -973,7 +1018,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value (º/s)"))
       .getCodeExtraInformation()
@@ -993,7 +1038,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("X component (N)"))
       .addParameter("expression", t("Y component (N)"))
       .addParameter("expression", t("Applying X position"))
@@ -1010,7 +1055,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Angle"))
       .addParameter("expression", t("Length (N)"))
       .addParameter("expression", t("Applying X position"))
@@ -1027,7 +1072,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Length (N)"))
       .addParameter("expression", t("X position"))
       .addParameter("expression", t("Y position"))
@@ -1045,7 +1090,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("X component (N.m)"))
       .addParameter("expression", t("Y component (N.m)"))
       .addParameter("expression", t("Applying X position"))
@@ -1062,7 +1107,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Angle"))
       .addParameter("expression", t("Length (N.m)"))
       .addParameter("expression", t("Applying X position"))
@@ -1079,7 +1124,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Length (N.m)"))
       .addParameter("expression", t("X position"))
       .addParameter("expression", t("Y position"))
@@ -1097,7 +1142,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Torque (N.m)"))
       .getCodeExtraInformation()
       .setFunctionName("applyTorque");
@@ -1111,7 +1156,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Angular impulse (N.m.s"))
       .getCodeExtraInformation()
       .setFunctionName("applyAngularImpulse");
@@ -1123,7 +1168,7 @@ module.exports = {
       t("Joints"),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("getMassCenterX");
 
@@ -1134,7 +1179,7 @@ module.exports = {
       t("Joints"),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .getCodeExtraInformation()
       .setFunctionName("getMassCenterY");
 
@@ -1150,7 +1195,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("isJointFirstObject");
@@ -1164,7 +1209,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("isJointSecondObject");
@@ -1176,7 +1221,7 @@ module.exports = {
       t("Joints"),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getJointFirstAnchorX");
@@ -1188,7 +1233,7 @@ module.exports = {
       t("Joints"),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getJointFirstAnchorY");
@@ -1200,7 +1245,7 @@ module.exports = {
       t("Joints"),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getJointSecondAnchorX");
@@ -1212,7 +1257,7 @@ module.exports = {
       t("Joints"),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getJointSecondAnchorY");
@@ -1226,7 +1271,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
@@ -1241,7 +1286,7 @@ module.exports = {
       t("Joints"),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getJointReactionForce");
@@ -1255,7 +1300,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
@@ -1270,7 +1315,7 @@ module.exports = {
       t("Joints"),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getJointReactionTorque");
@@ -1284,7 +1329,7 @@ module.exports = {
       "res/physics24.png",
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("removeJoint");
@@ -1301,7 +1346,7 @@ module.exports = {
       "JsPlatform/Extensions/distance_joint24.png",
       "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Anchor X on first body"))
       .addParameter("expression", t("Anchor Y on first body"))
       .addParameter("objectPtr", t("Second object"), "", false)
@@ -1324,7 +1369,7 @@ module.exports = {
       "JsPlatform/Extensions/distance_joint24.png",
       "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -1340,7 +1385,7 @@ module.exports = {
       t("Joints/Distance"),
       "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getDistanceJointLength");
@@ -1354,7 +1399,7 @@ module.exports = {
       "JsPlatform/Extensions/distance_joint24.png",
       "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -1370,7 +1415,7 @@ module.exports = {
       t("Joints/Distance"),
       "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getDistanceJointFrequency");
@@ -1384,7 +1429,7 @@ module.exports = {
       "JsPlatform/Extensions/distance_joint24.png",
       "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -1400,7 +1445,7 @@ module.exports = {
       t("Joints/Distance"),
       "JsPlatform/Extensions/distance_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getDistanceJointDampingRatio");
@@ -1417,7 +1462,7 @@ module.exports = {
       "JsPlatform/Extensions/revolute_joint24.png",
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("X anchor"))
       .addParameter("expression", t("Y anchor"))
       .addParameter("yesorno", t("Enable angle limits? (default: no)"), "", true).setDefaultValue("false")
@@ -1440,7 +1485,7 @@ module.exports = {
       "JsPlatform/Extensions/revolute_joint24.png",
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Anchor X on first body"))
       .addParameter("expression", t("Anchor Y on first body"))
       .addParameter("objectPtr", t("Second object"), "", false)
@@ -1465,7 +1510,7 @@ module.exports = {
       t("Joints/Revolute"),
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getRevoluteJointReferenceAngle");
@@ -1477,7 +1522,7 @@ module.exports = {
       t("Joints/Revolute"),
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getRevoluteJointAngle");
@@ -1489,7 +1534,7 @@ module.exports = {
       t("Joints/Revolute"),
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getRevoluteJointSpeed");
@@ -1503,7 +1548,7 @@ module.exports = {
       "JsPlatform/Extensions/revolute_joint24.png",
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("isRevoluteJointLimitsEnabled");
@@ -1517,7 +1562,7 @@ module.exports = {
       "JsPlatform/Extensions/revolute_joint24.png",
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("yesorno", t("Enable?"))
       .getCodeExtraInformation()
@@ -1532,7 +1577,7 @@ module.exports = {
       "JsPlatform/Extensions/revolute_joint24.png",
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("expression", t("Minimum angle"))
       .addParameter("expression", t("Maximum angle"))
@@ -1546,7 +1591,7 @@ module.exports = {
       t("Joints/Revolute"),
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getRevoluteJointMinAngle");
@@ -1558,7 +1603,7 @@ module.exports = {
       t("Joints/Revolute"),
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getRevoluteJointMaxAngle");
@@ -1572,7 +1617,7 @@ module.exports = {
       "JsPlatform/Extensions/revolute_joint24.png",
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("isRevoluteJointMotorEnabled");
@@ -1586,7 +1631,7 @@ module.exports = {
       "JsPlatform/Extensions/revolute_joint24.png",
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("yesorno", t("Enable?"))
       .getCodeExtraInformation()
@@ -1601,7 +1646,7 @@ module.exports = {
       "JsPlatform/Extensions/revolute_joint24.png",
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -1617,7 +1662,7 @@ module.exports = {
       t("Joints/Revolute"),
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getRevoluteJointMotorSpeed");
@@ -1631,7 +1676,7 @@ module.exports = {
       "JsPlatform/Extensions/revolute_joint24.png",
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -1647,7 +1692,7 @@ module.exports = {
       t("Joints/Revolute"),
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getRevoluteJointMaxMotorTorque");
@@ -1659,7 +1704,7 @@ module.exports = {
       t("Joints/Revolute"),
       "JsPlatform/Extensions/revolute_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getRevoluteJointMotorTorque");
@@ -1676,7 +1721,7 @@ module.exports = {
       "JsPlatform/Extensions/prismatic_joint24.png",
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Anchor X on first body"))
       .addParameter("expression", t("Anchor Y on first body"))
       .addParameter("objectPtr", t("Second object"), "", false)
@@ -1702,7 +1747,7 @@ module.exports = {
       t("Joints/Prismatic"),
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPrismaticJointAxisAngle");
@@ -1714,7 +1759,7 @@ module.exports = {
       t("Joints/Prismatic"),
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPrismaticJointReferenceAngle");
@@ -1726,7 +1771,7 @@ module.exports = {
       t("Joints/Prismatic"),
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPrismaticJointTranslation");
@@ -1738,7 +1783,7 @@ module.exports = {
       t("Joints/Prismatic"),
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPrismaticJointSpeed");
@@ -1752,7 +1797,7 @@ module.exports = {
       "JsPlatform/Extensions/prismatic_joint24.png",
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("isPrismaticJointLimitsEnabled");
@@ -1766,7 +1811,7 @@ module.exports = {
       "JsPlatform/Extensions/prismatic_joint24.png",
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("yesorno", t("Enable?"))
       .getCodeExtraInformation()
@@ -1781,7 +1826,7 @@ module.exports = {
       "JsPlatform/Extensions/prismatic_joint24.png",
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("expression", t("Minimum translation"))
       .addParameter("expression", t("Maximum translation"))
@@ -1795,7 +1840,7 @@ module.exports = {
       t("Joints/Prismatic"),
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPrismaticJointMinTranslation");
@@ -1807,7 +1852,7 @@ module.exports = {
       t("Joints/Prismatic"),
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPrismaticJointMaxTranslation");
@@ -1821,7 +1866,7 @@ module.exports = {
       "JsPlatform/Extensions/prismatic_joint24.png",
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("isPrismaticJointMotorEnabled");
@@ -1835,7 +1880,7 @@ module.exports = {
       "JsPlatform/Extensions/prismatic_joint24.png",
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("yesorno", t("Enable?"))
       .getCodeExtraInformation()
@@ -1850,7 +1895,7 @@ module.exports = {
       "JsPlatform/Extensions/prismatic_joint24.png",
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -1866,7 +1911,7 @@ module.exports = {
       t("Joints/Prismatic"),
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPrismaticJointMotorSpeed");
@@ -1880,7 +1925,7 @@ module.exports = {
       "JsPlatform/Extensions/prismatic_joint24.png",
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -1896,7 +1941,7 @@ module.exports = {
       t("Joints/Prismatic"),
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPrismaticJointMaxMotorForce");
@@ -1908,7 +1953,7 @@ module.exports = {
       t("Joints/Prismatic"),
       "JsPlatform/Extensions/prismatic_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPrismaticJointMotorForce");
@@ -1925,7 +1970,7 @@ module.exports = {
       "JsPlatform/Extensions/pulley_joint24.png",
       "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Anchor X on first body"))
       .addParameter("expression", t("Anchor Y on first body"))
       .addParameter("objectPtr", t("Second object"), "", false)
@@ -1950,7 +1995,7 @@ module.exports = {
       t("Joints/Pulley"),
       "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPulleyJointFirstGroundAnchorX");
@@ -1962,7 +2007,7 @@ module.exports = {
       t("Joints/Pulley"),
       "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPulleyJointFirstGroundAnchorY");
@@ -1974,7 +2019,7 @@ module.exports = {
       t("Joints/Pulley"),
       "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPulleyJointSecondGroundAnchorX");
@@ -1986,7 +2031,7 @@ module.exports = {
       t("Joints/Pulley"),
       "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPulleyJointSecondGroundAnchorY");
@@ -1998,7 +2043,7 @@ module.exports = {
       t("Joints/Pulley"),
       "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPulleyJointFirstLength");
@@ -2010,7 +2055,7 @@ module.exports = {
       t("Joints/Pulley"),
       "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPulleyJointSecondLength");
@@ -2022,7 +2067,7 @@ module.exports = {
       t("Joints/Pulley"),
       "JsPlatform/Extensions/pulley_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getPulleyJointRatio");
@@ -2039,7 +2084,7 @@ module.exports = {
       "JsPlatform/Extensions/gear_joint24.png",
       "JsPlatform/Extensions/gear_joint16.png")
       .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("First joint ID"))
       .addParameter("expression", t("Second joint ID"))
       .addParameter("expression", t("Ratio (non-zero) (default: 1)"), "", true).setDefaultValue("1")
@@ -2055,7 +2100,7 @@ module.exports = {
       t("Joints/Gear"),
       "JsPlatform/Extensions/gear_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getGearJointFirstJoint");
@@ -2067,7 +2112,7 @@ module.exports = {
       t("Joints/Gear"),
       "JsPlatform/Extensions/gear_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getGearJointSecondJoint");
@@ -2081,7 +2126,7 @@ module.exports = {
       "JsPlatform/Extensions/gear_joint24.png",
       "JsPlatform/Extensions/gear_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2097,7 +2142,7 @@ module.exports = {
       t("Joints/Gear"),
       "JsPlatform/Extensions/gear_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getGearJointRatio");
@@ -2114,7 +2159,7 @@ module.exports = {
       "JsPlatform/Extensions/mouse_joint24.png",
       "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Target X"))
       .addParameter("expression", t("Target Y"))
       .addParameter("expression", t("Maximum force (N) (non-negative) (default: 500)"), "", true).setDefaultValue("500")
@@ -2133,7 +2178,7 @@ module.exports = {
       "JsPlatform/Extensions/mouse_joint24.png",
       "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("expression", t("Target X"))
       .addParameter("expression", t("Target Y"))
@@ -2147,7 +2192,7 @@ module.exports = {
       t("Joints/Mouse"),
       "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMouseJointTargetX");
@@ -2159,7 +2204,7 @@ module.exports = {
       t("Joints/Mouse"),
       "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMouseJointTargetY");
@@ -2173,7 +2218,7 @@ module.exports = {
       "JsPlatform/Extensions/mouse_joint24.png",
       "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2189,7 +2234,7 @@ module.exports = {
       t("Joints/Mouse"),
       "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMouseJointMaxForce");
@@ -2203,7 +2248,7 @@ module.exports = {
       "JsPlatform/Extensions/mouse_joint24.png",
       "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2219,7 +2264,7 @@ module.exports = {
       t("Joints/Mouse"),
       "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMouseJointFrequency");
@@ -2233,7 +2278,7 @@ module.exports = {
       "JsPlatform/Extensions/mouse_joint24.png",
       "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2249,7 +2294,7 @@ module.exports = {
       t("Joints/Mouse"),
       "JsPlatform/Extensions/mouse_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMouseJointDampingRatio");
@@ -2266,7 +2311,7 @@ module.exports = {
       "JsPlatform/Extensions/wheel_joint24.png",
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Anchor X on first body"))
       .addParameter("expression", t("Anchor Y on first body"))
       .addParameter("objectPtr", t("Second object"), "", false)
@@ -2290,7 +2335,7 @@ module.exports = {
       t("Joints/Wheel"),
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWheelJointAxisAngle");
@@ -2302,7 +2347,7 @@ module.exports = {
       t("Joints/Wheel"),
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWheelJointTranslation");
@@ -2314,7 +2359,7 @@ module.exports = {
       t("Joints/Wheel"),
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWheelJointSpeed");
@@ -2328,7 +2373,7 @@ module.exports = {
       "JsPlatform/Extensions/wheel_joint24.png",
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("isWheelJointMotorEnabled");
@@ -2342,7 +2387,7 @@ module.exports = {
       "JsPlatform/Extensions/wheel_joint24.png",
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("yesorno", t("Enable?"))
       .getCodeExtraInformation()
@@ -2357,7 +2402,7 @@ module.exports = {
       "JsPlatform/Extensions/wheel_joint24.png",
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2373,7 +2418,7 @@ module.exports = {
       t("Joints/Wheel"),
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWheelJointMotorSpeed");
@@ -2387,7 +2432,7 @@ module.exports = {
       "JsPlatform/Extensions/wheel_joint24.png",
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2403,7 +2448,7 @@ module.exports = {
       t("Joints/Wheel"),
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWheelJointMaxMotorTorque");
@@ -2415,7 +2460,7 @@ module.exports = {
       t("Joints/Wheel"),
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWheelJointMotorTorque");
@@ -2429,7 +2474,7 @@ module.exports = {
       "JsPlatform/Extensions/wheel_joint24.png",
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2445,7 +2490,7 @@ module.exports = {
       t("Joints/Wheel"),
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWheelJointFrequency");
@@ -2459,7 +2504,7 @@ module.exports = {
       "JsPlatform/Extensions/wheel_joint24.png",
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2475,7 +2520,7 @@ module.exports = {
       t("Joints/Wheel"),
       "JsPlatform/Extensions/wheel_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWheelJointDampingRatio");
@@ -2492,7 +2537,7 @@ module.exports = {
       "JsPlatform/Extensions/weld_joint24.png",
       "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Anchor X on first body"))
       .addParameter("expression", t("Anchor Y on first body"))
       .addParameter("objectPtr", t("Second object"), "", false)
@@ -2513,7 +2558,7 @@ module.exports = {
       t("Joints/Weld"),
       "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWeldJointReferenceAngle");
@@ -2527,7 +2572,7 @@ module.exports = {
       "JsPlatform/Extensions/weld_joint24.png",
       "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2543,7 +2588,7 @@ module.exports = {
       t("Joints/Weld"),
       "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWeldJointFrequency");
@@ -2557,7 +2602,7 @@ module.exports = {
       "JsPlatform/Extensions/weld_joint24.png",
       "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2573,7 +2618,7 @@ module.exports = {
       t("Joints/Weld"),
       "JsPlatform/Extensions/weld_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getWeldJointDampingRatio");
@@ -2590,7 +2635,7 @@ module.exports = {
       "JsPlatform/Extensions/rope_joint24.png",
       "JsPlatform/Extensions/rope_joint16.png")
       .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Anchor X on first body"))
       .addParameter("expression", t("Anchor Y on first body"))
       .addParameter("objectPtr", t("Second object"), "", false)
@@ -2611,7 +2656,7 @@ module.exports = {
       "JsPlatform/Extensions/rope_joint24.png",
       "JsPlatform/Extensions/rope_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2627,7 +2672,7 @@ module.exports = {
       t("Joints/Rope"),
       "JsPlatform/Extensions/rope_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getRopeJointMaxLength");
@@ -2644,7 +2689,7 @@ module.exports = {
       "JsPlatform/Extensions/friction_joint24.png",
       "JsPlatform/Extensions/friction_joint16.png")
       .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Anchor X on first body"))
       .addParameter("expression", t("Anchor Y on first body"))
       .addParameter("objectPtr", t("Second object"), "", false)
@@ -2666,7 +2711,7 @@ module.exports = {
       "JsPlatform/Extensions/friction_joint24.png",
       "JsPlatform/Extensions/friction_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2682,7 +2727,7 @@ module.exports = {
       t("Joints/Friction"),
       "JsPlatform/Extensions/friction_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getFrictionJointMaxForce");
@@ -2696,7 +2741,7 @@ module.exports = {
       "JsPlatform/Extensions/friction_joint24.png",
       "JsPlatform/Extensions/friction_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2712,7 +2757,7 @@ module.exports = {
       t("Joints/Friction"),
       "JsPlatform/Extensions/friction_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getFrictionJointMaxTorque");
@@ -2729,7 +2774,7 @@ module.exports = {
       "JsPlatform/Extensions/motor_joint24.png",
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("First object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("objectPtr", t("Second object"), "", false)
       .addParameter("expression", t("Offset X position"))
       .addParameter("expression", t("Offset Y position"))
@@ -2751,7 +2796,7 @@ module.exports = {
       "JsPlatform/Extensions/motor_joint24.png",
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("expression", t("Offset X"))
       .addParameter("expression", t("Offset Y"))
@@ -2765,7 +2810,7 @@ module.exports = {
       t("Joints/Motor"),
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMotorJointOffsetX");
@@ -2777,7 +2822,7 @@ module.exports = {
       t("Joints/Motor"),
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMotorJointOffsetY");
@@ -2791,7 +2836,7 @@ module.exports = {
       "JsPlatform/Extensions/motor_joint24.png",
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2807,7 +2852,7 @@ module.exports = {
       t("Joints/Motor"),
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMotorJointAngularOffset");
@@ -2821,7 +2866,7 @@ module.exports = {
       "JsPlatform/Extensions/motor_joint24.png",
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2837,7 +2882,7 @@ module.exports = {
       t("Joints/Motor"),
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMotorJointMaxForce");
@@ -2851,7 +2896,7 @@ module.exports = {
       "JsPlatform/Extensions/motor_joint24.png",
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2867,7 +2912,7 @@ module.exports = {
       t("Joints/Motor"),
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMotorJointMaxTorque");
@@ -2881,7 +2926,7 @@ module.exports = {
       "JsPlatform/Extensions/motor_joint24.png",
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .addParameter("operator", t("Modification's sign"))
       .addParameter("expression", t("Value"))
@@ -2897,26 +2942,29 @@ module.exports = {
       t("Joints/Motor"),
       "JsPlatform/Extensions/motor_joint16.png")
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Joint ID"))
       .getCodeExtraInformation()
       .setFunctionName("getMotorJointCorrectionFactor");
 
+
+
+    // Collision
     extension.addCondition(
       "Collision",
       t("Collision"),
       t("Test if two objects collide."),
       t("_PARAM0_ is colliding with _PARAM2_"),
       t(""),
-      "JsPlatform/Extensions/motor_joint24.png",
-      "JsPlatform/Extensions/motor_joint16.png")
+      "res/physics24.png",
+      "res/physics16.png")
       .addParameter("objectList", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "PhysikBehavior")
+      .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("objectList", t("Object"), "", false)
       .addCodeOnlyParameter("conditionInverted", "")
       .getCodeExtraInformation()
-      .setIncludeFile("Extensions/Physik/physiktools.js")
-      .setFunctionName("gdjs.physik.objectsCollide");
+      .setIncludeFile("Extensions/Physics2/physics2tools.js")
+      .setFunctionName("gdjs.physics2.objectsCollide");
 
     return extension;
   },

@@ -1,5 +1,5 @@
 
-gdjs.PhysikSharedData = function(runtimeScene, sharedData)
+gdjs.Physics2SharedData = function(runtimeScene, sharedData)
 {
     this.gravityX = sharedData.content.gravityX;
     this.gravityY = sharedData.content.gravityY;
@@ -11,6 +11,7 @@ gdjs.PhysikSharedData = function(runtimeScene, sharedData)
     this.timeStep = 1 / 60;
     this.frameTime = 0;
     this.stepped = false;
+    this.timeScale = 1;
     this.world = new Box2D.b2World(new Box2D.b2Vec2(this.gravityX, this.gravityY), true);
     this.staticBody = this.world.CreateBody(new Box2D.b2BodyDef());
 
@@ -59,17 +60,17 @@ gdjs.PhysikSharedData = function(runtimeScene, sharedData)
     this.joints = {}; // (string)jointId -> (b2Joint)b2Joint
 };
 
-gdjs.PhysikSharedData.getSharedData = function(runtimeScene, behaviorName) {
+gdjs.Physics2SharedData.getSharedData = function(runtimeScene, behaviorName) {
     // Create one if needed
-    if (!runtimeScene.physikSharedData) {
+    if (!runtimeScene.physics2SharedData) {
         var initialData = runtimeScene.getInitialSharedDataForBehavior(behaviorName);
-        runtimeScene.physikSharedData = new gdjs.PhysikSharedData(runtimeScene, initialData);
+        runtimeScene.physics2SharedData = new gdjs.Physics2SharedData(runtimeScene, initialData);
     }
 
-    return runtimeScene.physikSharedData;
+    return runtimeScene.physics2SharedData;
 };
 
-gdjs.PhysikSharedData.prototype.step = function(deltaTime)
+gdjs.Physics2SharedData.prototype.step = function(deltaTime)
 {
     this.frameTime += deltaTime;
     if(this.frameTime >= this.timeStep){
@@ -79,7 +80,7 @@ gdjs.PhysikSharedData.prototype.step = function(deltaTime)
         if(numberOfSteps > 5) numberOfSteps = 5;
 
         for(var i=0; i<numberOfSteps; i++) {
-            this.world.Step(this.timeStep, 8, 10);
+            this.world.Step(this.timeStep * this.timeScale, 8, 10);
         }
         this.world.ClearForces();
     }
@@ -87,13 +88,13 @@ gdjs.PhysikSharedData.prototype.step = function(deltaTime)
     this.stepped = true;
 };
 
-gdjs.PhysikSharedData.gdjsCallbackRuntimeSceneUnloaded = function(runtimeScene) {
-    if(runtimeScene.physikSharedData && runtimeScene.physikSharedData.world){
-        Box2D.destroy(runtimeScene.physikSharedData.world);
+gdjs.Physics2SharedData.gdjsCallbackRuntimeSceneUnloaded = function(runtimeScene) {
+    if(runtimeScene.physics2SharedData && runtimeScene.physics2SharedData.world){
+        Box2D.destroy(runtimeScene.physics2SharedData.world);
     }
 }
 
-gdjs.PhysikSharedData.prototype.clearBodyJoints = function(body){
+gdjs.Physics2SharedData.prototype.clearBodyJoints = function(body){
     // Iterate through all the joints
     for(var jointId in this.joints){
         if (this.joints.hasOwnProperty(jointId)){
@@ -105,14 +106,14 @@ gdjs.PhysikSharedData.prototype.clearBodyJoints = function(body){
     }
 };
 
-gdjs.PhysikSharedData.prototype.addJoint = function(joint){
+gdjs.Physics2SharedData.prototype.addJoint = function(joint){
     // Add the joint to the list
     this.joints[this._nextJointId.toString(10)] = joint;
     // Return the current joint id and then increase it
     return this._nextJointId++;
 };
 
-gdjs.PhysikSharedData.prototype.getJoint = function(jointId){
+gdjs.Physics2SharedData.prototype.getJoint = function(jointId){
     // Cast to string
     jointId = jointId.toString(10);
     // Get the joint
@@ -123,7 +124,7 @@ gdjs.PhysikSharedData.prototype.getJoint = function(jointId){
     return null;
 };
 
-gdjs.PhysikSharedData.prototype.getJointId = function(joint){
+gdjs.Physics2SharedData.prototype.getJointId = function(joint){
     // Search the joint in the list and return the ID
     for(var jointId in this.joints){
         if (this.joints.hasOwnProperty(jointId)){
@@ -136,7 +137,7 @@ gdjs.PhysikSharedData.prototype.getJointId = function(joint){
     return 0;
 };
 
-gdjs.PhysikSharedData.prototype.removeJoint = function(jointId){
+gdjs.Physics2SharedData.prototype.removeJoint = function(jointId){
     // Cast to string
     jointId = jointId.toString(10);
     // Delete the joint
@@ -160,7 +161,7 @@ gdjs.PhysikSharedData.prototype.removeJoint = function(jointId){
 };
 
 
-gdjs.PhysikRuntimeBehavior = function(runtimeScene, behaviorData, owner)
+gdjs.Physics2RuntimeBehavior = function(runtimeScene, behaviorData, owner)
 {
     gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
 
@@ -186,7 +187,7 @@ gdjs.PhysikRuntimeBehavior = function(runtimeScene, behaviorData, owner)
     this.currentContacts.length = 0;
 
     this._body = null;
-    this._sharedData = gdjs.PhysikSharedData.getSharedData(runtimeScene, behaviorData.name);
+    this._sharedData = gdjs.Physics2SharedData.getSharedData(runtimeScene, behaviorData.name);
     this._tempb2Vec2 = new Box2D.b2Vec2(); // Avoid creating new vectors all the time
     this._tempb2Vec2Sec = new Box2D.b2Vec2(); // Sometimes two vectors are needed on the same function call
     this._objectOldX = 0;
@@ -196,22 +197,22 @@ gdjs.PhysikRuntimeBehavior = function(runtimeScene, behaviorData, owner)
     this._objectOldHeight = 0;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.PhysikRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "Physik::PhysikBehavior";
+gdjs.Physics2RuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
+gdjs.Physics2RuntimeBehavior.thisIsARuntimeBehaviorConstructor = "Physics2::Physics2Behavior";
 
-gdjs.PhysikRuntimeBehavior.prototype.b2Vec2 = function(x, y) {
+gdjs.Physics2RuntimeBehavior.prototype.b2Vec2 = function(x, y) {
     this._tempb2Vec2.set_x(x);
     this._tempb2Vec2.set_y(y);
     return this._tempb2Vec2;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.b2Vec2Sec = function(x, y) {
+gdjs.Physics2RuntimeBehavior.prototype.b2Vec2Sec = function(x, y) {
     this._tempb2Vec2Sec.set_x(x);
     this._tempb2Vec2Sec.set_y(y);
     return this._tempb2Vec2Sec;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.onDeActivate = function() {
+gdjs.Physics2RuntimeBehavior.prototype.onDeActivate = function() {
     if (this._body !== null){
         // When a body is deleted, Box2D removes automatically its joints, leaving an invalid pointer in our joints list
         this._sharedData.clearBodyJoints(this._body);
@@ -221,11 +222,11 @@ gdjs.PhysikRuntimeBehavior.prototype.onDeActivate = function() {
     }
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.ownerRemovedFromScene = function() {
+gdjs.Physics2RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
     this.onDeActivate();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.createShape = function() {
+gdjs.Physics2RuntimeBehavior.prototype.createShape = function() {
     // Get the scaled offset
     var offsetX = this.shapeOffsetX ? this.shapeOffsetX * this.shapeScale * this._sharedData.invScaleX : 0;
     var offsetY = this.shapeOffsetY ? this.shapeOffsetY * this.shapeScale * this._sharedData.invScaleY : 0;
@@ -294,7 +295,7 @@ gdjs.PhysikRuntimeBehavior.prototype.createShape = function() {
     return fixDef;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.recreateShape = function() {
+gdjs.Physics2RuntimeBehavior.prototype.recreateShape = function() {
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -308,25 +309,25 @@ gdjs.PhysikRuntimeBehavior.prototype.recreateShape = function() {
     this._objectOldHeight = this.owner.getHeight();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getShapeScale = function() {
+gdjs.Physics2RuntimeBehavior.prototype.getShapeScale = function() {
     return this.shapeScale;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setShapeScale = function(shapeScale) {
+gdjs.Physics2RuntimeBehavior.prototype.setShapeScale = function(shapeScale) {
     if(shapeScale !== this.shapeScale && shapeScale > 0){
         this.shapeScale = shapeScale;
         this.recreateShape();
     }
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getBody = function() {
+gdjs.Physics2RuntimeBehavior.prototype.getBody = function() {
     // If there is no body, set a new one
     if (this._body === null) this.createBody();
 
     return this._body;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.createBody = function() {
+gdjs.Physics2RuntimeBehavior.prototype.createBody = function() {
     // Generate the body definition
     var bodyDef = new Box2D.b2BodyDef();
 
@@ -357,7 +358,7 @@ gdjs.PhysikRuntimeBehavior.prototype.createBody = function() {
     this._objectOldHeight = this.owner.getHeight();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
+gdjs.Physics2RuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
     // Create a body if there is not one
     if(this._body === null){
         this.createBody();
@@ -381,7 +382,7 @@ gdjs.PhysikRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
     this._objectOldAngle = this.owner.getAngle();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
+gdjs.Physics2RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
     // If there is no body, set a new one
     if (this._body === null) this.createBody();
 
@@ -413,36 +414,41 @@ gdjs.PhysikRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
     this._sharedData.stepped = false;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getGravityX = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getGravityX = function(){
     return this._sharedData.gravityX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setGravityX = function(x){
-    // Check if there is no modification
-    if(this._sharedData.gravityX === x) return;
-    // Change the gravity on X
-    this._sharedData.gravityX = x;
-    this._sharedData.world.SetGravity(this.b2Vec2(this._sharedData.gravityX, this._sharedData.gravityX));
-};
-
-gdjs.PhysikRuntimeBehavior.prototype.getGravityY = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getGravityY = function(){
     return this._sharedData.gravityY;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setGravityY = function(y){
+gdjs.Physics2RuntimeBehavior.prototype.setGravity = function(x, y){
     // Check if there is no modification
-    if(this._sharedData.gravityY === y) return;
-    // Change the gravity on Y
+    if(this._sharedData.gravityX === x && this._sharedData.gravityY) return;
+    // Change the gravity
+    this._sharedData.gravityX = x;
     this._sharedData.gravityY = y;
-    this._sharedData.world.SetGravity(this.b2Vec2(this._sharedData.gravityX, this._sharedData.gravityX));
+    this._sharedData.world.SetGravity(this.b2Vec2(this._sharedData.gravityX, this._sharedData.gravityY));
 };
 
 
-gdjs.PhysikRuntimeBehavior.prototype.isDynamic = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getTimeScale = function(){
+    // Get the time scale
+    return this._sharedData.timeScale;
+};
+
+gdjs.Physics2RuntimeBehavior.prototype.setTimeScale = function(timeScale){
+    // Invalid value
+    if(timeScale < 0) return;
+    // Set the time scale
+    this._sharedData.timeScale = timeScale;
+};
+
+gdjs.Physics2RuntimeBehavior.prototype.isDynamic = function(){
     return this.type === "Dynamic";
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setDynamic = function(){
+gdjs.Physics2RuntimeBehavior.prototype.setDynamic = function(){
     // Check if there is no modification
     if(this.type === "Dynamic") return;
     // Change body type
@@ -457,11 +463,11 @@ gdjs.PhysikRuntimeBehavior.prototype.setDynamic = function(){
     this._body.SetAwake(true);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isStatic = function(){
+gdjs.Physics2RuntimeBehavior.prototype.isStatic = function(){
     return this.type === "Static";
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setStatic = function(){
+gdjs.Physics2RuntimeBehavior.prototype.setStatic = function(){
     // Check if there is no modification
     if(this.type === "Static") return;
     // Change body type
@@ -476,11 +482,11 @@ gdjs.PhysikRuntimeBehavior.prototype.setStatic = function(){
     this._body.SetAwake(true);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isKinematic = function(){
+gdjs.Physics2RuntimeBehavior.prototype.isKinematic = function(){
     return this.type === "Kinematic";
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setKinematic = function(){
+gdjs.Physics2RuntimeBehavior.prototype.setKinematic = function(){
     // Check if there is no modification
     if(this.type === "Kinematic") return;
     // Change body type
@@ -495,11 +501,11 @@ gdjs.PhysikRuntimeBehavior.prototype.setKinematic = function(){
     this._body.SetAwake(true);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isBullet = function(){
+gdjs.Physics2RuntimeBehavior.prototype.isBullet = function(){
     return this.bullet;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setBullet = function(enable){
+gdjs.Physics2RuntimeBehavior.prototype.setBullet = function(enable){
     // Check if there is no modification
     if(this.bullet === enable) return;
     // Change bullet flag
@@ -513,11 +519,11 @@ gdjs.PhysikRuntimeBehavior.prototype.setBullet = function(enable){
     this._body.SetBullet(this.bullet);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.hasFixedRotation = function(){
+gdjs.Physics2RuntimeBehavior.prototype.hasFixedRotation = function(){
     return this.fixedRotation;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setFixedRotation = function(enable){
+gdjs.Physics2RuntimeBehavior.prototype.setFixedRotation = function(enable){
     this.fixedRotation = enable;
 
     if(this._body === null){
@@ -527,11 +533,11 @@ gdjs.PhysikRuntimeBehavior.prototype.setFixedRotation = function(enable){
     this._body.SetFixedRotation(this.fixedRotation);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isSleepingAllowed = function(){
+gdjs.Physics2RuntimeBehavior.prototype.isSleepingAllowed = function(){
     return this.canSleep;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setSleepingAllowed = function(enable){
+gdjs.Physics2RuntimeBehavior.prototype.setSleepingAllowed = function(enable){
     this.canSleep = enable;
 
     if(this._body === null){
@@ -541,7 +547,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setSleepingAllowed = function(enable){
     this._body.SetSleepingAllowed(this.canSleep);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isSleeping = function(){
+gdjs.Physics2RuntimeBehavior.prototype.isSleeping = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -550,11 +556,11 @@ gdjs.PhysikRuntimeBehavior.prototype.isSleeping = function(){
     return !this._body.IsAwake();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getDensity = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getDensity = function(){
     return this.density;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setDensity = function(density){
+gdjs.Physics2RuntimeBehavior.prototype.setDensity = function(density){
     // Non-negative values only
     if(density < 0) density = 0;
     // Check if there is no modification
@@ -571,11 +577,11 @@ gdjs.PhysikRuntimeBehavior.prototype.setDensity = function(density){
     this._body.ResetMassData();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getFriction = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getFriction = function(){
     return this.friction;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setFriction = function(friction){
+gdjs.Physics2RuntimeBehavior.prototype.setFriction = function(friction){
     // Non-negative values only
     if(friction < 0) friction = 0;
     // Check if there is no modification
@@ -597,11 +603,11 @@ gdjs.PhysikRuntimeBehavior.prototype.setFriction = function(friction){
     }
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getRestitution = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getRestitution = function(){
     return this.restitution;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setRestitution = function(restitution){
+gdjs.Physics2RuntimeBehavior.prototype.setRestitution = function(restitution){
     // Non-negative values only
     if(restitution < 0) restitution = 0;
     // Check if there is no modification
@@ -623,11 +629,11 @@ gdjs.PhysikRuntimeBehavior.prototype.setRestitution = function(restitution){
     }
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getLinearDamping = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getLinearDamping = function(){
     return this.linearDamping;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setLinearDamping = function(linearDamping){
+gdjs.Physics2RuntimeBehavior.prototype.setLinearDamping = function(linearDamping){
     // Check if there is no modification
     if(this.linearDamping === linearDamping) return;
     // Change linearDamping
@@ -641,11 +647,11 @@ gdjs.PhysikRuntimeBehavior.prototype.setLinearDamping = function(linearDamping){
     this._body.SetLinearDamping(this.linearDamping);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getAngularDamping = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getAngularDamping = function(){
     return this.angularDamping;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setAngularDamping = function(angularDamping){
+gdjs.Physics2RuntimeBehavior.prototype.setAngularDamping = function(angularDamping){
     // Check if there is no modification
     if(this.angularDamping === angularDamping) return;
     // Change angularDamping
@@ -659,11 +665,11 @@ gdjs.PhysikRuntimeBehavior.prototype.setAngularDamping = function(angularDamping
     this._body.SetAngularDamping(this.angularDamping);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getGravityScale = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getGravityScale = function(){
     return this.gravityScale;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setGravityScale = function(gravityScale){
+gdjs.Physics2RuntimeBehavior.prototype.setGravityScale = function(gravityScale){
     // Check if there is no modification
     if(this.gravityScale === gravityScale) return;
     // Change the gravity scale
@@ -677,7 +683,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setGravityScale = function(gravityScale){
     this._body.SetGravityScale(this.gravityScale);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.layerEnabled = function(layer){
+gdjs.Physics2RuntimeBehavior.prototype.layerEnabled = function(layer){
     // Layer must be an integer
     layer = Math.floor(layer);
     // Layer must be in range [1, 16]
@@ -686,7 +692,7 @@ gdjs.PhysikRuntimeBehavior.prototype.layerEnabled = function(layer){
     return !!(this.layers & (1 << (layer - 1)));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.enableLayer = function(layer, enable){
+gdjs.Physics2RuntimeBehavior.prototype.enableLayer = function(layer, enable){
     // Layer must be an integer
     layer = Math.floor(layer);
     // Layer must be in range [1, 16]
@@ -709,7 +715,7 @@ gdjs.PhysikRuntimeBehavior.prototype.enableLayer = function(layer, enable){
     this._body.GetFixtureList().SetFilterData(filter);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.maskEnabled = function(mask){
+gdjs.Physics2RuntimeBehavior.prototype.maskEnabled = function(mask){
     // Mask must be an integer
     mask = Math.floor(mask);
     // Mask must be in range [1, 16]
@@ -718,7 +724,7 @@ gdjs.PhysikRuntimeBehavior.prototype.maskEnabled = function(mask){
     return !!(this.masks & (1 << (mask - 1)));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.enableMask = function(mask, enable){
+gdjs.Physics2RuntimeBehavior.prototype.enableMask = function(mask, enable){
     // Mask must be an integer
     mask = Math.floor(mask);
     // Mask must be in range [1, 16]
@@ -741,7 +747,7 @@ gdjs.PhysikRuntimeBehavior.prototype.enableMask = function(mask, enable){
     this._body.GetFixtureList().SetFilterData(filter);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getLinearVelocityX = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getLinearVelocityX = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -751,7 +757,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getLinearVelocityX = function(){
     return this._body.GetLinearVelocity().get_x() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setLinearVelocityX = function(linearVelocityX){
+gdjs.Physics2RuntimeBehavior.prototype.setLinearVelocityX = function(linearVelocityX){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -761,7 +767,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setLinearVelocityX = function(linearVelocit
     this._body.SetLinearVelocity(this.b2Vec2(linearVelocityX * this._sharedData.invScaleX, this._body.GetLinearVelocity().get_y()));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getLinearVelocityY = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getLinearVelocityY = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -771,7 +777,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getLinearVelocityY = function(){
     return this._body.GetLinearVelocity().get_y() * this._sharedData.scaleY;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setLinearVelocityY = function(linearVelocityY){
+gdjs.Physics2RuntimeBehavior.prototype.setLinearVelocityY = function(linearVelocityY){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -781,7 +787,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setLinearVelocityY = function(linearVelocit
     this._body.SetLinearVelocity(this.b2Vec2(this._body.GetLinearVelocity().get_x(), linearVelocityY * this._sharedData.invScaleY));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getLinearVelocityLength = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getLinearVelocityLength = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -792,7 +798,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getLinearVelocityLength = function(){
                        this._body.GetLinearVelocity().get_y() * this._sharedData.scaleY).Length();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getAngularVelocity = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getAngularVelocity = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -802,7 +808,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getAngularVelocity = function(){
     return gdjs.toDegrees(this._body.GetAngularVelocity());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setAngularVelocity = function(angularVelocity){
+gdjs.Physics2RuntimeBehavior.prototype.setAngularVelocity = function(angularVelocity){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -812,7 +818,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setAngularVelocity = function(angularVeloci
     this._body.SetAngularVelocity(gdjs.toRad(angularVelocity));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.applyForce = function(forceX, forceY, positionX, positionY){
+gdjs.Physics2RuntimeBehavior.prototype.applyForce = function(forceX, forceY, positionX, positionY){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -825,7 +831,7 @@ gdjs.PhysikRuntimeBehavior.prototype.applyForce = function(forceX, forceY, posit
                           this.b2Vec2Sec(positionX * this._sharedData.invScaleX, positionY * this._sharedData.invScaleY));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.applyPolarForce = function(angle, length, positionX, positionY){
+gdjs.Physics2RuntimeBehavior.prototype.applyPolarForce = function(angle, length, positionX, positionY){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -839,7 +845,7 @@ gdjs.PhysikRuntimeBehavior.prototype.applyPolarForce = function(angle, length, p
                           this.b2Vec2Sec(positionX * this._sharedData.invScaleX, positionY * this._sharedData.invScaleY));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.applyForceTowardPosition = function(length, towardX, towardY, positionX, positionY){
+gdjs.Physics2RuntimeBehavior.prototype.applyForceTowardPosition = function(length, towardX, towardY, positionX, positionY){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -854,7 +860,7 @@ gdjs.PhysikRuntimeBehavior.prototype.applyForceTowardPosition = function(length,
                           this.b2Vec2Sec(positionX * this._sharedData.invScaleX, positionY * this._sharedData.invScaleY));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.applyImpulse = function(impulseX, impulseY, positionX, positionY){
+gdjs.Physics2RuntimeBehavior.prototype.applyImpulse = function(impulseX, impulseY, positionX, positionY){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -867,7 +873,7 @@ gdjs.PhysikRuntimeBehavior.prototype.applyImpulse = function(impulseX, impulseY,
                                   this.b2Vec2Sec(positionX * this._sharedData.invScaleX, positionY * this._sharedData.invScaleY));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.applyPolarImpulse = function(angle, length, positionX, positionY){
+gdjs.Physics2RuntimeBehavior.prototype.applyPolarImpulse = function(angle, length, positionX, positionY){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -881,7 +887,7 @@ gdjs.PhysikRuntimeBehavior.prototype.applyPolarImpulse = function(angle, length,
                                   this.b2Vec2Sec(positionX * this._sharedData.invScaleX, positionY * this._sharedData.invScaleY));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.applyImpulseTowardPosition = function(length, towardX, towardY, positionX, positionY){
+gdjs.Physics2RuntimeBehavior.prototype.applyImpulseTowardPosition = function(length, towardX, towardY, positionX, positionY){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -896,7 +902,7 @@ gdjs.PhysikRuntimeBehavior.prototype.applyImpulseTowardPosition = function(lengt
                                   this.b2Vec2Sec(positionX * this._sharedData.invScaleX, positionY * this._sharedData.invScaleY));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.applyTorque = function(torque){
+gdjs.Physics2RuntimeBehavior.prototype.applyTorque = function(torque){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -908,7 +914,7 @@ gdjs.PhysikRuntimeBehavior.prototype.applyTorque = function(torque){
     this._body.ApplyTorque(torque);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.applyAngularImpulse = function(angularImpulse){
+gdjs.Physics2RuntimeBehavior.prototype.applyAngularImpulse = function(angularImpulse){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -920,7 +926,7 @@ gdjs.PhysikRuntimeBehavior.prototype.applyAngularImpulse = function(angularImpul
     this._body.ApplyAngularImpulse(angularImpulse);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMassCenterX = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getMassCenterX = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -929,7 +935,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMassCenterX = function(){
     return this._body.GetWorldCenter().get_x();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMassCenterY = function(){
+gdjs.Physics2RuntimeBehavior.prototype.getMassCenterY = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -941,7 +947,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMassCenterY = function(){
 
 
 // Joints
-gdjs.PhysikRuntimeBehavior.prototype.isJointFirstObject = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.isJointFirstObject = function(jointId){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -955,7 +961,7 @@ gdjs.PhysikRuntimeBehavior.prototype.isJointFirstObject = function(jointId){
     return joint.GetBodyA() === this._body;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isJointSecondObject = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.isJointSecondObject = function(jointId){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -969,7 +975,7 @@ gdjs.PhysikRuntimeBehavior.prototype.isJointSecondObject = function(jointId){
     return joint.GetBodyB() === this._body;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getJointFirstAnchorX = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getJointFirstAnchorX = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found
@@ -978,7 +984,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getJointFirstAnchorX = function(jointId){
     return joint.GetBodyA().GetWorldPoint(joint.GetLocalAnchorA()).get_x();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getJointFirstAnchorY = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getJointFirstAnchorY = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found
@@ -987,7 +993,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getJointFirstAnchorY = function(jointId){
     return joint.GetBodyA().GetWorldPoint(joint.GetLocalAnchorA()).get_y();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getJointSecondAnchorX = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getJointSecondAnchorX = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found
@@ -996,7 +1002,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getJointSecondAnchorX = function(jointId){
     return joint.GetBodyB().GetWorldPoint(joint.GetLocalAnchorB()).get_x();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getJointSecondAnchorY = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getJointSecondAnchorY = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found
@@ -1005,7 +1011,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getJointSecondAnchorY = function(jointId){
     return joint.GetBodyB().GetWorldPoint(joint.GetLocalAnchorB()).get_y();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getJointReactionForce = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getJointReactionForce = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found
@@ -1014,7 +1020,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getJointReactionForce = function(jointId){
     return joint.GetReactionForce(1 / this._sharedData.timeStep).Length();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getJointReactionTorque = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getJointReactionTorque = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found
@@ -1024,7 +1030,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getJointReactionTorque = function(jointId){
 };
 
 
-gdjs.PhysikRuntimeBehavior.prototype.removeJoint = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.removeJoint = function(jointId){
     // Just let the sharedData to manage and delete the joint
     this._sharedData.removeJoint(jointId);
 };
@@ -1032,7 +1038,7 @@ gdjs.PhysikRuntimeBehavior.prototype.removeJoint = function(jointId){
 
 
 // Distance joint
-gdjs.PhysikRuntimeBehavior.prototype.addDistanceJoint = function(x1, y1, other, x2, y2, length, frequency, dampingRatio, collideConnected, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addDistanceJoint = function(x1, y1, other, x2, y2, length, frequency, dampingRatio, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -1061,7 +1067,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addDistanceJoint = function(x1, y1, other, 
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointLength = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getDistanceJointLength = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1070,7 +1076,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointLength = function(jointId){
     return joint.GetLength() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setDistanceJointLength = function(jointId, length){
+gdjs.Physics2RuntimeBehavior.prototype.setDistanceJointLength = function(jointId, length){
     // Invalid value
     if(length <= 0) return;
     // Get the joint
@@ -1084,7 +1090,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setDistanceJointLength = function(jointId, 
     joint.GetBodyB().SetAwake(true);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointFrequency = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getDistanceJointFrequency = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1093,7 +1099,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointFrequency = function(jointI
     return joint.GetFrequency();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setDistanceJointFrequency = function(jointId, frequency){
+gdjs.Physics2RuntimeBehavior.prototype.setDistanceJointFrequency = function(jointId, frequency){
     // Invalid value
     if(frequency < 0) return;
     // Get the joint
@@ -1104,7 +1110,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setDistanceJointFrequency = function(jointI
     joint.SetFrequency(frequency);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointDampingRatio = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getDistanceJointDampingRatio = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1113,7 +1119,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getDistanceJointDampingRatio = function(joi
     return joint.GetDampingRatio();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setDistanceJointDampingRatio = function(jointId, dampingRatio){
+gdjs.Physics2RuntimeBehavior.prototype.setDistanceJointDampingRatio = function(jointId, dampingRatio){
     // Invalid value
     if(dampingRatio < 0) return;
     // Get the joint
@@ -1127,7 +1133,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setDistanceJointDampingRatio = function(joi
 
 
 // Revolute joint
-gdjs.PhysikRuntimeBehavior.prototype.addRevoluteJoint = function(x, y, enableLimit, referenceAngle, lowerAngle, upperAngle, enableMotor, motorSpeed, maxMotorTorque, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addRevoluteJoint = function(x, y, enableLimit, referenceAngle, lowerAngle, upperAngle, enableMotor, motorSpeed, maxMotorTorque, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -1159,7 +1165,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addRevoluteJoint = function(x, y, enableLim
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.addRevoluteJointBetweenTwoBodies = function(x1, y1, other, x2, y2, enableLimit, referenceAngle, lowerAngle, upperAngle, enableMotor, motorSpeed, maxMotorTorque, collideConnected, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addRevoluteJointBetweenTwoBodies = function(x1, y1, other, x2, y2, enableLimit, referenceAngle, lowerAngle, upperAngle, enableMotor, motorSpeed, maxMotorTorque, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -1197,7 +1203,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addRevoluteJointBetweenTwoBodies = function
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointReferenceAngle = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getRevoluteJointReferenceAngle = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1206,7 +1212,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointReferenceAngle = function(j
     return gdjs.toDegrees(joint.GetReferenceAngle());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointAngle = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getRevoluteJointAngle = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1215,7 +1221,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointAngle = function(jointId){
     return gdjs.toDegrees(joint.GetJointAngle());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointSpeed = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getRevoluteJointSpeed = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1224,7 +1230,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointSpeed = function(jointId){
     return gdjs.toDegrees(joint.GetJointSpeed());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isRevoluteJointLimitsEnabled = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.isRevoluteJointLimitsEnabled = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1233,7 +1239,7 @@ gdjs.PhysikRuntimeBehavior.prototype.isRevoluteJointLimitsEnabled = function(joi
     return joint.IsLimitEnabled();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.enableRevoluteJointLimits = function(jointId, enable){
+gdjs.Physics2RuntimeBehavior.prototype.enableRevoluteJointLimits = function(jointId, enable){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1242,7 +1248,7 @@ gdjs.PhysikRuntimeBehavior.prototype.enableRevoluteJointLimits = function(jointI
     joint.EnableLimit(enable);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMinAngle = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getRevoluteJointMinAngle = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1251,7 +1257,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMinAngle = function(jointId
     return gdjs.toDegrees(joint.GetLowerLimit());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMaxAngle = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getRevoluteJointMaxAngle = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1260,7 +1266,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMaxAngle = function(jointId
     return gdjs.toDegrees(joint.GetUpperLimit());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setRevoluteJointLimits = function(jointId, lowerAngle, upperAngle){
+gdjs.Physics2RuntimeBehavior.prototype.setRevoluteJointLimits = function(jointId, lowerAngle, upperAngle){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1275,7 +1281,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setRevoluteJointLimits = function(jointId, 
     joint.SetLimits(gdjs.toRad(lowerAngle), gdjs.toRad(upperAngle));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isRevoluteJointMotorEnabled = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.isRevoluteJointMotorEnabled = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1284,7 +1290,7 @@ gdjs.PhysikRuntimeBehavior.prototype.isRevoluteJointMotorEnabled = function(join
     return joint.IsMotorEnabled();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.enableRevoluteJointMotor = function(jointId, enable){
+gdjs.Physics2RuntimeBehavior.prototype.enableRevoluteJointMotor = function(jointId, enable){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1293,7 +1299,7 @@ gdjs.PhysikRuntimeBehavior.prototype.enableRevoluteJointMotor = function(jointId
     joint.EnableMotor(enable);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMotorSpeed = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getRevoluteJointMotorSpeed = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1302,7 +1308,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMotorSpeed = function(joint
     return gdjs.toDegrees(joint.GetMotorSpeed());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setRevoluteJointMotorSpeed = function(jointId, speed){
+gdjs.Physics2RuntimeBehavior.prototype.setRevoluteJointMotorSpeed = function(jointId, speed){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1311,7 +1317,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setRevoluteJointMotorSpeed = function(joint
     joint.SetMotorSpeed(gdjs.toRad(speed));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMaxMotorTorque = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getRevoluteJointMaxMotorTorque = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1320,7 +1326,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMaxMotorTorque = function(j
     return joint.GetMaxMotorTorque();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setRevoluteJointMaxMotorTorque = function(jointId, maxTorque){
+gdjs.Physics2RuntimeBehavior.prototype.setRevoluteJointMaxMotorTorque = function(jointId, maxTorque){
     // Invalid value
     if(maxTorque < 0) return;
     // Get the joint
@@ -1331,7 +1337,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setRevoluteJointMaxMotorTorque = function(j
     joint.SetMaxMotorTorque(maxTorque);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMotorTorque = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getRevoluteJointMotorTorque = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1343,7 +1349,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getRevoluteJointMotorTorque = function(join
 
 
 // Prismatic joint
-gdjs.PhysikRuntimeBehavior.prototype.addPrismaticJoint = function(x1, y1, other, x2, y2, axisAngle, referenceAngle, enableLimit, lowerTranslation, upperTranslation, enableMotor, motorSpeed, maxMotorForce, collideConnected, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addPrismaticJoint = function(x1, y1, other, x2, y2, axisAngle, referenceAngle, enableLimit, lowerTranslation, upperTranslation, enableMotor, motorSpeed, maxMotorForce, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -1384,7 +1390,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addPrismaticJoint = function(x1, y1, other,
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointAxisAngle = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPrismaticJointAxisAngle = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1393,7 +1399,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointAxisAngle = function(joint
     return gdjs.toDegrees(Math.atan2(joint.GetLocalAxisA().get_y(),joint.GetLocalAxisA().get_x()) + joint.GetBodyA().GetAngle());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointReferenceAngle = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPrismaticJointReferenceAngle = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1402,7 +1408,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointReferenceAngle = function(
     return gdjs.toDegrees(joint.GetReferenceAngle());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointTranslation = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPrismaticJointTranslation = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1411,7 +1417,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointTranslation = function(joi
     return joint.GetJointTranslation() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointSpeed = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPrismaticJointSpeed = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1420,7 +1426,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointSpeed = function(jointId){
     return joint.GetJointSpeed() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isPrismaticJointLimitsEnabled = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.isPrismaticJointLimitsEnabled = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1429,7 +1435,7 @@ gdjs.PhysikRuntimeBehavior.prototype.isPrismaticJointLimitsEnabled = function(jo
     return joint.IsLimitEnabled();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.enablePrismaticJointLimits = function(jointId, enable){
+gdjs.Physics2RuntimeBehavior.prototype.enablePrismaticJointLimits = function(jointId, enable){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1438,7 +1444,7 @@ gdjs.PhysikRuntimeBehavior.prototype.enablePrismaticJointLimits = function(joint
     joint.EnableLimit(enable);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMinTranslation = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPrismaticJointMinTranslation = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1447,7 +1453,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMinTranslation = function(
     return joint.GetLowerLimit() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMaxTranslation = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPrismaticJointMaxTranslation = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1456,7 +1462,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMaxTranslation = function(
     return joint.GetUpperLimit() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setPrismaticJointLimits = function(jointId, lowerTranslation, upperTranslation){
+gdjs.Physics2RuntimeBehavior.prototype.setPrismaticJointLimits = function(jointId, lowerTranslation, upperTranslation){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1474,7 +1480,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setPrismaticJointLimits = function(jointId,
     joint.SetLimits(lowerTranslation * this._sharedData.invScaleX, upperTranslation * this._sharedData.invScaleX);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isPrismaticJointMotorEnabled = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.isPrismaticJointMotorEnabled = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1483,7 +1489,7 @@ gdjs.PhysikRuntimeBehavior.prototype.isPrismaticJointMotorEnabled = function(joi
     return joint.IsMotorEnabled();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.enablePrismaticJointMotor = function(jointId, enable){
+gdjs.Physics2RuntimeBehavior.prototype.enablePrismaticJointMotor = function(jointId, enable){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1492,7 +1498,7 @@ gdjs.PhysikRuntimeBehavior.prototype.enablePrismaticJointMotor = function(jointI
     joint.EnableMotor(enable);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMotorSpeed = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPrismaticJointMotorSpeed = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1501,7 +1507,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMotorSpeed = function(join
     return joint.GetMotorSpeed() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setPrismaticJointMotorSpeed = function(jointId, speed){
+gdjs.Physics2RuntimeBehavior.prototype.setPrismaticJointMotorSpeed = function(jointId, speed){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1510,7 +1516,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setPrismaticJointMotorSpeed = function(join
     joint.SetMotorSpeed(speed * this._sharedData.invScaleX);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMaxMotorForce = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPrismaticJointMaxMotorForce = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1519,7 +1525,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMaxMotorForce = function(j
     return joint.GetMaxMotorForce();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setPrismaticJointMaxMotorForce = function(jointId, maxForce){
+gdjs.Physics2RuntimeBehavior.prototype.setPrismaticJointMaxMotorForce = function(jointId, maxForce){
     // Invalid value
     if(maxForce < 0) return;
     // Get the joint
@@ -1530,7 +1536,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setPrismaticJointMaxMotorForce = function(j
     joint.SetMaxMotorForce(maxForce);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMotorForce = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPrismaticJointMotorForce = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1542,7 +1548,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPrismaticJointMotorForce = function(join
 
 
 // Pulley joint
-gdjs.PhysikRuntimeBehavior.prototype.addPulleyJoint = function(x1, y1, other, x2, y2, groundX1, groundY1, groundX2, groundY2, lengthA, lengthB, ratio, collideConnected, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addPulleyJoint = function(x1, y1, other, x2, y2, groundX1, groundY1, groundX2, groundY2, lengthA, lengthB, ratio, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -1574,7 +1580,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addPulleyJoint = function(x1, y1, other, x2
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointFirstGroundAnchorX = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPulleyJointFirstGroundAnchorX = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1583,7 +1589,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointFirstGroundAnchorX = function
     return joint.GetGroundAnchorA().get_x() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointFirstGroundAnchorY = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPulleyJointFirstGroundAnchorY = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1592,7 +1598,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointFirstGroundAnchorY = function
     return joint.GetGroundAnchorA().get_y() * this._sharedData.scaleY;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointSecondGroundAnchorX = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPulleyJointSecondGroundAnchorX = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1601,7 +1607,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointSecondGroundAnchorX = functio
     return joint.GetGroundAnchorB().get_x() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointSecondGroundAnchorY = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPulleyJointSecondGroundAnchorY = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1610,7 +1616,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointSecondGroundAnchorY = functio
     return joint.GetGroundAnchorB().get_y() * this._sharedData.scaleY;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointFirstLength = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPulleyJointFirstLength = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1619,7 +1625,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointFirstLength = function(jointI
     return joint.GetCurrentLengthA() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointSecondLength = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPulleyJointSecondLength = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1628,7 +1634,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointSecondLength = function(joint
     return joint.GetCurrentLengthB() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointRatio = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getPulleyJointRatio = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1640,7 +1646,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getPulleyJointRatio = function(jointId){
 
 
 // Gear joint
-gdjs.PhysikRuntimeBehavior.prototype.addGearJoint = function(jointId1, jointId2, ratio, collideConnected, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addGearJoint = function(jointId1, jointId2, ratio, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -1671,7 +1677,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addGearJoint = function(jointId1, jointId2,
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getGearJointFirstJoint = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getGearJointFirstJoint = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1680,7 +1686,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getGearJointFirstJoint = function(jointId){
     return this._sharedData.getJointId(joint.GetJoint1());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getGearJointSecondJoint = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getGearJointSecondJoint = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1689,7 +1695,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getGearJointSecondJoint = function(jointId)
     return this._sharedData.getJointId(joint.GetJoint2());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getGearJointRatio = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getGearJointRatio = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1698,7 +1704,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getGearJointRatio = function(jointId){
     return joint.GetRatio();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setGearJointRatio = function(jointId, ratio){
+gdjs.Physics2RuntimeBehavior.prototype.setGearJointRatio = function(jointId, ratio){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1713,7 +1719,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setGearJointRatio = function(jointId, ratio
 
 
 // Mouse joint
-gdjs.PhysikRuntimeBehavior.prototype.addMouseJoint = function(targetX, targetY, maxForce, frequency, dampingRatio, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addMouseJoint = function(targetX, targetY, maxForce, frequency, dampingRatio, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -1733,7 +1739,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addMouseJoint = function(targetX, targetY, 
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMouseJointTargetX = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMouseJointTargetX = function(jointId){
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return 0;
@@ -1741,7 +1747,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMouseJointTargetX = function(jointId){
     return joint.GetTarget().get_x() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMouseJointTargetY = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMouseJointTargetY = function(jointId){
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return 0;
@@ -1749,7 +1755,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMouseJointTargetY = function(jointId){
     return joint.GetTarget().get_y() * this._sharedData.scaleY;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setMouseJointTarget = function(jointId, targetX, targetY){
+gdjs.Physics2RuntimeBehavior.prototype.setMouseJointTarget = function(jointId, targetX, targetY){
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return;
@@ -1759,7 +1765,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setMouseJointTarget = function(jointId, tar
     joint.GetBodyB().SetAwake(true);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMouseJointMaxForce = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMouseJointMaxForce = function(jointId){
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return 0;
@@ -1767,7 +1773,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMouseJointMaxForce = function(jointId){
     return joint.GetMaxForce();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setMouseJointMaxForce = function(jointId, maxForce){
+gdjs.Physics2RuntimeBehavior.prototype.setMouseJointMaxForce = function(jointId, maxForce){
     // Invalid value
     if(maxForce < 0) return;
     var joint = this._sharedData.getJoint(jointId);
@@ -1777,7 +1783,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setMouseJointMaxForce = function(jointId, m
     joint.SetMaxForce(maxForce);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMouseJointFrequency = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMouseJointFrequency = function(jointId){
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return 0;
@@ -1785,7 +1791,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMouseJointFrequency = function(jointId){
     return joint.GetFrequency();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setMouseJointFrequency = function(jointId, frequency){
+gdjs.Physics2RuntimeBehavior.prototype.setMouseJointFrequency = function(jointId, frequency){
     // Invalid value
     if(frequency <= 0) return;
     var joint = this._sharedData.getJoint(jointId);
@@ -1795,7 +1801,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setMouseJointFrequency = function(jointId, 
     joint.SetFrequency(frequency);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMouseJointDampingRatio = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMouseJointDampingRatio = function(jointId){
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_mouseJoint) return 0;
@@ -1803,7 +1809,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMouseJointDampingRatio = function(jointI
     return joint.GetDampingRatio();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setMouseJointDampingRatio = function(jointId, dampingRatio){
+gdjs.Physics2RuntimeBehavior.prototype.setMouseJointDampingRatio = function(jointId, dampingRatio){
     // Invalid value
     if(dampingRatio < 0) return;
     var joint = this._sharedData.getJoint(jointId);
@@ -1816,7 +1822,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setMouseJointDampingRatio = function(jointI
 
 
 // Wheel joint
-gdjs.PhysikRuntimeBehavior.prototype.addWheelJoint = function(x1, y1, other, x2, y2, axisAngle, frequency, dampingRatio, enableMotor, motorSpeed, maxMotorTorque, collideConnected, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addWheelJoint = function(x1, y1, other, x2, y2, axisAngle, frequency, dampingRatio, enableMotor, motorSpeed, maxMotorTorque, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -1848,7 +1854,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addWheelJoint = function(x1, y1, other, x2,
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWheelJointAxisAngle = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWheelJointAxisAngle = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1857,7 +1863,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointAxisAngle = function(jointId){
     return gdjs.toDegrees(Math.atan2(joint.GetLocalAxisA().get_y(),joint.GetLocalAxisA().get_x()) + joint.GetBodyA().GetAngle());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWheelJointTranslation = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWheelJointTranslation = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1866,7 +1872,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointTranslation = function(jointId
     return joint.GetJointTranslation() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWheelJointSpeed = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWheelJointSpeed = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1875,7 +1881,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointSpeed = function(jointId){
     return joint.GetJointSpeed() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.isWheelJointMotorEnabled = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.isWheelJointMotorEnabled = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1884,7 +1890,7 @@ gdjs.PhysikRuntimeBehavior.prototype.isWheelJointMotorEnabled = function(jointId
     return joint.IsMotorEnabled();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.enableWheelJointMotor = function(jointId, enable){
+gdjs.Physics2RuntimeBehavior.prototype.enableWheelJointMotor = function(jointId, enable){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1893,7 +1899,7 @@ gdjs.PhysikRuntimeBehavior.prototype.enableWheelJointMotor = function(jointId, e
     joint.EnableMotor(enable);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWheelJointMotorSpeed = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWheelJointMotorSpeed = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1902,7 +1908,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointMotorSpeed = function(jointId)
     return gdjs.toDegrees(joint.GetMotorSpeed());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setWheelJointMotorSpeed = function(jointId, speed){
+gdjs.Physics2RuntimeBehavior.prototype.setWheelJointMotorSpeed = function(jointId, speed){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1911,7 +1917,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setWheelJointMotorSpeed = function(jointId,
     joint.SetMotorSpeed(gdjs.toRad(speed));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWheelJointMaxMotorTorque = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWheelJointMaxMotorTorque = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1920,7 +1926,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointMaxMotorTorque = function(join
     return joint.GetMaxMotorTorque();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setWheelJointMaxMotorTorque = function(jointId, maxTorque){
+gdjs.Physics2RuntimeBehavior.prototype.setWheelJointMaxMotorTorque = function(jointId, maxTorque){
     // Invalid value
     if(maxTorque < 0) return;
     // Get the joint
@@ -1931,7 +1937,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setWheelJointMaxMotorTorque = function(join
     joint.SetMaxMotorTorque(maxTorque);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWheelJointMotorTorque = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWheelJointMotorTorque = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1940,7 +1946,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointMotorTorque = function(jointId
     return joint.GetMotorTorque(1 / this._sharedData.timeStep);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWheelJointFrequency = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWheelJointFrequency = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1949,7 +1955,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointFrequency = function(jointId){
     return joint.GetSpringFrequencyHz();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setWheelJointFrequency = function(jointId, frequency){
+gdjs.Physics2RuntimeBehavior.prototype.setWheelJointFrequency = function(jointId, frequency){
     // Invalid value
     if(frequency < 0) return;
     // Get the joint
@@ -1960,7 +1966,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setWheelJointFrequency = function(jointId, 
     joint.SetSpringFrequencyHz(frequency);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWheelJointDampingRatio = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWheelJointDampingRatio = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -1969,7 +1975,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWheelJointDampingRatio = function(jointI
     return joint.GetSpringDampingRatio();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setWheelJointDampingRatio = function(jointId, dampingRatio){
+gdjs.Physics2RuntimeBehavior.prototype.setWheelJointDampingRatio = function(jointId, dampingRatio){
     // Invalid value
     if(dampingRatio < 0) return;
     // Get the joint
@@ -1983,7 +1989,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setWheelJointDampingRatio = function(jointI
 
 
 // Weld joint
-gdjs.PhysikRuntimeBehavior.prototype.addWeldJoint = function(x1, y1, other, x2, y2, referenceAngle, frequency, dampingRatio, collideConnected, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addWeldJoint = function(x1, y1, other, x2, y2, referenceAngle, frequency, dampingRatio, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -2013,7 +2019,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addWeldJoint = function(x1, y1, other, x2, 
     variable.setNumber(this._sharedData.addJoint(joint));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWeldJointReferenceAngle = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWeldJointReferenceAngle = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2023,7 +2029,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWeldJointReferenceAngle = function(joint
     return gdjs.toDegrees(joint.referenceAngle);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWeldJointFrequency = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWeldJointFrequency = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2032,7 +2038,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWeldJointFrequency = function(jointId){
     return joint.GetFrequency();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setWeldJointFrequency = function(jointId, frequency){
+gdjs.Physics2RuntimeBehavior.prototype.setWeldJointFrequency = function(jointId, frequency){
     // Invalid value
     if(frequency < 0) return;
     // Get the joint
@@ -2043,7 +2049,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setWeldJointFrequency = function(jointId, f
     joint.SetFrequency(frequency);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getWeldJointDampingRatio = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getWeldJointDampingRatio = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2052,7 +2058,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getWeldJointDampingRatio = function(jointId
     return joint.GetDampingRatio();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setWeldJointDampingRatio = function(jointId, dampingRatio){
+gdjs.Physics2RuntimeBehavior.prototype.setWeldJointDampingRatio = function(jointId, dampingRatio){
     // Invalid value
     if(dampingRatio < 0) return;
     // Get the joint
@@ -2066,7 +2072,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setWeldJointDampingRatio = function(jointId
 
 
 // Rope joint
-gdjs.PhysikRuntimeBehavior.prototype.addRopeJoint = function(x1, y1, other, x2, y2, maxLength, collideConnected, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addRopeJoint = function(x1, y1, other, x2, y2, maxLength, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -2093,7 +2099,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addRopeJoint = function(x1, y1, other, x2, 
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getRopeJointMaxLength = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getRopeJointMaxLength = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2102,7 +2108,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getRopeJointMaxLength = function(jointId){
     return joint.GetMaxLength() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setRopeJointMaxLength = function(jointId, maxLength){
+gdjs.Physics2RuntimeBehavior.prototype.setRopeJointMaxLength = function(jointId, maxLength){
     // Invalid value
     if(maxLength < 0) return;
     // Get the joint
@@ -2119,7 +2125,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setRopeJointMaxLength = function(jointId, m
 
 
 // Friction joint
-gdjs.PhysikRuntimeBehavior.prototype.addFrictionJoint = function(x1, y1, other, x2, y2, maxForce, maxTorque, collideConnected, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addFrictionJoint = function(x1, y1, other, x2, y2, maxForce, maxTorque, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -2146,7 +2152,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addFrictionJoint = function(x1, y1, other, 
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getFrictionJointMaxForce = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getFrictionJointMaxForce = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2155,7 +2161,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getFrictionJointMaxForce = function(jointId
     return joint.GetMaxForce();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setFrictionJointMaxForce = function(jointId, maxForce){
+gdjs.Physics2RuntimeBehavior.prototype.setFrictionJointMaxForce = function(jointId, maxForce){
     // Invalid value
     if(maxForce < 0) return;
     // Get the joint
@@ -2166,7 +2172,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setFrictionJointMaxForce = function(jointId
     joint.SetMaxForce(maxForce);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getFrictionJointMaxTorque = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getFrictionJointMaxTorque = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2175,7 +2181,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getFrictionJointMaxTorque = function(jointI
     return joint.GetMaxTorque();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setFrictionJointMaxTorque = function(jointId, maxTorque){
+gdjs.Physics2RuntimeBehavior.prototype.setFrictionJointMaxTorque = function(jointId, maxTorque){
     // Invalid value
     if(maxTorque < 0) return;
     // Get the joint
@@ -2189,7 +2195,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setFrictionJointMaxTorque = function(jointI
 
 
 // Motor joint
-gdjs.PhysikRuntimeBehavior.prototype.addMotorJoint = function(other, offsetX, offsetY, offsetAngle, maxForce, maxTorque, correctionFactor, collideConnected, variable){
+gdjs.Physics2RuntimeBehavior.prototype.addMotorJoint = function(other, offsetX, offsetY, offsetAngle, maxForce, maxTorque, correctionFactor, collideConnected, variable){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
@@ -2218,7 +2224,7 @@ gdjs.PhysikRuntimeBehavior.prototype.addMotorJoint = function(other, offsetX, of
     variable.setNumber(jointId);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMotorJointOffsetX = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMotorJointOffsetX = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2227,7 +2233,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMotorJointOffsetX = function(jointId){
     return joint.GetLinearOffset().get_x() * this._sharedData.scaleX;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMotorJointOffsetY = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMotorJointOffsetY = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2236,7 +2242,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMotorJointOffsetY = function(jointId){
     return joint.GetLinearOffset().get_y() * this._sharedData.scaleY;
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setMotorJointOffset = function(jointId, offsetX, offsetY){
+gdjs.Physics2RuntimeBehavior.prototype.setMotorJointOffset = function(jointId, offsetX, offsetY){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2245,7 +2251,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setMotorJointOffset = function(jointId, off
     joint.SetLinearOffset(this.b2Vec2(offsetX * this._sharedData.invScaleX, offsetY * this._sharedData.invScaleY));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMotorJointAngularOffset = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMotorJointAngularOffset = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2254,7 +2260,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMotorJointAngularOffset = function(joint
     return gdjs.toDegrees(joint.GetAngularOffset());
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setMotorJointAngularOffset = function(jointId, offsetAngle){
+gdjs.Physics2RuntimeBehavior.prototype.setMotorJointAngularOffset = function(jointId, offsetAngle){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2263,7 +2269,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setMotorJointAngularOffset = function(joint
     joint.SetAngularOffset(gdjs.toRad(offsetAngle));
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMotorJointMaxForce = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMotorJointMaxForce = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2272,7 +2278,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMotorJointMaxForce = function(jointId){
     return joint.GetMaxForce();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setMotorJointMaxForce = function(jointId, maxForce){
+gdjs.Physics2RuntimeBehavior.prototype.setMotorJointMaxForce = function(jointId, maxForce){
     // Invalid value
     if(maxForce < 0) return;
     // Get the joint
@@ -2283,7 +2289,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setMotorJointMaxForce = function(jointId, m
     joint.SetMaxForce(maxForce);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMotorJointMaxTorque = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMotorJointMaxTorque = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2292,7 +2298,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMotorJointMaxTorque = function(jointId){
     return joint.GetMaxTorque();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setMotorJointMaxTorque = function(jointId, maxTorque){
+gdjs.Physics2RuntimeBehavior.prototype.setMotorJointMaxTorque = function(jointId, maxTorque){
     // Invalid value
     if(maxTorque < 0) return;
     // Get the joint
@@ -2306,7 +2312,7 @@ gdjs.PhysikRuntimeBehavior.prototype.setMotorJointMaxTorque = function(jointId, 
     joint.GetBodyB().SetAwake(true);
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.getMotorJointCorrectionFactor = function(jointId){
+gdjs.Physics2RuntimeBehavior.prototype.getMotorJointCorrectionFactor = function(jointId){
     // Get the joint
     var joint = this._sharedData.getJoint(jointId);
     // Joint not found or has wrong type
@@ -2315,7 +2321,7 @@ gdjs.PhysikRuntimeBehavior.prototype.getMotorJointCorrectionFactor = function(jo
     return joint.GetCorrectionFactor();
 };
 
-gdjs.PhysikRuntimeBehavior.prototype.setMotorJointCorrectionFactor = function(jointId, correctionFactor){
+gdjs.Physics2RuntimeBehavior.prototype.setMotorJointCorrectionFactor = function(jointId, correctionFactor){
     // Invalid value
     if(correctionFactor < 0 || correctionFactor > 1) return;
     // Get the joint
@@ -2329,12 +2335,15 @@ gdjs.PhysikRuntimeBehavior.prototype.setMotorJointCorrectionFactor = function(jo
     joint.GetBodyB().SetAwake(true);
 };
 
-gdjs.PhysikRuntimeBehavior.collisionTest = function(object1, object2, behavior){
+
+
+// Collision
+gdjs.Physics2RuntimeBehavior.collisionTest = function(object1, object2, behaviorName){
     // Check if the objects exist and share the behavior
-    if(object1 === null || !object1.hasBehavior(behavior)) return false;
-    if(object2 === null || !object2.hasBehavior(behavior)) return false;
+    if(object1 === null || !object1.hasBehavior(behaviorName)) return false;
+    if(object2 === null || !object2.hasBehavior(behaviorName)) return false;
     // Test if the second object is in the list of contacts of the first one
-    var behavior1 = object1.getBehavior(behavior);
+    var behavior1 = object1.getBehavior(behaviorName);
     for(var i=0, len=behavior1.currentContacts.length; i<len; ++i){
         if(behavior1.currentContacts[i].owner === object2){
             return true;

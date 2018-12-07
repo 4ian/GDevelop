@@ -368,7 +368,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getGravityX");
+      .setFunctionName("getGravityX")
+      .setManipulatedType("number");
 
     aut.addExpression(
       "GravityX",
@@ -394,7 +395,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getGravityY");
+      .setFunctionName("getGravityY")
+      .setManipulatedType("number");
 
     aut.addExpression(
       "GravityY",
@@ -435,7 +437,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getTimeScale");
+      .setFunctionName("getTimeScale")
+      .setManipulatedType("number");
 
     // This action has to be owned by the extension to run only once per objects list, not per instance
     extension.addAction(
@@ -672,7 +675,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getDensity");
+      .setFunctionName("getDensity")
+      .setManipulatedType("number");
 
     aut.addAction(
       "Density",
@@ -704,7 +708,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getFriction");
+      .setFunctionName("getFriction")
+      .setManipulatedType("number");
 
     aut.addAction(
       "Friction",
@@ -736,7 +741,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getRestitution");
+      .setFunctionName("getRestitution")
+      .setManipulatedType("number");
 
     aut.addAction(
       "Restitution",
@@ -768,7 +774,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getLinearDamping");
+      .setFunctionName("getLinearDamping")
+      .setManipulatedType("number");
 
     aut.addAction(
       "LinearDamping",
@@ -800,7 +807,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getAngularDamping");
+      .setFunctionName("getAngularDamping")
+      .setManipulatedType("number");
 
     aut.addAction(
       "AngularDamping",
@@ -832,7 +840,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getGravityScale");
+      .setFunctionName("getGravityScale")
+      .setManipulatedType("number");
 
     aut.addAction(
       "GravityScale",
@@ -928,7 +937,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getLinearVelocityX");
+      .setFunctionName("getLinearVelocityX")
+      .setManipulatedType("number");
 
     aut.addAction(
       "LinearVelocityX",
@@ -960,7 +970,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getLinearVelocityY");
+      .setFunctionName("getLinearVelocityY")
+      .setManipulatedType("number");
 
     aut.addAction(
       "LinearVelocityY",
@@ -992,7 +1003,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getLinearVelocityLength");
+      .setFunctionName("getLinearVelocityLength")
+      .setManipulatedType("number");
 
     aut.addCondition(
       "AngularVelocity",
@@ -1007,7 +1019,8 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("getAngularVelocity");
+      .setFunctionName("getAngularVelocity")
+      .setManipulatedType("number");
 
     aut.addAction(
       "AngularVelocity",
@@ -1165,7 +1178,7 @@ module.exports = {
       "MassCenterX",
       t("Mass center X"),
       t("Mass center X"),
-      t("Joints"),
+      t(""),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "Physics2Behavior")
@@ -1176,7 +1189,7 @@ module.exports = {
       "MassCenterY",
       t("Mass center Y"),
       t("Mass center Y"),
-      t("Joints"),
+      t(""),
       "res/physics16.png")
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "Physics2Behavior")

@@ -694,7 +694,7 @@ gdjs.Physics2RuntimeBehavior.prototype.layerEnabled = function(layer){
     // Layer must be an integer
     layer = Math.floor(layer);
     // Layer must be in range [1, 16]
-    if(layer < 1 || layer > 16 ) return;
+    if(layer < 1 || layer > 16 ) return false;
 
     return !!(this.layers & (1 << (layer - 1)));
 };
@@ -726,7 +726,7 @@ gdjs.Physics2RuntimeBehavior.prototype.maskEnabled = function(mask){
     // Mask must be an integer
     mask = Math.floor(mask);
     // Mask must be in range [1, 16]
-    if(mask < 1 || mask > 16 ) return;
+    if(mask < 1 || mask > 16 ) return false;
 
     return !!(this.masks & (1 << (mask - 1)));
 };
@@ -758,7 +758,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getLinearVelocityX = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
-        return;
+        return 0;
     }
     // Get the linear velocity on X
     return this._body.GetLinearVelocity().get_x() * this._sharedData.scaleX;
@@ -778,7 +778,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getLinearVelocityY = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
-        return;
+        return 0;
     }
     // Get the linear velocity on Y
     return this._body.GetLinearVelocity().get_y() * this._sharedData.scaleY;
@@ -798,7 +798,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getLinearVelocityLength = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
-        return;
+        return 0;
     }
     // Get the linear velocity length
     return this.b2Vec2(this._body.GetLinearVelocity().get_x() * this._sharedData.scaleX,
@@ -809,7 +809,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getAngularVelocity = function(){
     // If there is no body, set a new one
     if(this._body === null){
         this.createBody();
-        return;
+        return 0;
     }
     // Get the angular velocity
     return gdjs.toDegrees(this._body.GetAngularVelocity());
@@ -876,7 +876,7 @@ gdjs.Physics2RuntimeBehavior.prototype.applyImpulse = function(impulseX, impulse
     // Wake up the object
     this._body.SetAwake(true);
     // Apply the impulse
-    this._body.ApplyLinearImpulse(this.b2Vec2(forceX, forceY),
+    this._body.ApplyLinearImpulse(this.b2Vec2(impulseX, impulseY),
                                   this.b2Vec2Sec(positionX * this._sharedData.invScaleX, positionY * this._sharedData.invScaleY));
 };
 
@@ -939,7 +939,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getMassCenterX = function(){
         this.createBody();
     }
     // Get the mass center on X
-    return this._body.GetWorldCenter().get_x();
+    return this._body.GetWorldCenter().get_x() * this._sharedData.scaleX;
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.getMassCenterY = function(){
@@ -948,7 +948,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getMassCenterY = function(){
         this.createBody();
     }
     // Get the mass center on Y
-    return this._body.GetWorldCenter().get_y();
+    return this._body.GetWorldCenter().get_y() * this._sharedData.scaleY;
 };
 
 
@@ -1056,7 +1056,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addDistanceJoint = function(x1, y1, other
     // Get the second body
     var otherBody = other.getBehavior(this.name).getBody();
     // If the first and second objects/bodies are the same, return
-    if(this._body == otherBody) return;
+    if(this._body === otherBody) return;
     // Set joint settings
     var jointDef = new Box2D.b2DistanceJointDef();
     jointDef.set_bodyA(this._body);
@@ -1183,7 +1183,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addRevoluteJointBetweenTwoBodies = functi
     // Get the second body
     var otherBody = other.getBehavior(this.name).getBody();
     // If the first and second objects/bodies are the same, return
-    if(this._body == otherBody) return;
+    if(this._body === otherBody) return;
     // Set joint settings
     var jointDef = new Box2D.b2RevoluteJointDef();
     jointDef.set_bodyA(this._body);
@@ -1367,7 +1367,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addPrismaticJoint = function(x1, y1, othe
     // Get the second body
     var otherBody = other.getBehavior(this.name).getBody();
     // If the first and second objects/bodies are the same, return
-    if(this._body == otherBody) return;
+    if(this._body === otherBody) return;
     // Set joint settings
     var jointDef = new Box2D.b2PrismaticJointDef();
     jointDef.set_bodyA(this._body);
@@ -1566,19 +1566,19 @@ gdjs.Physics2RuntimeBehavior.prototype.addPulleyJoint = function(x1, y1, other, 
     // Get the second body
     var otherBody = other.getBehavior(this.name).getBody();
     // If the first and second objects/bodies are the same, return
-    if(this._body == otherBody) return;
+    if(this._body === otherBody) return;
     // Set joint settings
     var jointDef = new Box2D.b2PulleyJointDef();
     jointDef.set_bodyA(this._body);
     jointDef.set_localAnchorA(this._body.GetLocalPoint(this.b2Vec2(x1 * this._sharedData.invScaleX, y1 * this._sharedData.invScaleY)));
     jointDef.set_bodyB(otherBody);
     jointDef.set_localAnchorB(otherBody.GetLocalPoint(this.b2Vec2(x2 * this._sharedData.invScaleX, y2 * this._sharedData.invScaleY)));
-    jointDef.set_groundAnchorA(this.b2Vec2(groundX1 * this._sharedData.invScaleX, groundY1 * this._sharedData.invScaleX));
-    jointDef.set_groundAnchorB(this.b2Vec2(groundX2 * this._sharedData.invScaleX, groundY2 * this._sharedData.invScaleX));
+    jointDef.set_groundAnchorA(this.b2Vec2(groundX1 * this._sharedData.invScaleX, groundY1 * this._sharedData.invScaleY));
+    jointDef.set_groundAnchorB(this.b2Vec2(groundX2 * this._sharedData.invScaleX, groundY2 * this._sharedData.invScaleY));
     jointDef.set_lengthA(lengthA > 0 ? lengthA * this._sharedData.invScaleX :
-                            this.b2Vec2((groundX1 - x1) * this._sharedData.invScaleX, (groundY1 - y1) * this._sharedData.invScaleX).Length());
+                            this.b2Vec2((groundX1 - x1) * this._sharedData.invScaleX, (groundY1 - y1) * this._sharedData.invScaleY).Length());
     jointDef.set_lengthB(lengthB > 0 ? lengthB * this._sharedData.invScaleX :
-                            this.b2Vec2((groundX2 - x2) * this._sharedData.invScaleX, (groundY2 - y2) * this._sharedData.invScaleX).Length());
+                            this.b2Vec2((groundX2 - x2) * this._sharedData.invScaleX, (groundY2 - y2) * this._sharedData.invScaleY).Length());
     jointDef.set_ratio(ratio > 0 ? ratio : 1);
     jointDef.set_collideConnected(collideConnected);
     // Create the joint and get the id
@@ -1840,7 +1840,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addWheelJoint = function(x1, y1, other, x
     // Get the second body
     var otherBody = other.getBehavior(this.name).getBody();
     // If the first and second objects/bodies are the same, return
-    if(this._body == otherBody) return;
+    if(this._body === otherBody) return;
     // Set joint settings
     var jointDef = new Box2D.b2WheelJointDef();
     jointDef.set_bodyA(this._body);
@@ -1867,7 +1867,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getWheelJointAxisAngle = function(jointId
     // Joint not found or has wrong type
     if(joint === null || joint.GetType() !== Box2D.e_wheelJoint) return 0;
     // Get the joint axis angle
-    return gdjs.toDegrees(Math.atan2(joint.GetLocalAxisA().get_y(),joint.GetLocalAxisA().get_x()) + joint.GetBodyA().GetAngle());
+    return gdjs.toDegrees(Math.atan2(joint.GetLocalAxisA().get_y(), joint.GetLocalAxisA().get_x()) + joint.GetBodyA().GetAngle());
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.getWheelJointTranslation = function(jointId){
@@ -2007,7 +2007,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addWeldJoint = function(x1, y1, other, x2
     // Get the second body
     var otherBody = other.getBehavior(this.name).getBody();
     // If the first and second objects/bodies are the same, return
-    if(this._body == otherBody) return;
+    if(this._body === otherBody) return;
     // Set joint settings
     var jointDef = new Box2D.b2WeldJointDef();
     jointDef.set_bodyA(this._body);
@@ -2090,7 +2090,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addRopeJoint = function(x1, y1, other, x2
     // Get the second body
     var otherBody = other.getBehavior(this.name).getBody();
     // If the first and second objects/bodies are the same, return
-    if(this._body == otherBody) return;
+    if(this._body === otherBody) return;
     // Set joint settings
     var jointDef = new Box2D.b2RopeJointDef();
     jointDef.set_bodyA(this._body);
@@ -2143,7 +2143,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addFrictionJoint = function(x1, y1, other
     // Get the second body
     var otherBody = other.getBehavior(this.name).getBody();
     // If the first and second objects/bodies are the same, return
-    if(this._body == otherBody) return;
+    if(this._body === otherBody) return;
     // Set joint settings
     var jointDef = new Box2D.b2FrictionJointDef();
     jointDef.set_bodyA(this._body);
@@ -2213,7 +2213,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addMotorJoint = function(other, offsetX, 
     // Get the second body
     var otherBody = other.getBehavior(this.name).getBody();
     // If the first and second objects/bodies are the same, return
-    if(this._body == otherBody) return;
+    if(this._body === otherBody) return;
     // Set joint settings
     var jointDef = new Box2D.b2MotorJointDef();
     jointDef.set_bodyA(this._body);

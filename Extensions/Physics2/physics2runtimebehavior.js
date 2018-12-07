@@ -766,10 +766,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getLinearVelocityX = function(){
 
 gdjs.Physics2RuntimeBehavior.prototype.setLinearVelocityX = function(linearVelocityX){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Set the linear velocity on X
     this._body.SetLinearVelocity(this.b2Vec2(linearVelocityX * this._sharedData.invScaleX, this._body.GetLinearVelocity().get_y()));
 };
@@ -786,10 +783,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getLinearVelocityY = function(){
 
 gdjs.Physics2RuntimeBehavior.prototype.setLinearVelocityY = function(linearVelocityY){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Set the linear velocity on Y
     this._body.SetLinearVelocity(this.b2Vec2(this._body.GetLinearVelocity().get_x(), linearVelocityY * this._sharedData.invScaleY));
 };
@@ -807,30 +801,21 @@ gdjs.Physics2RuntimeBehavior.prototype.getLinearVelocityLength = function(){
 
 gdjs.Physics2RuntimeBehavior.prototype.getAngularVelocity = function(){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return 0;
-    }
+    if(this._body === null) this.createBody();
     // Get the angular velocity
     return gdjs.toDegrees(this._body.GetAngularVelocity());
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.setAngularVelocity = function(angularVelocity){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Set the angular velocity
     this._body.SetAngularVelocity(gdjs.toRad(angularVelocity));
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.applyForce = function(forceX, forceY, positionX, positionY){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Wake up the object
     this._body.SetAwake(true);
     // Apply the force
@@ -840,10 +825,7 @@ gdjs.Physics2RuntimeBehavior.prototype.applyForce = function(forceX, forceY, pos
 
 gdjs.Physics2RuntimeBehavior.prototype.applyPolarForce = function(angle, length, positionX, positionY){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Wake up the object
     this._body.SetAwake(true);
     // Apply the force
@@ -854,10 +836,7 @@ gdjs.Physics2RuntimeBehavior.prototype.applyPolarForce = function(angle, length,
 
 gdjs.Physics2RuntimeBehavior.prototype.applyForceTowardPosition = function(length, towardX, towardY, positionX, positionY){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Wake up the object
     this._body.SetAwake(true);
     // Apply the force
@@ -869,10 +848,7 @@ gdjs.Physics2RuntimeBehavior.prototype.applyForceTowardPosition = function(lengt
 
 gdjs.Physics2RuntimeBehavior.prototype.applyImpulse = function(impulseX, impulseY, positionX, positionY){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Wake up the object
     this._body.SetAwake(true);
     // Apply the impulse
@@ -882,10 +858,7 @@ gdjs.Physics2RuntimeBehavior.prototype.applyImpulse = function(impulseX, impulse
 
 gdjs.Physics2RuntimeBehavior.prototype.applyPolarImpulse = function(angle, length, positionX, positionY){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) his.createBody();
     // Wake up the object
     this._body.SetAwake(true);
     // Apply the impulse
@@ -896,10 +869,7 @@ gdjs.Physics2RuntimeBehavior.prototype.applyPolarImpulse = function(angle, lengt
 
 gdjs.Physics2RuntimeBehavior.prototype.applyImpulseTowardPosition = function(length, towardX, towardY, positionX, positionY){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Wake up the object
     this._body.SetAwake(true);
     // Apply the impulse
@@ -911,10 +881,7 @@ gdjs.Physics2RuntimeBehavior.prototype.applyImpulseTowardPosition = function(len
 
 gdjs.Physics2RuntimeBehavior.prototype.applyTorque = function(torque){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Wake up the object
     this._body.SetAwake(true);
     // Apply the torque
@@ -923,10 +890,7 @@ gdjs.Physics2RuntimeBehavior.prototype.applyTorque = function(torque){
 
 gdjs.Physics2RuntimeBehavior.prototype.applyAngularImpulse = function(angularImpulse){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Wake up the object
     this._body.SetAwake(true);
     // Apply the angular impulse
@@ -1047,10 +1011,7 @@ gdjs.Physics2RuntimeBehavior.prototype.removeJoint = function(jointId){
 // Distance joint
 gdjs.Physics2RuntimeBehavior.prototype.addDistanceJoint = function(x1, y1, other, x2, y2, length, frequency, dampingRatio, collideConnected, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // If there is no second object or it doesn't share the behavior, return
     if(other == null || !other.hasBehavior(this.name)) return;
     // Get the second body
@@ -1142,10 +1103,7 @@ gdjs.Physics2RuntimeBehavior.prototype.setDistanceJointDampingRatio = function(j
 // Revolute joint
 gdjs.Physics2RuntimeBehavior.prototype.addRevoluteJoint = function(x, y, enableLimit, referenceAngle, lowerAngle, upperAngle, enableMotor, motorSpeed, maxMotorTorque, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Set joint settings
     var jointDef = new Box2D.b2RevoluteJointDef();
     jointDef.set_bodyA(this._sharedData.staticBody);
@@ -1174,10 +1132,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addRevoluteJoint = function(x, y, enableL
 
 gdjs.Physics2RuntimeBehavior.prototype.addRevoluteJointBetweenTwoBodies = function(x1, y1, other, x2, y2, enableLimit, referenceAngle, lowerAngle, upperAngle, enableMotor, motorSpeed, maxMotorTorque, collideConnected, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // If there is no second object or it doesn't share the behavior, return
     if(other == null || !other.hasBehavior(this.name)) return;
     // Get the second body
@@ -1358,10 +1313,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getRevoluteJointMotorTorque = function(jo
 // Prismatic joint
 gdjs.Physics2RuntimeBehavior.prototype.addPrismaticJoint = function(x1, y1, other, x2, y2, axisAngle, referenceAngle, enableLimit, lowerTranslation, upperTranslation, enableMotor, motorSpeed, maxMotorForce, collideConnected, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // If there is no second object or it doesn't share the behavior, return
     if(other == null || !other.hasBehavior(this.name)) return;
     // Get the second body
@@ -1557,10 +1509,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getPrismaticJointMotorForce = function(jo
 // Pulley joint
 gdjs.Physics2RuntimeBehavior.prototype.addPulleyJoint = function(x1, y1, other, x2, y2, groundX1, groundY1, groundX2, groundY2, lengthA, lengthB, ratio, collideConnected, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // If there is no second object or it doesn't share the behavior, return
     if(other == null || !other.hasBehavior(this.name)) return;
     // Get the second body
@@ -1655,10 +1604,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getPulleyJointRatio = function(jointId){
 // Gear joint
 gdjs.Physics2RuntimeBehavior.prototype.addGearJoint = function(jointId1, jointId2, ratio, collideConnected, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Get the first joint
     var joint1 = this._sharedData.getJoint(jointId1);
     // Joint not found or has wrong type
@@ -1728,10 +1674,7 @@ gdjs.Physics2RuntimeBehavior.prototype.setGearJointRatio = function(jointId, rat
 // Mouse joint
 gdjs.Physics2RuntimeBehavior.prototype.addMouseJoint = function(targetX, targetY, maxForce, frequency, dampingRatio, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // Set joint settings
     var jointDef = new Box2D.b2MouseJointDef();
     jointDef.set_bodyA(this._sharedData.staticBody);
@@ -1831,10 +1774,7 @@ gdjs.Physics2RuntimeBehavior.prototype.setMouseJointDampingRatio = function(join
 // Wheel joint
 gdjs.Physics2RuntimeBehavior.prototype.addWheelJoint = function(x1, y1, other, x2, y2, axisAngle, frequency, dampingRatio, enableMotor, motorSpeed, maxMotorTorque, collideConnected, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // If there is no second object or it doesn't share the behavior, return
     if(other == null || !other.hasBehavior(this.name)) return;
     // Get the second body
@@ -1998,10 +1938,7 @@ gdjs.Physics2RuntimeBehavior.prototype.setWheelJointDampingRatio = function(join
 // Weld joint
 gdjs.Physics2RuntimeBehavior.prototype.addWeldJoint = function(x1, y1, other, x2, y2, referenceAngle, frequency, dampingRatio, collideConnected, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // If there is no second object or it doesn't share the behavior, return
     if(other == null || !other.hasBehavior(this.name)) return;
     // Get the second body
@@ -2081,10 +2018,7 @@ gdjs.Physics2RuntimeBehavior.prototype.setWeldJointDampingRatio = function(joint
 // Rope joint
 gdjs.Physics2RuntimeBehavior.prototype.addRopeJoint = function(x1, y1, other, x2, y2, maxLength, collideConnected, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // If there is no second object or it doesn't share the behavior, return
     if(other == null || !other.hasBehavior(this.name)) return;
     // Get the second body
@@ -2134,10 +2068,7 @@ gdjs.Physics2RuntimeBehavior.prototype.setRopeJointMaxLength = function(jointId,
 // Friction joint
 gdjs.Physics2RuntimeBehavior.prototype.addFrictionJoint = function(x1, y1, other, x2, y2, maxForce, maxTorque, collideConnected, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // If there is no second object or it doesn't share the behavior, return
     if(other == null || !other.hasBehavior(this.name)) return;
     // Get the second body
@@ -2204,10 +2135,7 @@ gdjs.Physics2RuntimeBehavior.prototype.setFrictionJointMaxTorque = function(join
 // Motor joint
 gdjs.Physics2RuntimeBehavior.prototype.addMotorJoint = function(other, offsetX, offsetY, offsetAngle, maxForce, maxTorque, correctionFactor, collideConnected, variable){
     // If there is no body, set a new one
-    if(this._body === null){
-        this.createBody();
-        return;
-    }
+    if(this._body === null) this.createBody();
     // If there is no second object or it doesn't share the behavior, return
     if(other == null || !other.hasBehavior(this.name)) return;
     // Get the second body

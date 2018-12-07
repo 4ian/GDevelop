@@ -435,10 +435,10 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setIncludeFile("Extensions/Physics2/physics2tools.js")
       .setFunctionName("getTimeScale");
 
-    aut.addAction(
+    // This action has to be owned by the extension to run only once per objects list, not per instance
+    extension.addAction(
       "TimeScale",
       t("Time scale"),
       t("Modify the world time scale."),
@@ -446,12 +446,12 @@ module.exports = {
       t("Global"),
       "res/physics24.png",
       "res/physics16.png")
-      .addParameter("object", t("Object"), "", false)
+      .addParameter("objectList", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
       .setIncludeFile("Extensions/Physics2/physics2tools.js")
-      .setFunctionName("setTimeScale");
+      .setFunctionName("gdjs.physics2.setTimeScale");
 
     aut.addExpression(
       "TimeScale",

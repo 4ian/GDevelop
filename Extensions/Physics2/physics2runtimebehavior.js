@@ -444,6 +444,13 @@ gdjs.Physics2RuntimeBehavior.prototype.setTimeScale = function(timeScale){
     this._sharedData.timeScale = timeScale;
 };
 
+gdjs.Physics2RuntimeBehavior.setTimeScaleFromObject = function(object, behaviorName, timeScale){
+    // Check if the object exist and has the behavior
+    if(object === null || !object.hasBehavior(behaviorName)) return;
+    // Set the time scale
+    object.getBehavior(behaviorName).setTimeScale(timeScale);
+};
+
 gdjs.Physics2RuntimeBehavior.prototype.isDynamic = function(){
     return this.type === "Dynamic";
 };

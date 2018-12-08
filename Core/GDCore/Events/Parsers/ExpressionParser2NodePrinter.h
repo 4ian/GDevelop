@@ -3,8 +3,8 @@
  * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#ifndef GDCORE_EXPRESSIONVALIDATOR_H
-#define GDCORE_EXPRESSIONVALIDATOR_H
+#ifndef GDCORE_EXPRESSIONNODEPRINTER_H
+#define GDCORE_EXPRESSIONNODEPRINTER_H
 
 #include <memory>
 #include <vector>
@@ -31,6 +31,12 @@ class GD_CORE_API ExpressionParser2NodePrinter
  public:
   ExpressionParser2NodePrinter(){};
   virtual ~ExpressionParser2NodePrinter(){};
+
+  static gd::String PrintNode(gd::ExpressionNode& node) {
+    gd::ExpressionParser2NodePrinter printer;
+    node.Visit(printer);
+    return printer.GetOutput();
+  }
 
   /**
    * \brief Get the string corresponding to the expression nodes.
@@ -111,4 +117,4 @@ class GD_CORE_API ExpressionParser2NodePrinter
 
 }  // namespace gd
 
-#endif  // GDCORE_EXPRESSIONVALIDATOR_H
+#endif  // GDCORE_EXPRESSIONNODEPRINTER_H

@@ -9,6 +9,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
@@ -251,6 +252,14 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
       ExpressionCodeGenerator generator(codeGenerator, context);
       if (nonCodeOnlyParameterIndex < parameters.size()) {
         parameters[nonCodeOnlyParameterIndex]->Visit(generator);
+        parametersCode += generator.GetOutput();
+      } else if (parameterMetadata.IsOptional()) {
+        // Optional parameters default value were not parsed at the time of the expression parsing.
+        // Parse them now.
+        ExpressionParser2 parser(codeGenerator.GetPlatform(), codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups());
+        auto node = parser.ParseExpression(parameterMetadata.GetType(), parameterMetadata.GetDefaultValue());
+
+        node->Visit(generator);
         parametersCode += generator.GetOutput();
       } else {
         parametersCode +=

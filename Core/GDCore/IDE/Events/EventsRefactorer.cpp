@@ -8,202 +8,144 @@
 #include <memory>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Event.h"
-#include "GDCore/Events/Parsers/ExpressionParser.h"
+#include "GDCore/Events/EventsList.h"
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
+#include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
+#include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
+#include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Project/ObjectsContainer.h"
-#include "GDCore/Events/EventsList.h"
 
 using namespace std;
 
 namespace gd {
 
-// TODO: Replace and remove (ExpressionObjectsRenamer)
-class CallbacksForRenamingObject : public gd::ParserCallbacks {
+/**
+ * \brief Go through the nodes and change the given object name to a new one.
+ *
+ * \see gd::ExpressionParser2
+ */
+class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
  public:
-  CallbacksForRenamingObject(gd::String& plainExpression_,
-                             gd::String oldName_,
-                             gd::String newName_)
-      : plainExpression(plainExpression_),
-        newName(newName_),
-        oldName(oldName_){};
-  virtual ~CallbacksForRenamingObject(){};
+  ExpressionObjectRenamer(const gd::String& objectName_,
+                          const gd::String& objectNewName_)
+      : hasDoneRenaming(false), objectName(objectName_), objectNewName(objectNewName_){};
+  virtual ~ExpressionObjectRenamer(){};
 
-  virtual void OnConstantToken(gd::String text) { plainExpression += text; };
+  static bool Rename(gd::ExpressionNode & node, const gd::String& objectName, const gd::String& objectNewName) {
+    if (ExpressionValidator::HasNoErrors(node)) {  
+      ExpressionObjectRenamer renamer(objectName, objectNewName);
+      node.Visit(renamer);
 
-  virtual void OnStaticFunction(gd::String functionName,
-                                const std::vector<gd::Expression>& parameters,
-                                const gd::ExpressionMetadata& expressionInfo) {
-    // Special case : Function without name is a litteral string.
-    if (functionName.empty()) {
-      if (parameters.empty()) return;
-      plainExpression += "\"" + parameters[0].GetPlainString() + "\"";
-
-      return;
+      return renamer.HasDoneRenaming();
     }
 
-    gd::String parametersStr;
-    for (std::size_t i = 0; i < parameters.size(); ++i) {
-      if (i < expressionInfo.parameters.size() &&
-          expressionInfo.parameters[i].codeOnly)
-        continue;  // Skip code only parameter which are not included in
-                   // function calls.
-
-      if (!parametersStr.empty()) parametersStr += ",";
-      parametersStr += parameters[i].GetPlainString();
-    }
-    plainExpression += functionName + "(" + parametersStr + ")";
-  };
-
-  virtual void OnObjectFunction(gd::String functionName,
-                                const std::vector<gd::Expression>& parameters,
-                                const gd::ExpressionMetadata& expressionInfo) {
-    if (parameters.empty()) return;
-
-    gd::String parametersStr;
-    for (std::size_t i = 1; i < parameters.size(); ++i) {
-      if (i < expressionInfo.parameters.size() &&
-          expressionInfo.parameters[i].codeOnly)
-        continue;  // Skip code only parameter which are not included in
-                   // function calls.
-
-      if (!parametersStr.empty()) parametersStr += ",";
-      parametersStr += parameters[i].GetPlainString();
-    }
-    plainExpression += (parameters[0].GetPlainString() == oldName
-                            ? newName
-                            : parameters[0].GetPlainString()) +
-                       "." + functionName + "(" + parametersStr + ")";
-  };
-
-  virtual void OnObjectBehaviorFunction(
-      gd::String functionName,
-      const std::vector<gd::Expression>& parameters,
-      const gd::ExpressionMetadata& expressionInfo) {
-    if (parameters.size() < 2) return;
-
-    gd::String parametersStr;
-    for (std::size_t i = 2; i < parameters.size(); ++i) {
-      if (i < expressionInfo.parameters.size() &&
-          expressionInfo.parameters[i].codeOnly)
-        continue;  // Skip code only parameter which are not included in
-                   // function calls.
-
-      if (!parametersStr.empty()) parametersStr += ",";
-      parametersStr += parameters[i].GetPlainString();
-    }
-    plainExpression += (parameters[0].GetPlainString() == oldName
-                            ? newName
-                            : parameters[0].GetPlainString()) +
-                       "." + parameters[1].GetPlainString() +
-                       "::" + functionName + "(" + parametersStr + ")";
-  };
-
-  virtual bool OnSubMathExpression(const gd::Platform& platform,
-                                   const gd::ObjectsContainer& project,
-                                   const gd::ObjectsContainer& layout,
-                                   gd::Expression& expression) {
-    // TODO: Add support for renaming in sub expressions. This is not working
-    // as the parser does not handle change made to the expression.
-    gd::String newExpression;
-
-    CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
-
-    gd::ExpressionParser parser(expression.GetPlainString());
-    if (!parser.ParseMathExpression(platform, project, layout, callbacks))
-      return false;
-
-    expression = gd::Expression(newExpression); // This change won't be picked up by the parser
-    return true;
+    return false;
   }
 
-  virtual bool OnSubTextExpression(const gd::Platform& platform,
-                                   const gd::ObjectsContainer& project,
-                                   const gd::ObjectsContainer& layout,
-                                   gd::Expression& expression) {
-    // TODO: Add support for renaming in sub expressions. This is not working
-    // as the parser does not handle change made to the expression.
-    gd::String newExpression;
+  bool HasDoneRenaming() const { return hasDoneRenaming; }
 
-    CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
-
-    gd::ExpressionParser parser(expression.GetPlainString());
-    if (!parser.ParseStringExpression(platform, project, layout, callbacks))
-      return false;
-
-    expression = gd::Expression(newExpression); // This change won't be picked up by the parser
-    return true;
+ protected:
+  void OnVisitSubExpressionNode(SubExpressionNode& node) override {
+    node.expression->Visit(*this);
   }
+  void OnVisitOperatorNode(OperatorNode& node) override {
+    node.leftHandSide->Visit(*this);
+    node.rightHandSide->Visit(*this);
+  }
+  void OnVisitNumberNode(NumberNode& node) override {}
+  void OnVisitTextNode(TextNode& node) override {}
+  void OnVisitVariableNode(VariableNode& node) override {
+    if (node.child) node.child->Visit(*this);
+  }
+  void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
+    if (node.child) node.child->Visit(*this);
+  }
+  void OnVisitVariableBracketAccessorNode(
+      VariableBracketAccessorNode& node) override {
+    node.expression->Visit(*this);
+    if (node.child) node.child->Visit(*this);
+  }
+  void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitFunctionNode(FunctionNode& node) override {
+    if (node.objectName == objectName) {
+      hasDoneRenaming = true;
+      node.objectName = objectNewName;
+    }
+    for (auto& parameter : node.parameters) {
+      parameter->Visit(*this);
+    }
+  }
+  void OnVisitEmptyNode(EmptyNode& node) override {}
 
  private:
-  gd::String& plainExpression;
-  gd::String newName;
-  gd::String oldName;
+  bool hasDoneRenaming;
+  const gd::String& objectName;
+  const gd::String& objectNewName;
 };
 
-// TODO: Replace and remove (ExpressionObjectsRemover)
-class CallbacksForRemovingObject : public gd::ParserCallbacks {
+/**
+ * \brief Go through the nodes and check if the given object is being used
+ * in the expression.
+ *
+ * \see gd::ExpressionParser2
+ */
+class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
  public:
-  CallbacksForRemovingObject(gd::String name_)
-      : objectPresent(false), name(name_){};
-  virtual ~CallbacksForRemovingObject(){};
+  ExpressionObjectFinder(const gd::String& objectName_)
+      : hasObject(false), objectName(objectName_) {};
+  virtual ~ExpressionObjectFinder(){};
 
-  bool objectPresent;  // True if the object is present in the expression
+  static bool CheckIfHasObject(gd::ExpressionNode & node, const gd::String & objectName) {
+    if (ExpressionValidator::HasNoErrors(node)) {  
+      ExpressionObjectFinder finder(objectName);
+      node.Visit(finder);
 
-  virtual void OnConstantToken(gd::String text){};
+      return finder.HasFoundObject();
+    }
 
-  virtual void OnStaticFunction(gd::String functionName,
-                                const std::vector<gd::Expression>& parameters,
-                                const gd::ExpressionMetadata& expressionInfo){};
-
-  virtual void OnObjectFunction(gd::String functionName,
-                                const std::vector<gd::Expression>& parameters,
-                                const gd::ExpressionMetadata& expressionInfo) {
-    if (parameters.empty()) return;
-
-    if (parameters[0].GetPlainString() == name) objectPresent = true;
-  };
-
-  virtual void OnObjectBehaviorFunction(
-      gd::String functionName,
-      const std::vector<gd::Expression>& parameters,
-      const gd::ExpressionMetadata& expressionInfo) {
-    if (parameters.empty()) return;
-
-    if (parameters[0].GetPlainString() == name) objectPresent = true;
-  };
-
-  virtual bool OnSubMathExpression(const gd::Platform& platform,
-                                   const gd::ObjectsContainer& project,
-                                   const gd::ObjectsContainer& layout,
-                                   gd::Expression& expression) {
-    CallbacksForRemovingObject callbacks(name);
-
-    gd::ExpressionParser parser(expression.GetPlainString());
-    if (!parser.ParseMathExpression(platform, project, layout, callbacks))
-      return false;
-
-    if (callbacks.objectPresent) objectPresent = true;
-    return true;
+    return false;
   }
 
-  virtual bool OnSubTextExpression(const gd::Platform& platform,
-                                   const gd::ObjectsContainer& project,
-                                   const gd::ObjectsContainer& layout,
-                                   gd::Expression& expression) {
-    CallbacksForRemovingObject callbacks(name);
+  bool HasFoundObject() const { return hasObject; }
 
-    gd::ExpressionParser parser(expression.GetPlainString());
-    if (!parser.ParseStringExpression(platform, project, layout, callbacks))
-      return false;
-
-    if (callbacks.objectPresent) objectPresent = true;
-    return true;
+ protected:
+  void OnVisitSubExpressionNode(SubExpressionNode& node) override {
+    node.expression->Visit(*this);
   }
+  void OnVisitOperatorNode(OperatorNode& node) override {
+    node.leftHandSide->Visit(*this);
+    node.rightHandSide->Visit(*this);
+  }
+  void OnVisitNumberNode(NumberNode& node) override {}
+  void OnVisitTextNode(TextNode& node) override {}
+  void OnVisitVariableNode(VariableNode& node) override {
+    if (node.child) node.child->Visit(*this);
+  }
+  void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
+    if (node.child) node.child->Visit(*this);
+  }
+  void OnVisitVariableBracketAccessorNode(
+      VariableBracketAccessorNode& node) override {
+    node.expression->Visit(*this);
+    if (node.child) node.child->Visit(*this);
+  }
+  void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitFunctionNode(FunctionNode& node) override {
+    if (node.objectName == objectName) {
+      hasObject = true;
+    }
+    for (auto& parameter : node.parameters) {
+      parameter->Visit(*this);
+    }
+  }
+  void OnVisitEmptyNode(EmptyNode& node) override {}
 
  private:
-  gd::String name;
+  bool hasObject;
+  const gd::String& objectName;
 };
 
 bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
@@ -223,34 +165,23 @@ bool EventsRefactorer::RenameObjectInActions(const gd::Platform& platform,
           actions[aId].GetParameter(pNb).GetPlainString() == oldName)
         actions[aId].SetParameter(pNb, gd::Expression(newName));
       // Replace object's name in expressions
-      else if (ParameterMetadata::IsExpression("number", instrInfos.parameters[pNb].type)) {
-        gd::String newExpression;
-        gd::String oldExpression =
-            actions[aId].GetParameter(pNb).GetPlainString();
-
-        CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
-
-        gd::ExpressionParser parser(oldExpression);
-        if (parser.ParseMathExpression(platform, project, layout, callbacks) &&
-            newExpression != oldExpression) {
-          somethingModified = true;
-          actions[aId].SetParameter(pNb, gd::Expression(newExpression));
+      else if (ParameterMetadata::IsExpression(
+                   "number", instrInfos.parameters[pNb].type)) {
+        gd::ExpressionParser2 parser(platform, project, layout);
+        auto node = parser.ParseExpression("number", actions[aId].GetParameter(pNb).GetPlainString());
+        
+        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+          actions[aId].SetParameter(pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
       }
       // Replace object's name in text expressions
-      else if (ParameterMetadata::IsExpression("string", instrInfos.parameters[pNb].type)) {
-        gd::String newExpression;
-        gd::String oldExpression =
-            actions[aId].GetParameter(pNb).GetPlainString();
-
-        CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
-
-        gd::ExpressionParser parser(oldExpression);
-        if (parser.ParseStringExpression(
-                platform, project, layout, callbacks) &&
-            newExpression != oldExpression) {
-          somethingModified = true;
-          actions[aId].SetParameter(pNb, gd::Expression(newExpression));
+      else if (ParameterMetadata::IsExpression(
+                   "string", instrInfos.parameters[pNb].type)) {
+        gd::ExpressionParser2 parser(platform, project, layout);
+        auto node = parser.ParseExpression("string", actions[aId].GetParameter(pNb).GetPlainString());
+        
+        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+          actions[aId].SetParameter(pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
       }
     }
@@ -287,31 +218,23 @@ bool EventsRefactorer::RenameObjectInConditions(
           conditions[cId].GetParameter(pNb).GetPlainString() == oldName)
         conditions[cId].SetParameter(pNb, gd::Expression(newName));
       // Replace object's name in expressions
-      else if (ParameterMetadata::IsExpression("number", instrInfos.parameters[pNb].type)) {
-        gd::String newExpression;
-        gd::String oldExpression =
-            conditions[cId].GetParameter(pNb).GetPlainString();
-
-        CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
-
-        gd::ExpressionParser parser(oldExpression);
-        if (parser.ParseMathExpression(platform, project, layout, callbacks)) {
-          somethingModified = true;
-          conditions[cId].SetParameter(pNb, gd::Expression(newExpression));
+      else if (ParameterMetadata::IsExpression(
+                   "number", instrInfos.parameters[pNb].type)) {
+        gd::ExpressionParser2 parser(platform, project, layout);
+        auto node = parser.ParseExpression("number", conditions[cId].GetParameter(pNb).GetPlainString());
+        
+        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+          conditions[cId].SetParameter(pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
       }
       // Replace object's name in text expressions
-      else if (ParameterMetadata::IsExpression("string", instrInfos.parameters[pNb].type)) {
-        gd::String newExpression;
-        gd::String oldExpression =
-            conditions[cId].GetParameter(pNb).GetPlainString();
-
-        CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
-
-        gd::ExpressionParser parser(oldExpression);
-        if (parser.ParseMathExpression(platform, project, layout, callbacks)) {
-          somethingModified = true;
-          conditions[cId].SetParameter(pNb, gd::Expression(newExpression));
+      else if (ParameterMetadata::IsExpression(
+                   "string", instrInfos.parameters[pNb].type)) {
+        gd::ExpressionParser2 parser(platform, project, layout);
+        auto node = parser.ParseExpression("string", conditions[cId].GetParameter(pNb).GetPlainString());
+        
+        if (ExpressionObjectRenamer::Rename(*node, oldName, newName)) {
+          conditions[cId].SetParameter(pNb, ExpressionParser2NodePrinter::PrintNode(*node));
         }
       }
     }
@@ -380,33 +303,30 @@ bool EventsRefactorer::RemoveObjectInActions(const gd::Platform& platform,
     gd::InstructionMetadata instrInfos =
         MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
     for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
-      // Replace object's name in parameters
+      // Find object's name in parameters
       if (gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) &&
           actions[aId].GetParameter(pNb).GetPlainString() == name) {
         deleteMe = true;
         break;
       }
-      // Replace object's name in expressions
-      else if (ParameterMetadata::IsExpression("number", instrInfos.parameters[pNb].type)) {
-        CallbacksForRemovingObject callbacks(name);
-
-        gd::ExpressionParser parser(
-            actions[aId].GetParameter(pNb).GetPlainString());
-        if (parser.ParseMathExpression(platform, project, layout, callbacks) &&
-            callbacks.objectPresent) {
+      // Find object's name in expressions
+      else if (ParameterMetadata::IsExpression(
+                   "number", instrInfos.parameters[pNb].type)) {
+        gd::ExpressionParser2 parser(platform, project, layout);
+        auto node = parser.ParseExpression("number", actions[aId].GetParameter(pNb).GetPlainString());
+        
+        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
           deleteMe = true;
           break;
         }
       }
-      // Replace object's name in text expressions
-      else if (ParameterMetadata::IsExpression("string", instrInfos.parameters[pNb].type)) {
-        CallbacksForRemovingObject callbacks(name);
-
-        gd::ExpressionParser parser(
-            actions[aId].GetParameter(pNb).GetPlainString());
-        if (parser.ParseStringExpression(
-                platform, project, layout, callbacks) &&
-            callbacks.objectPresent) {
+      // Find object's name in text expressions
+      else if (ParameterMetadata::IsExpression(
+                   "string", instrInfos.parameters[pNb].type)) {
+        gd::ExpressionParser2 parser(platform, project, layout);
+        auto node = parser.ParseExpression("string", actions[aId].GetParameter(pNb).GetPlainString());
+        
+        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
           deleteMe = true;
           break;
         }
@@ -444,33 +364,30 @@ bool EventsRefactorer::RemoveObjectInConditions(
     gd::InstructionMetadata instrInfos = MetadataProvider::GetConditionMetadata(
         platform, conditions[cId].GetType());
     for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
-      // Replace object's name in parameters
+      // Find object's name in parameters
       if (gd::ParameterMetadata::IsObject(instrInfos.parameters[pNb].type) &&
           conditions[cId].GetParameter(pNb).GetPlainString() == name) {
         deleteMe = true;
         break;
       }
-      // Replace object's name in expressions
-      else if (ParameterMetadata::IsExpression("number", instrInfos.parameters[pNb].type)) {
-        CallbacksForRemovingObject callbacks(name);
-
-        gd::ExpressionParser parser(
-            conditions[cId].GetParameter(pNb).GetPlainString());
-        if (parser.ParseMathExpression(platform, project, layout, callbacks) &&
-            callbacks.objectPresent) {
+      // Find object's name in expressions
+      else if (ParameterMetadata::IsExpression(
+                   "number", instrInfos.parameters[pNb].type)) {
+        gd::ExpressionParser2 parser(platform, project, layout);
+        auto node = parser.ParseExpression("number", conditions[cId].GetParameter(pNb).GetPlainString());
+        
+        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
           deleteMe = true;
           break;
         }
       }
-      // Replace object's name in text expressions
-      else if (ParameterMetadata::IsExpression("string", instrInfos.parameters[pNb].type)) {
-        CallbacksForRemovingObject callbacks(name);
-
-        gd::ExpressionParser parser(
-            conditions[cId].GetParameter(pNb).GetPlainString());
-        if (parser.ParseStringExpression(
-                platform, project, layout, callbacks) &&
-            callbacks.objectPresent) {
+      // Find object's name in text expressions
+      else if (ParameterMetadata::IsExpression(
+                   "string", instrInfos.parameters[pNb].type)) {
+        gd::ExpressionParser2 parser(platform, project, layout);
+        auto node = parser.ParseExpression("string", conditions[cId].GetParameter(pNb).GetPlainString());
+        
+        if (ExpressionObjectFinder::CheckIfHasObject(*node, name)) {
           deleteMe = true;
           break;
         }

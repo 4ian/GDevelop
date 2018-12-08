@@ -158,6 +158,40 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "\"test\") ?? \"\"");
     }
   }
+  SECTION("Valid function calls with optional arguments") {
+    {
+      auto node =
+          parser.ParseExpression("number", "MyExtension::MouseX(\"layer1\",)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getMouseX(\"\", \"layer1\", 0)");
+      // (first argument is the currentScene)
+    }
+    {
+      auto node =
+          parser.ParseExpression("number", "MyExtension::MouseX(\"layer1\",2+2)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getMouseX(\"\", \"layer1\", 2 + 2)");
+      // (first argument is the currentScene)
+    }
+  }
+  SECTION("Valid function calls (deprecated way of specifying optional arguments)") {
+    {
+      auto node =
+          parser.ParseExpression("number", "MyExtension::MouseX(,)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "getMouseX(\"\", \"\", 0)");
+      // (first argument is the currentScene)
+    }
+  }
   SECTION("Invalid function calls") {
     {
       auto node = parser.ParseExpression(

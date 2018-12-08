@@ -174,10 +174,12 @@ std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
   }
 
   bool numberHasStarted = false;
+  bool digitFound = false;
   bool dotFound = false;
   while (!IsEndReached()) {
     if (IsAnyChar("0123456789")) {
       numberHasStarted = true;
+      digitFound = true;
       parsedNumber += GetCurrentChar();
     } else if (IsAnyChar(".") && !dotFound) {
       numberHasStarted = true;
@@ -191,7 +193,7 @@ std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
   }
 
   auto number = gd::make_unique<NumberNode>(parsedNumber);
-  if (!numberHasStarted) {
+  if (!numberHasStarted || !digitFound) {
     number->diagnostic = RaiseSyntaxError(
         _("A number was expected. You must enter a number here."));
   }

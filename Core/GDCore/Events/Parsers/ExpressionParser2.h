@@ -124,8 +124,8 @@ class GD_CORE_API ExpressionParser2 {
       }
     } else {
       leftHandSide = ReadUntilWhitespace(type);
-      leftHandSide->diagnostic = RaiseSyntaxError(
-          _("You must enter a text, number or a valid expression call."));
+      leftHandSide->diagnostic = RaiseTypeError(
+          _("You must enter a text, number or a valid expression call."), expressionStartPosition);
     }
 
     SkipWhitespace();

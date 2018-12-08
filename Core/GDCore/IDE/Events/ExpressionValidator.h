@@ -32,6 +32,16 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
   virtual ~ExpressionValidator(){};
 
   /**
+   * \brief Helper function to check if a given node does not contain
+   * any error.
+   */
+  static bool HasNoErrors(gd::ExpressionNode& node) {
+    gd::ExpressionValidator validator;
+    node.Visit(validator);
+    return validator.GetErrors().empty();
+  }
+
+  /**
    * \brief Get all the errors
    *
    * No errors means that the expression is valid.

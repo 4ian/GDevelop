@@ -5,6 +5,7 @@ import Popover from 'material-ui/Popover';
 import Functions from 'material-ui/svg-icons/editor/functions';
 import RaisedButton from 'material-ui/RaisedButton';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import {mapVector} from '../../../Utils/MapFor';
 import ExpressionSelector from '../../InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import ExpressionParametersEditorDialog, {
   type ParameterValues,
@@ -157,31 +158,29 @@ export default class ExpressionField extends React.Component<Props, State> {
     } = this.props;
     if (!project) return null;
 
-    const callbacks = new gd.CallbacksForExpressionCorrectnessTesting(
+    const parser = new gd.ExpressionParser2(
+      gd.JsPlatform.get(),
       globalObjectsContainer,
       objectsContainer
     );
-    const parser = new gd.ExpressionParser(
-      value === undefined ? this.props.value : value
-    );
+    const expression = value === undefined ? this.props.value : value;
+    const expressionNode = parser
+      .parseExpression(expressionType, expression)
+      .get();
 
-    const parseFunction =
-      expressionType === 'string'
-        ? parser.parseStringExpression
-        : parser.parseMathExpression;
+    const expressionValidator = new gd.ExpressionValidator();
+    expressionNode.visit(expressionValidator);
+    const errors = expressionValidator.getErrors();
 
-    const isValid = parseFunction.call(
-      parser,
-      project.getCurrentPlatform(),
-      project,
-      objectsContainer,
-      callbacks
-    );
-    const error = parser.getFirstError();
+    // TODO: Multiple errors could be returned, as well as their
+    // positions, to be highlighted.
+    const errorMessages = mapVector(errors, error => error.getMessage());
+    const error = errorMessages.join(' ');
+
+    expressionValidator.delete();
     parser.delete();
-    callbacks.delete();
 
-    return isValid ? null : error;
+    return error === '' ? null : error;
   };
 
   _doValidation = (value?: string) => {

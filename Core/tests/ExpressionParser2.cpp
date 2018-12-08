@@ -309,6 +309,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "-, * or /) between numbers or expressions?");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 2);
     }
+    {
+      auto node = parser.ParseExpression("number", ".");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "A number was expected. You must enter a number here.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 1);
+    }
   }
 
   SECTION("Invalid number operators") {
@@ -323,6 +334,18 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
               "No operator found. Did you forget to enter an operator (like +, "
               "-, * or /) between numbers or expressions?");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 4);
+    }
+    {
+      auto node = parser.ParseExpression("number", "1//2");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You must enter a text, number or a valid expression call.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() ==
+              2);
     }
   }
 
@@ -462,6 +485,32 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     {
       auto node =
           parser.ParseExpression("number", "MySpriteObject.GetObjectNumber()");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid function calls (trailing commas)") {
+    {
+      auto node = parser.ParseExpression(
+          "number", "MyExtension::GetNumberWith3Params(12, \"hello world\",)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 0);
+    }
+  }
+
+  SECTION("Valid function calls (deprecated missing optional arguments)") {
+    {
+      auto node = parser.ParseExpression(
+          "number", "MyExtension::MouseX(,)");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
 

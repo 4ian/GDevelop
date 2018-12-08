@@ -9,103 +9,65 @@
 #include <vector>
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/EventsList.h"
-#include "GDCore/Events/Parsers/ExpressionParser.h"
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
+#include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
+#include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 
 namespace gd {
 
-// TODO: Replace and remove (ExpressionObjectsFinder)
-class CallbacksForListingObjects : public gd::ParserCallbacks {
+/**
+ * \brief Go through the nodes and report any object found.
+ *
+ * \see gd::ExpressionParser2
+ */
+class GD_CORE_API ExpressionObjectsAnalyzer
+    : public ExpressionParser2NodeWorker {
  public:
-  CallbacksForListingObjects(const gd::Platform& platform_,
-                             const gd::ObjectsContainer& project_,
-                             const gd::ObjectsContainer& layout_,
-                             EventsContext& context_)
-      : platform(platform_),
-        project(project_),
-        layout(layout_),
-        context(context_){};
-  virtual ~CallbacksForListingObjects(){};
+  ExpressionObjectsAnalyzer(EventsContext& context_) : context(context_){};
+  virtual ~ExpressionObjectsAnalyzer(){};
 
-  virtual void OnConstantToken(gd::String text){};
-
-  virtual void OnStaticFunction(gd::String functionName,
-                                const std::vector<gd::Expression>& parameters,
-                                const gd::ExpressionMetadata& expressionInfo) {
-    for (std::size_t i = 0;
-         i < parameters.size() && i < expressionInfo.parameters.size();
-         ++i) {
-      EventsContextAnalyzer::AnalyzeParameter(platform,
-                                              project,
-                                              layout,
-                                              expressionInfo.parameters[i],
-                                              parameters[i],
-                                              context);
-    }
-  };
-
-  virtual void OnObjectFunction(gd::String functionName,
-                                const std::vector<gd::Expression>& parameters,
-                                const gd::ExpressionMetadata& expressionInfo) {
-    for (std::size_t i = 0;
-         i < parameters.size() && i < expressionInfo.parameters.size();
-         ++i) {
-      EventsContextAnalyzer::AnalyzeParameter(platform,
-                                              project,
-                                              layout,
-                                              expressionInfo.parameters[i],
-                                              parameters[i],
-                                              context);
-    }
-  };
-
-  virtual void OnObjectBehaviorFunction(
-      gd::String functionName,
-      const std::vector<gd::Expression>& parameters,
-      const gd::ExpressionMetadata& expressionInfo) {
-    for (std::size_t i = 0;
-         i < parameters.size() && i < expressionInfo.parameters.size();
-         ++i) {
-      EventsContextAnalyzer::AnalyzeParameter(platform,
-                                              project,
-                                              layout,
-                                              expressionInfo.parameters[i],
-                                              parameters[i],
-                                              context);
-    }
-  };
-
-  virtual bool OnSubMathExpression(const gd::Platform& platform,
-                                   const gd::ObjectsContainer& project,
-                                   const gd::ObjectsContainer& layout,
-                                   gd::Expression& expression) {
-    CallbacksForListingObjects callbacks(platform, project, layout, context);
-
-    gd::ExpressionParser parser(expression.GetPlainString());
-    parser.ParseMathExpression(platform, project, layout, callbacks);
-    return true;
+ protected:
+  void OnVisitSubExpressionNode(SubExpressionNode& node) override {
+    node.expression->Visit(*this);
   }
-
-  virtual bool OnSubTextExpression(const gd::Platform& platform,
-                                   const gd::ObjectsContainer& project,
-                                   const gd::ObjectsContainer& layout,
-                                   gd::Expression& expression) {
-    CallbacksForListingObjects callbacks(platform, project, layout, context);
-
-    gd::ExpressionParser parser(expression.GetPlainString());
-    parser.ParseStringExpression(platform, project, layout, callbacks);
-    return true;
+  void OnVisitOperatorNode(OperatorNode& node) override {
+    node.leftHandSide->Visit(*this);
+    node.rightHandSide->Visit(*this);
   }
+  void OnVisitNumberNode(NumberNode& node) override {}
+  void OnVisitTextNode(TextNode& node) override {}
+  void OnVisitVariableNode(VariableNode& node) override {
+    if (node.child) node.child->Visit(*this);
+  }
+  void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
+    if (node.child) node.child->Visit(*this);
+  }
+  void OnVisitVariableBracketAccessorNode(
+      VariableBracketAccessorNode& node) override {
+    node.expression->Visit(*this);
+    if (node.child) node.child->Visit(*this);
+  }
+  void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitFunctionNode(FunctionNode& node) override {
+    if (!node.objectName.empty()) {
+      context.AddObjectName(node.objectName);
+    }
+    // TODO: we're potentially missing objects that are asked in parameters
+    // of type "object", "objectPtr", "objectList".
+    for (auto& parameter : node.parameters) {
+      parameter->Visit(*this);
+    }
+  }
+  void OnVisitEmptyNode(EmptyNode& node) override {}
 
  private:
-  const gd::Platform& platform;
-  const gd::ObjectsContainer& project;
-  const gd::ObjectsContainer& layout;
   EventsContext& context;
 };
 
@@ -143,15 +105,17 @@ void EventsContextAnalyzer::AnalyzeParameter(
   if (ParameterMetadata::IsObject(type)) {
     context.AddObjectName(value);
   } else if (ParameterMetadata::IsExpression("number", type)) {
-    CallbacksForListingObjects callbacks(platform, project, layout, context);
+    gd::ExpressionParser2 parser(platform, project, layout);
+    auto node = parser.ParseExpression("number", value);
 
-    gd::ExpressionParser parser(value);
-    parser.ParseMathExpression(platform, project, layout, callbacks);
+    ExpressionObjectsAnalyzer analyzer(context);
+    node->Visit(analyzer);
   } else if (ParameterMetadata::IsExpression("string", type)) {
-    CallbacksForListingObjects callbacks(platform, project, layout, context);
+    gd::ExpressionParser2 parser(platform, project, layout);
+    auto node = parser.ParseExpression("string", value);
 
-    gd::ExpressionParser parser(value);
-    parser.ParseStringExpression(platform, project, layout, callbacks);
+    ExpressionObjectsAnalyzer analyzer(context);
+    node->Visit(analyzer);
   }
 }
 

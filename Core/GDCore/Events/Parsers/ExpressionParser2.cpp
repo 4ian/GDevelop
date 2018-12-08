@@ -23,12 +23,12 @@ using namespace std;
 namespace gd {
 
 gd::String ExpressionParser2::NUMBER_FIRST_CHAR = "+-.0123456789";
-
-// Underscore is allowed in identifiers.
-gd::String ExpressionParser2::IDENTIFIER_SEPARATOR_CHAR =
-    " +-/*().,\"[]{}<>?\\=";
-
-gd::String ExpressionParser2::OPERATORS = "+-/*";
+gd::String ExpressionParser2::DOT = ".";
+gd::String ExpressionParser2::PARAMETERS_SEPARATOR = ",";
+gd::String ExpressionParser2::QUOTE = "\"";
+gd::String ExpressionParser2::BRACKETS = "()[]{}";
+gd::String ExpressionParser2::OPERATORS = "+-/*<>?^=\\";
+gd::String ExpressionParser2::WHITESPACES = " \n\r";
 
 ExpressionParser2::ExpressionParser2(
     const gd::Platform& platform_,
@@ -73,27 +73,26 @@ size_t GetMaximumParametersNumber(
 }  // namespace
 
 std::unique_ptr<ExpressionParserDiagnostic> ExpressionParser2::ValidateFunction(
-    const gd::String& type,
-    const gd::ExpressionMetadata& metadata,
-    size_t initialParameterIndex,
-    const gd::String& functionFullName,
-    const std::vector<std::unique_ptr<ExpressionNode>>& parameters,
-    size_t functionStartPosition) {
-  if (gd::MetadataProvider::IsBadExpressionMetadata(metadata)) {
+    const gd::FunctionNode& function, size_t functionStartPosition) {
+  if (gd::MetadataProvider::IsBadExpressionMetadata(
+          function.expressionMetadata)) {
     return gd::make_unique<ExpressionParserError>(
         "invalid_function_name",
-        _("Cannot find an expression with this name: ") + functionFullName +
-            "\n" + _("Double check that you've not made any typo in the name."),
+        _("Cannot find an expression with this name: ") +
+            function.functionName + "\n" +
+            _("Double check that you've not made any typo in the name."),
         functionStartPosition,
         GetCurrentPosition());
   }
 
-  size_t minParametersCount =
-      GetMinimumParametersNumber(metadata.parameters, initialParameterIndex);
-  size_t maxParametersCount =
-      GetMaximumParametersNumber(metadata.parameters, initialParameterIndex);
-  if (parameters.size() < minParametersCount ||
-      parameters.size() > maxParametersCount) {
+  size_t minParametersCount = GetMinimumParametersNumber(
+      function.expressionMetadata.parameters,
+      WrittenParametersFirstIndex(function.objectName, function.behaviorName));
+  size_t maxParametersCount = GetMaximumParametersNumber(
+      function.expressionMetadata.parameters,
+      WrittenParametersFirstIndex(function.objectName, function.behaviorName));
+  if (function.parameters.size() < minParametersCount ||
+      function.parameters.size() > maxParametersCount) {
     gd::String expectedCountMessage =
         minParametersCount == maxParametersCount
             ? _("The number of parameters must be exactly ") +
@@ -102,7 +101,7 @@ std::unique_ptr<ExpressionParserDiagnostic> ExpressionParser2::ValidateFunction(
                   gd::String::From(minParametersCount) + "-" +
                   gd::String::From(maxParametersCount);
 
-    if (parameters.size() < minParametersCount) {
+    if (function.parameters.size() < minParametersCount) {
       return gd::make_unique<ExpressionParserError>(
           "too_few_parameters",
           "You have not entered enough parameters for the expression. " +

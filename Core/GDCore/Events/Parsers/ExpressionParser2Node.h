@@ -263,13 +263,14 @@ struct FunctionNode : public FunctionOrEmptyNode {
  * encountered and any other node could not make sense.
  */
 struct EmptyNode : public FunctionOrEmptyNode {
-  EmptyNode(const gd::String &type_) : type(type_){};
+  EmptyNode(const gd::String &type_, const gd::String & text_ = "") : type(type_),text(text_){};
   virtual ~EmptyNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitEmptyNode(*this);
   };
 
   gd::String type;
+  gd::String text;
 };
 
 }  // namespace gd

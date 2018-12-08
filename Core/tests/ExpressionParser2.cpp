@@ -134,11 +134,53 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors().size() == 2);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "You must add the operator + between texts or expressions. For "
               "example: \"Your name: \" + VariableString(PlayerName).");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 2);
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+              "A text must end with a double quote (\"). Add a double quote to "
+              "terminate the text.");
+    }
+  }
+
+  SECTION("Unterminated expressions/extra characters") {
+    {
+      auto node = parser.ParseExpression("string", "\"hello\",");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "The expression has extra character at the end that should be "
+              "removed (or completed if your expression is not finished).");
+    }
+    {
+      auto node = parser.ParseExpression("string", "\"hello\"]");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "The expression has extra character at the end that should be "
+              "removed (or completed if your expression is not finished).");
+    }
+    {
+      auto node = parser.ParseExpression("string", "Idontexist(\"hello\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 2);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "The list of parameters is not terminated. Add a closing "
+              "parenthesis to end the parameters.");
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+              "This parameter was not expected by this expression. Remove it "
+              "or verify that you've entered the proper expression name.");
     }
   }
 
@@ -151,9 +193,11 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 2);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "Missing a closing parenthesis. Add a closing parenthesis for each opening parenthesis.");
+              "Missing a closing parenthesis. Add a closing parenthesis for "
+              "each opening parenthesis.");
       REQUIRE(validator.GetErrors()[1]->GetMessage() ==
-              "Missing a closing parenthesis. Add a closing parenthesis for each opening parenthesis.");
+              "Missing a closing parenthesis. Add a closing parenthesis for "
+              "each opening parenthesis.");
     }
   }
 
@@ -274,7 +318,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
-      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors().size() == 2);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "No operator found. Did you forget to enter an operator (like +, "
               "-, * or /) between numbers or expressions?");

@@ -83,7 +83,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
                                                           context);
 
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "12.45 * 0 * 0");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "12.45 * 0");
     }
   }
 

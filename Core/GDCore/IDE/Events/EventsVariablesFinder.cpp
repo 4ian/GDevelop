@@ -7,7 +7,9 @@
 #include "EventsVariablesFinder.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/Events/Parsers/ExpressionParser.h"
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
+#include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
+#include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -20,86 +22,67 @@ using namespace std;
 
 namespace gd {
 
-// TODO: Replace and remove (ExpressionParameterSearcher)
-class CallbacksForSearchingVariable : public gd::ParserCallbacks {
+/**
+ * \brief Go through the nodes and change the given object name to a new one.
+ *
+ * \see gd::ExpressionParser2
+ */
+class GD_CORE_API ExpressionParameterSearcher
+    : public ExpressionParser2NodeWorker {
  public:
-  CallbacksForSearchingVariable(std::set<gd::String>& results_,
-                                const gd::String& parameterType_,
-                                const gd::String& objectName_ = "")
+  ExpressionParameterSearcher(std::set<gd::String>& results_,
+                              const gd::String& parameterType_,
+                              const gd::String& objectName_ = "")
       : results(results_),
         parameterType(parameterType_),
         objectName(objectName_){};
-  virtual ~CallbacksForSearchingVariable(){};
+  virtual ~ExpressionParameterSearcher(){};
 
-  virtual void OnConstantToken(gd::String text) {}
-
-  virtual void OnStaticFunction(gd::String functionName,
-                                const std::vector<gd::Expression>& parameters,
-                                const gd::ExpressionMetadata& expressionInfo) {
-    SearchInParameters(parameters, expressionInfo);
+ protected:
+  void OnVisitSubExpressionNode(SubExpressionNode& node) override {
+    node.expression->Visit(*this);
   }
-  virtual void OnObjectFunction(gd::String functionName,
-                                const std::vector<gd::Expression>& parameters,
-                                const gd::ExpressionMetadata& expressionInfo) {
-    SearchInParameters(parameters, expressionInfo);
+  void OnVisitOperatorNode(OperatorNode& node) override {
+    node.leftHandSide->Visit(*this);
+    node.rightHandSide->Visit(*this);
   }
-  virtual void OnObjectBehaviorFunction(
-      gd::String functionName,
-      const std::vector<gd::Expression>& parameters,
-      const gd::ExpressionMetadata& expressionInfo) {
-    SearchInParameters(parameters, expressionInfo);
+  void OnVisitNumberNode(NumberNode& node) override {}
+  void OnVisitTextNode(TextNode& node) override {}
+  void OnVisitVariableNode(VariableNode& node) override {
+    if (node.child) node.child->Visit(*this);
   }
-
-  virtual bool OnSubMathExpression(const gd::Platform& platform,
-                                   const gd::ObjectsContainer& project,
-                                   const gd::ObjectsContainer& layout,
-                                   gd::Expression& expression) {
-    CallbacksForSearchingVariable callbacks(results, parameterType, objectName);
-
-    gd::ExpressionParser parser(expression.GetPlainString());
-    parser.ParseMathExpression(platform, project, layout, callbacks);
-
-    return true;
+  void OnVisitVariableAccessorNode(VariableAccessorNode& node) override {
+    if (node.child) node.child->Visit(*this);
   }
-
-  virtual bool OnSubTextExpression(const gd::Platform& platform,
-                                   const gd::ObjectsContainer& project,
-                                   const gd::ObjectsContainer& layout,
-                                   gd::Expression& expression) {
-    CallbacksForSearchingVariable callbacks(results, parameterType, objectName);
-
-    gd::ExpressionParser parser(expression.GetPlainString());
-    parser.ParseStringExpression(platform, project, layout, callbacks);
-
-    return true;
+  void OnVisitVariableBracketAccessorNode(
+      VariableBracketAccessorNode& node) override {
+    node.expression->Visit(*this);
+    if (node.child) node.child->Visit(*this);
   }
-
-  void SearchInParameters(const std::vector<gd::Expression>& parameters,
-                          const gd::ExpressionMetadata& expressionInfo) {
-    gd::String lastObjectParameter = "";
-    for (std::size_t i = 0; i < parameters.size(); ++i) {
-      if (i >= expressionInfo.parameters.size()) break;
-
-      // The parameter has the searched type...
-      if (expressionInfo.parameters[i].type == parameterType) {
-        //...remember the value of the parameter.
-        if (objectName.empty() || objectName == lastObjectParameter)
-          results.insert(parameters[i].GetPlainString());
+  void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitFunctionNode(FunctionNode& node) override {
+    bool considerFunction = objectName.empty() || node.objectName == objectName;
+    for (size_t i = 0; i < node.parameters.size() &&
+                       i < node.expressionMetadata.parameters.size();
+         ++i) {
+      auto& parameterMetadata = node.expressionMetadata.parameters[i];
+      if (considerFunction && parameterMetadata.GetType() == parameterType) {
+        // Store the value of the parameter
+        results.insert(
+            gd::ExpressionParser2NodePrinter::PrintNode(*node.parameters[i]));
+      } else {
+        node.parameters[i]->Visit(*this);
       }
-      // Remember the value of the last "object" parameter.
-      else if (gd::ParameterMetadata::IsObject(
-                   expressionInfo.parameters[i].type))
-        lastObjectParameter = parameters[i].GetPlainString();
     }
   }
+  void OnVisitEmptyNode(EmptyNode& node) override {}
 
  private:
-  std::set<gd::String>& results;  ///< Reference to the std::set where arguments
+  std::set<gd::String>& results;  ///< Reference to the std::set where argument
                                   ///< values must be stored.
-  gd::String parameterType;  ///< The name of the parameter to be searched for
-  gd::String
-      objectName;  ///< If not empty, parameters will be taken into account only
-                   ///< if the last object parameter is filled with this value.
+  gd::String parameterType;  ///< The type of the parameters to be searched for.
+  gd::String objectName;     ///< If not empty, parameters will be taken into
+                             ///< account only if related to this object.
 };
 
 std::set<gd::String> EventsVariablesFinder::FindAllGlobalVariables(
@@ -175,22 +158,26 @@ std::set<gd::String> EventsVariablesFinder::FindArgumentsInInstructions(
           results.insert(instructions[aId].GetParameter(pNb).GetPlainString());
       }
       // Search in expressions
-      else if (ParameterMetadata::IsExpression("number", instrInfos.parameters[pNb].type)) {
-        CallbacksForSearchingVariable callbacks(
-            results, parameterType, objectName);
+      else if (ParameterMetadata::IsExpression(
+                   "number", instrInfos.parameters[pNb].type)) {
+        gd::ExpressionParser2 parser(platform, project, layout);
+        auto node = parser.ParseExpression(
+            "number", instructions[aId].GetParameter(pNb).GetPlainString());
 
-        gd::ExpressionParser parser(
-            instructions[aId].GetParameter(pNb).GetPlainString());
-        parser.ParseMathExpression(platform, project, layout, callbacks);
+        ExpressionParameterSearcher searcher(
+            results, parameterType, objectName);
+        node->Visit(searcher);
       }
       // Search in gd::String expressions
-      else if (ParameterMetadata::IsExpression("string", instrInfos.parameters[pNb].type)) {
-        CallbacksForSearchingVariable callbacks(
-            results, parameterType, objectName);
+      else if (ParameterMetadata::IsExpression(
+                   "string", instrInfos.parameters[pNb].type)) {
+        gd::ExpressionParser2 parser(platform, project, layout);
+        auto node = parser.ParseExpression(
+            "number", instructions[aId].GetParameter(pNb).GetPlainString());
 
-        gd::ExpressionParser parser(
-            instructions[aId].GetParameter(pNb).GetPlainString());
-        parser.ParseStringExpression(platform, project, layout, callbacks);
+        ExpressionParameterSearcher searcher(
+            results, parameterType, objectName);
+        node->Visit(searcher);
       }
       // Remember the value of the last "object" parameter.
       else if (gd::ParameterMetadata::IsObject(

@@ -71,7 +71,7 @@ class GD_CORE_API ExpressionParser2 {
       op->rightHandSide->diagnostic = RaiseSyntaxError(
           _("The expression has extra character at the end that should be "
             "removed (or completed if your expression is not finished)."));
-      return op;
+      return std::move(op);
     }
 
     return expression;

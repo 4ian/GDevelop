@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <vector>
+#include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/String.h"
@@ -36,6 +37,16 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
       : codeGenerator(codeGenerator_), context(context_){};
   virtual ~ExpressionCodeGenerator(){};
 
+  /**
+   * Helper to generate the code for an expression.
+   * If expression is invalid, a default generated value is returned (0 for
+   * number expression, empty string for strings).
+   */
+  static gd::String GenerateExpressionCode(EventsCodeGenerator& codeGenerator,
+                                           EventsCodeGenerationContext& context,
+                                           const gd::String& type,
+                                           const gd::String& expression);
+
   const gd::String& GetOutput() { return output; };
 
  protected:
@@ -53,24 +64,24 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
 
  private:
   gd::String GenerateFreeFunctionCode(
-      const std::vector<std::unique_ptr<ExpressionNode>> & parameters,
+      const std::vector<std::unique_ptr<ExpressionNode>>& parameters,
       const ExpressionMetadata& expressionMetadata);
   gd::String GenerateObjectFunctionCode(
       const gd::String& type,
       const gd::String& objectName,
-      const std::vector<std::unique_ptr<ExpressionNode>> & parameters,
+      const std::vector<std::unique_ptr<ExpressionNode>>& parameters,
       const ExpressionMetadata& expressionMetadata);
   gd::String GenerateBehaviorFunctionCode(
       const gd::String& type,
       const gd::String& objectName,
       const gd::String& behaviorName,
-      const std::vector<std::unique_ptr<ExpressionNode>> & parameters,
+      const std::vector<std::unique_ptr<ExpressionNode>>& parameters,
       const ExpressionMetadata& expressionMetadata);
   gd::String GenerateParametersCodes(
-      const std::vector<std::unique_ptr<ExpressionNode>> & parameters,
+      const std::vector<std::unique_ptr<ExpressionNode>>& parameters,
       const ExpressionMetadata& expressionMetadata,
       size_t initialParameterIndex);
-  gd::String GenerateDefaultValue(const gd::String & type);
+  static gd::String GenerateDefaultValue(const gd::String& type);
 
   gd::String output;
   EventsCodeGenerator& codeGenerator;

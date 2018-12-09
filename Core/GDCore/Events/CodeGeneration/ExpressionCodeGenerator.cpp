@@ -19,9 +19,34 @@
 #include "GDCore/Extensions/Metadata/ObjectMetadata.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
+#include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 namespace gd {
+
+gd::String ExpressionCodeGenerator::GenerateExpressionCode(
+    EventsCodeGenerator& codeGenerator,
+    EventsCodeGenerationContext& context,
+    const gd::String& type,
+    const gd::String& expression) {
+  gd::ExpressionParser2 parser(codeGenerator.GetPlatform(),
+                               codeGenerator.GetGlobalObjectsAndGroups(),
+                               codeGenerator.GetObjectsAndGroups());
+  auto node = parser.ParseExpression(type, expression);
+  gd::ExpressionValidator validator;
+  node->Visit(validator);
+  if (!validator.GetErrors().empty()) {
+    std::cout << "Error: " << validator.GetErrors()[0]->GetMessage()
+              << " in: " << expression << std::endl;
+
+    return GenerateDefaultValue(type);
+  }
+
+  ExpressionCodeGenerator generator(codeGenerator, context);
+  node->Visit(generator);
+
+  return generator.GetOutput();
+}
 
 void ExpressionCodeGenerator::OnVisitOperatorNode(OperatorNode& node) {
   node.leftHandSide->Visit(*this);
@@ -254,10 +279,13 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
         parameters[nonCodeOnlyParameterIndex]->Visit(generator);
         parametersCode += generator.GetOutput();
       } else if (parameterMetadata.IsOptional()) {
-        // Optional parameters default value were not parsed at the time of the expression parsing.
-        // Parse them now.
-        ExpressionParser2 parser(codeGenerator.GetPlatform(), codeGenerator.GetGlobalObjectsAndGroups(), codeGenerator.GetObjectsAndGroups());
-        auto node = parser.ParseExpression(parameterMetadata.GetType(), parameterMetadata.GetDefaultValue());
+        // Optional parameters default value were not parsed at the time of the
+        // expression parsing. Parse them now.
+        ExpressionParser2 parser(codeGenerator.GetPlatform(),
+                                 codeGenerator.GetGlobalObjectsAndGroups(),
+                                 codeGenerator.GetObjectsAndGroups());
+        auto node = parser.ParseExpression(parameterMetadata.GetType(),
+                                           parameterMetadata.GetDefaultValue());
 
         node->Visit(generator);
         parametersCode += generator.GetOutput();

@@ -1,6 +1,6 @@
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
-import { createOrUpdateResource } from './ResourceUtils.js';
+import { createOrUpdateResource, getLocalResourceFullPath } from './ResourceUtils.js';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -19,14 +19,8 @@ export const openJfxr = ({
   extraOptions,
 }: ExternalEditorOpenOptions) => {
   if (!electron || !ipcRenderer) return;
-  const projectPath = path.dirname(project.getProjectFile());
-
-  let initialResourcePath = '';
-  initialResourcePath = resourcesLoader.getFullUrl(project, resourceNames[0]);
-  initialResourcePath = initialResourcePath.substring(
-    7,
-    initialResourcePath.lastIndexOf('?cache=')
-  );
+  const projectPath = path.dirname(project.getProjectFile(project, resourceNames[0]));
+  const initialResourcePath = getLocalResourceFullPath();
 
   const externalEditorData = {
     resourcePath: initialResourcePath,

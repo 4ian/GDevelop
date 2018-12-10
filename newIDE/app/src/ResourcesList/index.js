@@ -7,11 +7,13 @@ import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { createOrUpdateResource } from './ResourceUtils.js';
+import { createOrUpdateResource, getLocalResourceFullPath } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
 
 const path = optionalRequire('path');
 const glob = optionalRequire('glob');
+const electron = optionalRequire('electron');
+const hasElectron = electron ? true : false;
 
 const IMAGE_EXTENSIONS = 'png,jpg,jpeg,PNG,JPG,JPEG';
 const AUDIO_EXTENSIONS = 'wav,mp3,ogg,WAV,MP3,OGG';
@@ -85,6 +87,21 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
+  _locateResourceFile = (resource: gdResource) => {
+    const resourceFolderPath = path.dirname(getLocalResourceFullPath(this.props.project, resource.getFile()));
+    electron.shell.openItem(resourceFolderPath);
+  };
+
+  _openResourceFile = (resource: gdResource) => {
+    const resourceFilePath = getLocalResourceFullPath(this.props.project, resource.getFile());
+    electron.shell.openItem(resourceFilePath);
+  };
+
+  _copyResourceFilePath = (resource: gdResource) => {
+    const resourceFilePath = getLocalResourceFullPath(this.props.project, resource.getFile());
+    electron.clipboard.writeText(resourceFilePath);
+  };
+  
   _scanForNewResources = (extensions: string, createResource: () => gdResource) => {
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
@@ -174,22 +191,41 @@ export default class ResourcesList extends React.Component<Props, State> {
       },
       { type: 'separator' },
       {
+        label: 'Open File',
+        click: () => this._openResourceFile(resource),
+        enabled: hasElectron,
+      },
+      {
+        label: 'Locate File',
+        click: () => this._locateResourceFile(resource),
+        enabled: hasElectron,
+      },
+      {
+        label: 'Copy File Path',
+        click: () => this._copyResourceFilePath(resource),
+        enabled: hasElectron,
+      },
+      { type: 'separator' },
+      {
         label: 'Scan for Images',
         click: () => {
           this._scanForNewResources(IMAGE_EXTENSIONS, () => new gd.ImageResource());
         },
+        enabled: hasElectron,
       },
       {
         label: 'Scan for Audio',
         click: () => {
           this._scanForNewResources(AUDIO_EXTENSIONS, () => new gd.AudioResource());
         },
+        enabled: hasElectron,
       },
       {
         label: 'Scan for Fonts',
         click: () => {
           this._scanForNewResources(FONT_EXTENSIONS, () => new gd.FontResource());
         },
+        enabled: hasElectron,
       },
       { type: 'separator' },
       {

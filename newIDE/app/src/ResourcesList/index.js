@@ -7,11 +7,12 @@ import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { createOrUpdateResource } from './ResourceUtils.js';
+import { createOrUpdateResource, getLocalResourceFullPath } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
 
 const path = optionalRequire('path');
 const glob = optionalRequire('glob');
+const { shell, clipboard } = optionalRequire('electron')
 
 const IMAGE_EXTENSIONS = 'png,jpg,jpeg,PNG,JPG,JPEG';
 const AUDIO_EXTENSIONS = 'wav,mp3,ogg,WAV,MP3,OGG';
@@ -85,6 +86,21 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
+  _locateResourceFile = (resource: gdResource) => {
+    const resourceFolderPath = path.dirname(getLocalResourceFullPath(this.props.project, resource.getFile()));
+    shell.openItem(resourceFolderPath);
+  };
+
+  _openResourceFile = (resource: gdResource) => {
+    const resourceFilePath = getLocalResourceFullPath(this.props.project, resource.getFile());
+    shell.openItem(resourceFilePath);
+  };
+
+  _copyResourceFilePath = (resource: gdResource) => {
+    const resourceFilePath = getLocalResourceFullPath(this.props.project, resource.getFile());
+    clipboard.writeText(resourceFilePath);
+  };
+  
   _scanForNewResources = (extensions: string, createResource: () => gdResource) => {
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
@@ -171,6 +187,19 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: 'Remove',
         click: () => this._deleteResource(resource),
+      },
+      { type: 'separator' },
+      {
+        label: 'Open File',
+        click: () => this._openResourceFile(resource),
+      },
+      {
+        label: 'Locate File',
+        click: () => this._locateResourceFile(resource),
+      },
+      {
+        label: 'Copy File Path',
+        click: () => this._copyResourceFilePath(resource),
       },
       { type: 'separator' },
       {

@@ -1,7 +1,7 @@
 // @flow
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
-import { createOrUpdateResource } from './ResourceUtils.js';
+import { createOrUpdateResource, getLocalResourceFullPath } from './ResourceUtils.js';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -22,17 +22,8 @@ export const openPiskel = ({
 }: ExternalEditorOpenOptions) => {
   if (!electron || !ipcRenderer) return;
 
-  const resources = resourceNames.map((resourceName, originalIndex) => {
-    let resourcePath = resourcesLoader.getResourceFullUrl(
-      project,
-      resourceName
-    );
-
-    //TODO: check if this is necessary or if resourcesLoader should be updated.
-    resourcePath = resourcePath.substring(
-      7,
-      resourcePath.lastIndexOf('?cache=')
-    );
+  const resources = resourceNames.map((resourceName, originalIndex) => { 
+    let resourcePath = getLocalResourceFullPath(project, resourceName);
     return {
       resourcePath,
       resourceName,

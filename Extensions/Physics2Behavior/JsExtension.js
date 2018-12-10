@@ -15,8 +15,8 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       "Physics2",
-      "Physics2 behavior (beta)",
-      "Simulate physics, the successor of the old physics behavior",
+      "Physics2 behavior",
+      "Simulate physics",
       "Florian Rival, Franco Maciel",
       "MIT"
     );

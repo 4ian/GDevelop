@@ -12,7 +12,8 @@ import { type ResourceKind } from './ResourceSource.flow';
 
 const path = optionalRequire('path');
 const glob = optionalRequire('glob');
-const { shell, clipboard } = optionalRequire('electron')
+const electron = optionalRequire('electron');
+const hasElectron = electron ? true : false;
 
 const IMAGE_EXTENSIONS = 'png,jpg,jpeg,PNG,JPG,JPEG';
 const AUDIO_EXTENSIONS = 'wav,mp3,ogg,WAV,MP3,OGG';
@@ -88,17 +89,17 @@ export default class ResourcesList extends React.Component<Props, State> {
 
   _locateResourceFile = (resource: gdResource) => {
     const resourceFolderPath = path.dirname(getLocalResourceFullPath(this.props.project, resource.getFile()));
-    shell.openItem(resourceFolderPath);
+    electron.shell.openItem(resourceFolderPath);
   };
 
   _openResourceFile = (resource: gdResource) => {
     const resourceFilePath = getLocalResourceFullPath(this.props.project, resource.getFile());
-    shell.openItem(resourceFilePath);
+    electron.shell.openItem(resourceFilePath);
   };
 
   _copyResourceFilePath = (resource: gdResource) => {
     const resourceFilePath = getLocalResourceFullPath(this.props.project, resource.getFile());
-    clipboard.writeText(resourceFilePath);
+    electron.clipboard.writeText(resourceFilePath);
   };
   
   _scanForNewResources = (extensions: string, createResource: () => gdResource) => {
@@ -192,14 +193,17 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: 'Open File',
         click: () => this._openResourceFile(resource),
+        enabled: hasElectron,
       },
       {
         label: 'Locate File',
         click: () => this._locateResourceFile(resource),
+        enabled: hasElectron,
       },
       {
         label: 'Copy File Path',
         click: () => this._copyResourceFilePath(resource),
+        enabled: hasElectron,
       },
       { type: 'separator' },
       {
@@ -207,18 +211,21 @@ export default class ResourcesList extends React.Component<Props, State> {
         click: () => {
           this._scanForNewResources(IMAGE_EXTENSIONS, () => new gd.ImageResource());
         },
+        enabled: hasElectron,
       },
       {
         label: 'Scan for Audio',
         click: () => {
           this._scanForNewResources(AUDIO_EXTENSIONS, () => new gd.AudioResource());
         },
+        enabled: hasElectron,
       },
       {
         label: 'Scan for Fonts',
         click: () => {
           this._scanForNewResources(FONT_EXTENSIONS, () => new gd.FontResource());
         },
+        enabled: hasElectron,
       },
       { type: 'separator' },
       {

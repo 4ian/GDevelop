@@ -336,6 +336,63 @@ module.exports = {
       }
     ]
   },
+  "bouncing-ball-and-rope": {
+    "description": "Simulate a bouncing ball with ropes that can be created to move the ball around anchors.",
+    "usedExtensions": [
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Primitive drawing",
+        "name": "PrimitiveDrawing"
+      },
+      {
+        "fullName": "Panel Sprite (9-patch) Object",
+        "name": "PanelSpriteObject"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Physics behavior",
+        "name": "PhysicsBehavior"
+      },
+      {
+        "fullName": "Advanced control features",
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Linked objects",
+        "name": "LinkedObjects"
+      }
+    ]
+  },
   "breakout": {
     "description": "The classic Breakout arcade game adapted in GDevelop.",
     "usedExtensions": [
@@ -2011,6 +2068,39 @@ module.exports = {
       {
         "fullName": "Linked objects",
         "name": "LinkedObjects"
+      }
+    ]
+  },
+  "plane-and-clouds": {
+    "description": "Show how to randomly generate clouds to create an infinite sky.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
       }
     ]
   },

@@ -6,6 +6,7 @@ import basicAiWithPathfinding from '../fixtures/basic-ai-with-pathfinding/basic-
 import basicArtificialIntelligence from '../fixtures/basic-artificial-intelligence/basic-artificial-intelligence.json';
 import basicTopdownCarDriving from '../fixtures/basic-topdown-car-driving/basic-topdown-car-driving.json';
 import bombTheCrate from '../fixtures/bomb-the-crate/bomb-the-crate.json';
+import bouncingBallAndRope from '../fixtures/bouncing-ball-and-rope/bouncing-ball-and-rope.json';
 import breakout from '../fixtures/breakout/breakout.json';
 import buttons from '../fixtures/buttons/buttons.json';
 import carPhysics from '../fixtures/car-physics/car-physics.json';
@@ -60,6 +61,7 @@ import pathfindingBasics from '../fixtures/pathfinding-basics/pathfinding-basics
 import physics from '../fixtures/physics/physics.json';
 import pinObjectToAnother from '../fixtures/pin-object-to-another/pin-object-to-another.json';
 import pinObjectToAnotherMultipleParents from '../fixtures/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json';
+import planeAndClouds from '../fixtures/plane-and-clouds/plane-and-clouds.json';
 import platformer from '../fixtures/platformer/platformer.json';
 import platformerDoubleJump from '../fixtures/platformer-double-jump/platformer-double-jump.json';
 import playMusicOnMobile from '../fixtures/play-music-on-mobile/play-music-on-mobile.json';
@@ -105,6 +107,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(basicTopdownCarDriving);
     } else if (url === 'example://bomb-the-crate') {
       return Promise.resolve(bombTheCrate);
+    } else if (url === 'example://bouncing-ball-and-rope') {
+      return Promise.resolve(bouncingBallAndRope);
     } else if (url === 'example://breakout') {
       return Promise.resolve(breakout);
     } else if (url === 'example://buttons') {
@@ -115,6 +119,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(pinObjectToAnother);
     } else if (url === 'example://pin-object-to-another-multiple-parents') {
       return Promise.resolve(pinObjectToAnotherMultipleParents);
+    } else if (url === 'example://plane-and-clouds') {
+      return Promise.resolve(planeAndClouds);
     } else if (url === 'example://center-object-within-another') {
       return Promise.resolve(centerObjectWithinAnother);
     } else if (url === 'example://change-position-of-object') {

@@ -366,13 +366,13 @@ if (typeof FBInstant === "undefined" && typeof window !== "undefined") {
 
   // Retrieve the name of the supported APIs in our mock.
   for (var property in FBInstantMock) {
-    if (typeof property == "object") {
+    if (typeof FBInstantMock[property] == "object") {
       for (var subProperty in FBInstantMock[property]) {
         if (typeof FBInstantMock[property][subProperty] == "function") {
           supportedAPIs.push(property + "." + subProperty);
         }
       }
-    } else if (typeof property == "function") {
+    } else if (typeof FBInstantMock[property] == "function") {
       supportedAPIs.push(property);
     }
   }

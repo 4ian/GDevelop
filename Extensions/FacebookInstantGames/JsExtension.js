@@ -185,6 +185,22 @@ module.exports = {
 
     extension
       .addCondition(
+        "AreAdsSupported",
+        t("Check if ads are supported"),
+        t("Check if showind ads is supported on this device (only mobile phones can show ads)"),
+        t("Ads can be shown on this device"),
+        t("Facebook Instant Games/Ads"),
+        "JsPlatform/Extensions/facebookicon24.png",
+        "JsPlatform/Extensions/facebookicon16.png"
+      )
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/FacebookInstantGames/facebookinstantgamestools.js"
+      )
+      .setFunctionName("gdjs.evtTools.facebookInstantGames.areAdsSupported");
+
+    extension
+      .addCondition(
         "IsInterstitialAdReady",
         t("Is the interstitial ad ready"),
         t("Check if the interstitial ad requested from Facebook is loaded and ready to be shown."),

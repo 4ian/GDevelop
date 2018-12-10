@@ -17,7 +17,7 @@ class ObjectMetadata;
 class BehaviorMetadata;
 class InstructionMetadata;
 class ExpressionCodeGenerationInformation;
-}
+}  // namespace gd
 
 class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
   friend class VariableCodeGenerationCallbacks;
@@ -64,8 +64,8 @@ class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GetCodeNamespaceAccessor() { return ""; };
 
   /**
-   * \brief Get the namespace to be used to store code generated objects/values/functions.
-   * \note This is unused for C++ code generation.
+   * \brief Get the namespace to be used to store code generated
+   * objects/values/functions. \note This is unused for C++ code generation.
    */
   virtual gd::String GetCodeNamespace() { return ""; };
 
@@ -128,6 +128,25 @@ class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context);
+
+  virtual gd::String GenerateGetVariable(
+      gd::String variableName,
+      const VariableScope& scope,
+      gd::EventsCodeGenerationContext& context,
+      gd::String objectName);
+
+  virtual gd::String GenerateVariableAccessor(gd::String childName) {
+    return ".GetChild(" + ConvertToStringExplicit(childName) + ")";
+  };
+
+  virtual gd::String GenerateVariableBracketAccessor(
+      gd::String expressionCode) {
+    return ".GetChild(" + expressionCode + ")";
+  };
+
+  virtual gd::String GenerateBadVariable() {
+    return "runtimeContext->GetGameVariables().GetBadVariable()";
+  }
 
   /**
    * \brief Construct a code generator for the specified project and layout.

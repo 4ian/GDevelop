@@ -11,6 +11,7 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Parsers/ExpressionParser2.h"
 #include "GDCore/Events/Parsers/ExpressionParser2Node.h"
+#include "GDCore/Events/Parsers/ExpressionParser2NodePrinter.h"
 #include "GDCore/Events/Parsers/ExpressionParser2NodeWorker.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Extensions/Metadata/BehaviorMetadata.h"
@@ -22,22 +23,128 @@
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
+
+// Compatibility with old ExpressionParser
+#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/CodeGeneration/VariableParserCallbacks.h"
+#include "GDCore/Events/Parsers/ExpressionParser.h"
+#include "GDCore/Events/Parsers/VariableParser.h"
+// end of compatibility code
+
 namespace gd {
+
+bool ExpressionCodeGenerator::useOldExpressionParser = false;
 
 gd::String ExpressionCodeGenerator::GenerateExpressionCode(
     EventsCodeGenerator& codeGenerator,
     EventsCodeGenerationContext& context,
     const gd::String& type,
-    const gd::String& expression) {
+    const gd::String& expression,
+    const gd::String& objectName) {
+  // Compatibility with old ExpressionParser
+  if (useOldExpressionParser) {
+    if (type == "number") {
+      gd::String code = "";
+      gd::CallbacksForGeneratingExpressionCode callbacks(
+          code, codeGenerator, context);
+      gd::ExpressionParser parser(expression);
+      if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
+                                      codeGenerator.GetGlobalObjectsAndGroups(),
+                                      codeGenerator.GetObjectsAndGroups(),
+                                      callbacks) ||
+          code.empty()) {
+        std::cout << "Error (old ExpressionParser): \""
+                  << parser.GetFirstError() << "\" in: \"" << expression
+                  << "\" (number)" << std::endl;
+        code = "0";
+      }
+
+      return code;
+    } else if (type == "string") {
+      gd::String code = "";
+      gd::CallbacksForGeneratingExpressionCode callbacks(
+          code, codeGenerator, context);
+      gd::ExpressionParser parser(expression);
+      if (!parser.ParseStringExpression(
+              codeGenerator.GetPlatform(),
+              codeGenerator.GetGlobalObjectsAndGroups(),
+              codeGenerator.GetObjectsAndGroups(),
+              callbacks) ||
+          code.empty()) {
+        std::cout << "Error (old ExpressionParser): \""
+                  << parser.GetFirstError() << "\" in: \"" << expression
+                  << "\" (string)" << std::endl;
+        code = "\"\"";
+      }
+
+      return code;
+    } else if (type == "scenevar") {
+      gd::String code = "";
+      gd::VariableCodeGenerationCallbacks callbacks(
+          code,
+          codeGenerator,
+          context,
+          gd::EventsCodeGenerator::LAYOUT_VARIABLE);
+
+      gd::VariableParser parser(expression);
+      if (!parser.Parse(callbacks)) {
+        std::cout << "Error (old VariableParser) :" << parser.GetFirstError()
+                  << " in: " << expression << std::endl;
+        code = codeGenerator.GenerateBadVariable();
+      }
+      return code;
+    } else if (type == "globalvar") {
+      gd::String code = "";
+      gd::VariableCodeGenerationCallbacks callbacks(
+          code,
+          codeGenerator,
+          context,
+          gd::EventsCodeGenerator::PROJECT_VARIABLE);
+
+      gd::VariableParser parser(expression);
+      if (!parser.Parse(callbacks)) {
+        std::cout << "Error (old VariableParser) :" << parser.GetFirstError()
+                  << " in: " << expression << std::endl;
+        code = codeGenerator.GenerateBadVariable();
+      }
+      return code;
+    } else if (type == "objectvar") {
+      gd::String code = "";
+
+      // Object is either the object of the previous parameter or, if it is
+      // empty, the object being picked by the instruction.
+      gd::String object =
+          objectName.empty() ? context.GetCurrentObject() : objectName;
+
+      gd::VariableCodeGenerationCallbacks callbacks(
+          code, codeGenerator, context, object);
+
+      gd::VariableParser parser(expression);
+      if (!parser.Parse(callbacks)) {
+        std::cout << "Error (old VariableParser) :" << parser.GetFirstError()
+                  << " in: " << expression << std::endl;
+        code = codeGenerator.GenerateBadVariable();
+      }
+      return code;
+    }
+
+    std::cout << "Type error (old ExpressionParser): type \"" << type
+              << "\" is not supported" << std::endl;
+    return "/* Error during code generation: type " + type +
+           " is not supported for old ExpressionParser. */ 0";
+  }
+  // end of compatibility code
+
   gd::ExpressionParser2 parser(codeGenerator.GetPlatform(),
                                codeGenerator.GetGlobalObjectsAndGroups(),
                                codeGenerator.GetObjectsAndGroups());
-  auto node = parser.ParseExpression(type, expression);
+  auto node = parser.ParseExpression(type, expression, objectName);
   gd::ExpressionValidator validator;
   node->Visit(validator);
   if (!validator.GetErrors().empty()) {
-    std::cout << "Error: " << validator.GetErrors()[0]->GetMessage()
-              << " in: " << expression << std::endl;
+    std::cout << "Error: \"" << validator.GetErrors()[0]->GetMessage()
+              << "\" in: \"" << expression << "\" (" << type << ")"
+              << std::endl;
 
     return GenerateDefaultValue(type);
   }
@@ -81,8 +188,8 @@ void ExpressionCodeGenerator::OnVisitVariableNode(VariableNode& node) {
                  ? gd::EventsCodeGenerator::LAYOUT_VARIABLE
                  : gd::EventsCodeGenerator::OBJECT_VARIABLE);
 
-  output +=
-      codeGenerator.GenerateGetVariable(node.name, scope, node.objectName);
+  output += codeGenerator.GenerateGetVariable(
+      node.name, scope, context, node.objectName);
   if (node.child) node.child->Visit(*this);
 }
 
@@ -137,12 +244,10 @@ gd::String ExpressionCodeGenerator::GenerateFreeFunctionCode(
       expressionMetadata.codeExtraInformation.GetIncludeFiles());
 
   // Launch custom code generator if needed
-  // TODO: Add support for custom code generator
-  // if (expressionMetadata.codeExtraInformation.HasCustomCodeGenerator()) {
-  //   output += expressionMetadata.codeExtraInformation.customCodeGenerator(
-  //       parameters, codeGenerator, context);
-  //   return;
-  // }
+  if (expressionMetadata.codeExtraInformation.HasCustomCodeGenerator()) {
+    return expressionMetadata.codeExtraInformation.customCodeGenerator(
+        PrintParameters(parameters), codeGenerator, context);
+  }
 
   gd::String parametersCode =
       GenerateParametersCodes(parameters, expressionMetadata, 0);
@@ -165,12 +270,10 @@ gd::String ExpressionCodeGenerator::GenerateObjectFunctionCode(
       expressionMetadata.codeExtraInformation.GetIncludeFiles());
 
   // Launch custom code generator if needed
-  // TODO: Add support for custom code generator
-  // if (expressionMetadata.codeExtraInformation.HasCustomCodeGenerator()) {
-  //   output += expressionMetadata.codeExtraInformation.customCodeGenerator(
-  //       parameters, codeGenerator, context);
-  //   return;
-  // }
+  if (expressionMetadata.codeExtraInformation.HasCustomCodeGenerator()) {
+    return expressionMetadata.codeExtraInformation.customCodeGenerator(
+        PrintParameters(parameters), codeGenerator, context);
+  }
 
   // Prepare parameters
   gd::String parametersCode = GenerateParametersCodes(
@@ -219,12 +322,10 @@ gd::String ExpressionCodeGenerator::GenerateBehaviorFunctionCode(
       expressionMetadata.codeExtraInformation.GetIncludeFiles());
 
   // Launch custom code generator if needed
-  // TODO: Add support for custom code generator
-  // if (expressionMetadata.codeExtraInformation.HasCustomCodeGenerator()) {
-  //   output += expressionMetadata.codeExtraInformation.customCodeGenerator(
-  //       parameters, codeGenerator, context);
-  //   return;
-  // }
+  if (expressionMetadata.codeExtraInformation.HasCustomCodeGenerator()) {
+    return expressionMetadata.codeExtraInformation.customCodeGenerator(
+        PrintParameters(parameters), codeGenerator, context);
+  }
 
   // Prepare parameters
   gd::String parametersCode = GenerateParametersCodes(
@@ -308,6 +409,23 @@ gd::String ExpressionCodeGenerator::GenerateParametersCodes(
   }
 
   return parametersCode;
+}
+
+std::vector<gd::Expression> ExpressionCodeGenerator::PrintParameters(
+    const std::vector<std::unique_ptr<ExpressionNode>>& parameters) {
+  // Printing parameters is only useful because custom code generator of
+  // expression require to get the parameters of the expression as strings
+  // (gd::Expression). Once the old ExpressionParser is removed, custom
+  // code generator can be reworked to directly take the parsed nodes,
+  // avoiding an extra and useless printing/parsing of their parameters.
+
+  std::vector<gd::Expression> printedParameters;
+  for (auto& parameter : parameters) {
+    printedParameters.push_back(
+        gd::ExpressionParser2NodePrinter::PrintNode(*parameter));
+  }
+
+  return printedParameters;
 }
 
 gd::String ExpressionCodeGenerator::GenerateDefaultValue(

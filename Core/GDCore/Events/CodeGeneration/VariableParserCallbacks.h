@@ -10,13 +10,14 @@
 #include <string>
 #include <vector>
 #include "GDCore/Events/Parsers/VariableParser.h"
-#include "GDCpp/Runtime/String.h"
+#include "GDCore/String.h"
+#include "EventsCodeGenerator.h"
 namespace gd {
-class EventsCodeGenerator;
 class EventsCodeGenerationContext;
 }  // namespace gd
 
 // TODO: Replace and remove (ExpressionCodeGenerator)
+namespace gd {
 
 /**
  * \brief Callbacks called to generate the code for getting a variable.
@@ -38,8 +39,6 @@ class EventsCodeGenerationContext;
  */
 class VariableCodeGenerationCallbacks : public gd::VariableParserCallbacks {
  public:
-  enum VariableScope { LAYOUT_VARIABLE = 0, PROJECT_VARIABLE, OBJECT_VARIABLE };
-
   /**
    * \brief Default constructor for generating code for a layout/global
    * variable. \param output The string in which the code will be generated.
@@ -51,7 +50,7 @@ class VariableCodeGenerationCallbacks : public gd::VariableParserCallbacks {
   VariableCodeGenerationCallbacks(gd::String& output,
                                   gd::EventsCodeGenerator& codeGenerator_,
                                   gd::EventsCodeGenerationContext& context_,
-                                  const VariableScope& scope_);
+                                  const gd::EventsCodeGenerator::VariableScope& scope_);
   /**
 
    * \brief Default constructor for generating code for an object variable.
@@ -88,9 +87,11 @@ class VariableCodeGenerationCallbacks : public gd::VariableParserCallbacks {
   gd::String& output;
   gd::EventsCodeGenerator& codeGenerator;
   gd::EventsCodeGenerationContext& context;
-  VariableScope scope;
+  gd::EventsCodeGenerator::VariableScope scope;
   const gd::String object;  ///< The object name, when scope == OBJECT_VARIABLE.
 };
+
+}
 
 #endif  // VARIABLEPARSERCALLBACKS_H
 #endif

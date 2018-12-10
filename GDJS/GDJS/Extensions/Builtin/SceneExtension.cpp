@@ -6,7 +6,7 @@
 #include "SceneExtension.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
@@ -43,35 +43,19 @@ SceneExtension::SceneExtension() {
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
-        gd::String value1Code;
-        {
-          gd::CallbacksForGeneratingExpressionCode callbacks(
-              value1Code, codeGenerator, context);
-          gd::ExpressionParser parser(
-              instruction.GetParameters()[0].GetPlainString());
-          if (!parser.ParseMathExpression(
-                  codeGenerator.GetPlatform(),
-                  codeGenerator.GetGlobalObjectsAndGroups(),
-                  codeGenerator.GetObjectsAndGroups(),
-                  callbacks) ||
-              value1Code.empty())
-            value1Code = "0";
-        }
+        gd::String value1Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                instruction.GetParameters()[0].GetPlainString());
 
-        gd::String value2Code;
-        {
-          gd::CallbacksForGeneratingExpressionCode callbacks(
-              value2Code, codeGenerator, context);
-          gd::ExpressionParser parser(
-              instruction.GetParameters()[2].GetPlainString());
-          if (!parser.ParseMathExpression(
-                  codeGenerator.GetPlatform(),
-                  codeGenerator.GetGlobalObjectsAndGroups(),
-                  codeGenerator.GetObjectsAndGroups(),
-                  callbacks) ||
-              value2Code.empty())
-            value2Code = "0";
-        }
+        gd::String value2Code =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                instruction.GetParameters()[2].GetPlainString());
 
         gd::String resultingBoolean =
             codeGenerator.GenerateBooleanFullName("conditionTrue", context) +

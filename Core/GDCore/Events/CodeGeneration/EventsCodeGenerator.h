@@ -1,3 +1,8 @@
+/*
+ * GDevelop Core
+ * Copyright 2008-present Florian Rival (Florian.Rival@gmail.com). All rights
+ * reserved. This project is released under the MIT License.
+ */
 #ifndef GDCORE_EVENTSCODEGENERATOR_H
 #define GDCORE_EVENTSCODEGENERATOR_H
 
@@ -28,12 +33,12 @@ namespace gd {
 
 /**
  * \brief Internal class used to generate code from events
- * \todo For now, this class generates only C++ code for GD C++ Platform.
- *
- * \see CallbacksForGeneratingExpressionCode
  */
 class GD_CORE_API EventsCodeGenerator {
+  // Compatiblity with old ExpressionParser
   friend class CallbacksForGeneratingExpressionCode;
+  friend class VariableCodeGenerationCallbacks;
+  // end of compatibility code
   friend class ExpressionCodeGenerator;
 
  public:
@@ -417,6 +422,7 @@ class GD_CORE_API EventsCodeGenerator {
    */
   virtual gd::String GetCodeNamespace() { return ""; };
 
+  enum VariableScope { LAYOUT_VARIABLE = 0, PROJECT_VARIABLE, OBJECT_VARIABLE };
  protected:
   /**
    * \brief Generate the code for a single parameter.
@@ -472,14 +478,14 @@ class GD_CORE_API EventsCodeGenerator {
       std::vector<std::pair<gd::String, gd::String> >*
           supplementaryParametersTypes);
 
-  enum VariableScope { LAYOUT_VARIABLE = 0, PROJECT_VARIABLE, OBJECT_VARIABLE };
-
   /**
    * \brief Generate the code to get a variable.
    */
-  virtual gd::String GenerateGetVariable(gd::String variableName,
-                                         const VariableScope& scope,
-                                         gd::String objectName) {
+  virtual gd::String GenerateGetVariable(
+      gd::String variableName,
+      const VariableScope& scope,
+      gd::EventsCodeGenerationContext& context,
+      gd::String objectName) {
     if (scope == LAYOUT_VARIABLE) {
       return "getLayoutVariable(" + variableName + ")";
 
@@ -498,14 +504,21 @@ class GD_CORE_API EventsCodeGenerator {
   };
 
   /**
-   * \brief Generate the code to get the child of a variable, 
+   * \brief Generate the code to get the child of a variable,
    * using generated the expression.
    */
   virtual gd::String GenerateVariableBracketAccessor(
       gd::String expressionCode) {
     return ".getChild(" + expressionCode + ")";
   };
-  // TODO: Re-implement this in GDJS and GDCpp
+
+  /**
+   * \brief Generate the code to reference a variable which is 
+   * in an empty/null state.
+   */
+  virtual gd::String GenerateBadVariable() {
+      return "fakeBadVariable";
+  }
 
   /**
    * \brief Call a function of the current object.

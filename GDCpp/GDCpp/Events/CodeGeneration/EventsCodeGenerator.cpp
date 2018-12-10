@@ -18,7 +18,6 @@
 #include "GDCore/Project/Project.h"
 #include "GDCpp/Events/Builtin/ProfileEvent.h"
 #include "GDCpp/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCpp/Events/CodeGeneration/VariableParserCallbacks.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/Runtime/SceneNameMangler.h"
@@ -193,8 +192,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
   if (conditionInverted) predicat = GenerateNegatedPredicat(predicat);
 
   // Verify that object has behavior.
-  vector<gd::String> behaviors =
-      gd::GetBehaviorsOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
+  vector<gd::String> behaviors = gd::GetBehaviorsOfObject(
+      GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Bad behavior requested" << endl;
@@ -325,8 +324,8 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   }
 
   // Verify that object has behavior.
-  vector<gd::String> behaviors =
-      gd::GetBehaviorsOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
+  vector<gd::String> behaviors = gd::GetBehaviorsOfObject(
+      GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Bad behavior requested for an action" << endl;
@@ -397,47 +396,6 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
       argOutput += "NULL";
       for (std::size_t i = 0; i < realObjects.size(); ++i) argOutput += ")";
     }
-  } else if (metadata.type == "scenevar") {
-    VariableCodeGenerationCallbacks callbacks(
-        argOutput,
-        *this,
-        context,
-        VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
-
-    gd::VariableParser parser(parameter);
-    if (!parser.Parse(callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-      argOutput = "runtimeContext->GetSceneVariables().GetBadVariable()";
-    }
-  } else if (metadata.type == "globalvar") {
-    VariableCodeGenerationCallbacks callbacks(
-        argOutput,
-        *this,
-        context,
-        VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
-
-    gd::VariableParser parser(parameter);
-    if (!parser.Parse(callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-      argOutput = "runtimeContext->GetGameVariables().GetBadVariable()";
-    }
-  } else if (metadata.type == "objectvar") {
-    // Object is either the object of the previous parameter or, if it is empty,
-    // the object being picked by the instruction.
-    gd::String object = previousParameter;
-    if (object.empty()) object = context.GetCurrentObject();
-
-    VariableCodeGenerationCallbacks callbacks(
-        argOutput, *this, context, object);
-
-    gd::VariableParser parser(parameter);
-    if (!parser.Parse(callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-      argOutput = "runtimeContext->GetGameVariables().GetBadVariable()";
-    }
   } else {
     argOutput += gd::EventsCodeGenerator::GenerateParameterCodes(
         parameter,
@@ -448,6 +406,70 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   }
 
   return argOutput;
+}
+
+gd::String EventsCodeGenerator::GenerateGetVariable(
+    gd::String variableName,
+    const VariableScope& scope,
+    gd::EventsCodeGenerationContext& context,
+    gd::String objectName) {
+  gd::String output;
+  const gd::VariablesContainer* variables = NULL;
+  if (scope == LAYOUT_VARIABLE) {
+    output = "runtimeContext->GetSceneVariables()";
+
+    if (HasProjectAndLayout()) {
+      variables = &GetLayout().GetVariables();
+    }
+  } else if (scope == PROJECT_VARIABLE) {
+    output = "runtimeContext->GetGameVariables()";
+
+    if (HasProjectAndLayout()) {
+      variables = &GetProject().GetVariables();
+    }
+  } else {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
+
+    output = "RuntimeVariablesContainer::GetBadVariablesContainer()";
+    for (std::size_t i = 0; i < realObjects.size(); ++i) {
+      context.ObjectsListNeeded(realObjects[i]);
+
+      // Generate the call to GetVariables() method.
+      if (context.GetCurrentObject() == realObjects[i] &&
+          !context.GetCurrentObject().empty())
+        output =
+            GetObjectListName(realObjects[i], context) + "[i]->GetVariables()";
+      else
+        output = "((" + GetObjectListName(realObjects[i], context) +
+                 ".empty() ) ? " + output + " : " +
+                 GetObjectListName(realObjects[i], context) +
+                 "[0]->GetVariables())";
+    }
+
+    if (HasProjectAndLayout()) {
+      if (GetLayout().HasObjectNamed(
+              objectName))  // We check first layout's objects' list.
+        variables = &GetLayout().GetObject(objectName).GetVariables();
+      else if (GetProject().HasObjectNamed(
+                   objectName))  // Then the global objects list.
+        variables = &GetProject().GetObject(objectName).GetVariables();
+    }
+  }
+
+  // Optimize the lookup of the variable when the variable is declared.
+  //(In this case, it is stored in an array at runtime and we know its
+  // position.)
+  if (variables && variables->Has(variableName)) {
+    std::size_t index = variables->GetPosition(variableName);
+    if (index < variables->Count()) {
+      output += ".Get(" + gd::String::From(index) + ")";
+      return output;
+    }
+  }
+
+  output += ".Get(" + ConvertToStringExplicit(variableName) + ")";
+  return output;
 }
 
 gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
@@ -593,7 +615,8 @@ void EventsCodeGenerator::PreprocessEventList(gd::EventsList& eventsList) {
 
 #if !defined( \
     GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
-      if (GetLayout().GetProfiler() && GetLayout().GetProfiler()->profilingActivated &&
+      if (GetLayout().GetProfiler() &&
+          GetLayout().GetProfiler()->profilingActivated &&
           eventsList[i].IsExecutable()) {
         // Define a new profile event
         std::shared_ptr<ProfileEvent> profileEvent =

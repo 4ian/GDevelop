@@ -27,7 +27,7 @@ gd::String ExpressionParser2::DOT = ".";
 gd::String ExpressionParser2::PARAMETERS_SEPARATOR = ",";
 gd::String ExpressionParser2::QUOTE = "\"";
 gd::String ExpressionParser2::BRACKETS = "()[]{}";
-gd::String ExpressionParser2::OPERATORS = "+-/*<>?^=\\";
+gd::String ExpressionParser2::OPERATORS = "+-/*<>?^=\\:";
 gd::String ExpressionParser2::WHITESPACES = " \n\r";
 
 ExpressionParser2::ExpressionParser2(

@@ -7,13 +7,12 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDJS/Events/CodeGeneration/VariableParserCallbacks.h"
 
 using namespace gd;
 
@@ -65,32 +64,18 @@ VariablesExtension::VariablesExtension() {
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
-        gd::String expressionCode;
-        {
-          gd::CallbacksForGeneratingExpressionCode callbacks(
-              expressionCode, codeGenerator, context);
-          gd::ExpressionParser parser(
-              instruction.GetParameters()[2].GetPlainString());
-          if (!parser.ParseMathExpression(
-                  codeGenerator.GetPlatform(),
-                  codeGenerator.GetGlobalObjectsAndGroups(),
-                  codeGenerator.GetObjectsAndGroups(),
-                  callbacks) ||
-              expressionCode.empty())
-            expressionCode = "0";
-        }
-        gd::String varGetter;
-        {
-          VariableCodeGenerationCallbacks callbacks(
-              varGetter,
-              codeGenerator,
-              context,
-              VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
-          gd::VariableParser parser(
-              instruction.GetParameters()[0].GetPlainString());
-          if (!parser.Parse(callbacks))
-            varGetter = "runtimeScene.getVariables().get(\"\")";
-        }
+        gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                instruction.GetParameters()[2].GetPlainString());
+        gd::String varGetter =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "scenevar",
+                instruction.GetParameters()[0].GetPlainString());
 
         gd::String op = instruction.GetParameters()[1].GetPlainString();
         if (op == "=")
@@ -111,33 +96,18 @@ VariablesExtension::VariablesExtension() {
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
-        gd::String expressionCode;
-        {
-          gd::CallbacksForGeneratingExpressionCode callbacks(
-              expressionCode, codeGenerator, context);
-          gd::ExpressionParser parser(
-              instruction.GetParameters()[2].GetPlainString());
-          if (!parser.ParseStringExpression(
-                  codeGenerator.GetPlatform(),
-                  codeGenerator.GetGlobalObjectsAndGroups(),
-                  codeGenerator.GetObjectsAndGroups(),
-                  callbacks) ||
-              expressionCode.empty())
-            expressionCode = "\"\"";
-        }
-
-        gd::String varGetter;
-        {
-          VariableCodeGenerationCallbacks callbacks(
-              varGetter,
-              codeGenerator,
-              context,
-              VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
-          gd::VariableParser parser(
-              instruction.GetParameters()[0].GetPlainString());
-          if (!parser.Parse(callbacks))
-            varGetter = "runtimeScene.getVariables().get(\"\")";
-        }
+        gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                instruction.GetParameters()[2].GetPlainString());
+        gd::String varGetter =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "scenevar",
+                instruction.GetParameters()[0].GetPlainString());
 
         gd::String op = instruction.GetParameters()[1].GetPlainString();
         if (op == "=")
@@ -152,32 +122,18 @@ VariablesExtension::VariablesExtension() {
       [](gd::Instruction& instruction,
          gd::EventsCodeGenerator& codeGenerator,
          gd::EventsCodeGenerationContext& context) {
-        gd::String expressionCode;
-        {
-          gd::CallbacksForGeneratingExpressionCode callbacks(
-              expressionCode, codeGenerator, context);
-          gd::ExpressionParser parser(
-              instruction.GetParameters()[2].GetPlainString());
-          if (!parser.ParseMathExpression(
-                  codeGenerator.GetPlatform(),
-                  codeGenerator.GetGlobalObjectsAndGroups(),
-                  codeGenerator.GetObjectsAndGroups(),
-                  callbacks) ||
-              expressionCode.empty())
-            expressionCode = "0";
-        }
-        gd::String varGetter;
-        {
-          VariableCodeGenerationCallbacks callbacks(
-              varGetter,
-              codeGenerator,
-              context,
-              VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
-          gd::VariableParser parser(
-              instruction.GetParameters()[0].GetPlainString());
-          if (!parser.Parse(callbacks))
-            varGetter = "runtimeScene.getVariables().get(\"\")";
-        }
+        gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                instruction.GetParameters()[2].GetPlainString());
+        gd::String varGetter =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "globalvar",
+                instruction.GetParameters()[0].GetPlainString());
 
         gd::String op = instruction.GetParameters()[1].GetPlainString();
         if (op == "=")
@@ -199,33 +155,18 @@ VariablesExtension::VariablesExtension() {
           [](gd::Instruction& instruction,
              gd::EventsCodeGenerator& codeGenerator,
              gd::EventsCodeGenerationContext& context) {
-            gd::String expressionCode;
-            {
-              gd::CallbacksForGeneratingExpressionCode callbacks(
-                  expressionCode, codeGenerator, context);
-              gd::ExpressionParser parser(
-                  instruction.GetParameters()[2].GetPlainString());
-              if (!parser.ParseStringExpression(
-                      codeGenerator.GetPlatform(),
-                      codeGenerator.GetGlobalObjectsAndGroups(),
-                      codeGenerator.GetObjectsAndGroups(),
-                      callbacks) ||
-                  expressionCode.empty())
-                expressionCode = "\"\"";
-            }
-
-            gd::String varGetter;
-            {
-              VariableCodeGenerationCallbacks callbacks(
-                  varGetter,
-                  codeGenerator,
-                  context,
-                  VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
-              gd::VariableParser parser(
-                  instruction.GetParameters()[0].GetPlainString());
-              if (!parser.Parse(callbacks))
-                varGetter = "runtimeScene.getVariables().get(\"\")";
-            }
+            gd::String expressionCode =
+                gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                    codeGenerator,
+                    context,
+                    "string",
+                    instruction.GetParameters()[2].GetPlainString());
+            gd::String varGetter =
+                gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                    codeGenerator,
+                    context,
+                    "globalvar",
+                    instruction.GetParameters()[0].GetPlainString());
 
             gd::String op = instruction.GetParameters()[1].GetPlainString();
             if (op == "=")

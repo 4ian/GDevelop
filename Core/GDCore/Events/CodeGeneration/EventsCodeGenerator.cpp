@@ -3,6 +3,7 @@
 #include <utility>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
+#include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/Parsers/ExpressionParser.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
@@ -596,34 +597,14 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   gd::String argOutput;
 
   if (ParameterMetadata::IsExpression("number", metadata.type)) {
-    CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
-
-    gd::ExpressionParser parser(parameter);
-    if (!parser.ParseMathExpression(platform,
-                                    GetGlobalObjectsAndGroups(),
-                                    GetObjectsAndGroups(),
-                                    callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-
-      argOutput = "0";
-    }
-
-    if (argOutput.empty()) argOutput = "0";
+    argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+        *this, context, "number", parameter);
   } else if (ParameterMetadata::IsExpression("string", metadata.type)) {
-    CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
-
-    gd::ExpressionParser parser(parameter);
-    if (!parser.ParseStringExpression(platform,
-                                      GetGlobalObjectsAndGroups(),
-                                      GetObjectsAndGroups(),
-                                      callbacks)) {
-      cout << "Error in text expression" << parser.GetFirstError() << endl;
-
-      argOutput = "\"\"";
-    }
-
-    if (argOutput.empty()) argOutput = "\"\"";
+    argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+        *this, context, "string", parameter);
+  } else if (ParameterMetadata::IsExpression("variable", metadata.type)) {
+    argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+        *this, context, metadata.type, parameter, previousParameter);
   } else if (metadata.type == "relationalOperator") {
     argOutput += parameter == "=" ? "==" : parameter;
     if (argOutput != "==" && argOutput != "<" && argOutput != ">" &&
@@ -646,10 +627,8 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "key") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
-  } else if (metadata.type == "objectvar" || metadata.type == "scenevar" ||
-             metadata.type == "globalvar" || metadata.type == "password" ||
-             metadata.type == "musicfile" || metadata.type == "soundfile" ||
-             metadata.type == "police") {
+  } else if (metadata.type == "password" || metadata.type == "musicfile" ||
+             metadata.type == "soundfile" || metadata.type == "police") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "mouse") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";

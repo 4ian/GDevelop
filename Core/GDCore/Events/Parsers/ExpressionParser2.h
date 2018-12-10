@@ -43,14 +43,25 @@ class GD_CORE_API ExpressionParser2 {
                     const gd::ObjectsContainer &objectsContainer_);
   virtual ~ExpressionParser2(){};
 
+  /**
+   * Parse the given expression with the specified type.
+   *
+   * \param type Type of the expression: "string", "number",
+   * "identifier", "scenevar", "globalvar", "objectvar" or "unknown".
+   * \param expression The expression to parse
+   * \param objectName Specify the object name, only for the case of "objectvar"
+   * type.
+   *
+   * \return The node representing the expression as a parsed tree.
+   */
   std::unique_ptr<ExpressionNode> ParseExpression(
-      const gd::String &type,  // TODO: enumify type? "string", "number",
-                               // "identifier", "variable", "unknown"
-      const gd::String &expression_) {
+      const gd::String &type,  // TODO: enumify type?
+      const gd::String &expression_,
+      const gd::String &objectName = "") {
     expression = expression_;
 
     currentPosition = 0;
-    return Start(type);
+    return Start(type, objectName);
   }
 
  private:
@@ -58,8 +69,9 @@ class GD_CORE_API ExpressionParser2 {
    * Each method is a part of the grammar.
    */
   ///@{
-  std::unique_ptr<ExpressionNode> Start(const gd::String &type) {
-    auto expression = Expression(type);
+  std::unique_ptr<ExpressionNode> Start(const gd::String &type,
+                                        const gd::String &objectName = "") {
+    auto expression = Expression(type, objectName);
 
     // Check for extra characters at the end of the expression
     if (!IsEndReached()) {
@@ -125,7 +137,8 @@ class GD_CORE_API ExpressionParser2 {
     } else {
       leftHandSide = ReadUntilWhitespace(type);
       leftHandSide->diagnostic = RaiseTypeError(
-          _("You must enter a text, number or a valid expression call."), expressionStartPosition);
+          _("You must enter a text, number or a valid expression call."),
+          expressionStartPosition);
     }
 
     SkipWhitespace();

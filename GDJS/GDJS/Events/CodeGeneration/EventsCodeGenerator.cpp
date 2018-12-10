@@ -22,7 +22,6 @@
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDJS/Events/CodeGeneration/VariableParserCallbacks.h"
 #include "GDJS/Extensions/JsPlatform.h"
 
 using namespace std;
@@ -816,47 +815,6 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
       argOutput += "null";
       for (std::size_t i = 0; i < realObjects.size(); ++i) argOutput += ")";
     }
-  } else if (metadata.type == "scenevar") {
-    VariableCodeGenerationCallbacks callbacks(
-        argOutput,
-        *this,
-        context,
-        VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
-
-    gd::VariableParser parser(parameter);
-    if (!parser.Parse(callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-      argOutput = "gdjs.VariablesContainer.badVariable";
-    }
-  } else if (metadata.type == "globalvar") {
-    VariableCodeGenerationCallbacks callbacks(
-        argOutput,
-        *this,
-        context,
-        VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
-
-    gd::VariableParser parser(parameter);
-    if (!parser.Parse(callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-      argOutput = "gdjs.VariablesContainer.badVariable";
-    }
-  } else if (metadata.type == "objectvar") {
-    // Object is either the object of the previous parameter or, if it is empty,
-    // the object being picked by the instruction.
-    gd::String object = previousParameter;
-    if (object.empty()) object = context.GetCurrentObject();
-
-    VariableCodeGenerationCallbacks callbacks(
-        argOutput, *this, context, object);
-
-    gd::VariableParser parser(parameter);
-    if (!parser.Parse(callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-      argOutput = "gdjs.VariablesContainer.badVariable";
-    }
   } else
     return gd::EventsCodeGenerator::GenerateParameterCodes(
         parameter,
@@ -866,6 +824,72 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         supplementaryParametersTypes);
 
   return argOutput;
+}
+
+gd::String EventsCodeGenerator::GenerateGetVariable(
+    gd::String variableName,
+    const VariableScope& scope,
+    gd::EventsCodeGenerationContext& context,
+    gd::String objectName) {
+  gd::String output;
+  const gd::VariablesContainer* variables = NULL;
+  if (scope == LAYOUT_VARIABLE) {
+    output = "runtimeScene.getVariables()";
+
+    if (HasProjectAndLayout()) {
+      variables = &GetLayout().GetVariables();
+    }
+  } else if (scope == PROJECT_VARIABLE) {
+    output = "runtimeScene.getGame().getVariables()";
+
+    if (HasProjectAndLayout()) {
+      variables = &GetProject().GetVariables();
+    }
+  } else {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
+
+    output = "gdjs.VariablesContainer.badVariablesContainer";
+    for (std::size_t i = 0; i < realObjects.size(); ++i) {
+      context.ObjectsListNeeded(realObjects[i]);
+
+      // Generate the call to GetVariables() method.
+      if (context.GetCurrentObject() == realObjects[i] &&
+          !context.GetCurrentObject().empty())
+        output = GetObjectListName(realObjects[i], context) +
+                 "[i].getVariables()";
+      else
+        output = "((" +
+                 GetObjectListName(realObjects[i], context) +
+                 ".length === 0 ) ? " + output + " : " +
+                 GetObjectListName(realObjects[i], context) +
+                 "[0].getVariables())";
+    }
+
+    if (HasProjectAndLayout()) {
+      if (GetLayout().HasObjectNamed(
+              objectName))  // We check first layout's objects' list.
+        variables = &GetLayout().GetObject(objectName).GetVariables();
+      else if (GetProject().HasObjectNamed(
+                   objectName))  // Then the global objects list.
+        variables =
+            &GetProject().GetObject(objectName).GetVariables();
+    }
+  }
+
+  // Optimize the lookup of the variable when the variable is declared.
+  //(In this case, it is stored in an array at runtime and we know its
+  // position.)
+  if (variables && variables->Has(variableName)) {
+    std::size_t index = variables->GetPosition(variableName);
+    if (index < variables->Count()) {
+      output += ".getFromIndex(" + gd::String::From(index) + ")";
+      return output;
+    }
+  }
+
+  output += ".get(" + ConvertToStringExplicit(variableName) + ")";
+  return output;
 }
 
 gd::String EventsCodeGenerator::GenerateReferenceToUpperScopeBoolean(

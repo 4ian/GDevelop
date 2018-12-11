@@ -239,7 +239,7 @@ gdjs.SpriteRuntimeObject.prototype.update = function(runtimeScene) {
         var elapsedTime = this.getElapsedTime(runtimeScene) / 1000;
         this._frameElapsedTime += this._animationPaused ? 0 : elapsedTime * this._animationSpeedScale;
 
-        if ( this._frameElapsedTime > direction.timeBetweenFrames ) {
+        if ( this._frameElapsedTime > direction.timeBetweenFrames && direction.timeBetweenFrames > 0 ) {
             var count = Math.floor(this._frameElapsedTime / direction.timeBetweenFrames);
             this._currentFrame += count;
             this._frameElapsedTime = this._frameElapsedTime-count*direction.timeBetweenFrames;

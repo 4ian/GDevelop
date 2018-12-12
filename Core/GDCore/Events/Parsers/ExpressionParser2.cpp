@@ -29,6 +29,7 @@ gd::String ExpressionParser2::QUOTE = "\"";
 gd::String ExpressionParser2::BRACKETS = "()[]{}";
 gd::String ExpressionParser2::OPERATORS = "+-/*<>?^=\\:";
 gd::String ExpressionParser2::WHITESPACES = " \n\r";
+gd::String ExpressionParser2::NAMESPACE_SEPARATOR = "::";
 
 ExpressionParser2::ExpressionParser2(
     const gd::Platform& platform_,

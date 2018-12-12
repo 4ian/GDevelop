@@ -446,6 +446,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("number", "MyExtension::GetNumber()");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      REQUIRE(functionNode.functionName == "MyExtension::GetNumber");
+      REQUIRE(functionNode.objectName == "");
+      REQUIRE(functionNode.behaviorName == "");
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -456,6 +459,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           "number", "MyExtension::GetNumberWith2Params(12, \"hello world\")");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      REQUIRE(functionNode.functionName == "MyExtension::GetNumberWith2Params");
+      REQUIRE(functionNode.objectName == "");
+      REQUIRE(functionNode.behaviorName == "");
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
@@ -487,10 +493,39 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
           parser.ParseExpression("number", "MySpriteObject.GetObjectNumber()");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      REQUIRE(functionNode.functionName == "GetObjectNumber");
+      REQUIRE(functionNode.objectName == "MySpriteObject");
+      REQUIRE(functionNode.behaviorName == "");
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 0);
+    }
+    {
+      auto node =
+          parser.ParseExpression("number", "WhateverObject.WhateverBehavior::WhateverFunction()");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      REQUIRE(functionNode.functionName == "WhateverFunction");
+      REQUIRE(functionNode.objectName == "WhateverObject");
+      REQUIRE(functionNode.behaviorName == "WhateverBehavior");
+    }
+    {
+      auto node =
+          parser.ParseExpression("number", "WhateverObject.WhateverBehavior::WhateverFunction(1, \"2\", three)");
+      REQUIRE(node != nullptr);
+      auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
+      REQUIRE(functionNode.functionName == "WhateverFunction");
+      REQUIRE(functionNode.objectName == "WhateverObject");
+      REQUIRE(functionNode.behaviorName == "WhateverBehavior");
+      REQUIRE(functionNode.parameters.size() == 3);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*functionNode.parameters[0]);
+      auto &textNode = dynamic_cast<gd::TextNode &>(*functionNode.parameters[1]);
+      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[2]);
+
+      REQUIRE(numberNode.number == "1");
+      REQUIRE(textNode.text == "2");
+      REQUIRE(identifierNode.identifierName == "three");
     }
   }
 

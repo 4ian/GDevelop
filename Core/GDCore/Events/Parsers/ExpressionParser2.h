@@ -189,6 +189,13 @@ class GD_CORE_API ExpressionParser2 {
 
     SkipWhitespace();
 
+    if (IsNamespaceSeparator()) {
+      SkipNamespaceSeparator();
+
+      name += NAMESPACE_SEPARATOR;
+      name += ReadIdentifierName();
+    }
+
     if (IsAnyChar("(")) {
       SkipChar();
       return FreeFunction(type, name, identifierStartPosition);
@@ -287,15 +294,12 @@ class GD_CORE_API ExpressionParser2 {
 
     SkipWhitespace();
 
-    if (IsAnyChar(":")) {
-      SkipChar();
-      if (IsAnyChar(":")) {
-        SkipChar();
-        return BehaviorFunction(type,
-                                objectName,
-                                objectFunctionOrBehaviorName,
-                                functionStartPosition);
-      }
+    if (IsNamespaceSeparator()) {
+      SkipNamespaceSeparator();
+      return BehaviorFunction(type,
+                              objectName,
+                              objectFunctionOrBehaviorName,
+                              functionStartPosition);
     } else if (IsAnyChar("(")) {
       SkipChar();
 
@@ -498,6 +502,14 @@ class GD_CORE_API ExpressionParser2 {
     }
   }
 
+  void SkipNamespaceSeparator() {
+    // Namespace separator is a special kind of delimiter as it is 2 characters
+    // long
+    if (IsNamespaceSeparator()) {
+      currentPosition += NAMESPACE_SEPARATOR.size();
+    }
+  }
+
   bool IsAnyChar(const gd::String &allowedCharacters) {
     if (currentPosition < expression.size() &&
         allowedCharacters.find(expression[currentPosition]) !=
@@ -520,6 +532,14 @@ class GD_CORE_API ExpressionParser2 {
     }
 
     return false;
+  }
+
+  bool IsNamespaceSeparator() {
+    // Namespace separator is a special kind of delimiter as it is 2 characters
+    // long
+    return (currentPosition + NAMESPACE_SEPARATOR.size() <= expression.size() &&
+            expression.substr(currentPosition, NAMESPACE_SEPARATOR.size()) ==
+                NAMESPACE_SEPARATOR);
   }
 
   bool IsEndReached() { return currentPosition >= expression.size(); }
@@ -620,6 +640,7 @@ class GD_CORE_API ExpressionParser2 {
   static gd::String BRACKETS;
   static gd::String OPERATORS;
   static gd::String WHITESPACES;
+  static gd::String NAMESPACE_SEPARATOR;
 };
 
 }  // namespace gd

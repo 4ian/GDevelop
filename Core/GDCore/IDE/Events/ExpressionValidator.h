@@ -60,6 +60,10 @@ class GD_CORE_API ExpressionValidator : public ExpressionParser2NodeWorker {
     ReportAnyError(node);
     node.rightHandSide->Visit(*this);
   }
+  void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
+    ReportAnyError(node);
+    node.factor->Visit(*this);
+  }
   void OnVisitNumberNode(NumberNode& node) override { ReportAnyError(node); }
   void OnVisitTextNode(TextNode& node) override { ReportAnyError(node); }
   void OnVisitVariableNode(VariableNode& node) override {

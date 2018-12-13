@@ -64,12 +64,27 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
 
   SECTION("Valid numbers") {
     testPrinter("number", "123");
-    testPrinter("number", "-123");
-    testPrinter("number", "+123", "123");
     testPrinter("number", "3.14159");
     testPrinter("number", ".14159");
-    testPrinter("number", "-123.2");
     testPrinter("number", "3.");
+  }
+
+  SECTION("Valid unary operators") {
+    testPrinter("number", "-123");
+    testPrinter("number", "+123");
+    testPrinter("number", "+-123");
+    testPrinter("number", "+-+123.34567");
+    testPrinter("number", "-123.2");
+    testPrinter("number", "- + - 123.2", "-+-123.2");
+  }
+
+  SECTION("Valid unary operators with parenthesis") {
+    testPrinter("number", "-(123)");
+    testPrinter("number", "+((123))");
+    testPrinter("number", "+-(((123)))");
+    testPrinter("number", "+(-((+123.34567)))");
+    testPrinter("number", "-123.2");
+    testPrinter("number", "- (+ - ((123.2)))", "-(+-((123.2)))");
   }
 
   SECTION("Invalid numbers") {
@@ -150,5 +165,15 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
     testPrinter("scenevar",
                 "myVariable[ \"My named children\"  ].grandChild",
                 "myVariable[\"My named children\"].grandChild");
+  }
+  SECTION("Valid function calls with unary operators") {
+    testPrinter("number", "-MyExtension::GetNumber()");
+    testPrinter("number",
+                "+MyExtension::GetNumberWith2Params(12, \"hello world\")");
+    testPrinter("number",
+                "+-MyExtension::GetNumberWith3Params(12, \"hello world\")");
+    testPrinter("number",
+                "+--+MyExtension::GetNumberWith3Params(12, \"hello world\", 34)");
+    testPrinter("number", "--MySpriteObject.GetObjectNumber()");
   }
 }

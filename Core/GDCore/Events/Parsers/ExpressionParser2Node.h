@@ -103,6 +103,20 @@ struct OperatorNode : public ExpressionNode {
 };
 
 /**
+ * \brief A unary operator node. For example: "-2".
+ */
+struct UnaryOperatorNode : public ExpressionNode {
+  UnaryOperatorNode(gd::String::value_type op_) : op(op_){};
+  virtual ~UnaryOperatorNode(){};
+  virtual void Visit(ExpressionParser2NodeWorker &worker) {
+    worker.OnVisitUnaryOperatorNode(*this);
+  };
+
+  std::unique_ptr<ExpressionNode> factor;
+  gd::String::value_type op;  // TODO: Enumify?
+};
+
+/**
  * \brief A number node. For example: "123".
  */
 struct NumberNode : public ExpressionNode {
@@ -263,7 +277,8 @@ struct FunctionNode : public FunctionOrEmptyNode {
  * encountered and any other node could not make sense.
  */
 struct EmptyNode : public FunctionOrEmptyNode {
-  EmptyNode(const gd::String &type_, const gd::String & text_ = "") : type(type_),text(text_){};
+  EmptyNode(const gd::String &type_, const gd::String &text_ = "")
+      : type(type_), text(text_){};
   virtual ~EmptyNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitEmptyNode(*this);

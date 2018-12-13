@@ -70,6 +70,7 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
  protected:
   void OnVisitSubExpressionNode(SubExpressionNode& node) override;
   void OnVisitOperatorNode(OperatorNode& node) override;
+  void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override;
   void OnVisitNumberNode(NumberNode& node) override;
   void OnVisitTextNode(TextNode& node) override;
   void OnVisitVariableNode(VariableNode& node) override;

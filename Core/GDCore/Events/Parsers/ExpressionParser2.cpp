@@ -22,12 +22,14 @@ using namespace std;
 
 namespace gd {
 
-gd::String ExpressionParser2::NUMBER_FIRST_CHAR = "+-.0123456789";
+gd::String ExpressionParser2::NUMBER_FIRST_CHAR = ".0123456789";
 gd::String ExpressionParser2::DOT = ".";
 gd::String ExpressionParser2::PARAMETERS_SEPARATOR = ",";
 gd::String ExpressionParser2::QUOTE = "\"";
 gd::String ExpressionParser2::BRACKETS = "()[]{}";
-gd::String ExpressionParser2::OPERATORS = "+-/*<>?^=\\:";
+gd::String ExpressionParser2::EXPRESSION_OPERATORS = "+-<>?^=\\:";
+gd::String ExpressionParser2::TERM_OPERATORS = "/*";
+gd::String ExpressionParser2::UNARY_OPERATORS = "+-";
 gd::String ExpressionParser2::WHITESPACES = " \n\r";
 gd::String ExpressionParser2::NAMESPACE_SEPARATOR = "::";
 
@@ -167,12 +169,6 @@ std::unique_ptr<TextNode> ExpressionParser2::ReadText() {
 std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
   SkipWhitespace();
   gd::String parsedNumber;
-  if (IsAnyChar("+")) {
-    SkipChar();
-  } else if (IsAnyChar("-")) {
-    SkipChar();
-    parsedNumber += "-";
-  }
 
   bool numberHasStarted = false;
   bool digitFound = false;

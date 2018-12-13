@@ -46,6 +46,9 @@ class GD_CORE_API ExpressionParameterSearcher
     node.leftHandSide->Visit(*this);
     node.rightHandSide->Visit(*this);
   }
+  void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
+    node.factor->Visit(*this);
+  }
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {

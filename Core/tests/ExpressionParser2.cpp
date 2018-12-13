@@ -224,18 +224,6 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(numberNode.number == "123");
     }
     {
-      auto node = parser.ParseExpression("number", "-123");
-      REQUIRE(node != nullptr);
-      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
-      REQUIRE(numberNode.number == "-123");
-    }
-    {
-      auto node = parser.ParseExpression("number", "+123");
-      REQUIRE(node != nullptr);
-      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
-      REQUIRE(numberNode.number == "123");
-    }
-    {
       auto node = parser.ParseExpression("number", "3.14159");
       REQUIRE(node != nullptr);
       auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
@@ -248,16 +236,85 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(numberNode.number == ".14159");
     }
     {
-      auto node = parser.ParseExpression("number", "-123.2");
-      REQUIRE(node != nullptr);
-      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
-      REQUIRE(numberNode.number == "-123.2");
-    }
-    {
       auto node = parser.ParseExpression("number", "3.");
       REQUIRE(node != nullptr);
       auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
       REQUIRE(numberNode.number == "3.");
+    }
+  }
+
+  SECTION("valid unary operators") {
+    {
+      auto node = parser.ParseExpression("number", "-123");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '-');
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
+      REQUIRE(numberNode.number == "123");
+    }
+    {
+      auto node = parser.ParseExpression("number", "+123");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '+');
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
+      REQUIRE(numberNode.number == "123");
+    }
+    {
+      auto node = parser.ParseExpression("number", "-123.2");
+      REQUIRE(node != nullptr);
+      auto &unaryOperatorNode = dynamic_cast<gd::UnaryOperatorNode &>(*node);
+      REQUIRE(unaryOperatorNode.op == '-');
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*unaryOperatorNode.factor);
+      REQUIRE(numberNode.number == "123.2");
+    }
+  }
+
+  SECTION("Invalid unary operators") {
+    {
+      auto node = parser.ParseExpression("number", "*123");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You must enter a text, number or a valid expression call.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("string", "-\"hello\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You've used an operator that is not supported. Only + can be "
+              "used to concatenate texts, and must be placed between two texts "
+              "(or expressions).");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+    }
+    {
+      auto node = parser.ParseExpression("string", "+-\"hello\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 2);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You've used an operator that is not supported. Only + can be "
+              "used to concatenate texts, and must be placed between two texts "
+              "(or expressions).");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+      REQUIRE(validator.GetErrors()[1]->GetMessage() ==
+              "You've used an operator that is not supported. Only + can be "
+              "used to concatenate texts, and must be placed between two texts "
+              "(or expressions).");
+      REQUIRE(validator.GetErrors()[1]->GetStartPosition() == 1);
     }
   }
 
@@ -344,8 +401,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
               "You must enter a text, number or a valid expression call.");
-      REQUIRE(validator.GetErrors()[0]->GetStartPosition() ==
-              2);
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 2);
     }
   }
 
@@ -502,8 +558,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors().size() == 0);
     }
     {
-      auto node =
-          parser.ParseExpression("number", "WhateverObject.WhateverBehavior::WhateverFunction()");
+      auto node = parser.ParseExpression(
+          "number", "WhateverObject.WhateverBehavior::WhateverFunction()");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
       REQUIRE(functionNode.functionName == "WhateverFunction");
@@ -511,17 +567,21 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(functionNode.behaviorName == "WhateverBehavior");
     }
     {
-      auto node =
-          parser.ParseExpression("number", "WhateverObject.WhateverBehavior::WhateverFunction(1, \"2\", three)");
+      auto node = parser.ParseExpression(
+          "number",
+          "WhateverObject.WhateverBehavior::WhateverFunction(1, \"2\", three)");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
       REQUIRE(functionNode.functionName == "WhateverFunction");
       REQUIRE(functionNode.objectName == "WhateverObject");
       REQUIRE(functionNode.behaviorName == "WhateverBehavior");
       REQUIRE(functionNode.parameters.size() == 3);
-      auto &numberNode = dynamic_cast<gd::NumberNode &>(*functionNode.parameters[0]);
-      auto &textNode = dynamic_cast<gd::TextNode &>(*functionNode.parameters[1]);
-      auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[2]);
+      auto &numberNode =
+          dynamic_cast<gd::NumberNode &>(*functionNode.parameters[0]);
+      auto &textNode =
+          dynamic_cast<gd::TextNode &>(*functionNode.parameters[1]);
+      auto &identifierNode =
+          dynamic_cast<gd::IdentifierNode &>(*functionNode.parameters[2]);
 
       REQUIRE(numberNode.number == "1");
       REQUIRE(textNode.text == "2");
@@ -544,8 +604,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   SECTION("Valid function calls (deprecated missing optional arguments)") {
     {
-      auto node = parser.ParseExpression(
-          "number", "MyExtension::MouseX(,)");
+      auto node = parser.ParseExpression("number", "MyExtension::MouseX(,)");
       REQUIRE(node != nullptr);
       auto &functionNode = dynamic_cast<gd::FunctionNode &>(*node);
 

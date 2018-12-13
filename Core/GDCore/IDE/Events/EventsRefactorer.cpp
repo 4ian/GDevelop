@@ -55,6 +55,9 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
     node.leftHandSide->Visit(*this);
     node.rightHandSide->Visit(*this);
   }
+  void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
+    node.factor->Visit(*this);
+  }
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}
   void OnVisitVariableNode(VariableNode& node) override {
@@ -118,6 +121,9 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
   void OnVisitOperatorNode(OperatorNode& node) override {
     node.leftHandSide->Visit(*this);
     node.rightHandSide->Visit(*this);
+  }
+  void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
+    node.factor->Visit(*this);
   }
   void OnVisitNumberNode(NumberNode& node) override {}
   void OnVisitTextNode(TextNode& node) override {}

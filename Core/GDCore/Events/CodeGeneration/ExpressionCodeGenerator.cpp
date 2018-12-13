@@ -163,6 +163,16 @@ void ExpressionCodeGenerator::OnVisitOperatorNode(OperatorNode& node) {
   node.rightHandSide->Visit(*this);
 }
 
+void ExpressionCodeGenerator::OnVisitUnaryOperatorNode(
+    UnaryOperatorNode& node) {
+  output.push_back(node.op);
+  output += "(";  // Add extra parenthesis to ensure that things like --2 are
+                  // properly outputted as -(-2) (GDevelop don't have -- or ++
+                  // operators, but JavaScript and C++ have).
+  node.factor->Visit(*this);
+  output += ")";
+}
+
 void ExpressionCodeGenerator::OnVisitSubExpressionNode(
     SubExpressionNode& node) {
   output += "(";

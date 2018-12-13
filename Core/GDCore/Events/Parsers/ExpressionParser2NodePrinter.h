@@ -63,6 +63,10 @@ class GD_CORE_API ExpressionParser2NodePrinter
     }
     node.rightHandSide->Visit(*this);
   }
+  void OnVisitUnaryOperatorNode(UnaryOperatorNode& node) override {
+    output.push_back(node.op);
+    node.factor->Visit(*this);
+  }
   void OnVisitNumberNode(NumberNode& node) override { output += node.number; }
   void OnVisitTextNode(TextNode& node) override {
     output +=

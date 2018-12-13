@@ -94,58 +94,13 @@ class GD_CORE_API ExpressionParser2 {
     SkipWhitespace();
 
     size_t expressionStartPosition = GetCurrentPosition();
-    std::unique_ptr<ExpressionNode> leftHandSide;
-
-    if (IsAnyChar(QUOTE)) {
-      leftHandSide = ReadText();
-      if (type == "number")
-        leftHandSide->diagnostic =
-            RaiseTypeError(_("You entered a text, but a number was expected."),
-                           expressionStartPosition);
-      else if (type != "string")
-        leftHandSide->diagnostic = RaiseTypeError(
-            _("You entered a text, but this type was expected:") + type,
-            expressionStartPosition);
-    } else if (IsAnyChar(NUMBER_FIRST_CHAR)) {
-      leftHandSide = ReadNumber();
-      if (type == "string")
-        leftHandSide->diagnostic = RaiseTypeError(
-            _("You entered a number, but a text was expected (in quotes)."),
-            expressionStartPosition);
-      else if (type != "number")
-        leftHandSide->diagnostic = RaiseTypeError(
-            _("You entered a number, but this type was expected:") + type,
-            expressionStartPosition);
-    } else if (IsAnyChar("(")) {
-      SkipChar();
-      leftHandSide = SubExpression(type, objectName);
-
-      if (!IsAnyChar(")")) {
-        leftHandSide->diagnostic =
-            RaiseSyntaxError(_("Missing a closing parenthesis. Add a closing "
-                               "parenthesis for each opening parenthesis."));
-      }
-      SkipIfIsAnyChar(")");
-    } else if (IsIdentifierAllowedChar()) {
-      // This is a place where the grammar differs according to the
-      // type being expected.
-      if (gd::ParameterMetadata::IsExpression("variable", type)) {
-        leftHandSide = Variable(type, objectName);
-      } else {
-        leftHandSide = Identifier(type);
-      }
-    } else {
-      leftHandSide = ReadUntilWhitespace(type);
-      leftHandSide->diagnostic = RaiseTypeError(
-          _("You must enter a text, number or a valid expression call."),
-          expressionStartPosition);
-    }
+    std::unique_ptr<ExpressionNode> leftHandSide = Term(type, objectName);
 
     SkipWhitespace();
 
     if (IsEndReached()) return leftHandSide;
     if (IsAnyChar(",)]")) return leftHandSide;
-    if (IsAnyChar(OPERATORS)) {
+    if (IsAnyChar(EXPRESSION_OPERATORS)) {
       auto op = gd::make_unique<OperatorNode>();
       op->op = GetCurrentChar();
       op->leftHandSide = std::move(leftHandSide);
@@ -174,6 +129,88 @@ class GD_CORE_API ExpressionParser2 {
     op->leftHandSide = std::move(leftHandSide);
     op->rightHandSide = Expression(type, objectName);
     return std::move(op);
+  }
+
+  std::unique_ptr<ExpressionNode> Term(const gd::String &type, const gd::String &objectName) {
+    SkipWhitespace();
+
+    std::unique_ptr<ExpressionNode> factor = Factor(type, objectName);
+    SkipWhitespace();
+
+    while (IsAnyChar(TERM_OPERATORS)) {
+      auto op = gd::make_unique<OperatorNode>();
+      op->op = GetCurrentChar();
+      op->leftHandSide = std::move(factor);
+      op->diagnostic = ValidateOperator(type, GetCurrentChar());
+      SkipChar();
+      op->rightHandSide = Factor(type, objectName);
+      SkipWhitespace();
+
+      factor = std::move(op);
+    }
+
+    return factor;
+  };
+
+  std::unique_ptr<ExpressionNode> Factor(const gd::String &type, const gd::String &objectName) {
+    SkipWhitespace();
+
+    size_t expressionStartPosition = GetCurrentPosition();
+    std::unique_ptr<ExpressionNode> factor;
+
+    if (IsAnyChar(QUOTE)) {
+      factor = ReadText();
+      if (type == "number")
+        factor->diagnostic =
+            RaiseTypeError(_("You entered a text, but a number was expected."),
+                           expressionStartPosition);
+      else if (type != "string")
+        factor->diagnostic = RaiseTypeError(
+            _("You entered a text, but this type was expected:") + type,
+            expressionStartPosition);
+    } else if (IsAnyChar(UNARY_OPERATORS)) {
+      auto unaryOperator = gd::make_unique<UnaryOperatorNode>(GetCurrentChar());
+      unaryOperator->diagnostic = ValidateUnaryOperator(type, GetCurrentChar());
+      SkipChar();
+      unaryOperator->factor = Factor(type, objectName);
+
+      factor = std::move(unaryOperator);
+    } else if (IsAnyChar(NUMBER_FIRST_CHAR)) {
+      factor = ReadNumber();
+      if (type == "string")
+        factor->diagnostic = RaiseTypeError(
+            _("You entered a number, but a text was expected (in quotes)."),
+            expressionStartPosition);
+      else if (type != "number")
+        factor->diagnostic = RaiseTypeError(
+            _("You entered a number, but this type was expected:") + type,
+            expressionStartPosition);
+    } else if (IsAnyChar("(")) {
+      SkipChar();
+      factor = SubExpression(type, objectName);
+
+      if (!IsAnyChar(")")) {
+        factor->diagnostic =
+            RaiseSyntaxError(_("Missing a closing parenthesis. Add a closing "
+                               "parenthesis for each opening parenthesis."));
+      }
+      SkipIfIsAnyChar(")");
+    } else if (IsIdentifierAllowedChar()) {
+      // This is a place where the grammar differs according to the
+      // type being expected.
+      if (gd::ParameterMetadata::IsExpression("variable", type)) {
+        factor = Variable(type, objectName);
+      } else {
+        factor = Identifier(type);
+      }
+    } else {
+      factor = ReadUntilWhitespace(type);
+      factor->diagnostic = RaiseTypeError(
+          _("You must enter a text, number or a valid expression call."),
+          expressionStartPosition);
+    }
+
+    return factor;
   }
 
   std::unique_ptr<SubExpressionNode> SubExpression(
@@ -481,6 +518,35 @@ class GD_CORE_API ExpressionParser2 {
 
     return gd::make_unique<ExpressionParserDiagnostic>();
   }
+
+  std::unique_ptr<ExpressionParserDiagnostic> ValidateUnaryOperator(
+    const gd::String &type, gd::String::value_type operatorChar 
+  ) {
+    if (type == "number") {
+      if (operatorChar == '+' || operatorChar == '-') {
+        return gd::make_unique<ExpressionParserDiagnostic>();
+      }
+
+      return gd::make_unique<ExpressionParserError>(
+          "invalid_operator",
+          _("You've used an \"unary\" operator that is not supported. Operator should be "
+            "either + or -."),
+          GetCurrentPosition());
+    } else if (type == "string") {
+      return gd::make_unique<ExpressionParserError>(
+          "invalid_operator",
+          _("You've used an operator that is not supported. Only + can be used "
+            "to concatenate texts, and must be placed between two texts (or expressions)."),
+          GetCurrentPosition());
+    } else if (type == "identifier") {
+      return gd::make_unique<ExpressionParserError>(
+          "invalid_operator",
+          _("Operators (+, -, /, *) should not be used there."),
+          GetCurrentPosition());
+    }
+
+    return gd::make_unique<ExpressionParserDiagnostic>();
+  }
   ///@}
 
   /** \name Parsing tokens
@@ -527,7 +593,8 @@ class GD_CORE_API ExpressionParser2 {
         DOT.find(expression[currentPosition]) == gd::String::npos &&
         QUOTE.find(expression[currentPosition]) == gd::String::npos &&
         BRACKETS.find(expression[currentPosition]) == gd::String::npos &&
-        OPERATORS.find(expression[currentPosition]) == gd::String::npos) {
+        EXPRESSION_OPERATORS.find(expression[currentPosition]) == gd::String::npos&&
+        TERM_OPERATORS.find(expression[currentPosition]) == gd::String::npos) {
       return true;
     }
 
@@ -638,7 +705,9 @@ class GD_CORE_API ExpressionParser2 {
   static gd::String PARAMETERS_SEPARATOR;
   static gd::String QUOTE;
   static gd::String BRACKETS;
-  static gd::String OPERATORS;
+  static gd::String EXPRESSION_OPERATORS;
+  static gd::String TERM_OPERATORS;
+  static gd::String UNARY_OPERATORS;
   static gd::String WHITESPACES;
   static gd::String NAMESPACE_SEPARATOR;
 };

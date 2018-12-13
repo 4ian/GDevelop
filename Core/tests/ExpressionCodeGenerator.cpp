@@ -57,14 +57,6 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "12.45");
     }
-    {
-      auto node = parser.ParseExpression("number", "12.5 + -2.  /   (.3)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
-                                                          context);
-
-      node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "12.5 + -2. / (.3)");
-    }
   }
 
   SECTION("Invalid operators generation") {
@@ -84,6 +76,25 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
 
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "12.45 * 0");
+    }
+  }
+
+  SECTION("Valid unary operator generation") {
+    {
+      auto node = parser.ParseExpression("number", "-12.45");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "-(12.45)");
+    }
+    {
+      auto node = parser.ParseExpression("number", "12.5 + -2.  /   (.3)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "12.5 + -(2.) / (.3)");
     }
   }
 
@@ -299,6 +310,18 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
             "(getVariableForObject(MyOtherSpriteObject, mySecondVariable)) ?? "
             "0) ?? \"\").getChild(\"child2\"))");
       }
+    }
+  }
+  SECTION("Mixed/fuzzy tests") {
+    {
+      auto node = parser.ParseExpression("number", "-+-MyExtension::MouseX(,)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "-(+(-(getMouseX(\"\", \"\", 0))))");
+      // (first argument is the currentScene)
     }
   }
   SECTION("Helper for code generation") {

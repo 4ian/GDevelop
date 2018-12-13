@@ -5,7 +5,7 @@ import Popover from 'material-ui/Popover';
 import Functions from 'material-ui/svg-icons/editor/functions';
 import RaisedButton from 'material-ui/RaisedButton';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
-import {mapVector} from '../../../Utils/MapFor';
+import { mapVector } from '../../../Utils/MapFor';
 import ExpressionSelector from '../../InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import ExpressionParametersEditorDialog, {
   type ParameterValues,
@@ -13,6 +13,10 @@ import ExpressionParametersEditorDialog, {
 import { formatExpressionCall } from './FormatExpressionCall';
 import { type InstructionOrExpressionInformation } from '../../InstructionEditor/InstructionOrExpressionSelector/InstructionOrExpressionInformation.flow.js';
 import { type ParameterFieldProps } from '../ParameterFieldProps.flow';
+import BackgroundHighlighting, {
+  type Highlight,
+} from './BackgroundHighlighting';
+import debounce from 'lodash/debounce';
 const gd = global.gd;
 
 const styles = {
@@ -24,12 +28,22 @@ const styles = {
     flex: 1,
     minWidth: 300,
   },
+  textFieldAndHightlightContainer: {
+    position: 'relative',
+  },
   expressionSelector: {
     maxHeight: 350,
     overflowY: 'scroll',
   },
   input: {
     fontFamily: '"Lucida Console", Monaco, monospace',
+    lineHeight: 1.4,
+  },
+  backgroundHighlighting: {
+    marginTop: 12, //Properly align with the text field
+  },
+  backgroundHighlightingWithDescription: {
+    marginTop: 38, //Properly align with the text field
   },
   functionsButton: {
     marginTop: 7, //Properly align with the text field
@@ -45,7 +59,9 @@ type State = {|
   popoverOpen: boolean,
   parametersDialogOpen: boolean,
   selectedExpressionInfo: ?InstructionOrExpressionInformation,
+  validatedValue: string,
   errorText: ?string,
+  errorHighlights: Array<Highlight>,
 |};
 
 type Props = {|
@@ -65,7 +81,10 @@ export default class ExpressionField extends React.Component<Props, State> {
     popoverOpen: false,
     parametersDialogOpen: false,
     selectedExpressionInfo: null,
+
+    validatedValue: '',
     errorText: null,
+    errorHighlights: [],
   };
 
   componentDidMount() {
@@ -85,7 +104,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     });
   };
 
-  _handleFocus = (event: any) => {
+  _handleFocus = (event: { preventDefault: () => void }) => {
     // This prevents ghost click.
     event.preventDefault();
   };
@@ -97,12 +116,23 @@ export default class ExpressionField extends React.Component<Props, State> {
   };
 
   _handleChange = (value: string) => {
-    if (this.props.onChange) this.props.onChange(value);
+    this.setState(
+      {
+        validatedValue: value,
+      },
+      () => this._enqueueValidation()
+    );
+  };
 
-    this._doValidation(value);
-    this.setState({
-      popoverOpen: false,
-    });
+  _handleBlur = (event: { currentTarget: { value: string } }) => {
+    const value = event.currentTarget.value;
+    if (this.props.onChange) this.props.onChange(value);
+    this.setState(
+      {
+        validatedValue: value,
+      },
+      () => this._doValidation()
+    );
   };
 
   _handleMenuMouseDown = (event: any) => {
@@ -149,7 +179,12 @@ export default class ExpressionField extends React.Component<Props, State> {
     }, 5);
   };
 
-  _getError = (value?: string) => {
+  _enqueueValidation = debounce(() => {
+    this._doValidation();
+  }, 500);
+
+  _doValidation = () => {
+    this._enqueueValidation.cancel();
     const {
       project,
       globalObjectsContainer,
@@ -163,7 +198,7 @@ export default class ExpressionField extends React.Component<Props, State> {
       globalObjectsContainer,
       objectsContainer
     );
-    const expression = value === undefined ? this.props.value : value;
+    const expression = this.state.validatedValue;
     const expressionNode = parser
       .parseExpression(expressionType, expression)
       .get();
@@ -172,19 +207,24 @@ export default class ExpressionField extends React.Component<Props, State> {
     expressionNode.visit(expressionValidator);
     const errors = expressionValidator.getErrors();
 
-    // TODO: Multiple errors could be returned, as well as their
-    // positions, to be highlighted.
-    const errorMessages = mapVector(errors, error => error.getMessage());
-    const error = errorMessages.join(' ');
+    const errorHighlights = mapVector(errors, error => ({
+      begin: error.getStartPosition(),
+      end: error.getEndPosition() + 1,
+      message: error.getMessage(),
+      type: 'error',
+    }));
+    const hasMultipleErrors = errorHighlights.length > 1;
+    const errorText = errorHighlights
+      .map(
+        (highlight, i) =>
+          (hasMultipleErrors ? `[${i + 1}] ` : '') + highlight.message
+      )
+      .join(' ');
 
     expressionValidator.delete();
     parser.delete();
 
-    return error === '' ? null : error;
-  };
-
-  _doValidation = (value?: string) => {
-    this.setState({ errorText: this._getError(value) });
+    this.setState({ errorText, errorHighlights });
   };
 
   render() {
@@ -206,21 +246,33 @@ export default class ExpressionField extends React.Component<Props, State> {
       width: this._fieldElement ? this._fieldElement.clientWidth : 'auto',
     };
 
+    const backgroundHighlightingStyle = description
+      ? styles.backgroundHighlightingWithDescription
+      : styles.backgroundHighlighting;
+
     return (
       <div style={styles.container}>
         <div style={styles.textFieldContainer}>
-          <SemiControlledTextField
-            commitOnBlur
-            value={value}
-            floatingLabelText={description}
-            inputStyle={styles.input}
-            onChange={this._handleChange}
-            ref={field => (this._field = field)}
-            onFocus={this._handleFocus}
-            errorText={this.state.errorText}
-            multiLine
-            fullWidth
-          />
+          <div style={styles.textFieldAndHightlightContainer}>
+            <BackgroundHighlighting
+              value={value}
+              style={{ ...styles.input, ...backgroundHighlightingStyle }}
+              highlights={this.state.errorHighlights}
+            />
+            {/* TODO: Do validation on blur OR after 500 ms without change */}
+            <SemiControlledTextField
+              value={value}
+              floatingLabelText={description}
+              inputStyle={styles.input}
+              onChange={this._handleChange}
+              onBlur={this._handleBlur}
+              ref={field => (this._field = field)}
+              onFocus={this._handleFocus}
+              errorText={this.state.errorText}
+              multiLine
+              fullWidth
+            />
+          </div>
           {this._fieldElement && (
             <Popover
               style={popoverStyle}

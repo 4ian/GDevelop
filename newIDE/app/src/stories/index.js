@@ -380,6 +380,22 @@ storiesOf('ParameterFields', module)
       )}
     />
   ))
+  .add('ExpressionField (with errors)', () => (
+    <ValueStateHolder
+      initialValue={'Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3\n-Test2()+3-/2//2 \n+ 3()'}
+      render={(value, onChange) => (
+        <ExpressionField
+          project={project}
+          layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+          parameterRenderingService={ParameterRenderingService}
+        />
+      )}
+    />
+  ))
   .add('StringField', () => (
     <ValueStateHolder
       initialValue={'ToString(0) + "Test" + NewLine() + VariableString(MyVar)'}

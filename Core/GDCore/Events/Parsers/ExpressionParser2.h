@@ -137,6 +137,9 @@ class GD_CORE_API ExpressionParser2 {
     std::unique_ptr<ExpressionNode> factor = Factor(type, objectName);
     SkipWhitespace();
 
+    // This while loop is used instead of a recursion (like in Expression)
+    // to guarantee the proper operator precedence. (Expression could also
+    // be reworked to use a while loop).
     while (IsAnyChar(TERM_OPERATORS)) {
       auto op = gd::make_unique<OperatorNode>();
       op->op = GetCurrentChar();

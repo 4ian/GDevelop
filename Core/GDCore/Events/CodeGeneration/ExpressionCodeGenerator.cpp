@@ -440,7 +440,7 @@ std::vector<gd::Expression> ExpressionCodeGenerator::PrintParameters(
 
 gd::String ExpressionCodeGenerator::GenerateDefaultValue(
     const gd::String& type) {
-  return type == "string" ? "\"\"" : "0";
+  return (type == "string" || type == "identifier") ? "\"\"" : "0";
 }
 
 void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {

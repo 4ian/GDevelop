@@ -196,7 +196,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
       GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
-    cout << "Bad behavior requested" << endl;
+    cout << "Error: bad behavior \"" << behaviorName
+         << "\" requested for object \'" << objectName
+         << "\" (condition: " << instrInfos.GetFullName() << ")." << endl;
   } else {
     conditionCode += "for(std::size_t i = 0;i < " + ManObjListName(objectName) +
                      ".size();)\n";
@@ -328,7 +330,9 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
       GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
-    cout << "Bad behavior requested for an action" << endl;
+    cout << "Error: bad behavior \"" << behaviorName
+         << "\" requested for object \'" << objectName 
+         << "\" (action: " << instrInfos.GetFullName() << ")." << endl;
   } else {
     actionCode += "for(std::size_t i = 0;i < " + ManObjListName(objectName) +
                   ".size();++i)\n";

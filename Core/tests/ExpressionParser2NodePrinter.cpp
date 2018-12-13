@@ -113,7 +113,7 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
     testPrinter("number", "123 ?? 456", "123 ? ? 456");
     testPrinter("number", "123 << 456", "123 < < 456");
     testPrinter("number", "123 >> 456", "123 > > 456");
-    testPrinter("number", "123 !!! 456");
+    testPrinter("number", "123 !!! 456", "123 ! !! 456");
   }
 
   SECTION("Numbers and texts mismatchs") {

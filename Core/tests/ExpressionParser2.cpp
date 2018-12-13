@@ -736,4 +736,37 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(grandChildNode.name == "grandChild");
     }
   }
+
+  SECTION("Fuzzy/random tests") {
+    {
+      auto testExpression = [&parser](const gd::String & expression) {
+        auto testExpressionWithType = [&parser, &expression](const gd::String & type) {
+          auto node = parser.ParseExpression(type, expression);
+          REQUIRE(node != nullptr);
+          gd::ExpressionValidator validator;
+          node->Visit(validator);
+          REQUIRE(validator.GetErrors().size() != 0);
+        };
+
+        testExpressionWithType("number");
+        testExpressionWithType("string");
+        testExpressionWithType("scenevar");
+        testExpressionWithType("globalvar");
+        testExpressionWithType("objectvar");
+        testExpressionWithType("identifier");
+        testExpressionWithType("unknown");
+      };
+
+      REQUIRE_NOTHROW(testExpression(""));
+      REQUIRE_NOTHROW(testExpression("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
+      REQUIRE_NOTHROW(testExpression("2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2[]"));
+      REQUIRE_NOTHROW(testExpression("-043jovn"));
+      REQUIRE_NOTHROW(testExpression("-043jo\t\t\r\n+==\t-vn"));
+      REQUIRE_NOTHROW(testExpression("--=frpvlf-=3ok"));
+      REQUIRE_NOTHROW(testExpression("-[][\\][\\][]]"));
+      REQUIRE_NOTHROW(testExpression("r3o4f-kef03-34=-pf[w]"));
+      REQUIRE_NOTHROW(testExpression("-=-+))(_OK*UJKL}{\""));
+      REQUIRE_NOTHROW(testExpression("\\|\"\\|\"\\|\"w|\"\\\"\\\" \\\\\\\\\" fweewf \fe'f\fwe'\te'w\f'reg[pto43o]"));
+    }
+  }
 }

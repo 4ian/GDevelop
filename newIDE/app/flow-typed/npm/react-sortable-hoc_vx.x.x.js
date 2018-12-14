@@ -106,13 +106,19 @@ declare module 'react-sortable-hoc/dist/commonjs/Manager.js' {
   declare module.exports: $Exports<'react-sortable-hoc/dist/commonjs/Manager'>;
 }
 declare module 'react-sortable-hoc/dist/commonjs/SortableContainer/index.js' {
-  declare module.exports: $Exports<'react-sortable-hoc/dist/commonjs/SortableContainer/index'>;
+  declare module.exports: $Exports<
+    'react-sortable-hoc/dist/commonjs/SortableContainer/index'
+  >;
 }
 declare module 'react-sortable-hoc/dist/commonjs/SortableElement/index.js' {
-  declare module.exports: $Exports<'react-sortable-hoc/dist/commonjs/SortableElement/index'>;
+  declare module.exports: $Exports<
+    'react-sortable-hoc/dist/commonjs/SortableElement/index'
+  >;
 }
 declare module 'react-sortable-hoc/dist/commonjs/SortableHandle/index.js' {
-  declare module.exports: $Exports<'react-sortable-hoc/dist/commonjs/SortableHandle/index'>;
+  declare module.exports: $Exports<
+    'react-sortable-hoc/dist/commonjs/SortableHandle/index'
+  >;
 }
 declare module 'react-sortable-hoc/dist/commonjs/utils.js' {
   declare module.exports: $Exports<'react-sortable-hoc/dist/commonjs/utils'>;
@@ -124,22 +130,32 @@ declare module 'react-sortable-hoc/dist/es6/Manager.js' {
   declare module.exports: $Exports<'react-sortable-hoc/dist/es6/Manager'>;
 }
 declare module 'react-sortable-hoc/dist/es6/SortableContainer/index.js' {
-  declare module.exports: $Exports<'react-sortable-hoc/dist/es6/SortableContainer/index'>;
+  declare module.exports: $Exports<
+    'react-sortable-hoc/dist/es6/SortableContainer/index'
+  >;
 }
 declare module 'react-sortable-hoc/dist/es6/SortableElement/index.js' {
-  declare module.exports: $Exports<'react-sortable-hoc/dist/es6/SortableElement/index'>;
+  declare module.exports: $Exports<
+    'react-sortable-hoc/dist/es6/SortableElement/index'
+  >;
 }
 declare module 'react-sortable-hoc/dist/es6/SortableHandle/index.js' {
-  declare module.exports: $Exports<'react-sortable-hoc/dist/es6/SortableHandle/index'>;
+  declare module.exports: $Exports<
+    'react-sortable-hoc/dist/es6/SortableHandle/index'
+  >;
 }
 declare module 'react-sortable-hoc/dist/es6/utils.js' {
   declare module.exports: $Exports<'react-sortable-hoc/dist/es6/utils'>;
 }
 declare module 'react-sortable-hoc/dist/umd/react-sortable-hoc.js' {
-  declare module.exports: $Exports<'react-sortable-hoc/dist/umd/react-sortable-hoc'>;
+  declare module.exports: $Exports<
+    'react-sortable-hoc/dist/umd/react-sortable-hoc'
+  >;
 }
 declare module 'react-sortable-hoc/dist/umd/react-sortable-hoc.min.js' {
-  declare module.exports: $Exports<'react-sortable-hoc/dist/umd/react-sortable-hoc.min'>;
+  declare module.exports: $Exports<
+    'react-sortable-hoc/dist/umd/react-sortable-hoc.min'
+  >;
 }
 declare module 'react-sortable-hoc/examples/basic.js' {
   declare module.exports: $Exports<'react-sortable-hoc/examples/basic'>;
@@ -154,5 +170,7 @@ declare module 'react-sortable-hoc/examples/virtual-list.js' {
   declare module.exports: $Exports<'react-sortable-hoc/examples/virtual-list'>;
 }
 declare module 'react-sortable-hoc/examples/virtual-table-columns.js' {
-  declare module.exports: $Exports<'react-sortable-hoc/examples/virtual-table-columns'>;
+  declare module.exports: $Exports<
+    'react-sortable-hoc/examples/virtual-table-columns'
+  >;
 }

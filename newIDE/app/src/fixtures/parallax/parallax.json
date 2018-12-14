@@ -535,10 +535,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -548,12 +545,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "ObjectToFollow",
-                "-200",
-                "0",
-                "0"
-              ],
+              "parameters": ["ObjectToFollow", "-200", "0", "0"],
               "subInstructions": []
             }
           ],
@@ -569,10 +561,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Right"
-              ],
+              "parameters": ["", "Right"],
               "subInstructions": []
             }
           ],
@@ -582,12 +571,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "ObjectToFollow",
-                "200",
-                "0",
-                "0"
-              ],
+              "parameters": ["ObjectToFollow", "200", "0", "0"],
               "subInstructions": []
             }
           ],
@@ -604,9 +588,7 @@
                 "inverted": false,
                 "value": "MoveObjects"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -638,13 +620,7 @@
                 "inverted": false,
                 "value": "CameraX"
               },
-              "parameters": [
-                "",
-                "=",
-                "ObjectToFollow.X()",
-                "",
-                ""
-              ],
+              "parameters": ["", "=", "ObjectToFollow.X()", "", ""],
               "subInstructions": []
             },
             {

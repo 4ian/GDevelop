@@ -253,10 +253,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -274,13 +271,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "coin",
-                "MouseX()",
-                "MouseY()",
-                ""
-              ],
+              "parameters": ["", "coin", "MouseX()", "MouseY()", ""],
               "subInstructions": []
             }
           ],

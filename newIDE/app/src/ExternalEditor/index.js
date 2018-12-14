@@ -172,7 +172,9 @@ class ExternalEditor extends Component<Props, State> {
               this.editorOpened = true;
 
               if (this.props.editor === 'scene-editor') {
-                this.editor.openLayout(this.props.editedElementName, {openEventsEditor: false});
+                this.editor.openLayout(this.props.editedElementName, {
+                  openEventsEditor: false,
+                });
               }
               if (this.props.editor === 'external-layout-editor') {
                 this.editor.openExternalLayout(this.props.editedElementName);

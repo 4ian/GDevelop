@@ -116,8 +116,7 @@ class Animation extends React.Component<AnimationProps, void> {
         <MiniToolbar smallest>
           <DragHandle />
           <span style={styles.animationTitle}>
-            Animation #
-            {id}{' '}
+            Animation #{id}{' '}
             <SemiControlledTextField
               commitOnBlur
               value={animation.getName()}
@@ -146,7 +145,8 @@ class Animation extends React.Component<AnimationProps, void> {
               selectedSprites={selectedSprites}
               onSelectSprite={onSelectSprite}
               onReplaceByDirection={newDirection =>
-                onReplaceDirection(i, newDirection)}
+                onReplaceDirection(i, newDirection)
+              }
               objectName={objectName}
               animationName={animationName}
               onChangeName={onChangeName}
@@ -200,7 +200,8 @@ const SortableAnimationsList = SortableContainer(
                 selectedSprites={selectedSprites}
                 onSelectSprite={onSelectSprite}
                 onReplaceDirection={(directionId, newDirection) =>
-                  onReplaceDirection(i, directionId, newDirection)}
+                  onReplaceDirection(i, directionId, newDirection)
+                }
                 objectName={objectName}
               />
             );
@@ -363,7 +364,8 @@ class AnimationsListContainer extends React.Component<
         />
         <ContextMenu
           ref={spriteContextMenu =>
-            (this.spriteContextMenu = spriteContextMenu)}
+            (this.spriteContextMenu = spriteContextMenu)
+          }
           buildMenuTemplate={() => [
             {
               label: 'Delete selection',
@@ -470,8 +472,10 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
               object={spriteObject}
               resourcesLoader={this.resourcesLoader}
               project={project}
-              onPointsUpdated={() =>
-                this.forceUpdate() /*Force update to ensure dialog is properly positioned*/}
+              onPointsUpdated={
+                () =>
+                  this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
+              }
             />
           </Dialog>
         )}
@@ -494,8 +498,10 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
               object={spriteObject}
               resourcesLoader={this.resourcesLoader}
               project={project}
-              onCollisionMasksUpdated={() =>
-                this.forceUpdate() /*Force update to ensure dialog is properly positioned*/}
+              onCollisionMasksUpdated={
+                () =>
+                  this.forceUpdate() /*Force update to ensure dialog is properly positioned*/
+              }
             />
           </Dialog>
         )}

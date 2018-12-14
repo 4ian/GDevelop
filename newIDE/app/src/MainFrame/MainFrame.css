@@ -28,19 +28,20 @@
 :not(input):not(textarea):not(canvas),
 :not(input):not(textarea):not(canvas)::after,
 :not(input):not(textarea):not(canvas)::before {
-    -webkit-user-select: none;
-    user-select: none;
-    cursor: default;
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
 }
-a:not([draggable=true]), img:not([draggable=true]) {
-    -webkit-user-drag: none;
-    user-drag: none; /* Technically not supported in Electron yet */
+a:not([draggable='true']),
+img:not([draggable='true']) {
+  -webkit-user-drag: none;
+  user-drag: none; /* Technically not supported in Electron yet */
 }
 a[href^="http://"],
 a[href^="https://"],
 a[href^="ftp://"] {
-    -webkit-user-drag: auto;
-    user-drag: auto; /* Technically not supported in Electron yet */
+  -webkit-user-drag: auto;
+  user-drag: auto; /* Technically not supported in Electron yet */
 }
 
 /* Used for react-sortable-hoc SortableContainer, to make sure the

@@ -1974,11 +1974,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "Pause",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["Pause", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -1995,10 +1991,7 @@
                         "inverted": false,
                         "value": "HideLayer"
                       },
-                      "parameters": [
-                        "",
-                        "\"GameOver\""
-                      ],
+                      "parameters": ["", "\"GameOver\""],
                       "subInstructions": []
                     }
                   ],
@@ -2015,13 +2008,7 @@
                         "inverted": false,
                         "value": "CameraX"
                       },
-                      "parameters": [
-                        "",
-                        "+",
-                        "200*TimeDelta()",
-                        "\"\"",
-                        ""
-                      ],
+                      "parameters": ["", "+", "200*TimeDelta()", "\"\"", ""],
                       "subInstructions": []
                     }
                   ],
@@ -2048,9 +2035,7 @@
                             "inverted": false,
                             "value": "DepartScene"
                           },
-                          "parameters": [
-                            ""
-                          ],
+                          "parameters": [""],
                           "subInstructions": []
                         }
                       ],
@@ -2060,11 +2045,7 @@
                             "inverted": false,
                             "value": "SetAngle"
                           },
-                          "parameters": [
-                            "Rock",
-                            "=",
-                            "Random(360)"
-                          ],
+                          "parameters": ["Rock", "=", "Random(360)"],
                           "subInstructions": []
                         }
                       ],
@@ -2094,12 +2075,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "Player",
-                            "Life",
-                            ">=",
-                            "0"
-                          ],
+                          "parameters": ["Player", "Life", ">=", "0"],
                           "subInstructions": []
                         },
                         {
@@ -2107,11 +2083,7 @@
                             "inverted": false,
                             "value": "Timer"
                           },
-                          "parameters": [
-                            "",
-                            "0.15",
-                            "\"PlayerShootTimer\""
-                          ],
+                          "parameters": ["", "0.15", "\"PlayerShootTimer\""],
                           "subInstructions": []
                         }
                       ],
@@ -2149,12 +2121,7 @@
                             "inverted": false,
                             "value": "AddForceXY"
                           },
-                          "parameters": [
-                            "PlayerBullet",
-                            "1000",
-                            "0",
-                            "1"
-                          ],
+                          "parameters": ["PlayerBullet", "1000", "0", "1"],
                           "subInstructions": []
                         },
                         {
@@ -2176,10 +2143,7 @@
                             "inverted": false,
                             "value": "ResetTimer"
                           },
-                          "parameters": [
-                            "",
-                            "\"PlayerShootTimer\""
-                          ],
+                          "parameters": ["", "\"PlayerShootTimer\""],
                           "subInstructions": []
                         }
                       ],
@@ -2196,12 +2160,7 @@
                             "inverted": false,
                             "value": "AddForceXY"
                           },
-                          "parameters": [
-                            "Player",
-                            "200",
-                            "0",
-                            "0"
-                          ],
+                          "parameters": ["Player", "200", "0", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -2217,12 +2176,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "Player",
-                            "Life",
-                            "<=",
-                            "0"
-                          ],
+                          "parameters": ["Player", "Life", "<=", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -2262,11 +2216,7 @@
                                 "inverted": false,
                                 "value": "ModVarScene"
                               },
-                              "parameters": [
-                                "GameOver",
-                                "=",
-                                "1"
-                              ],
+                              "parameters": ["GameOver", "=", "1"],
                               "subInstructions": []
                             },
                             {
@@ -2274,10 +2224,7 @@
                                 "inverted": false,
                                 "value": "Delete"
                               },
-                              "parameters": [
-                                "Player",
-                                ""
-                              ],
+                              "parameters": ["Player", ""],
                               "subInstructions": []
                             }
                           ],
@@ -2308,10 +2255,7 @@
                             "inverted": false,
                             "value": "SourisBouton"
                           },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ],
+                          "parameters": ["", "Left"],
                           "subInstructions": []
                         }
                       ],
@@ -2341,10 +2285,7 @@
                                 "inverted": false,
                                 "value": "TopDownMovementBehavior::SimulateLeftKey"
                               },
-                              "parameters": [
-                                "Player",
-                                "TopDownMovement"
-                              ],
+                              "parameters": ["Player", "TopDownMovement"],
                               "subInstructions": []
                             }
                           ],
@@ -2374,10 +2315,7 @@
                                 "inverted": false,
                                 "value": "TopDownMovementBehavior::SimulateRightKey"
                               },
-                              "parameters": [
-                                "Player",
-                                "TopDownMovement"
-                              ],
+                              "parameters": ["Player", "TopDownMovement"],
                               "subInstructions": []
                             }
                           ],
@@ -2407,10 +2345,7 @@
                                 "inverted": false,
                                 "value": "TopDownMovementBehavior::SimulateDownKey"
                               },
-                              "parameters": [
-                                "Player",
-                                "TopDownMovement"
-                              ],
+                              "parameters": ["Player", "TopDownMovement"],
                               "subInstructions": []
                             }
                           ],
@@ -2440,10 +2375,7 @@
                                 "inverted": false,
                                 "value": "TopDownMovementBehavior::SimulateUpKey"
                               },
-                              "parameters": [
-                                "Player",
-                                "TopDownMovement"
-                              ],
+                              "parameters": ["Player", "TopDownMovement"],
                               "subInstructions": []
                             }
                           ],
@@ -2531,10 +2463,7 @@
                                         "inverted": false,
                                         "value": "ResetTimer"
                                       },
-                                      "parameters": [
-                                        "",
-                                        "\"EnemyShootTimer\""
-                                      ],
+                                      "parameters": ["", "\"EnemyShootTimer\""],
                                       "subInstructions": []
                                     }
                                   ],
@@ -2675,11 +2604,7 @@
                                         "inverted": false,
                                         "value": "Rotate"
                                       },
-                                      "parameters": [
-                                        "Rock",
-                                        "10",
-                                        ""
-                                      ],
+                                      "parameters": ["Rock", "10", ""],
                                       "subInstructions": []
                                     }
                                   ],
@@ -2756,12 +2681,7 @@
                                     "inverted": false,
                                     "value": "ModVarObjet"
                                   },
-                                  "parameters": [
-                                    "Player",
-                                    "Life",
-                                    "-",
-                                    "1"
-                                  ],
+                                  "parameters": ["Player", "Life", "-", "1"],
                                   "subInstructions": []
                                 }
                               ],
@@ -2800,10 +2720,7 @@
                                         "inverted": false,
                                         "value": "Delete"
                                       },
-                                      "parameters": [
-                                        "Vulnerable",
-                                        ""
-                                      ],
+                                      "parameters": ["Vulnerable", ""],
                                       "subInstructions": []
                                     }
                                   ],
@@ -2886,10 +2803,7 @@
                                         "inverted": false,
                                         "value": "Delete"
                                       },
-                                      "parameters": [
-                                        "PlayerBullet",
-                                        ""
-                                      ],
+                                      "parameters": ["PlayerBullet", ""],
                                       "subInstructions": []
                                     }
                                   ],
@@ -2936,10 +2850,7 @@
                                     "inverted": false,
                                     "value": "Delete"
                                   },
-                                  "parameters": [
-                                    "Vulnerable",
-                                    ""
-                                  ],
+                                  "parameters": ["Vulnerable", ""],
                                   "subInstructions": []
                                 }
                               ],
@@ -2969,10 +2880,7 @@
                                     "inverted": false,
                                     "value": "Delete"
                                   },
-                                  "parameters": [
-                                    "Vulnerable",
-                                    ""
-                                  ],
+                                  "parameters": ["Vulnerable", ""],
                                   "subInstructions": []
                                 }
                               ],
@@ -3007,12 +2915,7 @@
                             "inverted": false,
                             "value": "CollisionNP"
                           },
-                          "parameters": [
-                            "Player",
-                            "EnemyBullet",
-                            "",
-                            ""
-                          ],
+                          "parameters": ["Player", "EnemyBullet", "", ""],
                           "subInstructions": []
                         }
                       ],
@@ -3048,10 +2951,7 @@
                             "inverted": false,
                             "value": "Delete"
                           },
-                          "parameters": [
-                            "EnemyBullet",
-                            ""
-                          ],
+                          "parameters": ["EnemyBullet", ""],
                           "subInstructions": []
                         },
                         {
@@ -3073,12 +2973,7 @@
                             "inverted": false,
                             "value": "ModVarObjet"
                           },
-                          "parameters": [
-                            "Player",
-                            "Life",
-                            "-",
-                            "1"
-                          ],
+                          "parameters": ["Player", "Life", "-", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -3109,10 +3004,7 @@
                             "inverted": false,
                             "value": "ParticlesFunctions::HandleParticles"
                           },
-                          "parameters": [
-                            "",
-                            "Particle"
-                          ],
+                          "parameters": ["", "Particle"],
                           "subInstructions": []
                         }
                       ],
@@ -3182,11 +3074,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "GameOver",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["GameOver", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -3212,10 +3100,7 @@
                         "inverted": false,
                         "value": "ResetTimer"
                       },
-                      "parameters": [
-                        "",
-                        "\"GameOver\""
-                      ],
+                      "parameters": ["", "\"GameOver\""],
                       "subInstructions": []
                     },
                     {
@@ -3223,11 +3108,7 @@
                         "inverted": false,
                         "value": "TextObject::Opacity"
                       },
-                      "parameters": [
-                        "GameOver",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["GameOver", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -3258,10 +3139,7 @@
                         "inverted": false,
                         "value": "ShowLayer"
                       },
-                      "parameters": [
-                        "",
-                        "\"GameOver\""
-                      ],
+                      "parameters": ["", "\"GameOver\""],
                       "subInstructions": []
                     },
                     {
@@ -3269,11 +3147,7 @@
                         "inverted": false,
                         "value": "TextObject::Opacity"
                       },
-                      "parameters": [
-                        "GameOver",
-                        "+",
-                        "255*TimeDelta()"
-                      ],
+                      "parameters": ["GameOver", "+", "255*TimeDelta()"],
                       "subInstructions": []
                     }
                   ],
@@ -3289,11 +3163,7 @@
                         "inverted": false,
                         "value": "Timer"
                       },
-                      "parameters": [
-                        "",
-                        "2.5",
-                        "\"GameOver\""
-                      ],
+                      "parameters": ["", "2.5", "\"GameOver\""],
                       "subInstructions": []
                     }
                   ],
@@ -3303,11 +3173,7 @@
                         "inverted": false,
                         "value": "Scene"
                       },
-                      "parameters": [
-                        "",
-                        "\"Game\"",
-                        ""
-                      ],
+                      "parameters": ["", "\"Game\"", ""],
                       "subInstructions": []
                     }
                   ],
@@ -3402,11 +3268,7 @@
                         "inverted": false,
                         "value": "ChangePlan"
                       },
-                      "parameters": [
-                        "Particle",
-                        "=",
-                        "100"
-                      ],
+                      "parameters": ["Particle", "=", "100"],
                       "subInstructions": []
                     },
                     {
@@ -3427,11 +3289,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Particle",
-                        "=",
-                        "Random(2)"
-                      ],
+                      "parameters": ["Particle", "=", "Random(2)"],
                       "subInstructions": []
                     },
                     {
@@ -3439,11 +3297,7 @@
                         "inverted": false,
                         "value": "ChangeScale"
                       },
-                      "parameters": [
-                        "Particle",
-                        "=",
-                        "0.3+Random(5)/10"
-                      ],
+                      "parameters": ["Particle", "=", "0.3+Random(5)/10"],
                       "subInstructions": []
                     }
                   ],
@@ -3499,11 +3353,7 @@
                     "inverted": false,
                     "value": "Opacity"
                   },
-                  "parameters": [
-                    "Particle",
-                    "<=",
-                    "0"
-                  ],
+                  "parameters": ["Particle", "<=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -3513,10 +3363,7 @@
                     "inverted": false,
                     "value": "Delete"
                   },
-                  "parameters": [
-                    "Particle",
-                    ""
-                  ],
+                  "parameters": ["Particle", ""],
                   "subInstructions": []
                 }
               ],
@@ -3533,11 +3380,7 @@
                     "inverted": false,
                     "value": "Opacity"
                   },
-                  "parameters": [
-                    "Particle",
-                    "-",
-                    "380*TimeDelta()"
-                  ],
+                  "parameters": ["Particle", "-", "380*TimeDelta()"],
                   "subInstructions": []
                 }
               ],

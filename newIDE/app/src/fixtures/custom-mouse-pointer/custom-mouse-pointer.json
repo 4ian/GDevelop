@@ -274,9 +274,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -286,9 +284,7 @@
                 "inverted": false,
                 "value": "CacheSouris"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -320,13 +316,7 @@
                 "inverted": false,
                 "value": "MettreXY"
               },
-              "parameters": [
-                "MousePointer",
-                "=",
-                "MouseX()",
-                "=",
-                "MouseY()"
-              ],
+              "parameters": ["MousePointer", "=", "MouseX()", "=", "MouseY()"],
               "subInstructions": []
             }
           ],

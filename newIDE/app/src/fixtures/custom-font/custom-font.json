@@ -212,11 +212,7 @@
                 "inverted": false,
                 "value": "Scene"
               },
-              "parameters": [
-                "",
-                "\"displayText\"",
-                ""
-              ],
+              "parameters": ["", "\"displayText\"", ""],
               "subInstructions": []
             }
           ],

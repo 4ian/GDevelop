@@ -322,13 +322,7 @@
                 "inverted": false,
                 "value": "RotateTowardPosition"
               },
-              "parameters": [
-                "kenney",
-                "coin.X()",
-                "coin.Y()",
-                "100",
-                ""
-              ],
+              "parameters": ["kenney", "coin.X()", "coin.Y()", "100", ""],
               "subInstructions": []
             }
           ],
@@ -359,10 +353,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -380,13 +371,7 @@
                 "inverted": false,
                 "value": "MettreXY"
               },
-              "parameters": [
-                "coin",
-                "=",
-                "MouseX()",
-                "=",
-                "MouseY()"
-              ],
+              "parameters": ["coin", "=", "MouseX()", "=", "MouseY()"],
               "subInstructions": []
             }
           ],

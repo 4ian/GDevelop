@@ -306,10 +306,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -319,12 +316,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "kenney",
-                "-100",
-                "0",
-                ""
-              ],
+              "parameters": ["kenney", "-100", "0", ""],
               "subInstructions": []
             }
           ],
@@ -355,10 +347,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Right"
-              ],
+              "parameters": ["", "Right"],
               "subInstructions": []
             }
           ],
@@ -368,12 +357,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "kenney",
-                "100",
-                "0",
-                ""
-              ],
+              "parameters": ["kenney", "100", "0", ""],
               "subInstructions": []
             }
           ],
@@ -404,10 +388,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Up"
-              ],
+              "parameters": ["", "Up"],
               "subInstructions": []
             }
           ],
@@ -417,12 +398,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "kenney",
-                "0",
-                "-100",
-                ""
-              ],
+              "parameters": ["kenney", "0", "-100", ""],
               "subInstructions": []
             }
           ],
@@ -453,10 +429,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Down"
-              ],
+              "parameters": ["", "Down"],
               "subInstructions": []
             }
           ],
@@ -466,12 +439,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "kenney",
-                "0",
-                "100",
-                ""
-              ],
+              "parameters": ["kenney", "0", "100", ""],
               "subInstructions": []
             }
           ],
@@ -502,10 +470,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -544,11 +509,7 @@
                     "inverted": false,
                     "value": "NbObjet"
                   },
-                  "parameters": [
-                    "coin",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["coin", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -558,13 +519,7 @@
                     "inverted": false,
                     "value": "Create"
                   },
-                  "parameters": [
-                    "",
-                    "coin",
-                    "MouseX()",
-                    "MouseY()",
-                    ""
-                  ],
+                  "parameters": ["", "coin", "MouseX()", "MouseY()", ""],
                   "subInstructions": []
                 }
               ],
@@ -595,11 +550,7 @@
                     "inverted": false,
                     "value": "NbObjet"
                   },
-                  "parameters": [
-                    "coin",
-                    ">",
-                    "0"
-                  ],
+                  "parameters": ["coin", ">", "0"],
                   "subInstructions": []
                 }
               ],
@@ -609,13 +560,7 @@
                     "inverted": false,
                     "value": "MettreXY"
                   },
-                  "parameters": [
-                    "coin",
-                    "=",
-                    "MouseX()",
-                    "=",
-                    "MouseY()"
-                  ],
+                  "parameters": ["coin", "=", "MouseX()", "=", "MouseY()"],
                   "subInstructions": []
                 }
               ],
@@ -648,11 +593,7 @@
                 "inverted": false,
                 "value": "NbObjet"
               },
-              "parameters": [
-                "coin",
-                ">=",
-                "0"
-              ],
+              "parameters": ["coin", ">=", "0"],
               "subInstructions": []
             },
             {
@@ -660,9 +601,7 @@
                 "inverted": true,
                 "value": "AnyKeyPressed"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -672,12 +611,7 @@
                 "inverted": false,
                 "value": "AddForceVers"
               },
-              "parameters": [
-                "kenney",
-                "coin",
-                "100",
-                ""
-              ],
+              "parameters": ["kenney", "coin", "100", ""],
               "subInstructions": []
             }
           ],
@@ -708,12 +642,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "kenney",
-                "coin",
-                "",
-                ""
-              ],
+              "parameters": ["kenney", "coin", "", ""],
               "subInstructions": []
             }
           ],
@@ -723,10 +652,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "coin",
-                ""
-              ],
+              "parameters": ["coin", ""],
               "subInstructions": []
             }
           ],

@@ -3152,9 +3152,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -3164,11 +3162,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.0",
-                "=",
-                "\"a\""
-              ],
+              "parameters": ["key.0", "=", "\"a\""],
               "subInstructions": []
             },
             {
@@ -3176,11 +3170,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.1",
-                "=",
-                "\"b\""
-              ],
+              "parameters": ["key.1", "=", "\"b\""],
               "subInstructions": []
             },
             {
@@ -3188,11 +3178,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.2",
-                "=",
-                "\"c\""
-              ],
+              "parameters": ["key.2", "=", "\"c\""],
               "subInstructions": []
             },
             {
@@ -3200,11 +3186,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.3",
-                "=",
-                "\"d\""
-              ],
+              "parameters": ["key.3", "=", "\"d\""],
               "subInstructions": []
             },
             {
@@ -3212,11 +3194,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.4",
-                "=",
-                "\"e\""
-              ],
+              "parameters": ["key.4", "=", "\"e\""],
               "subInstructions": []
             },
             {
@@ -3224,11 +3202,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.5",
-                "=",
-                "\"f\""
-              ],
+              "parameters": ["key.5", "=", "\"f\""],
               "subInstructions": []
             },
             {
@@ -3236,11 +3210,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.6",
-                "=",
-                "\"g\""
-              ],
+              "parameters": ["key.6", "=", "\"g\""],
               "subInstructions": []
             },
             {
@@ -3248,11 +3218,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.7",
-                "=",
-                "\"h\""
-              ],
+              "parameters": ["key.7", "=", "\"h\""],
               "subInstructions": []
             },
             {
@@ -3260,11 +3226,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.8",
-                "=",
-                "\"i\""
-              ],
+              "parameters": ["key.8", "=", "\"i\""],
               "subInstructions": []
             },
             {
@@ -3272,11 +3234,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.9",
-                "=",
-                "\"j\""
-              ],
+              "parameters": ["key.9", "=", "\"j\""],
               "subInstructions": []
             },
             {
@@ -3284,11 +3242,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.10",
-                "=",
-                "\"k\""
-              ],
+              "parameters": ["key.10", "=", "\"k\""],
               "subInstructions": []
             },
             {
@@ -3296,11 +3250,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.11",
-                "=",
-                "\"l\""
-              ],
+              "parameters": ["key.11", "=", "\"l\""],
               "subInstructions": []
             },
             {
@@ -3308,11 +3258,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.12",
-                "=",
-                "\"m\""
-              ],
+              "parameters": ["key.12", "=", "\"m\""],
               "subInstructions": []
             },
             {
@@ -3320,11 +3266,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.13",
-                "=",
-                "\"n\""
-              ],
+              "parameters": ["key.13", "=", "\"n\""],
               "subInstructions": []
             },
             {
@@ -3332,11 +3274,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.14",
-                "=",
-                "\"o\""
-              ],
+              "parameters": ["key.14", "=", "\"o\""],
               "subInstructions": []
             },
             {
@@ -3344,11 +3282,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.15",
-                "=",
-                "\"p\""
-              ],
+              "parameters": ["key.15", "=", "\"p\""],
               "subInstructions": []
             },
             {
@@ -3356,11 +3290,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.16",
-                "=",
-                "\"q\""
-              ],
+              "parameters": ["key.16", "=", "\"q\""],
               "subInstructions": []
             },
             {
@@ -3368,11 +3298,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.17",
-                "=",
-                "\"r\""
-              ],
+              "parameters": ["key.17", "=", "\"r\""],
               "subInstructions": []
             },
             {
@@ -3380,11 +3306,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.18",
-                "=",
-                "\"s\""
-              ],
+              "parameters": ["key.18", "=", "\"s\""],
               "subInstructions": []
             },
             {
@@ -3392,11 +3314,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.19",
-                "=",
-                "\"t\""
-              ],
+              "parameters": ["key.19", "=", "\"t\""],
               "subInstructions": []
             },
             {
@@ -3404,11 +3322,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.20",
-                "=",
-                "\"u\""
-              ],
+              "parameters": ["key.20", "=", "\"u\""],
               "subInstructions": []
             },
             {
@@ -3416,11 +3330,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.21",
-                "=",
-                "\"v\""
-              ],
+              "parameters": ["key.21", "=", "\"v\""],
               "subInstructions": []
             },
             {
@@ -3428,11 +3338,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.22",
-                "=",
-                "\"w\""
-              ],
+              "parameters": ["key.22", "=", "\"w\""],
               "subInstructions": []
             },
             {
@@ -3440,11 +3346,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.23",
-                "=",
-                "\"x\""
-              ],
+              "parameters": ["key.23", "=", "\"x\""],
               "subInstructions": []
             },
             {
@@ -3452,11 +3354,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.24",
-                "=",
-                "\"y\""
-              ],
+              "parameters": ["key.24", "=", "\"y\""],
               "subInstructions": []
             },
             {
@@ -3464,11 +3362,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.25",
-                "=",
-                "\"z\""
-              ],
+              "parameters": ["key.25", "=", "\"z\""],
               "subInstructions": []
             },
             {
@@ -3476,11 +3370,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "key.26",
-                "=",
-                "\"Space\""
-              ],
+              "parameters": ["key.26", "=", "\"Space\""],
               "subInstructions": []
             },
             {
@@ -3488,11 +3378,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "pick_new_key",
-                "=",
-                "1"
-              ],
+              "parameters": ["pick_new_key", "=", "1"],
               "subInstructions": []
             },
             {
@@ -3500,11 +3386,7 @@
                 "inverted": false,
                 "value": "ModVarGlobal"
               },
-              "parameters": [
-                "key_counter",
-                "=",
-                "0"
-              ],
+              "parameters": ["key_counter", "=", "0"],
               "subInstructions": []
             },
             {
@@ -3512,10 +3394,7 @@
                 "inverted": false,
                 "value": "UnPauseTimer"
               },
-              "parameters": [
-                "",
-                "\"game_time\""
-              ],
+              "parameters": ["", "\"game_time\""],
               "subInstructions": []
             }
           ],
@@ -3585,11 +3464,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "pick_new_key",
-                "=",
-                "1"
-              ],
+              "parameters": ["pick_new_key", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -3599,11 +3474,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "random_key",
-                "=",
-                "Random(26)"
-              ],
+              "parameters": ["random_key", "=", "Random(26)"],
               "subInstructions": []
             }
           ],
@@ -3634,11 +3505,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "keys",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["keys", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -3646,11 +3513,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "pick_new_key",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["pick_new_key", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -3683,9 +3546,7 @@
                 "inverted": false,
                 "value": "AnyKeyPressed"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -3721,11 +3582,7 @@
                         "inverted": false,
                         "value": "Animation"
                       },
-                      "parameters": [
-                        "keys",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["keys", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -3735,11 +3592,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "keys",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["keys", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -3747,11 +3600,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "pick_new_key",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["pick_new_key", "=", "1"],
                       "subInstructions": []
                     },
                     {
@@ -3759,11 +3608,7 @@
                         "inverted": false,
                         "value": "ModVarGlobal"
                       },
-                      "parameters": [
-                        "key_counter",
-                        "+",
-                        "1"
-                      ],
+                      "parameters": ["key_counter", "+", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -3798,10 +3643,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -3825,12 +3667,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "keys",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["keys", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -3876,11 +3713,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "keys",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["keys", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -3888,11 +3721,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "pick_new_key",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["pick_new_key", "=", "1"],
                       "subInstructions": []
                     },
                     {
@@ -3900,11 +3729,7 @@
                         "inverted": false,
                         "value": "ModVarGlobal"
                       },
-                      "parameters": [
-                        "key_counter",
-                        "+",
-                        "1"
-                      ],
+                      "parameters": ["key_counter", "+", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -3987,11 +3812,7 @@
                 "inverted": false,
                 "value": "Timer"
               },
-              "parameters": [
-                "",
-                "60",
-                "\"game_time\""
-              ],
+              "parameters": ["", "60", "\"game_time\""],
               "subInstructions": []
             }
           ],
@@ -4001,11 +3822,7 @@
                 "inverted": false,
                 "value": "Scene"
               },
-              "parameters": [
-                "",
-                "\"game_over\"",
-                ""
-              ],
+              "parameters": ["", "\"game_over\"", ""],
               "subInstructions": []
             }
           ],
@@ -4190,9 +4007,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -4237,12 +4052,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "playagain",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["playagain", "", "", ""],
               "subInstructions": []
             }
           ],
@@ -4268,10 +4078,7 @@
                     "inverted": false,
                     "value": "TextObject::ChangeColor"
                   },
-                  "parameters": [
-                    "playagain",
-                    "\"65;117;5\""
-                  ],
+                  "parameters": ["playagain", "\"65;117;5\""],
                   "subInstructions": []
                 }
               ],
@@ -4287,10 +4094,7 @@
                     "inverted": false,
                     "value": "MouseButtonReleased"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -4300,11 +4104,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"play\"",
-                    ""
-                  ],
+                  "parameters": ["", "\"play\"", ""],
                   "subInstructions": []
                 }
               ],
@@ -4322,12 +4122,7 @@
                 "inverted": true,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "playagain",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["playagain", "", "", ""],
               "subInstructions": []
             },
             {
@@ -4345,10 +4140,7 @@
                 "inverted": false,
                 "value": "TextObject::ChangeColor"
               },
-              "parameters": [
-                "playagain",
-                "\"74;147;226\""
-              ],
+              "parameters": ["playagain", "\"74;147;226\""],
               "subInstructions": []
             }
           ],

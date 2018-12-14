@@ -15,7 +15,11 @@
 }
 
 /* Hovered titlebar background */
-.mosaic-gd-default-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
-.mosaic-gd-default-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+.mosaic-gd-default-theme.mosaic-blueprint-theme
+  .mosaic-window
+  .mosaic-window-toolbar.draggable:hover,
+.mosaic-gd-default-theme.mosaic.mosaic-blueprint-theme
+  .mosaic-preview
+  .mosaic-window-toolbar.draggable:hover {
   background: #9100ce !important;
 }

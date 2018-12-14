@@ -68,8 +68,16 @@ const contributors = [
   },
 
   // Community members:
-  { name: 'ddabrahim', description: 'Lots of examples bundled with GDevelop', link: 'https://gametemplates.itch.io/', },
-  { name: 'Gametemplates', description: 'Examples bundled with GDevelop', link: 'https://gametemplates.itch.io/', },
+  {
+    name: 'ddabrahim',
+    description: 'Lots of examples bundled with GDevelop',
+    link: 'https://gametemplates.itch.io/',
+  },
+  {
+    name: 'Gametemplates',
+    description: 'Examples bundled with GDevelop',
+    link: 'https://gametemplates.itch.io/',
+  },
   { name: 'Mats', description: 'Tutorials, Examples' },
   { name: 'erdo', description: 'Tutorials, Examples' },
   { name: 'Jubileuksen3', description: 'Tutorials, Examples' },
@@ -170,9 +178,8 @@ export default class AboutDialog extends PureComponent<Props, *> {
                         <FlatButton
                           label={updateButtonLabel}
                           onClick={() =>
-                            checkUpdates(
-                              canDownloadUpdate(updateStatus.status)
-                            )}
+                            checkUpdates(canDownloadUpdate(updateStatus.status))
+                          }
                         />
                       )}
                     </Line>
@@ -196,7 +203,8 @@ export default class AboutDialog extends PureComponent<Props, *> {
                           contributor.link ? (
                             <IconButton
                               onClick={() =>
-                                this._openLink(contributor.link || '')}
+                                this._openLink(contributor.link || '')
+                              }
                             >
                               <OpenInNew />
                             </IconButton>

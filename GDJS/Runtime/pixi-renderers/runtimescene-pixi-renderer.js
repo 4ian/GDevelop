@@ -32,22 +32,25 @@ gdjs.RuntimeScenePixiRenderer.prototype._renderProfileText = function() {
   if (!this._runtimeScene.getProfiler()) return;
 
   if (!this._profilerText) {
-    this._profilerText = new PIXI.Text(" ", {
-      align: "left",
-      stroke: "#FFF",
-      strokeThickness: 1
+    this._profilerText = new PIXI.Text(' ', {
+      align: 'left',
+      stroke: '#FFF',
+      strokeThickness: 1,
     });
     this._pixiContainer.addChild(this._profilerText);
   }
 
   var average = this._runtimeScene.getProfiler().getFramesAverageMeasures();
   var outputs = [];
-  gdjs.Profiler.getProfilerSectionTexts("All", average, outputs);
+  gdjs.Profiler.getProfilerSectionTexts('All', average, outputs);
 
-  this._profilerText.text = outputs.join("\n");
+  this._profilerText.text = outputs.join('\n');
 };
 
-gdjs.RuntimeScenePixiRenderer.prototype.renderDebugDraw = function(instances, layersCameraCoordinates) {
+gdjs.RuntimeScenePixiRenderer.prototype.renderDebugDraw = function(
+  instances,
+  layersCameraCoordinates
+) {
   if (!this._debugDraw) {
     this._debugDraw = new PIXI.Graphics();
     this._pixiContainer.addChild(this._debugDraw);
@@ -61,7 +64,7 @@ gdjs.RuntimeScenePixiRenderer.prototype.renderDebugDraw = function(instances, la
   debugDraw.fillAlpha = 0.1;
   debugDraw.alpha = 0.8;
 
-  for(var i = 0;i < instances.length;i++) {
+  for (var i = 0; i < instances.length; i++) {
     var object = instances[i];
     var cameraCoords = layersCameraCoordinates[object.getLayer()];
     var rendererObject = object.getRendererObject();
@@ -69,17 +72,22 @@ gdjs.RuntimeScenePixiRenderer.prototype.renderDebugDraw = function(instances, la
     if (!cameraCoords || !rendererObject) continue;
 
     var aabb = object.getAABB();
-    debugDraw.drawRect(aabb.min[0], aabb.min[1], aabb.max[0] - aabb.min[0], aabb.max[1] - aabb.min[1]);
+    debugDraw.drawRect(
+      aabb.min[0],
+      aabb.min[1],
+      aabb.max[0] - aabb.min[0],
+      aabb.max[1] - aabb.min[1]
+    );
   }
   debugDraw.endFill();
 };
 
 gdjs.RuntimeScenePixiRenderer.prototype.hideCursor = function() {
-  this._pixiRenderer.view.style.cursor = "none";
+  this._pixiRenderer.view.style.cursor = 'none';
 };
 
 gdjs.RuntimeScenePixiRenderer.prototype.showCursor = function() {
-  this._pixiRenderer.view.style.cursor = "";
+  this._pixiRenderer.view.style.cursor = '';
 };
 
 gdjs.RuntimeScenePixiRenderer.prototype.getPIXIContainer = function() {

@@ -42,7 +42,9 @@ if (shell.test('-f', sourceFile)) {
     function(response) {
       if (response.statusCode !== 200) {
         shell.echo(
-          `❌ Can't download libGD.js (${response.statusMessage}), please check your internet connection`
+          `❌ Can't download libGD.js (${
+            response.statusMessage
+          }), please check your internet connection`
         );
         shell.exit(1);
         return;
@@ -52,7 +54,10 @@ if (shell.test('-f', sourceFile)) {
         shell.echo('✅ libGD.js downloaded and stored in public/libGD.js');
 
         if (
-          !shell.cp('../public/libGD.js', destinationTestDirectory + '/index.js').stderr
+          !shell.cp(
+            '../public/libGD.js',
+            destinationTestDirectory + '/index.js'
+          ).stderr
         ) {
           shell.echo('✅ Copied libGD.js to node_modules folder');
         } else {

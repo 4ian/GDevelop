@@ -267,10 +267,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Space"
-              ],
+              "parameters": ["", "Space"],
               "subInstructions": []
             },
             {
@@ -278,10 +275,7 @@
                 "inverted": true,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -334,10 +328,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -345,10 +336,7 @@
                 "inverted": true,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Space"
-              ],
+              "parameters": ["", "Space"],
               "subInstructions": []
             },
             {
@@ -401,10 +389,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Space"
-              ],
+              "parameters": ["", "Space"],
               "subInstructions": []
             },
             {
@@ -412,10 +397,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -468,10 +450,7 @@
                 "inverted": true,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Space"
-              ],
+              "parameters": ["", "Space"],
               "subInstructions": []
             },
             {
@@ -479,10 +458,7 @@
                 "inverted": true,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -535,10 +511,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "h"
-              ],
+              "parameters": ["", "h"],
               "subInstructions": []
             },
             {
@@ -556,9 +529,7 @@
                 "inverted": false,
                 "value": "Cache"
               },
-              "parameters": [
-                "hide_text"
-              ],
+              "parameters": ["hide_text"],
               "subInstructions": []
             }
           ],
@@ -589,10 +560,7 @@
                 "inverted": true,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "h"
-              ],
+              "parameters": ["", "h"],
               "subInstructions": []
             },
             {
@@ -610,10 +578,7 @@
                 "inverted": false,
                 "value": "Montre"
               },
-              "parameters": [
-                "hide_text",
-                ""
-              ],
+              "parameters": ["hide_text", ""],
               "subInstructions": []
             }
           ],
@@ -644,10 +609,7 @@
                 "inverted": false,
                 "value": "DraggableBehavior::Dragged"
               },
-              "parameters": [
-                "drag_text",
-                "Draggable"
-              ],
+              "parameters": ["drag_text", "Draggable"],
               "subInstructions": []
             },
             {
@@ -665,11 +627,7 @@
                 "inverted": false,
                 "value": "TextObject::String"
               },
-              "parameters": [
-                "drag_text",
-                "=",
-                "\"The text is being dragged\""
-              ],
+              "parameters": ["drag_text", "=", "\"The text is being dragged\""],
               "subInstructions": []
             },
             {
@@ -677,10 +635,7 @@
                 "inverted": false,
                 "value": "TextObject::ChangeColor"
               },
-              "parameters": [
-                "drag_text",
-                "\"65;143;204\""
-              ],
+              "parameters": ["drag_text", "\"65;143;204\""],
               "subInstructions": []
             }
           ],
@@ -711,10 +666,7 @@
                 "inverted": true,
                 "value": "DraggableBehavior::Dragged"
               },
-              "parameters": [
-                "drag_text",
-                "Draggable"
-              ],
+              "parameters": ["drag_text", "Draggable"],
               "subInstructions": []
             },
             {
@@ -732,11 +684,7 @@
                 "inverted": false,
                 "value": "TextObject::String"
               },
-              "parameters": [
-                "drag_text",
-                "=",
-                "\"You can drag this text\""
-              ],
+              "parameters": ["drag_text", "=", "\"You can drag this text\""],
               "subInstructions": []
             },
             {
@@ -744,10 +692,7 @@
                 "inverted": false,
                 "value": "TextObject::ChangeColor"
               },
-              "parameters": [
-                "drag_text",
-                "\"0;0;0\""
-              ],
+              "parameters": ["drag_text", "\"0;0;0\""],
               "subInstructions": []
             }
           ],

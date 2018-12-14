@@ -22,9 +22,7 @@ const EmptyMessage = (props: Props) => (
   <ThemeConsumer>
     {muiTheme => (
       <div style={{ ...styles.containerStyle, ...props.style }}>
-        <BackgroundText
-          style={props.messageStyle}
-        >
+        <BackgroundText style={props.messageStyle}>
           {props.children}
         </BackgroundText>
       </div>

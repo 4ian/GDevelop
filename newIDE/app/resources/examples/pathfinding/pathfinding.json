@@ -2286,10 +2286,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -2343,11 +2340,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "i",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["i", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -2355,10 +2348,7 @@
                     "inverted": false,
                     "value": "Delete"
                   },
-                  "parameters": [
-                    "NodeMarker",
-                    ""
-                  ],
+                  "parameters": ["NodeMarker", ""],
                   "subInstructions": []
                 }
               ],
@@ -2375,11 +2365,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "i",
-                    "<",
-                    "Tank.Pathfinding::NodeCount()"
-                  ],
+                  "parameters": ["i", "<", "Tank.Pathfinding::NodeCount()"],
                   "subInstructions": []
                 }
               ],
@@ -2404,11 +2390,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "i",
-                    "+",
-                    "1"
-                  ],
+                  "parameters": ["i", "+", "1"],
                   "subInstructions": []
                 }
               ],
@@ -2480,12 +2462,7 @@
                 "inverted": false,
                 "value": "PathfindingBehavior::MaxSpeed"
               },
-              "parameters": [
-                "Tank",
-                "Pathfinding",
-                "=",
-                "400"
-              ],
+              "parameters": ["Tank", "Pathfinding", "=", "400"],
               "subInstructions": []
             }
           ],
@@ -2501,11 +2478,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "Tank",
-                "Symbol",
-                ""
-              ],
+              "parameters": ["Tank", "Symbol", ""],
               "subInstructions": []
             }
           ],
@@ -2515,12 +2488,7 @@
                 "inverted": false,
                 "value": "PathfindingBehavior::MaxSpeed"
               },
-              "parameters": [
-                "Tank",
-                "Pathfinding",
-                "=",
-                "200"
-              ],
+              "parameters": ["Tank", "Pathfinding", "=", "200"],
               "subInstructions": []
             }
           ],

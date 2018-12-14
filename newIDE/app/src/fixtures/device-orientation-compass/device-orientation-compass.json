@@ -288,9 +288,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],

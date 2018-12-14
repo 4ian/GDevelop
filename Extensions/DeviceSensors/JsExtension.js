@@ -1,27 +1,27 @@
 /**
  * This is a declaration of an extension for GDevelop 5.
- * 
+ *
  * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
  * to this extension file or to any other *.js file that you reference inside.
- * 
- * The file must be named "JsExtension.js", otherwise GDevelop won't load it. 
+ *
+ * The file must be named "JsExtension.js", otherwise GDevelop won't load it.
  * ⚠️ If you make a change and the extension is not loaded, open the developer console
  * and search for any errors.
- * 
+ *
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
   createExtension: function(t, gd) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      "DeviceSensors",
-      t("Device sensors"),
-      t(
-        "Allow the game to access the sensors of a mobile device."
-      ),
-      "Matthias Meike",
-      "Open source (MIT License)"
-    ).setExtensionHelpPath("/all-features/device-sensors");
+    extension
+      .setExtensionInformation(
+        "DeviceSensors",
+        t("Device sensors"),
+        t("Allow the game to access the sensors of a mobile device."),
+        "Matthias Meike",
+        "Open source (MIT License)"
+      )
+      .setExtensionHelpPath("/all-features/device-sensors");
 
     extension
       .addCondition(
@@ -36,18 +36,14 @@ module.exports = {
         "JsPlatform/Extensions/orientation_active32.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.orientation.isActive");
 
-      extension
+    extension
       .addCondition(
         "OrientationAlpha",
         t("Compare the value of orientation alpha"),
-        t(
-          "Compare the value of orientation alpha. (Range: 0 to 360°)"
-        ),
+        t("Compare the value of orientation alpha. (Range: 0 to 360°)"),
         t("Orientation alpha is _PARAM0__PARAM1_"),
         t("Sensors/Orientation"),
         "JsPlatform/Extensions/orientation_alpha24.png",
@@ -56,18 +52,14 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.orientation.getOrientationAlpha");
 
-      extension
+    extension
       .addCondition(
         "OrientationBeta",
         t("Compare the value of orientation beta"),
-        t(
-          "Compare the value of orientation beta. (Range: -180 to 180°)"
-        ),
+        t("Compare the value of orientation beta. (Range: -180 to 180°)"),
         t("Orientation beta is _PARAM0__PARAM1_"),
         t("Sensors/Orientation"),
         "JsPlatform/Extensions/orientation_beta24.png",
@@ -76,18 +68,14 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.orientation.getOrientationBeta");
 
-      extension
+    extension
       .addCondition(
         "OrientationGamma",
         t("Compare the value of orientation gamma"),
-        t(
-          "Compare the value of orientation gamma. (Range: -90 to 90°)"
-        ),
+        t("Compare the value of orientation gamma. (Range: -90 to 90°)"),
         t("Orientation gamma is _PARAM0__PARAM1_"),
         t("Sensors/Orientation"),
         "JsPlatform/Extensions/orientation_gamma24.png",
@@ -96,9 +84,7 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.orientation.getOrientationGamma");
 
     extension
@@ -111,11 +97,11 @@ module.exports = {
         "JsPlatform/Extensions/orientation_active24.png",
         "JsPlatform/Extensions/orientation_active32.png"
       )
-        .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
-      .setFunctionName("gdjs.deviceSensors.orientation.activateOrientationSensor");
+      .getCodeExtraInformation()
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
+      .setFunctionName(
+        "gdjs.deviceSensors.orientation.activateOrientationSensor"
+      );
 
     extension
       .addAction(
@@ -127,11 +113,11 @@ module.exports = {
         "JsPlatform/Extensions/orientation_inactive24.png",
         "JsPlatform/Extensions/orientation_inactive32.png"
       )
-        .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
-      .setFunctionName("gdjs.deviceSensors.orientation.deactivateOrientationSensor");
+      .getCodeExtraInformation()
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
+      .setFunctionName(
+        "gdjs.deviceSensors.orientation.deactivateOrientationSensor"
+      );
 
     extension
       .addExpression(
@@ -141,9 +127,7 @@ module.exports = {
         t("Sensors/Orientation")
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.orientation.getOrientationAbsolute");
 
     extension
@@ -154,9 +138,7 @@ module.exports = {
         t("Sensors/Orientation")
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.orientation.getOrientationAlpha");
 
     extension
@@ -167,9 +149,7 @@ module.exports = {
         t("Sensors/Orientation")
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.orientation.getOrientationBeta");
 
     extension
@@ -180,12 +160,10 @@ module.exports = {
         t("Sensors/Orientation")
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.orientation.getOrientationGamma");
 
-      extension
+    extension
       .addCondition(
         "MotionSensorActive",
         t("Sensor active"),
@@ -198,12 +176,10 @@ module.exports = {
         "JsPlatform/Extensions/motion_active32.png"
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.isActive");
 
-      extension
+    extension
       .addCondition(
         "RotationAlpha",
         t("Compare the value of rotation alpha"),
@@ -218,12 +194,10 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getRotationAlpha");
 
-      extension
+    extension
       .addCondition(
         "RotationBeta",
         t("Compare the value of rotation beta"),
@@ -238,12 +212,10 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getRotationBeta");
 
-      extension
+    extension
       .addCondition(
         "RotationGamma",
         t("Compare the value of rotation gamma"),
@@ -258,18 +230,14 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getRotationGamma");
 
-      extension
+    extension
       .addCondition(
         "AccelerationX",
         t("Compare the value of acceleration on X-axis"),
-        t(
-          "Compare the value of acceleration on the X-axis (m/s²)."
-        ),
+        t("Compare the value of acceleration on the X-axis (m/s²)."),
         t("Acceleration X is _PARAM0__PARAM1_"),
         t("Sensors/Motion"),
         "JsPlatform/Extensions/motion_acceleration_x24.png",
@@ -278,18 +246,14 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getAccelerationX");
 
-      extension
+    extension
       .addCondition(
         "AccelerationY",
         t("Compare the value of acceleration on Y-axis"),
-        t(
-          "Compare the value of acceleration on the Y-axis (m/s²)."
-        ),
+        t("Compare the value of acceleration on the Y-axis (m/s²)."),
         t("Acceleration Y is _PARAM0__PARAM1_"),
         t("Sensors/Motion"),
         "JsPlatform/Extensions/motion_acceleration_y24.png",
@@ -298,18 +262,14 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getAccelerationY");
 
-      extension
+    extension
       .addCondition(
         "AccelerationZ",
         t("Compare the value of acceleration on Z-axis"),
-        t(
-          "Compare the value of acceleration on the Z-axis (m/s²)."
-        ),
+        t("Compare the value of acceleration on the Z-axis (m/s²)."),
         t("Acceleration Z is _PARAM0__PARAM1_"),
         t("Sensors/Motion"),
         "JsPlatform/Extensions/motion_acceleration_z24.png",
@@ -318,9 +278,7 @@ module.exports = {
       .addParameter("relationalOperator", t("Sign of the test"))
       .addParameter("expression", t("Value (m/s²)"))
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getAccelerationZ");
 
     extension
@@ -333,10 +291,8 @@ module.exports = {
         "JsPlatform/Extensions/motion_active24.png",
         "JsPlatform/Extensions/motion_active32.png"
       )
-        .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .getCodeExtraInformation()
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.activateMotionSensor");
 
     extension
@@ -349,10 +305,8 @@ module.exports = {
         "JsPlatform/Extensions/motion_inactive24.png",
         "JsPlatform/Extensions/motion_inactive32.png"
       )
-        .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .getCodeExtraInformation()
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.deactivateMotionSensor");
 
     extension
@@ -363,9 +317,7 @@ module.exports = {
         t("Sensors/Motion")
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getRotationAlpha");
 
     extension
@@ -376,9 +328,7 @@ module.exports = {
         t("Sensors/Motion")
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getRotationBeta");
 
     extension
@@ -389,12 +339,10 @@ module.exports = {
         t("Sensors/Motion")
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getRotationGamma");
 
-      extension
+    extension
       .addExpression(
         "AccelerationX",
         t("Acceleration X value"),
@@ -402,12 +350,10 @@ module.exports = {
         t("Sensors/Motion")
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getAccelerationX");
 
-      extension
+    extension
       .addExpression(
         "AccelerationY",
         t("Acceleration Y value"),
@@ -415,12 +361,10 @@ module.exports = {
         t("Sensors/Motion")
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getAccelerationY");
 
-      extension
+    extension
       .addExpression(
         "AccelerationZ",
         t("Acceleration Z value"),
@@ -428,12 +372,12 @@ module.exports = {
         t("Sensors/Motion")
       )
       .getCodeExtraInformation()
-      .setIncludeFile(
-        "Extensions/DeviceSensors/devicesensortools.js"
-      )
+      .setIncludeFile("Extensions/DeviceSensors/devicesensortools.js")
       .setFunctionName("gdjs.deviceSensors.motion.getAccelerationZ");
 
     return extension;
   },
-  runExtensionSanityTests: function(gd, extension) { return []; },
+  runExtensionSanityTests: function(gd, extension) {
+    return [];
+  }
 };

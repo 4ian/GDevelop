@@ -14,8 +14,7 @@ const updateFrameElements = () => {
     if (piskelOptions.singleFrame) {
       editorContentDocument.getElementsByClassName(
         'preview-list-wrapper'
-      )[0].style.display =
-        'none';
+      )[0].style.display = 'none';
     }
   });
 };
@@ -46,8 +45,8 @@ const readBase64ImageFile = file => {
 };
 
 /**
-* Save the content to the specified file
-*/
+ * Save the content to the specified file
+ */
 const saveToFile = (content, filePath, callback) => {
   const reader = new FileReader();
   reader.onload = () => {
@@ -306,7 +305,6 @@ const loadPiskelDataFromGd = () => {
         const layer = piskelController.getLayers()[0];
         const removeFrameIndex = layer.getFrames().indexOf(frameToDelete);
         if (removeFrameIndex !== -1) {
-
           // Always keep the frame count at 1 or above by inserting an empty frame if we're reaching 0 - as Piskel does not support having no frames
           if (piskelController.getFrameCount() === 1) {
             piskelController.setCurrentFrameIndex(
@@ -344,7 +342,7 @@ const loadPiskelDataFromGd = () => {
  * Inject custom buttons in Piskel's header,
  * get rid of the new file button,
  * make animation name and path editable
-*/
+ */
 ipcRenderer.on('piskel-load-animation', (event, receivedOptions) => {
   piskelOptions = receivedOptions;
 

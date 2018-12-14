@@ -102,7 +102,7 @@ Add a behavior using [`addBehavior`](http://4ian.github.io/GD-Documentation/GDCo
 - For the behavior, create a `new gd.BehaviorJsImplementation()` and define `updateProperty` and `getProperties`.
 - For the shared data (which are properties shared between all behaviors of the same type), if you don't have the need for it, just pass `new gd.BehaviorsSharedData()`. If you need shared data, create a `new gd.BehaviorSharedDataJsImplementation()` and define `updateProperty` and `getProperties`.
 
-> ⚠️ Like other functions to declare extensions, make sure that you've not forgotten to declare a function and that all arguments are correct. 
+> ⚠️ Like other functions to declare extensions, make sure that you've not forgotten to declare a function and that all arguments are correct.
 
 > 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
 
@@ -110,7 +110,7 @@ Add a behavior using [`addBehavior`](http://4ian.github.io/GD-Documentation/GDCo
 
 > 👋 Declaring objects is not yet fully exposed to JavaScript extensions. Your help is welcome to expose this feature!
 
-Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a554baca486909e8741e902133cceeec0). The last  parameter is the `gd.Object` representing the object:
+Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a554baca486909e8741e902133cceeec0). The last parameter is the `gd.Object` representing the object:
 
 - Create a `new gd.ObjectJsImplementation()` and define `updateProperty` and `getProperties` (for the object properties) and `updateInitialInstanceProperty` and `getInitialInstanceProperties` (for the optional properties that are attached to each instance).
 
@@ -119,8 +119,6 @@ Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%
 #### Declare events
 
 > 👋 Declaring events is not yet exposed to JavaScript extensions. Your help is welcome to expose this feature!
-
-
 
 ## Starting a new extension from scratch
 

@@ -187,7 +187,9 @@ module.exports = {
       .addCondition(
         "AreAdsSupported",
         t("Check if ads are supported"),
-        t("Check if showind ads is supported on this device (only mobile phones can show ads)"),
+        t(
+          "Check if showind ads is supported on this device (only mobile phones can show ads)"
+        ),
         t("Ads can be shown on this device"),
         t("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
@@ -203,7 +205,9 @@ module.exports = {
       .addCondition(
         "IsInterstitialAdReady",
         t("Is the interstitial ad ready"),
-        t("Check if the interstitial ad requested from Facebook is loaded and ready to be shown."),
+        t(
+          "Check if the interstitial ad requested from Facebook is loaded and ready to be shown."
+        ),
         t("The interstitial ad is loaded and ready to be shown"),
         t("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
@@ -213,21 +217,29 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FacebookInstantGames/facebookinstantgamestools.js"
       )
-      .setFunctionName("gdjs.evtTools.facebookInstantGames.isInterstitialAdReady");
+      .setFunctionName(
+        "gdjs.evtTools.facebookInstantGames.isInterstitialAdReady"
+      );
 
     extension
       .addAction(
         "LoadInterstitialAd",
         t("Load and prepare an interstitial ad"),
-        t("Request and load an interstitial ad from Facebook, so that it is ready to be shown."),
-        t("Request and load an interstitial ad from Facebook (ad placement id: _PARAM0_, error in _PARAM1_)"),
+        t(
+          "Request and load an interstitial ad from Facebook, so that it is ready to be shown."
+        ),
+        t(
+          "Request and load an interstitial ad from Facebook (ad placement id: _PARAM0_, error in _PARAM1_)"
+        ),
         t("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter(
         "string",
-        t("The Ad Placement id (can be found while setting up the ad on Facebook)"),
+        t(
+          "The Ad Placement id (can be found while setting up the ad on Facebook)"
+        ),
         "",
         false
       )
@@ -247,8 +259,12 @@ module.exports = {
       .addAction(
         "ShowInterstitialAd",
         t("Show the loaded interstitial ad"),
-        t("Show the interstitial ad previously loaded in memory. This won't work if you did not load the interstitial before."),
-        t("Show the interstitial ad previously loaded in memory (if any error, store it in _PARAM0_)"),
+        t(
+          "Show the interstitial ad previously loaded in memory. This won't work if you did not load the interstitial before."
+        ),
+        t(
+          "Show the interstitial ad previously loaded in memory (if any error, store it in _PARAM0_)"
+        ),
         t("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
@@ -269,7 +285,9 @@ module.exports = {
       .addCondition(
         "IsRewardedVideoReady",
         t("Is the rewarded video ready"),
-        t("Check if the rewarded video requested from Facebook is loaded and ready to be shown."),
+        t(
+          "Check if the rewarded video requested from Facebook is loaded and ready to be shown."
+        ),
         t("The rewarded video is loaded and ready to be shown"),
         t("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
@@ -279,21 +297,29 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FacebookInstantGames/facebookinstantgamestools.js"
       )
-      .setFunctionName("gdjs.evtTools.facebookInstantGames.isRewardedVideoReady");
+      .setFunctionName(
+        "gdjs.evtTools.facebookInstantGames.isRewardedVideoReady"
+      );
 
     extension
       .addAction(
         "LoadRewardedVideo",
         t("Load and prepare a rewarded video"),
-        t("Request and load a rewarded video from Facebook, so that it is ready to be shown."),
-        t("Request and load a rewarded video from Facebook (ad placement id: _PARAM0_, error in _PARAM1_)"),
+        t(
+          "Request and load a rewarded video from Facebook, so that it is ready to be shown."
+        ),
+        t(
+          "Request and load a rewarded video from Facebook (ad placement id: _PARAM0_, error in _PARAM1_)"
+        ),
         t("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter(
         "string",
-        t("The Ad Placement id (can be found while setting up the ad on Facebook)"),
+        t(
+          "The Ad Placement id (can be found while setting up the ad on Facebook)"
+        ),
         "",
         false
       )
@@ -313,8 +339,12 @@ module.exports = {
       .addAction(
         "ShowRewardedVideo",
         t("Show the loaded rewarded video"),
-        t("Show the rewarded video previously loaded in memory. This won't work if you did not load the video before."),
-        t("Show the rewarded video previously loaded in memory (if any error, store it in _PARAM0_)"),
+        t(
+          "Show the rewarded video previously loaded in memory. This won't work if you did not load the video before."
+        ),
+        t(
+          "Show the rewarded video previously loaded in memory (if any error, store it in _PARAM0_)"
+        ),
         t("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"

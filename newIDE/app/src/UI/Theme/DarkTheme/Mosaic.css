@@ -19,7 +19,11 @@
 }
 
 /* Hovered titlebar background */
-.mosaic-gd-dark-theme.mosaic-blueprint-theme .mosaic-window .mosaic-window-toolbar.draggable:hover,
-.mosaic-gd-dark-theme.mosaic.mosaic-blueprint-theme .mosaic-preview .mosaic-window-toolbar.draggable:hover {
+.mosaic-gd-dark-theme.mosaic-blueprint-theme
+  .mosaic-window
+  .mosaic-window-toolbar.draggable:hover,
+.mosaic-gd-dark-theme.mosaic.mosaic-blueprint-theme
+  .mosaic-preview
+  .mosaic-window-toolbar.draggable:hover {
   background: #3c4698 !important;
 }

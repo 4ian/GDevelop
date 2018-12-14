@@ -2095,10 +2095,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Right"
-              ],
+              "parameters": ["", "Right"],
               "subInstructions": []
             }
           ],
@@ -2108,12 +2105,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "Player",
-                "200",
-                "0",
-                "0"
-              ],
+              "parameters": ["Player", "200", "0", "0"],
               "subInstructions": []
             },
             {
@@ -2121,10 +2113,7 @@
                 "inverted": false,
                 "value": "SetAnimationName"
               },
-              "parameters": [
-                "Player",
-                "\"Right_Walking\""
-              ],
+              "parameters": ["Player", "\"Right_Walking\""],
               "subInstructions": []
             },
             {
@@ -2132,10 +2121,7 @@
                 "inverted": false,
                 "value": "FlipX"
               },
-              "parameters": [
-                "Player",
-                "no"
-              ],
+              "parameters": ["Player", "no"],
               "subInstructions": []
             },
             {
@@ -2143,10 +2129,7 @@
                 "inverted": false,
                 "value": "FlipY"
               },
-              "parameters": [
-                "Player",
-                "no"
-              ],
+              "parameters": ["Player", "no"],
               "subInstructions": []
             }
           ],
@@ -2162,10 +2145,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -2175,12 +2155,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "Player",
-                "-200",
-                "0",
-                ""
-              ],
+              "parameters": ["Player", "-200", "0", ""],
               "subInstructions": []
             },
             {
@@ -2188,10 +2163,7 @@
                 "inverted": false,
                 "value": "SetAnimationName"
               },
-              "parameters": [
-                "Player",
-                "\"Right_Walking\""
-              ],
+              "parameters": ["Player", "\"Right_Walking\""],
               "subInstructions": []
             },
             {
@@ -2199,10 +2171,7 @@
                 "inverted": false,
                 "value": "FlipX"
               },
-              "parameters": [
-                "Player",
-                "yes"
-              ],
+              "parameters": ["Player", "yes"],
               "subInstructions": []
             },
             {
@@ -2210,10 +2179,7 @@
                 "inverted": false,
                 "value": "FlipY"
               },
-              "parameters": [
-                "Player",
-                "no"
-              ],
+              "parameters": ["Player", "no"],
               "subInstructions": []
             }
           ],
@@ -2229,10 +2195,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Up"
-              ],
+              "parameters": ["", "Up"],
               "subInstructions": []
             }
           ],
@@ -2242,12 +2205,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "Player",
-                "0",
-                "-200",
-                ""
-              ],
+              "parameters": ["Player", "0", "-200", ""],
               "subInstructions": []
             },
             {
@@ -2255,10 +2213,7 @@
                 "inverted": false,
                 "value": "SetAnimationName"
               },
-              "parameters": [
-                "Player",
-                "\"Up_Walking\""
-              ],
+              "parameters": ["Player", "\"Up_Walking\""],
               "subInstructions": []
             }
           ],
@@ -2274,10 +2229,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Down"
-              ],
+              "parameters": ["", "Down"],
               "subInstructions": []
             }
           ],
@@ -2287,12 +2239,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "Player",
-                "0",
-                "200",
-                ""
-              ],
+              "parameters": ["Player", "0", "200", ""],
               "subInstructions": []
             },
             {
@@ -2300,10 +2247,7 @@
                 "inverted": false,
                 "value": "SetAnimationName"
               },
-              "parameters": [
-                "Player",
-                "\"Down_Walking\""
-              ],
+              "parameters": ["Player", "\"Down_Walking\""],
               "subInstructions": []
             }
           ],
@@ -2319,10 +2263,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Space"
-              ],
+              "parameters": ["", "Space"],
               "subInstructions": []
             },
             {
@@ -2346,12 +2287,7 @@
                     "inverted": false,
                     "value": "VarObjet"
                   },
-                  "parameters": [
-                    "Player",
-                    "Bombs",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["Player", "Bombs", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -2375,11 +2311,7 @@
                     "inverted": false,
                     "value": "ChangePlan"
                   },
-                  "parameters": [
-                    "Bomb",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["Bomb", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -2387,10 +2319,7 @@
                     "inverted": false,
                     "value": "SetAnimationName"
                   },
-                  "parameters": [
-                    "Bomb",
-                    "\"Exploding\""
-                  ],
+                  "parameters": ["Bomb", "\"Exploding\""],
                   "subInstructions": []
                 },
                 {
@@ -2398,12 +2327,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "Player",
-                    "Bombs",
-                    "+",
-                    "1"
-                  ],
+                  "parameters": ["Player", "Bombs", "+", "1"],
                   "subInstructions": []
                 }
               ],
@@ -2436,10 +2360,7 @@
                 "inverted": false,
                 "value": "KeyReleased"
               },
-              "parameters": [
-                "",
-                "Right"
-              ],
+              "parameters": ["", "Right"],
               "subInstructions": []
             }
           ],
@@ -2449,10 +2370,7 @@
                 "inverted": false,
                 "value": "SetAnimationName"
               },
-              "parameters": [
-                "Player",
-                "\"Right_Idle\""
-              ],
+              "parameters": ["Player", "\"Right_Idle\""],
               "subInstructions": []
             },
             {
@@ -2460,10 +2378,7 @@
                 "inverted": false,
                 "value": "FlipX"
               },
-              "parameters": [
-                "Player",
-                "no"
-              ],
+              "parameters": ["Player", "no"],
               "subInstructions": []
             },
             {
@@ -2471,10 +2386,7 @@
                 "inverted": false,
                 "value": "FlipY"
               },
-              "parameters": [
-                "Player",
-                "no"
-              ],
+              "parameters": ["Player", "no"],
               "subInstructions": []
             }
           ],
@@ -2490,10 +2402,7 @@
                 "inverted": false,
                 "value": "KeyReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -2503,10 +2412,7 @@
                 "inverted": false,
                 "value": "SetAnimationName"
               },
-              "parameters": [
-                "Player",
-                "\"Right_Idle\""
-              ],
+              "parameters": ["Player", "\"Right_Idle\""],
               "subInstructions": []
             },
             {
@@ -2514,10 +2420,7 @@
                 "inverted": false,
                 "value": "FlipX"
               },
-              "parameters": [
-                "Player",
-                "yes"
-              ],
+              "parameters": ["Player", "yes"],
               "subInstructions": []
             },
             {
@@ -2525,10 +2428,7 @@
                 "inverted": false,
                 "value": "FlipY"
               },
-              "parameters": [
-                "Player",
-                "no"
-              ],
+              "parameters": ["Player", "no"],
               "subInstructions": []
             }
           ],
@@ -2544,10 +2444,7 @@
                 "inverted": false,
                 "value": "KeyReleased"
               },
-              "parameters": [
-                "",
-                "Up"
-              ],
+              "parameters": ["", "Up"],
               "subInstructions": []
             }
           ],
@@ -2557,10 +2454,7 @@
                 "inverted": false,
                 "value": "SetAnimationName"
               },
-              "parameters": [
-                "Player",
-                "\"Up_Idle\""
-              ],
+              "parameters": ["Player", "\"Up_Idle\""],
               "subInstructions": []
             }
           ],
@@ -2576,10 +2470,7 @@
                 "inverted": false,
                 "value": "KeyReleased"
               },
-              "parameters": [
-                "",
-                "Down"
-              ],
+              "parameters": ["", "Down"],
               "subInstructions": []
             }
           ],
@@ -2589,10 +2480,7 @@
                 "inverted": false,
                 "value": "SetAnimationName"
               },
-              "parameters": [
-                "Player",
-                "\"Down_Idle\""
-              ],
+              "parameters": ["Player", "\"Down_Idle\""],
               "subInstructions": []
             }
           ],
@@ -2630,9 +2518,7 @@
                 "inverted": false,
                 "value": "AnimationEnded"
               },
-              "parameters": [
-                "Bomb"
-              ],
+              "parameters": ["Bomb"],
               "subInstructions": []
             }
           ],
@@ -2642,13 +2528,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "Fire",
-                "Bomb.X()",
-                "Bomb.Y()",
-                ""
-              ],
+              "parameters": ["", "Fire", "Bomb.X()", "Bomb.Y()", ""],
               "subInstructions": []
             },
             {
@@ -2656,11 +2536,7 @@
                 "inverted": false,
                 "value": "ChangePlan"
               },
-              "parameters": [
-                "Fire",
-                "=",
-                "1"
-              ],
+              "parameters": ["Fire", "=", "1"],
               "subInstructions": []
             },
             {
@@ -2668,10 +2544,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Bomb",
-                ""
-              ],
+              "parameters": ["Bomb", ""],
               "subInstructions": []
             },
             {
@@ -2679,12 +2552,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "Player",
-                "Bombs",
-                "=",
-                "0"
-              ],
+              "parameters": ["Player", "Bombs", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -2715,11 +2583,7 @@
                 "inverted": false,
                 "value": "Sprite"
               },
-              "parameters": [
-                "Fire",
-                "=",
-                "3"
-              ],
+              "parameters": ["Fire", "=", "3"],
               "subInstructions": []
             }
           ],
@@ -2729,13 +2593,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "Right_Fire",
-                "Fire.X() + 64",
-                "Fire.Y()",
-                ""
-              ],
+              "parameters": ["", "Right_Fire", "Fire.X() + 64", "Fire.Y()", ""],
               "subInstructions": []
             },
             {
@@ -2743,13 +2601,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "Up_Fire",
-                "Fire.X()",
-                "Fire.Y() - 64",
-                ""
-              ],
+              "parameters": ["", "Up_Fire", "Fire.X()", "Fire.Y() - 64", ""],
               "subInstructions": []
             },
             {
@@ -2757,13 +2609,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "Left_Fire",
-                "Fire.X() - 64",
-                "Fire.Y()",
-                ""
-              ],
+              "parameters": ["", "Left_Fire", "Fire.X() - 64", "Fire.Y()", ""],
               "subInstructions": []
             },
             {
@@ -2771,13 +2617,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "Down_Fire",
-                "Fire.X()",
-                "Fire.Y() + 64",
-                ""
-              ],
+              "parameters": ["", "Down_Fire", "Fire.X()", "Fire.Y() + 64", ""],
               "subInstructions": []
             },
             {
@@ -2785,11 +2625,7 @@
                 "inverted": false,
                 "value": "ChangePlan"
               },
-              "parameters": [
-                "Right_Fire",
-                "=",
-                "1"
-              ],
+              "parameters": ["Right_Fire", "=", "1"],
               "subInstructions": []
             },
             {
@@ -2797,11 +2633,7 @@
                 "inverted": false,
                 "value": "ChangePlan"
               },
-              "parameters": [
-                "Up_Fire",
-                "=",
-                "1"
-              ],
+              "parameters": ["Up_Fire", "=", "1"],
               "subInstructions": []
             },
             {
@@ -2809,11 +2641,7 @@
                 "inverted": false,
                 "value": "ChangePlan"
               },
-              "parameters": [
-                "Left_Fire",
-                "=",
-                "1"
-              ],
+              "parameters": ["Left_Fire", "=", "1"],
               "subInstructions": []
             },
             {
@@ -2821,11 +2649,7 @@
                 "inverted": false,
                 "value": "ChangePlan"
               },
-              "parameters": [
-                "Down_Fire",
-                "=",
-                "1"
-              ],
+              "parameters": ["Down_Fire", "=", "1"],
               "subInstructions": []
             },
             {
@@ -2833,12 +2657,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "Fire",
-                "Timer",
-                "+",
-                "TimeDelta()"
-              ],
+              "parameters": ["Fire", "Timer", "+", "TimeDelta()"],
               "subInstructions": []
             }
           ],
@@ -2869,12 +2688,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "Fire",
-                "Timer",
-                ">=",
-                "0.3"
-              ],
+              "parameters": ["Fire", "Timer", ">=", "0.3"],
               "subInstructions": []
             }
           ],
@@ -2884,10 +2698,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Fire",
-                ""
-              ],
+              "parameters": ["Fire", ""],
               "subInstructions": []
             },
             {
@@ -2895,10 +2706,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Right_Fire",
-                ""
-              ],
+              "parameters": ["Right_Fire", ""],
               "subInstructions": []
             },
             {
@@ -2906,10 +2714,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Left_Fire",
-                ""
-              ],
+              "parameters": ["Left_Fire", ""],
               "subInstructions": []
             },
             {
@@ -2917,10 +2722,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Up_Fire",
-                ""
-              ],
+              "parameters": ["Up_Fire", ""],
               "subInstructions": []
             },
             {
@@ -2928,10 +2730,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Down_Fire",
-                ""
-              ],
+              "parameters": ["Down_Fire", ""],
               "subInstructions": []
             }
           ],
@@ -2962,12 +2761,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "Right_Fire",
-                "Crate",
-                "",
-                ""
-              ],
+              "parameters": ["Right_Fire", "Crate", "", ""],
               "subInstructions": []
             }
           ],
@@ -2977,10 +2771,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Crate",
-                ""
-              ],
+              "parameters": ["Crate", ""],
               "subInstructions": []
             }
           ],
@@ -2996,12 +2787,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "Left_Fire",
-                "Crate",
-                "",
-                ""
-              ],
+              "parameters": ["Left_Fire", "Crate", "", ""],
               "subInstructions": []
             }
           ],
@@ -3011,10 +2797,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Crate",
-                ""
-              ],
+              "parameters": ["Crate", ""],
               "subInstructions": []
             }
           ],
@@ -3030,12 +2813,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "Up_Fire",
-                "Crate",
-                "",
-                ""
-              ],
+              "parameters": ["Up_Fire", "Crate", "", ""],
               "subInstructions": []
             }
           ],
@@ -3045,10 +2823,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Crate",
-                ""
-              ],
+              "parameters": ["Crate", ""],
               "subInstructions": []
             }
           ],
@@ -3064,12 +2839,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "Down_Fire",
-                "Crate",
-                "",
-                ""
-              ],
+              "parameters": ["Down_Fire", "Crate", "", ""],
               "subInstructions": []
             }
           ],
@@ -3079,10 +2849,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Crate",
-                ""
-              ],
+              "parameters": ["Crate", ""],
               "subInstructions": []
             }
           ],
@@ -3121,10 +2888,7 @@
                 "inverted": false,
                 "value": "SeparateFromObjects"
               },
-              "parameters": [
-                "Player",
-                "Unmovables"
-              ],
+              "parameters": ["Player", "Unmovables"],
               "subInstructions": []
             }
           ],

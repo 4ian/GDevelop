@@ -52,7 +52,8 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         onOpenProperties={this.openProperties}
         canDelete={!!this.state.selectedResource}
         onDeleteSelection={() =>
-          this.deleteResource(this.state.selectedResource)}
+          this.deleteResource(this.state.selectedResource)
+        }
       />
     );
   }
@@ -121,7 +122,8 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             project={project}
             resourcesLoader={this.resourcesLoader}
             ref={propertiesEditor =>
-              (this._propertiesEditor = propertiesEditor)}
+              (this._propertiesEditor = propertiesEditor)
+            }
           />
         </MosaicWindow>
       ),

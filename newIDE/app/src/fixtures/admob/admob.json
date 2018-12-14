@@ -1148,11 +1148,7 @@
                 "inverted": false,
                 "value": "ModVarGlobal"
               },
-              "parameters": [
-                "just_changed_scene",
-                "=",
-                "0"
-              ],
+              "parameters": ["just_changed_scene", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -1168,9 +1164,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -1180,11 +1174,7 @@
                 "inverted": false,
                 "value": "ModVarGlobal"
               },
-              "parameters": [
-                "just_changed_scene",
-                "=",
-                "1"
-              ],
+              "parameters": ["just_changed_scene", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -1199,12 +1189,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "LoadAtTop",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "LoadAtTop", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1214,11 +1199,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\" Load\nat top\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\" Load\nat top\""],
                   "subInstructions": []
                 },
                 {
@@ -1248,12 +1229,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "LoadAtBottom",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "LoadAtBottom", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1263,11 +1239,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"   Load\nat bottom\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"   Load\nat bottom\""],
                   "subInstructions": []
                 },
                 {
@@ -1297,12 +1269,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "Show",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "Show", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1312,11 +1279,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Show\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"Show\""],
                   "subInstructions": []
                 },
                 {
@@ -1346,12 +1309,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "Hide",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "Hide", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1361,11 +1319,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Hide\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"Hide\""],
                   "subInstructions": []
                 },
                 {
@@ -1395,12 +1349,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "LoadAtTopAndDisplay",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "LoadAtTopAndDisplay", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1493,12 +1442,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "Remove",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "Remove", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1508,11 +1452,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Remove\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"Remove\""],
                   "subInstructions": []
                 },
                 {
@@ -1542,12 +1482,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "GoToInterstitials",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "GoToInterstitials", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1591,12 +1526,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "GoToRewardVideos",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "GoToRewardVideos", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1643,11 +1573,7 @@
                 "inverted": false,
                 "value": "SetAngle"
               },
-              "parameters": [
-                "Player",
-                "+",
-                "90*TimeDelta()"
-              ],
+              "parameters": ["Player", "+", "90*TimeDelta()"],
               "subInstructions": []
             }
           ],
@@ -1663,10 +1589,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -1690,12 +1613,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "LoadAtTop",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["LoadAtTop", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -1728,12 +1646,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "LoadAtBottom",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["LoadAtBottom", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -1766,12 +1679,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Show",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["Show", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -1797,12 +1705,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Hide",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["Hide", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -1828,12 +1731,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "LoadAtTopAndDisplay",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["LoadAtTopAndDisplay", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -1866,12 +1764,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "LoadAtBottomAndDisplay",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["LoadAtBottomAndDisplay", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -1904,12 +1797,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Remove",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["Remove", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -1935,12 +1823,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "GoToInterstitials",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["GoToInterstitials", "", "no", ""],
                   "subInstructions": []
                 },
                 {
@@ -1948,11 +1831,7 @@
                     "inverted": false,
                     "value": "VarGlobal"
                   },
-                  "parameters": [
-                    "just_changed_scene",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["just_changed_scene", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -1962,11 +1841,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"Interstitials\"",
-                    "yes"
-                  ],
+                  "parameters": ["", "\"Interstitials\"", "yes"],
                   "subInstructions": []
                 }
               ],
@@ -1982,12 +1857,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "GoToRewardVideos",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["GoToRewardVideos", "", "no", ""],
                   "subInstructions": []
                 },
                 {
@@ -1995,11 +1865,7 @@
                     "inverted": false,
                     "value": "VarGlobal"
                   },
-                  "parameters": [
-                    "just_changed_scene",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["just_changed_scene", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -2009,11 +1875,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"RewardVideos\"",
-                    "yes"
-                  ],
+                  "parameters": ["", "\"RewardVideos\"", "yes"],
                   "subInstructions": []
                 }
               ],
@@ -2032,11 +1894,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "loading",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["loading", "=", "\"false\""],
               "subInstructions": []
             },
             {
@@ -2044,11 +1902,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "ready",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["ready", "=", "\"false\""],
               "subInstructions": []
             },
             {
@@ -2056,11 +1910,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "showing",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["showing", "=", "\"false\""],
               "subInstructions": []
             },
             {
@@ -2068,11 +1918,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "exists",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["exists", "=", "\"false\""],
               "subInstructions": []
             }
           ],
@@ -2097,11 +1943,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "loading",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["loading", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],
@@ -2127,11 +1969,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "ready",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["ready", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],
@@ -2157,11 +1995,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "showing",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["showing", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],
@@ -2187,11 +2021,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "exists",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["exists", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],
@@ -2763,11 +2593,7 @@
                 "inverted": false,
                 "value": "ModVarGlobal"
               },
-              "parameters": [
-                "just_changed_scene",
-                "=",
-                "0"
-              ],
+              "parameters": ["just_changed_scene", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -2783,9 +2609,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -2795,11 +2619,7 @@
                 "inverted": false,
                 "value": "ModVarGlobal"
               },
-              "parameters": [
-                "just_changed_scene",
-                "=",
-                "1"
-              ],
+              "parameters": ["just_changed_scene", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -2814,12 +2634,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "Load",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "Load", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -2829,11 +2644,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Load\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"Load\""],
                   "subInstructions": []
                 },
                 {
@@ -2863,12 +2674,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "Display",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "Display", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -2878,11 +2684,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Display\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"Display\""],
                   "subInstructions": []
                 },
                 {
@@ -2912,12 +2714,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "LoadAndDisplay",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "LoadAndDisplay", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -2927,11 +2724,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Load & Display\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"Load & Display\""],
                   "subInstructions": []
                 },
                 {
@@ -2961,12 +2754,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "GoToRewardVideos",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "GoToRewardVideos", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -3010,12 +2798,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "GoToBanners",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "GoToBanners", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -3025,11 +2808,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\" Go to\nBanners\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\" Go to\nBanners\""],
                   "subInstructions": []
                 },
                 {
@@ -3062,11 +2841,7 @@
                 "inverted": false,
                 "value": "SetAngle"
               },
-              "parameters": [
-                "Player",
-                "+",
-                "90*TimeDelta()"
-              ],
+              "parameters": ["Player", "+", "90*TimeDelta()"],
               "subInstructions": []
             }
           ],
@@ -3082,10 +2857,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -3109,12 +2881,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Load",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["Load", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -3145,12 +2912,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Display",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["Display", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -3176,12 +2938,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "LoadAndDisplay",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["LoadAndDisplay", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -3212,12 +2969,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "GoToRewardVideos",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["GoToRewardVideos", "", "no", ""],
                   "subInstructions": []
                 },
                 {
@@ -3225,11 +2977,7 @@
                     "inverted": false,
                     "value": "VarGlobal"
                   },
-                  "parameters": [
-                    "just_changed_scene",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["just_changed_scene", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -3239,11 +2987,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"RewardVideos\"",
-                    "yes"
-                  ],
+                  "parameters": ["", "\"RewardVideos\"", "yes"],
                   "subInstructions": []
                 }
               ],
@@ -3259,12 +3003,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "GoToBanners",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["GoToBanners", "", "no", ""],
                   "subInstructions": []
                 },
                 {
@@ -3272,11 +3011,7 @@
                     "inverted": false,
                     "value": "VarGlobal"
                   },
-                  "parameters": [
-                    "just_changed_scene",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["just_changed_scene", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -3286,11 +3021,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"Banners\"",
-                    "yes"
-                  ],
+                  "parameters": ["", "\"Banners\"", "yes"],
                   "subInstructions": []
                 }
               ],
@@ -3309,11 +3040,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "loading",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["loading", "=", "\"false\""],
               "subInstructions": []
             },
             {
@@ -3321,11 +3048,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "ready",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["ready", "=", "\"false\""],
               "subInstructions": []
             },
             {
@@ -3333,11 +3056,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "showing",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["showing", "=", "\"false\""],
               "subInstructions": []
             }
           ],
@@ -3362,11 +3081,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "loading",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["loading", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],
@@ -3392,11 +3107,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "ready",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["ready", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],
@@ -3422,11 +3133,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "showing",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["showing", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],
@@ -4066,11 +3773,7 @@
                 "inverted": false,
                 "value": "ModVarGlobal"
               },
-              "parameters": [
-                "just_changed_scene",
-                "=",
-                "0"
-              ],
+              "parameters": ["just_changed_scene", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -4086,9 +3789,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -4098,11 +3799,7 @@
                 "inverted": false,
                 "value": "ModVarGlobal"
               },
-              "parameters": [
-                "just_changed_scene",
-                "=",
-                "1"
-              ],
+              "parameters": ["just_changed_scene", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -4117,12 +3814,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "Load",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "Load", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -4132,11 +3824,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Load\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"Load\""],
                   "subInstructions": []
                 },
                 {
@@ -4166,12 +3854,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "Display",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "Display", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -4181,11 +3864,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Display\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"Display\""],
                   "subInstructions": []
                 },
                 {
@@ -4215,12 +3894,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "LoadAndDisplay",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "LoadAndDisplay", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -4230,11 +3904,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Load & Display\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"Load & Display\""],
                   "subInstructions": []
                 },
                 {
@@ -4264,12 +3934,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "ClaimReward",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "ClaimReward", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -4279,11 +3944,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\"Claim Reward!\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\"Claim Reward!\""],
                   "subInstructions": []
                 },
                 {
@@ -4313,12 +3974,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "GoToBanners",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "GoToBanners", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -4328,11 +3984,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "=",
-                    "\" Go to\nBanners\""
-                  ],
+                  "parameters": ["ButtonText", "=", "\" Go to\nBanners\""],
                   "subInstructions": []
                 },
                 {
@@ -4362,12 +4014,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "ButtonText",
-                    "GoToInterstitials",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["ButtonText", "GoToInterstitials", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -4414,11 +4061,7 @@
                 "inverted": false,
                 "value": "SetAngle"
               },
-              "parameters": [
-                "Player",
-                "+",
-                "90*TimeDelta()"
-              ],
+              "parameters": ["Player", "+", "90*TimeDelta()"],
               "subInstructions": []
             }
           ],
@@ -4434,10 +4077,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -4461,12 +4101,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Load",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["Load", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -4497,12 +4132,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Display",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["Display", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -4528,12 +4158,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "LoadAndDisplay",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["LoadAndDisplay", "", "no", ""],
                   "subInstructions": []
                 }
               ],
@@ -4564,12 +4189,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "ClaimReward",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["ClaimReward", "", "no", ""],
                   "subInstructions": []
                 },
                 {
@@ -4577,9 +4197,7 @@
                     "inverted": false,
                     "value": "AdMob::VideoReward"
                   },
-                  "parameters": [
-                    "yes"
-                  ],
+                  "parameters": ["yes"],
                   "subInstructions": []
                 }
               ],
@@ -4608,12 +4226,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "GoToBanners",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["GoToBanners", "", "no", ""],
                   "subInstructions": []
                 },
                 {
@@ -4621,11 +4234,7 @@
                     "inverted": false,
                     "value": "VarGlobal"
                   },
-                  "parameters": [
-                    "just_changed_scene",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["just_changed_scene", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -4635,11 +4244,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"Banners\"",
-                    "yes"
-                  ],
+                  "parameters": ["", "\"Banners\"", "yes"],
                   "subInstructions": []
                 }
               ],
@@ -4655,12 +4260,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "GoToInterstitials",
-                    "",
-                    "no",
-                    ""
-                  ],
+                  "parameters": ["GoToInterstitials", "", "no", ""],
                   "subInstructions": []
                 },
                 {
@@ -4668,11 +4268,7 @@
                     "inverted": false,
                     "value": "VarGlobal"
                   },
-                  "parameters": [
-                    "just_changed_scene",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["just_changed_scene", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -4682,11 +4278,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"Interstitials\"",
-                    "yes"
-                  ],
+                  "parameters": ["", "\"Interstitials\"", "yes"],
                   "subInstructions": []
                 }
               ],
@@ -4705,11 +4297,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "loading",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["loading", "=", "\"false\""],
               "subInstructions": []
             },
             {
@@ -4717,11 +4305,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "ready",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["ready", "=", "\"false\""],
               "subInstructions": []
             },
             {
@@ -4729,11 +4313,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "showing",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["showing", "=", "\"false\""],
               "subInstructions": []
             },
             {
@@ -4741,11 +4321,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "reward",
-                "=",
-                "\"false\""
-              ],
+              "parameters": ["reward", "=", "\"false\""],
               "subInstructions": []
             }
           ],
@@ -4770,11 +4346,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "loading",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["loading", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],
@@ -4800,11 +4372,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "ready",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["ready", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],
@@ -4830,11 +4398,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "showing",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["showing", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],
@@ -4850,9 +4414,7 @@
                     "inverted": false,
                     "value": "AdMob::VideoReward"
                   },
-                  "parameters": [
-                    "no"
-                  ],
+                  "parameters": ["no"],
                   "subInstructions": []
                 }
               ],
@@ -4862,11 +4424,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "reward",
-                    "=",
-                    "\"true\""
-                  ],
+                  "parameters": ["reward", "=", "\"true\""],
                   "subInstructions": []
                 }
               ],

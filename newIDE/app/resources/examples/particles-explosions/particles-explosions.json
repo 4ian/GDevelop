@@ -325,11 +325,7 @@
                 "inverted": false,
                 "value": "Timer"
               },
-              "parameters": [
-                "",
-                "Random(0.3)+0.2",
-                "\"Creating\""
-              ],
+              "parameters": ["", "Random(0.3)+0.2", "\"Creating\""],
               "subInstructions": []
             }
           ],
@@ -339,13 +335,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "Explosion",
-                "Random(800)",
-                "Random(600)",
-                ""
-              ],
+              "parameters": ["", "Explosion", "Random(800)", "Random(600)", ""],
               "subInstructions": []
             },
             {
@@ -381,10 +371,7 @@
                 "inverted": false,
                 "value": "ResetTimer"
               },
-              "parameters": [
-                "",
-                "\"Creating\""
-              ],
+              "parameters": ["", "\"Creating\""],
               "subInstructions": []
             }
           ],

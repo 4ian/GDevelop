@@ -79,34 +79,54 @@ declare module 'randomcolor/demo/build.js' {
   declare module.exports: $Exports<'randomcolor/demo/build'>;
 }
 declare module 'randomcolor/demo/Edit fiddle - JSFiddle_files/_dist-editor.js' {
-  declare module.exports: $Exports<'randomcolor/demo/Edit fiddle - JSFiddle_files/_dist-editor'>;
+  declare module.exports: $Exports<
+    'randomcolor/demo/Edit fiddle - JSFiddle_files/_dist-editor'
+  >;
 }
 declare module 'randomcolor/demo/Edit fiddle - JSFiddle_files/carbon.js' {
-  declare module.exports: $Exports<'randomcolor/demo/Edit fiddle - JSFiddle_files/carbon'>;
+  declare module.exports: $Exports<
+    'randomcolor/demo/Edit fiddle - JSFiddle_files/carbon'
+  >;
 }
 declare module 'randomcolor/demo/Edit fiddle - JSFiddle_files/dummy.js' {
-  declare module.exports: $Exports<'randomcolor/demo/Edit fiddle - JSFiddle_files/dummy'>;
+  declare module.exports: $Exports<
+    'randomcolor/demo/Edit fiddle - JSFiddle_files/dummy'
+  >;
 }
 declare module 'randomcolor/demo/Edit fiddle - JSFiddle_files/embed.js' {
-  declare module.exports: $Exports<'randomcolor/demo/Edit fiddle - JSFiddle_files/embed'>;
+  declare module.exports: $Exports<
+    'randomcolor/demo/Edit fiddle - JSFiddle_files/embed'
+  >;
 }
 declare module 'randomcolor/demo/Edit fiddle - JSFiddle_files/highlight.pack.js' {
-  declare module.exports: $Exports<'randomcolor/demo/Edit fiddle - JSFiddle_files/highlight.pack'>;
+  declare module.exports: $Exports<
+    'randomcolor/demo/Edit fiddle - JSFiddle_files/highlight.pack'
+  >;
 }
 declare module 'randomcolor/demo/Edit fiddle - JSFiddle_files/OrbitControls.js' {
-  declare module.exports: $Exports<'randomcolor/demo/Edit fiddle - JSFiddle_files/OrbitControls'>;
+  declare module.exports: $Exports<
+    'randomcolor/demo/Edit fiddle - JSFiddle_files/OrbitControls'
+  >;
 }
 declare module 'randomcolor/demo/Edit fiddle - JSFiddle_files/three.min.js' {
-  declare module.exports: $Exports<'randomcolor/demo/Edit fiddle - JSFiddle_files/three.min'>;
+  declare module.exports: $Exports<
+    'randomcolor/demo/Edit fiddle - JSFiddle_files/three.min'
+  >;
 }
 declare module 'randomcolor/demo/Edit fiddle - JSFiddle_files/togetherjs.js' {
-  declare module.exports: $Exports<'randomcolor/demo/Edit fiddle - JSFiddle_files/togetherjs'>;
+  declare module.exports: $Exports<
+    'randomcolor/demo/Edit fiddle - JSFiddle_files/togetherjs'
+  >;
 }
 declare module 'randomcolor/demo/Edit fiddle - JSFiddle_files/tracker.js' {
-  declare module.exports: $Exports<'randomcolor/demo/Edit fiddle - JSFiddle_files/tracker'>;
+  declare module.exports: $Exports<
+    'randomcolor/demo/Edit fiddle - JSFiddle_files/tracker'
+  >;
 }
 declare module 'randomcolor/demo/Edit fiddle - JSFiddle_files/widget.js' {
-  declare module.exports: $Exports<'randomcolor/demo/Edit fiddle - JSFiddle_files/widget'>;
+  declare module.exports: $Exports<
+    'randomcolor/demo/Edit fiddle - JSFiddle_files/widget'
+  >;
 }
 declare module 'randomcolor/demo/tests.js' {
   declare module.exports: $Exports<'randomcolor/demo/tests'>;

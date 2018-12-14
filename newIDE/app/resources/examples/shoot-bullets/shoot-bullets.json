@@ -346,9 +346,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -358,10 +356,7 @@
                 "inverted": false,
                 "value": "UnPauseTimer"
               },
-              "parameters": [
-                "",
-                "shoot-timer"
-              ],
+              "parameters": ["", "shoot-timer"],
               "subInstructions": []
             }
           ],
@@ -437,10 +432,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 },
                 {
@@ -448,10 +440,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Space"
-                  ],
+                  "parameters": ["", "Space"],
                   "subInstructions": []
                 }
               ]
@@ -499,11 +488,7 @@
                     "inverted": false,
                     "value": "Timer"
                   },
-                  "parameters": [
-                    "",
-                    "0.25",
-                    "shoot-timer"
-                  ],
+                  "parameters": ["", "0.25", "shoot-timer"],
                   "subInstructions": []
                 }
               ],
@@ -527,11 +512,7 @@
                     "inverted": false,
                     "value": "SetAngle"
                   },
-                  "parameters": [
-                    "bullet",
-                    "=",
-                    "kenney.Angle()"
-                  ],
+                  "parameters": ["bullet", "=", "kenney.Angle()"],
                   "subInstructions": []
                 },
                 {
@@ -539,12 +520,7 @@
                     "inverted": false,
                     "value": "AddForceAL"
                   },
-                  "parameters": [
-                    "bullet",
-                    "bullet.Angle()",
-                    "300",
-                    "1"
-                  ],
+                  "parameters": ["bullet", "bullet.Angle()", "300", "1"],
                   "subInstructions": []
                 },
                 {
@@ -552,10 +528,7 @@
                     "inverted": false,
                     "value": "ResetTimer"
                   },
-                  "parameters": [
-                    "",
-                    "shoot-timer"
-                  ],
+                  "parameters": ["", "shoot-timer"],
                   "subInstructions": []
                 }
               ],

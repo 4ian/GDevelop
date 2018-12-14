@@ -1,17 +1,17 @@
-const fs = require('fs');
-const path = require('path');
-const async = require('async');
-const awsS3 = require('aws-sdk/clients/s3');
-const { makeTimestampedId } = require('./Utils/TimestampedId');
-const recursive = require('recursive-readdir');
+const fs = require("fs");
+const path = require("path");
+const async = require("async");
+const awsS3 = require("aws-sdk/clients/s3");
+const { makeTimestampedId } = require("./Utils/TimestampedId");
+const recursive = require("recursive-readdir");
 
 const accessKeyId = process.env.UPLOAD_S3_ACCESS_KEY_ID;
 const secretAccessKey = process.env.UPLOAD_S3_SECRET_ACCESS_KEY;
 const destinationBucket = `gd-games-in`;
-const region = 'eu-west-1';
+const region = "eu-west-1";
 const mime = {
-  '.js': 'text/javascript',
-  '.html': 'text/html',
+  ".js": "text/javascript",
+  ".html": "text/html"
 };
 
 if (!accessKeyId || !secretAccessKey) {
@@ -19,7 +19,7 @@ if (!accessKeyId || !secretAccessKey) {
     "⚠️ Either UPLOAD_S3_ACCESS_KEY_ID or UPLOAD_S3_SECRET_ACCESS_KEY are not defined. Upload won't be working."
   );
   console.info(
-    'ℹ️ Copy .env.dist file to .env and fill the values to fix this warning.'
+    "ℹ️ Copy .env.dist file to .env and fill the values to fix this warning."
   );
 }
 
@@ -30,7 +30,7 @@ module.exports = {
    */
   uploadGameFolderToBucket: (localDir, onProgress, onDone) => {
     if (!accessKeyId || !secretAccessKey) {
-      onDone('Missing S3 configuration');
+      onDone("Missing S3 configuration");
       return;
     }
 
@@ -38,10 +38,10 @@ module.exports = {
       accessKeyId: accessKeyId,
       secretAccessKey: secretAccessKey,
       region: region,
-      correctClockSkew: true,
+      correctClockSkew: true
     });
 
-    const prefix = 'game-' + makeTimestampedId();
+    const prefix = "game-" + makeTimestampedId();
     recursive(localDir)
       .then(allFiles => {
         const updateProgress = (fileIndex, loaded, total) => {
@@ -57,14 +57,14 @@ module.exports = {
               .upload({
                 Body: body,
                 Bucket: destinationBucket,
-                Key: prefix + '/' + filename,
-                ContentType: mime[fileExtension],
+                Key: prefix + "/" + filename,
+                ContentType: mime[fileExtension]
               })
-              .on('httpUploadProgress', function(progress) {
+              .on("httpUploadProgress", function(progress) {
                 updateProgress(fileIndex, progress.loaded, progress.total || 0);
               })
               .send(function(err, data) {
-                callback(err, prefix + '/' + filename);
+                callback(err, prefix + "/" + filename);
               });
           }),
           (err, results) => {
@@ -77,7 +77,7 @@ module.exports = {
         );
       })
       .catch(err => {
-        console.error('Unable to recursively read directory ' + localDir);
+        console.error("Unable to recursively read directory " + localDir);
         onDone(err);
       });
   },
@@ -88,7 +88,7 @@ module.exports = {
    */
   uploadArchiveToBucket: (localFile, onProgress, onDone) => {
     if (!accessKeyId || !secretAccessKey) {
-      onDone('Missing S3 configuration');
+      onDone("Missing S3 configuration");
       return;
     }
 
@@ -96,24 +96,24 @@ module.exports = {
       accessKeyId: accessKeyId,
       secretAccessKey: secretAccessKey,
       region: region,
-      correctClockSkew: true,
+      correctClockSkew: true
     });
 
-    const prefix = 'game-archive-' + makeTimestampedId();
-    const filename = 'game-archive.zip';
+    const prefix = "game-archive-" + makeTimestampedId();
+    const filename = "game-archive.zip";
     const body = fs.createReadStream(localFile);
 
     awsS3Client
       .upload({
         Body: body,
         Bucket: destinationBucket,
-        Key: prefix + '/' + filename,
+        Key: prefix + "/" + filename
       })
-      .on('httpUploadProgress', function(progress) {
+      .on("httpUploadProgress", function(progress) {
         onProgress(progress.loaded, progress.total || 0);
       })
       .send(function(err, data) {
-        onDone(err, prefix + '/' + filename);
+        onDone(err, prefix + "/" + filename);
       });
-  },
+  }
 };

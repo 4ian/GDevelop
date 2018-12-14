@@ -334,9 +334,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -346,11 +344,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "cell_width",
-                "=",
-                "32"
-              ],
+              "parameters": ["cell_width", "=", "32"],
               "subInstructions": []
             },
             {
@@ -358,11 +352,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "cell_height",
-                "=",
-                "32"
-              ],
+              "parameters": ["cell_height", "=", "32"],
               "subInstructions": []
             }
           ],
@@ -393,12 +383,7 @@
                     "inverted": false,
                     "value": "SetWindowSize"
                   },
-                  "parameters": [
-                    "",
-                    "600",
-                    "400",
-                    "yes"
-                  ],
+                  "parameters": ["", "600", "400", "yes"],
                   "subInstructions": []
                 }
               ],
@@ -431,10 +416,7 @@
                 "inverted": false,
                 "value": "DraggableBehavior::Dragged"
               },
-              "parameters": [
-                "Pea",
-                "Draggable"
-              ],
+              "parameters": ["Pea", "Draggable"],
               "subInstructions": []
             }
           ],
@@ -489,11 +471,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "i",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["i", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -541,11 +519,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "i",
-                    "+",
-                    "1"
-                  ],
+                  "parameters": ["i", "+", "1"],
                   "subInstructions": []
                 }
               ],

@@ -52,23 +52,33 @@ declare module 'react-error-boundary/dist/umd/react-error-boundary' {
 
 // Filename aliases
 declare module 'react-error-boundary/dist/commonjs/ErrorBoundary.js' {
-  declare module.exports: $Exports<'react-error-boundary/dist/commonjs/ErrorBoundary'>;
+  declare module.exports: $Exports<
+    'react-error-boundary/dist/commonjs/ErrorBoundary'
+  >;
 }
 declare module 'react-error-boundary/dist/commonjs/ErrorBoundaryFallbackComponent.js' {
-  declare module.exports: $Exports<'react-error-boundary/dist/commonjs/ErrorBoundaryFallbackComponent'>;
+  declare module.exports: $Exports<
+    'react-error-boundary/dist/commonjs/ErrorBoundaryFallbackComponent'
+  >;
 }
 declare module 'react-error-boundary/dist/commonjs/index.js' {
   declare module.exports: $Exports<'react-error-boundary/dist/commonjs/index'>;
 }
 declare module 'react-error-boundary/dist/es/ErrorBoundary.js' {
-  declare module.exports: $Exports<'react-error-boundary/dist/es/ErrorBoundary'>;
+  declare module.exports: $Exports<
+    'react-error-boundary/dist/es/ErrorBoundary'
+  >;
 }
 declare module 'react-error-boundary/dist/es/ErrorBoundaryFallbackComponent.js' {
-  declare module.exports: $Exports<'react-error-boundary/dist/es/ErrorBoundaryFallbackComponent'>;
+  declare module.exports: $Exports<
+    'react-error-boundary/dist/es/ErrorBoundaryFallbackComponent'
+  >;
 }
 declare module 'react-error-boundary/dist/es/index.js' {
   declare module.exports: $Exports<'react-error-boundary/dist/es/index'>;
 }
 declare module 'react-error-boundary/dist/umd/react-error-boundary.js' {
-  declare module.exports: $Exports<'react-error-boundary/dist/umd/react-error-boundary'>;
+  declare module.exports: $Exports<
+    'react-error-boundary/dist/umd/react-error-boundary'
+  >;
 }

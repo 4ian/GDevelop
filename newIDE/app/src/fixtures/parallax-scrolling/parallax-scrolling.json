@@ -2446,9 +2446,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -2458,12 +2456,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "player",
-                    "walk",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["player", "walk", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -2471,12 +2464,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "player",
-                    "stand",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["player", "stand", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -2484,12 +2472,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "player",
-                    "jump",
-                    "=",
-                    "2"
-                  ],
+                  "parameters": ["player", "jump", "=", "2"],
                   "subInstructions": []
                 },
                 {
@@ -2497,11 +2480,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "player",
-                    "=",
-                    "player.Variable(stand)"
-                  ],
+                  "parameters": ["player", "=", "player.Variable(stand)"],
                   "subInstructions": []
                 }
               ],
@@ -2532,10 +2511,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::IsOnFloor"
                   },
-                  "parameters": [
-                    "player",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["player", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -2551,10 +2527,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ],
+                      "parameters": ["", "Right"],
                       "subInstructions": []
                     },
                     {
@@ -2562,10 +2535,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::IsMoving"
                       },
-                      "parameters": [
-                        "player",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["player", "PlatformerObject"],
                       "subInstructions": []
                     }
                   ],
@@ -2575,10 +2545,7 @@
                         "inverted": false,
                         "value": "FlipX"
                       },
-                      "parameters": [
-                        "player",
-                        "no"
-                      ],
+                      "parameters": ["player", "no"],
                       "subInstructions": []
                     },
                     {
@@ -2586,10 +2553,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::SimulateRightKey"
                       },
-                      "parameters": [
-                        "player",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["player", "PlatformerObject"],
                       "subInstructions": []
                     },
                     {
@@ -2597,11 +2561,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "player",
-                        "=",
-                        "player.Variable(walk)"
-                      ],
+                      "parameters": ["player", "=", "player.Variable(walk)"],
                       "subInstructions": []
                     }
                   ],
@@ -2617,10 +2577,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     },
                     {
@@ -2628,10 +2585,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::IsMoving"
                       },
-                      "parameters": [
-                        "player",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["player", "PlatformerObject"],
                       "subInstructions": []
                     }
                   ],
@@ -2641,10 +2595,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::SimulateLeftKey"
                       },
-                      "parameters": [
-                        "player",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["player", "PlatformerObject"],
                       "subInstructions": []
                     },
                     {
@@ -2652,11 +2603,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "player",
-                        "=",
-                        "player.Variable(walk)"
-                      ],
+                      "parameters": ["player", "=", "player.Variable(walk)"],
                       "subInstructions": []
                     },
                     {
@@ -2664,10 +2611,7 @@
                         "inverted": false,
                         "value": "FlipX"
                       },
-                      "parameters": [
-                        "player",
-                        "yes"
-                      ],
+                      "parameters": ["player", "yes"],
                       "subInstructions": []
                     }
                   ],
@@ -2683,10 +2627,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ],
+                      "parameters": ["", "Right"],
                       "subInstructions": []
                     },
                     {
@@ -2694,10 +2635,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     }
                   ],
@@ -2707,11 +2645,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "player",
-                        "=",
-                        "player.Variable(stand)"
-                      ],
+                      "parameters": ["player", "=", "player.Variable(stand)"],
                       "subInstructions": []
                     }
                   ],
@@ -2744,10 +2678,7 @@
                     "inverted": true,
                     "value": "PlatformBehavior::IsOnFloor"
                   },
-                  "parameters": [
-                    "player",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["player", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -2757,11 +2688,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "player",
-                    "=",
-                    "player.Variable(jump)"
-                  ],
+                  "parameters": ["player", "=", "player.Variable(jump)"],
                   "subInstructions": []
                 }
               ],
@@ -2776,10 +2703,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Space"
-                      ],
+                      "parameters": ["", "Space"],
                       "subInstructions": []
                     }
                   ],
@@ -2789,10 +2713,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::SimulateJumpKey"
                       },
-                      "parameters": [
-                        "player",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["player", "PlatformerObject"],
                       "subInstructions": []
                     }
                   ],
@@ -2840,13 +2761,7 @@
                     "inverted": false,
                     "value": "CameraX"
                   },
-                  "parameters": [
-                    "",
-                    "=",
-                    "player.X()",
-                    "\"\"",
-                    ""
-                  ],
+                  "parameters": ["", "=", "player.X()", "\"\"", ""],
                   "subInstructions": []
                 }
               ],
@@ -2878,13 +2793,7 @@
                     "inverted": false,
                     "value": "CameraX"
                   },
-                  "parameters": [
-                    "",
-                    "=",
-                    "player.X()*0.5",
-                    "\"layer 2\"",
-                    ""
-                  ],
+                  "parameters": ["", "=", "player.X()*0.5", "\"layer 2\"", ""],
                   "subInstructions": []
                 }
               ],
@@ -2916,13 +2825,7 @@
                     "inverted": false,
                     "value": "CameraX"
                   },
-                  "parameters": [
-                    "",
-                    "=",
-                    "player.X()*0.2",
-                    "\"layer 3\"",
-                    ""
-                  ],
+                  "parameters": ["", "=", "player.X()*0.2", "\"layer 3\"", ""],
                   "subInstructions": []
                 }
               ],
@@ -2954,13 +2857,7 @@
                     "inverted": false,
                     "value": "CameraX"
                   },
-                  "parameters": [
-                    "",
-                    "=",
-                    "player.X()*0.1",
-                    "\"layer 4\"",
-                    ""
-                  ],
+                  "parameters": ["", "=", "player.X()*0.1", "\"layer 4\"", ""],
                   "subInstructions": []
                 }
               ],

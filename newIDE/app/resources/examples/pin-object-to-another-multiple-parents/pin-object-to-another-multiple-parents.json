@@ -508,9 +508,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -565,11 +563,7 @@
                             "inverted": false,
                             "value": "LinkedObjects::LinkObjects"
                           },
-                          "parameters": [
-                            "",
-                            "parent",
-                            "child"
-                          ],
+                          "parameters": ["", "parent", "child"],
                           "subInstructions": []
                         },
                         {
@@ -643,12 +637,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "parent",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["parent", "", "yes", ""],
                   "subInstructions": []
                 }
               ],
@@ -664,10 +653,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "MouseWheelDelta()",
-                        "a"
-                      ],
+                      "parameters": ["MouseWheelDelta()", "a"],
                       "subInstructions": []
                     }
                   ],
@@ -677,11 +663,7 @@
                         "inverted": false,
                         "value": "Rotate"
                       },
-                      "parameters": [
-                        "parent",
-                        "-50",
-                        ""
-                      ],
+                      "parameters": ["parent", "-50", ""],
                       "subInstructions": []
                     }
                   ],
@@ -697,10 +679,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "MouseWheelDelta()",
-                        "s"
-                      ],
+                      "parameters": ["MouseWheelDelta()", "s"],
                       "subInstructions": []
                     }
                   ],
@@ -710,11 +689,7 @@
                         "inverted": false,
                         "value": "Rotate"
                       },
-                      "parameters": [
-                        "parent",
-                        "50",
-                        ""
-                      ],
+                      "parameters": ["parent", "50", ""],
                       "subInstructions": []
                     }
                   ],
@@ -748,11 +723,7 @@
                     "inverted": false,
                     "value": "LinkedObjects::PickObjectsLinkedTo"
                   },
-                  "parameters": [
-                    "",
-                    "child",
-                    "parent"
-                  ],
+                  "parameters": ["", "child", "parent"],
                   "subInstructions": []
                 }
               ],
@@ -866,11 +837,7 @@
                     "inverted": false,
                     "value": "LinkedObjects::PickObjectsLinkedTo"
                   },
-                  "parameters": [
-                    "",
-                    "child",
-                    "parent"
-                  ],
+                  "parameters": ["", "child", "parent"],
                   "subInstructions": []
                 }
               ],
@@ -880,12 +847,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "child",
-                    "angle",
-                    "=",
-                    "child.Angle()"
-                  ],
+                  "parameters": ["child", "angle", "=", "child.Angle()"],
                   "subInstructions": []
                 },
                 {

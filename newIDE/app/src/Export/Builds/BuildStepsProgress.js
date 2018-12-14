@@ -97,11 +97,13 @@ export default ({
       <StepContent>
         {!build && <p>Build is starting...</p>}
         {build && <BuildProgress build={build} onDownload={onDownload} />}
-        {showSeeAllMyBuildsExplanation && <EmptyMessage>
-          If you close this window while the build is being done, you can see
-          its progress and download the game later by clicking on See All My
-          Builds below.
-        </EmptyMessage>}
+        {showSeeAllMyBuildsExplanation && (
+          <EmptyMessage>
+            If you close this window while the build is being done, you can see
+            its progress and download the game later by clicking on See All My
+            Builds below.
+          </EmptyMessage>
+        )}
       </StepContent>
     </Step>
   </Stepper>

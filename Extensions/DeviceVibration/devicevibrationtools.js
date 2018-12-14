@@ -12,10 +12,10 @@ gdjs.deviceVibration = {};
  * @param {number} duration Value in milliseconds.
  */
 gdjs.deviceVibration.startVibration = function(duration) {
-  if (typeof navigator == "undefined" || !navigator.vibrate) return
-  
+  if (typeof navigator == "undefined" || !navigator.vibrate) return;
+
   navigator.vibrate([duration]);
-}
+};
 
 /**
  * Vibrate the mobile device in a pattern.
@@ -24,20 +24,20 @@ gdjs.deviceVibration.startVibration = function(duration) {
  * @param {string} intervals Comma separated list of values (in ms).
  */
 gdjs.deviceVibration.startVibrationPattern = function(intervals) {
-  const pattern = '^[0-9]+(,[0-9]+)*$'
+  const pattern = "^[0-9]+(,[0-9]+)*$";
 
-  if (typeof navigator == "undefined" || !navigator.vibrate) return
+  if (typeof navigator == "undefined" || !navigator.vibrate) return;
 
-  if (intervals.match(pattern)){
+  if (intervals.match(pattern)) {
     navigator.vibrate(intervals.split(","));
   }
-}
+};
 
 /**
  * Stop the current vibration on the mobile device.
  */
 gdjs.deviceVibration.stopVibration = function() {
-  if (typeof navigator == "undefined" || !navigator.vibrate) return
+  if (typeof navigator == "undefined" || !navigator.vibrate) return;
 
   navigator.vibrate([]);
-}
+};

@@ -29,7 +29,7 @@ const editors: Array<ResourceExternalEditor> = [
         'This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.'
       );
     },
-  }
+  },
 ];
 
 export default editors;

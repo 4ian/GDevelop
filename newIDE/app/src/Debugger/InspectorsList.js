@@ -59,7 +59,8 @@ export default class InspectorsList extends React.Component<Props, void> {
             this.props.onChooseInspector(
               inspectorDescription,
               fullInspectorPath
-            )}
+            )
+          }
           nestedItems={nestedItems}
           primaryTogglesNestedList
         />

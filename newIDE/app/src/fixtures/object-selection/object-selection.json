@@ -525,10 +525,7 @@
                 "inverted": true,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -546,11 +543,7 @@
                 "inverted": false,
                 "value": "ChangeAnimation"
               },
-              "parameters": [
-                "Tank",
-                "=",
-                "0"
-              ],
+              "parameters": ["Tank", "=", "0"],
               "subInstructions": []
             },
             {
@@ -558,11 +551,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "select_all",
-                "=",
-                "1"
-              ],
+              "parameters": ["select_all", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -593,10 +582,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -635,12 +621,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Tank",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["Tank", "", "yes", ""],
                   "subInstructions": []
                 }
               ],
@@ -650,11 +631,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "select_all",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["select_all", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -662,11 +639,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "Tank",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["Tank", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -697,11 +670,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "select_all",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["select_all", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -711,11 +680,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "Tank",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["Tank", "=", "1"],
                   "subInstructions": []
                 }
               ],

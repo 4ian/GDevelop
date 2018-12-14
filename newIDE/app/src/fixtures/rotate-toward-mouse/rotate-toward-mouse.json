@@ -245,13 +245,7 @@
                 "inverted": false,
                 "value": "RotateTowardPosition"
               },
-              "parameters": [
-                "kenney",
-                "MouseX()",
-                "MouseY()",
-                "0",
-                ""
-              ],
+              "parameters": ["kenney", "MouseX()", "MouseY()", "0", ""],
               "subInstructions": []
             }
           ],

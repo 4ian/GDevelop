@@ -713,9 +713,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -725,11 +723,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "mute",
-                "=",
-                "0"
-              ],
+              "parameters": ["mute", "=", "0"],
               "subInstructions": []
             },
             {
@@ -737,11 +731,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "play",
-                "=",
-                "0"
-              ],
+              "parameters": ["play", "=", "0"],
               "subInstructions": []
             },
             {
@@ -749,11 +739,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "sound_level",
-                "=",
-                "50"
-              ],
+              "parameters": ["sound_level", "=", "50"],
               "subInstructions": []
             },
             {
@@ -761,11 +747,7 @@
                 "inverted": false,
                 "value": "ModGlobalVolume"
               },
-              "parameters": [
-                "",
-                "=",
-                "Variable(sound_level)"
-              ],
+              "parameters": ["", "=", "Variable(sound_level)"],
               "subInstructions": []
             },
             {
@@ -836,10 +818,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -847,12 +826,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "slider_button",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["slider_button", "", "", ""],
               "subInstructions": []
             }
           ],
@@ -898,11 +872,7 @@
                     "inverted": false,
                     "value": "MettreX"
                   },
-                  "parameters": [
-                    "slider_button",
-                    "=",
-                    "MouseX()"
-                  ],
+                  "parameters": ["slider_button", "=", "MouseX()"],
                   "subInstructions": []
                 },
                 {
@@ -910,11 +880,7 @@
                     "inverted": false,
                     "value": "ModGlobalVolume"
                   },
-                  "parameters": [
-                    "",
-                    "=",
-                    "Variable(sound_level)"
-                  ],
+                  "parameters": ["", "=", "Variable(sound_level)"],
                   "subInstructions": []
                 }
               ],
@@ -946,11 +912,7 @@
                 "inverted": false,
                 "value": "ChangeScaleWidth"
               },
-              "parameters": [
-                "volume_slider",
-                "+",
-                "0.05"
-              ],
+              "parameters": ["volume_slider", "+", "0.05"],
               "subInstructions": []
             },
             {
@@ -958,11 +920,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "sound_level",
-                "+",
-                "5"
-              ],
+              "parameters": ["sound_level", "+", "5"],
               "subInstructions": []
             }
           ],
@@ -992,11 +950,7 @@
                 "inverted": false,
                 "value": "ChangeScaleWidth"
               },
-              "parameters": [
-                "volume_slider",
-                "-",
-                "0.05"
-              ],
+              "parameters": ["volume_slider", "-", "0.05"],
               "subInstructions": []
             },
             {
@@ -1004,11 +958,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "sound_level",
-                "-",
-                "5"
-              ],
+              "parameters": ["sound_level", "-", "5"],
               "subInstructions": []
             }
           ],
@@ -1039,10 +989,7 @@
                 "inverted": false,
                 "value": "MouseButtonReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -1052,11 +999,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "switch",
-                "=",
-                "0"
-              ],
+              "parameters": ["switch", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -1072,10 +1015,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -1114,12 +1054,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "buttons",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["buttons", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1151,12 +1086,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "mute",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["mute", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1172,11 +1102,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "switch",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["switch", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -1184,11 +1110,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "mute",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["mute", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -1196,11 +1118,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "play",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["play", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1210,11 +1128,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "mute",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["mute", "=", "1"],
                       "subInstructions": []
                     },
                     {
@@ -1222,11 +1136,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "switch",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["switch", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1241,12 +1151,7 @@
                             "inverted": false,
                             "value": "MusicCanalVolume"
                           },
-                          "parameters": [
-                            "",
-                            "1",
-                            ">",
-                            "0"
-                          ],
+                          "parameters": ["", "1", ">", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -1256,12 +1161,7 @@
                             "inverted": false,
                             "value": "ModVolumeMusicCanal"
                           },
-                          "parameters": [
-                            "",
-                            "1",
-                            "=",
-                            "0"
-                          ],
+                          "parameters": ["", "1", "=", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -1279,11 +1179,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "switch",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["switch", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -1291,11 +1187,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "mute",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["mute", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1305,11 +1197,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "mute",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["mute", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -1317,11 +1205,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "switch",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["switch", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1336,12 +1220,7 @@
                             "inverted": false,
                             "value": "MusicCanalVolume"
                           },
-                          "parameters": [
-                            "",
-                            "1",
-                            "<",
-                            "100"
-                          ],
+                          "parameters": ["", "1", "<", "100"],
                           "subInstructions": []
                         }
                       ],
@@ -1351,12 +1230,7 @@
                             "inverted": false,
                             "value": "ModVolumeMusicCanal"
                           },
-                          "parameters": [
-                            "",
-                            "1",
-                            "=",
-                            "100"
-                          ],
+                          "parameters": ["", "1", "=", "100"],
                           "subInstructions": []
                         }
                       ],
@@ -1391,12 +1265,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "pause",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["pause", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1412,11 +1281,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "play",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["play", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1426,11 +1291,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "play",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["play", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -1446,10 +1307,7 @@
                             "inverted": false,
                             "value": "PauseMusicCanal"
                           },
-                          "parameters": [
-                            "",
-                            "1"
-                          ],
+                          "parameters": ["", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -1484,12 +1342,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "play",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["play", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1505,11 +1358,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "play",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["play", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -1519,11 +1368,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "play",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["play", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1538,10 +1383,7 @@
                             "inverted": true,
                             "value": "MusicPlaying"
                           },
-                          "parameters": [
-                            "",
-                            "1"
-                          ],
+                          "parameters": ["", "1"],
                           "subInstructions": []
                         },
                         {
@@ -1549,10 +1391,7 @@
                             "inverted": true,
                             "value": "MusicPaused"
                           },
-                          "parameters": [
-                            "",
-                            "1"
-                          ],
+                          "parameters": ["", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -1585,10 +1424,7 @@
                             "inverted": false,
                             "value": "MusicPaused"
                           },
-                          "parameters": [
-                            "",
-                            "1"
-                          ],
+                          "parameters": ["", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -1598,10 +1434,7 @@
                             "inverted": false,
                             "value": "RePlayMusicCanal"
                           },
-                          "parameters": [
-                            "",
-                            "1"
-                          ],
+                          "parameters": ["", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -1636,11 +1469,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "play",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["play", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -1648,11 +1477,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "mute",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["mute", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -1682,11 +1507,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "music",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["music", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -1694,11 +1515,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "mute",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["mute", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -1714,11 +1531,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "play",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["play", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -1726,11 +1539,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "mute",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["mute", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -1748,11 +1557,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "track_info",
-                    "=",
-                    "\"Muted\""
-                  ],
+                  "parameters": ["track_info", "=", "\"Muted\""],
                   "subInstructions": []
                 },
                 {
@@ -1760,11 +1565,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "mute",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["mute", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -1772,11 +1573,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "music",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["music", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -1792,11 +1589,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "play",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["play", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -1804,11 +1597,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "mute",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["mute", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -1826,11 +1615,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "track_info",
-                    "=",
-                    "\"Paused\""
-                  ],
+                  "parameters": ["track_info", "=", "\"Paused\""],
                   "subInstructions": []
                 },
                 {
@@ -1838,11 +1623,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "music",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["music", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -1858,11 +1639,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "play",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["play", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -1870,11 +1647,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "mute",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["mute", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -1904,11 +1677,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "music",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["music", "=", "1"],
                   "subInstructions": []
                 }
               ],

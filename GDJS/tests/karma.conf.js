@@ -60,7 +60,7 @@ module.exports = function(config) {
 
       //All benchmark files:
       './benchmarks/init.js',
-      './benchmarks/**/*.js'
-    ]
+      './benchmarks/**/*.js',
+    ],
   });
 };

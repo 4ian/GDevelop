@@ -27,7 +27,7 @@ Images resources, GDJS Runtime, extensions will be copied in resources, and [lib
 [build libGD.js by yourself](https://github.com/4ian/GDevelop.js) (useful if you modified GDevelop native code like extensions).
 
 > Note for Linux: If you get an error message that looks like this:
-`Error: watch GD/newIDE/app/some/file ENOSPC` then follow the instructions [here](https://stackoverflow.com/questions/22475849/node-js-error-enospc) to fix.
+> `Error: watch GD/newIDE/app/some/file ENOSPC` then follow the instructions [here](https://stackoverflow.com/questions/22475849/node-js-error-enospc) to fix.
 
 ### Development of the standalone app
 
@@ -51,8 +51,7 @@ node node_modules\electron\cli.js app
 
 There is a script file that automates cloning this repository, building the newIde and running it
 
-* For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GDevelop/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GD to be cloned to, then simply run it.
-
+- For Windows: You can download the batch script [here](https://raw.githubusercontent.com/4ian/GDevelop/master/scripts/gitCloneAndBuildGD.bat) and save it to where you want GD to be cloned to, then simply run it.
 
 ### Development of UI components
 
@@ -81,9 +80,9 @@ It's possible to create new themes for the UI. See [this file](https://github.co
 
 Make sure to have the standalone app running with Electron.
 
-* If you want create/modify *a extensions*, check the [README about extensions](./README-extensions.md) for a step-by-step explanations to get started in 5 minutes.
+- If you want create/modify _a extensions_, check the [README about extensions](./README-extensions.md) for a step-by-step explanations to get started in 5 minutes.
 
-* The *game engine core* ([GDJS](https://github.com/4ian/GDevelop/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GDevelop/tree/master/GDJS/Runtime). If you modify anything, run the `import-GDJS-Runtime.js` script:
+- The _game engine core_ ([GDJS](https://github.com/4ian/GDevelop/tree/master/GDJS)) is in [GDJS/Runtime folder](https://github.com/4ian/GDevelop/tree/master/GDJS/Runtime). If you modify anything, run the `import-GDJS-Runtime.js` script:
 
   ```bash
   cd newIDE/app
@@ -95,7 +94,7 @@ Make sure to have the standalone app running with Electron.
 
 ### Recommended tools for development
 
-Any text editor is fine, but it's a good idea to have one with *Prettier* (code formatting), *ESLint* (code linting) and *Flow* (type checking) integration.
+Any text editor is fine, but it's a good idea to have one with _Prettier_ (code formatting), _ESLint_ (code linting) and _Flow_ (type checking) integration.
 
 👉 You can use [Visual Studio Code](https://code.visualstudio.com) with these extensions: [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [Flow Language Support](https://github.com/flowtype/flow-for-vscode).
 
@@ -119,7 +118,6 @@ To build artifacts for all platforms and publish to a draft GitHub release:
 ```
 GH_TOKEN=xxx yarn build --mac --win --linux tar.gz --publish always
 ```
-
 
 ### Webapp version
 

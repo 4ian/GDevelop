@@ -308,9 +308,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -320,10 +318,7 @@
                 "inverted": false,
                 "value": "SceneBackground"
               },
-              "parameters": [
-                "",
-                "\"0;0;0;\""
-              ],
+              "parameters": ["", "\"0;0;0;\""],
               "subInstructions": []
             }
           ],
@@ -371,9 +366,7 @@
                     "inverted": false,
                     "value": "AnyKeyPressed"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 },
                 {
@@ -381,10 +374,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ]
@@ -466,11 +456,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "prev_num",
-                "=",
-                "Variable(num)"
-              ],
+              "parameters": ["prev_num", "=", "Variable(num)"],
               "subInstructions": []
             },
             {
@@ -478,11 +464,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "num",
-                "=",
-                "Random(61)"
-              ],
+              "parameters": ["num", "=", "Random(61)"],
               "subInstructions": []
             }
           ],
@@ -514,11 +496,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "prev_num",
-                "=",
-                "Variable(num)"
-              ],
+              "parameters": ["prev_num", "=", "Variable(num)"],
               "subInstructions": []
             }
           ],
@@ -529,11 +507,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "num",
-                "=",
-                "Random(61)"
-              ],
+              "parameters": ["num", "=", "Random(61)"],
               "subInstructions": []
             }
           ],
@@ -619,10 +593,7 @@
                 "inverted": false,
                 "value": "JSONToVariableStructure"
               },
-              "parameters": [
-                "VariableString(person_json)",
-                "person"
-              ],
+              "parameters": ["VariableString(person_json)", "person"],
               "subInstructions": []
             },
             {
@@ -630,10 +601,7 @@
                 "inverted": false,
                 "value": "JSONToVariableStructure"
               },
-              "parameters": [
-                "VariableString(planet_json)",
-                "planet"
-              ],
+              "parameters": ["VariableString(planet_json)", "planet"],
               "subInstructions": []
             },
             {

@@ -259,10 +259,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -272,11 +269,7 @@
                 "inverted": false,
                 "value": "MettreX"
               },
-              "parameters": [
-                "kenney",
-                "-",
-                "2"
-              ],
+              "parameters": ["kenney", "-", "2"],
               "subInstructions": []
             }
           ],
@@ -307,10 +300,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Right"
-              ],
+              "parameters": ["", "Right"],
               "subInstructions": []
             }
           ],
@@ -320,11 +310,7 @@
                 "inverted": false,
                 "value": "MettreX"
               },
-              "parameters": [
-                "kenney",
-                "+",
-                "2"
-              ],
+              "parameters": ["kenney", "+", "2"],
               "subInstructions": []
             }
           ],
@@ -355,10 +341,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Up"
-              ],
+              "parameters": ["", "Up"],
               "subInstructions": []
             }
           ],
@@ -368,11 +351,7 @@
                 "inverted": false,
                 "value": "MettreY"
               },
-              "parameters": [
-                "kenney",
-                "-",
-                "2"
-              ],
+              "parameters": ["kenney", "-", "2"],
               "subInstructions": []
             }
           ],
@@ -403,10 +382,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Down"
-              ],
+              "parameters": ["", "Down"],
               "subInstructions": []
             }
           ],
@@ -416,11 +392,7 @@
                 "inverted": false,
                 "value": "MettreY"
               },
-              "parameters": [
-                "kenney",
-                "+",
-                "2"
-              ],
+              "parameters": ["kenney", "+", "2"],
               "subInstructions": []
             }
           ],
@@ -451,10 +423,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -472,13 +441,7 @@
                 "inverted": false,
                 "value": "MettreXY"
               },
-              "parameters": [
-                "kenney",
-                "=",
-                "MouseX()",
-                "=",
-                "MouseY()"
-              ],
+              "parameters": ["kenney", "=", "MouseX()", "=", "MouseY()"],
               "subInstructions": []
             }
           ],

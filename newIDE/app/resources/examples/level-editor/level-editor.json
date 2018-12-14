@@ -418,12 +418,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "NewLevel",
-                "",
-                "yes",
-                ""
-              ],
+              "parameters": ["NewLevel", "", "yes", ""],
               "subInstructions": []
             }
           ],
@@ -449,10 +444,7 @@
                     "inverted": false,
                     "value": "TextObject::ChangeColor"
                   },
-                  "parameters": [
-                    "NewLevel",
-                    "\"208;2;27\""
-                  ],
+                  "parameters": ["NewLevel", "\"208;2;27\""],
                   "subInstructions": []
                 }
               ],
@@ -468,10 +460,7 @@
                     "inverted": false,
                     "value": "MouseButtonReleased"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -481,11 +470,7 @@
                     "inverted": false,
                     "value": "ModVarGlobalTxt"
                   },
-                  "parameters": [
-                    "Game",
-                    "=",
-                    "\"New\""
-                  ],
+                  "parameters": ["Game", "=", "\"New\""],
                   "subInstructions": []
                 },
                 {
@@ -493,11 +478,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"Editor\"",
-                    ""
-                  ],
+                  "parameters": ["", "\"Editor\"", ""],
                   "subInstructions": []
                 }
               ],
@@ -515,12 +496,7 @@
                 "inverted": true,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "NewLevel",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["NewLevel", "", "", ""],
               "subInstructions": []
             },
             {
@@ -538,10 +514,7 @@
                 "inverted": false,
                 "value": "TextObject::ChangeColor"
               },
-              "parameters": [
-                "NewLevel",
-                "\"0;0;0\""
-              ],
+              "parameters": ["NewLevel", "\"0;0;0\""],
               "subInstructions": []
             }
           ],
@@ -572,12 +545,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "LoadLevel",
-                "",
-                "yes",
-                ""
-              ],
+              "parameters": ["LoadLevel", "", "yes", ""],
               "subInstructions": []
             }
           ],
@@ -603,10 +571,7 @@
                     "inverted": false,
                     "value": "TextObject::ChangeColor"
                   },
-                  "parameters": [
-                    "LoadLevel",
-                    "\"208;2;27\""
-                  ],
+                  "parameters": ["LoadLevel", "\"208;2;27\""],
                   "subInstructions": []
                 }
               ],
@@ -622,10 +587,7 @@
                     "inverted": false,
                     "value": "MouseButtonReleased"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -635,11 +597,7 @@
                     "inverted": false,
                     "value": "ModVarGlobalTxt"
                   },
-                  "parameters": [
-                    "Game",
-                    "=",
-                    "\"Load\""
-                  ],
+                  "parameters": ["Game", "=", "\"Load\""],
                   "subInstructions": []
                 },
                 {
@@ -647,11 +605,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"Editor\"",
-                    ""
-                  ],
+                  "parameters": ["", "\"Editor\"", ""],
                   "subInstructions": []
                 }
               ],
@@ -669,12 +623,7 @@
                 "inverted": true,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "LoadLevel",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["LoadLevel", "", "", ""],
               "subInstructions": []
             },
             {
@@ -692,10 +641,7 @@
                 "inverted": false,
                 "value": "TextObject::ChangeColor"
               },
-              "parameters": [
-                "LoadLevel",
-                "\"0;0;0\""
-              ],
+              "parameters": ["LoadLevel", "\"0;0;0\""],
               "subInstructions": []
             }
           ],
@@ -2481,9 +2427,7 @@
                         "inverted": false,
                         "value": "DepartScene"
                       },
-                      "parameters": [
-                        ""
-                      ],
+                      "parameters": [""],
                       "subInstructions": []
                     }
                   ],
@@ -2493,11 +2437,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "cell_width",
-                        "=",
-                        "70"
-                      ],
+                      "parameters": ["cell_width", "=", "70"],
                       "subInstructions": []
                     },
                     {
@@ -2505,11 +2445,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "cell_height",
-                        "=",
-                        "70"
-                      ],
+                      "parameters": ["cell_height", "=", "70"],
                       "subInstructions": []
                     }
                   ],
@@ -2554,9 +2490,7 @@
                         "inverted": false,
                         "value": "DepartScene"
                       },
-                      "parameters": [
-                        ""
-                      ],
+                      "parameters": [""],
                       "subInstructions": []
                     }
                   ],
@@ -2566,10 +2500,7 @@
                         "inverted": false,
                         "value": "HideLayer"
                       },
-                      "parameters": [
-                        "",
-                        "\"TileSelection\""
-                      ],
+                      "parameters": ["", "\"TileSelection\""],
                       "subInstructions": []
                     }
                   ],
@@ -2585,10 +2516,7 @@
                         "inverted": false,
                         "value": "KeyReleased"
                       },
-                      "parameters": [
-                        "",
-                        "i"
-                      ],
+                      "parameters": ["", "i"],
                       "subInstructions": []
                     }
                   ],
@@ -2598,11 +2526,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "trigger",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["trigger", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -2618,10 +2542,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "i"
-                      ],
+                      "parameters": ["", "i"],
                       "subInstructions": []
                     }
                   ],
@@ -2637,10 +2558,7 @@
                             "inverted": false,
                             "value": "LayerVisible"
                           },
-                          "parameters": [
-                            "",
-                            "\"TileSelection\""
-                          ],
+                          "parameters": ["", "\"TileSelection\""],
                           "subInstructions": []
                         },
                         {
@@ -2648,11 +2566,7 @@
                             "inverted": false,
                             "value": "VarScene"
                           },
-                          "parameters": [
-                            "trigger",
-                            "=",
-                            "0"
-                          ],
+                          "parameters": ["trigger", "=", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -2662,10 +2576,7 @@
                             "inverted": false,
                             "value": "HideLayer"
                           },
-                          "parameters": [
-                            "",
-                            "\"TileSelection\""
-                          ],
+                          "parameters": ["", "\"TileSelection\""],
                           "subInstructions": []
                         },
                         {
@@ -2673,10 +2584,7 @@
                             "inverted": false,
                             "value": "ShowLayer"
                           },
-                          "parameters": [
-                            "",
-                            "\"\""
-                          ],
+                          "parameters": ["", "\"\""],
                           "subInstructions": []
                         },
                         {
@@ -2684,11 +2592,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "trigger",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["trigger", "=", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -2704,10 +2608,7 @@
                             "inverted": true,
                             "value": "LayerVisible"
                           },
-                          "parameters": [
-                            "",
-                            "\"TileSelection\""
-                          ],
+                          "parameters": ["", "\"TileSelection\""],
                           "subInstructions": []
                         },
                         {
@@ -2715,11 +2616,7 @@
                             "inverted": false,
                             "value": "VarScene"
                           },
-                          "parameters": [
-                            "trigger",
-                            "=",
-                            "0"
-                          ],
+                          "parameters": ["trigger", "=", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -2729,10 +2626,7 @@
                             "inverted": false,
                             "value": "ShowLayer"
                           },
-                          "parameters": [
-                            "",
-                            "\"TileSelection\""
-                          ],
+                          "parameters": ["", "\"TileSelection\""],
                           "subInstructions": []
                         },
                         {
@@ -2740,10 +2634,7 @@
                             "inverted": false,
                             "value": "HideLayer"
                           },
-                          "parameters": [
-                            "",
-                            "\"\""
-                          ],
+                          "parameters": ["", "\"\""],
                           "subInstructions": []
                         },
                         {
@@ -2751,11 +2642,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "trigger",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["trigger", "=", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -2802,10 +2689,7 @@
                         "inverted": false,
                         "value": "LayerVisible"
                       },
-                      "parameters": [
-                        "",
-                        "\"TileSelection\""
-                      ],
+                      "parameters": ["", "\"TileSelection\""],
                       "subInstructions": []
                     }
                   ],
@@ -2821,10 +2705,7 @@
                             "inverted": false,
                             "value": "MouseButtonReleased"
                           },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ],
+                          "parameters": ["", "Left"],
                           "subInstructions": []
                         }
                       ],
@@ -2840,12 +2721,7 @@
                                 "inverted": false,
                                 "value": "SourisSurObjet"
                               },
-                              "parameters": [
-                                "SelectionTile",
-                                "",
-                                "",
-                                ""
-                              ],
+                              "parameters": ["SelectionTile", "", "", ""],
                               "subInstructions": []
                             }
                           ],
@@ -2874,10 +2750,7 @@
                                     "inverted": false,
                                     "value": "HideLayer"
                                   },
-                                  "parameters": [
-                                    "",
-                                    "\"TileSelection\""
-                                  ],
+                                  "parameters": ["", "\"TileSelection\""],
                                   "subInstructions": []
                                 },
                                 {
@@ -2885,10 +2758,7 @@
                                     "inverted": false,
                                     "value": "ShowLayer"
                                   },
-                                  "parameters": [
-                                    "",
-                                    "\"\""
-                                  ],
+                                  "parameters": ["", "\"\""],
                                   "subInstructions": []
                                 },
                                 {
@@ -2951,10 +2821,7 @@
                         "inverted": true,
                         "value": "LayerVisible"
                       },
-                      "parameters": [
-                        "",
-                        "\"TileSelection\""
-                      ],
+                      "parameters": ["", "\"TileSelection\""],
                       "subInstructions": []
                     }
                   ],
@@ -2970,10 +2837,7 @@
                             "inverted": false,
                             "value": "SourisBouton"
                           },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ],
+                          "parameters": ["", "Left"],
                           "subInstructions": []
                         },
                         {
@@ -3004,12 +2868,7 @@
                                     "inverted": false,
                                     "value": "SourisSurObjet"
                                   },
-                                  "parameters": [
-                                    "Tile",
-                                    "",
-                                    "yes",
-                                    ""
-                                  ],
+                                  "parameters": ["Tile", "", "yes", ""],
                                   "subInstructions": []
                                 }
                               ]
@@ -3035,11 +2894,7 @@
                                 "inverted": false,
                                 "value": "ChangePlan"
                               },
-                              "parameters": [
-                                "Tile",
-                                "=",
-                                "1"
-                              ],
+                              "parameters": ["Tile", "=", "1"],
                               "subInstructions": []
                             },
                             {
@@ -3059,10 +2914,7 @@
                                 "inverted": false,
                                 "value": "Grid::Snap"
                               },
-                              "parameters": [
-                                "",
-                                "Tile"
-                              ],
+                              "parameters": ["", "Tile"],
                               "subInstructions": []
                             }
                           ],
@@ -3111,10 +2963,7 @@
                         "inverted": false,
                         "value": "SourisBouton"
                       },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ],
+                      "parameters": ["", "Right"],
                       "subInstructions": []
                     }
                   ],
@@ -3130,12 +2979,7 @@
                             "inverted": false,
                             "value": "SourisSurObjet"
                           },
-                          "parameters": [
-                            "Tile",
-                            "",
-                            "yes",
-                            ""
-                          ],
+                          "parameters": ["Tile", "", "yes", ""],
                           "subInstructions": []
                         }
                       ],
@@ -3145,10 +2989,7 @@
                             "inverted": false,
                             "value": "Delete"
                           },
-                          "parameters": [
-                            "Tile",
-                            ""
-                          ],
+                          "parameters": ["Tile", ""],
                           "subInstructions": []
                         }
                       ],
@@ -3195,9 +3036,7 @@
                         "inverted": false,
                         "value": "DepartScene"
                       },
-                      "parameters": [
-                        ""
-                      ],
+                      "parameters": [""],
                       "subInstructions": []
                     }
                   ],
@@ -3221,11 +3060,7 @@
                         "inverted": false,
                         "value": "ChangeScale"
                       },
-                      "parameters": [
-                        "CursorTile",
-                        "=",
-                        "0.3"
-                      ],
+                      "parameters": ["CursorTile", "=", "0.3"],
                       "subInstructions": []
                     }
                   ],
@@ -3278,10 +3113,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "q"
-                      ],
+                      "parameters": ["", "q"],
                       "subInstructions": []
                     }
                   ],
@@ -3291,11 +3123,7 @@
                         "inverted": false,
                         "value": "Scene"
                       },
-                      "parameters": [
-                        "",
-                        "\"Menu\"",
-                        ""
-                      ],
+                      "parameters": ["", "\"Menu\"", ""],
                       "subInstructions": []
                     }
                   ],
@@ -3343,10 +3171,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "s"
-                  ],
+                  "parameters": ["", "s"],
                   "subInstructions": []
                 },
                 {
@@ -3385,10 +3210,7 @@
                         "inverted": false,
                         "value": "GroupExists"
                       },
-                      "parameters": [
-                        "\"save\"",
-                        "\"Tile1PositionX\""
-                      ],
+                      "parameters": ["\"save\"", "\"Tile1PositionX\""],
                       "subInstructions": []
                     }
                   ],
@@ -3398,9 +3220,7 @@
                         "inverted": false,
                         "value": "DeleteFichier"
                       },
-                      "parameters": [
-                        "\"save\""
-                      ],
+                      "parameters": ["\"save\""],
                       "subInstructions": []
                     }
                   ],
@@ -3432,11 +3252,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "counter",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["counter", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -3466,11 +3282,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "counter",
-                            "+",
-                            "1"
-                          ],
+                          "parameters": ["counter", "+", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -3580,9 +3392,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -3598,11 +3408,7 @@
                         "inverted": false,
                         "value": "VarGlobalTxt"
                       },
-                      "parameters": [
-                        "Game",
-                        "=",
-                        "\"Load\""
-                      ],
+                      "parameters": ["Game", "=", "\"Load\""],
                       "subInstructions": []
                     }
                   ],
@@ -3619,11 +3425,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "counter",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["counter", "=", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -3722,11 +3524,7 @@
                             "inverted": false,
                             "value": "ChangePlan"
                           },
-                          "parameters": [
-                            "Tile",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["Tile", "=", "1"],
                           "subInstructions": []
                         },
                         {
@@ -3746,11 +3544,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "counter",
-                            "+",
-                            "1"
-                          ],
+                          "parameters": ["counter", "+", "1"],
                           "subInstructions": []
                         }
                       ],

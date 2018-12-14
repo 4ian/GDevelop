@@ -13,20 +13,19 @@
  * @param {Object} behaviorData The object used to setup the behavior
  * @param {gdjs.RuntimeObject} owner The object owning the behavior
  */
-gdjs.RuntimeBehavior = function(runtimeScene, behaviorData, owner)
-{
-    this.name = behaviorData.name || "";
-    this.type = behaviorData.type || "";
-    this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
-    this._activated = true;
-    this.owner = owner;
+gdjs.RuntimeBehavior = function(runtimeScene, behaviorData, owner) {
+  this.name = behaviorData.name || '';
+  this.type = behaviorData.type || '';
+  this._nameId = gdjs.RuntimeObject.getNameIdentifier(this.name);
+  this._activated = true;
+  this.owner = owner;
 };
 /**
  * Get the name of the behavior.
  * @return {string} The behavior's name.
  */
 gdjs.RuntimeBehavior.prototype.getName = function() {
-	return this.name;
+  return this.name;
 };
 
 /**
@@ -34,7 +33,7 @@ gdjs.RuntimeBehavior.prototype.getName = function() {
  * @return {number} The behavior's name identifier.
  */
 gdjs.RuntimeBehavior.prototype.getNameId = function() {
-	return this._nameId;
+  return this._nameId;
 };
 
 /**
@@ -43,14 +42,14 @@ gdjs.RuntimeBehavior.prototype.getNameId = function() {
  * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene owning the object
  */
 gdjs.RuntimeBehavior.prototype.stepPreEvents = function(runtimeScene) {
-	if ( this._activated ) {
-		var profiler = runtimeScene.getProfiler();
-		if (profiler) profiler.begin(this.name);
-		
-		this.doStepPreEvents(runtimeScene);
+  if (this._activated) {
+    var profiler = runtimeScene.getProfiler();
+    if (profiler) profiler.begin(this.name);
 
-		if (profiler) profiler.end(this.name);
-	}
+    this.doStepPreEvents(runtimeScene);
+
+    if (profiler) profiler.end(this.name);
+  }
 };
 
 /**
@@ -59,14 +58,14 @@ gdjs.RuntimeBehavior.prototype.stepPreEvents = function(runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene owning the object
  */
 gdjs.RuntimeBehavior.prototype.stepPostEvents = function(runtimeScene) {
-	if ( this._activated ) {
-		var profiler = runtimeScene.getProfiler();
-		if (profiler) profiler.begin(this.name);
-		
-		this.doStepPostEvents(runtimeScene);
+  if (this._activated) {
+    var profiler = runtimeScene.getProfiler();
+    if (profiler) profiler.begin(this.name);
 
-		if (profiler) profiler.end(this.name);
-	}
+    this.doStepPostEvents(runtimeScene);
+
+    if (profiler) profiler.end(this.name);
+  }
 };
 
 /**
@@ -74,63 +73,52 @@ gdjs.RuntimeBehavior.prototype.stepPostEvents = function(runtimeScene) {
  * @param {boolean} enable true to enable the behavior, false to disable it
  */
 gdjs.RuntimeBehavior.prototype.activate = function(enable) {
-	if ( enable === undefined ) enable = true;
-	if ( !this._activated && enable ) {
-		this._activated = true;
-		this.onActivate();
-	}
-	else if ( this._activated && !enable ) {
-		this._activated = false;
-		this.onDeActivate();
-	}
+  if (enable === undefined) enable = true;
+  if (!this._activated && enable) {
+    this._activated = true;
+    this.onActivate();
+  } else if (this._activated && !enable) {
+    this._activated = false;
+    this.onDeActivate();
+  }
 };
 
 /**
  * Return true if the behavior is activated
  */
 gdjs.RuntimeBehavior.prototype.activated = function() {
-	return this._activated;
+  return this._activated;
 };
 
 /**
  * Behaviors writers: Reimplement this method to do extra work
  * when the behavior is activated
  */
-gdjs.RuntimeBehavior.prototype.onActivate = function() {
-
-};
+gdjs.RuntimeBehavior.prototype.onActivate = function() {};
 
 /**
  * Behaviors writers: Reimplement this method to do extra work
  * when the behavior is deactivated
  */
-gdjs.RuntimeBehavior.prototype.onDeActivate = function() {
-
-};
+gdjs.RuntimeBehavior.prototype.onDeActivate = function() {};
 
 /**
  * Behaviors writers: This method is called each tick before events are done.
  * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene owning the object
  */
-gdjs.RuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
-
-};
+gdjs.RuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {};
 
 /**
  * Behaviors writers: This method is called each tick after events are done.
  * @param {gdjs.RuntimeScene} runtimeScene The runtimeScene owning the object
  */
-gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
-
-}
+gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {};
 
 /**
  * Behaviors writers: This method is called when the owner of the behavior
  * is removed from its scene.
  */
-gdjs.RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
-
-}
+gdjs.RuntimeBehavior.prototype.ownerRemovedFromScene = function() {};
 
 //Notify gdjs this.the runtimeBehavior exists.
-gdjs.RuntimeBehavior.thisIsARuntimeBehaviorConstructor = "";
+gdjs.RuntimeBehavior.thisIsARuntimeBehaviorConstructor = '';

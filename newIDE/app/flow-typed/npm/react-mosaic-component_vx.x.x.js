@@ -116,25 +116,39 @@ declare module 'react-mosaic-component/test/registerTsNode' {
 
 // Filename aliases
 declare module 'react-mosaic-component/lib/buttons/defaultToolbarControls.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/buttons/defaultToolbarControls'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/buttons/defaultToolbarControls'
+  >;
 }
 declare module 'react-mosaic-component/lib/buttons/ExpandButton.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/buttons/ExpandButton'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/buttons/ExpandButton'
+  >;
 }
 declare module 'react-mosaic-component/lib/buttons/MosaicButton.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/buttons/MosaicButton'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/buttons/MosaicButton'
+  >;
 }
 declare module 'react-mosaic-component/lib/buttons/RemoveButton.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/buttons/RemoveButton'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/buttons/RemoveButton'
+  >;
 }
 declare module 'react-mosaic-component/lib/buttons/ReplaceButton.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/buttons/ReplaceButton'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/buttons/ReplaceButton'
+  >;
 }
 declare module 'react-mosaic-component/lib/buttons/Separator.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/buttons/Separator'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/buttons/Separator'
+  >;
 }
 declare module 'react-mosaic-component/lib/buttons/SplitButton.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/buttons/SplitButton'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/buttons/SplitButton'
+  >;
 }
 declare module 'react-mosaic-component/lib/contextTypes.js' {
   declare module.exports: $Exports<'react-mosaic-component/lib/contextTypes'>;
@@ -149,7 +163,9 @@ declare module 'react-mosaic-component/lib/Mosaic.js' {
   declare module.exports: $Exports<'react-mosaic-component/lib/Mosaic'>;
 }
 declare module 'react-mosaic-component/lib/MosaicDropTarget.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/MosaicDropTarget'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/MosaicDropTarget'
+  >;
 }
 declare module 'react-mosaic-component/lib/MosaicRoot.js' {
   declare module.exports: $Exports<'react-mosaic-component/lib/MosaicRoot'>;
@@ -158,10 +174,14 @@ declare module 'react-mosaic-component/lib/MosaicWindow.js' {
   declare module.exports: $Exports<'react-mosaic-component/lib/MosaicWindow'>;
 }
 declare module 'react-mosaic-component/lib/MosaicZeroState.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/MosaicZeroState'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/MosaicZeroState'
+  >;
 }
 declare module 'react-mosaic-component/lib/RootDropTargets.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/RootDropTargets'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/RootDropTargets'
+  >;
 }
 declare module 'react-mosaic-component/lib/Split.js' {
   declare module.exports: $Exports<'react-mosaic-component/lib/Split'>;
@@ -170,17 +190,27 @@ declare module 'react-mosaic-component/lib/types.js' {
   declare module.exports: $Exports<'react-mosaic-component/lib/types'>;
 }
 declare module 'react-mosaic-component/lib/util/assertNever.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/util/assertNever'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/util/assertNever'
+  >;
 }
 declare module 'react-mosaic-component/lib/util/BoundingBox.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/util/BoundingBox'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/util/BoundingBox'
+  >;
 }
 declare module 'react-mosaic-component/lib/util/mosaicUpdates.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/util/mosaicUpdates'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/util/mosaicUpdates'
+  >;
 }
 declare module 'react-mosaic-component/lib/util/mosaicUtilities.js' {
-  declare module.exports: $Exports<'react-mosaic-component/lib/util/mosaicUtilities'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/lib/util/mosaicUtilities'
+  >;
 }
 declare module 'react-mosaic-component/test/registerTsNode.js' {
-  declare module.exports: $Exports<'react-mosaic-component/test/registerTsNode'>;
+  declare module.exports: $Exports<
+    'react-mosaic-component/test/registerTsNode'
+  >;
 }

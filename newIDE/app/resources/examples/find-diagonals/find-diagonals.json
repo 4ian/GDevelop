@@ -834,10 +834,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -861,12 +858,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Box",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["Box", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -890,11 +882,7 @@
                     "inverted": false,
                     "value": "ChangeScale"
                   },
-                  "parameters": [
-                    "Mask",
-                    "=",
-                    "5"
-                  ],
+                  "parameters": ["Mask", "=", "5"],
                   "subInstructions": []
                 }
               ],
@@ -910,11 +898,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "Box",
-                    "Mask",
-                    ""
-                  ],
+                  "parameters": ["Box", "Mask", ""],
                   "subInstructions": []
                 }
               ],
@@ -924,10 +908,7 @@
                     "inverted": false,
                     "value": "Delete"
                   },
-                  "parameters": [
-                    "Box",
-                    ""
-                  ],
+                  "parameters": ["Box", ""],
                   "subInstructions": []
                 }
               ],
@@ -1537,9 +1518,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -1549,11 +1528,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "MaxDistance",
-                "=",
-                "2"
-              ],
+              "parameters": ["MaxDistance", "=", "2"],
               "subInstructions": []
             }
           ],
@@ -1569,10 +1544,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -1596,12 +1568,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Box",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["Box", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -1611,11 +1578,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "direction",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["direction", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -1647,11 +1610,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "distance",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["distance", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1697,11 +1656,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "distance",
-                            "+",
-                            "1"
-                          ],
+                          "parameters": ["distance", "+", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -1733,11 +1688,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "direction",
-                            "+",
-                            "1"
-                          ],
+                          "parameters": ["direction", "+", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -1772,11 +1723,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "Box",
-                    "Mask",
-                    ""
-                  ],
+                  "parameters": ["Box", "Mask", ""],
                   "subInstructions": []
                 }
               ],
@@ -1786,10 +1733,7 @@
                     "inverted": false,
                     "value": "Delete"
                   },
-                  "parameters": [
-                    "Box",
-                    ""
-                  ],
+                  "parameters": ["Box", ""],
                   "subInstructions": []
                 }
               ],
@@ -2342,9 +2286,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -2354,11 +2296,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "MaxDistance",
-                "=",
-                "2"
-              ],
+              "parameters": ["MaxDistance", "=", "2"],
               "subInstructions": []
             }
           ],
@@ -2374,10 +2312,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -2401,12 +2336,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Box",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["Box", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -2416,11 +2346,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "x",
-                    "=",
-                    "Box.PointX(Centre)"
-                  ],
+                  "parameters": ["x", "=", "Box.PointX(Centre)"],
                   "subInstructions": []
                 },
                 {
@@ -2428,11 +2354,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "y",
-                    "=",
-                    "Box.PointY(Centre)"
-                  ],
+                  "parameters": ["y", "=", "Box.PointY(Centre)"],
                   "subInstructions": []
                 },
                 {
@@ -2440,11 +2362,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "direction",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["direction", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -2461,11 +2379,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "distance",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["distance", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -2506,11 +2420,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "distance",
-                            "+",
-                            "1"
-                          ],
+                          "parameters": ["distance", "+", "1"],
                           "subInstructions": []
                         },
                         {
@@ -2518,10 +2428,7 @@
                             "inverted": false,
                             "value": "AjoutObjConcern"
                           },
-                          "parameters": [
-                            "",
-                            "Box"
-                          ],
+                          "parameters": ["", "Box"],
                           "subInstructions": []
                         }
                       ],
@@ -2587,10 +2494,7 @@
                                 "inverted": false,
                                 "value": "Delete"
                               },
-                              "parameters": [
-                                "Box",
-                                ""
-                              ],
+                              "parameters": ["Box", ""],
                               "subInstructions": []
                             }
                           ],
@@ -2609,11 +2513,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "direction",
-                            "+",
-                            "1"
-                          ],
+                          "parameters": ["direction", "+", "1"],
                           "subInstructions": []
                         }
                       ],

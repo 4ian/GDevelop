@@ -544,10 +544,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -602,12 +599,7 @@
                 "inverted": false,
                 "value": "PathfindingBehavior::Speed"
               },
-              "parameters": [
-                "player",
-                "Pathfinding",
-                ">",
-                "0"
-              ],
+              "parameters": ["player", "Pathfinding", ">", "0"],
               "subInstructions": []
             },
             {
@@ -625,11 +617,7 @@
                 "inverted": false,
                 "value": "TextObject::String"
               },
-              "parameters": [
-                "message",
-                "=",
-                "\"I'm on my way\""
-              ],
+              "parameters": ["message", "=", "\"I'm on my way\""],
               "subInstructions": []
             }
           ],
@@ -660,11 +648,7 @@
                     "inverted": false,
                     "value": "ActivateBehavior"
                   },
-                  "parameters": [
-                    "obstacle",
-                    "Draggable",
-                    "no"
-                  ],
+                  "parameters": ["obstacle", "Draggable", "no"],
                   "subInstructions": []
                 }
               ],
@@ -697,12 +681,7 @@
                 "inverted": false,
                 "value": "PathfindingBehavior::Speed"
               },
-              "parameters": [
-                "player",
-                "Pathfinding",
-                "=",
-                "0"
-              ],
+              "parameters": ["player", "Pathfinding", "=", "0"],
               "subInstructions": []
             },
             {
@@ -720,11 +699,7 @@
                 "inverted": false,
                 "value": "TextObject::String"
               },
-              "parameters": [
-                "message",
-                "=",
-                "\"Waiting for destination\""
-              ],
+              "parameters": ["message", "=", "\"Waiting for destination\""],
               "subInstructions": []
             }
           ],
@@ -755,11 +730,7 @@
                     "inverted": false,
                     "value": "ActivateBehavior"
                   },
-                  "parameters": [
-                    "obstacle",
-                    "Draggable",
-                    "yes"
-                  ],
+                  "parameters": ["obstacle", "Draggable", "yes"],
                   "subInstructions": []
                 }
               ],
@@ -792,10 +763,7 @@
                 "inverted": false,
                 "value": "MouseButtonReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -811,10 +779,7 @@
                     "inverted": true,
                     "value": "PathfindingBehavior::PathFound"
                   },
-                  "parameters": [
-                    "player",
-                    "Pathfinding"
-                  ],
+                  "parameters": ["player", "Pathfinding"],
                   "subInstructions": []
                 }
               ],
@@ -824,11 +789,7 @@
                     "inverted": false,
                     "value": "TextObject::String"
                   },
-                  "parameters": [
-                    "message",
-                    "=",
-                    "\"I can't go there\""
-                  ],
+                  "parameters": ["message", "=", "\"I can't go there\""],
                   "subInstructions": []
                 }
               ],

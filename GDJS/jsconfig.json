@@ -1,9 +1,6 @@
 {
-    "compilerOptions": {
-        "target": "ES5"
-    },
-    "include": [
-        "Runtime/**/*",
-        "../Extensions/**/*.js"
-    ]
+  "compilerOptions": {
+    "target": "ES5"
+  },
+  "include": ["Runtime/**/*", "../Extensions/**/*.js"]
 }

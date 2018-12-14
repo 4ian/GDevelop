@@ -3,7 +3,7 @@
 //TODO: These types could be generated from GDevelop.js instead of being
 //manually written here.
 type EmscriptenObject = Object & {
-    ptr: Number
+  ptr: Number,
 };
 
 declare type gdPlatform = EmscriptenObject;

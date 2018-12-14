@@ -325,10 +325,10 @@ module.exports = {
    * You can optionally add sanity tests that will check the basic working
    * of your extension behaviors/objects by instanciating behaviors/objects
    * and setting the property to a given value.
-   * 
+   *
    * If you don't have any tests, you can simply return an empty array like this:
    * `runExtensionSanityTests: function(gd, extension) { return []; }`
-   * 
+   *
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */

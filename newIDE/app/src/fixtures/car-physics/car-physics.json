@@ -1050,9 +1050,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -1062,14 +1060,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::AddRevoluteJointBetweenObjects"
               },
-              "parameters": [
-                "Tire",
-                "Physics",
-                "Car",
-                "",
-                "0",
-                "0"
-              ],
+              "parameters": ["Tire", "Physics", "Car", "", "0", "0"],
               "subInstructions": []
             }
           ],
@@ -1107,10 +1098,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "d"
-                  ],
+                  "parameters": ["", "d"],
                   "subInstructions": []
                 },
                 {
@@ -1118,12 +1106,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "BtnRight",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["BtnRight", "", "yes", ""],
                   "subInstructions": []
                 }
               ]
@@ -1135,12 +1118,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::ApplyTorque"
               },
-              "parameters": [
-                "Tire",
-                "Physics",
-                "-30*TimeDelta()",
-                ""
-              ],
+              "parameters": ["Tire", "Physics", "-30*TimeDelta()", ""],
               "subInstructions": []
             }
           ],
@@ -1155,13 +1133,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::AngularVelocity"
                   },
-                  "parameters": [
-                    "Tire",
-                    "Physics",
-                    "=",
-                    "0",
-                    ""
-                  ],
+                  "parameters": ["Tire", "Physics", "=", "0", ""],
                   "subInstructions": []
                 }
               ],
@@ -1171,12 +1143,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::SetAngularVelocity"
                   },
-                  "parameters": [
-                    "Tire",
-                    "Physics",
-                    "-0.0001",
-                    ""
-                  ],
+                  "parameters": ["Tire", "Physics", "-0.0001", ""],
                   "subInstructions": []
                 }
               ],
@@ -1192,13 +1159,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::AngularVelocity"
                   },
-                  "parameters": [
-                    "Tire",
-                    "Physics",
-                    "<",
-                    "-160",
-                    ""
-                  ],
+                  "parameters": ["Tire", "Physics", "<", "-160", ""],
                   "subInstructions": []
                 }
               ],
@@ -1208,12 +1169,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::SetAngularVelocity"
                   },
-                  "parameters": [
-                    "Tire",
-                    "Physics",
-                    "-160",
-                    ""
-                  ],
+                  "parameters": ["Tire", "Physics", "-160", ""],
                   "subInstructions": []
                 }
               ],
@@ -1253,10 +1209,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "a"
-                  ],
+                  "parameters": ["", "a"],
                   "subInstructions": []
                 },
                 {
@@ -1264,12 +1217,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "BtnLeft",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["BtnLeft", "", "yes", ""],
                   "subInstructions": []
                 }
               ]
@@ -1281,12 +1229,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::ApplyTorque"
               },
-              "parameters": [
-                "Tire",
-                "Physics",
-                "20*TimeDelta()",
-                ""
-              ],
+              "parameters": ["Tire", "Physics", "20*TimeDelta()", ""],
               "subInstructions": []
             }
           ],
@@ -1301,13 +1244,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::AngularVelocity"
                   },
-                  "parameters": [
-                    "Tire",
-                    "Physics",
-                    ">",
-                    "20",
-                    ""
-                  ],
+                  "parameters": ["Tire", "Physics", ">", "20", ""],
                   "subInstructions": []
                 }
               ],
@@ -1317,12 +1254,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::SetAngularVelocity"
                   },
-                  "parameters": [
-                    "Tire",
-                    "Physics",
-                    "20",
-                    ""
-                  ],
+                  "parameters": ["Tire", "Physics", "20", ""],
                   "subInstructions": []
                 }
               ],
@@ -1338,13 +1270,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::AngularVelocity"
                   },
-                  "parameters": [
-                    "Tire",
-                    "Physics",
-                    "=",
-                    "0",
-                    ""
-                  ],
+                  "parameters": ["Tire", "Physics", "=", "0", ""],
                   "subInstructions": []
                 }
               ],
@@ -1354,12 +1280,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::SetAngularVelocity"
                   },
-                  "parameters": [
-                    "Tire",
-                    "Physics",
-                    "0.0001",
-                    ""
-                  ],
+                  "parameters": ["Tire", "Physics", "0.0001", ""],
                   "subInstructions": []
                 }
               ],
@@ -1393,13 +1314,7 @@
                 "inverted": false,
                 "value": "CentreCamera"
               },
-              "parameters": [
-                "",
-                "Car",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["", "Car", "", "", ""],
               "subInstructions": []
             },
             {
@@ -1442,11 +1357,7 @@
                 "inverted": false,
                 "value": "PosY"
               },
-              "parameters": [
-                "Car",
-                ">",
-                "1200"
-              ],
+              "parameters": ["Car", ">", "1200"],
               "subInstructions": []
             }
           ],
@@ -1456,11 +1367,7 @@
                 "inverted": false,
                 "value": "Scene"
               },
-              "parameters": [
-                "",
-                "\"Scene\"",
-                ""
-              ],
+              "parameters": ["", "\"Scene\"", ""],
               "subInstructions": []
             }
           ],

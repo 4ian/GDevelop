@@ -96,8 +96,10 @@ export class ObjectEditorDialog extends Component<*, StateType> {
               resourceSources={this.props.resourceSources}
               onChooseResource={this.props.onChooseResource}
               resourceExternalEditors={this.props.resourceExternalEditors}
-              onSizeUpdated={() =>
-                this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+              onSizeUpdated={
+                () =>
+                  this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
+              }
               objectName={this.props.objectName}
             />
           )}
@@ -105,8 +107,10 @@ export class ObjectEditorDialog extends Component<*, StateType> {
           <BehaviorsEditor
             object={this.props.object}
             project={this.props.project}
-            onSizeUpdated={() =>
-              this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+            onSizeUpdated={
+              () =>
+                this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
+            }
           />
         )}
       </Dialog>

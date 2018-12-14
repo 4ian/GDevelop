@@ -5,7 +5,8 @@ type $npm$propTypes$ReactPropsCheckType = (
   props: any,
   propName: string,
   componentName: string,
-  href?: string) => ?Error;
+  href?: string
+) => ?Error;
 
 declare module 'prop-types' {
   declare var array: React$PropType$Primitive<Array<any>>;
@@ -26,10 +27,10 @@ declare module 'prop-types' {
   declare var shape: React$PropType$Shape;
 
   declare function checkPropTypes<V>(
-    propTypes: $Subtype<{[_: $Keys<V>]: $npm$propTypes$ReactPropsCheckType}>,
+    propTypes: $Subtype<{ [_: $Keys<V>]: $npm$propTypes$ReactPropsCheckType }>,
     values: V,
     location: string,
     componentName: string,
-    getStack: ?(() => ?string)
-  ) : void;
+    getStack: ?() => ?string
+  ): void;
 }

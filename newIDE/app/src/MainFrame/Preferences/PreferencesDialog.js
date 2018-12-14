@@ -79,10 +79,7 @@ export default class PreferencesDialog extends Component<Props, State> {
               <Line noMargin>
                 <p>
                   You can contribute and create your own themes:{' '}
-                  <FlatButton
-                    label="Learn more"
-                    onClick={this.createTheme}
-                  />{' '}
+                  <FlatButton label="Learn more" onClick={this.createTheme} />{' '}
                 </p>
               </Line>
               <Line>
@@ -95,7 +92,9 @@ export default class PreferencesDialog extends Component<Props, State> {
               </Line>
               <Line>
                 <Toggle
-                  onToggle={(e, check) => setShowEventsFunctionsExtensions(check)}
+                  onToggle={(e, check) =>
+                    setShowEventsFunctionsExtensions(check)
+                  }
                   toggled={values.showEventsFunctionsExtensions}
                   labelPosition="right"
                   label="Activate events functions (alpha, please report any bugs)"

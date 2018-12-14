@@ -202,9 +202,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -250,11 +248,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "text.string.count",
-                "=",
-                "3"
-              ],
+              "parameters": ["text.string.count", "=", "3"],
               "subInstructions": []
             },
             {
@@ -262,11 +256,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "text.typing_speed",
-                "=",
-                "0.05"
-              ],
+              "parameters": ["text.typing_speed", "=", "0.05"],
               "subInstructions": []
             },
             {
@@ -274,11 +264,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "text.prompt.blinking_delay",
-                "=",
-                "0.4"
-              ],
+              "parameters": ["text.prompt.blinking_delay", "=", "0.4"],
               "subInstructions": []
             },
             {
@@ -286,11 +272,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "text.prompt.character",
-                "=",
-                "\"_\""
-              ],
+              "parameters": ["text.prompt.character", "=", "\"_\""],
               "subInstructions": []
             },
             {
@@ -298,11 +280,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "automation.string.finished",
-                "=",
-                "1"
-              ],
+              "parameters": ["automation.string.finished", "=", "1"],
               "subInstructions": []
             },
             {
@@ -310,11 +288,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "input.waiting",
-                "=",
-                "0"
-              ],
+              "parameters": ["input.waiting", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -345,11 +319,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "input.waiting",
-                "=",
-                "1"
-              ],
+              "parameters": ["input.waiting", "=", "1"],
               "subInstructions": []
             },
             {
@@ -364,9 +334,7 @@
                     "inverted": false,
                     "value": "AnyKeyPressed"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 },
                 {
@@ -374,10 +342,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ]
@@ -389,11 +354,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "input.waiting",
-                "=",
-                "0"
-              ],
+              "parameters": ["input.waiting", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -424,11 +385,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "input.waiting",
-                "=",
-                "0"
-              ],
+              "parameters": ["input.waiting", "=", "0"],
               "subInstructions": []
             },
             {
@@ -450,10 +407,7 @@
                 "inverted": false,
                 "value": "ResetTimer"
               },
-              "parameters": [
-                "",
-                "\"automation.typing_speed\""
-              ],
+              "parameters": ["", "\"automation.typing_speed\""],
               "subInstructions": []
             }
           ],
@@ -468,11 +422,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "automation.string.finished",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["automation.string.finished", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -482,11 +432,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "automation.string.finished",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["automation.string.finished", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -494,11 +440,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "automation.current.string.id",
-                    "+",
-                    "1"
-                  ],
+                  "parameters": ["automation.current.string.id", "+", "1"],
                   "subInstructions": []
                 }
               ],
@@ -527,11 +469,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "automation.current.string.id",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["automation.current.string.id", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -583,11 +521,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "automation.current.character.id",
-                    "+",
-                    "1"
-                  ],
+                  "parameters": ["automation.current.character.id", "+", "1"],
                   "subInstructions": []
                 }
               ],
@@ -617,11 +551,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "automation.current.character.id",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["automation.current.character.id", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -629,11 +559,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "automation.string.finished",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["automation.string.finished", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -641,11 +567,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "input.waiting",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["input.waiting", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -733,10 +655,7 @@
                 "inverted": false,
                 "value": "ResetTimer"
               },
-              "parameters": [
-                "",
-                "\"automation.prompt.blinking_delay\""
-              ],
+              "parameters": ["", "\"automation.prompt.blinking_delay\""],
               "subInstructions": []
             },
             {
@@ -744,11 +663,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "automation.process_check",
-                "=",
-                "0"
-              ],
+              "parameters": ["automation.process_check", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -763,11 +678,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "automation.prompt.state",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["automation.prompt.state", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -777,11 +688,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "automation.process_check",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["automation.process_check", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -789,11 +696,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "automation.prompt.state",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["automation.prompt.state", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -809,11 +712,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "automation.process_check",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["automation.process_check", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -821,11 +720,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "automation.prompt.state",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["automation.prompt.state", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -835,11 +730,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "automation.prompt.state",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["automation.prompt.state", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -857,11 +748,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "automation.prompt.state",
-                "=",
-                "1"
-              ],
+              "parameters": ["automation.prompt.state", "=", "1"],
               "subInstructions": []
             }
           ],

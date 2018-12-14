@@ -515,9 +515,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -535,13 +533,7 @@
                 "inverted": false,
                 "value": "CentreCamera"
               },
-              "parameters": [
-                "",
-                "board",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["", "board", "", "", ""],
               "subInstructions": []
             },
             {
@@ -549,9 +541,7 @@
                 "inverted": false,
                 "value": "Cache"
               },
-              "parameters": [
-                "you_win"
-              ],
+              "parameters": ["you_win"],
               "subInstructions": []
             }
           ],
@@ -637,12 +627,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "ball",
-                "boundary",
-                "",
-                ""
-              ],
+              "parameters": ["ball", "boundary", "", ""],
               "subInstructions": []
             }
           ],
@@ -652,10 +637,7 @@
                 "inverted": false,
                 "value": "SeparateFromObjects"
               },
-              "parameters": [
-                "ball",
-                "boundary"
-              ],
+              "parameters": ["ball", "boundary"],
               "subInstructions": []
             }
           ],
@@ -686,12 +668,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "ball",
-                "pit",
-                "",
-                ""
-              ],
+              "parameters": ["ball", "pit", "", ""],
               "subInstructions": []
             },
             {
@@ -709,10 +686,7 @@
                 "inverted": false,
                 "value": "Montre"
               },
-              "parameters": [
-                "you_win",
-                ""
-              ],
+              "parameters": ["you_win", ""],
               "subInstructions": []
             }
           ],

@@ -23,7 +23,6 @@ declare module 'node-require-function' {
  * needed.
  */
 
-
 // Filename aliases
 declare module 'node-require-function/index' {
   declare module.exports: $Exports<'node-require-function'>;

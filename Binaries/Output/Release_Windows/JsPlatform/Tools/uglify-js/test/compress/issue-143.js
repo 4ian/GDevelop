@@ -13,36 +13,52 @@
  */
 
 tranformation_sort_order_equal: {
-    options = {
-        comparisons: true,
-    };
+  options = {
+    comparisons: true
+  };
 
-    input: { (a = parseInt('100')) == a }
-    expect: { (a = parseInt('100')) == a }
+  input: {
+    (a = parseInt("100")) == a;
+  }
+  expect: {
+    (a = parseInt("100")) == a;
+  }
 }
 
 tranformation_sort_order_unequal: {
-    options = {
-        comparisons: true,
-    };
+  options = {
+    comparisons: true
+  };
 
-    input: { (a = parseInt('100')) != a }
-    expect: { (a = parseInt('100')) != a }
+  input: {
+    (a = parseInt("100")) != a;
+  }
+  expect: {
+    (a = parseInt("100")) != a;
+  }
 }
 
 tranformation_sort_order_lesser_or_equal: {
-    options = {
-        comparisons: true,
-    };
+  options = {
+    comparisons: true
+  };
 
-    input: { (a = parseInt('100')) <= a }
-    expect: { (a = parseInt('100')) <= a }
+  input: {
+    (a = parseInt("100")) <= a;
+  }
+  expect: {
+    (a = parseInt("100")) <= a;
+  }
 }
 tranformation_sort_order_greater_or_equal: {
-    options = {
-        comparisons: true,
-    };
+  options = {
+    comparisons: true
+  };
 
-    input: { (a = parseInt('100')) >= a }
-    expect: { (a = parseInt('100')) >= a }
+  input: {
+    (a = parseInt("100")) >= a;
+  }
+  expect: {
+    (a = parseInt("100")) >= a;
+  }
 }

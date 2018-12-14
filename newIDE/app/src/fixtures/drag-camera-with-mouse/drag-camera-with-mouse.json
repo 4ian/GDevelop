@@ -1830,10 +1830,7 @@
                         "inverted": false,
                         "value": "SourisBouton"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     },
                     {
@@ -1851,11 +1848,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "scrollStartX",
-                        "=",
-                        "MouseX(\"\",0)"
-                      ],
+                      "parameters": ["scrollStartX", "=", "MouseX(\"\",0)"],
                       "subInstructions": []
                     },
                     {
@@ -1863,11 +1856,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "scrollStartY",
-                        "=",
-                        "MouseY(\"\",0)"
-                      ],
+                      "parameters": ["scrollStartY", "=", "MouseY(\"\",0)"],
                       "subInstructions": []
                     }
                   ],
@@ -1883,10 +1872,7 @@
                         "inverted": false,
                         "value": "SourisBouton"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     }
                   ],
@@ -2033,11 +2019,7 @@
                                 "inverted": false,
                                 "value": "VarScene"
                               },
-                              "parameters": [
-                                "scrollDistanceX",
-                                ">",
-                                "1"
-                              ],
+                              "parameters": ["scrollDistanceX", ">", "1"],
                               "subInstructions": []
                             }
                           ],
@@ -2091,11 +2073,7 @@
                                 "inverted": false,
                                 "value": "VarScene"
                               },
-                              "parameters": [
-                                "scrollDistanceX",
-                                ">",
-                                "1"
-                              ],
+                              "parameters": ["scrollDistanceX", ">", "1"],
                               "subInstructions": []
                             }
                           ],
@@ -2164,11 +2142,7 @@
                                 "inverted": false,
                                 "value": "VarScene"
                               },
-                              "parameters": [
-                                "scrollDistanceY",
-                                ">",
-                                "1"
-                              ],
+                              "parameters": ["scrollDistanceY", ">", "1"],
                               "subInstructions": []
                             }
                           ],
@@ -2222,11 +2196,7 @@
                                 "inverted": false,
                                 "value": "VarScene"
                               },
-                              "parameters": [
-                                "scrollDistanceY",
-                                ">",
-                                "1"
-                              ],
+                              "parameters": ["scrollDistanceY", ">", "1"],
                               "subInstructions": []
                             }
                           ],

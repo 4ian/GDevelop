@@ -1089,7 +1089,9 @@ declare module 'aws-sdk/clients/cognitoidentity.js' {
   declare module.exports: $Exports<'aws-sdk/clients/cognitoidentity'>;
 }
 declare module 'aws-sdk/clients/cognitoidentityserviceprovider.js' {
-  declare module.exports: $Exports<'aws-sdk/clients/cognitoidentityserviceprovider'>;
+  declare module.exports: $Exports<
+    'aws-sdk/clients/cognitoidentityserviceprovider'
+  >;
 }
 declare module 'aws-sdk/clients/cognitosync.js' {
   declare module.exports: $Exports<'aws-sdk/clients/cognitosync'>;
@@ -1239,10 +1241,14 @@ declare module 'aws-sdk/clients/machinelearning.js' {
   declare module.exports: $Exports<'aws-sdk/clients/machinelearning'>;
 }
 declare module 'aws-sdk/clients/marketplacecommerceanalytics.js' {
-  declare module.exports: $Exports<'aws-sdk/clients/marketplacecommerceanalytics'>;
+  declare module.exports: $Exports<
+    'aws-sdk/clients/marketplacecommerceanalytics'
+  >;
 }
 declare module 'aws-sdk/clients/marketplaceentitlementservice.js' {
-  declare module.exports: $Exports<'aws-sdk/clients/marketplaceentitlementservice'>;
+  declare module.exports: $Exports<
+    'aws-sdk/clients/marketplaceentitlementservice'
+  >;
 }
 declare module 'aws-sdk/clients/marketplacemetering.js' {
   declare module.exports: $Exports<'aws-sdk/clients/marketplacemetering'>;
@@ -1326,7 +1332,9 @@ declare module 'aws-sdk/clients/sagemakerruntime.js' {
   declare module.exports: $Exports<'aws-sdk/clients/sagemakerruntime'>;
 }
 declare module 'aws-sdk/clients/serverlessapplicationrepository.js' {
-  declare module.exports: $Exports<'aws-sdk/clients/serverlessapplicationrepository'>;
+  declare module.exports: $Exports<
+    'aws-sdk/clients/serverlessapplicationrepository'
+  >;
 }
 declare module 'aws-sdk/clients/servicecatalog.js' {
   declare module.exports: $Exports<'aws-sdk/clients/servicecatalog'>;
@@ -1464,37 +1472,55 @@ declare module 'aws-sdk/lib/credentials.js' {
   declare module.exports: $Exports<'aws-sdk/lib/credentials'>;
 }
 declare module 'aws-sdk/lib/credentials/cognito_identity_credentials.js' {
-  declare module.exports: $Exports<'aws-sdk/lib/credentials/cognito_identity_credentials'>;
+  declare module.exports: $Exports<
+    'aws-sdk/lib/credentials/cognito_identity_credentials'
+  >;
 }
 declare module 'aws-sdk/lib/credentials/credential_provider_chain.js' {
-  declare module.exports: $Exports<'aws-sdk/lib/credentials/credential_provider_chain'>;
+  declare module.exports: $Exports<
+    'aws-sdk/lib/credentials/credential_provider_chain'
+  >;
 }
 declare module 'aws-sdk/lib/credentials/ec2_metadata_credentials.js' {
-  declare module.exports: $Exports<'aws-sdk/lib/credentials/ec2_metadata_credentials'>;
+  declare module.exports: $Exports<
+    'aws-sdk/lib/credentials/ec2_metadata_credentials'
+  >;
 }
 declare module 'aws-sdk/lib/credentials/ecs_credentials.js' {
   declare module.exports: $Exports<'aws-sdk/lib/credentials/ecs_credentials'>;
 }
 declare module 'aws-sdk/lib/credentials/environment_credentials.js' {
-  declare module.exports: $Exports<'aws-sdk/lib/credentials/environment_credentials'>;
+  declare module.exports: $Exports<
+    'aws-sdk/lib/credentials/environment_credentials'
+  >;
 }
 declare module 'aws-sdk/lib/credentials/file_system_credentials.js' {
-  declare module.exports: $Exports<'aws-sdk/lib/credentials/file_system_credentials'>;
+  declare module.exports: $Exports<
+    'aws-sdk/lib/credentials/file_system_credentials'
+  >;
 }
 declare module 'aws-sdk/lib/credentials/remote_credentials.js' {
-  declare module.exports: $Exports<'aws-sdk/lib/credentials/remote_credentials'>;
+  declare module.exports: $Exports<
+    'aws-sdk/lib/credentials/remote_credentials'
+  >;
 }
 declare module 'aws-sdk/lib/credentials/saml_credentials.js' {
   declare module.exports: $Exports<'aws-sdk/lib/credentials/saml_credentials'>;
 }
 declare module 'aws-sdk/lib/credentials/shared_ini_file_credentials.js' {
-  declare module.exports: $Exports<'aws-sdk/lib/credentials/shared_ini_file_credentials'>;
+  declare module.exports: $Exports<
+    'aws-sdk/lib/credentials/shared_ini_file_credentials'
+  >;
 }
 declare module 'aws-sdk/lib/credentials/temporary_credentials.js' {
-  declare module.exports: $Exports<'aws-sdk/lib/credentials/temporary_credentials'>;
+  declare module.exports: $Exports<
+    'aws-sdk/lib/credentials/temporary_credentials'
+  >;
 }
 declare module 'aws-sdk/lib/credentials/web_identity_credentials.js' {
-  declare module.exports: $Exports<'aws-sdk/lib/credentials/web_identity_credentials'>;
+  declare module.exports: $Exports<
+    'aws-sdk/lib/credentials/web_identity_credentials'
+  >;
 }
 declare module 'aws-sdk/lib/dynamodb/converter.js' {
   declare module.exports: $Exports<'aws-sdk/lib/dynamodb/converter'>;

@@ -255,11 +255,7 @@
                 "inverted": false,
                 "value": "TextObject::String"
               },
-              "parameters": [
-                "Text",
-                "=",
-                "\"Input: \" + Entry.String()"
-              ],
+              "parameters": ["Text", "=", "\"Input: \" + Entry.String()"],
               "subInstructions": []
             }
           ],

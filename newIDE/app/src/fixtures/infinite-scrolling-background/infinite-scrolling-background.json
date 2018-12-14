@@ -241,9 +241,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -253,11 +251,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "scroll_speed",
-                "=",
-                "1"
-              ],
+              "parameters": ["scroll_speed", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -289,11 +283,7 @@
                 "inverted": false,
                 "value": "PosX"
               },
-              "parameters": [
-                "background",
-                "<=",
-                "-background.Width()"
-              ],
+              "parameters": ["background", "<=", "-background.Width()"],
               "subInstructions": []
             }
           ],
@@ -303,11 +293,7 @@
                 "inverted": false,
                 "value": "MettreX"
               },
-              "parameters": [
-                "background",
-                "=",
-                "background.Width()"
-              ],
+              "parameters": ["background", "=", "background.Width()"],
               "subInstructions": []
             }
           ],
@@ -339,11 +325,7 @@
                 "inverted": false,
                 "value": "MettreX"
               },
-              "parameters": [
-                "background",
-                "-",
-                "Variable(scroll_speed)"
-              ],
+              "parameters": ["background", "-", "Variable(scroll_speed)"],
               "subInstructions": []
             }
           ],

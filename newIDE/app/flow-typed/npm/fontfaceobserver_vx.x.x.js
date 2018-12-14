@@ -58,7 +58,9 @@ declare module 'fontfaceobserver/fontfaceobserver.js' {
   declare module.exports: $Exports<'fontfaceobserver/fontfaceobserver'>;
 }
 declare module 'fontfaceobserver/fontfaceobserver.standalone.js' {
-  declare module.exports: $Exports<'fontfaceobserver/fontfaceobserver.standalone'>;
+  declare module.exports: $Exports<
+    'fontfaceobserver/fontfaceobserver.standalone'
+  >;
 }
 declare module 'fontfaceobserver/src/descriptors.js' {
   declare module.exports: $Exports<'fontfaceobserver/src/descriptors'>;

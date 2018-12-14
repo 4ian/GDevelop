@@ -13475,10 +13475,7 @@
                     "inverted": false,
                     "value": "TopDownMovementBehavior::IsMoving"
                   },
-                  "parameters": [
-                    "Minda",
-                    "TopDownMovement"
-                  ],
+                  "parameters": ["Minda", "TopDownMovement"],
                   "subInstructions": []
                 }
               ],
@@ -13494,10 +13491,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     },
                     {
@@ -13505,10 +13499,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Up"
-                      ],
+                      "parameters": ["", "Up"],
                       "subInstructions": []
                     },
                     {
@@ -13516,10 +13507,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Down"
-                      ],
+                      "parameters": ["", "Down"],
                       "subInstructions": []
                     }
                   ],
@@ -13529,11 +13517,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Minda",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["Minda", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -13549,10 +13533,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ],
+                      "parameters": ["", "Right"],
                       "subInstructions": []
                     },
                     {
@@ -13560,10 +13541,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Up"
-                      ],
+                      "parameters": ["", "Up"],
                       "subInstructions": []
                     },
                     {
@@ -13571,10 +13549,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Down"
-                      ],
+                      "parameters": ["", "Down"],
                       "subInstructions": []
                     }
                   ],
@@ -13584,11 +13559,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Minda",
-                        "=",
-                        "2"
-                      ],
+                      "parameters": ["Minda", "=", "2"],
                       "subInstructions": []
                     }
                   ],
@@ -13604,10 +13575,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Up"
-                      ],
+                      "parameters": ["", "Up"],
                       "subInstructions": []
                     },
                     {
@@ -13615,10 +13583,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     },
                     {
@@ -13626,10 +13591,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ],
+                      "parameters": ["", "Right"],
                       "subInstructions": []
                     }
                   ],
@@ -13639,11 +13601,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Minda",
-                        "=",
-                        "3"
-                      ],
+                      "parameters": ["Minda", "=", "3"],
                       "subInstructions": []
                     }
                   ],
@@ -13659,10 +13617,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Down"
-                      ],
+                      "parameters": ["", "Down"],
                       "subInstructions": []
                     },
                     {
@@ -13670,10 +13625,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     },
                     {
@@ -13681,10 +13633,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ],
+                      "parameters": ["", "Right"],
                       "subInstructions": []
                     }
                   ],
@@ -13694,11 +13643,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Minda",
-                        "=",
-                        "4"
-                      ],
+                      "parameters": ["Minda", "=", "4"],
                       "subInstructions": []
                     }
                   ],
@@ -13729,10 +13674,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     },
                     {
@@ -13740,10 +13682,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Up"
-                      ],
+                      "parameters": ["", "Up"],
                       "subInstructions": []
                     }
                   ],
@@ -13753,11 +13692,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Minda",
-                        "=",
-                        "5"
-                      ],
+                      "parameters": ["Minda", "=", "5"],
                       "subInstructions": []
                     },
                     {
@@ -13765,12 +13700,7 @@
                         "inverted": false,
                         "value": "AddForceXY"
                       },
-                      "parameters": [
-                        "Minda",
-                        "-20",
-                        "45",
-                        "0"
-                      ],
+                      "parameters": ["Minda", "-20", "45", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -13786,10 +13716,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     },
                     {
@@ -13797,10 +13724,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Down"
-                      ],
+                      "parameters": ["", "Down"],
                       "subInstructions": []
                     }
                   ],
@@ -13810,11 +13734,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Minda",
-                        "=",
-                        "6"
-                      ],
+                      "parameters": ["Minda", "=", "6"],
                       "subInstructions": []
                     },
                     {
@@ -13822,12 +13742,7 @@
                         "inverted": false,
                         "value": "AddForceXY"
                       },
-                      "parameters": [
-                        "Minda",
-                        "-45",
-                        "-45",
-                        "0"
-                      ],
+                      "parameters": ["Minda", "-45", "-45", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -13843,10 +13758,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ],
+                      "parameters": ["", "Right"],
                       "subInstructions": []
                     },
                     {
@@ -13854,10 +13766,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Up"
-                      ],
+                      "parameters": ["", "Up"],
                       "subInstructions": []
                     }
                   ],
@@ -13867,11 +13776,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Minda",
-                        "=",
-                        "7"
-                      ],
+                      "parameters": ["Minda", "=", "7"],
                       "subInstructions": []
                     },
                     {
@@ -13879,12 +13784,7 @@
                         "inverted": false,
                         "value": "AddForceXY"
                       },
-                      "parameters": [
-                        "Minda",
-                        "45",
-                        "45",
-                        "0"
-                      ],
+                      "parameters": ["Minda", "45", "45", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -13900,10 +13800,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ],
+                      "parameters": ["", "Right"],
                       "subInstructions": []
                     },
                     {
@@ -13911,10 +13808,7 @@
                         "inverted": false,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Down"
-                      ],
+                      "parameters": ["", "Down"],
                       "subInstructions": []
                     }
                   ],
@@ -13924,11 +13818,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Minda",
-                        "=",
-                        "8"
-                      ],
+                      "parameters": ["Minda", "=", "8"],
                       "subInstructions": []
                     },
                     {
@@ -13936,12 +13826,7 @@
                         "inverted": false,
                         "value": "AddForceXY"
                       },
-                      "parameters": [
-                        "Minda",
-                        "20",
-                        "-45",
-                        "0"
-                      ],
+                      "parameters": ["Minda", "20", "-45", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -13959,10 +13844,7 @@
                     "inverted": true,
                     "value": "TopDownMovementBehavior::IsMoving"
                   },
-                  "parameters": [
-                    "Minda",
-                    "TopDownMovement"
-                  ],
+                  "parameters": ["Minda", "TopDownMovement"],
                   "subInstructions": []
                 }
               ],
@@ -13972,11 +13854,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "Minda",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["Minda", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -14022,10 +13900,7 @@
                     "inverted": false,
                     "value": "SeparateFromObjects"
                   },
-                  "parameters": [
-                    "Minda",
-                    "bg_grp"
-                  ],
+                  "parameters": ["Minda", "bg_grp"],
                   "subInstructions": []
                 }
               ],

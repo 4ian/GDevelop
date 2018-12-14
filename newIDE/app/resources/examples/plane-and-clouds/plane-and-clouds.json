@@ -556,9 +556,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -568,12 +566,7 @@
                 "inverted": false,
                 "value": "ZoomCamera"
               },
-              "parameters": [
-                "",
-                "0.25",
-                "",
-                ""
-              ],
+              "parameters": ["", "0.25", "", ""],
               "subInstructions": []
             },
             {
@@ -581,12 +574,7 @@
                 "inverted": false,
                 "value": "ZoomCamera"
               },
-              "parameters": [
-                "",
-                "0.25",
-                "\"UpperLayer\"",
-                ""
-              ],
+              "parameters": ["", "0.25", "\"UpperLayer\"", ""],
               "subInstructions": []
             }
           ],
@@ -684,11 +672,7 @@
                 "inverted": false,
                 "value": "SetAngle"
               },
-              "parameters": [
-                "Smoke",
-                "=",
-                "Plane.Angle() + 180"
-              ],
+              "parameters": ["Smoke", "=", "Plane.Angle() + 180"],
               "subInstructions": []
             }
           ],
@@ -720,13 +704,7 @@
                 "inverted": false,
                 "value": "CentreCamera"
               },
-              "parameters": [
-                "",
-                "Plane",
-                "yes",
-                "",
-                ""
-              ],
+              "parameters": ["", "Plane", "yes", "", ""],
               "subInstructions": []
             },
             {
@@ -785,12 +763,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "Bullet",
-                "id",
-                "=",
-                "0"
-              ],
+              "parameters": ["Bullet", "id", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -814,11 +787,7 @@
                 "inverted": false,
                 "value": "SetAngle"
               },
-              "parameters": [
-                "Bullet",
-                "=",
-                "Plane.Angle()"
-              ],
+              "parameters": ["Bullet", "=", "Plane.Angle()"],
               "subInstructions": []
             }
           ],
@@ -834,12 +803,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "Bullet",
-                "id",
-                "=",
-                "1"
-              ],
+              "parameters": ["Bullet", "id", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -863,11 +827,7 @@
                 "inverted": false,
                 "value": "SetAngle"
               },
-              "parameters": [
-                "Bullet",
-                "=",
-                "Plane.Angle()"
-              ],
+              "parameters": ["Bullet", "=", "Plane.Angle()"],
               "subInstructions": []
             }
           ],
@@ -899,11 +859,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "create_cloud",
-                "=",
-                "0"
-              ],
+              "parameters": ["create_cloud", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -933,11 +889,7 @@
                     "inverted": false,
                     "value": "NbObjet"
                   },
-                  "parameters": [
-                    "Cloud",
-                    "<",
-                    "10"
-                  ],
+                  "parameters": ["Cloud", "<", "10"],
                   "subInstructions": []
                 }
               ],
@@ -947,11 +899,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "create_cloud",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["create_cloud", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -982,11 +930,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "create_cloud",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["create_cloud", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -1022,11 +966,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "Cloud",
-                    "=",
-                    "Random(2)"
-                  ],
+                  "parameters": ["Cloud", "=", "Random(2)"],
                   "subInstructions": []
                 },
                 {
@@ -1034,11 +974,7 @@
                     "inverted": false,
                     "value": "ChangePlan"
                   },
-                  "parameters": [
-                    "Cloud",
-                    "=",
-                    "RandomWithStep(0, 2, 2)"
-                  ],
+                  "parameters": ["Cloud", "=", "RandomWithStep(0, 2, 2)"],
                   "subInstructions": []
                 }
               ],
@@ -1068,11 +1004,7 @@
                         "inverted": false,
                         "value": "Plan"
                       },
-                      "parameters": [
-                        "Cloud",
-                        "=",
-                        "2"
-                      ],
+                      "parameters": ["Cloud", "=", "2"],
                       "subInstructions": []
                     }
                   ],
@@ -1082,11 +1014,7 @@
                         "inverted": false,
                         "value": "ChangeScale"
                       },
-                      "parameters": [
-                        "Cloud",
-                        "=",
-                        "3"
-                      ],
+                      "parameters": ["Cloud", "=", "3"],
                       "subInstructions": []
                     },
                     {
@@ -1094,11 +1022,7 @@
                         "inverted": false,
                         "value": "Opacity"
                       },
-                      "parameters": [
-                        "Cloud",
-                        "=",
-                        "150"
-                      ],
+                      "parameters": ["Cloud", "=", "150"],
                       "subInstructions": []
                     },
                     {
@@ -1106,10 +1030,7 @@
                         "inverted": false,
                         "value": "ChangeLayer"
                       },
-                      "parameters": [
-                        "Cloud",
-                        "\"UpperLayer\""
-                      ],
+                      "parameters": ["Cloud", "\"UpperLayer\""],
                       "subInstructions": []
                     },
                     {
@@ -1158,10 +1079,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -1169,11 +1087,7 @@
                 "inverted": false,
                 "value": "NbObjet"
               },
-              "parameters": [
-                "Bullet",
-                "=",
-                "0"
-              ],
+              "parameters": ["Bullet", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -1204,11 +1118,7 @@
                     "inverted": false,
                     "value": "SetAngle"
                   },
-                  "parameters": [
-                    "Bullet",
-                    "=",
-                    "Plane.Angle()"
-                  ],
+                  "parameters": ["Bullet", "=", "Plane.Angle()"],
                   "subInstructions": []
                 },
                 {
@@ -1216,12 +1126,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "Bullet",
-                    "id",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["Bullet", "id", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -1252,11 +1157,7 @@
                     "inverted": false,
                     "value": "SetAngle"
                   },
-                  "parameters": [
-                    "Bullet",
-                    "=",
-                    "Plane.Angle()"
-                  ],
+                  "parameters": ["Bullet", "=", "Plane.Angle()"],
                   "subInstructions": []
                 },
                 {
@@ -1264,12 +1165,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "Bullet",
-                    "id",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["Bullet", "id", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -1302,10 +1198,7 @@
                 "inverted": false,
                 "value": "MouseButtonReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -1315,10 +1208,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Bullet",
-                ""
-              ],
+              "parameters": ["Bullet", ""],
               "subInstructions": []
             }
           ],
@@ -1349,11 +1239,7 @@
                 "inverted": false,
                 "value": "Plan"
               },
-              "parameters": [
-                "Cloud",
-                "=",
-                "0"
-              ],
+              "parameters": ["Cloud", "=", "0"],
               "subInstructions": []
             },
             {
@@ -1361,12 +1247,7 @@
                 "inverted": true,
                 "value": "Distance"
               },
-              "parameters": [
-                "Cloud",
-                "Plane",
-                "800",
-                ""
-              ],
+              "parameters": ["Cloud", "Plane", "800", ""],
               "subInstructions": []
             }
           ],
@@ -1376,10 +1257,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Cloud",
-                ""
-              ],
+              "parameters": ["Cloud", ""],
               "subInstructions": []
             }
           ],
@@ -1411,11 +1289,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "x",
-                "=",
-                "Plane.X()"
-              ],
+              "parameters": ["x", "=", "Plane.X()"],
               "subInstructions": []
             },
             {
@@ -1423,11 +1297,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "y",
-                "=",
-                "Plane.Y()"
-              ],
+              "parameters": ["y", "=", "Plane.Y()"],
               "subInstructions": []
             },
             {
@@ -1435,13 +1305,7 @@
                 "inverted": false,
                 "value": "MettreXY"
               },
-              "parameters": [
-                "Plane",
-                "*",
-                "1.5",
-                "*",
-                "1.5"
-              ],
+              "parameters": ["Plane", "*", "1.5", "*", "1.5"],
               "subInstructions": []
             }
           ],
@@ -1471,11 +1335,7 @@
                     "inverted": false,
                     "value": "Plan"
                   },
-                  "parameters": [
-                    "Cloud",
-                    "=",
-                    "2"
-                  ],
+                  "parameters": ["Cloud", "=", "2"],
                   "subInstructions": []
                 },
                 {
@@ -1483,12 +1343,7 @@
                     "inverted": true,
                     "value": "Distance"
                   },
-                  "parameters": [
-                    "Cloud",
-                    "Plane",
-                    "800",
-                    ""
-                  ],
+                  "parameters": ["Cloud", "Plane", "800", ""],
                   "subInstructions": []
                 }
               ],
@@ -1498,10 +1353,7 @@
                     "inverted": false,
                     "value": "Delete"
                   },
-                  "parameters": [
-                    "Cloud",
-                    ""
-                  ],
+                  "parameters": ["Cloud", ""],
                   "subInstructions": []
                 }
               ],

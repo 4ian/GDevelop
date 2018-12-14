@@ -49,7 +49,7 @@ export class CodeEditor extends React.Component<Props, State> {
         }
       });
     }
-  }
+  };
 
   setupEditorCompletions = (editor: any, monaco: any) => {
     if (!monacoCompletionsInitialized) {

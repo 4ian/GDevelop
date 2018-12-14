@@ -201,10 +201,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Space"
-                  ],
+                  "parameters": ["", "Space"],
                   "subInstructions": []
                 },
                 {
@@ -212,9 +209,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ]
@@ -226,11 +221,7 @@
                 "inverted": false,
                 "value": "NewEventsFunctionsExtension::Function"
               },
-              "parameters": [
-                "",
-                "MyObject",
-                ""
-              ],
+              "parameters": ["", "MyObject", ""],
               "subInstructions": []
             }
           ],
@@ -286,13 +277,7 @@
                     "inverted": false,
                     "value": "Create"
                   },
-                  "parameters": [
-                    "",
-                    "ObjectToCreate2",
-                    "300",
-                    "300",
-                    ""
-                  ],
+                  "parameters": ["", "ObjectToCreate2", "300", "300", ""],
                   "subInstructions": []
                 }
               ],
@@ -329,11 +314,7 @@
                     "inverted": false,
                     "value": "NewEventsFunctionsExtension::Function2"
                   },
-                  "parameters": [
-                    "",
-                    "ObjectToCreate",
-                    ""
-                  ],
+                  "parameters": ["", "ObjectToCreate", ""],
                   "subInstructions": []
                 }
               ],

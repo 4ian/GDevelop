@@ -58,9 +58,8 @@ export default class Welcome extends React.Component {
         <p>
           We've added some basic stories inside the{' '}
           <code style={styles.code}>src/stories</code> directory.
-          <br />
-          A story is a single state of one or more UI components. You can have
-          as many stories as you want.
+          <br />A story is a single state of one or more UI components. You can
+          have as many stories as you want.
           <br />
           (Basically a story is like a visual test case.)
         </p>
@@ -75,7 +74,8 @@ export default class Welcome extends React.Component {
           dangerouslySetInnerHTML={{ __html: `<pre>${codeBlock}</pre>` }}
         />
         <p>
-          Usually we create stories with smaller UI components in the app.<br />
+          Usually we create stories with smaller UI components in the app.
+          <br />
           Have a look at the{' '}
           <a
             style={styles.link}

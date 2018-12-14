@@ -129,7 +129,8 @@ class Instruction extends React.Component<Props, *> {
                 [parameterType]: true,
               })}
               onClick={domEvent =>
-                this.props.onParameterClick(domEvent, parameterIndex)}
+                this.props.onParameterClick(domEvent, parameterIndex)
+              }
             >
               {ParameterRenderingService.renderParameterString(
                 parameterType,

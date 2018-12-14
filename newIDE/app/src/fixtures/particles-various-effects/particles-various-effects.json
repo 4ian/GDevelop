@@ -632,11 +632,7 @@
                 "inverted": false,
                 "value": "Timer"
               },
-              "parameters": [
-                "",
-                "1",
-                "\"Creating\""
-              ],
+              "parameters": ["", "1", "\"Creating\""],
               "subInstructions": []
             }
           ],
@@ -660,10 +656,7 @@
                 "inverted": false,
                 "value": "ResetTimer"
               },
-              "parameters": [
-                "",
-                "\"Creating\""
-              ],
+              "parameters": ["", "\"Creating\""],
               "subInstructions": []
             }
           ],

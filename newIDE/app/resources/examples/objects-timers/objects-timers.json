@@ -572,9 +572,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -584,11 +582,7 @@
                 "inverted": false,
                 "value": "ChangeScale"
               },
-              "parameters": [
-                "Sprite",
-                "=",
-                "2"
-              ],
+              "parameters": ["Sprite", "=", "2"],
               "subInstructions": []
             },
             {
@@ -596,11 +590,7 @@
                 "inverted": false,
                 "value": "ChangeScale"
               },
-              "parameters": [
-                "Sprite2",
-                "=",
-                "2"
-              ],
+              "parameters": ["Sprite2", "=", "2"],
               "subInstructions": []
             },
             {
@@ -608,12 +598,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "Sprite",
-                "color_time",
-                "=",
-                "(Random(29)+1)/10"
-              ],
+              "parameters": ["Sprite", "color_time", "=", "(Random(29)+1)/10"],
               "subInstructions": []
             },
             {
@@ -621,10 +606,7 @@
                 "inverted": false,
                 "value": "ResetObjectTimer"
               },
-              "parameters": [
-                "Sprite",
-                "\"color\""
-              ],
+              "parameters": ["Sprite", "\"color\""],
               "subInstructions": []
             },
             {
@@ -632,10 +614,7 @@
                 "inverted": false,
                 "value": "ResetObjectTimer"
               },
-              "parameters": [
-                "Sprite",
-                "\"otherTimer\""
-              ],
+              "parameters": ["Sprite", "\"otherTimer\""],
               "subInstructions": []
             },
             {
@@ -643,10 +622,7 @@
                 "inverted": false,
                 "value": "PauseObjectTimer"
               },
-              "parameters": [
-                "Sprite2",
-                "\"counter\""
-              ],
+              "parameters": ["Sprite2", "\"counter\""],
               "subInstructions": []
             }
           ],
@@ -702,10 +678,7 @@
                 "inverted": false,
                 "value": "ResetObjectTimer"
               },
-              "parameters": [
-                "Sprite",
-                "\"color\""
-              ],
+              "parameters": ["Sprite", "\"color\""],
               "subInstructions": []
             }
           ],
@@ -736,10 +709,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -757,10 +727,7 @@
                 "inverted": false,
                 "value": "AjoutHasard"
               },
-              "parameters": [
-                "",
-                "Sprite"
-              ],
+              "parameters": ["", "Sprite"],
               "subInstructions": []
             },
             {
@@ -768,10 +735,7 @@
                 "inverted": false,
                 "value": "ResetObjectTimer"
               },
-              "parameters": [
-                "Sprite",
-                "\"otherTimer\""
-              ],
+              "parameters": ["Sprite", "\"otherTimer\""],
               "subInstructions": []
             }
           ],
@@ -801,12 +765,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Sprite2",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["Sprite2", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -816,10 +775,7 @@
                     "inverted": false,
                     "value": "ResetObjectTimer"
                   },
-                  "parameters": [
-                    "Sprite2",
-                    "\"counter\""
-                  ],
+                  "parameters": ["Sprite2", "\"counter\""],
                   "subInstructions": []
                 },
                 {
@@ -827,10 +783,7 @@
                     "inverted": false,
                     "value": "UnPauseObjectTimer"
                   },
-                  "parameters": [
-                    "Sprite2",
-                    "\"counter\""
-                  ],
+                  "parameters": ["Sprite2", "\"counter\""],
                   "subInstructions": []
                 }
               ],
@@ -863,10 +816,7 @@
                 "inverted": true,
                 "value": "ObjectTimerPaused"
               },
-              "parameters": [
-                "Sprite2",
-                "\"counter\""
-              ],
+              "parameters": ["Sprite2", "\"counter\""],
               "subInstructions": []
             },
             {
@@ -874,11 +824,7 @@
                 "inverted": false,
                 "value": "ObjectTimer"
               },
-              "parameters": [
-                "Sprite2",
-                "\"counter\"",
-                "5"
-              ],
+              "parameters": ["Sprite2", "\"counter\"", "5"],
               "subInstructions": []
             }
           ],
@@ -888,11 +834,7 @@
                 "inverted": false,
                 "value": "ChangeScale"
               },
-              "parameters": [
-                "Sprite2",
-                "=",
-                "(Random(39) + 1) / 10"
-              ],
+              "parameters": ["Sprite2", "=", "(Random(39) + 1) / 10"],
               "subInstructions": []
             },
             {
@@ -900,10 +842,7 @@
                 "inverted": false,
                 "value": "PauseObjectTimer"
               },
-              "parameters": [
-                "Sprite2",
-                "\"counter\""
-              ],
+              "parameters": ["Sprite2", "\"counter\""],
               "subInstructions": []
             }
           ],
@@ -935,12 +874,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "Counter",
-                "id",
-                "=",
-                "Sprite.Variable(id)"
-              ],
+              "parameters": ["Counter", "id", "=", "Sprite.Variable(id)"],
               "subInstructions": []
             }
           ],
@@ -971,12 +905,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "Counter2",
-                "id",
-                "=",
-                "Sprite2.Variable(id)"
-              ],
+              "parameters": ["Counter2", "id", "=", "Sprite2.Variable(id)"],
               "subInstructions": []
             }
           ],

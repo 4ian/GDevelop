@@ -1167,9 +1167,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -1201,11 +1199,7 @@
                     "inverted": false,
                     "value": "ChangePlan"
                   },
-                  "parameters": [
-                    "small_magnet",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["small_magnet", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -1213,11 +1207,7 @@
                     "inverted": false,
                     "value": "LinkedObjects::LinkObjects"
                   },
-                  "parameters": [
-                    "",
-                    "Hole",
-                    "small_magnet"
-                  ],
+                  "parameters": ["", "Hole", "small_magnet"],
                   "subInstructions": []
                 },
                 {
@@ -1225,9 +1215,7 @@
                     "inverted": false,
                     "value": "Cache"
                   },
-                  "parameters": [
-                    "small_magnet"
-                  ],
+                  "parameters": ["small_magnet"],
                   "subInstructions": []
                 }
               ],
@@ -1261,10 +1249,7 @@
                 "inverted": false,
                 "value": "TourneVers"
               },
-              "parameters": [
-                "Magnet",
-                "Ball"
-              ],
+              "parameters": ["Magnet", "Ball"],
               "subInstructions": []
             },
             {
@@ -1272,11 +1257,7 @@
                 "inverted": false,
                 "value": "MettreX"
               },
-              "parameters": [
-                "Magnet",
-                "=",
-                "MouseX(\"\",0)"
-              ],
+              "parameters": ["Magnet", "=", "MouseX(\"\",0)"],
               "subInstructions": []
             },
             {
@@ -1284,11 +1265,7 @@
                 "inverted": false,
                 "value": "MettreY"
               },
-              "parameters": [
-                "Magnet",
-                "=",
-                "MouseY(\"\",0)"
-              ],
+              "parameters": ["Magnet", "=", "MouseY(\"\",0)"],
               "subInstructions": []
             }
           ],
@@ -1320,13 +1297,7 @@
                 "inverted": false,
                 "value": "CentreCamera"
               },
-              "parameters": [
-                "",
-                "Ball",
-                "yes",
-                "",
-                ""
-              ],
+              "parameters": ["", "Ball", "yes", "", ""],
               "subInstructions": []
             }
           ],
@@ -1357,12 +1328,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "Ball",
-                "in_hole",
-                "=",
-                "0"
-              ],
+              "parameters": ["Ball", "in_hole", "=", "0"],
               "subInstructions": []
             },
             {
@@ -1370,12 +1336,7 @@
                 "inverted": false,
                 "value": "Distance"
               },
-              "parameters": [
-                "Magnet",
-                "Ball",
-                "300",
-                ""
-              ],
+              "parameters": ["Magnet", "Ball", "300", ""],
               "subInstructions": []
             }
           ],
@@ -1421,12 +1382,7 @@
                 "inverted": false,
                 "value": "Collision"
               },
-              "parameters": [
-                "Ball",
-                "Magnet",
-                "",
-                ""
-              ],
+              "parameters": ["Ball", "Magnet", "", ""],
               "subInstructions": []
             },
             {
@@ -1434,12 +1390,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "Ball",
-                "in_hole",
-                "=",
-                "0"
-              ],
+              "parameters": ["Ball", "in_hole", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -1449,9 +1400,7 @@
                 "inverted": false,
                 "value": "Arreter"
               },
-              "parameters": [
-                "Ball"
-              ],
+              "parameters": ["Ball"],
               "subInstructions": []
             }
           ],
@@ -1482,12 +1431,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "Ball",
-                "Hole",
-                "",
-                ""
-              ],
+              "parameters": ["Ball", "Hole", "", ""],
               "subInstructions": []
             }
           ],
@@ -1503,12 +1447,7 @@
                     "inverted": false,
                     "value": "VarObjet"
                   },
-                  "parameters": [
-                    "Ball",
-                    "in_hole",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["Ball", "in_hole", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -1518,12 +1457,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "Ball",
-                    "in_hole",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["Ball", "in_hole", "=", "1"],
                   "subInstructions": []
                 },
                 {
@@ -1531,9 +1465,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "Ball"
-                  ],
+                  "parameters": ["Ball"],
                   "subInstructions": []
                 }
               ],
@@ -1549,11 +1481,7 @@
                     "inverted": false,
                     "value": "LinkedObjects::PickObjectsLinkedTo"
                   },
-                  "parameters": [
-                    "",
-                    "small_magnet",
-                    "Hole"
-                  ],
+                  "parameters": ["", "small_magnet", "Hole"],
                   "subInstructions": []
                 },
                 {
@@ -1561,12 +1489,7 @@
                     "inverted": true,
                     "value": "Distance"
                   },
-                  "parameters": [
-                    "Ball",
-                    "small_magnet",
-                    "5",
-                    ""
-                  ],
+                  "parameters": ["Ball", "small_magnet", "5", ""],
                   "subInstructions": []
                 }
               ],
@@ -1576,12 +1499,7 @@
                     "inverted": false,
                     "value": "AddForceVers"
                   },
-                  "parameters": [
-                    "Ball",
-                    "small_magnet",
-                    "130",
-                    "0"
-                  ],
+                  "parameters": ["Ball", "small_magnet", "130", "0"],
                   "subInstructions": []
                 }
               ],

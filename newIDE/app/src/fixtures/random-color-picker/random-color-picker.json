@@ -2111,9 +2111,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -2195,10 +2193,7 @@
                 "inverted": false,
                 "value": "MouseButtonReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -2214,12 +2209,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "pickColor",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["pickColor", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -2229,10 +2219,7 @@
                     "inverted": false,
                     "value": "ChangeColor"
                   },
-                  "parameters": [
-                    "whiteBox",
-                    "pickColor.VariableString(color)"
-                  ],
+                  "parameters": ["whiteBox", "pickColor.VariableString(color)"],
                   "subInstructions": []
                 },
                 {

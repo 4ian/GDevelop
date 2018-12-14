@@ -18,7 +18,7 @@ gdjs.evtTools.string = gdjs.evtTools.string || {};
  * @private
  */
 gdjs.evtTools.string.newLine = function() {
-    return "\n";
+  return '\n';
 };
 
 /**
@@ -26,7 +26,7 @@ gdjs.evtTools.string.newLine = function() {
  * @private
  */
 gdjs.evtTools.string.fromCodePoint = function(codePoint) {
-    return String.fromCodePoint(codePoint);
+  return String.fromCodePoint(codePoint);
 };
 
 /**
@@ -34,7 +34,7 @@ gdjs.evtTools.string.fromCodePoint = function(codePoint) {
  * @private
  */
 gdjs.evtTools.string.toUpperCase = function(str) {
-    return str.toUpperCase();
+  return str.toUpperCase();
 };
 
 /**
@@ -42,7 +42,7 @@ gdjs.evtTools.string.toUpperCase = function(str) {
  * @private
  */
 gdjs.evtTools.string.toLowerCase = function(str) {
-    return str.toLowerCase()
+  return str.toLowerCase();
 };
 
 /**
@@ -50,10 +50,9 @@ gdjs.evtTools.string.toLowerCase = function(str) {
  * @private
  */
 gdjs.evtTools.string.subStr = function(str, start, len) {
-    if ( start < str.length && start >= 0 )
-    	return str.substr(start, len);
+  if (start < str.length && start >= 0) return str.substr(start, len);
 
-    return "";
+  return '';
 };
 
 /**
@@ -61,10 +60,9 @@ gdjs.evtTools.string.subStr = function(str, start, len) {
  * @private
  */
 gdjs.evtTools.string.strAt = function(str, start) {
-    if ( start < str.length && start >= 0 )
-    	return str.substr(start, 1);
+  if (start < str.length && start >= 0) return str.substr(start, 1);
 
-    return "";
+  return '';
 };
 
 /**
@@ -72,19 +70,18 @@ gdjs.evtTools.string.strAt = function(str, start) {
  * @private
  */
 gdjs.evtTools.string.strRepeat = function(str, count) {
-    var result = "";
-    for ( var i = 0; i < count; i++ )
-        result += str;
+  var result = '';
+  for (var i = 0; i < count; i++) result += str;
 
-    return result;
-}
+  return result;
+};
 
 /**
  * Return the length of the string
  * @private
  */
 gdjs.evtTools.string.strLen = function(str) {
-    return str.length;
+  return str.length;
 };
 
 /**
@@ -92,7 +89,7 @@ gdjs.evtTools.string.strLen = function(str) {
  * @private
  */
 gdjs.evtTools.string.strFind = function(str, what) {
-    return str.indexOf(what);
+  return str.indexOf(what);
 };
 
 /**
@@ -100,7 +97,7 @@ gdjs.evtTools.string.strFind = function(str, what) {
  * @private
  */
 gdjs.evtTools.string.strRFind = function(str, what) {
-    return str.lastIndexOf(what);
+  return str.lastIndexOf(what);
 };
 
 /**
@@ -108,7 +105,7 @@ gdjs.evtTools.string.strRFind = function(str, what) {
  * @private
  */
 gdjs.evtTools.string.strFindFrom = function(str, what, pos) {
-    return str.indexOf(what, pos);
+  return str.indexOf(what, pos);
 };
 
 /**
@@ -116,5 +113,5 @@ gdjs.evtTools.string.strFindFrom = function(str, what, pos) {
  * @private
  */
 gdjs.evtTools.string.strRFindFrom = function(str, what, pos) {
-    return str.lastIndexOf(what, pos);
+  return str.lastIndexOf(what, pos);
 };

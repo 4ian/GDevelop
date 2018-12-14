@@ -1225,10 +1225,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "Storage",
-                    "Left"
-                  ],
+                  "parameters": ["Storage", "Left"],
                   "subInstructions": []
                 },
                 {
@@ -1236,12 +1233,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Storage",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["Storage", "", "yes", ""],
                   "subInstructions": []
                 },
                 {
@@ -1265,12 +1257,7 @@
                         "inverted": false,
                         "value": "VarObjetTxt"
                       },
-                      "parameters": [
-                        "Storage",
-                        "locked",
-                        "=",
-                        "\"no\""
-                      ],
+                      "parameters": ["Storage", "locked", "=", "\"no\""],
                       "subInstructions": []
                     },
                     {
@@ -1278,10 +1265,7 @@
                         "inverted": true,
                         "value": "AnimationName"
                       },
-                      "parameters": [
-                        "Storage",
-                        "\"broken\""
-                      ],
+                      "parameters": ["Storage", "\"broken\""],
                       "subInstructions": []
                     }
                   ],
@@ -1291,10 +1275,7 @@
                         "inverted": false,
                         "value": "SetAnimationName"
                       },
-                      "parameters": [
-                        "Storage",
-                        "\"empty\""
-                      ],
+                      "parameters": ["Storage", "\"empty\""],
                       "subInstructions": []
                     }
                   ],
@@ -1344,12 +1325,7 @@
                                 "inverted": false,
                                 "value": "VarObjetTxt"
                               },
-                              "parameters": [
-                                "Storage",
-                                "drop",
-                                "=",
-                                "\"\""
-                              ],
+                              "parameters": ["Storage", "drop", "=", "\"\""],
                               "subInstructions": []
                             }
                           ]
@@ -1396,12 +1372,7 @@
                             "inverted": false,
                             "value": "VarObjetTxt"
                           },
-                          "parameters": [
-                            "Storage",
-                            "drop",
-                            "!=",
-                            "\"Random\""
-                          ],
+                          "parameters": ["Storage", "drop", "!=", "\"Random\""],
                           "subInstructions": []
                         },
                         {
@@ -1409,12 +1380,7 @@
                             "inverted": false,
                             "value": "VarObjetTxt"
                           },
-                          "parameters": [
-                            "Storage",
-                            "drop",
-                            "!=",
-                            "\"\""
-                          ],
+                          "parameters": ["Storage", "drop", "!=", "\"\""],
                           "subInstructions": []
                         },
                         {
@@ -1422,12 +1388,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "Storage",
-                            "dropQuantity",
-                            ">",
-                            "0"
-                          ],
+                          "parameters": ["Storage", "dropQuantity", ">", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -1547,12 +1508,7 @@
                                 "inverted": false,
                                 "value": "ModVarObjetTxt"
                               },
-                              "parameters": [
-                                "Storage",
-                                "drop",
-                                "=",
-                                "\"\""
-                              ],
+                              "parameters": ["Storage", "drop", "=", "\"\""],
                               "subInstructions": []
                             }
                           ],
@@ -1585,12 +1541,7 @@
                             "inverted": false,
                             "value": "VarObjetTxt"
                           },
-                          "parameters": [
-                            "Storage",
-                            "drop",
-                            "=",
-                            "\"Random\""
-                          ],
+                          "parameters": ["Storage", "drop", "=", "\"Random\""],
                           "subInstructions": []
                         },
                         {
@@ -1598,12 +1549,7 @@
                             "inverted": false,
                             "value": "VarObjetTxt"
                           },
-                          "parameters": [
-                            "Storage",
-                            "drop",
-                            "!=",
-                            "\"\""
-                          ],
+                          "parameters": ["Storage", "drop", "!=", "\"\""],
                           "subInstructions": []
                         },
                         {
@@ -1611,12 +1557,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "Storage",
-                            "dropQuantity",
-                            ">",
-                            "0"
-                          ],
+                          "parameters": ["Storage", "dropQuantity", ">", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -1640,11 +1581,7 @@
                             "inverted": false,
                             "value": "ChangeAnimation"
                           },
-                          "parameters": [
-                            "DropItem",
-                            "=",
-                            "Random(5)"
-                          ],
+                          "parameters": ["DropItem", "=", "Random(5)"],
                           "subInstructions": []
                         },
                         {
@@ -1737,12 +1674,7 @@
                                 "inverted": false,
                                 "value": "ModVarObjetTxt"
                               },
-                              "parameters": [
-                                "Storage",
-                                "drop",
-                                "=",
-                                "\"\""
-                              ],
+                              "parameters": ["Storage", "drop", "=", "\"\""],
                               "subInstructions": []
                             }
                           ],
@@ -1777,12 +1709,7 @@
                         "inverted": false,
                         "value": "VarObjetTxt"
                       },
-                      "parameters": [
-                        "Storage",
-                        "locked",
-                        "=",
-                        "\"yes\""
-                      ],
+                      "parameters": ["Storage", "locked", "=", "\"yes\""],
                       "subInstructions": []
                     },
                     {
@@ -1790,10 +1717,7 @@
                         "inverted": false,
                         "value": "AnimationName"
                       },
-                      "parameters": [
-                        "Storage",
-                        "\"complete\""
-                      ],
+                      "parameters": ["Storage", "\"complete\""],
                       "subInstructions": []
                     }
                   ],
@@ -1854,10 +1778,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "Storage",
-                    "Right"
-                  ],
+                  "parameters": ["Storage", "Right"],
                   "subInstructions": []
                 },
                 {
@@ -1865,12 +1786,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Storage",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["Storage", "", "yes", ""],
                   "subInstructions": []
                 },
                 {
@@ -1888,12 +1804,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "Storage",
-                    "durability",
-                    "-",
-                    "50"
-                  ],
+                  "parameters": ["Storage", "durability", "-", "50"],
                   "subInstructions": []
                 }
               ],
@@ -1923,12 +1834,7 @@
                         "inverted": false,
                         "value": "VarObjet"
                       },
-                      "parameters": [
-                        "Storage",
-                        "durability",
-                        "<=",
-                        "0"
-                      ],
+                      "parameters": ["Storage", "durability", "<=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -1938,10 +1844,7 @@
                         "inverted": false,
                         "value": "SetAnimationName"
                       },
-                      "parameters": [
-                        "Storage",
-                        "\"broken\""
-                      ],
+                      "parameters": ["Storage", "\"broken\""],
                       "subInstructions": []
                     }
                   ],
@@ -1991,12 +1894,7 @@
                                 "inverted": false,
                                 "value": "VarObjetTxt"
                               },
-                              "parameters": [
-                                "Storage",
-                                "drop",
-                                "=",
-                                "\"\""
-                              ],
+                              "parameters": ["Storage", "drop", "=", "\"\""],
                               "subInstructions": []
                             }
                           ]
@@ -2043,12 +1941,7 @@
                             "inverted": false,
                             "value": "VarObjetTxt"
                           },
-                          "parameters": [
-                            "Storage",
-                            "drop",
-                            "!=",
-                            "\"Random\""
-                          ],
+                          "parameters": ["Storage", "drop", "!=", "\"Random\""],
                           "subInstructions": []
                         },
                         {
@@ -2056,12 +1949,7 @@
                             "inverted": false,
                             "value": "VarObjetTxt"
                           },
-                          "parameters": [
-                            "Storage",
-                            "drop",
-                            "!=",
-                            "\"\""
-                          ],
+                          "parameters": ["Storage", "drop", "!=", "\"\""],
                           "subInstructions": []
                         },
                         {
@@ -2069,12 +1957,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "Storage",
-                            "dropQuantity",
-                            ">",
-                            "0"
-                          ],
+                          "parameters": ["Storage", "dropQuantity", ">", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -2194,12 +2077,7 @@
                                 "inverted": false,
                                 "value": "ModVarObjetTxt"
                               },
-                              "parameters": [
-                                "Storage",
-                                "drop",
-                                "=",
-                                "\"\""
-                              ],
+                              "parameters": ["Storage", "drop", "=", "\"\""],
                               "subInstructions": []
                             },
                             {
@@ -2245,12 +2123,7 @@
                             "inverted": false,
                             "value": "VarObjetTxt"
                           },
-                          "parameters": [
-                            "Storage",
-                            "drop",
-                            "=",
-                            "\"Random\""
-                          ],
+                          "parameters": ["Storage", "drop", "=", "\"Random\""],
                           "subInstructions": []
                         },
                         {
@@ -2258,12 +2131,7 @@
                             "inverted": false,
                             "value": "VarObjetTxt"
                           },
-                          "parameters": [
-                            "Storage",
-                            "drop",
-                            "!=",
-                            "\"\""
-                          ],
+                          "parameters": ["Storage", "drop", "!=", "\"\""],
                           "subInstructions": []
                         },
                         {
@@ -2271,12 +2139,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "Storage",
-                            "dropQuantity",
-                            ">",
-                            "0"
-                          ],
+                          "parameters": ["Storage", "dropQuantity", ">", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -2300,11 +2163,7 @@
                             "inverted": false,
                             "value": "ChangeAnimation"
                           },
-                          "parameters": [
-                            "DropItem",
-                            "=",
-                            "Random(5)"
-                          ],
+                          "parameters": ["DropItem", "=", "Random(5)"],
                           "subInstructions": []
                         },
                         {
@@ -2397,12 +2256,7 @@
                                 "inverted": false,
                                 "value": "ModVarObjetTxt"
                               },
-                              "parameters": [
-                                "Storage",
-                                "drop",
-                                "=",
-                                "\"\""
-                              ],
+                              "parameters": ["Storage", "drop", "=", "\"\""],
                               "subInstructions": []
                             }
                           ],
@@ -2453,10 +2307,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 },
                 {
@@ -2464,12 +2315,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "DropItem",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["DropItem", "", "yes", ""],
                   "subInstructions": []
                 }
               ],
@@ -2513,10 +2359,7 @@
                         "inverted": false,
                         "value": "Delete"
                       },
-                      "parameters": [
-                        "DropItem",
-                        ""
-                      ],
+                      "parameters": ["DropItem", ""],
                       "subInstructions": []
                     }
                   ],

@@ -413,9 +413,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -437,11 +435,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "object",
-                "=",
-                "\"My_picture\""
-              ],
+              "parameters": ["object", "=", "\"My_picture\""],
               "subInstructions": []
             },
             {
@@ -449,11 +443,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "animation",
-                "=",
-                "0"
-              ],
+              "parameters": ["animation", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -491,10 +481,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "m"
-                  ],
+                  "parameters": ["", "m"],
                   "subInstructions": []
                 },
                 {
@@ -502,10 +489,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ]

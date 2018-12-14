@@ -128,22 +128,30 @@ declare module 'keen-tracking/lib/extend-events.js' {
   declare module.exports: $Exports<'keen-tracking/lib/extend-events'>;
 }
 declare module 'keen-tracking/lib/helpers/getBrowserProfile.js' {
-  declare module.exports: $Exports<'keen-tracking/lib/helpers/getBrowserProfile'>;
+  declare module.exports: $Exports<
+    'keen-tracking/lib/helpers/getBrowserProfile'
+  >;
 }
 declare module 'keen-tracking/lib/helpers/getDatetimeIndex.js' {
-  declare module.exports: $Exports<'keen-tracking/lib/helpers/getDatetimeIndex'>;
+  declare module.exports: $Exports<
+    'keen-tracking/lib/helpers/getDatetimeIndex'
+  >;
 }
 declare module 'keen-tracking/lib/helpers/getDomNodePath.js' {
   declare module.exports: $Exports<'keen-tracking/lib/helpers/getDomNodePath'>;
 }
 declare module 'keen-tracking/lib/helpers/getScreenProfile.js' {
-  declare module.exports: $Exports<'keen-tracking/lib/helpers/getScreenProfile'>;
+  declare module.exports: $Exports<
+    'keen-tracking/lib/helpers/getScreenProfile'
+  >;
 }
 declare module 'keen-tracking/lib/helpers/getUniqueId.js' {
   declare module.exports: $Exports<'keen-tracking/lib/helpers/getUniqueId'>;
 }
 declare module 'keen-tracking/lib/helpers/getWindowProfile.js' {
-  declare module.exports: $Exports<'keen-tracking/lib/helpers/getWindowProfile'>;
+  declare module.exports: $Exports<
+    'keen-tracking/lib/helpers/getWindowProfile'
+  >;
 }
 declare module 'keen-tracking/lib/index.js' {
   declare module.exports: $Exports<'keen-tracking/lib/index'>;

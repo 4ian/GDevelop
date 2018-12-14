@@ -1,6 +1,7 @@
 html,
 body {
-  font: 1em "jaf-bernino-sans", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", Geneva, Verdana, sans-serif;
+  font: 1em 'jaf-bernino-sans', 'Lucida Grande', 'Lucida Sans Unicode',
+    'Lucida Sans', Geneva, Verdana, sans-serif;
   background-color: #fff;
 }
 ul,
@@ -151,8 +152,8 @@ li {
 }
 .main h4.name span.returnType {
   margin-left: 3px;
-  background-color: transparent!important;
-  color: gray!important;
+  background-color: transparent !important;
+  color: gray !important;
 }
 .main span.static {
   display: inline-block;
@@ -164,10 +165,10 @@ li {
   margin-right: 8px;
 }
 .main span.number {
-  background-color: gray!important;
+  background-color: gray !important;
 }
 .main span.string {
-  background-color: gray!important;
+  background-color: gray !important;
 }
 .main span.object {
   background-color: #2a6496 !important;
@@ -239,7 +240,7 @@ li {
 .main .nameContainer .inherited {
   display: inline-block;
   border-radius: 3px;
-  background-color: #888!important;
+  background-color: #888 !important;
   font-size: 0.7em;
   padding: 2px 4px;
   margin-right: 5px;
@@ -266,7 +267,7 @@ li {
 .main .nameContainer h4 .signature {
   font-size: 13px;
   font-weight: normal;
-  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 .main .nameContainer h4 .type-signature.type a {
   color: #fff;
@@ -307,7 +308,7 @@ li {
 .main table .optional {
   float: left;
   border-radius: 3px;
-  background-color: #ddd!important;
+  background-color: #ddd !important;
   font-size: 0.7em;
   padding: 2px 4px;
   margin-right: 5px;
@@ -347,7 +348,8 @@ footer {
   margin: 15px 0;
   padding-top: 15px;
   border-top: 1px solid #e1e1e1;
-  font-family: "freight-text-pro", Georgia, Cambria, "Times New Roman", Times, serif;
+  font-family: 'freight-text-pro', Georgia, Cambria, 'Times New Roman', Times,
+    serif;
   font-size: 0.8em;
   color: gray;
 }

@@ -44,16 +44,22 @@ declare module 'material-ui-search-bar/styleguide.config' {
 
 // Filename aliases
 declare module 'material-ui-search-bar/lib/components/SearchBar/index.js' {
-  declare module.exports: $Exports<'material-ui-search-bar/lib/components/SearchBar/index'>;
+  declare module.exports: $Exports<
+    'material-ui-search-bar/lib/components/SearchBar/index'
+  >;
 }
 declare module 'material-ui-search-bar/lib/components/SearchBar/SearchBar.js' {
-  declare module.exports: $Exports<'material-ui-search-bar/lib/components/SearchBar/SearchBar'>;
+  declare module.exports: $Exports<
+    'material-ui-search-bar/lib/components/SearchBar/SearchBar'
+  >;
 }
 declare module 'material-ui-search-bar/lib/index.js' {
   declare module.exports: $Exports<'material-ui-search-bar/lib/index'>;
 }
 declare module 'material-ui-search-bar/lib/styleguide/Wrapper.js' {
-  declare module.exports: $Exports<'material-ui-search-bar/lib/styleguide/Wrapper'>;
+  declare module.exports: $Exports<
+    'material-ui-search-bar/lib/styleguide/Wrapper'
+  >;
 }
 declare module 'material-ui-search-bar/styleguide.config.js' {
   declare module.exports: $Exports<'material-ui-search-bar/styleguide.config'>;

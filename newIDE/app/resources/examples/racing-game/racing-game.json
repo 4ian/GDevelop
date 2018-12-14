@@ -7382,13 +7382,7 @@
                 "inverted": false,
                 "value": "CentreCamera"
               },
-              "parameters": [
-                "",
-                "Camera",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["", "Camera", "", "", ""],
               "subInstructions": []
             }
           ],
@@ -7404,9 +7398,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -7416,9 +7408,7 @@
                 "inverted": false,
                 "value": "Cache"
               },
-              "parameters": [
-                "Invisible"
-              ],
+              "parameters": ["Invisible"],
               "subInstructions": []
             }
           ],
@@ -7488,12 +7478,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "AICar",
-                "Acceleration",
-                "+",
-                "40*TimeDelta()"
-              ],
+              "parameters": ["AICar", "Acceleration", "+", "40*TimeDelta()"],
               "subInstructions": []
             }
           ],
@@ -7509,12 +7494,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "AICar",
-                "Acceleration",
-                ">",
-                "40"
-              ],
+              "parameters": ["AICar", "Acceleration", ">", "40"],
               "subInstructions": []
             }
           ],
@@ -7524,12 +7504,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "AICar",
-                "Acceleration",
-                "=",
-                "40"
-              ],
+              "parameters": ["AICar", "Acceleration", "=", "40"],
               "subInstructions": []
             }
           ],
@@ -7545,12 +7520,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "AICar",
-                "Acceleration",
-                "<",
-                "0"
-              ],
+              "parameters": ["AICar", "Acceleration", "<", "0"],
               "subInstructions": []
             }
           ],
@@ -7560,12 +7530,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "AICar",
-                "Acceleration",
-                "=",
-                "0"
-              ],
+              "parameters": ["AICar", "Acceleration", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -7582,12 +7547,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "AICar",
-                "Breaking",
-                "-",
-                "15*TimeDelta()"
-              ],
+              "parameters": ["AICar", "Breaking", "-", "15*TimeDelta()"],
               "subInstructions": []
             }
           ],
@@ -7603,12 +7563,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "AICar",
-                "Breaking",
-                "<",
-                "0"
-              ],
+              "parameters": ["AICar", "Breaking", "<", "0"],
               "subInstructions": []
             }
           ],
@@ -7618,12 +7573,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "AICar",
-                "Breaking",
-                "=",
-                "0"
-              ],
+              "parameters": ["AICar", "Breaking", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -7639,12 +7589,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "AICar",
-                "Breaking",
-                ">",
-                "35"
-              ],
+              "parameters": ["AICar", "Breaking", ">", "35"],
               "subInstructions": []
             }
           ],
@@ -7654,12 +7599,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "AICar",
-                "Breaking",
-                "=",
-                "35"
-              ],
+              "parameters": ["AICar", "Breaking", "=", "35"],
               "subInstructions": []
             }
           ],
@@ -7698,13 +7638,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "AICar",
-                    "AIDirectionIndicator",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["AICar", "AIDirectionIndicator", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -7750,13 +7684,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::CollisionWith"
                   },
-                  "parameters": [
-                    "AICar",
-                    "Physics",
-                    "AIPlayer",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["AICar", "Physics", "AIPlayer", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -7787,13 +7715,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::CollisionWith"
                   },
-                  "parameters": [
-                    "AICar",
-                    "Physics",
-                    "AICar",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["AICar", "Physics", "AICar", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -7824,13 +7746,7 @@
                     "inverted": false,
                     "value": "PhysicsBehavior::CollisionWith"
                   },
-                  "parameters": [
-                    "AICar",
-                    "Physics",
-                    "Obstacle",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["AICar", "Physics", "Obstacle", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -7840,12 +7756,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "AICar",
-                    "Acceleration",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["AICar", "Acceleration", "=", "0"],
                   "subInstructions": []
                 },
                 {
@@ -7853,12 +7764,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "AICar",
-                    "Breaking",
-                    "=",
-                    "25"
-                  ],
+                  "parameters": ["AICar", "Breaking", "=", "25"],
                   "subInstructions": []
                 }
               ],
@@ -8016,10 +7922,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Up"
-              ],
+              "parameters": ["", "Up"],
               "subInstructions": []
             }
           ],
@@ -8072,12 +7975,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Acceleration",
-                ">",
-                "70"
-              ],
+              "parameters": ["PlayerCar", "Acceleration", ">", "70"],
               "subInstructions": []
             }
           ],
@@ -8087,12 +7985,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Acceleration",
-                "=",
-                "70"
-              ],
+              "parameters": ["PlayerCar", "Acceleration", "=", "70"],
               "subInstructions": []
             }
           ],
@@ -8108,12 +8001,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Acceleration",
-                "<",
-                "0"
-              ],
+              "parameters": ["PlayerCar", "Acceleration", "<", "0"],
               "subInstructions": []
             }
           ],
@@ -8123,12 +8011,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Acceleration",
-                "=",
-                "0"
-              ],
+              "parameters": ["PlayerCar", "Acceleration", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -8144,10 +8027,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Down"
-              ],
+              "parameters": ["", "Down"],
               "subInstructions": []
             }
           ],
@@ -8157,12 +8037,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Breaking",
-                "+",
-                "50*TimeDelta()"
-              ],
+              "parameters": ["PlayerCar", "Breaking", "+", "50*TimeDelta()"],
               "subInstructions": []
             }
           ],
@@ -8178,12 +8053,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Breaking",
-                "<",
-                "0"
-              ],
+              "parameters": ["PlayerCar", "Breaking", "<", "0"],
               "subInstructions": []
             }
           ],
@@ -8193,12 +8063,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Breaking",
-                "=",
-                "0"
-              ],
+              "parameters": ["PlayerCar", "Breaking", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -8214,12 +8079,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Breaking",
-                ">",
-                "35"
-              ],
+              "parameters": ["PlayerCar", "Breaking", ">", "35"],
               "subInstructions": []
             }
           ],
@@ -8229,12 +8089,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Breaking",
-                "=",
-                "35"
-              ],
+              "parameters": ["PlayerCar", "Breaking", "=", "35"],
               "subInstructions": []
             }
           ],
@@ -8251,12 +8106,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Breaking",
-                "-",
-                "15*TimeDelta()"
-              ],
+              "parameters": ["PlayerCar", "Breaking", "-", "15*TimeDelta()"],
               "subInstructions": []
             }
           ],
@@ -8333,10 +8183,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -8346,12 +8193,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::ApplyTorque"
               },
-              "parameters": [
-                "PlayerCar",
-                "Physics",
-                "25",
-                "1"
-              ],
+              "parameters": ["PlayerCar", "Physics", "25", "1"],
               "subInstructions": []
             }
           ],
@@ -8367,10 +8209,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Right"
-              ],
+              "parameters": ["", "Right"],
               "subInstructions": []
             }
           ],
@@ -8380,12 +8219,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::ApplyTorque"
               },
-              "parameters": [
-                "PlayerCar",
-                "Physics",
-                "-25",
-                ""
-              ],
+              "parameters": ["PlayerCar", "Physics", "-25", ""],
               "subInstructions": []
             }
           ],
@@ -8401,13 +8235,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::CollisionWith"
               },
-              "parameters": [
-                "PlayerCar",
-                "Physics",
-                "Obstacle",
-                "",
-                ""
-              ],
+              "parameters": ["PlayerCar", "Physics", "Obstacle", "", ""],
               "subInstructions": []
             }
           ],
@@ -8417,12 +8245,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "PlayerCar",
-                "Acceleration",
-                "=",
-                "0"
-              ],
+              "parameters": ["PlayerCar", "Acceleration", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -8460,10 +8283,7 @@
                 "inverted": true,
                 "value": "SoundPlaying"
               },
-              "parameters": [
-                "",
-                "1"
-              ],
+              "parameters": ["", "1"],
               "subInstructions": []
             }
           ],
@@ -8473,14 +8293,7 @@
                 "inverted": false,
                 "value": "PlaySoundCanal"
               },
-              "parameters": [
-                "",
-                "vroom.wav",
-                "1",
-                "yes",
-                "100",
-                "1"
-              ],
+              "parameters": ["", "vroom.wav", "1", "yes", "100", "1"],
               "subInstructions": []
             }
           ],
@@ -8533,9 +8346,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -8567,11 +8378,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "channel",
-                    "=",
-                    "2"
-                  ],
+                  "parameters": ["channel", "=", "2"],
                   "subInstructions": []
                 }
               ],
@@ -8589,12 +8396,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "AICar",
-                    "channel",
-                    "=",
-                    "Variable(channel)"
-                  ],
+                  "parameters": ["AICar", "channel", "=", "Variable(channel)"],
                   "subInstructions": []
                 },
                 {
@@ -8617,11 +8419,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "channel",
-                    "+",
-                    "1"
-                  ],
+                  "parameters": ["channel", "+", "1"],
                   "subInstructions": []
                 }
               ],
@@ -8704,12 +8502,7 @@
                     "inverted": false,
                     "value": "SoundCanalVolume"
                   },
-                  "parameters": [
-                    "",
-                    "AICar.Variable(channel)",
-                    ">",
-                    "40"
-                  ],
+                  "parameters": ["", "AICar.Variable(channel)", ">", "40"],
                   "subInstructions": []
                 }
               ],
@@ -8719,12 +8512,7 @@
                     "inverted": false,
                     "value": "ModVolumeSoundCanal"
                   },
-                  "parameters": [
-                    "",
-                    "AICar.Variable(channel)",
-                    "=",
-                    "40"
-                  ],
+                  "parameters": ["", "AICar.Variable(channel)", "=", "40"],
                   "subInstructions": []
                 }
               ],

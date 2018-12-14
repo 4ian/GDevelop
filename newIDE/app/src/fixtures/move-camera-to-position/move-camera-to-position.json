@@ -316,9 +316,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -328,11 +326,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "cameraSpeed",
-                "=",
-                "2"
-              ],
+              "parameters": ["cameraSpeed", "=", "2"],
               "subInstructions": []
             }
           ],
@@ -363,10 +357,7 @@
                 "inverted": true,
                 "value": "DraggableBehavior::Dragged"
               },
-              "parameters": [
-                "object",
-                "Draggable"
-              ],
+              "parameters": ["object", "Draggable"],
               "subInstructions": []
             },
             {
@@ -384,11 +375,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "targetX",
-                "=",
-                "object.X()"
-              ],
+              "parameters": ["targetX", "=", "object.X()"],
               "subInstructions": []
             },
             {
@@ -396,11 +383,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "targetY",
-                "=",
-                "object.Y()"
-              ],
+              "parameters": ["targetY", "=", "object.Y()"],
               "subInstructions": []
             }
           ],
@@ -431,10 +414,7 @@
                 "inverted": true,
                 "value": "DraggableBehavior::Dragged"
               },
-              "parameters": [
-                "object",
-                "Draggable"
-              ],
+              "parameters": ["object", "Draggable"],
               "subInstructions": []
             }
           ],
@@ -450,13 +430,7 @@
                     "inverted": false,
                     "value": "CameraX"
                   },
-                  "parameters": [
-                    "",
-                    "<",
-                    "floor(Variable(targetX))",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["", "<", "floor(Variable(targetX))", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -466,13 +440,7 @@
                     "inverted": false,
                     "value": "CameraX"
                   },
-                  "parameters": [
-                    "",
-                    "+",
-                    "Variable(cameraSpeed)",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["", "+", "Variable(cameraSpeed)", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -504,13 +472,7 @@
                     "inverted": false,
                     "value": "CameraY"
                   },
-                  "parameters": [
-                    "",
-                    "+",
-                    "Variable(cameraSpeed)",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["", "+", "Variable(cameraSpeed)", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -526,13 +488,7 @@
                     "inverted": false,
                     "value": "CameraX"
                   },
-                  "parameters": [
-                    "",
-                    ">",
-                    "floor(Variable(targetX))",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["", ">", "floor(Variable(targetX))", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -542,13 +498,7 @@
                     "inverted": false,
                     "value": "CameraX"
                   },
-                  "parameters": [
-                    "",
-                    "-",
-                    "Variable(cameraSpeed)",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["", "-", "Variable(cameraSpeed)", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -580,13 +530,7 @@
                     "inverted": false,
                     "value": "CameraY"
                   },
-                  "parameters": [
-                    "",
-                    "-",
-                    "Variable(cameraSpeed)",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["", "-", "Variable(cameraSpeed)", "", ""],
                   "subInstructions": []
                 }
               ],

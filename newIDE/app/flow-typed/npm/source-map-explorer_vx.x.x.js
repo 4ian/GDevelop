@@ -49,7 +49,9 @@ declare module 'source-map-explorer/test.js' {
   declare module.exports: $Exports<'source-map-explorer/test'>;
 }
 declare module 'source-map-explorer/testdata/foo.min.inline-map.js' {
-  declare module.exports: $Exports<'source-map-explorer/testdata/foo.min.inline-map'>;
+  declare module.exports: $Exports<
+    'source-map-explorer/testdata/foo.min.inline-map'
+  >;
 }
 declare module 'source-map-explorer/testdata/foo.min.js' {
   declare module.exports: $Exports<'source-map-explorer/testdata/foo.min'>;

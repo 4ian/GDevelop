@@ -502,10 +502,14 @@ declare module 'pixi.js/bin/pixi.min.js' {
   declare module.exports: $Exports<'pixi.js/bin/pixi.min'>;
 }
 declare module 'pixi.js/src/accessibility/AccessibilityManager.js' {
-  declare module.exports: $Exports<'pixi.js/src/accessibility/AccessibilityManager'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/accessibility/AccessibilityManager'
+  >;
 }
 declare module 'pixi.js/src/accessibility/accessibleTarget.js' {
-  declare module.exports: $Exports<'pixi.js/src/accessibility/accessibleTarget'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/accessibility/accessibleTarget'
+  >;
 }
 declare module 'pixi.js/src/accessibility/index.js' {
   declare module.exports: $Exports<'pixi.js/src/accessibility/index'>;
@@ -526,10 +530,14 @@ declare module 'pixi.js/src/core/graphics/GraphicsData.js' {
   declare module.exports: $Exports<'pixi.js/src/core/graphics/GraphicsData'>;
 }
 declare module 'pixi.js/src/core/graphics/webgl/GraphicsRenderer.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/graphics/webgl/GraphicsRenderer'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/graphics/webgl/GraphicsRenderer'
+  >;
 }
 declare module 'pixi.js/src/core/graphics/webgl/WebGLGraphicsData.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/graphics/webgl/WebGLGraphicsData'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/graphics/webgl/WebGLGraphicsData'
+  >;
 }
 declare module 'pixi.js/src/core/index.js' {
   declare module.exports: $Exports<'pixi.js/src/core/index'>;
@@ -559,97 +567,155 @@ declare module 'pixi.js/src/core/math/shapes/Rectangle.js' {
   declare module.exports: $Exports<'pixi.js/src/core/math/shapes/Rectangle'>;
 }
 declare module 'pixi.js/src/core/math/shapes/RoundedRectangle.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/math/shapes/RoundedRectangle'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/math/shapes/RoundedRectangle'
+  >;
 }
 declare module 'pixi.js/src/core/particles/ParticleContainer.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/particles/ParticleContainer'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/particles/ParticleContainer'
+  >;
 }
 declare module 'pixi.js/src/core/particles/webgl/ParticleBuffer.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/particles/webgl/ParticleBuffer'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/particles/webgl/ParticleBuffer'
+  >;
 }
 declare module 'pixi.js/src/core/particles/webgl/ParticleRenderer.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/particles/webgl/ParticleRenderer'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/particles/webgl/ParticleRenderer'
+  >;
 }
 declare module 'pixi.js/src/core/particles/webgl/ParticleShader.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/particles/webgl/ParticleShader'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/particles/webgl/ParticleShader'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/canvas/CanvasRenderer.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/canvas/CanvasRenderer'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/canvas/CanvasRenderer'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/canvas/utils/CanvasBuffer.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/canvas/utils/CanvasBuffer'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/canvas/utils/CanvasBuffer'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/canvas/utils/CanvasGraphics.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/canvas/utils/CanvasGraphics'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/canvas/utils/CanvasGraphics'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/canvas/utils/CanvasMaskManager.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/canvas/utils/CanvasMaskManager'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/canvas/utils/CanvasMaskManager'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/canvas/utils/CanvasTinter.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/canvas/utils/CanvasTinter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/canvas/utils/CanvasTinter'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/SystemRenderer.js' {
   declare module.exports: $Exports<'pixi.js/src/core/renderers/SystemRenderer'>;
 }
 declare module 'pixi.js/src/core/renderers/webgl/filters/AbstractFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/filters/AbstractFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/filters/AbstractFilter'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/filters/FXAAFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/filters/FXAAFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/filters/FXAAFilter'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/filters/SpriteMaskFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/filters/SpriteMaskFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/filters/SpriteMaskFilter'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/managers/BlendModeManager.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/managers/BlendModeManager'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/managers/BlendModeManager'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/managers/FilterManager.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/managers/FilterManager'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/managers/FilterManager'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/managers/MaskManager.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/managers/MaskManager'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/managers/MaskManager'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/managers/ShaderManager.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/managers/ShaderManager'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/managers/ShaderManager'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/managers/StencilManager.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/managers/StencilManager'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/managers/StencilManager'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/managers/WebGLManager.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/managers/WebGLManager'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/managers/WebGLManager'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/shaders/ComplexPrimitiveShader.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/shaders/ComplexPrimitiveShader'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/shaders/ComplexPrimitiveShader'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/shaders/PrimitiveShader.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/shaders/PrimitiveShader'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/shaders/PrimitiveShader'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/shaders/Shader.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/shaders/Shader'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/shaders/Shader'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/shaders/TextureShader.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/shaders/TextureShader'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/shaders/TextureShader'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/utils/ObjectRenderer.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/utils/ObjectRenderer'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/utils/ObjectRenderer'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/utils/Quad.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/utils/Quad'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/utils/Quad'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/utils/RenderTarget.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/utils/RenderTarget'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/utils/RenderTarget'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/utils/StencilMaskStack.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/utils/StencilMaskStack'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/utils/StencilMaskStack'
+  >;
 }
 declare module 'pixi.js/src/core/renderers/webgl/WebGLRenderer.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/renderers/webgl/WebGLRenderer'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/renderers/webgl/WebGLRenderer'
+  >;
 }
 declare module 'pixi.js/src/core/sprites/Sprite.js' {
   declare module.exports: $Exports<'pixi.js/src/core/sprites/Sprite'>;
 }
 declare module 'pixi.js/src/core/sprites/webgl/SpriteRenderer.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/sprites/webgl/SpriteRenderer'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/sprites/webgl/SpriteRenderer'
+  >;
 }
 declare module 'pixi.js/src/core/text/Text.js' {
   declare module.exports: $Exports<'pixi.js/src/core/text/Text'>;
@@ -667,7 +733,9 @@ declare module 'pixi.js/src/core/textures/TextureUvs.js' {
   declare module.exports: $Exports<'pixi.js/src/core/textures/TextureUvs'>;
 }
 declare module 'pixi.js/src/core/textures/VideoBaseTexture.js' {
-  declare module.exports: $Exports<'pixi.js/src/core/textures/VideoBaseTexture'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/core/textures/VideoBaseTexture'
+  >;
 }
 declare module 'pixi.js/src/core/ticker/index.js' {
   declare module.exports: $Exports<'pixi.js/src/core/ticker/index'>;
@@ -727,28 +795,40 @@ declare module 'pixi.js/src/filters/blur/SmartBlurFilter.js' {
   declare module.exports: $Exports<'pixi.js/src/filters/blur/SmartBlurFilter'>;
 }
 declare module 'pixi.js/src/filters/color/ColorMatrixFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/color/ColorMatrixFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/color/ColorMatrixFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/color/ColorStepFilter.js' {
   declare module.exports: $Exports<'pixi.js/src/filters/color/ColorStepFilter'>;
 }
 declare module 'pixi.js/src/filters/convolution/ConvolutionFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/convolution/ConvolutionFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/convolution/ConvolutionFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/crosshatch/CrossHatchFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/crosshatch/CrossHatchFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/crosshatch/CrossHatchFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/displacement/DisplacementFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/displacement/DisplacementFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/displacement/DisplacementFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/dot/DotScreenFilter.js' {
   declare module.exports: $Exports<'pixi.js/src/filters/dot/DotScreenFilter'>;
 }
 declare module 'pixi.js/src/filters/dropshadow/BlurYTintFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/dropshadow/BlurYTintFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/dropshadow/BlurYTintFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/dropshadow/DropShadowFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/dropshadow/DropShadowFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/dropshadow/DropShadowFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/gray/GrayFilter.js' {
   declare module.exports: $Exports<'pixi.js/src/filters/gray/GrayFilter'>;
@@ -763,7 +843,9 @@ declare module 'pixi.js/src/filters/noise/NoiseFilter.js' {
   declare module.exports: $Exports<'pixi.js/src/filters/noise/NoiseFilter'>;
 }
 declare module 'pixi.js/src/filters/pixelate/PixelateFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/pixelate/PixelateFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/pixelate/PixelateFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/rgb/RGBSplitFilter.js' {
   declare module.exports: $Exports<'pixi.js/src/filters/rgb/RGBSplitFilter'>;
@@ -772,19 +854,29 @@ declare module 'pixi.js/src/filters/sepia/SepiaFilter.js' {
   declare module.exports: $Exports<'pixi.js/src/filters/sepia/SepiaFilter'>;
 }
 declare module 'pixi.js/src/filters/shockwave/ShockwaveFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/shockwave/ShockwaveFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/shockwave/ShockwaveFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/tiltshift/TiltShiftAxisFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/tiltshift/TiltShiftAxisFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/tiltshift/TiltShiftAxisFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/tiltshift/TiltShiftFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/tiltshift/TiltShiftFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/tiltshift/TiltShiftFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/tiltshift/TiltShiftXFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/tiltshift/TiltShiftXFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/tiltshift/TiltShiftXFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/tiltshift/TiltShiftYFilter.js' {
-  declare module.exports: $Exports<'pixi.js/src/filters/tiltshift/TiltShiftYFilter'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/filters/tiltshift/TiltShiftYFilter'
+  >;
 }
 declare module 'pixi.js/src/filters/twist/TwistFilter.js' {
   declare module.exports: $Exports<'pixi.js/src/filters/twist/TwistFilter'>;
@@ -799,7 +891,9 @@ declare module 'pixi.js/src/interaction/InteractionData.js' {
   declare module.exports: $Exports<'pixi.js/src/interaction/InteractionData'>;
 }
 declare module 'pixi.js/src/interaction/InteractionManager.js' {
-  declare module.exports: $Exports<'pixi.js/src/interaction/InteractionManager'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/interaction/InteractionManager'
+  >;
 }
 declare module 'pixi.js/src/interaction/interactiveTarget.js' {
   declare module.exports: $Exports<'pixi.js/src/interaction/interactiveTarget'>;
@@ -847,5 +941,7 @@ declare module 'pixi.js/src/polyfill/Object.assign.js' {
   declare module.exports: $Exports<'pixi.js/src/polyfill/Object.assign'>;
 }
 declare module 'pixi.js/src/polyfill/requestAnimationFrame.js' {
-  declare module.exports: $Exports<'pixi.js/src/polyfill/requestAnimationFrame'>;
+  declare module.exports: $Exports<
+    'pixi.js/src/polyfill/requestAnimationFrame'
+  >;
 }

@@ -1524,9 +1524,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -1536,11 +1534,7 @@
                 "inverted": false,
                 "value": "ChangeAnimationSpeedScale"
               },
-              "parameters": [
-                "Player",
-                "=",
-                "1"
-              ],
+              "parameters": ["Player", "=", "1"],
               "subInstructions": []
             },
             {
@@ -1548,11 +1542,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "player_state",
-                "=",
-                "\"idle\""
-              ],
+              "parameters": ["player_state", "=", "\"idle\""],
               "subInstructions": []
             }
           ],
@@ -1592,10 +1582,7 @@
                     "inverted": false,
                     "value": "HideLayer"
                   },
-                  "parameters": [
-                    "",
-                    "\"touch\""
-                  ],
+                  "parameters": ["", "\"touch\""],
                   "subInstructions": []
                 }
               ],
@@ -1628,11 +1615,7 @@
                 "inverted": false,
                 "value": "PosX"
               },
-              "parameters": [
-                "Player",
-                "<",
-                "4"
-              ],
+              "parameters": ["Player", "<", "4"],
               "subInstructions": []
             }
           ],
@@ -1642,11 +1625,7 @@
                 "inverted": false,
                 "value": "MettreX"
               },
-              "parameters": [
-                "Player",
-                "=",
-                "4226"
-              ],
+              "parameters": ["Player", "=", "4226"],
               "subInstructions": []
             }
           ],
@@ -1662,11 +1641,7 @@
                 "inverted": false,
                 "value": "PosX"
               },
-              "parameters": [
-                "Player",
-                ">",
-                "4296"
-              ],
+              "parameters": ["Player", ">", "4296"],
               "subInstructions": []
             }
           ],
@@ -1676,11 +1651,7 @@
                 "inverted": false,
                 "value": "MettreX"
               },
-              "parameters": [
-                "Player",
-                "=",
-                "74"
-              ],
+              "parameters": ["Player", "=", "74"],
               "subInstructions": []
             }
           ],
@@ -1711,10 +1682,7 @@
                 "inverted": false,
                 "value": "PlatformBehavior::IsJumping"
               },
-              "parameters": [
-                "Player",
-                "PlatformerObject"
-              ],
+              "parameters": ["Player", "PlatformerObject"],
               "subInstructions": []
             }
           ],
@@ -1724,11 +1692,7 @@
                 "inverted": false,
                 "value": "ChangeAnimation"
               },
-              "parameters": [
-                "Player",
-                "=",
-                "1"
-              ],
+              "parameters": ["Player", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -1744,10 +1708,7 @@
                 "inverted": false,
                 "value": "PlatformBehavior::IsFalling"
               },
-              "parameters": [
-                "Player",
-                "PlatformerObject"
-              ],
+              "parameters": ["Player", "PlatformerObject"],
               "subInstructions": []
             }
           ],
@@ -1757,11 +1718,7 @@
                 "inverted": false,
                 "value": "ChangeAnimation"
               },
-              "parameters": [
-                "Player",
-                "=",
-                "1"
-              ],
+              "parameters": ["Player", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -1777,10 +1734,7 @@
                 "inverted": false,
                 "value": "PlatformBehavior::IsOnFloor"
               },
-              "parameters": [
-                "Player",
-                "PlatformerObject"
-              ],
+              "parameters": ["Player", "PlatformerObject"],
               "subInstructions": []
             }
           ],
@@ -1796,10 +1750,7 @@
                     "inverted": true,
                     "value": "PlatformBehavior::IsMoving"
                   },
-                  "parameters": [
-                    "Player",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["Player", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -1809,11 +1760,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "Player",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["Player", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -1829,10 +1776,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::IsMoving"
                   },
-                  "parameters": [
-                    "Player",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["Player", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -1842,11 +1786,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "Player",
-                    "=",
-                    "2"
-                  ],
+                  "parameters": ["Player", "=", "2"],
                   "subInstructions": []
                 }
               ],
@@ -1901,10 +1841,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -1920,11 +1857,7 @@
                         "inverted": false,
                         "value": "VarSceneTxt"
                       },
-                      "parameters": [
-                        "player_state",
-                        "=",
-                        "\"move_right\""
-                      ],
+                      "parameters": ["player_state", "=", "\"move_right\""],
                       "subInstructions": []
                     }
                   ],
@@ -1941,11 +1874,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "speed_scale",
-                            "-",
-                            "10"
-                          ],
+                          "parameters": ["speed_scale", "-", "10"],
                           "subInstructions": []
                         },
                         {
@@ -1990,10 +1919,7 @@
                         "inverted": true,
                         "value": "PlatformBehavior::IsMoving"
                       },
-                      "parameters": [
-                        "Player",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["Player", "PlatformerObject"],
                       "subInstructions": []
                     }
                   ],
@@ -2003,10 +1929,7 @@
                         "inverted": false,
                         "value": "FlipX"
                       },
-                      "parameters": [
-                        "Player",
-                        "yes"
-                      ],
+                      "parameters": ["Player", "yes"],
                       "subInstructions": []
                     },
                     {
@@ -2014,11 +1937,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "player_state",
-                        "=",
-                        "\"move_left\""
-                      ],
+                      "parameters": ["player_state", "=", "\"move_left\""],
                       "subInstructions": []
                     }
                   ],
@@ -2043,10 +1962,7 @@
                             "inverted": false,
                             "value": "ResetTimer"
                           },
-                          "parameters": [
-                            "",
-                            "\"movementTime\""
-                          ],
+                          "parameters": ["", "\"movementTime\""],
                           "subInstructions": []
                         },
                         {
@@ -2054,11 +1970,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "speed_scale",
-                            "=",
-                            "800"
-                          ],
+                          "parameters": ["speed_scale", "=", "800"],
                           "subInstructions": []
                         }
                       ],
@@ -2091,11 +2003,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "player_state",
-                        "=",
-                        "\"move_left\""
-                      ],
+                      "parameters": ["player_state", "=", "\"move_left\""],
                       "subInstructions": []
                     }
                   ],
@@ -2155,10 +2063,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Right"
-                  ],
+                  "parameters": ["", "Right"],
                   "subInstructions": []
                 }
               ],
@@ -2174,11 +2079,7 @@
                         "inverted": false,
                         "value": "VarSceneTxt"
                       },
-                      "parameters": [
-                        "player_state",
-                        "=",
-                        "\"move_left\""
-                      ],
+                      "parameters": ["player_state", "=", "\"move_left\""],
                       "subInstructions": []
                     }
                   ],
@@ -2195,11 +2096,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "speed_scale",
-                            "-",
-                            "10"
-                          ],
+                          "parameters": ["speed_scale", "-", "10"],
                           "subInstructions": []
                         },
                         {
@@ -2244,10 +2141,7 @@
                         "inverted": true,
                         "value": "PlatformBehavior::IsMoving"
                       },
-                      "parameters": [
-                        "Player",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["Player", "PlatformerObject"],
                       "subInstructions": []
                     }
                   ],
@@ -2257,10 +2151,7 @@
                         "inverted": false,
                         "value": "FlipX"
                       },
-                      "parameters": [
-                        "Player",
-                        "no"
-                      ],
+                      "parameters": ["Player", "no"],
                       "subInstructions": []
                     },
                     {
@@ -2268,11 +2159,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "player_state",
-                        "=",
-                        "\"move_right\""
-                      ],
+                      "parameters": ["player_state", "=", "\"move_right\""],
                       "subInstructions": []
                     }
                   ],
@@ -2297,10 +2184,7 @@
                             "inverted": false,
                             "value": "ResetTimer"
                           },
-                          "parameters": [
-                            "",
-                            "\"movementTime\""
-                          ],
+                          "parameters": ["", "\"movementTime\""],
                           "subInstructions": []
                         },
                         {
@@ -2308,11 +2192,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "speed_scale",
-                            "=",
-                            "800"
-                          ],
+                          "parameters": ["speed_scale", "=", "800"],
                           "subInstructions": []
                         }
                       ],
@@ -2345,11 +2225,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "player_state",
-                        "=",
-                        "\"move_right\""
-                      ],
+                      "parameters": ["player_state", "=", "\"move_right\""],
                       "subInstructions": []
                     }
                   ],
@@ -2411,10 +2287,7 @@
                 "inverted": false,
                 "value": "LayerVisible"
               },
-              "parameters": [
-                "",
-                "\"touch\""
-              ],
+              "parameters": ["", "\"touch\""],
               "subInstructions": []
             }
           ],
@@ -2445,10 +2318,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -2464,12 +2334,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "btn_left",
-                        "",
-                        "yes",
-                        ""
-                      ],
+                      "parameters": ["btn_left", "", "yes", ""],
                       "subInstructions": []
                     }
                   ],
@@ -2479,10 +2344,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::SimulateLeftKey"
                       },
-                      "parameters": [
-                        "Player",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["Player", "PlatformerObject"],
                       "subInstructions": []
                     }
                   ],
@@ -2497,11 +2359,7 @@
                             "inverted": false,
                             "value": "VarSceneTxt"
                           },
-                          "parameters": [
-                            "player_state",
-                            "=",
-                            "\"move_right\""
-                          ],
+                          "parameters": ["player_state", "=", "\"move_right\""],
                           "subInstructions": []
                         }
                       ],
@@ -2518,11 +2376,7 @@
                                 "inverted": false,
                                 "value": "ModVarScene"
                               },
-                              "parameters": [
-                                "speed_scale",
-                                "-",
-                                "10"
-                              ],
+                              "parameters": ["speed_scale", "-", "10"],
                               "subInstructions": []
                             },
                             {
@@ -2567,10 +2421,7 @@
                             "inverted": true,
                             "value": "PlatformBehavior::IsMoving"
                           },
-                          "parameters": [
-                            "Player",
-                            "PlatformerObject"
-                          ],
+                          "parameters": ["Player", "PlatformerObject"],
                           "subInstructions": []
                         }
                       ],
@@ -2580,10 +2431,7 @@
                             "inverted": false,
                             "value": "FlipX"
                           },
-                          "parameters": [
-                            "Player",
-                            "yes"
-                          ],
+                          "parameters": ["Player", "yes"],
                           "subInstructions": []
                         },
                         {
@@ -2591,11 +2439,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "player_state",
-                            "=",
-                            "\"move_left\""
-                          ],
+                          "parameters": ["player_state", "=", "\"move_left\""],
                           "subInstructions": []
                         }
                       ],
@@ -2620,10 +2464,7 @@
                                 "inverted": false,
                                 "value": "ResetTimer"
                               },
-                              "parameters": [
-                                "",
-                                "\"movementTime\""
-                              ],
+                              "parameters": ["", "\"movementTime\""],
                               "subInstructions": []
                             },
                             {
@@ -2631,11 +2472,7 @@
                                 "inverted": false,
                                 "value": "ModVarScene"
                               },
-                              "parameters": [
-                                "speed_scale",
-                                "=",
-                                "800"
-                              ],
+                              "parameters": ["speed_scale", "=", "800"],
                               "subInstructions": []
                             }
                           ],
@@ -2668,11 +2505,7 @@
                             "inverted": false,
                             "value": "VarScene"
                           },
-                          "parameters": [
-                            "player_state",
-                            "=",
-                            "\"move_left\""
-                          ],
+                          "parameters": ["player_state", "=", "\"move_left\""],
                           "subInstructions": []
                         }
                       ],
@@ -2732,12 +2565,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "btn_right",
-                        "Right",
-                        "yes",
-                        ""
-                      ],
+                      "parameters": ["btn_right", "Right", "yes", ""],
                       "subInstructions": []
                     }
                   ],
@@ -2747,10 +2575,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::SimulateRightKey"
                       },
-                      "parameters": [
-                        "Player",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["Player", "PlatformerObject"],
                       "subInstructions": []
                     }
                   ],
@@ -2765,11 +2590,7 @@
                             "inverted": false,
                             "value": "VarSceneTxt"
                           },
-                          "parameters": [
-                            "player_state",
-                            "=",
-                            "\"move_left\""
-                          ],
+                          "parameters": ["player_state", "=", "\"move_left\""],
                           "subInstructions": []
                         }
                       ],
@@ -2786,11 +2607,7 @@
                                 "inverted": false,
                                 "value": "ModVarScene"
                               },
-                              "parameters": [
-                                "speed_scale",
-                                "-",
-                                "10"
-                              ],
+                              "parameters": ["speed_scale", "-", "10"],
                               "subInstructions": []
                             },
                             {
@@ -2835,10 +2652,7 @@
                             "inverted": true,
                             "value": "PlatformBehavior::IsMoving"
                           },
-                          "parameters": [
-                            "Player",
-                            "PlatformerObject"
-                          ],
+                          "parameters": ["Player", "PlatformerObject"],
                           "subInstructions": []
                         }
                       ],
@@ -2848,10 +2662,7 @@
                             "inverted": false,
                             "value": "FlipX"
                           },
-                          "parameters": [
-                            "Player",
-                            "no"
-                          ],
+                          "parameters": ["Player", "no"],
                           "subInstructions": []
                         },
                         {
@@ -2859,11 +2670,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "player_state",
-                            "=",
-                            "\"move_right\""
-                          ],
+                          "parameters": ["player_state", "=", "\"move_right\""],
                           "subInstructions": []
                         }
                       ],
@@ -2888,10 +2695,7 @@
                                 "inverted": false,
                                 "value": "ResetTimer"
                               },
-                              "parameters": [
-                                "",
-                                "\"movementTime\""
-                              ],
+                              "parameters": ["", "\"movementTime\""],
                               "subInstructions": []
                             },
                             {
@@ -2899,11 +2703,7 @@
                                 "inverted": false,
                                 "value": "ModVarScene"
                               },
-                              "parameters": [
-                                "speed_scale",
-                                "=",
-                                "800"
-                              ],
+                              "parameters": ["speed_scale", "=", "800"],
                               "subInstructions": []
                             }
                           ],
@@ -2936,11 +2736,7 @@
                             "inverted": false,
                             "value": "VarScene"
                           },
-                          "parameters": [
-                            "player_state",
-                            "=",
-                            "\"move_right\""
-                          ],
+                          "parameters": ["player_state", "=", "\"move_right\""],
                           "subInstructions": []
                         }
                       ],
@@ -3000,12 +2796,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "btn_jump",
-                        "",
-                        "yes",
-                        ""
-                      ],
+                      "parameters": ["btn_jump", "", "yes", ""],
                       "subInstructions": []
                     }
                   ],
@@ -3021,10 +2812,7 @@
                             "inverted": false,
                             "value": "PlatformBehavior::IsOnFloor"
                           },
-                          "parameters": [
-                            "Player",
-                            "PlatformerObject"
-                          ],
+                          "parameters": ["Player", "PlatformerObject"],
                           "subInstructions": []
                         }
                       ],
@@ -3034,10 +2822,7 @@
                             "inverted": false,
                             "value": "PlatformBehavior::SimulateJumpKey"
                           },
-                          "parameters": [
-                            "Player",
-                            "PlatformerObject"
-                          ],
+                          "parameters": ["Player", "PlatformerObject"],
                           "subInstructions": []
                         }
                       ],
@@ -3074,10 +2859,7 @@
                 "inverted": true,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -3085,10 +2867,7 @@
                 "inverted": true,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Right"
-              ],
+              "parameters": ["", "Right"],
               "subInstructions": []
             },
             {
@@ -3096,10 +2875,7 @@
                 "inverted": true,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -3115,10 +2891,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::IsMoving"
                   },
-                  "parameters": [
-                    "Player",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["Player", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -3128,11 +2901,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "speed_scale",
-                    "-",
-                    "10"
-                  ],
+                  "parameters": ["speed_scale", "-", "10"],
                   "subInstructions": []
                 },
                 {
@@ -3175,10 +2944,7 @@
                     "inverted": true,
                     "value": "PlatformBehavior::IsMoving"
                   },
-                  "parameters": [
-                    "Player",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["Player", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -3188,11 +2954,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "player_state",
-                    "=",
-                    "\"idle\""
-                  ],
+                  "parameters": ["player_state", "=", "\"idle\""],
                   "subInstructions": []
                 }
               ],
@@ -3226,13 +2988,7 @@
                 "inverted": false,
                 "value": "CameraX"
               },
-              "parameters": [
-                "",
-                "=",
-                "Player.X()",
-                "",
-                ""
-              ],
+              "parameters": ["", "=", "Player.X()", "", ""],
               "subInstructions": []
             },
             {

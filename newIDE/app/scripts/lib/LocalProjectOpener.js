@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 module.exports = {
-  readProjectJSONFile: (filepath) => {
+  readProjectJSONFile: filepath => {
     return new Promise((resolve, reject) => {
       if (!fs) return reject('Not supported');
 
@@ -21,7 +21,7 @@ module.exports = {
     const serializedProject = gd.Serializer.fromJSObject(projectObject);
     const newProject = gd.ProjectHelper.createNewGDJSProject();
     newProject.unserializeFrom(serializedProject);
-  
+
     return newProject;
   },
 };

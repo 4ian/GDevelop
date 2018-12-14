@@ -13,17 +13,21 @@ module.exports = {
   writeProjectJSONFile: (gd, project, filepath) => {
     return new Promise((resolve, reject) => {
       if (!fs) return reject('Not supported');
-  
+
       try {
-        const content = JSON.stringify(serializeToJSObject(gd, project), null, 2);
+        const content = JSON.stringify(
+          serializeToJSObject(gd, project),
+          null,
+          2
+        );
         fs.writeFile(filepath, content, err => {
           if (err) return reject(err);
-  
+
           resolve();
         });
       } catch (e) {
         return reject(e);
       }
     });
-  }
+  },
 };

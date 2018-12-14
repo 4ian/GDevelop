@@ -390,11 +390,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "angle",
-                "+",
-                "50*TimeDelta()"
-              ],
+              "parameters": ["angle", "+", "50*TimeDelta()"],
               "subInstructions": []
             },
             {
@@ -402,13 +398,7 @@
                 "inverted": false,
                 "value": "MettreAutourPos"
               },
-              "parameters": [
-                "Char1",
-                "120",
-                "300",
-                "100",
-                "Variable(angle)"
-              ],
+              "parameters": ["Char1", "120", "300", "100", "Variable(angle)"],
               "subInstructions": []
             },
             {

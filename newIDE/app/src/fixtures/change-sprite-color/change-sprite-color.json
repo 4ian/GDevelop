@@ -253,11 +253,7 @@
                 "inverted": false,
                 "value": "NbObjet"
               },
-              "parameters": [
-                "Pea",
-                "<",
-                "15"
-              ],
+              "parameters": ["Pea", "<", "15"],
               "subInstructions": []
             }
           ],
@@ -267,11 +263,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "CreatePea",
-                "=",
-                "1"
-              ],
+              "parameters": ["CreatePea", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -302,11 +294,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "CreatePea",
-                "=",
-                "1"
-              ],
+              "parameters": ["CreatePea", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -316,13 +304,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "Pea",
-                "0",
-                "0",
-                ""
-              ],
+              "parameters": ["", "Pea", "0", "0", ""],
               "subInstructions": []
             },
             {
@@ -344,12 +326,7 @@
                 "inverted": false,
                 "value": "AddForceAL"
               },
-              "parameters": [
-                "Pea",
-                "Random(360)",
-                "300",
-                "1"
-              ],
+              "parameters": ["Pea", "Random(360)", "300", "1"],
               "subInstructions": []
             },
             {
@@ -368,11 +345,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "CreatePea",
-                "=",
-                "0"
-              ],
+              "parameters": ["CreatePea", "=", "0"],
               "subInstructions": []
             }
           ],

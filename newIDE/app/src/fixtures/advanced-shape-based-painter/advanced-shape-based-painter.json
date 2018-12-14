@@ -783,9 +783,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -795,11 +793,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "i",
-                "=",
-                "0"
-              ],
+              "parameters": ["i", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -816,13 +810,7 @@
                     "inverted": false,
                     "value": "Create"
                   },
-                  "parameters": [
-                    "",
-                    "Shapes",
-                    "50",
-                    "150+Variable(i)*40",
-                    ""
-                  ],
+                  "parameters": ["", "Shapes", "50", "150+Variable(i)*40", ""],
                   "subInstructions": []
                 },
                 {
@@ -830,11 +818,7 @@
                     "inverted": false,
                     "value": "ChangeSprite"
                   },
-                  "parameters": [
-                    "Shapes",
-                    "=",
-                    "Variable(i)"
-                  ],
+                  "parameters": ["Shapes", "=", "Variable(i)"],
                   "subInstructions": []
                 },
                 {
@@ -842,9 +826,7 @@
                     "inverted": false,
                     "value": "PauseAnimation"
                   },
-                  "parameters": [
-                    "Shapes"
-                  ],
+                  "parameters": ["Shapes"],
                   "subInstructions": []
                 },
                 {
@@ -852,11 +834,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "i",
-                    "+",
-                    "1"
-                  ],
+                  "parameters": ["i", "+", "1"],
                   "subInstructions": []
                 }
               ],
@@ -875,10 +853,7 @@
                 "inverted": false,
                 "value": "PrimitiveDrawing::FillColor"
               },
-              "parameters": [
-                "Drawer",
-                "\"0;0;0\""
-              ],
+              "parameters": ["Drawer", "\"0;0;0\""],
               "subInstructions": []
             },
             {
@@ -886,11 +861,7 @@
                 "inverted": false,
                 "value": "PrimitiveDrawing::FillOpacity"
               },
-              "parameters": [
-                "Drawer",
-                "=",
-                "255"
-              ],
+              "parameters": ["Drawer", "=", "255"],
               "subInstructions": []
             },
             {
@@ -898,11 +869,7 @@
                 "inverted": false,
                 "value": "PrimitiveDrawing::OutlineSize"
               },
-              "parameters": [
-                "Drawer",
-                "=",
-                "0"
-              ],
+              "parameters": ["Drawer", "=", "0"],
               "subInstructions": []
             },
             {
@@ -910,13 +877,7 @@
                 "inverted": false,
                 "value": "PrimitiveDrawing::Rectangle"
               },
-              "parameters": [
-                "Drawer",
-                "50",
-                "400",
-                "305",
-                "405"
-              ],
+              "parameters": ["Drawer", "50", "400", "305", "405"],
               "subInstructions": []
             },
             {
@@ -924,13 +885,7 @@
                 "inverted": false,
                 "value": "PrimitiveDrawing::Rectangle"
               },
-              "parameters": [
-                "Drawer",
-                "50",
-                "430",
-                "305",
-                "435"
-              ],
+              "parameters": ["Drawer", "50", "430", "305", "435"],
               "subInstructions": []
             },
             {
@@ -938,13 +893,7 @@
                 "inverted": false,
                 "value": "PrimitiveDrawing::Rectangle"
               },
-              "parameters": [
-                "Drawer",
-                "50",
-                "460",
-                "305",
-                "465"
-              ],
+              "parameters": ["Drawer", "50", "460", "305", "465"],
               "subInstructions": []
             },
             {
@@ -952,13 +901,7 @@
                 "inverted": false,
                 "value": "PrimitiveDrawing::Rectangle"
               },
-              "parameters": [
-                "Drawer",
-                "50",
-                "490",
-                "305",
-                "495"
-              ],
+              "parameters": ["Drawer", "50", "490", "305", "495"],
               "subInstructions": []
             }
           ],
@@ -985,11 +928,7 @@
                     "inverted": false,
                     "value": "PrimitiveDrawing::FillOpacity"
                   },
-                  "parameters": [
-                    "Drawer",
-                    "=",
-                    "Variable(A)"
-                  ],
+                  "parameters": ["Drawer", "=", "Variable(A)"],
                   "subInstructions": []
                 },
                 {
@@ -997,13 +936,7 @@
                     "inverted": false,
                     "value": "PrimitiveDrawing::Rectangle"
                   },
-                  "parameters": [
-                    "Drawer",
-                    "310",
-                    "400",
-                    "405",
-                    "495"
-                  ],
+                  "parameters": ["Drawer", "310", "400", "405", "495"],
                   "subInstructions": []
                 }
               ],
@@ -1021,10 +954,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -1065,11 +995,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "canDraw",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["canDraw", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -1099,11 +1025,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "Shapes",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["Shapes", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -1113,11 +1035,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "canDraw",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["canDraw", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -1125,11 +1043,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "shape",
-                        "=",
-                        "Shapes.Sprite()"
-                      ],
+                      "parameters": ["shape", "=", "Shapes.Sprite()"],
                       "subInstructions": []
                     }
                   ],
@@ -1160,11 +1074,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "BarSelect",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["BarSelect", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -1174,11 +1084,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "canDraw",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["canDraw", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -1186,12 +1092,7 @@
                         "inverted": false,
                         "value": "ModVarObjet"
                       },
-                      "parameters": [
-                        "BarSelect",
-                        "Drag",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["BarSelect", "Drag", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1222,11 +1123,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "canDraw",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["canDraw", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1236,11 +1133,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "drawing",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["drawing", "=", "1"],
                       "subInstructions": []
                     },
                     {
@@ -1248,11 +1141,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "Shapes.Size",
-                        "+",
-                        "1"
-                      ],
+                      "parameters": ["Shapes.Size", "+", "1"],
                       "subInstructions": []
                     },
                     {
@@ -1370,11 +1259,7 @@
                                 "inverted": false,
                                 "value": "VarScene"
                               },
-                              "parameters": [
-                                "shape",
-                                "=",
-                                "0"
-                              ],
+                              "parameters": ["shape", "=", "0"],
                               "subInstructions": []
                             },
                             {
@@ -1382,11 +1267,7 @@
                                 "inverted": false,
                                 "value": "VarScene"
                               },
-                              "parameters": [
-                                "shape",
-                                "=",
-                                "2"
-                              ],
+                              "parameters": ["shape", "=", "2"],
                               "subInstructions": []
                             },
                             {
@@ -1394,11 +1275,7 @@
                                 "inverted": false,
                                 "value": "VarScene"
                               },
-                              "parameters": [
-                                "shape",
-                                "=",
-                                "4"
-                              ],
+                              "parameters": ["shape", "=", "4"],
                               "subInstructions": []
                             }
                           ]
@@ -1527,11 +1404,7 @@
                                 "inverted": false,
                                 "value": "VarScene"
                               },
-                              "parameters": [
-                                "shape",
-                                "=",
-                                "1"
-                              ],
+                              "parameters": ["shape", "=", "1"],
                               "subInstructions": []
                             },
                             {
@@ -1539,11 +1412,7 @@
                                 "inverted": false,
                                 "value": "VarScene"
                               },
-                              "parameters": [
-                                "shape",
-                                "=",
-                                "3"
-                              ],
+                              "parameters": ["shape", "=", "3"],
                               "subInstructions": []
                             }
                           ]
@@ -1654,12 +1523,7 @@
                     "inverted": false,
                     "value": "VarObjet"
                   },
-                  "parameters": [
-                    "BarSelect",
-                    "Drag",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["BarSelect", "Drag", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -1669,11 +1533,7 @@
                     "inverted": false,
                     "value": "MettreX"
                   },
-                  "parameters": [
-                    "BarSelect",
-                    "=",
-                    "MouseX(\"\",0)"
-                  ],
+                  "parameters": ["BarSelect", "=", "MouseX(\"\",0)"],
                   "subInstructions": []
                 }
               ],
@@ -1688,11 +1548,7 @@
                         "inverted": false,
                         "value": "PosX"
                       },
-                      "parameters": [
-                        "BarSelect",
-                        "<",
-                        "50"
-                      ],
+                      "parameters": ["BarSelect", "<", "50"],
                       "subInstructions": []
                     }
                   ],
@@ -1702,11 +1558,7 @@
                         "inverted": false,
                         "value": "MettreX"
                       },
-                      "parameters": [
-                        "BarSelect",
-                        "=",
-                        "50"
-                      ],
+                      "parameters": ["BarSelect", "=", "50"],
                       "subInstructions": []
                     }
                   ],
@@ -1722,11 +1574,7 @@
                         "inverted": false,
                         "value": "PosX"
                       },
-                      "parameters": [
-                        "BarSelect",
-                        ">",
-                        "305"
-                      ],
+                      "parameters": ["BarSelect", ">", "305"],
                       "subInstructions": []
                     }
                   ],
@@ -1736,11 +1584,7 @@
                         "inverted": false,
                         "value": "MettreX"
                       },
-                      "parameters": [
-                        "BarSelect",
-                        "=",
-                        "305"
-                      ],
+                      "parameters": ["BarSelect", "=", "305"],
                       "subInstructions": []
                     }
                   ],
@@ -1777,12 +1621,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "BarSelect",
-                            "ID",
-                            "=",
-                            "0"
-                          ],
+                          "parameters": ["BarSelect", "ID", "=", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -1792,11 +1631,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "R",
-                            "=",
-                            "BarSelect.Variable(Value)"
-                          ],
+                          "parameters": ["R", "=", "BarSelect.Variable(Value)"],
                           "subInstructions": []
                         }
                       ],
@@ -1812,12 +1647,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "BarSelect",
-                            "ID",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["BarSelect", "ID", "=", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -1827,11 +1657,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "G",
-                            "=",
-                            "BarSelect.Variable(Value)"
-                          ],
+                          "parameters": ["G", "=", "BarSelect.Variable(Value)"],
                           "subInstructions": []
                         }
                       ],
@@ -1847,12 +1673,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "BarSelect",
-                            "ID",
-                            "=",
-                            "2"
-                          ],
+                          "parameters": ["BarSelect", "ID", "=", "2"],
                           "subInstructions": []
                         }
                       ],
@@ -1862,11 +1683,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "B",
-                            "=",
-                            "BarSelect.Variable(Value)"
-                          ],
+                          "parameters": ["B", "=", "BarSelect.Variable(Value)"],
                           "subInstructions": []
                         }
                       ],
@@ -1882,12 +1699,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "BarSelect",
-                            "ID",
-                            "=",
-                            "3"
-                          ],
+                          "parameters": ["BarSelect", "ID", "=", "3"],
                           "subInstructions": []
                         }
                       ],
@@ -1897,11 +1709,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "A",
-                            "=",
-                            "BarSelect.Variable(Value)"
-                          ],
+                          "parameters": ["A", "=", "BarSelect.Variable(Value)"],
                           "subInstructions": []
                         }
                       ],
@@ -1936,11 +1744,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "drawing",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["drawing", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -2008,11 +1812,7 @@
                             "inverted": false,
                             "value": "VarScene"
                           },
-                          "parameters": [
-                            "shape",
-                            "=",
-                            "0"
-                          ],
+                          "parameters": ["shape", "=", "0"],
                           "subInstructions": []
                         },
                         {
@@ -2020,11 +1820,7 @@
                             "inverted": false,
                             "value": "VarScene"
                           },
-                          "parameters": [
-                            "shape",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["shape", "=", "1"],
                           "subInstructions": []
                         }
                       ]
@@ -2123,11 +1919,7 @@
                             "inverted": false,
                             "value": "VarScene"
                           },
-                          "parameters": [
-                            "shape",
-                            "=",
-                            "2"
-                          ],
+                          "parameters": ["shape", "=", "2"],
                           "subInstructions": []
                         },
                         {
@@ -2135,11 +1927,7 @@
                             "inverted": false,
                             "value": "VarScene"
                           },
-                          "parameters": [
-                            "shape",
-                            "=",
-                            "3"
-                          ],
+                          "parameters": ["shape", "=", "3"],
                           "subInstructions": []
                         },
                         {
@@ -2147,11 +1935,7 @@
                             "inverted": false,
                             "value": "VarScene"
                           },
-                          "parameters": [
-                            "shape",
-                            "=",
-                            "4"
-                          ],
+                          "parameters": ["shape", "=", "4"],
                           "subInstructions": []
                         }
                       ]
@@ -2222,10 +2006,7 @@
                 "inverted": true,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -2243,11 +2024,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "drawing",
-                "=",
-                "0"
-              ],
+              "parameters": ["drawing", "=", "0"],
               "subInstructions": []
             },
             {
@@ -2255,12 +2032,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "BarSelect",
-                "Drag",
-                "=",
-                "0"
-              ],
+              "parameters": ["BarSelect", "Drag", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -2292,11 +2064,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "i",
-                "=",
-                "0"
-              ],
+              "parameters": ["i", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -2599,11 +2367,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "i",
-                    "+",
-                    "1"
-                  ],
+                  "parameters": ["i", "+", "1"],
                   "subInstructions": []
                 }
               ],

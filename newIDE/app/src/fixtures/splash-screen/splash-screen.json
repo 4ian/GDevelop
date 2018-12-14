@@ -250,9 +250,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -290,11 +288,7 @@
                 "inverted": false,
                 "value": "Opacity"
               },
-              "parameters": [
-                "logo",
-                "=",
-                "0"
-              ],
+              "parameters": ["logo", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -326,11 +320,7 @@
                 "inverted": false,
                 "value": "Opacity"
               },
-              "parameters": [
-                "logo",
-                "+",
-                "TimeDelta()*15"
-              ],
+              "parameters": ["logo", "+", "TimeDelta()*15"],
               "subInstructions": []
             }
           ],
@@ -361,11 +351,7 @@
                 "inverted": false,
                 "value": "Opacity"
               },
-              "parameters": [
-                "logo",
-                ">=",
-                "100"
-              ],
+              "parameters": ["logo", ">=", "100"],
               "subInstructions": []
             }
           ],
@@ -375,10 +361,7 @@
                 "inverted": false,
                 "value": "Scene"
               },
-              "parameters": [
-                "",
-                "VariableString(SceneAfterSplash)"
-              ],
+              "parameters": ["", "VariableString(SceneAfterSplash)"],
               "subInstructions": []
             }
           ],

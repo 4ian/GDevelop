@@ -20,7 +20,8 @@ export default ({ subscription, limit, onChangeSubscription }: Props) => {
     <Column noMargin>
       <p>
         You have {Math.max(limit.max - limit.current, 0)} remaining builds for
-        today (out of {limit.max}).
+        today (out of {limit.max}
+        ).
       </p>
       {hasSubscription &&
         limit.limitReached && (

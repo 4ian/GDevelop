@@ -14,18 +14,18 @@ declare module '@storybook/react' {
   ) => Renderable;
 
   declare interface Story {
-    add(storyName: string, callback: RenderFunction): Story,
-    addDecorator(decorator: StoryDecorator): Story,
+    add(storyName: string, callback: RenderFunction): Story;
+    addDecorator(decorator: StoryDecorator): Story;
   }
 
   declare interface StoryObject {
-    name: string,
-    render: RenderFunction,
+    name: string;
+    render: RenderFunction;
   }
 
   declare interface StoryBucket {
-    kind: string,
-    stories: Array<StoryObject>,
+    kind: string;
+    stories: Array<StoryObject>;
   }
 
   declare function addDecorator(decorator: StoryDecorator): void;

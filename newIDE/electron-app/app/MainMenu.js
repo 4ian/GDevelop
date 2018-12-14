@@ -1,6 +1,6 @@
-const electron = require('electron');
+const electron = require("electron");
 const { app, Menu, ipcMain } = electron;
-const package = require('./package.json');
+const package = require("./package.json");
 
 /**
  * Create the editor main menu. Menu items that requires interaction
@@ -10,161 +10,163 @@ const package = require('./package.json');
  */
 const buildMainMenuFor = window => {
   const fileTemplate = {
-    label: 'File',
+    label: "File",
     submenu: [
       {
-        label: 'Create a New Project...',
-        accelerator: 'CommandOrControl+N',
+        label: "Create a New Project...",
+        accelerator: "CommandOrControl+N",
         click() {
-          window.webContents.send('main-menu-create');
-        },
+          window.webContents.send("main-menu-create");
+        }
       },
-      { type: 'separator' },
+      { type: "separator" },
       {
-        label: 'Open...',
-        accelerator: 'CommandOrControl+O',
+        label: "Open...",
+        accelerator: "CommandOrControl+O",
         click() {
-          window.webContents.send('main-menu-open');
-        },
+          window.webContents.send("main-menu-open");
+        }
       },
-      { type: 'separator' },
+      { type: "separator" },
       {
-        label: 'Save',
-        accelerator: 'CommandOrControl+S',
+        label: "Save",
+        accelerator: "CommandOrControl+S",
         click() {
-          window.webContents.send('main-menu-save');
-        },
+          window.webContents.send("main-menu-save");
+        }
       },
       {
-        label: 'Save as...',
+        label: "Save as...",
         enabled: false, // TODO: Unimplemented for now
         click() {
-          window.webContents.send('main-menu-save-as');
-        },
+          window.webContents.send("main-menu-save-as");
+        }
       },
-      { type: 'separator' },
+      { type: "separator" },
       {
-        label: 'Export (web, iOS, Android)...',
+        label: "Export (web, iOS, Android)...",
         click() {
-          window.webContents.send('main-menu-export');
-        },
+          window.webContents.send("main-menu-export");
+        }
       },
-      { type: 'separator' },
+      { type: "separator" },
       {
-        label: 'Close Project',
-        accelerator: 'CommandOrControl+W',
+        label: "Close Project",
+        accelerator: "CommandOrControl+W",
         click() {
-          window.webContents.send('main-menu-close');
-        },
-      },
-    ],
+          window.webContents.send("main-menu-close");
+        }
+      }
+    ]
   };
-  if (process.platform !== 'darwin') {
+  if (process.platform !== "darwin") {
     fileTemplate.submenu.push(
-      { type: 'separator' },
+      { type: "separator" },
       {
-        label: 'My Profile',
+        label: "My Profile",
         click() {
-          window.webContents.send('main-menu-open-profile');
-        },
+          window.webContents.send("main-menu-open-profile");
+        }
       },
       {
-        label: 'Preferences',
+        label: "Preferences",
         click() {
-          window.webContents.send('main-menu-open-preferences');
-        },
+          window.webContents.send("main-menu-open-preferences");
+        }
       }
     );
   }
 
   const editTemplate = {
-    label: 'Edit',
+    label: "Edit",
     submenu: [
-      { role: 'undo' },
-      { role: 'redo' },
-      { type: 'separator' },
-      { role: 'cut' },
-      { role: 'copy' },
-      { role: 'paste' },
-      { role: 'pasteandmatchstyle' },
-      { role: 'delete' },
-      { role: 'selectall' },
-    ],
+      { role: "undo" },
+      { role: "redo" },
+      { type: "separator" },
+      { role: "cut" },
+      { role: "copy" },
+      { role: "paste" },
+      { role: "pasteandmatchstyle" },
+      { role: "delete" },
+      { role: "selectall" }
+    ]
   };
 
   const viewTemplate = {
-    label: 'View',
+    label: "View",
     submenu: [
       {
-        label: 'Show Start Page',
+        label: "Show Start Page",
         click() {
-          window.webContents.send('main-menu-open-start-page');
-        },
+          window.webContents.send("main-menu-open-start-page");
+        }
       },
       {
-        label: 'Open Debugger',
+        label: "Open Debugger",
         click() {
-          window.webContents.send('main-menu-open-debugger');
-        },
+          window.webContents.send("main-menu-open-debugger");
+        }
       },
-      { type: 'separator' },
-      { role: 'toggledevtools' },
-      { type: 'separator' },
-      { role: 'togglefullscreen' },
-    ],
+      { type: "separator" },
+      { role: "toggledevtools" },
+      { type: "separator" },
+      { role: "togglefullscreen" }
+    ]
   };
 
   const windowTemplate = {
-    role: 'window',
-    submenu: [{ role: 'minimize' }, { role: 'close' }],
+    role: "window",
+    submenu: [{ role: "minimize" }, { role: "close" }]
   };
 
   const helpTemplate = {
-    role: 'help',
+    role: "help",
     submenu: [
       {
-        label: 'GDevelop website',
+        label: "GDevelop website",
         click() {
           electron.shell.openExternal(package.homepage);
-        },
+        }
       },
-      { type: 'separator' },
+      { type: "separator" },
       {
-        label: 'Community Forums',
+        label: "Community Forums",
         click() {
-          electron.shell.openExternal('http://forum.compilgames.net');
-        },
-      },
-      {
-        label: 'Community Discord Chat',
-        click() {
-          electron.shell.openExternal('https://discord.gg/JWcfHEB');
-        },
-      },
-      { type: 'separator' },
-      {
-        label: 'Contribute to GDevelop',
-        click() {
-          electron.shell.openExternal('https://gdevelop-app.com/contribute/');
-        },
+          electron.shell.openExternal("http://forum.compilgames.net");
+        }
       },
       {
-        label: 'Create Extensions for GDevelop',
+        label: "Community Discord Chat",
         click() {
-          electron.shell.openExternal('https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md');
-        },
+          electron.shell.openExternal("https://discord.gg/JWcfHEB");
+        }
       },
-    ],
+      { type: "separator" },
+      {
+        label: "Contribute to GDevelop",
+        click() {
+          electron.shell.openExternal("https://gdevelop-app.com/contribute/");
+        }
+      },
+      {
+        label: "Create Extensions for GDevelop",
+        click() {
+          electron.shell.openExternal(
+            "https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md"
+          );
+        }
+      }
+    ]
   };
-  if (process.platform !== 'darwin') {
+  if (process.platform !== "darwin") {
     fileTemplate.submenu.push(
-      { type: 'separator' },
+      { type: "separator" },
       {
-        label: 'About GDevelop',
+        label: "About GDevelop",
         click() {
-          window.webContents.send('main-menu-open-about');
-        },
-      },
+          window.webContents.send("main-menu-open-about");
+        }
+      }
     );
   }
 
@@ -173,56 +175,56 @@ const buildMainMenuFor = window => {
     editTemplate,
     viewTemplate,
     windowTemplate,
-    helpTemplate,
+    helpTemplate
   ];
 
-  if (process.platform === 'darwin') {
+  if (process.platform === "darwin") {
     template.unshift({
       label: app.getName(),
       submenu: [
         {
-          label: 'About GDevelop',
+          label: "About GDevelop",
           click() {
-            window.webContents.send('main-menu-open-about');
-          },
+            window.webContents.send("main-menu-open-about");
+          }
         },
-        { type: 'separator' },
+        { type: "separator" },
         {
-          label: 'My Profile',
+          label: "My Profile",
           click() {
-            window.webContents.send('main-menu-open-profile');
-          },
+            window.webContents.send("main-menu-open-profile");
+          }
         },
         {
-          label: 'Preferences',
+          label: "Preferences",
           click() {
-            window.webContents.send('main-menu-open-preferences');
-          },
+            window.webContents.send("main-menu-open-preferences");
+          }
         },
-        { type: 'separator' },
-        { role: 'services', submenu: [] },
-        { type: 'separator' },
-        { role: 'hide' },
-        { role: 'hideothers' },
-        { role: 'unhide' },
-        { type: 'separator' },
-        { role: 'quit' },
-      ],
+        { type: "separator" },
+        { role: "services", submenu: [] },
+        { type: "separator" },
+        { role: "hide" },
+        { role: "hideothers" },
+        { role: "unhide" },
+        { type: "separator" },
+        { role: "quit" }
+      ]
     });
 
     editTemplate.submenu.push(
-      { type: 'separator' },
+      { type: "separator" },
       {
-        label: 'Speech',
-        submenu: [{ role: 'startspeaking' }, { role: 'stopspeaking' }],
+        label: "Speech",
+        submenu: [{ role: "startspeaking" }, { role: "stopspeaking" }]
       }
     );
 
     windowTemplate.submenu = [
-      { role: 'minimize' },
-      { role: 'zoom' },
-      { type: 'separator' },
-      { role: 'front' },
+      { role: "minimize" },
+      { role: "zoom" },
+      { type: "separator" },
+      { role: "front" }
     ];
   }
 

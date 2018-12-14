@@ -373,12 +373,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "VibrateOnce",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["VibrateOnce", "", "", ""],
               "subInstructions": []
             },
             {
@@ -386,10 +381,7 @@
                 "inverted": false,
                 "value": "MouseButtonReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -399,9 +391,7 @@
                 "inverted": false,
                 "value": "DeviceVibration::StartVibration"
               },
-              "parameters": [
-                "500"
-              ],
+              "parameters": ["500"],
               "subInstructions": []
             }
           ],
@@ -417,12 +407,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "VibrateMulti",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["VibrateMulti", "", "", ""],
               "subInstructions": []
             },
             {
@@ -430,10 +415,7 @@
                 "inverted": false,
                 "value": "MouseButtonReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -443,9 +425,7 @@
                 "inverted": false,
                 "value": "DeviceVibration::StartVibrationPattern"
               },
-              "parameters": [
-                "\"200,50,200,50,500,20,500,20,500,20,500\""
-              ],
+              "parameters": ["\"200,50,200,50,500,20,500,20,500,20,500\""],
               "subInstructions": []
             }
           ],
@@ -461,12 +441,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "StopVibration",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["StopVibration", "", "", ""],
               "subInstructions": []
             },
             {
@@ -474,10 +449,7 @@
                 "inverted": false,
                 "value": "MouseButtonReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],

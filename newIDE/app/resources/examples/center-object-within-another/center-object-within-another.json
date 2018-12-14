@@ -303,10 +303,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Right"
-              ],
+              "parameters": ["", "Right"],
               "subInstructions": []
             },
             {
@@ -338,11 +335,7 @@
                 "inverted": false,
                 "value": "ChangePlan"
               },
-              "parameters": [
-                "Brick",
-                "=",
-                "0"
-              ],
+              "parameters": ["Brick", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -373,10 +366,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -408,11 +398,7 @@
                 "inverted": false,
                 "value": "ChangePlan"
               },
-              "parameters": [
-                "Coin",
-                "=",
-                "1"
-              ],
+              "parameters": ["Coin", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -443,12 +429,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "Coin",
-                    "Brick",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["Coin", "Brick", "", ""],
                   "subInstructions": []
                 }
               ],

@@ -415,10 +415,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -426,11 +423,7 @@
                 "inverted": false,
                 "value": "Timer"
               },
-              "parameters": [
-                "",
-                "0.25",
-                "\"FireRate\""
-              ],
+              "parameters": ["", "0.25", "\"FireRate\""],
               "subInstructions": []
             }
           ],
@@ -454,13 +447,7 @@
                 "inverted": false,
                 "value": "AddForceVersPos"
               },
-              "parameters": [
-                "Bullet",
-                "MouseX()",
-                "MouseY()",
-                "300",
-                "1"
-              ],
+              "parameters": ["Bullet", "MouseX()", "MouseY()", "300", "1"],
               "subInstructions": []
             },
             {
@@ -468,10 +455,7 @@
                 "inverted": false,
                 "value": "ResetTimer"
               },
-              "parameters": [
-                "",
-                "\"FireRate\""
-              ],
+              "parameters": ["", "\"FireRate\""],
               "subInstructions": []
             }
           ],
@@ -488,13 +472,7 @@
                 "inverted": false,
                 "value": "MettreXY"
               },
-              "parameters": [
-                "Target",
-                "=",
-                "MouseX()",
-                "=",
-                "MouseY()"
-              ],
+              "parameters": ["Target", "=", "MouseX()", "=", "MouseY()"],
               "subInstructions": []
             },
             {
@@ -502,11 +480,7 @@
                 "inverted": false,
                 "value": "TourneVersPos"
               },
-              "parameters": [
-                "Tank",
-                "MouseX()",
-                "MouseY()"
-              ],
+              "parameters": ["Tank", "MouseX()", "MouseY()"],
               "subInstructions": []
             }
           ],
@@ -850,10 +824,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -861,11 +832,7 @@
                 "inverted": false,
                 "value": "Timer"
               },
-              "parameters": [
-                "",
-                "0.25",
-                "\"FireRate\""
-              ],
+              "parameters": ["", "0.25", "\"FireRate\""],
               "subInstructions": []
             }
           ],
@@ -875,10 +842,7 @@
                 "inverted": false,
                 "value": "ResetTimer"
               },
-              "parameters": [
-                "",
-                "\"FireRate\""
-              ],
+              "parameters": ["", "\"FireRate\""],
               "subInstructions": []
             }
           ],
@@ -949,11 +913,7 @@
                 "inverted": false,
                 "value": "TourneVersPos"
               },
-              "parameters": [
-                "Tank",
-                "MouseX(\"\",0)",
-                "MouseY(\"\",0)"
-              ],
+              "parameters": ["Tank", "MouseX(\"\",0)", "MouseY(\"\",0)"],
               "subInstructions": []
             },
             {
@@ -961,13 +921,7 @@
                 "inverted": false,
                 "value": "MettreXY"
               },
-              "parameters": [
-                "Target",
-                "=",
-                "MouseX()",
-                "=",
-                "MouseY()"
-              ],
+              "parameters": ["Target", "=", "MouseX()", "=", "MouseY()"],
               "subInstructions": []
             }
           ],

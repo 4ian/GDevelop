@@ -50,11 +50,11 @@ export default class MeasuresTable extends React.Component<Props, State> {
 
     const parentPercent =
       parentSection && section.time && parentSection.time !== 0
-        ? section.time / parentSection.time * 100
+        ? (section.time / parentSection.time) * 100
         : 100;
     const totalPercent =
       profilerMeasures && section.time && profilerMeasures.time !== 0
-        ? section.time / profilerMeasures.time * 100
+        ? (section.time / profilerMeasures.time) * 100
         : 100;
     const isCollapsed = this._isSectionCollapsed(path);
 

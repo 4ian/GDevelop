@@ -31,10 +31,7 @@ type State = {|
   showGDevelopSplash: boolean,
 |};
 
-class ProjectPropertiesDialog extends React.Component<
-  Props,
-  State
-> {
+class ProjectPropertiesDialog extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = this._loadFrom(props.project);
@@ -146,7 +143,8 @@ class ProjectPropertiesDialog extends React.Component<
             onChange={value =>
               this.setState({
                 windowDefaultWidth: Math.max(0, parseInt(value, 10)),
-              })}
+              })
+            }
           />
           <SemiControlledTextField
             floatingLabelText="Game's window height"
@@ -156,7 +154,8 @@ class ProjectPropertiesDialog extends React.Component<
             onChange={value =>
               this.setState({
                 windowDefaultHeight: Math.max(0, parseInt(value, 10)),
-              })}
+              })
+            }
           />
           <SemiControlledTextField
             floatingLabelText="Author name"
@@ -198,7 +197,8 @@ class ProjectPropertiesDialog extends React.Component<
             floatingLabelFixed
             value={sizeOnStartupMode}
             onChange={(e, i, value) =>
-              this.setState({ sizeOnStartupMode: value })}
+              this.setState({ sizeOnStartupMode: value })
+            }
           >
             <MenuItem value="" primaryText="No changes to the game size" />
             <MenuItem
@@ -238,7 +238,8 @@ class ProjectPropertiesDialog extends React.Component<
         </Dialog>
         <SubscriptionChecker
           ref={subscriptionChecker =>
-            (this._subscriptionChecker = subscriptionChecker)}
+            (this._subscriptionChecker = subscriptionChecker)
+          }
           onChangeSubscription={() => {
             this.props.onClose();
             this.props.onChangeSubscription();

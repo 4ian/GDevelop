@@ -101,8 +101,7 @@ export default class ImagePreview extends React.Component<Props, State> {
       imageWidth,
       imageHeight,
     });
-    if (this.props.onSize)
-      this.props.onSize(imageWidth, imageHeight);
+    if (this.props.onSize) this.props.onSize(imageWidth, imageHeight);
   };
 
   render() {

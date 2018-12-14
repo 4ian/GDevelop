@@ -52,7 +52,5 @@ const ThemableLayerRow = ({
   </TableRow>
 );
 
-const LayerRow = muiThemeable()(
-  ThemableLayerRow
-);
+const LayerRow = muiThemeable()(ThemableLayerRow);
 export default LayerRow;

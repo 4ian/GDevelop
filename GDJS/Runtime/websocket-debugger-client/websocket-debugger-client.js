@@ -47,7 +47,7 @@ gdjs.WebsocketDebuggerClient = function(runtimegame) {
         } else if (data.command === 'call') {
           that.call(data.path, data.args);
         } else if (data.command === 'profiler.start') {
-          runtimegame.startCurrentSceneProfiler(function (stoppedProfiler) {
+          runtimegame.startCurrentSceneProfiler(function(stoppedProfiler) {
             that.sendProfilerOutput(
               stoppedProfiler.getFramesAverageMeasures(),
               stoppedProfiler.getStats()

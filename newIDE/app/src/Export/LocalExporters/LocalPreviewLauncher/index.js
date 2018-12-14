@@ -202,7 +202,8 @@ export default class LocalPreviewLauncher extends React.Component<
       <React.Fragment>
         <SubscriptionChecker
           ref={subscriptionChecker =>
-            (this._subscriptionChecker = subscriptionChecker)}
+            (this._subscriptionChecker = subscriptionChecker)
+          }
           onChangeSubscription={() => {
             this.setState({ networkPreviewDialogOpen: false });
             if (this.props.onChangeSubscription)

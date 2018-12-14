@@ -460,10 +460,7 @@
                     "inverted": false,
                     "value": "MouseButtonReleased"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -479,12 +476,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "new_button",
-                        "",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["new_button", "", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -494,11 +486,7 @@
                         "inverted": false,
                         "value": "ModVarGlobal"
                       },
-                      "parameters": [
-                        "load",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["load", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -506,11 +494,7 @@
                         "inverted": false,
                         "value": "Scene"
                       },
-                      "parameters": [
-                        "",
-                        "\"scene1\"",
-                        "true"
-                      ],
+                      "parameters": ["", "\"scene1\"", "true"],
                       "subInstructions": []
                     }
                   ],
@@ -526,12 +510,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "load_button",
-                        "",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["load_button", "", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -541,11 +520,7 @@
                         "inverted": false,
                         "value": "ModVarGlobal"
                       },
-                      "parameters": [
-                        "load",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["load", "=", "1"],
                       "subInstructions": []
                     },
                     {
@@ -553,11 +528,7 @@
                         "inverted": false,
                         "value": "Scene"
                       },
-                      "parameters": [
-                        "",
-                        "\"scene1\"",
-                        "true"
-                      ],
+                      "parameters": ["", "\"scene1\"", "true"],
                       "subInstructions": []
                     }
                   ],
@@ -1175,9 +1146,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -1209,11 +1178,7 @@
                         "inverted": false,
                         "value": "ModVarGlobal"
                       },
-                      "parameters": [
-                        "high_score",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["high_score", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -1256,11 +1221,7 @@
                         "inverted": false,
                         "value": "VarGlobal"
                       },
-                      "parameters": [
-                        "load",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["load", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1368,10 +1329,7 @@
                             "inverted": false,
                             "value": "GroupExists"
                           },
-                          "parameters": [
-                            "\"save\"",
-                            "\"high_score\""
-                          ],
+                          "parameters": ["\"save\"", "\"high_score\""],
                           "subInstructions": []
                         }
                       ],
@@ -1394,11 +1352,7 @@
                             "inverted": false,
                             "value": "ModVarGlobal"
                           },
-                          "parameters": [
-                            "high_score",
-                            "=",
-                            "Variable(score)"
-                          ],
+                          "parameters": ["high_score", "=", "Variable(score)"],
                           "subInstructions": []
                         },
                         {
@@ -1459,10 +1413,7 @@
                     "inverted": false,
                     "value": "MouseButtonReleased"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -1478,12 +1429,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "save_button",
-                        "",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["save_button", "", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -1601,12 +1547,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "back_button",
-                        "q",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["back_button", "q", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -1638,11 +1579,7 @@
                             "inverted": false,
                             "value": "Scene"
                           },
-                          "parameters": [
-                            "",
-                            "\"main\"",
-                            "true"
-                          ],
+                          "parameters": ["", "\"main\"", "true"],
                           "subInstructions": []
                         }
                       ],
@@ -1677,10 +1614,7 @@
                     "inverted": false,
                     "value": "DraggableBehavior::Dragged"
                   },
-                  "parameters": [
-                    "character",
-                    "Draggable"
-                  ],
+                  "parameters": ["character", "Draggable"],
                   "subInstructions": []
                 }
               ],
@@ -1690,11 +1624,7 @@
                     "inverted": false,
                     "value": "ModVarGlobal"
                   },
-                  "parameters": [
-                    "high_score",
-                    "+",
-                    "1"
-                  ],
+                  "parameters": ["high_score", "+", "1"],
                   "subInstructions": []
                 },
                 {

@@ -4632,10 +4632,14 @@ declare module 'material-ui/Badge/index.js' {
   declare module.exports: $Exports<'material-ui/Badge/index'>;
 }
 declare module 'material-ui/BottomNavigation/BottomNavigation.js' {
-  declare module.exports: $Exports<'material-ui/BottomNavigation/BottomNavigation'>;
+  declare module.exports: $Exports<
+    'material-ui/BottomNavigation/BottomNavigation'
+  >;
 }
 declare module 'material-ui/BottomNavigation/BottomNavigationItem.js' {
-  declare module.exports: $Exports<'material-ui/BottomNavigation/BottomNavigationItem'>;
+  declare module.exports: $Exports<
+    'material-ui/BottomNavigation/BottomNavigationItem'
+  >;
 }
 declare module 'material-ui/BottomNavigation/index.js' {
   declare module.exports: $Exports<'material-ui/BottomNavigation/index'>;
@@ -4677,7 +4681,9 @@ declare module 'material-ui/Chip/index.js' {
   declare module.exports: $Exports<'material-ui/Chip/index'>;
 }
 declare module 'material-ui/CircularProgress/CircularProgress.js' {
-  declare module.exports: $Exports<'material-ui/CircularProgress/CircularProgress'>;
+  declare module.exports: $Exports<
+    'material-ui/CircularProgress/CircularProgress'
+  >;
 }
 declare module 'material-ui/CircularProgress/index.js' {
   declare module.exports: $Exports<'material-ui/CircularProgress/index'>;
@@ -4686,7 +4692,9 @@ declare module 'material-ui/DatePicker/Calendar.js' {
   declare module.exports: $Exports<'material-ui/DatePicker/Calendar'>;
 }
 declare module 'material-ui/DatePicker/CalendarActionButtons.js' {
-  declare module.exports: $Exports<'material-ui/DatePicker/CalendarActionButtons'>;
+  declare module.exports: $Exports<
+    'material-ui/DatePicker/CalendarActionButtons'
+  >;
 }
 declare module 'material-ui/DatePicker/CalendarMonth.js' {
   declare module.exports: $Exports<'material-ui/DatePicker/CalendarMonth'>;
@@ -4752,7 +4760,9 @@ declare module 'material-ui/FlatButton/index.js' {
   declare module.exports: $Exports<'material-ui/FlatButton/index'>;
 }
 declare module 'material-ui/FloatingActionButton/FloatingActionButton.js' {
-  declare module.exports: $Exports<'material-ui/FloatingActionButton/FloatingActionButton'>;
+  declare module.exports: $Exports<
+    'material-ui/FloatingActionButton/FloatingActionButton'
+  >;
 }
 declare module 'material-ui/FloatingActionButton/index.js' {
   declare module.exports: $Exports<'material-ui/FloatingActionButton/index'>;
@@ -4821,7 +4831,9 @@ declare module 'material-ui/internal/ExpandTransition.js' {
   declare module.exports: $Exports<'material-ui/internal/ExpandTransition'>;
 }
 declare module 'material-ui/internal/ExpandTransitionChild.js' {
-  declare module.exports: $Exports<'material-ui/internal/ExpandTransitionChild'>;
+  declare module.exports: $Exports<
+    'material-ui/internal/ExpandTransitionChild'
+  >;
 }
 declare module 'material-ui/internal/FocusRipple.js' {
   declare module.exports: $Exports<'material-ui/internal/FocusRipple'>;
@@ -4899,10 +4911,14 @@ declare module 'material-ui/Popover/Popover.js' {
   declare module.exports: $Exports<'material-ui/Popover/Popover'>;
 }
 declare module 'material-ui/Popover/PopoverAnimationDefault.js' {
-  declare module.exports: $Exports<'material-ui/Popover/PopoverAnimationDefault'>;
+  declare module.exports: $Exports<
+    'material-ui/Popover/PopoverAnimationDefault'
+  >;
 }
 declare module 'material-ui/Popover/PopoverAnimationVertical.js' {
-  declare module.exports: $Exports<'material-ui/Popover/PopoverAnimationVertical'>;
+  declare module.exports: $Exports<
+    'material-ui/Popover/PopoverAnimationVertical'
+  >;
 }
 declare module 'material-ui/RadioButton/index.js' {
   declare module.exports: $Exports<'material-ui/RadioButton/index'>;
@@ -4923,7 +4939,9 @@ declare module 'material-ui/RefreshIndicator/index.js' {
   declare module.exports: $Exports<'material-ui/RefreshIndicator/index'>;
 }
 declare module 'material-ui/RefreshIndicator/RefreshIndicator.js' {
-  declare module.exports: $Exports<'material-ui/RefreshIndicator/RefreshIndicator'>;
+  declare module.exports: $Exports<
+    'material-ui/RefreshIndicator/RefreshIndicator'
+  >;
 }
 declare module 'material-ui/SelectField/index.js' {
   declare module.exports: $Exports<'material-ui/SelectField/index'>;
@@ -4968,10 +4986,14 @@ declare module 'material-ui/Stepper/Stepper.js' {
   declare module.exports: $Exports<'material-ui/Stepper/Stepper'>;
 }
 declare module 'material-ui/styles/baseThemes/darkBaseTheme.js' {
-  declare module.exports: $Exports<'material-ui/styles/baseThemes/darkBaseTheme'>;
+  declare module.exports: $Exports<
+    'material-ui/styles/baseThemes/darkBaseTheme'
+  >;
 }
 declare module 'material-ui/styles/baseThemes/lightBaseTheme.js' {
-  declare module.exports: $Exports<'material-ui/styles/baseThemes/lightBaseTheme'>;
+  declare module.exports: $Exports<
+    'material-ui/styles/baseThemes/lightBaseTheme'
+  >;
 }
 declare module 'material-ui/styles/colors.js' {
   declare module.exports: $Exports<'material-ui/styles/colors'>;
@@ -5007,25 +5029,35 @@ declare module 'material-ui/Subheader/Subheader.js' {
   declare module.exports: $Exports<'material-ui/Subheader/Subheader'>;
 }
 declare module 'material-ui/svg-icons/action/accessibility.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/accessibility'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/accessibility'
+  >;
 }
 declare module 'material-ui/svg-icons/action/accessible.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/accessible'>;
 }
 declare module 'material-ui/svg-icons/action/account-balance-wallet.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/account-balance-wallet'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/account-balance-wallet'
+  >;
 }
 declare module 'material-ui/svg-icons/action/account-balance.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/account-balance'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/account-balance'
+  >;
 }
 declare module 'material-ui/svg-icons/action/account-box.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/account-box'>;
 }
 declare module 'material-ui/svg-icons/action/account-circle.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/account-circle'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/account-circle'
+  >;
 }
 declare module 'material-ui/svg-icons/action/add-shopping-cart.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/add-shopping-cart'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/add-shopping-cart'
+  >;
 }
 declare module 'material-ui/svg-icons/action/alarm-add.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/alarm-add'>;
@@ -5055,19 +5087,29 @@ declare module 'material-ui/svg-icons/action/assessment.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/assessment'>;
 }
 declare module 'material-ui/svg-icons/action/assignment-ind.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/assignment-ind'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/assignment-ind'
+  >;
 }
 declare module 'material-ui/svg-icons/action/assignment-late.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/assignment-late'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/assignment-late'
+  >;
 }
 declare module 'material-ui/svg-icons/action/assignment-return.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/assignment-return'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/assignment-return'
+  >;
 }
 declare module 'material-ui/svg-icons/action/assignment-returned.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/assignment-returned'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/assignment-returned'
+  >;
 }
 declare module 'material-ui/svg-icons/action/assignment-turned-in.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/assignment-turned-in'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/assignment-turned-in'
+  >;
 }
 declare module 'material-ui/svg-icons/action/assignment.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/assignment'>;
@@ -5082,7 +5124,9 @@ declare module 'material-ui/svg-icons/action/book.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/book'>;
 }
 declare module 'material-ui/svg-icons/action/bookmark-border.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/bookmark-border'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/bookmark-border'
+  >;
 }
 declare module 'material-ui/svg-icons/action/bookmark.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/bookmark'>;
@@ -5097,25 +5141,35 @@ declare module 'material-ui/svg-icons/action/cached.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/cached'>;
 }
 declare module 'material-ui/svg-icons/action/camera-enhance.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/camera-enhance'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/camera-enhance'
+  >;
 }
 declare module 'material-ui/svg-icons/action/card-giftcard.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/card-giftcard'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/card-giftcard'
+  >;
 }
 declare module 'material-ui/svg-icons/action/card-membership.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/card-membership'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/card-membership'
+  >;
 }
 declare module 'material-ui/svg-icons/action/card-travel.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/card-travel'>;
 }
 declare module 'material-ui/svg-icons/action/change-history.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/change-history'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/change-history'
+  >;
 }
 declare module 'material-ui/svg-icons/action/check-circle.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/check-circle'>;
 }
 declare module 'material-ui/svg-icons/action/chrome-reader-mode.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/chrome-reader-mode'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/chrome-reader-mode'
+  >;
 }
 declare module 'material-ui/svg-icons/action/class.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/class'>;
@@ -5124,7 +5178,9 @@ declare module 'material-ui/svg-icons/action/code.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/code'>;
 }
 declare module 'material-ui/svg-icons/action/compare-arrows.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/compare-arrows'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/compare-arrows'
+  >;
 }
 declare module 'material-ui/svg-icons/action/copyright.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/copyright'>;
@@ -5139,7 +5195,9 @@ declare module 'material-ui/svg-icons/action/date-range.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/date-range'>;
 }
 declare module 'material-ui/svg-icons/action/delete-forever.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/delete-forever'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/delete-forever'
+  >;
 }
 declare module 'material-ui/svg-icons/action/delete.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/delete'>;
@@ -5187,7 +5245,9 @@ declare module 'material-ui/svg-icons/action/face.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/face'>;
 }
 declare module 'material-ui/svg-icons/action/favorite-border.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/favorite-border'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/favorite-border'
+  >;
 }
 declare module 'material-ui/svg-icons/action/favorite.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/favorite'>;
@@ -5208,13 +5268,17 @@ declare module 'material-ui/svg-icons/action/flight-land.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/flight-land'>;
 }
 declare module 'material-ui/svg-icons/action/flight-takeoff.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/flight-takeoff'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/flight-takeoff'
+  >;
 }
 declare module 'material-ui/svg-icons/action/flip-to-back.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/flip-to-back'>;
 }
 declare module 'material-ui/svg-icons/action/flip-to-front.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/flip-to-front'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/flip-to-front'
+  >;
 }
 declare module 'material-ui/svg-icons/action/g-translate.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/g-translate'>;
@@ -5241,7 +5305,9 @@ declare module 'material-ui/svg-icons/action/help.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/help'>;
 }
 declare module 'material-ui/svg-icons/action/highlight-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/highlight-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/highlight-off'
+  >;
 }
 declare module 'material-ui/svg-icons/action/history.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/history'>;
@@ -5250,10 +5316,14 @@ declare module 'material-ui/svg-icons/action/home.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/home'>;
 }
 declare module 'material-ui/svg-icons/action/hourglass-empty.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/hourglass-empty'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/hourglass-empty'
+  >;
 }
 declare module 'material-ui/svg-icons/action/hourglass-full.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/hourglass-full'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/hourglass-full'
+  >;
 }
 declare module 'material-ui/svg-icons/action/http.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/http'>;
@@ -5262,7 +5332,9 @@ declare module 'material-ui/svg-icons/action/https.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/https'>;
 }
 declare module 'material-ui/svg-icons/action/important-devices.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/important-devices'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/important-devices'
+  >;
 }
 declare module 'material-ui/svg-icons/action/info-outline.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/info-outline'>;
@@ -5274,10 +5346,14 @@ declare module 'material-ui/svg-icons/action/input.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/input'>;
 }
 declare module 'material-ui/svg-icons/action/invert-colors.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/invert-colors'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/invert-colors'
+  >;
 }
 declare module 'material-ui/svg-icons/action/label-outline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/label-outline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/label-outline'
+  >;
 }
 declare module 'material-ui/svg-icons/action/label.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/label'>;
@@ -5289,7 +5365,9 @@ declare module 'material-ui/svg-icons/action/launch.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/launch'>;
 }
 declare module 'material-ui/svg-icons/action/lightbulb-outline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/lightbulb-outline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/lightbulb-outline'
+  >;
 }
 declare module 'material-ui/svg-icons/action/line-style.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/line-style'>;
@@ -5313,7 +5391,9 @@ declare module 'material-ui/svg-icons/action/loyalty.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/loyalty'>;
 }
 declare module 'material-ui/svg-icons/action/markunread-mailbox.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/markunread-mailbox'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/markunread-mailbox'
+  >;
 }
 declare module 'material-ui/svg-icons/action/motorcycle.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/motorcycle'>;
@@ -5328,7 +5408,9 @@ declare module 'material-ui/svg-icons/action/opacity.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/opacity'>;
 }
 declare module 'material-ui/svg-icons/action/open-in-browser.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/open-in-browser'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/open-in-browser'
+  >;
 }
 declare module 'material-ui/svg-icons/action/open-in-new.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/open-in-new'>;
@@ -5346,76 +5428,110 @@ declare module 'material-ui/svg-icons/action/payment.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/payment'>;
 }
 declare module 'material-ui/svg-icons/action/perm-camera-mic.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/perm-camera-mic'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/perm-camera-mic'
+  >;
 }
 declare module 'material-ui/svg-icons/action/perm-contact-calendar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/perm-contact-calendar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/perm-contact-calendar'
+  >;
 }
 declare module 'material-ui/svg-icons/action/perm-data-setting.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/perm-data-setting'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/perm-data-setting'
+  >;
 }
 declare module 'material-ui/svg-icons/action/perm-device-information.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/perm-device-information'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/perm-device-information'
+  >;
 }
 declare module 'material-ui/svg-icons/action/perm-identity.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/perm-identity'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/perm-identity'
+  >;
 }
 declare module 'material-ui/svg-icons/action/perm-media.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/perm-media'>;
 }
 declare module 'material-ui/svg-icons/action/perm-phone-msg.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/perm-phone-msg'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/perm-phone-msg'
+  >;
 }
 declare module 'material-ui/svg-icons/action/perm-scan-wifi.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/perm-scan-wifi'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/perm-scan-wifi'
+  >;
 }
 declare module 'material-ui/svg-icons/action/pets.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/pets'>;
 }
 declare module 'material-ui/svg-icons/action/picture-in-picture-alt.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/picture-in-picture-alt'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/picture-in-picture-alt'
+  >;
 }
 declare module 'material-ui/svg-icons/action/picture-in-picture.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/picture-in-picture'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/picture-in-picture'
+  >;
 }
 declare module 'material-ui/svg-icons/action/play-for-work.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/play-for-work'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/play-for-work'
+  >;
 }
 declare module 'material-ui/svg-icons/action/polymer.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/polymer'>;
 }
 declare module 'material-ui/svg-icons/action/power-settings-new.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/power-settings-new'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/power-settings-new'
+  >;
 }
 declare module 'material-ui/svg-icons/action/pregnant-woman.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/pregnant-woman'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/pregnant-woman'
+  >;
 }
 declare module 'material-ui/svg-icons/action/print.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/print'>;
 }
 declare module 'material-ui/svg-icons/action/query-builder.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/query-builder'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/query-builder'
+  >;
 }
 declare module 'material-ui/svg-icons/action/question-answer.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/question-answer'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/question-answer'
+  >;
 }
 declare module 'material-ui/svg-icons/action/receipt.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/receipt'>;
 }
 declare module 'material-ui/svg-icons/action/record-voice-over.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/record-voice-over'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/record-voice-over'
+  >;
 }
 declare module 'material-ui/svg-icons/action/redeem.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/redeem'>;
 }
 declare module 'material-ui/svg-icons/action/remove-shopping-cart.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/remove-shopping-cart'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/remove-shopping-cart'
+  >;
 }
 declare module 'material-ui/svg-icons/action/reorder.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/reorder'>;
 }
 declare module 'material-ui/svg-icons/action/report-problem.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/report-problem'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/report-problem'
+  >;
 }
 declare module 'material-ui/svg-icons/action/restore-page.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/restore-page'>;
@@ -5427,7 +5543,9 @@ declare module 'material-ui/svg-icons/action/room.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/room'>;
 }
 declare module 'material-ui/svg-icons/action/rounded-corner.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/rounded-corner'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/rounded-corner'
+  >;
 }
 declare module 'material-ui/svg-icons/action/rowing.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/rowing'>;
@@ -5439,52 +5557,84 @@ declare module 'material-ui/svg-icons/action/search.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/search'>;
 }
 declare module 'material-ui/svg-icons/action/settings-applications.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-applications'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-applications'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-backup-restore.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-backup-restore'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-backup-restore'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-bluetooth.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-bluetooth'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-bluetooth'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-brightness.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-brightness'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-brightness'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-cell.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-cell'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-cell'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-ethernet.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-ethernet'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-ethernet'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-input-antenna.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-input-antenna'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-input-antenna'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-input-component.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-input-component'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-input-component'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-input-composite.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-input-composite'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-input-composite'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-input-hdmi.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-input-hdmi'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-input-hdmi'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-input-svideo.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-input-svideo'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-input-svideo'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-overscan.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-overscan'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-overscan'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-phone.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-phone'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-phone'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-power.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-power'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-power'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-remote.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-remote'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-remote'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings-voice.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/settings-voice'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/settings-voice'
+  >;
 }
 declare module 'material-ui/svg-icons/action/settings.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/settings'>;
@@ -5496,16 +5646,24 @@ declare module 'material-ui/svg-icons/action/shop.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/shop'>;
 }
 declare module 'material-ui/svg-icons/action/shopping-basket.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/shopping-basket'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/shopping-basket'
+  >;
 }
 declare module 'material-ui/svg-icons/action/shopping-cart.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/shopping-cart'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/shopping-cart'
+  >;
 }
 declare module 'material-ui/svg-icons/action/speaker-notes-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/speaker-notes-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/speaker-notes-off'
+  >;
 }
 declare module 'material-ui/svg-icons/action/speaker-notes.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/speaker-notes'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/speaker-notes'
+  >;
 }
 declare module 'material-ui/svg-icons/action/spellcheck.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/spellcheck'>;
@@ -5520,7 +5678,9 @@ declare module 'material-ui/svg-icons/action/subject.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/subject'>;
 }
 declare module 'material-ui/svg-icons/action/supervisor-account.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/supervisor-account'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/supervisor-account'
+  >;
 }
 declare module 'material-ui/svg-icons/action/swap-horiz.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/swap-horiz'>;
@@ -5529,13 +5689,19 @@ declare module 'material-ui/svg-icons/action/swap-vert.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/swap-vert'>;
 }
 declare module 'material-ui/svg-icons/action/swap-vertical-circle.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/swap-vertical-circle'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/swap-vertical-circle'
+  >;
 }
 declare module 'material-ui/svg-icons/action/system-update-alt.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/system-update-alt'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/system-update-alt'
+  >;
 }
 declare module 'material-ui/svg-icons/action/tab-unselected.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/tab-unselected'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/tab-unselected'
+  >;
 }
 declare module 'material-ui/svg-icons/action/tab.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/tab'>;
@@ -5544,7 +5710,9 @@ declare module 'material-ui/svg-icons/action/theaters.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/theaters'>;
 }
 declare module 'material-ui/svg-icons/action/three-d-rotation.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/three-d-rotation'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/three-d-rotation'
+  >;
 }
 declare module 'material-ui/svg-icons/action/thumb-down.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/thumb-down'>;
@@ -5553,7 +5721,9 @@ declare module 'material-ui/svg-icons/action/thumb-up.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/thumb-up'>;
 }
 declare module 'material-ui/svg-icons/action/thumbs-up-down.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/thumbs-up-down'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/thumbs-up-down'
+  >;
 }
 declare module 'material-ui/svg-icons/action/timeline.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/timeline'>;
@@ -5571,22 +5741,30 @@ declare module 'material-ui/svg-icons/action/touch-app.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/touch-app'>;
 }
 declare module 'material-ui/svg-icons/action/track-changes.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/track-changes'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/track-changes'
+  >;
 }
 declare module 'material-ui/svg-icons/action/translate.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/translate'>;
 }
 declare module 'material-ui/svg-icons/action/trending-down.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/trending-down'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/trending-down'
+  >;
 }
 declare module 'material-ui/svg-icons/action/trending-flat.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/trending-flat'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/trending-flat'
+  >;
 }
 declare module 'material-ui/svg-icons/action/trending-up.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/trending-up'>;
 }
 declare module 'material-ui/svg-icons/action/turned-in-not.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/turned-in-not'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/turned-in-not'
+  >;
 }
 declare module 'material-ui/svg-icons/action/turned-in.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/turned-in'>;
@@ -5595,7 +5773,9 @@ declare module 'material-ui/svg-icons/action/update.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/update'>;
 }
 declare module 'material-ui/svg-icons/action/verified-user.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/verified-user'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/verified-user'
+  >;
 }
 declare module 'material-ui/svg-icons/action/view-agenda.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/view-agenda'>;
@@ -5604,7 +5784,9 @@ declare module 'material-ui/svg-icons/action/view-array.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/view-array'>;
 }
 declare module 'material-ui/svg-icons/action/view-carousel.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/view-carousel'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/view-carousel'
+  >;
 }
 declare module 'material-ui/svg-icons/action/view-column.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/view-column'>;
@@ -5613,7 +5795,9 @@ declare module 'material-ui/svg-icons/action/view-day.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/view-day'>;
 }
 declare module 'material-ui/svg-icons/action/view-headline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/view-headline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/view-headline'
+  >;
 }
 declare module 'material-ui/svg-icons/action/view-list.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/view-list'>;
@@ -5631,7 +5815,9 @@ declare module 'material-ui/svg-icons/action/view-week.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/view-week'>;
 }
 declare module 'material-ui/svg-icons/action/visibility-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/visibility-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/visibility-off'
+  >;
 }
 declare module 'material-ui/svg-icons/action/visibility.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/visibility'>;
@@ -5643,7 +5829,9 @@ declare module 'material-ui/svg-icons/action/work.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/work'>;
 }
 declare module 'material-ui/svg-icons/action/youtube-searched-for.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/action/youtube-searched-for'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/action/youtube-searched-for'
+  >;
 }
 declare module 'material-ui/svg-icons/action/zoom-in.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/action/zoom-in'>;
@@ -5679,7 +5867,9 @@ declare module 'material-ui/svg-icons/av/av-timer.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/av-timer'>;
 }
 declare module 'material-ui/svg-icons/av/branding-watermark.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/branding-watermark'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/branding-watermark'
+  >;
 }
 declare module 'material-ui/svg-icons/av/call-to-action.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/call-to-action'>;
@@ -5700,7 +5890,9 @@ declare module 'material-ui/svg-icons/av/fast-rewind.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/fast-rewind'>;
 }
 declare module 'material-ui/svg-icons/av/featured-play-list.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/featured-play-list'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/featured-play-list'
+  >;
 }
 declare module 'material-ui/svg-icons/av/featured-video.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/featured-video'>;
@@ -5709,7 +5901,9 @@ declare module 'material-ui/svg-icons/av/fiber-dvr.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/fiber-dvr'>;
 }
 declare module 'material-ui/svg-icons/av/fiber-manual-record.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/fiber-manual-record'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/fiber-manual-record'
+  >;
 }
 declare module 'material-ui/svg-icons/av/fiber-new.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/fiber-new'>;
@@ -5718,7 +5912,9 @@ declare module 'material-ui/svg-icons/av/fiber-pin.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/fiber-pin'>;
 }
 declare module 'material-ui/svg-icons/av/fiber-smart-record.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/fiber-smart-record'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/fiber-smart-record'
+  >;
 }
 declare module 'material-ui/svg-icons/av/forward-10.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/forward-10'>;
@@ -5778,10 +5974,14 @@ declare module 'material-ui/svg-icons/av/note.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/note'>;
 }
 declare module 'material-ui/svg-icons/av/pause-circle-filled.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/pause-circle-filled'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/pause-circle-filled'
+  >;
 }
 declare module 'material-ui/svg-icons/av/pause-circle-outline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/pause-circle-outline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/pause-circle-outline'
+  >;
 }
 declare module 'material-ui/svg-icons/av/pause.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/pause'>;
@@ -5790,13 +5990,19 @@ declare module 'material-ui/svg-icons/av/play-arrow.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/play-arrow'>;
 }
 declare module 'material-ui/svg-icons/av/play-circle-filled.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/play-circle-filled'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/play-circle-filled'
+  >;
 }
 declare module 'material-ui/svg-icons/av/play-circle-outline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/play-circle-outline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/play-circle-outline'
+  >;
 }
 declare module 'material-ui/svg-icons/av/playlist-add-check.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/playlist-add-check'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/playlist-add-check'
+  >;
 }
 declare module 'material-ui/svg-icons/av/playlist-add.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/playlist-add'>;
@@ -5820,7 +6026,9 @@ declare module 'material-ui/svg-icons/av/recent-actors.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/recent-actors'>;
 }
 declare module 'material-ui/svg-icons/av/remove-from-queue.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/remove-from-queue'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/remove-from-queue'
+  >;
 }
 declare module 'material-ui/svg-icons/av/repeat-one.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/repeat-one'>;
@@ -5850,7 +6058,9 @@ declare module 'material-ui/svg-icons/av/skip-previous.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/skip-previous'>;
 }
 declare module 'material-ui/svg-icons/av/slow-motion-video.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/av/slow-motion-video'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/av/slow-motion-video'
+  >;
 }
 declare module 'material-ui/svg-icons/av/snooze.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/snooze'>;
@@ -5904,61 +6114,95 @@ declare module 'material-ui/svg-icons/av/web.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/av/web'>;
 }
 declare module 'material-ui/svg-icons/communication/business.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/business'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/business'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/call-end.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/call-end'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/call-end'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/call-made.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/call-made'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/call-made'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/call-merge.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/call-merge'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/call-merge'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/call-missed-outgoing.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/call-missed-outgoing'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/call-missed-outgoing'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/call-missed.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/call-missed'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/call-missed'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/call-received.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/call-received'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/call-received'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/call-split.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/call-split'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/call-split'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/call.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/communication/call'>;
 }
 declare module 'material-ui/svg-icons/communication/chat-bubble-outline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/chat-bubble-outline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/chat-bubble-outline'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/chat-bubble.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/chat-bubble'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/chat-bubble'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/chat.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/communication/chat'>;
 }
 declare module 'material-ui/svg-icons/communication/clear-all.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/clear-all'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/clear-all'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/comment.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/comment'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/comment'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/contact-mail.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/contact-mail'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/contact-mail'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/contact-phone.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/contact-phone'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/contact-phone'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/contacts.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/contacts'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/contacts'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/dialer-sip.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/dialer-sip'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/dialer-sip'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/dialpad.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/dialpad'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/dialpad'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/email.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/communication/email'>;
@@ -5967,97 +6211,155 @@ declare module 'material-ui/svg-icons/communication/forum.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/communication/forum'>;
 }
 declare module 'material-ui/svg-icons/communication/import-contacts.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/import-contacts'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/import-contacts'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/import-export.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/import-export'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/import-export'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/invert-colors-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/invert-colors-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/invert-colors-off'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/live-help.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/live-help'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/live-help'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/location-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/location-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/location-off'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/location-on.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/location-on'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/location-on'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/mail-outline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/mail-outline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/mail-outline'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/message.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/message'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/message'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/no-sim.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/no-sim'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/no-sim'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/phone.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/communication/phone'>;
 }
 declare module 'material-ui/svg-icons/communication/phonelink-erase.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/phonelink-erase'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/phonelink-erase'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/phonelink-lock.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/phonelink-lock'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/phonelink-lock'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/phonelink-ring.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/phonelink-ring'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/phonelink-ring'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/phonelink-setup.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/phonelink-setup'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/phonelink-setup'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/portable-wifi-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/portable-wifi-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/portable-wifi-off'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/present-to-all.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/present-to-all'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/present-to-all'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/ring-volume.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/ring-volume'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/ring-volume'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/rss-feed.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/rss-feed'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/rss-feed'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/screen-share.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/screen-share'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/screen-share'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/speaker-phone.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/speaker-phone'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/speaker-phone'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/stay-current-landscape.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/stay-current-landscape'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/stay-current-landscape'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/stay-current-portrait.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/stay-current-portrait'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/stay-current-portrait'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/stay-primary-landscape.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/stay-primary-landscape'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/stay-primary-landscape'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/stay-primary-portrait.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/stay-primary-portrait'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/stay-primary-portrait'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/stop-screen-share.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/stop-screen-share'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/stop-screen-share'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/swap-calls.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/swap-calls'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/swap-calls'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/textsms.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/textsms'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/textsms'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/voicemail.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/voicemail'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/voicemail'
+  >;
 }
 declare module 'material-ui/svg-icons/communication/vpn-key.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/communication/vpn-key'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/communication/vpn-key'
+  >;
 }
 declare module 'material-ui/svg-icons/content/add-box.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/add-box'>;
 }
 declare module 'material-ui/svg-icons/content/add-circle-outline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/content/add-circle-outline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/content/add-circle-outline'
+  >;
 }
 declare module 'material-ui/svg-icons/content/add-circle.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/add-circle'>;
@@ -6078,19 +6380,25 @@ declare module 'material-ui/svg-icons/content/clear.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/clear'>;
 }
 declare module 'material-ui/svg-icons/content/content-copy.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/content/content-copy'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/content/content-copy'
+  >;
 }
 declare module 'material-ui/svg-icons/content/content-cut.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/content-cut'>;
 }
 declare module 'material-ui/svg-icons/content/content-paste.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/content/content-paste'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/content/content-paste'
+  >;
 }
 declare module 'material-ui/svg-icons/content/create.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/create'>;
 }
 declare module 'material-ui/svg-icons/content/delete-sweep.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/content/delete-sweep'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/content/delete-sweep'
+  >;
 }
 declare module 'material-ui/svg-icons/content/drafts.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/drafts'>;
@@ -6102,7 +6410,9 @@ declare module 'material-ui/svg-icons/content/flag.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/flag'>;
 }
 declare module 'material-ui/svg-icons/content/font-download.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/content/font-download'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/content/font-download'
+  >;
 }
 declare module 'material-ui/svg-icons/content/forward.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/forward'>;
@@ -6117,7 +6427,9 @@ declare module 'material-ui/svg-icons/content/link.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/link'>;
 }
 declare module 'material-ui/svg-icons/content/low-priority.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/content/low-priority'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/content/low-priority'
+  >;
 }
 declare module 'material-ui/svg-icons/content/mail.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/mail'>;
@@ -6126,7 +6438,9 @@ declare module 'material-ui/svg-icons/content/markunread.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/markunread'>;
 }
 declare module 'material-ui/svg-icons/content/move-to-inbox.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/content/move-to-inbox'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/content/move-to-inbox'
+  >;
 }
 declare module 'material-ui/svg-icons/content/next-week.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/next-week'>;
@@ -6135,10 +6449,14 @@ declare module 'material-ui/svg-icons/content/redo.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/redo'>;
 }
 declare module 'material-ui/svg-icons/content/remove-circle-outline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/content/remove-circle-outline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/content/remove-circle-outline'
+  >;
 }
 declare module 'material-ui/svg-icons/content/remove-circle.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/content/remove-circle'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/content/remove-circle'
+  >;
 }
 declare module 'material-ui/svg-icons/content/remove.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/content/remove'>;
@@ -6180,7 +6498,9 @@ declare module 'material-ui/svg-icons/device/access-alarm.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/access-alarm'>;
 }
 declare module 'material-ui/svg-icons/device/access-alarms.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/access-alarms'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/access-alarms'
+  >;
 }
 declare module 'material-ui/svg-icons/device/access-time.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/access-time'>;
@@ -6189,10 +6509,14 @@ declare module 'material-ui/svg-icons/device/add-alarm.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/add-alarm'>;
 }
 declare module 'material-ui/svg-icons/device/airplanemode-active.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/airplanemode-active'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/airplanemode-active'
+  >;
 }
 declare module 'material-ui/svg-icons/device/airplanemode-inactive.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/airplanemode-inactive'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/airplanemode-inactive'
+  >;
 }
 declare module 'material-ui/svg-icons/device/battery-20.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/battery-20'>;
@@ -6213,28 +6537,44 @@ declare module 'material-ui/svg-icons/device/battery-90.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/battery-90'>;
 }
 declare module 'material-ui/svg-icons/device/battery-alert.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/battery-alert'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/battery-alert'
+  >;
 }
 declare module 'material-ui/svg-icons/device/battery-charging-20.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/battery-charging-20'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/battery-charging-20'
+  >;
 }
 declare module 'material-ui/svg-icons/device/battery-charging-30.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/battery-charging-30'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/battery-charging-30'
+  >;
 }
 declare module 'material-ui/svg-icons/device/battery-charging-50.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/battery-charging-50'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/battery-charging-50'
+  >;
 }
 declare module 'material-ui/svg-icons/device/battery-charging-60.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/battery-charging-60'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/battery-charging-60'
+  >;
 }
 declare module 'material-ui/svg-icons/device/battery-charging-80.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/battery-charging-80'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/battery-charging-80'
+  >;
 }
 declare module 'material-ui/svg-icons/device/battery-charging-90.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/battery-charging-90'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/battery-charging-90'
+  >;
 }
 declare module 'material-ui/svg-icons/device/battery-charging-full.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/battery-charging-full'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/battery-charging-full'
+  >;
 }
 declare module 'material-ui/svg-icons/device/battery-full.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/battery-full'>;
@@ -6243,37 +6583,55 @@ declare module 'material-ui/svg-icons/device/battery-std.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/battery-std'>;
 }
 declare module 'material-ui/svg-icons/device/battery-unknown.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/battery-unknown'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/battery-unknown'
+  >;
 }
 declare module 'material-ui/svg-icons/device/bluetooth-connected.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/bluetooth-connected'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/bluetooth-connected'
+  >;
 }
 declare module 'material-ui/svg-icons/device/bluetooth-disabled.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/bluetooth-disabled'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/bluetooth-disabled'
+  >;
 }
 declare module 'material-ui/svg-icons/device/bluetooth-searching.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/bluetooth-searching'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/bluetooth-searching'
+  >;
 }
 declare module 'material-ui/svg-icons/device/bluetooth.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/bluetooth'>;
 }
 declare module 'material-ui/svg-icons/device/brightness-auto.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/brightness-auto'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/brightness-auto'
+  >;
 }
 declare module 'material-ui/svg-icons/device/brightness-high.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/brightness-high'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/brightness-high'
+  >;
 }
 declare module 'material-ui/svg-icons/device/brightness-low.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/brightness-low'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/brightness-low'
+  >;
 }
 declare module 'material-ui/svg-icons/device/brightness-medium.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/brightness-medium'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/brightness-medium'
+  >;
 }
 declare module 'material-ui/svg-icons/device/data-usage.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/data-usage'>;
 }
 declare module 'material-ui/svg-icons/device/developer-mode.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/developer-mode'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/developer-mode'
+  >;
 }
 declare module 'material-ui/svg-icons/device/devices.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/devices'>;
@@ -6285,7 +6643,9 @@ declare module 'material-ui/svg-icons/device/gps-fixed.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/gps-fixed'>;
 }
 declare module 'material-ui/svg-icons/device/gps-not-fixed.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/gps-not-fixed'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/gps-not-fixed'
+  >;
 }
 declare module 'material-ui/svg-icons/device/gps-off.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/gps-off'>;
@@ -6294,10 +6654,14 @@ declare module 'material-ui/svg-icons/device/graphic-eq.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/graphic-eq'>;
 }
 declare module 'material-ui/svg-icons/device/location-disabled.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/location-disabled'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/location-disabled'
+  >;
 }
 declare module 'material-ui/svg-icons/device/location-searching.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/location-searching'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/location-searching'
+  >;
 }
 declare module 'material-ui/svg-icons/device/network-cell.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/network-cell'>;
@@ -6309,91 +6673,147 @@ declare module 'material-ui/svg-icons/device/nfc.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/nfc'>;
 }
 declare module 'material-ui/svg-icons/device/screen-lock-landscape.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/screen-lock-landscape'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/screen-lock-landscape'
+  >;
 }
 declare module 'material-ui/svg-icons/device/screen-lock-portrait.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/screen-lock-portrait'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/screen-lock-portrait'
+  >;
 }
 declare module 'material-ui/svg-icons/device/screen-lock-rotation.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/screen-lock-rotation'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/screen-lock-rotation'
+  >;
 }
 declare module 'material-ui/svg-icons/device/screen-rotation.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/screen-rotation'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/screen-rotation'
+  >;
 }
 declare module 'material-ui/svg-icons/device/sd-storage.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/sd-storage'>;
 }
 declare module 'material-ui/svg-icons/device/settings-system-daydream.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/settings-system-daydream'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/settings-system-daydream'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-0-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-0-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-0-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-1-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-1-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-1-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-2-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-2-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-2-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-3-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-3-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-3-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-4-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-4-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-4-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-connected-no-internet-0-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-connected-no-internet-0-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-connected-no-internet-0-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-connected-no-internet-1-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-connected-no-internet-1-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-connected-no-internet-1-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-connected-no-internet-2-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-connected-no-internet-2-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-connected-no-internet-2-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-connected-no-internet-3-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-connected-no-internet-3-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-connected-no-internet-3-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-connected-no-internet-4-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-connected-no-internet-4-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-connected-no-internet-4-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-no-sim.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-no-sim'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-no-sim'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-null.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-null'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-null'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-cellular-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-cellular-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-cellular-off'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-wifi-0-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-wifi-0-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-wifi-0-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-wifi-1-bar-lock.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-wifi-1-bar-lock'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-wifi-1-bar-lock'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-wifi-1-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-wifi-1-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-wifi-1-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-wifi-2-bar-lock.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-wifi-2-bar-lock'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-wifi-2-bar-lock'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-wifi-2-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-wifi-2-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-wifi-2-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-wifi-3-bar-lock.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-wifi-3-bar-lock'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-wifi-3-bar-lock'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-wifi-3-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-wifi-3-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-wifi-3-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-wifi-4-bar-lock.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-wifi-4-bar-lock'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-wifi-4-bar-lock'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-wifi-4-bar.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-wifi-4-bar'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-wifi-4-bar'
+  >;
 }
 declare module 'material-ui/svg-icons/device/signal-wifi-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/signal-wifi-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/signal-wifi-off'
+  >;
 }
 declare module 'material-ui/svg-icons/device/storage.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/storage'>;
@@ -6411,7 +6831,9 @@ declare module 'material-ui/svg-icons/device/wifi-lock.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/device/wifi-lock'>;
 }
 declare module 'material-ui/svg-icons/device/wifi-tethering.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/device/wifi-tethering'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/device/wifi-tethering'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/attach-file.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/attach-file'>;
@@ -6423,7 +6845,9 @@ declare module 'material-ui/svg-icons/editor/border-all.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/border-all'>;
 }
 declare module 'material-ui/svg-icons/editor/border-bottom.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/border-bottom'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/border-bottom'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/border-clear.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/border-clear'>;
@@ -6432,7 +6856,9 @@ declare module 'material-ui/svg-icons/editor/border-color.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/border-color'>;
 }
 declare module 'material-ui/svg-icons/editor/border-horizontal.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/border-horizontal'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/border-horizontal'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/border-inner.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/border-inner'>;
@@ -6453,7 +6879,9 @@ declare module 'material-ui/svg-icons/editor/border-top.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/border-top'>;
 }
 declare module 'material-ui/svg-icons/editor/border-vertical.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/border-vertical'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/border-vertical'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/bubble-chart.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/bubble-chart'>;
@@ -6462,16 +6890,24 @@ declare module 'material-ui/svg-icons/editor/drag-handle.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/drag-handle'>;
 }
 declare module 'material-ui/svg-icons/editor/format-align-center.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-align-center'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-align-center'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-align-justify.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-align-justify'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-align-justify'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-align-left.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-align-left'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-align-left'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-align-right.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-align-right'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-align-right'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-bold.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/format-bold'>;
@@ -6480,31 +6916,49 @@ declare module 'material-ui/svg-icons/editor/format-clear.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/format-clear'>;
 }
 declare module 'material-ui/svg-icons/editor/format-color-fill.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-color-fill'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-color-fill'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-color-reset.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-color-reset'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-color-reset'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-color-text.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-color-text'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-color-text'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-indent-decrease.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-indent-decrease'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-indent-decrease'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-indent-increase.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-indent-increase'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-indent-increase'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-italic.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-italic'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-italic'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-line-spacing.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-line-spacing'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-line-spacing'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-list-bulleted.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-list-bulleted'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-list-bulleted'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-list-numbered.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-list-numbered'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-list-numbered'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-paint.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/format-paint'>;
@@ -6513,22 +6967,32 @@ declare module 'material-ui/svg-icons/editor/format-quote.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/format-quote'>;
 }
 declare module 'material-ui/svg-icons/editor/format-shapes.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-shapes'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-shapes'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-size.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/format-size'>;
 }
 declare module 'material-ui/svg-icons/editor/format-strikethrough.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-strikethrough'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-strikethrough'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-textdirection-l-to-r.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-textdirection-l-to-r'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-textdirection-l-to-r'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-textdirection-r-to-l.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-textdirection-r-to-l'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-textdirection-r-to-l'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/format-underlined.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/format-underlined'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/format-underlined'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/functions.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/functions'>;
@@ -6540,16 +7004,24 @@ declare module 'material-ui/svg-icons/editor/insert-chart.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/insert-chart'>;
 }
 declare module 'material-ui/svg-icons/editor/insert-comment.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/insert-comment'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/insert-comment'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/insert-drive-file.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/insert-drive-file'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/insert-drive-file'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/insert-emoticon.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/insert-emoticon'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/insert-emoticon'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/insert-invitation.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/insert-invitation'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/insert-invitation'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/insert-link.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/insert-link'>;
@@ -6570,16 +7042,22 @@ declare module 'material-ui/svg-icons/editor/mode-edit.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/mode-edit'>;
 }
 declare module 'material-ui/svg-icons/editor/monetization-on.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/monetization-on'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/monetization-on'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/money-off.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/money-off'>;
 }
 declare module 'material-ui/svg-icons/editor/multiline-chart.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/multiline-chart'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/multiline-chart'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/pie-chart-outlined.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/pie-chart-outlined'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/pie-chart-outlined'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/pie-chart.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/pie-chart'>;
@@ -6597,7 +7075,9 @@ declare module 'material-ui/svg-icons/editor/space-bar.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/space-bar'>;
 }
 declare module 'material-ui/svg-icons/editor/strikethrough-s.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/strikethrough-s'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/strikethrough-s'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/text-fields.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/text-fields'>;
@@ -6606,13 +7086,19 @@ declare module 'material-ui/svg-icons/editor/title.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/title'>;
 }
 declare module 'material-ui/svg-icons/editor/vertical-align-bottom.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/vertical-align-bottom'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/vertical-align-bottom'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/vertical-align-center.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/vertical-align-center'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/vertical-align-center'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/vertical-align-top.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/editor/vertical-align-top'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/editor/vertical-align-top'
+  >;
 }
 declare module 'material-ui/svg-icons/editor/wrap-text.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/editor/wrap-text'>;
@@ -6642,7 +7128,9 @@ declare module 'material-ui/svg-icons/file/cloud.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/file/cloud'>;
 }
 declare module 'material-ui/svg-icons/file/create-new-folder.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/file/create-new-folder'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/file/create-new-folder'
+  >;
 }
 declare module 'material-ui/svg-icons/file/file-download.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/file/file-download'>;
@@ -6660,7 +7148,9 @@ declare module 'material-ui/svg-icons/file/folder.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/file/folder'>;
 }
 declare module 'material-ui/svg-icons/hardware/cast-connected.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/cast-connected'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/cast-connected'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/cast.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/cast'>;
@@ -6669,19 +7159,27 @@ declare module 'material-ui/svg-icons/hardware/computer.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/computer'>;
 }
 declare module 'material-ui/svg-icons/hardware/desktop-mac.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/desktop-mac'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/desktop-mac'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/desktop-windows.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/desktop-windows'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/desktop-windows'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/developer-board.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/developer-board'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/developer-board'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/device-hub.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/device-hub'>;
 }
 declare module 'material-ui/svg-icons/hardware/devices-other.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/devices-other'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/devices-other'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/dock.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/dock'>;
@@ -6690,52 +7188,78 @@ declare module 'material-ui/svg-icons/hardware/gamepad.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/gamepad'>;
 }
 declare module 'material-ui/svg-icons/hardware/headset-mic.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/headset-mic'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/headset-mic'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/headset.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/headset'>;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard-arrow-down.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard-arrow-down'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/keyboard-arrow-down'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard-arrow-left.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard-arrow-left'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/keyboard-arrow-left'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard-arrow-right.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard-arrow-right'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/keyboard-arrow-right'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard-arrow-up.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard-arrow-up'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/keyboard-arrow-up'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard-backspace.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard-backspace'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/keyboard-backspace'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard-capslock.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard-capslock'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/keyboard-capslock'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard-hide.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard-hide'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/keyboard-hide'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard-return.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard-return'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/keyboard-return'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard-tab.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard-tab'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/keyboard-tab'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard-voice.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard-voice'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/keyboard-voice'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/keyboard.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/keyboard'>;
 }
 declare module 'material-ui/svg-icons/hardware/laptop-chromebook.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/laptop-chromebook'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/laptop-chromebook'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/laptop-mac.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/laptop-mac'>;
 }
 declare module 'material-ui/svg-icons/hardware/laptop-windows.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/laptop-windows'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/laptop-windows'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/laptop.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/laptop'>;
@@ -6747,19 +7271,27 @@ declare module 'material-ui/svg-icons/hardware/mouse.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/mouse'>;
 }
 declare module 'material-ui/svg-icons/hardware/phone-android.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/phone-android'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/phone-android'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/phone-iphone.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/phone-iphone'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/phone-iphone'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/phonelink-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/phonelink-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/phonelink-off'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/phonelink.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/phonelink'>;
 }
 declare module 'material-ui/svg-icons/hardware/power-input.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/power-input'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/power-input'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/router.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/router'>;
@@ -6777,13 +7309,17 @@ declare module 'material-ui/svg-icons/hardware/smartphone.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/smartphone'>;
 }
 declare module 'material-ui/svg-icons/hardware/speaker-group.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/speaker-group'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/speaker-group'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/speaker.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/speaker'>;
 }
 declare module 'material-ui/svg-icons/hardware/tablet-android.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/tablet-android'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/tablet-android'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/tablet-mac.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/tablet-mac'>;
@@ -6798,7 +7334,9 @@ declare module 'material-ui/svg-icons/hardware/tv.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/tv'>;
 }
 declare module 'material-ui/svg-icons/hardware/videogame-asset.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/hardware/videogame-asset'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/hardware/videogame-asset'
+  >;
 }
 declare module 'material-ui/svg-icons/hardware/watch.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/hardware/watch'>;
@@ -6813,7 +7351,9 @@ declare module 'material-ui/svg-icons/image/adjust.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/adjust'>;
 }
 declare module 'material-ui/svg-icons/image/assistant-photo.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/assistant-photo'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/assistant-photo'
+  >;
 }
 declare module 'material-ui/svg-icons/image/assistant.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/assistant'>;
@@ -6879,13 +7419,19 @@ declare module 'material-ui/svg-icons/image/camera.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/camera'>;
 }
 declare module 'material-ui/svg-icons/image/center-focus-strong.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/center-focus-strong'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/center-focus-strong'
+  >;
 }
 declare module 'material-ui/svg-icons/image/center-focus-weak.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/center-focus-weak'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/center-focus-weak'
+  >;
 }
 declare module 'material-ui/svg-icons/image/collections-bookmark.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/collections-bookmark'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/collections-bookmark'
+  >;
 }
 declare module 'material-ui/svg-icons/image/collections.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/collections'>;
@@ -6900,7 +7446,9 @@ declare module 'material-ui/svg-icons/image/compare.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/compare'>;
 }
 declare module 'material-ui/svg-icons/image/control-point-duplicate.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/control-point-duplicate'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/control-point-duplicate'
+  >;
 }
 declare module 'material-ui/svg-icons/image/control-point.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/control-point'>;
@@ -6924,7 +7472,9 @@ declare module 'material-ui/svg-icons/image/crop-free.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/crop-free'>;
 }
 declare module 'material-ui/svg-icons/image/crop-landscape.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/crop-landscape'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/crop-landscape'
+  >;
 }
 declare module 'material-ui/svg-icons/image/crop-original.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/crop-original'>;
@@ -6951,16 +7501,24 @@ declare module 'material-ui/svg-icons/image/edit.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/edit'>;
 }
 declare module 'material-ui/svg-icons/image/exposure-neg-1.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/exposure-neg-1'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/exposure-neg-1'
+  >;
 }
 declare module 'material-ui/svg-icons/image/exposure-neg-2.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/exposure-neg-2'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/exposure-neg-2'
+  >;
 }
 declare module 'material-ui/svg-icons/image/exposure-plus-1.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/exposure-plus-1'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/exposure-plus-1'
+  >;
 }
 declare module 'material-ui/svg-icons/image/exposure-plus-2.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/exposure-plus-2'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/exposure-plus-2'
+  >;
 }
 declare module 'material-ui/svg-icons/image/exposure-zero.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/exposure-zero'>;
@@ -6999,10 +7557,14 @@ declare module 'material-ui/svg-icons/image/filter-9.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/filter-9'>;
 }
 declare module 'material-ui/svg-icons/image/filter-b-and-w.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/filter-b-and-w'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/filter-b-and-w'
+  >;
 }
 declare module 'material-ui/svg-icons/image/filter-center-focus.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/filter-center-focus'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/filter-center-focus'
+  >;
 }
 declare module 'material-ui/svg-icons/image/filter-drama.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/filter-drama'>;
@@ -7017,10 +7579,14 @@ declare module 'material-ui/svg-icons/image/filter-none.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/filter-none'>;
 }
 declare module 'material-ui/svg-icons/image/filter-tilt-shift.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/filter-tilt-shift'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/filter-tilt-shift'
+  >;
 }
 declare module 'material-ui/svg-icons/image/filter-vintage.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/filter-vintage'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/filter-vintage'
+  >;
 }
 declare module 'material-ui/svg-icons/image/filter.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/filter'>;
@@ -7068,7 +7634,9 @@ declare module 'material-ui/svg-icons/image/healing.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/healing'>;
 }
 declare module 'material-ui/svg-icons/image/image-aspect-ratio.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/image-aspect-ratio'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/image-aspect-ratio'
+  >;
 }
 declare module 'material-ui/svg-icons/image/image.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/image'>;
@@ -7116,10 +7684,14 @@ declare module 'material-ui/svg-icons/image/loupe.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/loupe'>;
 }
 declare module 'material-ui/svg-icons/image/monochrome-photos.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/monochrome-photos'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/monochrome-photos'
+  >;
 }
 declare module 'material-ui/svg-icons/image/movie-creation.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/movie-creation'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/movie-creation'
+  >;
 }
 declare module 'material-ui/svg-icons/image/movie-filter.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/movie-filter'>;
@@ -7134,7 +7706,9 @@ declare module 'material-ui/svg-icons/image/nature.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/nature'>;
 }
 declare module 'material-ui/svg-icons/image/navigate-before.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/navigate-before'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/navigate-before'
+  >;
 }
 declare module 'material-ui/svg-icons/image/navigate-next.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/navigate-next'>;
@@ -7143,16 +7717,24 @@ declare module 'material-ui/svg-icons/image/palette.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/palette'>;
 }
 declare module 'material-ui/svg-icons/image/panorama-fish-eye.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/panorama-fish-eye'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/panorama-fish-eye'
+  >;
 }
 declare module 'material-ui/svg-icons/image/panorama-horizontal.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/panorama-horizontal'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/panorama-horizontal'
+  >;
 }
 declare module 'material-ui/svg-icons/image/panorama-vertical.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/panorama-vertical'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/panorama-vertical'
+  >;
 }
 declare module 'material-ui/svg-icons/image/panorama-wide-angle.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/panorama-wide-angle'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/panorama-wide-angle'
+  >;
 }
 declare module 'material-ui/svg-icons/image/panorama.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/panorama'>;
@@ -7170,28 +7752,40 @@ declare module 'material-ui/svg-icons/image/photo-library.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/photo-library'>;
 }
 declare module 'material-ui/svg-icons/image/photo-size-select-actual.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/photo-size-select-actual'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/photo-size-select-actual'
+  >;
 }
 declare module 'material-ui/svg-icons/image/photo-size-select-large.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/photo-size-select-large'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/photo-size-select-large'
+  >;
 }
 declare module 'material-ui/svg-icons/image/photo-size-select-small.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/photo-size-select-small'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/photo-size-select-small'
+  >;
 }
 declare module 'material-ui/svg-icons/image/photo.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/photo'>;
 }
 declare module 'material-ui/svg-icons/image/picture-as-pdf.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/picture-as-pdf'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/picture-as-pdf'
+  >;
 }
 declare module 'material-ui/svg-icons/image/portrait.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/portrait'>;
 }
 declare module 'material-ui/svg-icons/image/remove-red-eye.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/remove-red-eye'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/remove-red-eye'
+  >;
 }
 declare module 'material-ui/svg-icons/image/rotate-90-degrees-ccw.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/rotate-90-degrees-ccw'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/rotate-90-degrees-ccw'
+  >;
 }
 declare module 'material-ui/svg-icons/image/rotate-left.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/rotate-left'>;
@@ -7260,7 +7854,9 @@ declare module 'material-ui/svg-icons/image/wb-cloudy.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/wb-cloudy'>;
 }
 declare module 'material-ui/svg-icons/image/wb-incandescent.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/image/wb-incandescent'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/image/wb-incandescent'
+  >;
 }
 declare module 'material-ui/svg-icons/image/wb-iridescent.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/image/wb-iridescent'>;
@@ -7281,10 +7877,14 @@ declare module 'material-ui/svg-icons/maps/beenhere.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/beenhere'>;
 }
 declare module 'material-ui/svg-icons/maps/directions-bike.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/directions-bike'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/directions-bike'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/directions-boat.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/directions-boat'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/directions-boat'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/directions-bus.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/directions-bus'>;
@@ -7293,19 +7893,27 @@ declare module 'material-ui/svg-icons/maps/directions-car.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/directions-car'>;
 }
 declare module 'material-ui/svg-icons/maps/directions-railway.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/directions-railway'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/directions-railway'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/directions-run.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/directions-run'>;
 }
 declare module 'material-ui/svg-icons/maps/directions-subway.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/directions-subway'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/directions-subway'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/directions-transit.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/directions-transit'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/directions-transit'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/directions-walk.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/directions-walk'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/directions-walk'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/directions.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/directions'>;
@@ -7347,7 +7955,9 @@ declare module 'material-ui/svg-icons/maps/local-car-wash.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/local-car-wash'>;
 }
 declare module 'material-ui/svg-icons/maps/local-convenience-store.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/local-convenience-store'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/local-convenience-store'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/local-dining.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/local-dining'>;
@@ -7359,10 +7969,14 @@ declare module 'material-ui/svg-icons/maps/local-florist.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/local-florist'>;
 }
 declare module 'material-ui/svg-icons/maps/local-gas-station.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/local-gas-station'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/local-gas-station'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/local-grocery-store.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/local-grocery-store'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/local-grocery-store'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/local-hospital.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/local-hospital'>;
@@ -7371,7 +7985,9 @@ declare module 'material-ui/svg-icons/maps/local-hotel.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/local-hotel'>;
 }
 declare module 'material-ui/svg-icons/maps/local-laundry-service.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/local-laundry-service'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/local-laundry-service'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/local-library.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/local-library'>;
@@ -7401,10 +8017,14 @@ declare module 'material-ui/svg-icons/maps/local-play.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/local-play'>;
 }
 declare module 'material-ui/svg-icons/maps/local-post-office.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/local-post-office'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/local-post-office'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/local-printshop.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/local-printshop'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/local-printshop'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/local-see.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/local-see'>;
@@ -7428,7 +8048,9 @@ declare module 'material-ui/svg-icons/maps/near-me.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/near-me'>;
 }
 declare module 'material-ui/svg-icons/maps/person-pin-circle.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/person-pin-circle'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/person-pin-circle'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/person-pin.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/person-pin'>;
@@ -7443,7 +8065,9 @@ declare module 'material-ui/svg-icons/maps/rate-review.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/rate-review'>;
 }
 declare module 'material-ui/svg-icons/maps/restaurant-menu.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/restaurant-menu'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/restaurant-menu'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/restaurant.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/restaurant'>;
@@ -7452,7 +8076,9 @@ declare module 'material-ui/svg-icons/maps/satellite.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/satellite'>;
 }
 declare module 'material-ui/svg-icons/maps/store-mall-directory.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/store-mall-directory'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/store-mall-directory'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/streetview.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/streetview'>;
@@ -7473,37 +8099,55 @@ declare module 'material-ui/svg-icons/maps/tram.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/tram'>;
 }
 declare module 'material-ui/svg-icons/maps/transfer-within-a-station.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/maps/transfer-within-a-station'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/maps/transfer-within-a-station'
+  >;
 }
 declare module 'material-ui/svg-icons/maps/zoom-out-map.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/maps/zoom-out-map'>;
 }
 declare module 'material-ui/svg-icons/navigation-arrow-drop-right.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation-arrow-drop-right'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation-arrow-drop-right'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/apps.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/navigation/apps'>;
 }
 declare module 'material-ui/svg-icons/navigation/arrow-back.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/arrow-back'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/arrow-back'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/arrow-downward.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/arrow-downward'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/arrow-downward'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/arrow-drop-down-circle.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/arrow-drop-down-circle'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/arrow-drop-down-circle'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/arrow-drop-down.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/arrow-drop-down'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/arrow-drop-down'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/arrow-drop-up.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/arrow-drop-up'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/arrow-drop-up'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/arrow-forward.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/arrow-forward'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/arrow-forward'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/arrow-upward.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/arrow-upward'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/arrow-upward'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/cancel.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/navigation/cancel'>;
@@ -7512,124 +8156,196 @@ declare module 'material-ui/svg-icons/navigation/check.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/navigation/check'>;
 }
 declare module 'material-ui/svg-icons/navigation/chevron-left.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/chevron-left'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/chevron-left'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/chevron-right.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/chevron-right'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/chevron-right'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/close.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/navigation/close'>;
 }
 declare module 'material-ui/svg-icons/navigation/expand-less.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/expand-less'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/expand-less'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/expand-more.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/expand-more'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/expand-more'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/first-page.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/first-page'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/first-page'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/fullscreen-exit.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/fullscreen-exit'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/fullscreen-exit'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/fullscreen.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/fullscreen'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/fullscreen'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/last-page.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/last-page'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/last-page'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/menu.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/navigation/menu'>;
 }
 declare module 'material-ui/svg-icons/navigation/more-horiz.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/more-horiz'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/more-horiz'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/more-vert.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/more-vert'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/more-vert'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/refresh.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/navigation/refresh'>;
 }
 declare module 'material-ui/svg-icons/navigation/subdirectory-arrow-left.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/subdirectory-arrow-left'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/subdirectory-arrow-left'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/subdirectory-arrow-right.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/subdirectory-arrow-right'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/subdirectory-arrow-right'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/unfold-less.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/unfold-less'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/unfold-less'
+  >;
 }
 declare module 'material-ui/svg-icons/navigation/unfold-more.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/navigation/unfold-more'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/navigation/unfold-more'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/adb.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/notification/adb'>;
 }
 declare module 'material-ui/svg-icons/notification/airline-seat-flat-angled.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/airline-seat-flat-angled'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/airline-seat-flat-angled'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/airline-seat-flat.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/airline-seat-flat'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/airline-seat-flat'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/airline-seat-individual-suite.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/airline-seat-individual-suite'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/airline-seat-individual-suite'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/airline-seat-legroom-extra.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/airline-seat-legroom-extra'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/airline-seat-legroom-extra'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/airline-seat-legroom-normal.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/airline-seat-legroom-normal'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/airline-seat-legroom-normal'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/airline-seat-legroom-reduced.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/airline-seat-legroom-reduced'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/airline-seat-legroom-reduced'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/airline-seat-recline-extra.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/airline-seat-recline-extra'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/airline-seat-recline-extra'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/airline-seat-recline-normal.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/airline-seat-recline-normal'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/airline-seat-recline-normal'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/bluetooth-audio.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/bluetooth-audio'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/bluetooth-audio'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/confirmation-number.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/confirmation-number'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/confirmation-number'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/disc-full.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/disc-full'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/disc-full'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/do-not-disturb-alt.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/do-not-disturb-alt'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/do-not-disturb-alt'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/do-not-disturb-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/do-not-disturb-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/do-not-disturb-off'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/do-not-disturb-on.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/do-not-disturb-on'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/do-not-disturb-on'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/do-not-disturb.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/do-not-disturb'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/do-not-disturb'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/drive-eta.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/drive-eta'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/drive-eta'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/enhanced-encryption.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/enhanced-encryption'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/enhanced-encryption'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/event-available.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/event-available'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/event-available'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/event-busy.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/event-busy'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/event-busy'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/event-note.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/event-note'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/event-note'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/folder-special.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/folder-special'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/folder-special'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/live-tv.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/live-tv'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/live-tv'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/mms.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/notification/mms'>;
@@ -7638,85 +8354,133 @@ declare module 'material-ui/svg-icons/notification/more.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/notification/more'>;
 }
 declare module 'material-ui/svg-icons/notification/network-check.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/network-check'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/network-check'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/network-locked.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/network-locked'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/network-locked'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/no-encryption.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/no-encryption'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/no-encryption'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/ondemand-video.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/ondemand-video'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/ondemand-video'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/personal-video.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/personal-video'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/personal-video'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/phone-bluetooth-speaker.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/phone-bluetooth-speaker'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/phone-bluetooth-speaker'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/phone-forwarded.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/phone-forwarded'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/phone-forwarded'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/phone-in-talk.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/phone-in-talk'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/phone-in-talk'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/phone-locked.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/phone-locked'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/phone-locked'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/phone-missed.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/phone-missed'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/phone-missed'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/phone-paused.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/phone-paused'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/phone-paused'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/power.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/notification/power'>;
 }
 declare module 'material-ui/svg-icons/notification/priority-high.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/priority-high'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/priority-high'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/rv-hookup.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/rv-hookup'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/rv-hookup'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/sd-card.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/sd-card'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/sd-card'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/sim-card-alert.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/sim-card-alert'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/sim-card-alert'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/sms-failed.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/sms-failed'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/sms-failed'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/sms.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/notification/sms'>;
 }
 declare module 'material-ui/svg-icons/notification/sync-disabled.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/sync-disabled'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/sync-disabled'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/sync-problem.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/sync-problem'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/sync-problem'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/sync.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/notification/sync'>;
 }
 declare module 'material-ui/svg-icons/notification/system-update.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/system-update'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/system-update'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/tap-and-play.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/tap-and-play'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/tap-and-play'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/time-to-leave.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/time-to-leave'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/time-to-leave'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/vibration.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/vibration'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/vibration'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/voice-chat.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/voice-chat'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/voice-chat'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/vpn-lock.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/notification/vpn-lock'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/notification/vpn-lock'
+  >;
 }
 declare module 'material-ui/svg-icons/notification/wc.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/notification/wc'>;
@@ -7728,16 +8492,22 @@ declare module 'material-ui/svg-icons/places/ac-unit.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/places/ac-unit'>;
 }
 declare module 'material-ui/svg-icons/places/airport-shuttle.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/places/airport-shuttle'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/places/airport-shuttle'
+  >;
 }
 declare module 'material-ui/svg-icons/places/all-inclusive.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/places/all-inclusive'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/places/all-inclusive'
+  >;
 }
 declare module 'material-ui/svg-icons/places/beach-access.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/places/beach-access'>;
 }
 declare module 'material-ui/svg-icons/places/business-center.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/places/business-center'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/places/business-center'
+  >;
 }
 declare module 'material-ui/svg-icons/places/casino.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/places/casino'>;
@@ -7746,13 +8516,19 @@ declare module 'material-ui/svg-icons/places/child-care.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/places/child-care'>;
 }
 declare module 'material-ui/svg-icons/places/child-friendly.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/places/child-friendly'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/places/child-friendly'
+  >;
 }
 declare module 'material-ui/svg-icons/places/fitness-center.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/places/fitness-center'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/places/fitness-center'
+  >;
 }
 declare module 'material-ui/svg-icons/places/free-breakfast.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/places/free-breakfast'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/places/free-breakfast'
+  >;
 }
 declare module 'material-ui/svg-icons/places/golf-course.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/places/golf-course'>;
@@ -7776,7 +8552,9 @@ declare module 'material-ui/svg-icons/places/smoke-free.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/places/smoke-free'>;
 }
 declare module 'material-ui/svg-icons/places/smoking-rooms.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/places/smoking-rooms'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/places/smoking-rooms'
+  >;
 }
 declare module 'material-ui/svg-icons/places/spa.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/places/spa'>;
@@ -7794,7 +8572,9 @@ declare module 'material-ui/svg-icons/social/group.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/group'>;
 }
 declare module 'material-ui/svg-icons/social/location-city.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/location-city'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/location-city'
+  >;
 }
 declare module 'material-ui/svg-icons/social/mood-bad.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/mood-bad'>;
@@ -7803,19 +8583,29 @@ declare module 'material-ui/svg-icons/social/mood.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/mood'>;
 }
 declare module 'material-ui/svg-icons/social/notifications-active.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/notifications-active'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/notifications-active'
+  >;
 }
 declare module 'material-ui/svg-icons/social/notifications-none.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/notifications-none'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/notifications-none'
+  >;
 }
 declare module 'material-ui/svg-icons/social/notifications-off.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/notifications-off'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/notifications-off'
+  >;
 }
 declare module 'material-ui/svg-icons/social/notifications-paused.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/notifications-paused'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/notifications-paused'
+  >;
 }
 declare module 'material-ui/svg-icons/social/notifications.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/notifications'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/notifications'
+  >;
 }
 declare module 'material-ui/svg-icons/social/pages.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/pages'>;
@@ -7824,7 +8614,9 @@ declare module 'material-ui/svg-icons/social/party-mode.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/party-mode'>;
 }
 declare module 'material-ui/svg-icons/social/people-outline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/people-outline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/people-outline'
+  >;
 }
 declare module 'material-ui/svg-icons/social/people.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/people'>;
@@ -7833,7 +8625,9 @@ declare module 'material-ui/svg-icons/social/person-add.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/person-add'>;
 }
 declare module 'material-ui/svg-icons/social/person-outline.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/person-outline'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/person-outline'
+  >;
 }
 declare module 'material-ui/svg-icons/social/person.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/person'>;
@@ -7851,19 +8645,29 @@ declare module 'material-ui/svg-icons/social/school.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/school'>;
 }
 declare module 'material-ui/svg-icons/social/sentiment-dissatisfied.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/sentiment-dissatisfied'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/sentiment-dissatisfied'
+  >;
 }
 declare module 'material-ui/svg-icons/social/sentiment-neutral.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/sentiment-neutral'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/sentiment-neutral'
+  >;
 }
 declare module 'material-ui/svg-icons/social/sentiment-satisfied.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/sentiment-satisfied'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/sentiment-satisfied'
+  >;
 }
 declare module 'material-ui/svg-icons/social/sentiment-very-dissatisfied.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/sentiment-very-dissatisfied'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/sentiment-very-dissatisfied'
+  >;
 }
 declare module 'material-ui/svg-icons/social/sentiment-very-satisfied.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/social/sentiment-very-satisfied'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/social/sentiment-very-satisfied'
+  >;
 }
 declare module 'material-ui/svg-icons/social/share.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/share'>;
@@ -7872,19 +8676,27 @@ declare module 'material-ui/svg-icons/social/whatshot.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/social/whatshot'>;
 }
 declare module 'material-ui/svg-icons/toggle/check-box-outline-blank.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/toggle/check-box-outline-blank'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/toggle/check-box-outline-blank'
+  >;
 }
 declare module 'material-ui/svg-icons/toggle/check-box.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/toggle/check-box'>;
 }
 declare module 'material-ui/svg-icons/toggle/indeterminate-check-box.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/toggle/indeterminate-check-box'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/toggle/indeterminate-check-box'
+  >;
 }
 declare module 'material-ui/svg-icons/toggle/radio-button-checked.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/toggle/radio-button-checked'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/toggle/radio-button-checked'
+  >;
 }
 declare module 'material-ui/svg-icons/toggle/radio-button-unchecked.js' {
-  declare module.exports: $Exports<'material-ui/svg-icons/toggle/radio-button-unchecked'>;
+  declare module.exports: $Exports<
+    'material-ui/svg-icons/toggle/radio-button-unchecked'
+  >;
 }
 declare module 'material-ui/svg-icons/toggle/star-border.js' {
   declare module.exports: $Exports<'material-ui/svg-icons/toggle/star-border'>;

@@ -610,12 +610,7 @@
                     "inverted": true,
                     "value": "Distance"
                   },
-                  "parameters": [
-                    "SpaceGuy",
-                    "Planet",
-                    "100",
-                    ""
-                  ],
+                  "parameters": ["SpaceGuy", "Planet", "100", ""],
                   "subInstructions": []
                 },
                 {
@@ -630,10 +625,7 @@
                         "inverted": true,
                         "value": "KeyPressed"
                       },
-                      "parameters": [
-                        "",
-                        "Space"
-                      ],
+                      "parameters": ["", "Space"],
                       "subInstructions": []
                     },
                     {
@@ -641,12 +633,7 @@
                         "inverted": true,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "BtnJump",
-                        "",
-                        "yes",
-                        ""
-                      ],
+                      "parameters": ["BtnJump", "", "yes", ""],
                       "subInstructions": []
                     }
                   ]
@@ -705,10 +692,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Space"
-                  ],
+                  "parameters": ["", "Space"],
                   "subInstructions": []
                 },
                 {
@@ -716,12 +700,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "BtnJump",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["BtnJump", "", "yes", ""],
                   "subInstructions": []
                 }
               ]
@@ -785,10 +764,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Right"
-                  ],
+                  "parameters": ["", "Right"],
                   "subInstructions": []
                 },
                 {
@@ -796,12 +772,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "BtnRight",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["BtnRight", "", "yes", ""],
                   "subInstructions": []
                 }
               ]
@@ -842,10 +813,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 },
                 {
@@ -853,12 +821,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "BtnLeft",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["BtnLeft", "", "yes", ""],
                   "subInstructions": []
                 }
               ]
@@ -922,11 +885,7 @@
                 "inverted": false,
                 "value": "SetAngle"
               },
-              "parameters": [
-                "SpaceGuy",
-                "-",
-                "90"
-              ],
+              "parameters": ["SpaceGuy", "-", "90"],
               "subInstructions": []
             }
           ],

@@ -415,9 +415,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -427,11 +425,7 @@
                 "inverted": false,
                 "value": "ModVarGlobalTxt"
               },
-              "parameters": [
-                "RotateKey",
-                "=",
-                "\"Up\""
-              ],
+              "parameters": ["RotateKey", "=", "\"Up\""],
               "subInstructions": []
             }
           ],
@@ -462,10 +456,7 @@
                 "inverted": false,
                 "value": "KeyFromTextPressed"
               },
-              "parameters": [
-                "",
-                "GlobalVariableString(RotateKey)"
-              ],
+              "parameters": ["", "GlobalVariableString(RotateKey)"],
               "subInstructions": []
             }
           ],
@@ -475,11 +466,7 @@
                 "inverted": false,
                 "value": "Rotate"
               },
-              "parameters": [
-                "Player",
-                "180",
-                "LastPressedKey()"
-              ],
+              "parameters": ["Player", "180", "LastPressedKey()"],
               "subInstructions": []
             }
           ],
@@ -510,11 +497,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "Player",
-                "GlobalVariableString(RotateKey)",
-                ""
-              ],
+              "parameters": ["Player", "GlobalVariableString(RotateKey)", ""],
               "subInstructions": []
             },
             {
@@ -522,10 +505,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -535,11 +515,7 @@
                 "inverted": false,
                 "value": "ModVarGlobalTxt"
               },
-              "parameters": [
-                "RotateKey",
-                "=",
-                "LastPressedKey()"
-              ],
+              "parameters": ["RotateKey", "=", "LastPressedKey()"],
               "subInstructions": []
             }
           ],
@@ -571,11 +547,7 @@
                 "inverted": false,
                 "value": "TextObject::String"
               },
-              "parameters": [
-                "LastKeyText",
-                "=",
-                "LastPressedKey()"
-              ],
+              "parameters": ["LastKeyText", "=", "LastPressedKey()"],
               "subInstructions": []
             },
             {

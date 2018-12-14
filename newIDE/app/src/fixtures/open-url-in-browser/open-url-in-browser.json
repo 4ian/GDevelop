@@ -199,10 +199,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -220,9 +217,7 @@
                 "inverted": false,
                 "value": "LaunchFile"
               },
-              "parameters": [
-                "\"http://www.gdevelop-app.com\""
-              ],
+              "parameters": ["\"http://www.gdevelop-app.com\""],
               "subInstructions": []
             }
           ],

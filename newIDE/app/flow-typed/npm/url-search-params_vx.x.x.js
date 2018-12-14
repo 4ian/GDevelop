@@ -44,17 +44,25 @@ declare module 'url-search-params/build/url-search-params.node' {
 
 // Filename aliases
 declare module 'url-search-params/build/url-search-params.amd.js' {
-  declare module.exports: $Exports<'url-search-params/build/url-search-params.amd'>;
+  declare module.exports: $Exports<
+    'url-search-params/build/url-search-params.amd'
+  >;
 }
 declare module 'url-search-params/build/url-search-params.js' {
   declare module.exports: $Exports<'url-search-params/build/url-search-params'>;
 }
 declare module 'url-search-params/build/url-search-params.max.amd.js' {
-  declare module.exports: $Exports<'url-search-params/build/url-search-params.max.amd'>;
+  declare module.exports: $Exports<
+    'url-search-params/build/url-search-params.max.amd'
+  >;
 }
 declare module 'url-search-params/build/url-search-params.max.js' {
-  declare module.exports: $Exports<'url-search-params/build/url-search-params.max'>;
+  declare module.exports: $Exports<
+    'url-search-params/build/url-search-params.max'
+  >;
 }
 declare module 'url-search-params/build/url-search-params.node.js' {
-  declare module.exports: $Exports<'url-search-params/build/url-search-params.node'>;
+  declare module.exports: $Exports<
+    'url-search-params/build/url-search-params.node'
+  >;
 }

@@ -476,10 +476,7 @@
                 "inverted": true,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Space"
-              ],
+              "parameters": ["", "Space"],
               "subInstructions": []
             },
             {
@@ -487,10 +484,7 @@
                 "inverted": true,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -508,11 +502,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "switch_animation",
-                "=",
-                "0"
-              ],
+              "parameters": ["switch_animation", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -550,10 +540,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Space"
-                  ],
+                  "parameters": ["", "Space"],
                   "subInstructions": []
                 },
                 {
@@ -561,10 +548,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ]
@@ -590,10 +574,7 @@
                     "inverted": false,
                     "value": "AnimationName"
                   },
-                  "parameters": [
-                    "kenney",
-                    "\"Stand\""
-                  ],
+                  "parameters": ["kenney", "\"Stand\""],
                   "subInstructions": []
                 },
                 {
@@ -601,11 +582,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "switch_animation",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["switch_animation", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -615,10 +592,7 @@
                     "inverted": false,
                     "value": "SetAnimationName"
                   },
-                  "parameters": [
-                    "kenney",
-                    "\"Walk\""
-                  ],
+                  "parameters": ["kenney", "\"Walk\""],
                   "subInstructions": []
                 },
                 {
@@ -626,11 +600,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "switch_animation",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["switch_animation", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -646,10 +616,7 @@
                     "inverted": false,
                     "value": "AnimationName"
                   },
-                  "parameters": [
-                    "kenney",
-                    "\"Walk\""
-                  ],
+                  "parameters": ["kenney", "\"Walk\""],
                   "subInstructions": []
                 },
                 {
@@ -657,11 +624,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "switch_animation",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["switch_animation", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -671,10 +634,7 @@
                     "inverted": false,
                     "value": "SetAnimationName"
                   },
-                  "parameters": [
-                    "kenney",
-                    "\"Stand\""
-                  ],
+                  "parameters": ["kenney", "\"Stand\""],
                   "subInstructions": []
                 },
                 {
@@ -682,11 +642,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "switch_animation",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["switch_animation", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -719,10 +675,7 @@
                 "inverted": false,
                 "value": "KeyReleased"
               },
-              "parameters": [
-                "",
-                "p"
-              ],
+              "parameters": ["", "p"],
               "subInstructions": []
             }
           ],
@@ -732,11 +685,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "pause_animation",
-                "=",
-                "0"
-              ],
+              "parameters": ["pause_animation", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -752,10 +701,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "p"
-              ],
+              "parameters": ["", "p"],
               "subInstructions": []
             },
             {
@@ -779,9 +725,7 @@
                     "inverted": true,
                     "value": "AnimStopped"
                   },
-                  "parameters": [
-                    "kenney"
-                  ],
+                  "parameters": ["kenney"],
                   "subInstructions": []
                 },
                 {
@@ -789,11 +733,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "pause_animation",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["pause_animation", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -803,9 +743,7 @@
                     "inverted": false,
                     "value": "PauseAnimation"
                   },
-                  "parameters": [
-                    "kenney"
-                  ],
+                  "parameters": ["kenney"],
                   "subInstructions": []
                 },
                 {
@@ -813,11 +751,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "pause_animation",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["pause_animation", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -833,9 +767,7 @@
                     "inverted": false,
                     "value": "AnimStopped"
                   },
-                  "parameters": [
-                    "kenney"
-                  ],
+                  "parameters": ["kenney"],
                   "subInstructions": []
                 },
                 {
@@ -843,11 +775,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "pause_animation",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["pause_animation", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -857,9 +785,7 @@
                     "inverted": false,
                     "value": "PlayAnimation"
                   },
-                  "parameters": [
-                    "kenney"
-                  ],
+                  "parameters": ["kenney"],
                   "subInstructions": []
                 },
                 {
@@ -867,11 +793,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "pause_animation",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["pause_animation", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -904,9 +826,7 @@
                 "inverted": false,
                 "value": "AnimStopped"
               },
-              "parameters": [
-                "kenney"
-              ],
+              "parameters": ["kenney"],
               "subInstructions": []
             },
             {
@@ -924,10 +844,7 @@
                 "inverted": false,
                 "value": "Montre"
               },
-              "parameters": [
-                "pause_message",
-                ""
-              ],
+              "parameters": ["pause_message", ""],
               "subInstructions": []
             }
           ],
@@ -958,9 +875,7 @@
                 "inverted": true,
                 "value": "AnimStopped"
               },
-              "parameters": [
-                "kenney"
-              ],
+              "parameters": ["kenney"],
               "subInstructions": []
             },
             {
@@ -978,9 +893,7 @@
                 "inverted": false,
                 "value": "Cache"
               },
-              "parameters": [
-                "pause_message"
-              ],
+              "parameters": ["pause_message"],
               "subInstructions": []
             }
           ],
@@ -1011,10 +924,7 @@
                 "inverted": false,
                 "value": "AnimationName"
               },
-              "parameters": [
-                "kenney",
-                "\"Walk\""
-              ],
+              "parameters": ["kenney", "\"Walk\""],
               "subInstructions": []
             },
             {
@@ -1032,11 +942,7 @@
                 "inverted": false,
                 "value": "TextObject::String"
               },
-              "parameters": [
-                "animation_message",
-                "=",
-                "\"Walk\""
-              ],
+              "parameters": ["animation_message", "=", "\"Walk\""],
               "subInstructions": []
             }
           ],
@@ -1067,10 +973,7 @@
                 "inverted": false,
                 "value": "AnimationName"
               },
-              "parameters": [
-                "kenney",
-                "\"Stand\""
-              ],
+              "parameters": ["kenney", "\"Stand\""],
               "subInstructions": []
             },
             {
@@ -1088,11 +991,7 @@
                 "inverted": false,
                 "value": "TextObject::String"
               },
-              "parameters": [
-                "animation_message",
-                "=",
-                "\"Stand\""
-              ],
+              "parameters": ["animation_message", "=", "\"Stand\""],
               "subInstructions": []
             }
           ],

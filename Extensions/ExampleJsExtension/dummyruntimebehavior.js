@@ -7,29 +7,33 @@
  * @extends gdjs.RuntimeBehavior
  * @constructor
  */
-gdjs.DummyRuntimeBehavior = function(runtimeScene, behaviorData, owner)
-{
-    gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
+gdjs.DummyRuntimeBehavior = function(runtimeScene, behaviorData, owner) {
+  gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
 
-    // Here you can access to the behavior data (JSON declared in JsExtension.js)
-    // using behaviorData.content:
-    this._textToSet = behaviorData.content.property1;
+  // Here you can access to the behavior data (JSON declared in JsExtension.js)
+  // using behaviorData.content:
+  this._textToSet = behaviorData.content.property1;
 
-    // You can also run arbitrary code at the creation of the behavior:
-    console.log("DummyRuntimeBehavior was created for object:", owner);
+  // You can also run arbitrary code at the creation of the behavior:
+  console.log("DummyRuntimeBehavior was created for object:", owner);
 };
 
-gdjs.DummyRuntimeBehavior.prototype = Object.create( gdjs.RuntimeBehavior.prototype );
-gdjs.DummyRuntimeBehavior.thisIsARuntimeBehaviorConstructor = "MyDummyExtension::DummyBehavior";
+gdjs.DummyRuntimeBehavior.prototype = Object.create(
+  gdjs.RuntimeBehavior.prototype
+);
+gdjs.DummyRuntimeBehavior.thisIsARuntimeBehaviorConstructor =
+  "MyDummyExtension::DummyBehavior";
 
-gdjs.DummyRuntimeBehavior.prototype.onDeActivate = function() {
-};
+gdjs.DummyRuntimeBehavior.prototype.onDeActivate = function() {};
 
 gdjs.DummyRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
-    // This is run at every frame, before events are launched.
-    this.owner.getVariables().get("VariableSetFromBehavior").setString(this._textToSet);
+  // This is run at every frame, before events are launched.
+  this.owner
+    .getVariables()
+    .get("VariableSetFromBehavior")
+    .setString(this._textToSet);
 };
 
 gdjs.DummyRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
-    // This is run at every frame, after events are launched.
+  // This is run at every frame, after events are launched.
 };

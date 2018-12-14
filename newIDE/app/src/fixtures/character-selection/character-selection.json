@@ -1070,10 +1070,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -1089,12 +1086,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Player1",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["Player1", "", "yes", ""],
                   "subInstructions": []
                 }
               ],
@@ -1104,11 +1096,7 @@
                     "inverted": false,
                     "value": "ModVarGlobalTxt"
                   },
-                  "parameters": [
-                    "selectedCharacter",
-                    "=",
-                    "\"Player1\""
-                  ],
+                  "parameters": ["selectedCharacter", "=", "\"Player1\""],
                   "subInstructions": []
                 },
                 {
@@ -1116,11 +1104,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"Game\"",
-                    ""
-                  ],
+                  "parameters": ["", "\"Game\"", ""],
                   "subInstructions": []
                 }
               ],
@@ -1136,12 +1120,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Player2",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["Player2", "", "yes", ""],
                   "subInstructions": []
                 }
               ],
@@ -1151,11 +1130,7 @@
                     "inverted": false,
                     "value": "ModVarGlobalTxt"
                   },
-                  "parameters": [
-                    "selectedCharacter",
-                    "=",
-                    "\"Player2\""
-                  ],
+                  "parameters": ["selectedCharacter", "=", "\"Player2\""],
                   "subInstructions": []
                 },
                 {
@@ -1163,11 +1138,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"Game\"",
-                    ""
-                  ],
+                  "parameters": ["", "\"Game\"", ""],
                   "subInstructions": []
                 }
               ],
@@ -1183,12 +1154,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Player3",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["Player3", "", "yes", ""],
                   "subInstructions": []
                 }
               ],
@@ -1198,11 +1164,7 @@
                     "inverted": false,
                     "value": "ModVarGlobalTxt"
                   },
-                  "parameters": [
-                    "selectedCharacter",
-                    "=",
-                    "\"Player3\""
-                  ],
+                  "parameters": ["selectedCharacter", "=", "\"Player3\""],
                   "subInstructions": []
                 },
                 {
@@ -1210,11 +1172,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"Game\"",
-                    ""
-                  ],
+                  "parameters": ["", "\"Game\"", ""],
                   "subInstructions": []
                 }
               ],
@@ -4842,9 +4800,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -4888,9 +4844,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -4900,9 +4854,7 @@
                     "inverted": false,
                     "value": "Cache"
                   },
-                  "parameters": [
-                    "PlayerHitBox"
-                  ],
+                  "parameters": ["PlayerHitBox"],
                   "subInstructions": []
                 }
               ],
@@ -4956,10 +4908,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "RShift"
-                  ],
+                  "parameters": ["", "RShift"],
                   "subInstructions": []
                 },
                 {
@@ -4974,11 +4923,7 @@
                         "inverted": false,
                         "value": "Animation"
                       },
-                      "parameters": [
-                        "Player",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["Player", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -4986,11 +4931,7 @@
                         "inverted": false,
                         "value": "Animation"
                       },
-                      "parameters": [
-                        "Player",
-                        "=",
-                        "2"
-                      ],
+                      "parameters": ["Player", "=", "2"],
                       "subInstructions": []
                     }
                   ]
@@ -5024,10 +4965,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::IsJumping"
                   },
-                  "parameters": [
-                    "PlayerHitBox",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["PlayerHitBox", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -5037,11 +4975,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "Player",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["Player", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -5057,10 +4991,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::IsFalling"
                   },
-                  "parameters": [
-                    "PlayerHitBox",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["PlayerHitBox", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -5070,11 +5001,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "Player",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["Player", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -5090,10 +5017,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::IsOnFloor"
                   },
-                  "parameters": [
-                    "PlayerHitBox",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["PlayerHitBox", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -5109,10 +5033,7 @@
                         "inverted": true,
                         "value": "PlatformBehavior::IsMoving"
                       },
-                      "parameters": [
-                        "PlayerHitBox",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["PlayerHitBox", "PlatformerObject"],
                       "subInstructions": []
                     }
                   ],
@@ -5122,11 +5043,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Player",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["Player", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -5142,10 +5059,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::IsMoving"
                       },
-                      "parameters": [
-                        "PlayerHitBox",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["PlayerHitBox", "PlatformerObject"],
                       "subInstructions": []
                     }
                   ],
@@ -5155,11 +5069,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Player",
-                        "=",
-                        "2"
-                      ],
+                      "parameters": ["Player", "=", "2"],
                       "subInstructions": []
                     }
                   ],
@@ -5177,10 +5087,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -5190,10 +5097,7 @@
                     "inverted": false,
                     "value": "FlipX"
                   },
-                  "parameters": [
-                    "Player",
-                    "yes"
-                  ],
+                  "parameters": ["Player", "yes"],
                   "subInstructions": []
                 }
               ],
@@ -5209,10 +5113,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Right"
-                  ],
+                  "parameters": ["", "Right"],
                   "subInstructions": []
                 }
               ],
@@ -5222,10 +5123,7 @@
                     "inverted": false,
                     "value": "FlipX"
                   },
-                  "parameters": [
-                    "Player",
-                    "no"
-                  ],
+                  "parameters": ["Player", "no"],
                   "subInstructions": []
                 }
               ],
@@ -5257,13 +5155,7 @@
                     "inverted": false,
                     "value": "CameraX"
                   },
-                  "parameters": [
-                    "",
-                    "=",
-                    "Player.X()",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["", "=", "Player.X()", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -5294,9 +5186,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -5306,9 +5196,7 @@
                     "inverted": false,
                     "value": "Cache"
                   },
-                  "parameters": [
-                    "GoLeft"
-                  ],
+                  "parameters": ["GoLeft"],
                   "subInstructions": []
                 },
                 {
@@ -5316,9 +5204,7 @@
                     "inverted": false,
                     "value": "Cache"
                   },
-                  "parameters": [
-                    "GoRight"
-                  ],
+                  "parameters": ["GoRight"],
                   "subInstructions": []
                 }
               ],
@@ -5334,11 +5220,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "GoLeft",
-                    "MovingPlatform",
-                    ""
-                  ],
+                  "parameters": ["GoLeft", "MovingPlatform", ""],
                   "subInstructions": []
                 }
               ],
@@ -5348,9 +5230,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "MovingPlatform"
-                  ],
+                  "parameters": ["MovingPlatform"],
                   "subInstructions": []
                 },
                 {
@@ -5358,12 +5238,7 @@
                     "inverted": false,
                     "value": "AddForceXY"
                   },
-                  "parameters": [
-                    "MovingPlatform",
-                    "-150",
-                    "0",
-                    "1"
-                  ],
+                  "parameters": ["MovingPlatform", "-150", "0", "1"],
                   "subInstructions": []
                 }
               ],
@@ -5379,11 +5254,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "GoRight",
-                    "MovingPlatform",
-                    ""
-                  ],
+                  "parameters": ["GoRight", "MovingPlatform", ""],
                   "subInstructions": []
                 }
               ],
@@ -5393,9 +5264,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "MovingPlatform"
-                  ],
+                  "parameters": ["MovingPlatform"],
                   "subInstructions": []
                 },
                 {
@@ -5403,12 +5272,7 @@
                     "inverted": false,
                     "value": "AddForceXY"
                   },
-                  "parameters": [
-                    "MovingPlatform",
-                    "150",
-                    "0",
-                    "1"
-                  ],
+                  "parameters": ["MovingPlatform", "150", "0", "1"],
                   "subInstructions": []
                 }
               ],
@@ -5521,9 +5385,7 @@
                     "inverted": false,
                     "value": "Cache"
                   },
-                  "parameters": [
-                    "VirtualControls"
-                  ],
+                  "parameters": ["VirtualControls"],
                   "subInstructions": []
                 }
               ],
@@ -5539,9 +5401,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -5551,10 +5411,7 @@
                     "inverted": false,
                     "value": "TouchSimulateMouse"
                   },
-                  "parameters": [
-                    "",
-                    "no"
-                  ],
+                  "parameters": ["", "no"],
                   "subInstructions": []
                 }
               ],
@@ -5570,12 +5427,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "LeftButton",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["LeftButton", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -5585,10 +5437,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::SimulateLeftKey"
                   },
-                  "parameters": [
-                    "PlayerHitBox",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["PlayerHitBox", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -5604,12 +5453,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "RightButton",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["RightButton", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -5619,10 +5463,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::SimulateRightKey"
                   },
-                  "parameters": [
-                    "PlayerHitBox",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["PlayerHitBox", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -5638,12 +5479,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "JumpButton",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["JumpButton", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -5653,10 +5489,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::SimulateJumpKey"
                   },
-                  "parameters": [
-                    "PlayerHitBox",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["PlayerHitBox", "PlatformerObject"],
                   "subInstructions": []
                 }
               ],
@@ -5734,9 +5567,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -5746,11 +5577,7 @@
                 "inverted": false,
                 "value": "ActivateBehavior"
               },
-              "parameters": [
-                "Fly",
-                "PlatformerObject",
-                "no"
-              ],
+              "parameters": ["Fly", "PlatformerObject", "no"],
               "subInstructions": []
             }
           ],
@@ -5781,11 +5608,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "GoLeft",
-                "Enemy",
-                ""
-              ],
+              "parameters": ["GoLeft", "Enemy", ""],
               "subInstructions": []
             }
           ],
@@ -5795,12 +5618,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "Enemy",
-                "GoingLeft",
-                "=",
-                "1"
-              ],
+              "parameters": ["Enemy", "GoingLeft", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -5816,11 +5634,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "GoRight",
-                "Enemy",
-                ""
-              ],
+              "parameters": ["GoRight", "Enemy", ""],
               "subInstructions": []
             }
           ],
@@ -5830,12 +5644,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "Enemy",
-                "GoingLeft",
-                "=",
-                "0"
-              ],
+              "parameters": ["Enemy", "GoingLeft", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -5851,11 +5660,7 @@
                 "inverted": false,
                 "value": "Animation"
               },
-              "parameters": [
-                "Enemy",
-                "=",
-                "0"
-              ],
+              "parameters": ["Enemy", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -5871,12 +5676,7 @@
                     "inverted": false,
                     "value": "VarObjet"
                   },
-                  "parameters": [
-                    "Enemy",
-                    "GoingLeft",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["Enemy", "GoingLeft", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -5886,12 +5686,7 @@
                     "inverted": false,
                     "value": "AddForceXY"
                   },
-                  "parameters": [
-                    "Fly",
-                    "-300",
-                    "0",
-                    "0"
-                  ],
+                  "parameters": ["Fly", "-300", "0", "0"],
                   "subInstructions": []
                 },
                 {
@@ -5899,10 +5694,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::SimulateLeftKey"
                   },
-                  "parameters": [
-                    "Enemy",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["Enemy", "PlatformerObject"],
                   "subInstructions": []
                 },
                 {
@@ -5910,10 +5702,7 @@
                     "inverted": false,
                     "value": "FlipX"
                   },
-                  "parameters": [
-                    "Enemy",
-                    "no"
-                  ],
+                  "parameters": ["Enemy", "no"],
                   "subInstructions": []
                 }
               ],
@@ -5929,12 +5718,7 @@
                     "inverted": false,
                     "value": "VarObjet"
                   },
-                  "parameters": [
-                    "Enemy",
-                    "GoingLeft",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["Enemy", "GoingLeft", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -5944,12 +5728,7 @@
                     "inverted": false,
                     "value": "AddForceXY"
                   },
-                  "parameters": [
-                    "Fly",
-                    "300",
-                    "0",
-                    "0"
-                  ],
+                  "parameters": ["Fly", "300", "0", "0"],
                   "subInstructions": []
                 },
                 {
@@ -5957,10 +5736,7 @@
                     "inverted": false,
                     "value": "PlatformBehavior::SimulateRightKey"
                   },
-                  "parameters": [
-                    "Enemy",
-                    "PlatformerObject"
-                  ],
+                  "parameters": ["Enemy", "PlatformerObject"],
                   "subInstructions": []
                 },
                 {
@@ -5968,10 +5744,7 @@
                     "inverted": false,
                     "value": "FlipX"
                   },
-                  "parameters": [
-                    "Enemy",
-                    "yes"
-                  ],
+                  "parameters": ["Enemy", "yes"],
                   "subInstructions": []
                 }
               ],
@@ -6002,11 +5775,7 @@
                     "inverted": false,
                     "value": "CollisionNP"
                   },
-                  "parameters": [
-                    "PlayerHitBox",
-                    "Enemy",
-                    ""
-                  ],
+                  "parameters": ["PlayerHitBox", "Enemy", ""],
                   "subInstructions": []
                 }
               ],
@@ -6022,10 +5791,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::IsFalling"
                       },
-                      "parameters": [
-                        "PlayerHitBox",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["PlayerHitBox", "PlatformerObject"],
                       "subInstructions": []
                     }
                   ],
@@ -6035,11 +5801,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "Enemy",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["Enemy", "=", "1"],
                       "subInstructions": []
                     },
                     {
@@ -6047,11 +5809,7 @@
                         "inverted": false,
                         "value": "ActivateBehavior"
                       },
-                      "parameters": [
-                        "Enemy",
-                        "PlatformerObject",
-                        "yes"
-                      ],
+                      "parameters": ["Enemy", "PlatformerObject", "yes"],
                       "subInstructions": []
                     },
                     {
@@ -6059,12 +5817,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::Gravity"
                       },
-                      "parameters": [
-                        "Enemy",
-                        "PlatformerObject",
-                        "=",
-                        "1500"
-                      ],
+                      "parameters": ["Enemy", "PlatformerObject", "=", "1500"],
                       "subInstructions": []
                     },
                     {
@@ -6072,10 +5825,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::SetCanJump"
                       },
-                      "parameters": [
-                        "PlayerHitBox",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["PlayerHitBox", "PlatformerObject"],
                       "subInstructions": []
                     },
                     {
@@ -6083,10 +5833,7 @@
                         "inverted": false,
                         "value": "PlatformBehavior::SimulateJumpKey"
                       },
-                      "parameters": [
-                        "PlayerHitBox",
-                        "PlatformerObject"
-                      ],
+                      "parameters": ["PlayerHitBox", "PlatformerObject"],
                       "subInstructions": []
                     },
                     {
@@ -6117,11 +5864,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "Score",
-                            "+",
-                            "50"
-                          ],
+                          "parameters": ["Score", "+", "50"],
                           "subInstructions": []
                         }
                       ],
@@ -6179,11 +5922,7 @@
                 "inverted": false,
                 "value": "Animation"
               },
-              "parameters": [
-                "Enemy",
-                "=",
-                "1"
-              ],
+              "parameters": ["Enemy", "=", "1"],
               "subInstructions": []
             },
             {
@@ -6191,10 +5930,7 @@
                 "inverted": false,
                 "value": "PlatformBehavior::IsOnFloor"
               },
-              "parameters": [
-                "Enemy",
-                "PlatformerObject"
-              ],
+              "parameters": ["Enemy", "PlatformerObject"],
               "subInstructions": []
             },
             {
@@ -6202,10 +5938,7 @@
                 "inverted": true,
                 "value": "PlatformBehavior::IsMoving"
               },
-              "parameters": [
-                "Enemy",
-                "PlatformerObject"
-              ],
+              "parameters": ["Enemy", "PlatformerObject"],
               "subInstructions": []
             }
           ],
@@ -6215,11 +5948,7 @@
                 "inverted": false,
                 "value": "ActivateBehavior"
               },
-              "parameters": [
-                "Enemy",
-                "PlatformerObject",
-                "false"
-              ],
+              "parameters": ["Enemy", "PlatformerObject", "false"],
               "subInstructions": []
             },
             {
@@ -6227,11 +5956,7 @@
                 "inverted": false,
                 "value": "Opacity"
               },
-              "parameters": [
-                "Enemy",
-                "-",
-                "50*TimeDelta()"
-              ],
+              "parameters": ["Enemy", "-", "50*TimeDelta()"],
               "subInstructions": []
             }
           ],
@@ -6246,11 +5971,7 @@
                     "inverted": false,
                     "value": "Opacity"
                   },
-                  "parameters": [
-                    "Enemy",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["Enemy", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -6260,10 +5981,7 @@
                     "inverted": false,
                     "value": "Delete"
                   },
-                  "parameters": [
-                    "Enemy",
-                    ""
-                  ],
+                  "parameters": ["Enemy", ""],
                   "subInstructions": []
                 }
               ],
@@ -6288,11 +6006,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "PlayerHitBox",
-                "Coin",
-                ""
-              ],
+              "parameters": ["PlayerHitBox", "Coin", ""],
               "subInstructions": []
             },
             {
@@ -6300,11 +6014,7 @@
                 "inverted": false,
                 "value": "Opacity"
               },
-              "parameters": [
-                "Coin",
-                "=",
-                "255"
-              ],
+              "parameters": ["Coin", "=", "255"],
               "subInstructions": []
             }
           ],
@@ -6314,11 +6024,7 @@
                 "inverted": false,
                 "value": "Opacity"
               },
-              "parameters": [
-                "Coin",
-                "=",
-                "254"
-              ],
+              "parameters": ["Coin", "=", "254"],
               "subInstructions": []
             },
             {
@@ -6340,11 +6046,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "Score",
-                "+",
-                "100"
-              ],
+              "parameters": ["Score", "+", "100"],
               "subInstructions": []
             }
           ],
@@ -6360,11 +6062,7 @@
                 "inverted": false,
                 "value": "Opacity"
               },
-              "parameters": [
-                "Coin",
-                "<",
-                "255"
-              ],
+              "parameters": ["Coin", "<", "255"],
               "subInstructions": []
             }
           ],
@@ -6374,11 +6072,7 @@
                 "inverted": false,
                 "value": "Opacity"
               },
-              "parameters": [
-                "Coin",
-                "-",
-                "255*TimeDelta()"
-              ],
+              "parameters": ["Coin", "-", "255*TimeDelta()"],
               "subInstructions": []
             },
             {
@@ -6386,12 +6080,7 @@
                 "inverted": false,
                 "value": "AddForceXY"
               },
-              "parameters": [
-                "Coin",
-                "0",
-                "-30",
-                "0"
-              ],
+              "parameters": ["Coin", "0", "-30", "0"],
               "subInstructions": []
             }
           ],
@@ -6407,11 +6096,7 @@
                 "inverted": false,
                 "value": "Opacity"
               },
-              "parameters": [
-                "Coin",
-                "=",
-                "0"
-              ],
+              "parameters": ["Coin", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -6421,10 +6106,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Coin",
-                "0"
-              ],
+              "parameters": ["Coin", "0"],
               "subInstructions": []
             }
           ],
@@ -6448,11 +6130,7 @@
                 "inverted": false,
                 "value": "TextObject::String"
               },
-              "parameters": [
-                "Score",
-                "=",
-                "\"x \"+ToString(Variable(Score))"
-              ],
+              "parameters": ["Score", "=", "\"x \"+ToString(Variable(Score))"],
               "subInstructions": []
             }
           ],

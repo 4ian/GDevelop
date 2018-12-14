@@ -16,8 +16,8 @@ Then launch tests:
 
 Tests are launched using PhantomJS. You need Firefox installed as PhantomJS launch an instance of Firefox and run tests in it.
 
-Tests are located in **tests** folder for the game engine, or directly in the folder of the tested extensions. 
+Tests are located in **tests** folder for the game engine, or directly in the folder of the tested extensions.
 
-### Games in *games* folder
+### Games in _games_ folder
 
-Games contained in *games* folder are mainly here to be launched manually in order to check that a particular feature is working. Read the comments in the events to see what is the expected behavior, or compare with the native platform if you can.
+Games contained in _games_ folder are mainly here to be launched manually in order to check that a particular feature is working. Read the comments in the events to see what is the expected behavior, or compare with the native platform if you can.

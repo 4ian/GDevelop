@@ -441,9 +441,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -539,10 +537,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "MouseWheelDelta()",
-                    "a"
-                  ],
+                  "parameters": ["MouseWheelDelta()", "a"],
                   "subInstructions": []
                 }
               ],
@@ -552,11 +547,7 @@
                     "inverted": false,
                     "value": "Rotate"
                   },
-                  "parameters": [
-                    "parent",
-                    "-50",
-                    ""
-                  ],
+                  "parameters": ["parent", "-50", ""],
                   "subInstructions": []
                 }
               ],
@@ -572,10 +563,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "MouseWheelDelta()",
-                    "s"
-                  ],
+                  "parameters": ["MouseWheelDelta()", "s"],
                   "subInstructions": []
                 }
               ],
@@ -585,11 +573,7 @@
                     "inverted": false,
                     "value": "Rotate"
                   },
-                  "parameters": [
-                    "parent",
-                    "50",
-                    ""
-                  ],
+                  "parameters": ["parent", "50", ""],
                   "subInstructions": []
                 }
               ],

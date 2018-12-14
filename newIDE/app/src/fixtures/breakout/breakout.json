@@ -586,9 +586,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -620,11 +618,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "random_layout",
-                    "=",
-                    "Random(2) + 1"
-                  ],
+                  "parameters": ["random_layout", "=", "Random(2) + 1"],
                   "subInstructions": []
                 }
               ],
@@ -679,11 +673,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "random_color",
-                    "=",
-                    "Random(2)"
-                  ],
+                  "parameters": ["random_color", "=", "Random(2)"],
                   "subInstructions": []
                 }
               ],
@@ -700,11 +690,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "brick",
-                        "=",
-                        "Variable(random_color)"
-                      ],
+                      "parameters": ["brick", "=", "Variable(random_color)"],
                       "subInstructions": []
                     }
                   ],
@@ -747,11 +733,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "device",
-                    "=",
-                    "\"mobile\""
-                  ],
+                  "parameters": ["device", "=", "\"mobile\""],
                   "subInstructions": []
                 }
               ],
@@ -777,11 +759,7 @@
                     "inverted": false,
                     "value": "ModVarSceneTxt"
                   },
-                  "parameters": [
-                    "device",
-                    "=",
-                    "\"pc\""
-                  ],
+                  "parameters": ["device", "=", "\"pc\""],
                   "subInstructions": []
                 }
               ],
@@ -814,11 +792,7 @@
                 "inverted": false,
                 "value": "VarSceneTxt"
               },
-              "parameters": [
-                "device",
-                "=",
-                "\"pc\""
-              ],
+              "parameters": ["device", "=", "\"pc\""],
               "subInstructions": []
             }
           ],
@@ -849,10 +823,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 },
                 {
@@ -860,10 +831,7 @@
                     "inverted": true,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Right"
-                  ],
+                  "parameters": ["", "Right"],
                   "subInstructions": []
                 },
                 {
@@ -871,11 +839,7 @@
                     "inverted": false,
                     "value": "PosX"
                   },
-                  "parameters": [
-                    "barre",
-                    ">",
-                    "38"
-                  ],
+                  "parameters": ["barre", ">", "38"],
                   "subInstructions": []
                 }
               ],
@@ -885,11 +849,7 @@
                     "inverted": false,
                     "value": "MettreX"
                   },
-                  "parameters": [
-                    "barre",
-                    "-",
-                    "10"
-                  ],
+                  "parameters": ["barre", "-", "10"],
                   "subInstructions": []
                 }
               ],
@@ -920,10 +880,7 @@
                     "inverted": true,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 },
                 {
@@ -931,10 +888,7 @@
                     "inverted": false,
                     "value": "KeyPressed"
                   },
-                  "parameters": [
-                    "",
-                    "Right"
-                  ],
+                  "parameters": ["", "Right"],
                   "subInstructions": []
                 },
                 {
@@ -942,11 +896,7 @@
                     "inverted": false,
                     "value": "PosX"
                   },
-                  "parameters": [
-                    "barre",
-                    "<",
-                    "SceneWindowWidth() - 45"
-                  ],
+                  "parameters": ["barre", "<", "SceneWindowWidth() - 45"],
                   "subInstructions": []
                 }
               ],
@@ -956,11 +906,7 @@
                     "inverted": false,
                     "value": "MettreX"
                   },
-                  "parameters": [
-                    "barre",
-                    "+",
-                    "10"
-                  ],
+                  "parameters": ["barre", "+", "10"],
                   "subInstructions": []
                 }
               ],
@@ -993,11 +939,7 @@
                 "inverted": false,
                 "value": "VarSceneTxt"
               },
-              "parameters": [
-                "device",
-                "=",
-                "\"mobile\""
-              ],
+              "parameters": ["device", "=", "\"mobile\""],
               "subInstructions": []
             }
           ],
@@ -1013,11 +955,7 @@
                     "inverted": false,
                     "value": "PosX"
                   },
-                  "parameters": [
-                    "barre",
-                    "<",
-                    "SceneWindowWidth() - 45"
-                  ],
+                  "parameters": ["barre", "<", "SceneWindowWidth() - 45"],
                   "subInstructions": []
                 },
                 {
@@ -1025,11 +963,7 @@
                     "inverted": false,
                     "value": "PosX"
                   },
-                  "parameters": [
-                    "barre",
-                    "<",
-                    "MouseX()"
-                  ],
+                  "parameters": ["barre", "<", "MouseX()"],
                   "subInstructions": []
                 }
               ],
@@ -1039,11 +973,7 @@
                     "inverted": false,
                     "value": "MettreX"
                   },
-                  "parameters": [
-                    "barre",
-                    "+",
-                    "10"
-                  ],
+                  "parameters": ["barre", "+", "10"],
                   "subInstructions": []
                 }
               ],
@@ -1059,11 +989,7 @@
                     "inverted": false,
                     "value": "PosX"
                   },
-                  "parameters": [
-                    "barre",
-                    ">",
-                    "38"
-                  ],
+                  "parameters": ["barre", ">", "38"],
                   "subInstructions": []
                 },
                 {
@@ -1071,11 +997,7 @@
                     "inverted": false,
                     "value": "PosX"
                   },
-                  "parameters": [
-                    "barre",
-                    ">",
-                    "MouseX()"
-                  ],
+                  "parameters": ["barre", ">", "MouseX()"],
                   "subInstructions": []
                 }
               ],
@@ -1085,11 +1007,7 @@
                     "inverted": false,
                     "value": "MettreX"
                   },
-                  "parameters": [
-                    "barre",
-                    "-",
-                    "10"
-                  ],
+                  "parameters": ["barre", "-", "10"],
                   "subInstructions": []
                 }
               ],
@@ -1122,9 +1040,7 @@
                 "inverted": false,
                 "value": "Arret"
               },
-              "parameters": [
-                "balle"
-              ],
+              "parameters": ["balle"],
               "subInstructions": []
             }
           ],
@@ -1134,12 +1050,7 @@
                 "inverted": false,
                 "value": "AddForceAL"
               },
-              "parameters": [
-                "balle",
-                "-45+Random(5)-Random(5)\n",
-                "250",
-                "1"
-              ],
+              "parameters": ["balle", "-45+Random(5)-Random(5)\n", "250", "1"],
               "subInstructions": []
             }
           ],
@@ -1170,13 +1081,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "balle",
-                "brick",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["balle", "brick", "", "", ""],
               "subInstructions": []
             }
           ],
@@ -1186,12 +1091,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "balle",
-                "ValeurAngle",
-                "=",
-                "balle.ForceAngle()"
-              ],
+              "parameters": ["balle", "ValeurAngle", "=", "balle.ForceAngle()"],
               "subInstructions": []
             }
           ],
@@ -1206,11 +1106,7 @@
                     "inverted": false,
                     "value": "PosX"
                   },
-                  "parameters": [
-                    "balle",
-                    "<",
-                    "brick.X()+2"
-                  ],
+                  "parameters": ["balle", "<", "brick.X()+2"],
                   "subInstructions": []
                 }
               ],
@@ -1220,9 +1116,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "balle"
-                  ],
+                  "parameters": ["balle"],
                   "subInstructions": []
                 },
                 {
@@ -1243,11 +1137,7 @@
                     "inverted": false,
                     "value": "MettreX"
                   },
-                  "parameters": [
-                    "balle",
-                    "=",
-                    "brick.X()-balle.Width()"
-                  ],
+                  "parameters": ["balle", "=", "brick.X()-balle.Width()"],
                   "subInstructions": []
                 }
               ],
@@ -1277,9 +1167,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "balle"
-                  ],
+                  "parameters": ["balle"],
                   "subInstructions": []
                 },
                 {
@@ -1300,11 +1188,7 @@
                     "inverted": false,
                     "value": "MettreX"
                   },
-                  "parameters": [
-                    "balle",
-                    "=",
-                    "brick.X()+brick.Width()"
-                  ],
+                  "parameters": ["balle", "=", "brick.X()+brick.Width()"],
                   "subInstructions": []
                 }
               ],
@@ -1320,11 +1204,7 @@
                     "inverted": false,
                     "value": "PosY"
                   },
-                  "parameters": [
-                    "balle",
-                    "<",
-                    "brick.Y()+1"
-                  ],
+                  "parameters": ["balle", "<", "brick.Y()+1"],
                   "subInstructions": []
                 }
               ],
@@ -1334,9 +1214,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "balle"
-                  ],
+                  "parameters": ["balle"],
                   "subInstructions": []
                 },
                 {
@@ -1357,11 +1235,7 @@
                     "inverted": false,
                     "value": "MettreY"
                   },
-                  "parameters": [
-                    "balle",
-                    "=",
-                    "brick.Y()-balle.Height()"
-                  ],
+                  "parameters": ["balle", "=", "brick.Y()-balle.Height()"],
                   "subInstructions": []
                 }
               ],
@@ -1391,9 +1265,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "balle"
-                  ],
+                  "parameters": ["balle"],
                   "subInstructions": []
                 },
                 {
@@ -1414,11 +1286,7 @@
                     "inverted": false,
                     "value": "MettreY"
                   },
-                  "parameters": [
-                    "balle",
-                    "=",
-                    "brick.Y()+brick.Height()"
-                  ],
+                  "parameters": ["balle", "=", "brick.Y()+brick.Height()"],
                   "subInstructions": []
                 }
               ],
@@ -1435,10 +1303,7 @@
                     "inverted": false,
                     "value": "Delete"
                   },
-                  "parameters": [
-                    "brick",
-                    ""
-                  ],
+                  "parameters": ["brick", ""],
                   "subInstructions": []
                 }
               ],
@@ -1471,11 +1336,7 @@
                 "inverted": false,
                 "value": "PosY"
               },
-              "parameters": [
-                "balle",
-                "<",
-                "10"
-              ],
+              "parameters": ["balle", "<", "10"],
               "subInstructions": []
             }
           ],
@@ -1485,12 +1346,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "balle",
-                "ValeurAngle",
-                "=",
-                "balle.ForceAngle()"
-              ],
+              "parameters": ["balle", "ValeurAngle", "=", "balle.ForceAngle()"],
               "subInstructions": []
             },
             {
@@ -1498,9 +1354,7 @@
                 "inverted": false,
                 "value": "Arreter"
               },
-              "parameters": [
-                "balle"
-              ],
+              "parameters": ["balle"],
               "subInstructions": []
             },
             {
@@ -1521,11 +1375,7 @@
                 "inverted": false,
                 "value": "MettreY"
               },
-              "parameters": [
-                "balle",
-                "=",
-                "11"
-              ],
+              "parameters": ["balle", "=", "11"],
               "subInstructions": []
             }
           ],
@@ -1541,11 +1391,7 @@
                 "inverted": false,
                 "value": "PosX"
               },
-              "parameters": [
-                "balle",
-                ">",
-                "790"
-              ],
+              "parameters": ["balle", ">", "790"],
               "subInstructions": []
             }
           ],
@@ -1555,12 +1401,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "balle",
-                "ValeurAngle",
-                "=",
-                "balle.ForceAngle()"
-              ],
+              "parameters": ["balle", "ValeurAngle", "=", "balle.ForceAngle()"],
               "subInstructions": []
             },
             {
@@ -1568,9 +1409,7 @@
                 "inverted": false,
                 "value": "Arreter"
               },
-              "parameters": [
-                "balle"
-              ],
+              "parameters": ["balle"],
               "subInstructions": []
             },
             {
@@ -1591,11 +1430,7 @@
                 "inverted": false,
                 "value": "MettreX"
               },
-              "parameters": [
-                "balle",
-                "=",
-                "789"
-              ],
+              "parameters": ["balle", "=", "789"],
               "subInstructions": []
             }
           ],
@@ -1611,11 +1446,7 @@
                 "inverted": false,
                 "value": "PosX"
               },
-              "parameters": [
-                "balle",
-                "<",
-                "10"
-              ],
+              "parameters": ["balle", "<", "10"],
               "subInstructions": []
             }
           ],
@@ -1625,12 +1456,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "balle",
-                "ValeurAngle",
-                "=",
-                "balle.ForceAngle()"
-              ],
+              "parameters": ["balle", "ValeurAngle", "=", "balle.ForceAngle()"],
               "subInstructions": []
             },
             {
@@ -1638,9 +1464,7 @@
                 "inverted": false,
                 "value": "Arreter"
               },
-              "parameters": [
-                "balle"
-              ],
+              "parameters": ["balle"],
               "subInstructions": []
             },
             {
@@ -1661,11 +1485,7 @@
                 "inverted": false,
                 "value": "MettreX"
               },
-              "parameters": [
-                "balle",
-                "=",
-                "11"
-              ],
+              "parameters": ["balle", "=", "11"],
               "subInstructions": []
             }
           ],
@@ -1696,10 +1516,7 @@
                 "inverted": false,
                 "value": "Collision"
               },
-              "parameters": [
-                "balle",
-                "barre"
-              ],
+              "parameters": ["balle", "barre"],
               "subInstructions": []
             }
           ],
@@ -1709,12 +1526,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "balle",
-                "ValeurAngle",
-                "=",
-                "balle.ForceAngle()"
-              ],
+              "parameters": ["balle", "ValeurAngle", "=", "balle.ForceAngle()"],
               "subInstructions": []
             },
             {
@@ -1722,9 +1534,7 @@
                 "inverted": false,
                 "value": "Arreter"
               },
-              "parameters": [
-                "balle"
-              ],
+              "parameters": ["balle"],
               "subInstructions": []
             },
             {
@@ -1745,11 +1555,7 @@
                 "inverted": false,
                 "value": "MettreY"
               },
-              "parameters": [
-                "balle",
-                "=",
-                "barre.Y()-10"
-              ],
+              "parameters": ["balle", "=", "barre.Y()-10"],
               "subInstructions": []
             }
           ],
@@ -1787,11 +1593,7 @@
                     "inverted": false,
                     "value": "PosY"
                   },
-                  "parameters": [
-                    "balle",
-                    ">",
-                    "600"
-                  ],
+                  "parameters": ["balle", ">", "600"],
                   "subInstructions": []
                 },
                 {
@@ -1799,11 +1601,7 @@
                     "inverted": false,
                     "value": "NbObjet"
                   },
-                  "parameters": [
-                    "brick",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["brick", "=", "0"],
                   "subInstructions": []
                 }
               ]
@@ -1815,10 +1613,7 @@
                 "inverted": false,
                 "value": "Scene"
               },
-              "parameters": [
-                "",
-                "\"Pong\""
-              ],
+              "parameters": ["", "\"Pong\""],
               "subInstructions": []
             }
           ],

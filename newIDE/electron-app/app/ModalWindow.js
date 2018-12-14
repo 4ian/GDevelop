@@ -2,9 +2,7 @@ const electron = require("electron");
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const isDev = require("electron-is").dev();
 const ipcMain = electron.ipcMain;
-const {
-  load
-} = require('./Utils/UrlLoader');
+const { load } = require("./Utils/UrlLoader");
 
 // Generic function to load external editors in a modal window.
 // Keep a global reference of the window object, if you don't, the window will
@@ -24,9 +22,8 @@ const loadModalWindow = ({
   relativeWidth = 0.7,
   relativeHeight = 0.9,
   backgroundColor = "white",
-  show = false,
+  show = false
 }) => {
-
   if (modalWindow) {
     modalWindow.show();
     onReady(modalWindow);

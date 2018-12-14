@@ -1,4 +1,7 @@
-gdjs.LoadingScreenPixiRenderer = function(runtimeGamePixiRenderer, loadingScreenSetup) {
+gdjs.LoadingScreenPixiRenderer = function(
+  runtimeGamePixiRenderer,
+  loadingScreenSetup
+) {
   this._pixiRenderer = runtimeGamePixiRenderer.getPIXIRenderer();
   this._loadingScreen = new PIXI.Container();
 

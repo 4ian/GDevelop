@@ -361,9 +361,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -373,12 +371,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "Box",
-                "initialX",
-                "=",
-                "Box.X()"
-              ],
+              "parameters": ["Box", "initialX", "=", "Box.X()"],
               "subInstructions": []
             },
             {
@@ -386,12 +379,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "Box",
-                "initialY",
-                "=",
-                "Box.Y()"
-              ],
+              "parameters": ["Box", "initialY", "=", "Box.Y()"],
               "subInstructions": []
             },
             {
@@ -399,11 +387,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "maxDistance",
-                "=",
-                "50"
-              ],
+              "parameters": ["maxDistance", "=", "50"],
               "subInstructions": []
             },
             {
@@ -411,11 +395,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "movementSpeed",
-                "=",
-                "100"
-              ],
+              "parameters": ["movementSpeed", "=", "100"],
               "subInstructions": []
             },
             {
@@ -423,11 +403,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "movementDirection",
-                "=",
-                "\"vertical\""
-              ],
+              "parameters": ["movementDirection", "=", "\"vertical\""],
               "subInstructions": []
             }
           ],
@@ -457,11 +433,7 @@
                     "inverted": false,
                     "value": "VarSceneTxt"
                   },
-                  "parameters": [
-                    "movementDirection",
-                    "=",
-                    "\"horizontal\""
-                  ],
+                  "parameters": ["movementDirection", "=", "\"horizontal\""],
                   "subInstructions": []
                 }
               ],
@@ -471,11 +443,7 @@
                     "inverted": false,
                     "value": "MettreX"
                   },
-                  "parameters": [
-                    "Box",
-                    "+",
-                    "Variable(maxDistance)"
-                  ],
+                  "parameters": ["Box", "+", "Variable(maxDistance)"],
                   "subInstructions": []
                 }
               ],
@@ -506,11 +474,7 @@
                     "inverted": false,
                     "value": "VarSceneTxt"
                   },
-                  "parameters": [
-                    "movementDirection",
-                    "=",
-                    "\"vertical\""
-                  ],
+                  "parameters": ["movementDirection", "=", "\"vertical\""],
                   "subInstructions": []
                 }
               ],
@@ -520,11 +484,7 @@
                     "inverted": false,
                     "value": "MettreY"
                   },
-                  "parameters": [
-                    "Box",
-                    "+",
-                    "Variable(maxDistance)"
-                  ],
+                  "parameters": ["Box", "+", "Variable(maxDistance)"],
                   "subInstructions": []
                 }
               ],
@@ -557,11 +517,7 @@
                 "inverted": false,
                 "value": "VarSceneTxt"
               },
-              "parameters": [
-                "movementDirection",
-                "=",
-                "\"horizontal\""
-              ],
+              "parameters": ["movementDirection", "=", "\"horizontal\""],
               "subInstructions": []
             }
           ],
@@ -614,9 +570,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "Box"
-                  ],
+                  "parameters": ["Box"],
                   "subInstructions": []
                 },
                 {
@@ -624,12 +578,7 @@
                     "inverted": false,
                     "value": "AddForceXY"
                   },
-                  "parameters": [
-                    "Box",
-                    "Variable(movementSpeed)",
-                    "0",
-                    "1"
-                  ],
+                  "parameters": ["Box", "Variable(movementSpeed)", "0", "1"],
                   "subInstructions": []
                 }
               ],
@@ -682,9 +631,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "Box"
-                  ],
+                  "parameters": ["Box"],
                   "subInstructions": []
                 },
                 {
@@ -692,12 +639,7 @@
                     "inverted": false,
                     "value": "AddForceXY"
                   },
-                  "parameters": [
-                    "Box",
-                    "-Variable(movementSpeed)",
-                    "0",
-                    "1"
-                  ],
+                  "parameters": ["Box", "-Variable(movementSpeed)", "0", "1"],
                   "subInstructions": []
                 }
               ],
@@ -730,11 +672,7 @@
                 "inverted": false,
                 "value": "VarSceneTxt"
               },
-              "parameters": [
-                "movementDirection",
-                "=",
-                "\"vertical\""
-              ],
+              "parameters": ["movementDirection", "=", "\"vertical\""],
               "subInstructions": []
             }
           ],
@@ -787,9 +725,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "Box"
-                  ],
+                  "parameters": ["Box"],
                   "subInstructions": []
                 },
                 {
@@ -797,12 +733,7 @@
                     "inverted": false,
                     "value": "AddForceXY"
                   },
-                  "parameters": [
-                    "Box",
-                    "0",
-                    "Variable(movementSpeed)",
-                    "1"
-                  ],
+                  "parameters": ["Box", "0", "Variable(movementSpeed)", "1"],
                   "subInstructions": []
                 }
               ],
@@ -855,9 +786,7 @@
                     "inverted": false,
                     "value": "Arreter"
                   },
-                  "parameters": [
-                    "Box"
-                  ],
+                  "parameters": ["Box"],
                   "subInstructions": []
                 },
                 {
@@ -865,12 +794,7 @@
                     "inverted": false,
                     "value": "AddForceXY"
                   },
-                  "parameters": [
-                    "Box",
-                    "0",
-                    "-Variable(movementSpeed)",
-                    "1"
-                  ],
+                  "parameters": ["Box", "0", "-Variable(movementSpeed)", "1"],
                   "subInstructions": []
                 }
               ],

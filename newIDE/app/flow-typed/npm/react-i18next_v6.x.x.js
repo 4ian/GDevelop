@@ -1,14 +1,14 @@
 // flow-typed signature: 6c6a5771bbdffe188d60637063b5f9a4
 // flow-typed version: 6533cd10ce/react-i18next_v6.x.x/flow_>=v0.53.x
 
-declare module "react-i18next" {
+declare module 'react-i18next' {
   declare type TFunction = (key?: ?string, data?: ?Object) => string;
   declare type Locales = string | Array<string>;
 
   declare type TranslatorProps = {
     t: TFunction,
     i18nLoadedAt: Date,
-    i18n: Object
+    i18n: Object,
   };
 
   declare type Translator<OP, P> = (
@@ -17,12 +17,12 @@ declare module "react-i18next" {
 
   declare type TranslateOptions = $Shape<{
     wait: boolean,
-    nsMode: "default" | "fallback",
+    nsMode: 'default' | 'fallback',
     bindi18n: false | string,
     bindStore: false | string,
     withRef: boolean,
     translateFuncName: string,
-    i18n: Object
+    i18n: Object,
   }>;
 
   declare function translate<OP, P>(
@@ -35,7 +35,7 @@ declare module "react-i18next" {
     ns?: string | Array<string>,
     children: (t: TFunction, { i18n: Object, t: TFunction }) => React$Node,
     initialI18nStore?: Object,
-    initialLanguage?: string
+    initialLanguage?: string,
   };
   declare var I18n: React$ComponentType<I18nProps>;
 
@@ -48,7 +48,7 @@ declare module "react-i18next" {
     parent?: string,
     style?: Object,
     t?: TFunction,
-    useDangerouslySetInnerHTML?: boolean
+    useDangerouslySetInnerHTML?: boolean,
   };
   declare var Interpolate: React$ComponentType<InterpolateProps>;
 
@@ -57,7 +57,7 @@ declare module "react-i18next" {
     parent?: string,
     i18n?: Object,
     i18nKey?: string,
-    t?: TFunction
+    t?: TFunction,
   };
   declare var Trans: React$ComponentType<TransProps>;
 
@@ -66,22 +66,22 @@ declare module "react-i18next" {
 
   declare type NamespacesProps = {
     components: Array<React$ComponentType<*>>,
-    i18n: { loadNamespaces: Function }
+    i18n: { loadNamespaces: Function },
   };
   declare function loadNamespaces(props: NamespacesProps): Promise<void>;
 
   declare var reactI18nextModule: {
-    type: "3rdParty",
-    init: (instance: Object) => void
+    type: '3rdParty',
+    init: (instance: Object) => void,
   };
 
   declare var defaultOptions: {
     wait: false,
     withRef: false,
-    bindI18n: "languageChanged loaded",
-    bindStore: "added removed",
-    translateFuncName: "t",
-    nsMode: "default"
+    bindI18n: 'languageChanged loaded',
+    bindStore: 'added removed',
+    translateFuncName: 't',
+    nsMode: 'default',
   };
 
   declare function setDefaults(options: TranslateOptions): void;

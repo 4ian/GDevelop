@@ -268,9 +268,7 @@
                 "inverted": false,
                 "value": "PopStartedTouch"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -280,13 +278,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "Marker",
-                "0",
-                "0",
-                ""
-              ],
+              "parameters": ["", "Marker", "0", "0", ""],
               "subInstructions": []
             },
             {
@@ -294,12 +286,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "Marker",
-                "TouchId",
-                "=",
-                "LastTouchId()"
-              ],
+              "parameters": ["Marker", "TouchId", "=", "LastTouchId()"],
               "subInstructions": []
             }
           ],
@@ -331,9 +318,7 @@
                 "inverted": false,
                 "value": "PopEndedTouch"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -343,12 +328,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "Marker",
-                "TouchId",
-                "=",
-                "LastEndedTouchId()"
-              ],
+              "parameters": ["Marker", "TouchId", "=", "LastEndedTouchId()"],
               "subInstructions": []
             }
           ],
@@ -358,10 +338,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Marker",
-                ""
-              ],
+              "parameters": ["Marker", ""],
               "subInstructions": []
             }
           ],

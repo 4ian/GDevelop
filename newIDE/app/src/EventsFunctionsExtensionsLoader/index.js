@@ -30,7 +30,7 @@ export const loadProjectEventsFunctionsExtensions = (
         project,
         project.getEventsFunctionsExtensionAt(i),
         eventsFunctionWriter,
-        {skipCodeGeneration: true}
+        { skipCodeGeneration: true }
       );
     })
   ).then(() =>
@@ -51,7 +51,7 @@ const loadProjectEventsFunctionsExtension = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsFunctionWriter: EventsFunctionWriter,
-  options: {skipCodeGeneration?: boolean} = {}
+  options: { skipCodeGeneration?: boolean } = {}
 ): Promise<void> => {
   return generateEventsFunctionExtension(
     project,
@@ -71,7 +71,7 @@ const generateEventsFunctionExtension = (
   project: gdProject,
   eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsFunctionWriter: EventsFunctionWriter,
-  {skipCodeGeneration}: {skipCodeGeneration?: boolean} = {}
+  { skipCodeGeneration }: { skipCodeGeneration?: boolean } = {}
 ): Promise<gdEventsFunctionsExtension> => {
   const extension = new gd.PlatformExtension();
 
@@ -105,7 +105,7 @@ const generateEventsFunctionExtension = (
       codeExtraInformation
         .setIncludeFile(eventsFunctionWriter.getIncludeFileFor(functionName))
         .setFunctionName(functionName);
-      
+
       if (!skipCodeGeneration) {
         const includeFiles = new gd.SetString();
         const code = gd.EventsCodeGenerator.generateEventsFunctionCode(
@@ -118,7 +118,7 @@ const generateEventsFunctionExtension = (
           // as extensions generated can be used either for preview or export.
           true
         );
-      
+
         // Add any include file required by the function to the list
         // of include files for this function (so that when used, the "dependencies"
         // are transitively included).
@@ -128,9 +128,9 @@ const generateEventsFunctionExtension = (
           .forEach((includeFile: string) => {
             codeExtraInformation.addIncludeFile(includeFile);
           });
-      
+
         includeFiles.delete();
-      
+
         return eventsFunctionWriter.writeFunctionCode(functionName, code);
       } else {
         // Skip code generation if no events function writer is provided.
@@ -150,9 +150,9 @@ export const unloadProjectEventsFunctionsExtensions = (
 ): Promise<void> => {
   return Promise.all(
     mapFor(0, project.getEventsFunctionsExtensionsCount(), i => {
-      gd.JsPlatform
-        .get()
-        .removeExtension(project.getEventsFunctionsExtensionAt(i).getName());
+      gd.JsPlatform.get().removeExtension(
+        project.getEventsFunctionsExtensionAt(i).getName()
+      );
     })
   );
 };

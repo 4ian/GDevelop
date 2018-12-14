@@ -148,18 +148,19 @@ export default class RuntimeSceneInspector extends React.Component<
                     });
                   }
                 }}
-                dataSource={Object.keys(
-                  runtimeScene._objects.items
-                ).map(objectName => ({
-                  text: objectName,
-                  value: objectName,
-                }))}
+                dataSource={Object.keys(runtimeScene._objects.items).map(
+                  objectName => ({
+                    text: objectName,
+                    value: objectName,
+                  })
+                )}
               />
               <RaisedButton
                 label="Create"
                 primary
                 onClick={() =>
-                  onCall(['createObject'], [this.state.newObjectName])}
+                  onCall(['createObject'], [this.state.newObjectName])
+                }
               />
             </Line>
           )}

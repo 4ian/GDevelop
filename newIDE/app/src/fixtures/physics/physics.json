@@ -2954,12 +2954,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::AddRevoluteJoint"
               },
-              "parameters": [
-                "Lever",
-                "Physics",
-                "309",
-                "243"
-              ],
+              "parameters": ["Lever", "Physics", "309", "243"],
               "subInstructions": []
             }
           ],
@@ -2990,10 +2985,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -3011,13 +3003,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "BigBox",
-                "MouseX()",
-                "MouseY()",
-                ""
-              ],
+              "parameters": ["", "BigBox", "MouseX()", "MouseY()", ""],
               "subInstructions": []
             }
           ],
@@ -3048,10 +3034,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Right"
-              ],
+              "parameters": ["", "Right"],
               "subInstructions": []
             }
           ],
@@ -3061,12 +3044,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::ApplyForce"
               },
-              "parameters": [
-                "BlackSphere",
-                "Physics",
-                "15",
-                "-5"
-              ],
+              "parameters": ["BlackSphere", "Physics", "15", "-5"],
               "subInstructions": []
             }
           ],
@@ -3097,11 +3075,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::CollisionWith"
               },
-              "parameters": [
-                "Text",
-                "Physics",
-                "BigBox"
-              ],
+              "parameters": ["Text", "Physics", "BigBox"],
               "subInstructions": []
             }
           ],
@@ -3111,10 +3085,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::SetDynamic"
               },
-              "parameters": [
-                "Text",
-                "Physics"
-              ],
+              "parameters": ["Text", "Physics"],
               "subInstructions": []
             }
           ],

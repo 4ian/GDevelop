@@ -439,9 +439,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -451,10 +449,7 @@
                 "inverted": false,
                 "value": "SceneBackground"
               },
-              "parameters": [
-                "",
-                "\"0;0;0\""
-              ],
+              "parameters": ["", "\"0;0;0\""],
               "subInstructions": []
             }
           ],
@@ -485,12 +480,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "button",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["button", "", "", ""],
               "subInstructions": []
             },
             {
@@ -508,10 +498,7 @@
                 "inverted": false,
                 "value": "TextObject::ChangeColor"
               },
-              "parameters": [
-                "button",
-                "\"0;255;128\""
-              ],
+              "parameters": ["button", "\"0;255;128\""],
               "subInstructions": []
             }
           ],
@@ -527,12 +514,7 @@
                 "inverted": true,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "button",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["button", "", "", ""],
               "subInstructions": []
             },
             {
@@ -550,10 +532,7 @@
                 "inverted": false,
                 "value": "TextObject::ChangeColor"
               },
-              "parameters": [
-                "button",
-                "\"255;255;255\""
-              ],
+              "parameters": ["button", "\"255;255;255\""],
               "subInstructions": []
             }
           ],
@@ -584,10 +563,7 @@
                 "inverted": false,
                 "value": "MouseButtonReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -603,12 +579,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "button",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["button", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -618,11 +589,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"asteroids\"",
-                    "true"
-                  ],
+                  "parameters": ["", "\"asteroids\"", "true"],
                   "subInstructions": []
                 }
               ],
@@ -1858,9 +1825,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -1892,11 +1857,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "player_life",
-                        "=",
-                        "3"
-                      ],
+                      "parameters": ["player_life", "=", "3"],
                       "subInstructions": []
                     },
                     {
@@ -1904,11 +1865,7 @@
                         "inverted": false,
                         "value": "ModVarGlobal"
                       },
-                      "parameters": [
-                        "large_asteroid_to_spawn",
-                        "=",
-                        "5"
-                      ],
+                      "parameters": ["large_asteroid_to_spawn", "=", "5"],
                       "subInstructions": []
                     },
                     {
@@ -1916,11 +1873,7 @@
                         "inverted": false,
                         "value": "ModVarGlobal"
                       },
-                      "parameters": [
-                        "medium_asteroid_to_spawn",
-                        "=",
-                        "2"
-                      ],
+                      "parameters": ["medium_asteroid_to_spawn", "=", "2"],
                       "subInstructions": []
                     },
                     {
@@ -1928,11 +1881,7 @@
                         "inverted": false,
                         "value": "ModVarGlobal"
                       },
-                      "parameters": [
-                        "small_asteroid_to_spawn",
-                        "=",
-                        "3"
-                      ],
+                      "parameters": ["small_asteroid_to_spawn", "=", "3"],
                       "subInstructions": []
                     },
                     {
@@ -1940,11 +1889,7 @@
                         "inverted": false,
                         "value": "ModVarGlobalTxt"
                       },
-                      "parameters": [
-                        "player_turnleft_key",
-                        "=",
-                        "\"a\""
-                      ],
+                      "parameters": ["player_turnleft_key", "=", "\"a\""],
                       "subInstructions": []
                     },
                     {
@@ -1952,11 +1897,7 @@
                         "inverted": false,
                         "value": "ModVarGlobalTxt"
                       },
-                      "parameters": [
-                        "player_turnright_key",
-                        "=",
-                        "\"d\""
-                      ],
+                      "parameters": ["player_turnright_key", "=", "\"d\""],
                       "subInstructions": []
                     },
                     {
@@ -1964,11 +1905,7 @@
                         "inverted": false,
                         "value": "ModVarGlobalTxt"
                       },
-                      "parameters": [
-                        "player_forward_key",
-                        "=",
-                        "\"w\""
-                      ],
+                      "parameters": ["player_forward_key", "=", "\"w\""],
                       "subInstructions": []
                     },
                     {
@@ -1976,11 +1913,7 @@
                         "inverted": false,
                         "value": "ModVarGlobalTxt"
                       },
-                      "parameters": [
-                        "player_shoot_key",
-                        "=",
-                        "\"Space\""
-                      ],
+                      "parameters": ["player_shoot_key", "=", "\"Space\""],
                       "subInstructions": []
                     },
                     {
@@ -1988,11 +1921,7 @@
                         "inverted": false,
                         "value": "ModVarGlobal"
                       },
-                      "parameters": [
-                        "sound_volume",
-                        "=",
-                        "30"
-                      ],
+                      "parameters": ["sound_volume", "=", "30"],
                       "subInstructions": []
                     },
                     {
@@ -2000,10 +1929,7 @@
                         "inverted": false,
                         "value": "UnPauseTimer"
                       },
-                      "parameters": [
-                        "",
-                        "\"player_shoot_timer\""
-                      ],
+                      "parameters": ["", "\"player_shoot_timer\""],
                       "subInstructions": []
                     }
                   ],
@@ -2044,10 +1970,7 @@
                         "inverted": false,
                         "value": "HideLayer"
                       },
-                      "parameters": [
-                        "",
-                        "\"touch\""
-                      ],
+                      "parameters": ["", "\"touch\""],
                       "subInstructions": []
                     }
                   ],
@@ -2079,10 +2002,7 @@
                         "inverted": false,
                         "value": "SceneBackground"
                       },
-                      "parameters": [
-                        "",
-                        "\"0;0;0\""
-                      ],
+                      "parameters": ["", "\"0;0;0\""],
                       "subInstructions": []
                     }
                   ],
@@ -2210,11 +2130,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "debrish_speed",
-                        "=",
-                        "Random(10) + 10"
-                      ],
+                      "parameters": ["debrish_speed", "=", "Random(10) + 10"],
                       "subInstructions": []
                     },
                     {
@@ -2222,11 +2138,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "debrish_rotation",
-                        "=",
-                        "10"
-                      ],
+                      "parameters": ["debrish_rotation", "=", "10"],
                       "subInstructions": []
                     }
                   ],
@@ -2273,11 +2185,7 @@
                         "inverted": false,
                         "value": "ChangePlan"
                       },
-                      "parameters": [
-                        "larg_asteroid",
-                        "=",
-                        "3"
-                      ],
+                      "parameters": ["larg_asteroid", "=", "3"],
                       "subInstructions": []
                     },
                     {
@@ -2285,11 +2193,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "larg_asteroid",
-                        "=",
-                        "Random(2)"
-                      ],
+                      "parameters": ["larg_asteroid", "=", "Random(2)"],
                       "subInstructions": []
                     },
                     {
@@ -2346,11 +2250,7 @@
                             "inverted": false,
                             "value": "CollisionNP"
                           },
-                          "parameters": [
-                            "larg_asteroid",
-                            "player",
-                            ""
-                          ],
+                          "parameters": ["larg_asteroid", "player", ""],
                           "subInstructions": []
                         }
                       ],
@@ -2546,11 +2446,7 @@
                     "inverted": false,
                     "value": "NbObjet"
                   },
-                  "parameters": [
-                    "larg_asteroid",
-                    ">",
-                    "0"
-                  ],
+                  "parameters": ["larg_asteroid", ">", "0"],
                   "subInstructions": []
                 }
               ],
@@ -2589,12 +2485,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "larg_asteroid",
-                            "rotation",
-                            "=",
-                            "0"
-                          ],
+                          "parameters": ["larg_asteroid", "rotation", "=", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -2624,12 +2515,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "larg_asteroid",
-                            "rotation",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["larg_asteroid", "rotation", "=", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -2862,11 +2748,7 @@
                             "inverted": false,
                             "value": "CollisionNP"
                           },
-                          "parameters": [
-                            "player_bullet",
-                            "larg_asteroid",
-                            ""
-                          ],
+                          "parameters": ["player_bullet", "larg_asteroid", ""],
                           "subInstructions": []
                         },
                         {
@@ -2884,11 +2766,7 @@
                             "inverted": false,
                             "value": "ModVarGlobal"
                           },
-                          "parameters": [
-                            "asteroid_count",
-                            "+",
-                            "1"
-                          ],
+                          "parameters": ["asteroid_count", "+", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -2919,11 +2797,7 @@
                                 "inverted": false,
                                 "value": "ModVarScene"
                               },
-                              "parameters": [
-                                "debrish_angle",
-                                "=",
-                                "0"
-                              ],
+                              "parameters": ["debrish_angle", "=", "0"],
                               "subInstructions": []
                             }
                           ],
@@ -2955,11 +2829,7 @@
                                 "inverted": false,
                                 "value": "ChangePlan"
                               },
-                              "parameters": [
-                                "debrish",
-                                "=",
-                                "4"
-                              ],
+                              "parameters": ["debrish", "=", "4"],
                               "subInstructions": []
                             },
                             {
@@ -2980,12 +2850,7 @@
                                 "inverted": false,
                                 "value": "ModVarObjet"
                               },
-                              "parameters": [
-                                "debrish",
-                                "opacity",
-                                "=",
-                                "255"
-                              ],
+                              "parameters": ["debrish", "opacity", "=", "255"],
                               "subInstructions": []
                             },
                             {
@@ -3057,11 +2922,7 @@
                                 "inverted": false,
                                 "value": "ChangePlan"
                               },
-                              "parameters": [
-                                "medium_asteroid",
-                                "=",
-                                "3"
-                              ],
+                              "parameters": ["medium_asteroid", "=", "3"],
                               "subInstructions": []
                             },
                             {
@@ -3116,10 +2977,7 @@
                                 "inverted": false,
                                 "value": "Delete"
                               },
-                              "parameters": [
-                                "larg_asteroid",
-                                ""
-                              ],
+                              "parameters": ["larg_asteroid", ""],
                               "subInstructions": []
                             },
                             {
@@ -3127,10 +2985,7 @@
                                 "inverted": false,
                                 "value": "Delete"
                               },
-                              "parameters": [
-                                "player_bullet",
-                                ""
-                              ],
+                              "parameters": ["player_bullet", ""],
                               "subInstructions": []
                             }
                           ],
@@ -3205,11 +3060,7 @@
                     "inverted": false,
                     "value": "NbObjet"
                   },
-                  "parameters": [
-                    "medium_asteroid",
-                    ">",
-                    "0"
-                  ],
+                  "parameters": ["medium_asteroid", ">", "0"],
                   "subInstructions": []
                 }
               ],
@@ -3452,11 +3303,7 @@
                             "inverted": false,
                             "value": "MettreY"
                           },
-                          "parameters": [
-                            "medium_asteroid",
-                            "=",
-                            "-32"
-                          ],
+                          "parameters": ["medium_asteroid", "=", "-32"],
                           "subInstructions": []
                         }
                       ],
@@ -3472,11 +3319,7 @@
                             "inverted": false,
                             "value": "PosY"
                           },
-                          "parameters": [
-                            "medium_asteroid",
-                            "<",
-                            "-32"
-                          ],
+                          "parameters": ["medium_asteroid", "<", "-32"],
                           "subInstructions": []
                         }
                       ],
@@ -3543,11 +3386,7 @@
                             "inverted": false,
                             "value": "ModVarGlobal"
                           },
-                          "parameters": [
-                            "asteroid_count",
-                            "+",
-                            "1"
-                          ],
+                          "parameters": ["asteroid_count", "+", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -3578,11 +3417,7 @@
                                 "inverted": false,
                                 "value": "ModVarScene"
                               },
-                              "parameters": [
-                                "debrish_angle",
-                                "=",
-                                "0"
-                              ],
+                              "parameters": ["debrish_angle", "=", "0"],
                               "subInstructions": []
                             }
                           ],
@@ -3614,11 +3449,7 @@
                                 "inverted": false,
                                 "value": "ChangePlan"
                               },
-                              "parameters": [
-                                "debrish",
-                                "=",
-                                "4"
-                              ],
+                              "parameters": ["debrish", "=", "4"],
                               "subInstructions": []
                             },
                             {
@@ -3639,12 +3470,7 @@
                                 "inverted": false,
                                 "value": "ModVarObjet"
                               },
-                              "parameters": [
-                                "debrish",
-                                "opacity",
-                                "=",
-                                "255"
-                              ],
+                              "parameters": ["debrish", "opacity", "=", "255"],
                               "subInstructions": []
                             },
                             {
@@ -3716,11 +3542,7 @@
                                 "inverted": false,
                                 "value": "ChangePlan"
                               },
-                              "parameters": [
-                                "small_asteroid",
-                                "=",
-                                "3"
-                              ],
+                              "parameters": ["small_asteroid", "=", "3"],
                               "subInstructions": []
                             },
                             {
@@ -3775,10 +3597,7 @@
                                 "inverted": false,
                                 "value": "Delete"
                               },
-                              "parameters": [
-                                "medium_asteroid",
-                                ""
-                              ],
+                              "parameters": ["medium_asteroid", ""],
                               "subInstructions": []
                             },
                             {
@@ -3786,10 +3605,7 @@
                                 "inverted": false,
                                 "value": "Delete"
                               },
-                              "parameters": [
-                                "player_bullet",
-                                ""
-                              ],
+                              "parameters": ["player_bullet", ""],
                               "subInstructions": []
                             }
                           ],
@@ -3864,11 +3680,7 @@
                     "inverted": false,
                     "value": "NbObjet"
                   },
-                  "parameters": [
-                    "small_asteroid",
-                    ">",
-                    "0"
-                  ],
+                  "parameters": ["small_asteroid", ">", "0"],
                   "subInstructions": []
                 }
               ],
@@ -4180,11 +3992,7 @@
                             "inverted": false,
                             "value": "CollisionNP"
                           },
-                          "parameters": [
-                            "player_bullet",
-                            "small_asteroid",
-                            ""
-                          ],
+                          "parameters": ["player_bullet", "small_asteroid", ""],
                           "subInstructions": []
                         },
                         {
@@ -4202,11 +4010,7 @@
                             "inverted": false,
                             "value": "ModVarGlobal"
                           },
-                          "parameters": [
-                            "asteroid_count",
-                            "+",
-                            "1"
-                          ],
+                          "parameters": ["asteroid_count", "+", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -4222,11 +4026,7 @@
                                 "inverted": false,
                                 "value": "ModVarScene"
                               },
-                              "parameters": [
-                                "debrish_angle",
-                                "=",
-                                "0"
-                              ],
+                              "parameters": ["debrish_angle", "=", "0"],
                               "subInstructions": []
                             }
                           ],
@@ -4258,11 +4058,7 @@
                                 "inverted": false,
                                 "value": "ChangePlan"
                               },
-                              "parameters": [
-                                "debrish",
-                                "=",
-                                "4"
-                              ],
+                              "parameters": ["debrish", "=", "4"],
                               "subInstructions": []
                             },
                             {
@@ -4283,12 +4079,7 @@
                                 "inverted": false,
                                 "value": "ModVarObjet"
                               },
-                              "parameters": [
-                                "debrish",
-                                "opacity",
-                                "=",
-                                "255"
-                              ],
+                              "parameters": ["debrish", "opacity", "=", "255"],
                               "subInstructions": []
                             },
                             {
@@ -4330,10 +4121,7 @@
                                 "inverted": false,
                                 "value": "Delete"
                               },
-                              "parameters": [
-                                "small_asteroid",
-                                ""
-                              ],
+                              "parameters": ["small_asteroid", ""],
                               "subInstructions": []
                             },
                             {
@@ -4341,10 +4129,7 @@
                                 "inverted": false,
                                 "value": "Delete"
                               },
-                              "parameters": [
-                                "player_bullet",
-                                ""
-                              ],
+                              "parameters": ["player_bullet", ""],
                               "subInstructions": []
                             }
                           ],
@@ -4419,11 +4204,7 @@
                     "inverted": false,
                     "value": "NbObjet"
                   },
-                  "parameters": [
-                    "debrish",
-                    ">",
-                    "0"
-                  ],
+                  "parameters": ["debrish", ">", "0"],
                   "subInstructions": []
                 }
               ],
@@ -4462,12 +4243,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "debrish",
-                            "rotation",
-                            "=",
-                            "0"
-                          ],
+                          "parameters": ["debrish", "rotation", "=", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -4497,12 +4273,7 @@
                             "inverted": false,
                             "value": "VarObjet"
                           },
-                          "parameters": [
-                            "debrish",
-                            "rotation",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["debrish", "rotation", "=", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -4642,11 +4413,7 @@
                             "inverted": false,
                             "value": "Opacity"
                           },
-                          "parameters": [
-                            "debrish",
-                            "<",
-                            "50"
-                          ],
+                          "parameters": ["debrish", "<", "50"],
                           "subInstructions": []
                         }
                       ],
@@ -4656,10 +4423,7 @@
                             "inverted": false,
                             "value": "Delete"
                           },
-                          "parameters": [
-                            "debrish",
-                            ""
-                          ],
+                          "parameters": ["debrish", ""],
                           "subInstructions": []
                         }
                       ],
@@ -4694,11 +4458,7 @@
                     "inverted": false,
                     "value": "NbObjet"
                   },
-                  "parameters": [
-                    "engine_particle",
-                    ">",
-                    "0"
-                  ],
+                  "parameters": ["engine_particle", ">", "0"],
                   "subInstructions": []
                 }
               ],
@@ -4917,11 +4677,7 @@
                             "inverted": false,
                             "value": "Opacity"
                           },
-                          "parameters": [
-                            "engine_particle",
-                            "<",
-                            "50"
-                          ],
+                          "parameters": ["engine_particle", "<", "50"],
                           "subInstructions": []
                         }
                       ],
@@ -4931,10 +4687,7 @@
                             "inverted": false,
                             "value": "Delete"
                           },
-                          "parameters": [
-                            "engine_particle",
-                            ""
-                          ],
+                          "parameters": ["engine_particle", ""],
                           "subInstructions": []
                         }
                       ],
@@ -4991,11 +4744,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "player_destroyable",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["player_destroyable", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -5013,11 +4762,7 @@
                         "inverted": false,
                         "value": "Opacity"
                       },
-                      "parameters": [
-                        "player",
-                        "=",
-                        "100"
-                      ],
+                      "parameters": ["player", "=", "100"],
                       "subInstructions": []
                     }
                   ],
@@ -5033,11 +4778,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "player_destroyable",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["player_destroyable", "=", "1"],
                       "subInstructions": []
                     },
                     {
@@ -5055,11 +4796,7 @@
                         "inverted": false,
                         "value": "Opacity"
                       },
-                      "parameters": [
-                        "player",
-                        "=",
-                        "255"
-                      ],
+                      "parameters": ["player", "=", "255"],
                       "subInstructions": []
                     }
                   ],
@@ -5090,11 +4827,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "player_destroyable",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["player_destroyable", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -5104,10 +4837,7 @@
                         "inverted": false,
                         "value": "UnPauseTimer"
                       },
-                      "parameters": [
-                        "",
-                        "\"player_destroyable\""
-                      ],
+                      "parameters": ["", "\"player_destroyable\""],
                       "subInstructions": []
                     }
                   ],
@@ -5136,11 +4866,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "player_destroyable",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["player_destroyable", "=", "1"],
                           "subInstructions": []
                         },
                         {
@@ -5148,10 +4874,7 @@
                             "inverted": false,
                             "value": "PauseTimer"
                           },
-                          "parameters": [
-                            "",
-                            "\"player_destroyable\""
-                          ],
+                          "parameters": ["", "\"player_destroyable\""],
                           "subInstructions": []
                         },
                         {
@@ -5159,10 +4882,7 @@
                             "inverted": false,
                             "value": "ResetTimer"
                           },
-                          "parameters": [
-                            "",
-                            "\"player_destroyable\""
-                          ],
+                          "parameters": ["", "\"player_destroyable\""],
                           "subInstructions": []
                         }
                       ],
@@ -5276,10 +4996,7 @@
                         "inverted": false,
                         "value": "LayerVisible"
                       },
-                      "parameters": [
-                        "",
-                        "\"touch\""
-                      ],
+                      "parameters": ["", "\"touch\""],
                       "subInstructions": []
                     }
                   ],
@@ -5295,10 +5012,7 @@
                             "inverted": false,
                             "value": "SourisBouton"
                           },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ],
+                          "parameters": ["", "Left"],
                           "subInstructions": []
                         }
                       ],
@@ -5314,12 +5028,7 @@
                                 "inverted": false,
                                 "value": "SourisSurObjet"
                               },
-                              "parameters": [
-                                "btn_rotate_left",
-                                "",
-                                "yes",
-                                ""
-                              ],
+                              "parameters": ["btn_rotate_left", "", "yes", ""],
                               "subInstructions": []
                             }
                           ],
@@ -5349,12 +5058,7 @@
                                 "inverted": false,
                                 "value": "SourisSurObjet"
                               },
-                              "parameters": [
-                                "btn_rotate_right",
-                                "",
-                                "yes",
-                                ""
-                              ],
+                              "parameters": ["btn_rotate_right", "", "yes", ""],
                               "subInstructions": []
                             }
                           ],
@@ -5457,10 +5161,7 @@
                                 "inverted": false,
                                 "value": "SoundPlaying"
                               },
-                              "parameters": [
-                                "",
-                                "3"
-                              ],
+                              "parameters": ["", "3"],
                               "subInstructions": []
                             }
                           ],
@@ -5470,10 +5171,7 @@
                                 "inverted": false,
                                 "value": "StopSoundCanal"
                               },
-                              "parameters": [
-                                "",
-                                "3"
-                              ],
+                              "parameters": ["", "3"],
                               "subInstructions": []
                             }
                           ],
@@ -5489,10 +5187,7 @@
                                 "inverted": true,
                                 "value": "SoundPlaying"
                               },
-                              "parameters": [
-                                "",
-                                "3"
-                              ],
+                              "parameters": ["", "3"],
                               "subInstructions": []
                             }
                           ],
@@ -5586,10 +5281,7 @@
                                 "inverted": false,
                                 "value": "SoundPlaying"
                               },
-                              "parameters": [
-                                "",
-                                "3"
-                              ],
+                              "parameters": ["", "3"],
                               "subInstructions": []
                             },
                             {
@@ -5607,10 +5299,7 @@
                                 "inverted": false,
                                 "value": "StopSoundCanal"
                               },
-                              "parameters": [
-                                "",
-                                "3"
-                              ],
+                              "parameters": ["", "3"],
                               "subInstructions": []
                             }
                           ],
@@ -5626,10 +5315,7 @@
                                 "inverted": true,
                                 "value": "SoundPlaying"
                               },
-                              "parameters": [
-                                "",
-                                "3"
-                              ],
+                              "parameters": ["", "3"],
                               "subInstructions": []
                             }
                           ],
@@ -5677,11 +5363,7 @@
                                 "inverted": false,
                                 "value": "NbObjet"
                               },
-                              "parameters": [
-                                "player",
-                                ">",
-                                "0"
-                              ],
+                              "parameters": ["player", ">", "0"],
                               "subInstructions": []
                             }
                           ],
@@ -5697,11 +5379,7 @@
                                     "inverted": false,
                                     "value": "Timer"
                                   },
-                                  "parameters": [
-                                    "",
-                                    "0.1",
-                                    "\"engine\""
-                                  ],
+                                  "parameters": ["", "0.1", "\"engine\""],
                                   "subInstructions": []
                                 }
                               ],
@@ -5829,10 +5507,7 @@
                                         "inverted": false,
                                         "value": "ResetTimer"
                                       },
-                                      "parameters": [
-                                        "",
-                                        "\"engine\""
-                                      ],
+                                      "parameters": ["", "\"engine\""],
                                       "subInstructions": []
                                     }
                                   ],
@@ -5871,10 +5546,7 @@
                         "inverted": false,
                         "value": "LayerVisible"
                       },
-                      "parameters": [
-                        "",
-                        "\"touch\""
-                      ],
+                      "parameters": ["", "\"touch\""],
                       "subInstructions": []
                     }
                   ],
@@ -5890,10 +5562,7 @@
                             "inverted": false,
                             "value": "MouseButtonReleased"
                           },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ],
+                          "parameters": ["", "Left"],
                           "subInstructions": []
                         }
                       ],
@@ -5909,12 +5578,7 @@
                                 "inverted": false,
                                 "value": "SourisSurObjet"
                               },
-                              "parameters": [
-                                "btn_thruster",
-                                "",
-                                "yes",
-                                ""
-                              ],
+                              "parameters": ["btn_thruster", "", "yes", ""],
                               "subInstructions": []
                             }
                           ],
@@ -5958,10 +5622,7 @@
                                     "inverted": false,
                                     "value": "SoundPlaying"
                                   },
-                                  "parameters": [
-                                    "",
-                                    "3"
-                                  ],
+                                  "parameters": ["", "3"],
                                   "subInstructions": []
                                 }
                               ],
@@ -5971,10 +5632,7 @@
                                     "inverted": false,
                                     "value": "StopSoundCanal"
                                   },
-                                  "parameters": [
-                                    "",
-                                    "3"
-                                  ],
+                                  "parameters": ["", "3"],
                                   "subInstructions": []
                                 }
                               ],
@@ -5990,10 +5648,7 @@
                                     "inverted": true,
                                     "value": "SoundPlaying"
                                   },
-                                  "parameters": [
-                                    "",
-                                    "3"
-                                  ],
+                                  "parameters": ["", "3"],
                                   "subInstructions": []
                                 }
                               ],
@@ -6030,10 +5685,7 @@
                             "inverted": false,
                             "value": "SourisBouton"
                           },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ],
+                          "parameters": ["", "Left"],
                           "subInstructions": []
                         }
                       ],
@@ -6049,12 +5701,7 @@
                                 "inverted": false,
                                 "value": "SourisSurObjet"
                               },
-                              "parameters": [
-                                "btn_thruster",
-                                "",
-                                "yes",
-                                ""
-                              ],
+                              "parameters": ["btn_thruster", "", "yes", ""],
                               "subInstructions": []
                             }
                           ],
@@ -6110,10 +5757,7 @@
                                     "inverted": false,
                                     "value": "SoundPlaying"
                                   },
-                                  "parameters": [
-                                    "",
-                                    "3"
-                                  ],
+                                  "parameters": ["", "3"],
                                   "subInstructions": []
                                 },
                                 {
@@ -6131,10 +5775,7 @@
                                     "inverted": false,
                                     "value": "StopSoundCanal"
                                   },
-                                  "parameters": [
-                                    "",
-                                    "3"
-                                  ],
+                                  "parameters": ["", "3"],
                                   "subInstructions": []
                                 }
                               ],
@@ -6150,10 +5791,7 @@
                                     "inverted": true,
                                     "value": "SoundPlaying"
                                   },
-                                  "parameters": [
-                                    "",
-                                    "3"
-                                  ],
+                                  "parameters": ["", "3"],
                                   "subInstructions": []
                                 }
                               ],
@@ -6201,11 +5839,7 @@
                                     "inverted": false,
                                     "value": "NbObjet"
                                   },
-                                  "parameters": [
-                                    "player",
-                                    ">",
-                                    "0"
-                                  ],
+                                  "parameters": ["player", ">", "0"],
                                   "subInstructions": []
                                 }
                               ],
@@ -6221,11 +5855,7 @@
                                         "inverted": false,
                                         "value": "Timer"
                                       },
-                                      "parameters": [
-                                        "",
-                                        "0.1",
-                                        "\"engine\""
-                                      ],
+                                      "parameters": ["", "0.1", "\"engine\""],
                                       "subInstructions": []
                                     }
                                   ],
@@ -6353,10 +5983,7 @@
                                             "inverted": false,
                                             "value": "ResetTimer"
                                           },
-                                          "parameters": [
-                                            "",
-                                            "\"engine\""
-                                          ],
+                                          "parameters": ["", "\"engine\""],
                                           "subInstructions": []
                                         }
                                       ],
@@ -6434,11 +6061,7 @@
                         "inverted": false,
                         "value": "PosX"
                       },
-                      "parameters": [
-                        "player",
-                        "<",
-                        "-player.Width()"
-                      ],
+                      "parameters": ["player", "<", "-player.Width()"],
                       "subInstructions": []
                     }
                   ],
@@ -6482,11 +6105,7 @@
                         "inverted": false,
                         "value": "MettreX"
                       },
-                      "parameters": [
-                        "player",
-                        "=",
-                        "-player.Width()"
-                      ],
+                      "parameters": ["player", "=", "-player.Width()"],
                       "subInstructions": []
                     }
                   ],
@@ -6516,11 +6135,7 @@
                         "inverted": false,
                         "value": "MettreY"
                       },
-                      "parameters": [
-                        "player",
-                        "=",
-                        "-player.Height()"
-                      ],
+                      "parameters": ["player", "=", "-player.Height()"],
                       "subInstructions": []
                     }
                   ],
@@ -6536,11 +6151,7 @@
                         "inverted": false,
                         "value": "PosY"
                       },
-                      "parameters": [
-                        "player",
-                        "<",
-                        "-player.Height()"
-                      ],
+                      "parameters": ["player", "<", "-player.Height()"],
                       "subInstructions": []
                     }
                   ],
@@ -6659,11 +6270,7 @@
                             "inverted": false,
                             "value": "ChangePlan"
                           },
-                          "parameters": [
-                            "player_bullet",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["player_bullet", "=", "1"],
                           "subInstructions": []
                         },
                         {
@@ -6706,10 +6313,7 @@
                                 "inverted": false,
                                 "value": "SoundPlaying"
                               },
-                              "parameters": [
-                                "",
-                                "1"
-                              ],
+                              "parameters": ["", "1"],
                               "subInstructions": []
                             }
                           ],
@@ -6719,10 +6323,7 @@
                                 "inverted": false,
                                 "value": "StopSoundCanal"
                               },
-                              "parameters": [
-                                "",
-                                "1"
-                              ],
+                              "parameters": ["", "1"],
                               "subInstructions": []
                             }
                           ],
@@ -6738,10 +6339,7 @@
                                 "inverted": true,
                                 "value": "SoundPlaying"
                               },
-                              "parameters": [
-                                "",
-                                "1"
-                              ],
+                              "parameters": ["", "1"],
                               "subInstructions": []
                             }
                           ],
@@ -6766,10 +6364,7 @@
                                 "inverted": false,
                                 "value": "ResetTimer"
                               },
-                              "parameters": [
-                                "",
-                                "\"player_shoot_timer\""
-                              ],
+                              "parameters": ["", "\"player_shoot_timer\""],
                               "subInstructions": []
                             }
                           ],
@@ -6804,10 +6399,7 @@
                         "inverted": false,
                         "value": "LayerVisible"
                       },
-                      "parameters": [
-                        "",
-                        "\"touch\""
-                      ],
+                      "parameters": ["", "\"touch\""],
                       "subInstructions": []
                     }
                   ],
@@ -6823,10 +6415,7 @@
                             "inverted": false,
                             "value": "SourisBouton"
                           },
-                          "parameters": [
-                            "",
-                            "Left"
-                          ],
+                          "parameters": ["", "Left"],
                           "subInstructions": []
                         }
                       ],
@@ -6842,12 +6431,7 @@
                                 "inverted": false,
                                 "value": "SourisSurObjet"
                               },
-                              "parameters": [
-                                "btn_fire",
-                                "",
-                                "yes",
-                                ""
-                              ],
+                              "parameters": ["btn_fire", "", "yes", ""],
                               "subInstructions": []
                             }
                           ],
@@ -6918,11 +6502,7 @@
                                     "inverted": false,
                                     "value": "ChangePlan"
                                   },
-                                  "parameters": [
-                                    "player_bullet",
-                                    "=",
-                                    "1"
-                                  ],
+                                  "parameters": ["player_bullet", "=", "1"],
                                   "subInstructions": []
                                 },
                                 {
@@ -6965,10 +6545,7 @@
                                         "inverted": false,
                                         "value": "SoundPlaying"
                                       },
-                                      "parameters": [
-                                        "",
-                                        "1"
-                                      ],
+                                      "parameters": ["", "1"],
                                       "subInstructions": []
                                     }
                                   ],
@@ -6978,10 +6555,7 @@
                                         "inverted": false,
                                         "value": "StopSoundCanal"
                                       },
-                                      "parameters": [
-                                        "",
-                                        "1"
-                                      ],
+                                      "parameters": ["", "1"],
                                       "subInstructions": []
                                     }
                                   ],
@@ -6997,10 +6571,7 @@
                                         "inverted": true,
                                         "value": "SoundPlaying"
                                       },
-                                      "parameters": [
-                                        "",
-                                        "1"
-                                      ],
+                                      "parameters": ["", "1"],
                                       "subInstructions": []
                                     }
                                   ],
@@ -7067,12 +6638,7 @@
                         "inverted": false,
                         "value": "CollisionNP"
                       },
-                      "parameters": [
-                        "player",
-                        "asteroids",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["player", "asteroids", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -7088,11 +6654,7 @@
                             "inverted": false,
                             "value": "VarScene"
                           },
-                          "parameters": [
-                            "player_destroyable",
-                            "=",
-                            "1"
-                          ],
+                          "parameters": ["player_destroyable", "=", "1"],
                           "subInstructions": []
                         }
                       ],
@@ -7144,10 +6706,7 @@
                             "inverted": false,
                             "value": "Delete"
                           },
-                          "parameters": [
-                            "player",
-                            ""
-                          ],
+                          "parameters": ["player", ""],
                           "subInstructions": []
                         },
                         {
@@ -7155,11 +6714,7 @@
                             "inverted": false,
                             "value": "ModVarScene"
                           },
-                          "parameters": [
-                            "player_life",
-                            "-",
-                            "1"
-                          ],
+                          "parameters": ["player_life", "-", "1"],
                           "subInstructions": []
                         },
                         {
@@ -7201,10 +6756,7 @@
                                 "inverted": true,
                                 "value": "SoundPlaying"
                               },
-                              "parameters": [
-                                "",
-                                "2"
-                              ],
+                              "parameters": ["", "2"],
                               "subInstructions": []
                             }
                           ],
@@ -7256,11 +6808,7 @@
                         "inverted": false,
                         "value": "NbObjet"
                       },
-                      "parameters": [
-                        "player",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["player", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -7276,11 +6824,7 @@
                             "inverted": false,
                             "value": "NbObjet"
                           },
-                          "parameters": [
-                            "player_debrish",
-                            "=",
-                            "0"
-                          ],
+                          "parameters": ["player_debrish", "=", "0"],
                           "subInstructions": []
                         }
                       ],
@@ -7296,11 +6840,7 @@
                                 "inverted": false,
                                 "value": "VarScene"
                               },
-                              "parameters": [
-                                "player_life",
-                                ">",
-                                "0"
-                              ],
+                              "parameters": ["player_life", ">", "0"],
                               "subInstructions": []
                             }
                           ],
@@ -7370,11 +6910,7 @@
                         "inverted": false,
                         "value": "NbObjet"
                       },
-                      "parameters": [
-                        "player",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["player", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -7430,11 +6966,7 @@
                             "inverted": false,
                             "value": "Rotate"
                           },
-                          "parameters": [
-                            "player_debrish_1",
-                            "100",
-                            ""
-                          ],
+                          "parameters": ["player_debrish_1", "100", ""],
                           "subInstructions": []
                         },
                         {
@@ -7442,11 +6974,7 @@
                             "inverted": false,
                             "value": "Rotate"
                           },
-                          "parameters": [
-                            "player_debrish_2",
-                            "100",
-                            ""
-                          ],
+                          "parameters": ["player_debrish_2", "100", ""],
                           "subInstructions": []
                         },
                         {
@@ -7454,11 +6982,7 @@
                             "inverted": false,
                             "value": "Rotate"
                           },
-                          "parameters": [
-                            "player_debrish_3",
-                            "100",
-                            ""
-                          ],
+                          "parameters": ["player_debrish_3", "100", ""],
                           "subInstructions": []
                         }
                       ],
@@ -7515,11 +7039,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "player_life",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["player_life", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -7527,11 +7047,7 @@
                         "inverted": false,
                         "value": "Timer"
                       },
-                      "parameters": [
-                        "",
-                        "3",
-                        "\"end_game_timer\""
-                      ],
+                      "parameters": ["", "3", "\"end_game_timer\""],
                       "subInstructions": []
                     }
                   ],
@@ -7541,11 +7057,7 @@
                         "inverted": false,
                         "value": "Scene"
                       },
-                      "parameters": [
-                        "",
-                        "\"game_over\"",
-                        "true"
-                      ],
+                      "parameters": ["", "\"game_over\"", "true"],
                       "subInstructions": []
                     }
                   ],
@@ -7576,11 +7088,7 @@
                         "inverted": false,
                         "value": "NbObjet"
                       },
-                      "parameters": [
-                        "asteroids",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["asteroids", "=", "0"],
                       "subInstructions": []
                     },
                     {
@@ -7588,11 +7096,7 @@
                         "inverted": false,
                         "value": "Timer"
                       },
-                      "parameters": [
-                        "",
-                        "3",
-                        "\"end_game_timer\""
-                      ],
+                      "parameters": ["", "3", "\"end_game_timer\""],
                       "subInstructions": []
                     }
                   ],
@@ -7602,11 +7106,7 @@
                         "inverted": false,
                         "value": "Scene"
                       },
-                      "parameters": [
-                        "",
-                        "\"game_over\"",
-                        "true"
-                      ],
+                      "parameters": ["", "\"game_over\"", "true"],
                       "subInstructions": []
                     }
                   ],
@@ -7786,9 +7286,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -7798,10 +7296,7 @@
                 "inverted": false,
                 "value": "SceneBackground"
               },
-              "parameters": [
-                "",
-                "\"0;0;0\""
-              ],
+              "parameters": ["", "\"0;0;0\""],
               "subInstructions": []
             }
           ],
@@ -7832,10 +7327,7 @@
                 "inverted": false,
                 "value": "MouseButtonReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -7843,12 +7335,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "restart",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["restart", "", "", ""],
               "subInstructions": []
             }
           ],
@@ -7858,11 +7345,7 @@
                 "inverted": false,
                 "value": "Scene"
               },
-              "parameters": [
-                "",
-                "\"asteroids\"",
-                "true"
-              ],
+              "parameters": ["", "\"asteroids\"", "true"],
               "subInstructions": []
             }
           ],
@@ -7893,12 +7376,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "restart",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["restart", "", "", ""],
               "subInstructions": []
             },
             {
@@ -7916,10 +7394,7 @@
                 "inverted": false,
                 "value": "TextObject::ChangeColor"
               },
-              "parameters": [
-                "restart",
-                "\"0;255;128\""
-              ],
+              "parameters": ["restart", "\"0;255;128\""],
               "subInstructions": []
             }
           ],
@@ -7935,12 +7410,7 @@
                 "inverted": true,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "restart",
-                "",
-                "",
-                ""
-              ],
+              "parameters": ["restart", "", "", ""],
               "subInstructions": []
             },
             {
@@ -7958,10 +7428,7 @@
                 "inverted": false,
                 "value": "TextObject::ChangeColor"
               },
-              "parameters": [
-                "restart",
-                "\"255;255;255\""
-              ],
+              "parameters": ["restart", "\"255;255;255\""],
               "subInstructions": []
             }
           ],
@@ -8036,11 +7503,7 @@
                 "inverted": false,
                 "value": "SetAngle"
               },
-              "parameters": [
-                "player",
-                "=",
-                "Random(270)"
-              ],
+              "parameters": ["player", "=", "Random(270)"],
               "subInstructions": []
             },
             {
@@ -8048,11 +7511,7 @@
                 "inverted": false,
                 "value": "ChangePlan"
               },
-              "parameters": [
-                "player",
-                "=",
-                "2"
-              ],
+              "parameters": ["player", "=", "2"],
               "subInstructions": []
             }
           ],
@@ -8084,11 +7543,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "player_movement_angle",
-                "=",
-                "Random(270)"
-              ],
+              "parameters": ["player_movement_angle", "=", "Random(270)"],
               "subInstructions": []
             },
             {
@@ -8096,11 +7551,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "player_destroyable",
-                "=",
-                "0"
-              ],
+              "parameters": ["player_destroyable", "=", "0"],
               "subInstructions": []
             },
             {
@@ -8108,11 +7559,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "player_undestroyable_time",
-                "=",
-                "5"
-              ],
+              "parameters": ["player_undestroyable_time", "=", "5"],
               "subInstructions": []
             },
             {
@@ -8120,11 +7567,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "player_max_speed",
-                "=",
-                "50"
-              ],
+              "parameters": ["player_max_speed", "=", "50"],
               "subInstructions": []
             },
             {
@@ -8132,11 +7575,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "player_rotation_speed",
-                "=",
-                "50"
-              ],
+              "parameters": ["player_rotation_speed", "=", "50"],
               "subInstructions": []
             },
             {
@@ -8144,11 +7583,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "player_acceleration",
-                "=",
-                "70"
-              ],
+              "parameters": ["player_acceleration", "=", "70"],
               "subInstructions": []
             },
             {
@@ -8156,11 +7591,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "player_speed",
-                "=",
-                "Variable(player_max_speed)"
-              ],
+              "parameters": ["player_speed", "=", "Variable(player_max_speed)"],
               "subInstructions": []
             },
             {
@@ -8168,11 +7599,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "player_firerate",
-                "=",
-                "0.25"
-              ],
+              "parameters": ["player_firerate", "=", "0.25"],
               "subInstructions": []
             },
             {

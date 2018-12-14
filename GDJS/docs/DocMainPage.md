@@ -2,7 +2,7 @@
 
 This is the documentation for GDJS JavaScript game engine used in GDevelop.
 
-> GDevelop is an **open-source**, cross-platform **game creator** designed *to be used by everyone*. Download it on [gdevelop-app.com](https://gdevelop-app.com/) if you don't have it yet!
+> GDevelop is an **open-source**, cross-platform **game creator** designed _to be used by everyone_. Download it on [gdevelop-app.com](https://gdevelop-app.com/) if you don't have it yet!
 
 ## Using the game engine in your game
 

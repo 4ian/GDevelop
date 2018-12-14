@@ -132,7 +132,10 @@ app.on("ready", function() {
       indexSubPath: "piskel/piskel-index.html",
       backgroundColor: "#000000",
       onReady: piskelWindow => {
-        piskelWindow.webContents.send("piskel-load-animation", externalEditorData),
+        piskelWindow.webContents.send(
+          "piskel-load-animation",
+          externalEditorData
+        ),
           piskelWindow.show();
       }
     });

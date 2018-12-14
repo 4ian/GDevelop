@@ -395,11 +395,7 @@
                 "inverted": true,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "Button",
-                "",
-                ""
-              ],
+              "parameters": ["Button", "", ""],
               "subInstructions": []
             }
           ],
@@ -409,11 +405,7 @@
                 "inverted": false,
                 "value": "ChangeAnimation"
               },
-              "parameters": [
-                "Button",
-                "=",
-                "0"
-              ],
+              "parameters": ["Button", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -444,11 +436,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "Button",
-                "",
-                ""
-              ],
+              "parameters": ["Button", "", ""],
               "subInstructions": []
             }
           ],
@@ -458,11 +446,7 @@
                 "inverted": false,
                 "value": "ChangeAnimation"
               },
-              "parameters": [
-                "Button",
-                "=",
-                "1"
-              ],
+              "parameters": ["Button", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -492,10 +476,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -505,11 +486,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "Button",
-                    "=",
-                    "2"
-                  ],
+                  "parameters": ["Button", "=", "2"],
                   "subInstructions": []
                 }
               ],
@@ -540,10 +517,7 @@
                     "inverted": false,
                     "value": "MouseButtonReleased"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -553,10 +527,7 @@
                     "inverted": false,
                     "value": "Scene"
                   },
-                  "parameters": [
-                    "",
-                    "\"More buttons\""
-                  ],
+                  "parameters": ["", "\"More buttons\""],
                   "subInstructions": []
                 }
               ],
@@ -1196,11 +1167,7 @@
                 "inverted": true,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "Button",
-                "",
-                ""
-              ],
+              "parameters": ["Button", "", ""],
               "subInstructions": []
             }
           ],
@@ -1210,11 +1177,7 @@
                 "inverted": false,
                 "value": "ChangeAnimation"
               },
-              "parameters": [
-                "Button",
-                "=",
-                "0"
-              ],
+              "parameters": ["Button", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -1245,11 +1208,7 @@
                 "inverted": false,
                 "value": "SourisSurObjet"
               },
-              "parameters": [
-                "Button",
-                "",
-                ""
-              ],
+              "parameters": ["Button", "", ""],
               "subInstructions": []
             }
           ],
@@ -1259,11 +1218,7 @@
                 "inverted": false,
                 "value": "ChangeAnimation"
               },
-              "parameters": [
-                "Button",
-                "=",
-                "1"
-              ],
+              "parameters": ["Button", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -1293,10 +1248,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -1306,11 +1258,7 @@
                     "inverted": false,
                     "value": "ChangeAnimation"
                   },
-                  "parameters": [
-                    "Button",
-                    "=",
-                    "2"
-                  ],
+                  "parameters": ["Button", "=", "2"],
                   "subInstructions": []
                 }
               ],
@@ -1326,10 +1274,7 @@
                     "inverted": false,
                     "value": "MouseButtonReleased"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 }
               ],
@@ -1360,11 +1305,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "Button1",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["Button1", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -1394,11 +1335,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "Button2",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["Button2", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -1428,11 +1365,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "Button3",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["Button3", "", ""],
                       "subInstructions": []
                     }
                   ],

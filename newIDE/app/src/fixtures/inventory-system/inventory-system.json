@@ -2965,9 +2965,7 @@
                     "inverted": false,
                     "value": "DepartScene"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -2999,11 +2997,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "id_counter",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["id_counter", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -3062,11 +3056,7 @@
                         "inverted": false,
                         "value": "ChangePlan"
                       },
-                      "parameters": [
-                        "pointer_dragobject",
-                        "=",
-                        "3"
-                      ],
+                      "parameters": ["pointer_dragobject", "=", "3"],
                       "subInstructions": []
                     }
                   ],
@@ -3126,11 +3116,7 @@
                         "inverted": false,
                         "value": "LinkedObjects::LinkObjects"
                       },
-                      "parameters": [
-                        "",
-                        "slot_text",
-                        "inventory_slot"
-                      ],
+                      "parameters": ["", "slot_text", "inventory_slot"],
                       "subInstructions": []
                     },
                     {
@@ -3138,11 +3124,7 @@
                         "inverted": false,
                         "value": "ChangePlan"
                       },
-                      "parameters": [
-                        "slot_text",
-                        "=",
-                        "2"
-                      ],
+                      "parameters": ["slot_text", "=", "2"],
                       "subInstructions": []
                     },
                     {
@@ -3163,11 +3145,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "id_counter",
-                        "+",
-                        "1"
-                      ],
+                      "parameters": ["id_counter", "+", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -3223,11 +3201,7 @@
                         "inverted": false,
                         "value": "LinkedObjects::PickObjectsLinkedTo"
                       },
-                      "parameters": [
-                        "",
-                        "inventory_slot",
-                        "slot_text"
-                      ],
+                      "parameters": ["", "inventory_slot", "slot_text"],
                       "subInstructions": []
                     },
                     {
@@ -3324,10 +3298,7 @@
                     "inverted": false,
                     "value": "MouseButtonReleased"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 },
                 {
@@ -3335,12 +3306,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "items",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["items", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -3398,11 +3364,7 @@
                         "inverted": true,
                         "value": "VarSceneTxt"
                       },
-                      "parameters": [
-                        "picked_item",
-                        "=",
-                        "\"\""
-                      ],
+                      "parameters": ["picked_item", "=", "\"\""],
                       "subInstructions": []
                     }
                   ],
@@ -3470,11 +3432,7 @@
                                 "inverted": false,
                                 "value": "LinkedObjects::PickObjectsLinkedTo"
                               },
-                              "parameters": [
-                                "",
-                                "slot_text",
-                                "inventory_slot"
-                              ],
+                              "parameters": ["", "slot_text", "inventory_slot"],
                               "subInstructions": []
                             },
                             {
@@ -3520,10 +3478,7 @@
                             "inverted": false,
                             "value": "Delete"
                           },
-                          "parameters": [
-                            "items",
-                            ""
-                          ],
+                          "parameters": ["items", ""],
                           "subInstructions": []
                         },
                         {
@@ -3531,11 +3486,7 @@
                             "inverted": false,
                             "value": "ModVarSceneTxt"
                           },
-                          "parameters": [
-                            "picked_item",
-                            "=",
-                            "\"\""
-                          ],
+                          "parameters": ["picked_item", "=", "\"\""],
                           "subInstructions": []
                         }
                       ],
@@ -3582,11 +3533,7 @@
                         "inverted": true,
                         "value": "VarSceneTxt"
                       },
-                      "parameters": [
-                        "picked_item",
-                        "=",
-                        "\"\""
-                      ],
+                      "parameters": ["picked_item", "=", "\"\""],
                       "subInstructions": []
                     }
                   ],
@@ -3679,11 +3626,7 @@
                                 "inverted": false,
                                 "value": "LinkedObjects::PickObjectsLinkedTo"
                               },
-                              "parameters": [
-                                "",
-                                "slot_text",
-                                "inventory_slot"
-                              ],
+                              "parameters": ["", "slot_text", "inventory_slot"],
                               "subInstructions": []
                             },
                             {
@@ -3729,10 +3672,7 @@
                             "inverted": false,
                             "value": "Delete"
                           },
-                          "parameters": [
-                            "items",
-                            ""
-                          ],
+                          "parameters": ["items", ""],
                           "subInstructions": []
                         },
                         {
@@ -3740,11 +3680,7 @@
                             "inverted": false,
                             "value": "ModVarSceneTxt"
                           },
-                          "parameters": [
-                            "picked_item",
-                            "=",
-                            "\"\""
-                          ],
+                          "parameters": ["picked_item", "=", "\"\""],
                           "subInstructions": []
                         }
                       ],
@@ -3793,10 +3729,7 @@
                     "inverted": false,
                     "value": "LayerVisible"
                   },
-                  "parameters": [
-                    "",
-                    "\"inventory\""
-                  ],
+                  "parameters": ["", "\"inventory\""],
                   "subInstructions": []
                 }
               ],
@@ -3827,10 +3760,7 @@
                         "inverted": false,
                         "value": "MouseButtonReleased"
                       },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ],
+                      "parameters": ["", "Right"],
                       "subInstructions": []
                     },
                     {
@@ -3838,12 +3768,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "inventory_slot",
-                        "",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["inventory_slot", "", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -3902,11 +3827,7 @@
                             "inverted": false,
                             "value": "LinkedObjects::PickObjectsLinkedTo"
                           },
-                          "parameters": [
-                            "",
-                            "slot_text",
-                            "inventory_slot"
-                          ],
+                          "parameters": ["", "slot_text", "inventory_slot"],
                           "subInstructions": []
                         },
                         {
@@ -3989,10 +3910,7 @@
                             "inverted": false,
                             "value": "SetAnimationName"
                           },
-                          "parameters": [
-                            "inventory_slot",
-                            "\"empty\""
-                          ],
+                          "parameters": ["inventory_slot", "\"empty\""],
                           "subInstructions": []
                         },
                         {
@@ -4054,10 +3972,7 @@
                     "inverted": false,
                     "value": "LayerVisible"
                   },
-                  "parameters": [
-                    "",
-                    "\"inventory\""
-                  ],
+                  "parameters": ["", "\"inventory\""],
                   "subInstructions": []
                 }
               ],
@@ -4088,10 +4003,7 @@
                         "inverted": false,
                         "value": "SourisBouton"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     },
                     {
@@ -4099,12 +4011,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "inventory_slot",
-                        "",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["inventory_slot", "", "", ""],
                       "subInstructions": []
                     },
                     {
@@ -4232,10 +4139,7 @@
                                 "inverted": false,
                                 "value": "SetAnimationName"
                               },
-                              "parameters": [
-                                "inventory_slot",
-                                "\"empty\""
-                              ],
+                              "parameters": ["inventory_slot", "\"empty\""],
                               "subInstructions": []
                             },
                             {
@@ -4243,11 +4147,7 @@
                                 "inverted": false,
                                 "value": "LinkedObjects::PickObjectsLinkedTo"
                               },
-                              "parameters": [
-                                "",
-                                "slot_text",
-                                "inventory_slot"
-                              ],
+                              "parameters": ["", "slot_text", "inventory_slot"],
                               "subInstructions": []
                             },
                             {
@@ -4255,11 +4155,7 @@
                                 "inverted": false,
                                 "value": "TextObject::String"
                               },
-                              "parameters": [
-                                "slot_text",
-                                "=",
-                                "\"0\""
-                              ],
+                              "parameters": ["slot_text", "=", "\"0\""],
                               "subInstructions": []
                             }
                           ],
@@ -4294,10 +4190,7 @@
                         "inverted": false,
                         "value": "MouseButtonReleased"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     },
                     {
@@ -4305,12 +4198,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "inventory_slot",
-                        "",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["inventory_slot", "", "", ""],
                       "subInstructions": []
                     },
                     {
@@ -4425,11 +4313,7 @@
                                 "inverted": false,
                                 "value": "LinkedObjects::PickObjectsLinkedTo"
                               },
-                              "parameters": [
-                                "",
-                                "slot_text",
-                                "inventory_slot"
-                              ],
+                              "parameters": ["", "slot_text", "inventory_slot"],
                               "subInstructions": []
                             },
                             {
@@ -4462,10 +4346,7 @@
                                 "inverted": false,
                                 "value": "SetAnimationName"
                               },
-                              "parameters": [
-                                "pointer_dragobject",
-                                "\"empty\""
-                              ],
+                              "parameters": ["pointer_dragobject", "\"empty\""],
                               "subInstructions": []
                             }
                           ],
@@ -4586,11 +4467,7 @@
                                 "inverted": false,
                                 "value": "LinkedObjects::PickObjectsLinkedTo"
                               },
-                              "parameters": [
-                                "",
-                                "slot_text",
-                                "inventory_slot"
-                              ],
+                              "parameters": ["", "slot_text", "inventory_slot"],
                               "subInstructions": []
                             },
                             {
@@ -4677,10 +4554,7 @@
                     "inverted": false,
                     "value": "LayerVisible"
                   },
-                  "parameters": [
-                    "",
-                    "\"inventory\""
-                  ],
+                  "parameters": ["", "\"inventory\""],
                   "subInstructions": []
                 }
               ],
@@ -4711,10 +4585,7 @@
                         "inverted": false,
                         "value": "MouseButtonReleased"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
+                      "parameters": ["", "Left"],
                       "subInstructions": []
                     },
                     {
@@ -4722,12 +4593,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "inventory_bin",
-                        "",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["inventory_bin", "", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -4800,10 +4666,7 @@
                                 "inverted": false,
                                 "value": "SetAnimationName"
                               },
-                              "parameters": [
-                                "pointer_dragobject",
-                                "\"empty\""
-                              ],
+                              "parameters": ["pointer_dragobject", "\"empty\""],
                               "subInstructions": []
                             }
                           ],
@@ -4838,12 +4701,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "inventory_bin",
-                        "",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["inventory_bin", "", "", ""],
                       "subInstructions": []
                     },
                     {
@@ -4861,11 +4719,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "inventory_bin",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["inventory_bin", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -4881,12 +4735,7 @@
                         "inverted": true,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "inventory_bin",
-                        "",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["inventory_bin", "", "", ""],
                       "subInstructions": []
                     },
                     {
@@ -4904,11 +4753,7 @@
                         "inverted": false,
                         "value": "ChangeAnimation"
                       },
-                      "parameters": [
-                        "inventory_bin",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["inventory_bin", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -4940,10 +4785,7 @@
                     "inverted": false,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 },
                 {
@@ -4967,12 +4809,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "save_text",
-                        "s",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["save_text", "s", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -4999,12 +4836,7 @@
                         "inverted": false,
                         "value": "SourisSurObjet"
                       },
-                      "parameters": [
-                        "load_text",
-                        "l",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["load_text", "l", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -5062,10 +4894,7 @@
                     "inverted": false,
                     "value": "KeyReleased"
                   },
-                  "parameters": [
-                    "",
-                    "i"
-                  ],
+                  "parameters": ["", "i"],
                   "subInstructions": []
                 }
               ],
@@ -5075,11 +4904,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "i_released",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["i_released", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -5109,10 +4934,7 @@
                         "inverted": false,
                         "value": "LayerVisible"
                       },
-                      "parameters": [
-                        "",
-                        "\"inventory\""
-                      ],
+                      "parameters": ["", "\"inventory\""],
                       "subInstructions": []
                     },
                     {
@@ -5120,11 +4942,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "i_released",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["i_released", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -5134,10 +4952,7 @@
                         "inverted": false,
                         "value": "HideLayer"
                       },
-                      "parameters": [
-                        "",
-                        "\"inventory\""
-                      ],
+                      "parameters": ["", "\"inventory\""],
                       "subInstructions": []
                     },
                     {
@@ -5145,11 +4960,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "i_released",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["i_released", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -5180,10 +4991,7 @@
                         "inverted": true,
                         "value": "LayerVisible"
                       },
-                      "parameters": [
-                        "",
-                        "\"inventory\""
-                      ],
+                      "parameters": ["", "\"inventory\""],
                       "subInstructions": []
                     },
                     {
@@ -5191,11 +4999,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "i_released",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["i_released", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -5205,10 +5009,7 @@
                         "inverted": false,
                         "value": "ShowLayer"
                       },
-                      "parameters": [
-                        "",
-                        "\"inventory\""
-                      ],
+                      "parameters": ["", "\"inventory\""],
                       "subInstructions": []
                     },
                     {
@@ -5216,11 +5017,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "i_released",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["i_released", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -5372,11 +5169,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "save_exists",
-                "=",
-                "1"
-              ],
+              "parameters": ["save_exists", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -5392,11 +5185,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "save_exists",
-                "=",
-                "1"
-              ],
+              "parameters": ["save_exists", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -5428,12 +5217,7 @@
                     "inverted": true,
                     "value": "VarObjetTxt"
                   },
-                  "parameters": [
-                    "inventory_slot",
-                    "nameofitem",
-                    "=",
-                    "\"\""
-                  ],
+                  "parameters": ["inventory_slot", "nameofitem", "=", "\"\""],
                   "subInstructions": []
                 }
               ],
@@ -5472,11 +5256,7 @@
                         "inverted": false,
                         "value": "LinkedObjects::PickObjectsLinkedTo"
                       },
-                      "parameters": [
-                        "",
-                        "slot_text",
-                        "inventory_slot"
-                      ],
+                      "parameters": ["", "slot_text", "inventory_slot"],
                       "subInstructions": []
                     },
                     {
@@ -5518,10 +5298,7 @@
                         "inverted": false,
                         "value": "SetAnimationName"
                       },
-                      "parameters": [
-                        "inventory_slot",
-                        "\"empty\""
-                      ],
+                      "parameters": ["inventory_slot", "\"empty\""],
                       "subInstructions": []
                     }
                   ],
@@ -5686,11 +5463,7 @@
                             "inverted": false,
                             "value": "LinkedObjects::PickObjectsLinkedTo"
                           },
-                          "parameters": [
-                            "",
-                            "slot_text",
-                            "inventory_slot"
-                          ],
+                          "parameters": ["", "slot_text", "inventory_slot"],
                           "subInstructions": []
                         },
                         {

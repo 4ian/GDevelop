@@ -544,10 +544,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -557,11 +554,7 @@
                 "inverted": false,
                 "value": "Scene"
               },
-              "parameters": [
-                "",
-                "\"Rope Example\"",
-                ""
-              ],
+              "parameters": ["", "\"Rope Example\"", ""],
               "subInstructions": []
             }
           ],
@@ -1286,9 +1279,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -1298,11 +1289,7 @@
                 "inverted": false,
                 "value": "ActivateBehavior"
               },
-              "parameters": [
-                "Group",
-                "Physics",
-                "no"
-              ],
+              "parameters": ["Group", "Physics", "no"],
               "subInstructions": []
             },
             {
@@ -1310,11 +1297,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "speedLerp",
-                "=",
-                "0.05"
-              ],
+              "parameters": ["speedLerp", "=", "0.05"],
               "subInstructions": []
             },
             {
@@ -1322,12 +1305,7 @@
                 "inverted": false,
                 "value": "ZoomCamera"
               },
-              "parameters": [
-                "",
-                "0.5",
-                "",
-                ""
-              ],
+              "parameters": ["", "0.5", "", ""],
               "subInstructions": []
             },
             {
@@ -1335,13 +1313,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::ApplyImpulseUsingPolarCoordinates"
               },
-              "parameters": [
-                "MainChar",
-                "Physics",
-                "90",
-                "0.2",
-                ""
-              ],
+              "parameters": ["MainChar", "Physics", "90", "0.2", ""],
               "subInstructions": []
             },
             {
@@ -1349,11 +1321,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "bounceSpeed",
-                "=",
-                "0.04"
-              ],
+              "parameters": ["bounceSpeed", "=", "0.04"],
               "subInstructions": []
             }
           ],
@@ -1380,9 +1348,7 @@
                     "inverted": false,
                     "value": "Toujours"
                   },
-                  "parameters": [
-                    ""
-                  ],
+                  "parameters": [""],
                   "subInstructions": []
                 }
               ],
@@ -1438,13 +1404,7 @@
                         "inverted": false,
                         "value": "CentreCamera"
                       },
-                      "parameters": [
-                        "",
-                        "Follow",
-                        "",
-                        "",
-                        ""
-                      ],
+                      "parameters": ["", "Follow", "", "", ""],
                       "subInstructions": []
                     }
                   ],
@@ -1478,10 +1438,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -1497,11 +1454,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "attached",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["attached", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -1532,11 +1485,7 @@
                         "inverted": false,
                         "value": "ActivateBehavior"
                       },
-                      "parameters": [
-                        "Group",
-                        "Physics",
-                        "yes"
-                      ],
+                      "parameters": ["Group", "Physics", "yes"],
                       "subInstructions": []
                     },
                     {
@@ -1544,11 +1493,7 @@
                         "inverted": false,
                         "value": "Opacity"
                       },
-                      "parameters": [
-                        "Group",
-                        "=",
-                        "50"
-                      ],
+                      "parameters": ["Group", "=", "50"],
                       "subInstructions": []
                     },
                     {
@@ -1556,11 +1501,7 @@
                         "inverted": false,
                         "value": "LinkedObjects::LinkObjects"
                       },
-                      "parameters": [
-                        "",
-                        "MainChar",
-                        "Group"
-                      ],
+                      "parameters": ["", "MainChar", "Group"],
                       "subInstructions": []
                     },
                     {
@@ -1583,11 +1524,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "attached",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["attached", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -1606,11 +1543,7 @@
                     "inverted": false,
                     "value": "LinkedObjects::PickObjectsLinkedTo"
                   },
-                  "parameters": [
-                    "",
-                    "Group",
-                    "MainChar"
-                  ],
+                  "parameters": ["", "Group", "MainChar"],
                   "subInstructions": []
                 },
                 {
@@ -1654,10 +1587,7 @@
                     "inverted": true,
                     "value": "SourisBouton"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 },
                 {
@@ -1665,11 +1595,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "attached",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["attached", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -1679,11 +1605,7 @@
                     "inverted": false,
                     "value": "LinkedObjects::PickObjectsLinkedTo"
                   },
-                  "parameters": [
-                    "",
-                    "Group",
-                    "MainChar"
-                  ],
+                  "parameters": ["", "Group", "MainChar"],
                   "subInstructions": []
                 },
                 {
@@ -1691,11 +1613,7 @@
                     "inverted": false,
                     "value": "Opacity"
                   },
-                  "parameters": [
-                    "Group",
-                    "=",
-                    "255"
-                  ],
+                  "parameters": ["Group", "=", "255"],
                   "subInstructions": []
                 },
                 {
@@ -1703,11 +1621,7 @@
                     "inverted": false,
                     "value": "ActivateBehavior"
                   },
-                  "parameters": [
-                    "Group",
-                    "Physics",
-                    "no"
-                  ],
+                  "parameters": ["Group", "Physics", "no"],
                   "subInstructions": []
                 },
                 {
@@ -1715,11 +1629,7 @@
                     "inverted": false,
                     "value": "LinkedObjects::RemoveLinkBetween"
                   },
-                  "parameters": [
-                    "",
-                    "MainChar",
-                    "Group"
-                  ],
+                  "parameters": ["", "MainChar", "Group"],
                   "subInstructions": []
                 },
                 {
@@ -1727,11 +1637,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "attached",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["attached", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -1765,12 +1671,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::CollisionWith"
               },
-              "parameters": [
-                "MainChar",
-                "Physics",
-                "Platform",
-                ""
-              ],
+              "parameters": ["MainChar", "Physics", "Platform", ""],
               "subInstructions": []
             }
           ],
@@ -1817,13 +1718,7 @@
                 "inverted": false,
                 "value": "PhysicsBehavior::LinearVelocity"
               },
-              "parameters": [
-                "MainChar",
-                "Physics",
-                "<",
-                "0.0001",
-                ""
-              ],
+              "parameters": ["MainChar", "Physics", "<", "0.0001", ""],
               "subInstructions": []
             }
           ],
@@ -1833,11 +1728,7 @@
                 "inverted": false,
                 "value": "Scene"
               },
-              "parameters": [
-                "",
-                "\"Rope Example\"",
-                ""
-              ],
+              "parameters": ["", "\"Rope Example\"", ""],
               "subInstructions": []
             }
           ],
@@ -1868,11 +1759,7 @@
                 "inverted": false,
                 "value": "PosY"
               },
-              "parameters": [
-                "MainChar",
-                ">",
-                "1800"
-              ],
+              "parameters": ["MainChar", ">", "1800"],
               "subInstructions": []
             }
           ],
@@ -1882,11 +1769,7 @@
                 "inverted": false,
                 "value": "Scene"
               },
-              "parameters": [
-                "",
-                "\"Rope Example\"",
-                ""
-              ],
+              "parameters": ["", "\"Rope Example\"", ""],
               "subInstructions": []
             }
           ],
@@ -1917,12 +1800,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "MainChar",
-                "Finish",
-                "Finish",
-                ""
-              ],
+              "parameters": ["MainChar", "Finish", "Finish", ""],
               "subInstructions": []
             }
           ],
@@ -1932,11 +1810,7 @@
                 "inverted": false,
                 "value": "Scene"
               },
-              "parameters": [
-                "",
-                "\"Title\"",
-                ""
-              ],
+              "parameters": ["", "\"Title\"", ""],
               "subInstructions": []
             }
           ],

@@ -24,48 +24,58 @@ gdjs.deviceSensors = {
   }
 };
 
- /**
-  * Activate the orientation sensor's listener.
-  * @private
+/**
+ * Activate the orientation sensor's listener.
+ * @private
  */
 gdjs.deviceSensors.orientation._activateOrientationListener = function() {
-  window.addEventListener("deviceorientation", gdjs.deviceSensors.orientation._handleOrientation, true);
+  window.addEventListener(
+    "deviceorientation",
+    gdjs.deviceSensors.orientation._handleOrientation,
+    true
+  );
   gdjs.deviceSensors.orientation._isActive = true;
-}
+};
 
- /**
-  * Deactivate the orientation sensor's listener.
-  * @private
+/**
+ * Deactivate the orientation sensor's listener.
+ * @private
  */
 gdjs.deviceSensors.orientation._deactivateOrientationListener = function() {
-  window.removeEventListener('deviceorientation', gdjs.deviceSensors.orientation._handleOrientation, true);
+  window.removeEventListener(
+    "deviceorientation",
+    gdjs.deviceSensors.orientation._handleOrientation,
+    true
+  );
   gdjs.deviceSensors.orientation._isActive = false;
-}
+};
 
- /**
-  * Orientation sensor event callback function.
-  * @private
+/**
+ * Orientation sensor event callback function.
+ * @private
  */
 gdjs.deviceSensors.orientation._handleOrientation = function(event) {
-  gdjs.deviceSensors.orientation._absolute = event.absolute ? event.absolute : 0;
+  gdjs.deviceSensors.orientation._absolute = event.absolute
+    ? event.absolute
+    : 0;
   gdjs.deviceSensors.orientation._alpha = event.alpha ? event.alpha : 0;
   gdjs.deviceSensors.orientation._beta = event.beta ? event.beta : 0;
   gdjs.deviceSensors.orientation._gamma = event.gamma ? event.gamma : 0;
-}
+};
 
 /**
  * Activate the orientation sensor
  */
 gdjs.deviceSensors.orientation.activateOrientationSensor = function() {
   gdjs.deviceSensors.orientation._activateOrientationListener();
-}
+};
 
 /**
  * Deactivate the orientation sensor
  */
 gdjs.deviceSensors.orientation.deactivateOrientationSensor = function() {
   gdjs.deviceSensors.orientation._deactivateOrientationListener();
-}
+};
 
 /**
  * Check if the orientation sensor is currently active
@@ -73,7 +83,7 @@ gdjs.deviceSensors.orientation.deactivateOrientationSensor = function() {
  */
 gdjs.deviceSensors.orientation.isActive = function() {
   return gdjs.deviceSensors.orientation._isActive;
-}
+};
 
 /**
  * Get the value of the device orientation's absolute as a number
@@ -100,63 +110,85 @@ gdjs.deviceSensors.orientation.getOrientationBeta = function() {
 };
 
 /**
-* Get the value of the device orientation's gamma as a number (Range: -90 to 90)
-* @return {number} The device orientation's gamma value
-*/
+ * Get the value of the device orientation's gamma as a number (Range: -90 to 90)
+ * @return {number} The device orientation's gamma value
+ */
 gdjs.deviceSensors.orientation.getOrientationGamma = function() {
   return gdjs.deviceSensors.orientation._gamma;
 };
 
-
- /**
-  * Activate the motion sensor's listener.
-  * @private
+/**
+ * Activate the motion sensor's listener.
+ * @private
  */
 gdjs.deviceSensors.motion._activateMotionListener = function() {
-  window.addEventListener("devicemotion", gdjs.deviceSensors.motion._handleMotion, true);
+  window.addEventListener(
+    "devicemotion",
+    gdjs.deviceSensors.motion._handleMotion,
+    true
+  );
   gdjs.deviceSensors.motion._isActive = true;
-}
+};
 
- /**
-  * Deactivate the motion sensor's listener.
-  * @private
+/**
+ * Deactivate the motion sensor's listener.
+ * @private
  */
 gdjs.deviceSensors.motion._deactivateMotionListener = function() {
-  window.removeEventListener('devicemotion', gdjs.deviceSensors.motion._handleMotion, true);
+  window.removeEventListener(
+    "devicemotion",
+    gdjs.deviceSensors.motion._handleMotion,
+    true
+  );
   gdjs.deviceSensors.motion._isActive = false;
-}
+};
 
- /**
-  * Motion sensor event callback function.
-  * @private
+/**
+ * Motion sensor event callback function.
+ * @private
  */
-gdjs.deviceSensors.motion._handleMotion = function(event) {  
-  if (event.accelerationIncludingGravity){
-    gdjs.deviceSensors.motion._accelerationX = event.accelerationIncludingGravity.x ? event.accelerationIncludingGravity.x : 0;
-    gdjs.deviceSensors.motion._accelerationY = event.accelerationIncludingGravity.y ? event.accelerationIncludingGravity.y : 0;
-    gdjs.deviceSensors.motion._accelerationZ = event.accelerationIncludingGravity.z ? event.accelerationIncludingGravity.z : 0;
+gdjs.deviceSensors.motion._handleMotion = function(event) {
+  if (event.accelerationIncludingGravity) {
+    gdjs.deviceSensors.motion._accelerationX = event
+      .accelerationIncludingGravity.x
+      ? event.accelerationIncludingGravity.x
+      : 0;
+    gdjs.deviceSensors.motion._accelerationY = event
+      .accelerationIncludingGravity.y
+      ? event.accelerationIncludingGravity.y
+      : 0;
+    gdjs.deviceSensors.motion._accelerationZ = event
+      .accelerationIncludingGravity.z
+      ? event.accelerationIncludingGravity.z
+      : 0;
   }
 
-  if (event.rotationRate){
-    gdjs.deviceSensors.motion._rotationAlpha = event.rotationRate.alpha ? event.rotationRate.alpha : 0;
-    gdjs.deviceSensors.motion._rotationBeta = event.rotationRate.beta ? event.rotationRate.beta : 0;
-    gdjs.deviceSensors.motion._rotationGamma = event.rotationRate.gamma ? event.rotationRate.gamma : 0;
+  if (event.rotationRate) {
+    gdjs.deviceSensors.motion._rotationAlpha = event.rotationRate.alpha
+      ? event.rotationRate.alpha
+      : 0;
+    gdjs.deviceSensors.motion._rotationBeta = event.rotationRate.beta
+      ? event.rotationRate.beta
+      : 0;
+    gdjs.deviceSensors.motion._rotationGamma = event.rotationRate.gamma
+      ? event.rotationRate.gamma
+      : 0;
   }
-}
+};
 
 /**
  * Activate the motion sensor
  */
 gdjs.deviceSensors.motion.activateMotionSensor = function() {
   gdjs.deviceSensors.motion._activateMotionListener();
-}
+};
 
 /**
  * Deactivate the motion sensor
  */
 gdjs.deviceSensors.motion.deactivateMotionSensor = function() {
   gdjs.deviceSensors.motion._deactivateMotionListener();
-}
+};
 
 /**
  * Check if the motion sensor is currently active
@@ -164,7 +196,7 @@ gdjs.deviceSensors.motion.deactivateMotionSensor = function() {
  */
 gdjs.deviceSensors.motion.isActive = function() {
   return gdjs.deviceSensors.motion._isActive;
-}
+};
 
 /**
  * Get the alpha rotation rate as a number
@@ -185,12 +217,12 @@ gdjs.deviceSensors.motion.getRotationBeta = function() {
 /**
  * Get the gamma rotation rate as a number
  * @return {number} The rotation gamma value
-*/
+ */
 gdjs.deviceSensors.motion.getRotationGamma = function() {
   return gdjs.deviceSensors.motion._rotationGamma;
 };
 
-  /**
+/**
  * Get the acceleration value on the X-axis as a number
  * @return {number} Acceleration on the X-axis
  */
@@ -209,7 +241,7 @@ gdjs.deviceSensors.motion.getAccelerationY = function() {
 /**
  * Get the acceleration value on the Z-axis as a number
  * @return {number} Acceleration on the Z-axis
-*/
+ */
 gdjs.deviceSensors.motion.getAccelerationZ = function() {
   return gdjs.deviceSensors.motion._accelerationZ;
 };

@@ -1368,10 +1368,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -1381,11 +1378,7 @@
                 "inverted": false,
                 "value": "SetAngle"
               },
-              "parameters": [
-                "Perso",
-                "-",
-                "4"
-              ],
+              "parameters": ["Perso", "-", "4"],
               "subInstructions": []
             }
           ],
@@ -1401,10 +1394,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Right"
-              ],
+              "parameters": ["", "Right"],
               "subInstructions": []
             }
           ],
@@ -1414,11 +1404,7 @@
                 "inverted": false,
                 "value": "SetAngle"
               },
-              "parameters": [
-                "Perso",
-                "+",
-                "4"
-              ],
+              "parameters": ["Perso", "+", "4"],
               "subInstructions": []
             }
           ],
@@ -1434,10 +1420,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Up"
-              ],
+              "parameters": ["", "Up"],
               "subInstructions": []
             }
           ],
@@ -1447,12 +1430,7 @@
                 "inverted": false,
                 "value": "AddForceAL"
               },
-              "parameters": [
-                "Perso",
-                "Perso.Angle()",
-                "75",
-                "0"
-              ],
+              "parameters": ["Perso", "Perso.Angle()", "75", "0"],
               "subInstructions": []
             }
           ],
@@ -1468,10 +1446,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Down"
-              ],
+              "parameters": ["", "Down"],
               "subInstructions": []
             }
           ],
@@ -1481,12 +1456,7 @@
                 "inverted": false,
                 "value": "AddForceAL"
               },
-              "parameters": [
-                "Perso",
-                "Perso.Angle()",
-                "-75",
-                "0"
-              ],
+              "parameters": ["Perso", "Perso.Angle()", "-75", "0"],
               "subInstructions": []
             }
           ],
@@ -1517,10 +1487,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -1530,11 +1497,7 @@
                 "inverted": false,
                 "value": "TourneVersPos"
               },
-              "parameters": [
-                "Perso",
-                "MouseX(\"\",0)",
-                "MouseY(\"\",0)"
-              ],
+              "parameters": ["Perso", "MouseX(\"\",0)", "MouseY(\"\",0)"],
               "subInstructions": []
             },
             {
@@ -1620,11 +1583,7 @@
                     "inverted": false,
                     "value": "NbObjet"
                   },
-                  "parameters": [
-                    "Perso",
-                    ">",
-                    "0"
-                  ],
+                  "parameters": ["Perso", ">", "0"],
                   "subInstructions": []
                 }
               ],
@@ -1634,12 +1593,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "IA",
-                    "Alerte",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["IA", "Alerte", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -1673,12 +1627,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "IA",
-                "Alerte",
-                "=",
-                "1"
-              ],
+              "parameters": ["IA", "Alerte", "=", "1"],
               "subInstructions": []
             },
             {
@@ -1686,11 +1635,7 @@
                 "inverted": true,
                 "value": "LinkedObjects::PickObjectsLinkedTo"
               },
-              "parameters": [
-                "",
-                "Alert",
-                "IA"
-              ],
+              "parameters": ["", "Alert", "IA"],
               "subInstructions": []
             }
           ],
@@ -1714,11 +1659,7 @@
                 "inverted": false,
                 "value": "Opacity"
               },
-              "parameters": [
-                "Alert",
-                "=",
-                "150"
-              ],
+              "parameters": ["Alert", "=", "150"],
               "subInstructions": []
             },
             {
@@ -1726,11 +1667,7 @@
                 "inverted": false,
                 "value": "LinkedObjects::LinkObjects"
               },
-              "parameters": [
-                "",
-                "Alert",
-                "IA"
-              ],
+              "parameters": ["", "Alert", "IA"],
               "subInstructions": []
             }
           ],
@@ -1747,12 +1684,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "IA",
-                "Alerte",
-                "=",
-                "1"
-              ],
+              "parameters": ["IA", "Alerte", "=", "1"],
               "subInstructions": []
             },
             {
@@ -1760,11 +1692,7 @@
                 "inverted": false,
                 "value": "LinkedObjects::PickObjectsLinkedTo"
               },
-              "parameters": [
-                "",
-                "Alert",
-                "IA"
-              ],
+              "parameters": ["", "Alert", "IA"],
               "subInstructions": []
             }
           ],
@@ -1774,13 +1702,7 @@
                 "inverted": false,
                 "value": "MettreXY"
               },
-              "parameters": [
-                "Alert",
-                "=",
-                "IA.X()",
-                "=",
-                "IA.Y()"
-              ],
+              "parameters": ["Alert", "=", "IA.X()", "=", "IA.Y()"],
               "subInstructions": []
             }
           ],
@@ -1811,12 +1733,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "IA",
-                "Alerte",
-                "=",
-                "1"
-              ],
+              "parameters": ["IA", "Alerte", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -1863,11 +1780,7 @@
                 "inverted": false,
                 "value": "Timer"
               },
-              "parameters": [
-                "",
-                "5",
-                "\"FinAlerte\""
-              ],
+              "parameters": ["", "5", "\"FinAlerte\""],
               "subInstructions": []
             }
           ],
@@ -1877,12 +1790,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "IA",
-                "Alerte",
-                "=",
-                "0"
-              ],
+              "parameters": ["IA", "Alerte", "=", "0"],
               "subInstructions": []
             },
             {
@@ -1890,10 +1798,7 @@
                 "inverted": false,
                 "value": "ResetTimer"
               },
-              "parameters": [
-                "",
-                "\"FinAlerte\""
-              ],
+              "parameters": ["", "\"FinAlerte\""],
               "subInstructions": []
             }
           ],
@@ -1924,10 +1829,7 @@
                 "inverted": false,
                 "value": "Collision"
               },
-              "parameters": [
-                "Perso",
-                "Mur"
-              ],
+              "parameters": ["Perso", "Mur"],
               "subInstructions": []
             }
           ],
@@ -1937,10 +1839,7 @@
                 "inverted": false,
                 "value": "Rebondir"
               },
-              "parameters": [
-                "Perso",
-                "Mur"
-              ],
+              "parameters": ["Perso", "Mur"],
               "subInstructions": []
             }
           ],
@@ -1972,12 +1871,7 @@
                 "inverted": false,
                 "value": "VarObjet"
               },
-              "parameters": [
-                "IA",
-                "Alerte",
-                "=",
-                "0"
-              ],
+              "parameters": ["IA", "Alerte", "=", "0"],
               "subInstructions": []
             },
             {
@@ -1985,11 +1879,7 @@
                 "inverted": false,
                 "value": "LinkedObjects::PickObjectsLinkedTo"
               },
-              "parameters": [
-                "",
-                "Alert",
-                "IA"
-              ],
+              "parameters": ["", "Alert", "IA"],
               "subInstructions": []
             }
           ],
@@ -1999,10 +1889,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Alert",
-                ""
-              ],
+              "parameters": ["Alert", ""],
               "subInstructions": []
             },
             {
@@ -2010,10 +1897,7 @@
                 "inverted": false,
                 "value": "LinkedObjects::RemoveAllLinksOf"
               },
-              "parameters": [
-                "",
-                "IA"
-              ],
+              "parameters": ["", "IA"],
               "subInstructions": []
             }
           ],
@@ -2044,12 +1928,7 @@
                 "inverted": false,
                 "value": "PathfindingBehavior::Speed"
               },
-              "parameters": [
-                "IA",
-                "Pathfinding",
-                "=",
-                "0"
-              ],
+              "parameters": ["IA", "Pathfinding", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -2059,11 +1938,7 @@
                 "inverted": false,
                 "value": "ChangeAnimation"
               },
-              "parameters": [
-                "IA",
-                "=",
-                "1"
-              ],
+              "parameters": ["IA", "=", "1"],
               "subInstructions": []
             }
           ],
@@ -2079,12 +1954,7 @@
                 "inverted": false,
                 "value": "PathfindingBehavior::Speed"
               },
-              "parameters": [
-                "IA",
-                "Pathfinding",
-                ">",
-                "0"
-              ],
+              "parameters": ["IA", "Pathfinding", ">", "0"],
               "subInstructions": []
             }
           ],
@@ -2094,11 +1964,7 @@
                 "inverted": false,
                 "value": "ChangeAnimation"
               },
-              "parameters": [
-                "IA",
-                "=",
-                "0"
-              ],
+              "parameters": ["IA", "=", "0"],
               "subInstructions": []
             }
           ],

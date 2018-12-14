@@ -425,10 +425,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -444,12 +441,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Source",
-                    "",
-                    "yes",
-                    ""
-                  ],
+                  "parameters": ["Source", "", "yes", ""],
                   "subInstructions": []
                 }
               ],
@@ -465,10 +457,7 @@
                         "inverted": true,
                         "value": "DraggableBehavior::Dragged"
                       },
-                      "parameters": [
-                        "Target",
-                        "Draggable"
-                      ],
+                      "parameters": ["Target", "Draggable"],
                       "subInstructions": []
                     },
                     {
@@ -476,11 +465,7 @@
                         "inverted": false,
                         "value": "NbObjet"
                       },
-                      "parameters": [
-                        "Bullet",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["Bullet", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -490,11 +475,7 @@
                         "inverted": false,
                         "value": "ActivateBehavior"
                       },
-                      "parameters": [
-                        "Target",
-                        "Draggable",
-                        "no"
-                      ],
+                      "parameters": ["Target", "Draggable", "no"],
                       "subInstructions": []
                     }
                   ],
@@ -539,11 +520,7 @@
                 "inverted": false,
                 "value": "NbObjet"
               },
-              "parameters": [
-                "Bullet",
-                ">",
-                "0"
-              ],
+              "parameters": ["Bullet", ">", "0"],
               "subInstructions": []
             }
           ],
@@ -567,11 +544,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "voy",
-                "+",
-                "TimeDelta() * Variable(g)"
-              ],
+              "parameters": ["voy", "+", "TimeDelta() * Variable(g)"],
               "subInstructions": []
             }
           ],
@@ -602,12 +575,7 @@
                 "inverted": false,
                 "value": "CollisionNP"
               },
-              "parameters": [
-                "Target",
-                "Bullet",
-                "",
-                ""
-              ],
+              "parameters": ["Target", "Bullet", "", ""],
               "subInstructions": []
             }
           ],
@@ -617,10 +585,7 @@
                 "inverted": false,
                 "value": "Delete"
               },
-              "parameters": [
-                "Bullet",
-                ""
-              ],
+              "parameters": ["Bullet", ""],
               "subInstructions": []
             },
             {
@@ -628,11 +593,7 @@
                 "inverted": false,
                 "value": "ActivateBehavior"
               },
-              "parameters": [
-                "Target",
-                "Draggable",
-                "yes"
-              ],
+              "parameters": ["Target", "Draggable", "yes"],
               "subInstructions": []
             }
           ],
@@ -717,11 +678,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "h",
-                "=",
-                "Source.Y() - Target.Y()"
-              ],
+              "parameters": ["h", "=", "Source.Y() - Target.Y()"],
               "subInstructions": []
             },
             {
@@ -729,11 +686,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "d",
-                "=",
-                "Target.X() - Source.X()"
-              ],
+              "parameters": ["d", "=", "Target.X() - Source.X()"],
               "subInstructions": []
             },
             {
@@ -741,11 +694,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "g",
-                "=",
-                "98"
-              ],
+              "parameters": ["g", "=", "98"],
               "subInstructions": []
             },
             {
@@ -753,11 +702,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "voy",
-                "=",
-                "-175"
-              ],
+              "parameters": ["voy", "=", "-175"],
               "subInstructions": []
             },
             {
@@ -777,13 +722,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "Bullet",
-                "Source.X()",
-                "Source.Y()",
-                ""
-              ],
+              "parameters": ["", "Bullet", "Source.X()", "Source.Y()", ""],
               "subInstructions": []
             }
           ],
@@ -886,11 +825,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "h",
-                "=",
-                "Source.Y() - Target.Y()"
-              ],
+              "parameters": ["h", "=", "Source.Y() - Target.Y()"],
               "subInstructions": []
             },
             {
@@ -898,11 +833,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "d",
-                "=",
-                "Target.X() - Source.X()"
-              ],
+              "parameters": ["d", "=", "Target.X() - Source.X()"],
               "subInstructions": []
             },
             {
@@ -910,11 +841,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "g",
-                "=",
-                "98"
-              ],
+              "parameters": ["g", "=", "98"],
               "subInstructions": []
             },
             {
@@ -922,11 +849,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "angle",
-                "=",
-                "45"
-              ],
+              "parameters": ["angle", "=", "45"],
               "subInstructions": []
             },
             {
@@ -958,13 +881,7 @@
                 "inverted": false,
                 "value": "Create"
               },
-              "parameters": [
-                "",
-                "Bullet",
-                "Source.X()",
-                "Source.Y()",
-                ""
-              ],
+              "parameters": ["", "Bullet", "Source.X()", "Source.Y()", ""],
               "subInstructions": []
             }
           ],

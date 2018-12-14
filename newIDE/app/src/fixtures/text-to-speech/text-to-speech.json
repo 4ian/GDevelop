@@ -217,9 +217,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -274,10 +272,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Return"
-              ],
+              "parameters": ["", "Return"],
               "subInstructions": []
             }
           ],
@@ -287,11 +282,7 @@
                 "inverted": false,
                 "value": "ModVarSceneTxt"
               },
-              "parameters": [
-                "speech",
-                "=",
-                "TextEntry.String()"
-              ],
+              "parameters": ["speech", "=", "TextEntry.String()"],
               "subInstructions": []
             },
             {
@@ -299,11 +290,7 @@
                 "inverted": false,
                 "value": "TextEntryObject::String"
               },
-              "parameters": [
-                "TextEntry",
-                "=",
-                "\"\""
-              ],
+              "parameters": ["TextEntry", "=", "\"\""],
               "subInstructions": []
             }
           ],

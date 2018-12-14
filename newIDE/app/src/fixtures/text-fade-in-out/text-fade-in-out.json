@@ -199,9 +199,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -211,11 +209,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "Fade",
-                "=",
-                "0.5"
-              ],
+              "parameters": ["Fade", "=", "0.5"],
               "subInstructions": []
             }
           ],
@@ -231,11 +225,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "Fade",
-                ">",
-                "0"
-              ],
+              "parameters": ["Fade", ">", "0"],
               "subInstructions": []
             }
           ],
@@ -245,11 +235,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "Fade",
-                "-",
-                "0.1*TimeDelta()"
-              ],
+              "parameters": ["Fade", "-", "0.1*TimeDelta()"],
               "subInstructions": []
             },
             {
@@ -380,9 +366,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -392,11 +376,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "Fade",
-                "=",
-                "0"
-              ],
+              "parameters": ["Fade", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -412,11 +392,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "Fade",
-                "<",
-                "1"
-              ],
+              "parameters": ["Fade", "<", "1"],
               "subInstructions": []
             }
           ],
@@ -426,11 +402,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "Fade",
-                "+",
-                "0.1*TimeDelta()"
-              ],
+              "parameters": ["Fade", "+", "0.1*TimeDelta()"],
               "subInstructions": []
             },
             {
@@ -561,9 +533,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -573,11 +543,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "Fade",
-                "=",
-                "0"
-              ],
+              "parameters": ["Fade", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -593,11 +559,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "Fade",
-                "<",
-                "0.5"
-              ],
+              "parameters": ["Fade", "<", "0.5"],
               "subInstructions": []
             }
           ],
@@ -607,11 +569,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "Fade",
-                "+",
-                "0.1*TimeDelta()"
-              ],
+              "parameters": ["Fade", "+", "0.1*TimeDelta()"],
               "subInstructions": []
             },
             {

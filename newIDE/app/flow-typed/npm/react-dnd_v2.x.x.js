@@ -1,18 +1,18 @@
 // flow-typed signature: 6457154c7e96ef3ce4b654781625f315
 // flow-typed version: 7bc41826e1/react-dnd_v2.x.x/flow_>=v0.53.x
 
-declare module "react-dnd" {
+declare module 'react-dnd' {
   declare type Identifier = string;
 
   declare type ClientOffset = {
     x: number,
-    y: number
+    y: number,
   };
 
   declare type ElementOrNode = React$Element<any> | HTMLElement;
 
   declare type DndOptions<P> = {
-    arePropsEqual?: (props: P, otherProps: P) => boolean
+    arePropsEqual?: (props: P, otherProps: P) => boolean,
   };
 
   declare type ComponentClassWithDefaultProps<D: {}, P: {}, S> = Class<
@@ -23,11 +23,11 @@ declare module "react-dnd" {
   declare type InstanceOf<C> = _InstanceOf<*, C>;
 
   declare class ConnectedComponent<C, I, P> extends React$Component<P> {
-    static DecoratedComponent: C,
-    getDecoratedComponentInstance(): I,
-    getHandlerId(): Identifier,
-    props: P,
-    state: void
+    static DecoratedComponent: C;
+    getDecoratedComponentInstance(): I;
+    getHandlerId(): Identifier;
+    props: P;
+    state: void;
   }
 
   declare type Connector<SP: {}, CP: {}> = (<
@@ -69,7 +69,7 @@ declare module "react-dnd" {
 
     canDrag?: (props: P, monitor: DragSourceMonitor) => boolean,
 
-    isDragging?: (props: P, monitor: DragSourceMonitor) => boolean
+    isDragging?: (props: P, monitor: DragSourceMonitor) => boolean,
   };
 
   declare type DragSourceMonitor = {
@@ -83,22 +83,22 @@ declare module "react-dnd" {
     getInitialSourceClientOffset: () => ClientOffset,
     getClientOffset: () => ClientOffset,
     getDifferenceFromInitialOffset: () => ClientOffset,
-    getSourceClientOffset: () => ClientOffset
+    getSourceClientOffset: () => ClientOffset,
   };
 
   declare type DragSourceConnector = {
     dragSource: () => ConnectDragSource,
-    dragPreview: () => ConnectDragPreview
+    dragPreview: () => ConnectDragPreview,
   };
 
   declare type DragSourceOptions = {
-    dropEffect?: string
+    dropEffect?: string,
   };
 
   declare type DragPreviewOptions = {
     captureDraggingState?: boolean,
     anchorX?: number,
-    anchorY?: number
+    anchorY?: number,
   };
 
   declare type ConnectDragSource = <T: ElementOrNode>(
@@ -144,7 +144,7 @@ declare module "react-dnd" {
       component: React$Component<P, any>
     ) => void,
 
-    canDrop?: (props: P, monitor: DropTargetMonitor) => boolean
+    canDrop?: (props: P, monitor: DropTargetMonitor) => boolean,
   };
 
   declare type DropTargetMonitor = {
@@ -158,11 +158,11 @@ declare module "react-dnd" {
     getInitialSourceClientOffset: () => ClientOffset,
     getClientOffset: () => ClientOffset,
     getDifferenceFromInitialOffset: () => ClientOffset,
-    getSourceClientOffset: () => ClientOffset
+    getSourceClientOffset: () => ClientOffset,
   };
 
   declare type DropTargetConnector = {
-    dropTarget: () => ConnectDropTarget
+    dropTarget: () => ConnectDropTarget,
   };
 
   declare type ConnectDropTarget = <T: ElementOrNode>(elementOrNode: T) => ?T;
@@ -190,7 +190,7 @@ declare module "react-dnd" {
     getInitialSourceClientOffset: () => ClientOffset,
     getClientOffset: () => ClientOffset,
     getDifferenceFromInitialOffset: () => ClientOffset,
-    getSourceClientOffset: () => ClientOffset
+    getSourceClientOffset: () => ClientOffset,
   };
 
   declare function DragLayer<OP: {}, CP: {}>(

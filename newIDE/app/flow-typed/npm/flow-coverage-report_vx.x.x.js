@@ -208,34 +208,48 @@ declare module 'flow-coverage-report/src/lib/report-text' {
 
 // Filename aliases
 declare module 'flow-coverage-report/assets/codemirror-annotatescrollbar-addon.js' {
-  declare module.exports: $Exports<'flow-coverage-report/assets/codemirror-annotatescrollbar-addon'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/assets/codemirror-annotatescrollbar-addon'
+  >;
 }
 declare module 'flow-coverage-report/assets/codemirror-javascript-mode.js' {
-  declare module.exports: $Exports<'flow-coverage-report/assets/codemirror-javascript-mode'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/assets/codemirror-javascript-mode'
+  >;
 }
 declare module 'flow-coverage-report/assets/codemirror-simplescrollbars-addon.js' {
-  declare module.exports: $Exports<'flow-coverage-report/assets/codemirror-simplescrollbars-addon'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/assets/codemirror-simplescrollbars-addon'
+  >;
 }
 declare module 'flow-coverage-report/assets/codemirror.js' {
   declare module.exports: $Exports<'flow-coverage-report/assets/codemirror'>;
 }
 declare module 'flow-coverage-report/assets/flow-highlight-source.js' {
-  declare module.exports: $Exports<'flow-coverage-report/assets/flow-highlight-source'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/assets/flow-highlight-source'
+  >;
 }
 declare module 'flow-coverage-report/assets/index.js' {
   declare module.exports: $Exports<'flow-coverage-report/assets/index'>;
 }
 declare module 'flow-coverage-report/assets/jquery-3.1.0.min.js' {
-  declare module.exports: $Exports<'flow-coverage-report/assets/jquery-3.1.0.min'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/assets/jquery-3.1.0.min'
+  >;
 }
 declare module 'flow-coverage-report/assets/semantic-tablesort.js' {
-  declare module.exports: $Exports<'flow-coverage-report/assets/semantic-tablesort'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/assets/semantic-tablesort'
+  >;
 }
 declare module 'flow-coverage-report/assets/semantic.min.js' {
   declare module.exports: $Exports<'flow-coverage-report/assets/semantic.min'>;
 }
 declare module 'flow-coverage-report/bin/flow-coverage-report.js' {
-  declare module.exports: $Exports<'flow-coverage-report/bin/flow-coverage-report'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/bin/flow-coverage-report'
+  >;
 }
 declare module 'flow-coverage-report/dist/lib/cli/args.js' {
   declare module.exports: $Exports<'flow-coverage-report/dist/lib/cli/args'>;
@@ -247,31 +261,49 @@ declare module 'flow-coverage-report/dist/lib/cli/index.js' {
   declare module.exports: $Exports<'flow-coverage-report/dist/lib/cli/index'>;
 }
 declare module 'flow-coverage-report/dist/lib/components/body-coverage-sourcefile.js' {
-  declare module.exports: $Exports<'flow-coverage-report/dist/lib/components/body-coverage-sourcefile'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/dist/lib/components/body-coverage-sourcefile'
+  >;
 }
 declare module 'flow-coverage-report/dist/lib/components/body-coverage-summary.js' {
-  declare module.exports: $Exports<'flow-coverage-report/dist/lib/components/body-coverage-summary'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/dist/lib/components/body-coverage-summary'
+  >;
 }
 declare module 'flow-coverage-report/dist/lib/components/coverage-file-table-head.js' {
-  declare module.exports: $Exports<'flow-coverage-report/dist/lib/components/coverage-file-table-head'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/dist/lib/components/coverage-file-table-head'
+  >;
 }
 declare module 'flow-coverage-report/dist/lib/components/coverage-file-table-row.js' {
-  declare module.exports: $Exports<'flow-coverage-report/dist/lib/components/coverage-file-table-row'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/dist/lib/components/coverage-file-table-row'
+  >;
 }
 declare module 'flow-coverage-report/dist/lib/components/coverage-meter-bar.js' {
-  declare module.exports: $Exports<'flow-coverage-report/dist/lib/components/coverage-meter-bar'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/dist/lib/components/coverage-meter-bar'
+  >;
 }
 declare module 'flow-coverage-report/dist/lib/components/coverage-summary-table.js' {
-  declare module.exports: $Exports<'flow-coverage-report/dist/lib/components/coverage-summary-table'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/dist/lib/components/coverage-summary-table'
+  >;
 }
 declare module 'flow-coverage-report/dist/lib/components/footer.js' {
-  declare module.exports: $Exports<'flow-coverage-report/dist/lib/components/footer'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/dist/lib/components/footer'
+  >;
 }
 declare module 'flow-coverage-report/dist/lib/components/head.js' {
-  declare module.exports: $Exports<'flow-coverage-report/dist/lib/components/head'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/dist/lib/components/head'
+  >;
 }
 declare module 'flow-coverage-report/dist/lib/components/html-report-page.js' {
-  declare module.exports: $Exports<'flow-coverage-report/dist/lib/components/html-report-page'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/dist/lib/components/html-report-page'
+  >;
 }
 declare module 'flow-coverage-report/dist/lib/flow.js' {
   declare module.exports: $Exports<'flow-coverage-report/dist/lib/flow'>;
@@ -301,31 +333,49 @@ declare module 'flow-coverage-report/src/lib/cli/index.js' {
   declare module.exports: $Exports<'flow-coverage-report/src/lib/cli/index'>;
 }
 declare module 'flow-coverage-report/src/lib/components/body-coverage-sourcefile.jsx' {
-  declare module.exports: $Exports<'flow-coverage-report/src/lib/components/body-coverage-sourcefile'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/src/lib/components/body-coverage-sourcefile'
+  >;
 }
 declare module 'flow-coverage-report/src/lib/components/body-coverage-summary.jsx' {
-  declare module.exports: $Exports<'flow-coverage-report/src/lib/components/body-coverage-summary'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/src/lib/components/body-coverage-summary'
+  >;
 }
 declare module 'flow-coverage-report/src/lib/components/coverage-file-table-head.jsx' {
-  declare module.exports: $Exports<'flow-coverage-report/src/lib/components/coverage-file-table-head'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/src/lib/components/coverage-file-table-head'
+  >;
 }
 declare module 'flow-coverage-report/src/lib/components/coverage-file-table-row.jsx' {
-  declare module.exports: $Exports<'flow-coverage-report/src/lib/components/coverage-file-table-row'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/src/lib/components/coverage-file-table-row'
+  >;
 }
 declare module 'flow-coverage-report/src/lib/components/coverage-meter-bar.jsx' {
-  declare module.exports: $Exports<'flow-coverage-report/src/lib/components/coverage-meter-bar'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/src/lib/components/coverage-meter-bar'
+  >;
 }
 declare module 'flow-coverage-report/src/lib/components/coverage-summary-table.jsx' {
-  declare module.exports: $Exports<'flow-coverage-report/src/lib/components/coverage-summary-table'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/src/lib/components/coverage-summary-table'
+  >;
 }
 declare module 'flow-coverage-report/src/lib/components/footer.jsx' {
-  declare module.exports: $Exports<'flow-coverage-report/src/lib/components/footer'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/src/lib/components/footer'
+  >;
 }
 declare module 'flow-coverage-report/src/lib/components/head.jsx' {
-  declare module.exports: $Exports<'flow-coverage-report/src/lib/components/head'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/src/lib/components/head'
+  >;
 }
 declare module 'flow-coverage-report/src/lib/components/html-report-page.jsx' {
-  declare module.exports: $Exports<'flow-coverage-report/src/lib/components/html-report-page'>;
+  declare module.exports: $Exports<
+    'flow-coverage-report/src/lib/components/html-report-page'
+  >;
 }
 declare module 'flow-coverage-report/src/lib/flow.js' {
   declare module.exports: $Exports<'flow-coverage-report/src/lib/flow'>;

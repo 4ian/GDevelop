@@ -70,7 +70,7 @@ export default class InstructionParametersEditor extends React.Component<
       }, 300); // Let the time to the dialog that is potentially containing the InstructionParametersEditor to finish its transition.
     }
   }
-  
+
   focus() {
     // Verify that there is a field to focus.
     if (

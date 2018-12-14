@@ -532,9 +532,7 @@
                 "inverted": false,
                 "value": "DepartScene"
               },
-              "parameters": [
-                ""
-              ],
+              "parameters": [""],
               "subInstructions": []
             }
           ],
@@ -544,11 +542,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "drag_factor",
-                "=",
-                "0.2"
-              ],
+              "parameters": ["drag_factor", "=", "0.2"],
               "subInstructions": []
             }
           ],
@@ -564,10 +558,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -591,12 +582,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "Player",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["Player", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -606,11 +592,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "drag",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["drag", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -628,10 +610,7 @@
                 "inverted": false,
                 "value": "MouseButtonReleased"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -641,11 +620,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "drag",
-                "=",
-                "0"
-              ],
+              "parameters": ["drag", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -661,11 +636,7 @@
                 "inverted": false,
                 "value": "VarScene"
               },
-              "parameters": [
-                "drag",
-                "=",
-                "1"
-              ],
+              "parameters": ["drag", "=", "1"],
               "subInstructions": []
             }
           ],

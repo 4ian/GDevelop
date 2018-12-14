@@ -12,7 +12,7 @@ export const stopPIXITicker = () => {
   if (ticker) ticker.stop();
 };
 
-/** 
+/**
  * Start the PIXI Ticker used to monitor interactions
  */
 export const startPIXITicker = () => {

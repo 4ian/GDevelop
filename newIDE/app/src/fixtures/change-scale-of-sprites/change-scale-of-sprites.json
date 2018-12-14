@@ -244,10 +244,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             },
             {
@@ -279,12 +276,7 @@
                 "inverted": false,
                 "value": "ModVarObjet"
               },
-              "parameters": [
-                "sprite",
-                "timer",
-                "=",
-                "0"
-              ],
+              "parameters": ["sprite", "timer", "=", "0"],
               "subInstructions": []
             },
             {
@@ -292,11 +284,7 @@
                 "inverted": false,
                 "value": "ChangeScale"
               },
-              "parameters": [
-                "sprite",
-                "=",
-                "0.1"
-              ],
+              "parameters": ["sprite", "=", "0.1"],
               "subInstructions": []
             },
             {
@@ -340,11 +328,7 @@
                 "inverted": false,
                 "value": "NbObjet"
               },
-              "parameters": [
-                "sprite",
-                ">",
-                "0"
-              ],
+              "parameters": ["sprite", ">", "0"],
               "subInstructions": []
             }
           ],
@@ -362,12 +346,7 @@
                     "inverted": false,
                     "value": "ModVarObjet"
                   },
-                  "parameters": [
-                    "sprite",
-                    "timer",
-                    "+",
-                    "1 * TimeDelta()"
-                  ],
+                  "parameters": ["sprite", "timer", "+", "1 * TimeDelta()"],
                   "subInstructions": []
                 }
               ],
@@ -397,12 +376,7 @@
                         "inverted": false,
                         "value": "VarObjet"
                       },
-                      "parameters": [
-                        "sprite",
-                        "timer",
-                        ">",
-                        "0.05"
-                      ],
+                      "parameters": ["sprite", "timer", ">", "0.05"],
                       "subInstructions": []
                     },
                     {
@@ -424,11 +398,7 @@
                         "inverted": false,
                         "value": "ChangeScale"
                       },
-                      "parameters": [
-                        "sprite",
-                        "+",
-                        "0.01"
-                      ],
+                      "parameters": ["sprite", "+", "0.01"],
                       "subInstructions": []
                     },
                     {
@@ -436,12 +406,7 @@
                         "inverted": false,
                         "value": "ModVarObjet"
                       },
-                      "parameters": [
-                        "sprite",
-                        "timer",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["sprite", "timer", "=", "0"],
                       "subInstructions": []
                     }
                   ],

@@ -309,10 +309,7 @@
                     "inverted": false,
                     "value": "MouseButtonReleased"
                   },
-                  "parameters": [
-                    "",
-                    "Left"
-                  ],
+                  "parameters": ["", "Left"],
                   "subInstructions": []
                 },
                 {
@@ -320,10 +317,7 @@
                     "inverted": false,
                     "value": "KeyReleased"
                   },
-                  "parameters": [
-                    "",
-                    "Space"
-                  ],
+                  "parameters": ["", "Space"],
                   "subInstructions": []
                 }
               ]
@@ -343,11 +337,7 @@
                 "inverted": false,
                 "value": "ModVarScene"
               },
-              "parameters": [
-                "switch_animation",
-                "=",
-                "0"
-              ],
+              "parameters": ["switch_animation", "=", "0"],
               "subInstructions": []
             }
           ],
@@ -378,10 +368,7 @@
                 "inverted": false,
                 "value": "SourisBouton"
               },
-              "parameters": [
-                "",
-                "Left"
-              ],
+              "parameters": ["", "Left"],
               "subInstructions": []
             }
           ],
@@ -397,12 +384,7 @@
                     "inverted": false,
                     "value": "SourisSurObjet"
                   },
-                  "parameters": [
-                    "kenney",
-                    "",
-                    "",
-                    ""
-                  ],
+                  "parameters": ["kenney", "", "", ""],
                   "subInstructions": []
                 }
               ],
@@ -418,10 +400,7 @@
                         "inverted": false,
                         "value": "AnimationName"
                       },
-                      "parameters": [
-                        "kenney",
-                        "\"Cheer\""
-                      ],
+                      "parameters": ["kenney", "\"Cheer\""],
                       "subInstructions": []
                     },
                     {
@@ -429,11 +408,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "switch_animation",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["switch_animation", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -443,10 +418,7 @@
                         "inverted": false,
                         "value": "SetAnimationName"
                       },
-                      "parameters": [
-                        "kenney",
-                        "\"Duck\""
-                      ],
+                      "parameters": ["kenney", "\"Duck\""],
                       "subInstructions": []
                     },
                     {
@@ -454,11 +426,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "switch_animation",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["switch_animation", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -474,10 +442,7 @@
                         "inverted": false,
                         "value": "AnimationName"
                       },
-                      "parameters": [
-                        "kenney",
-                        "\"Duck\""
-                      ],
+                      "parameters": ["kenney", "\"Duck\""],
                       "subInstructions": []
                     },
                     {
@@ -485,11 +450,7 @@
                         "inverted": false,
                         "value": "VarScene"
                       },
-                      "parameters": [
-                        "switch_animation",
-                        "=",
-                        "0"
-                      ],
+                      "parameters": ["switch_animation", "=", "0"],
                       "subInstructions": []
                     }
                   ],
@@ -499,10 +460,7 @@
                         "inverted": false,
                         "value": "SetAnimationName"
                       },
-                      "parameters": [
-                        "kenney",
-                        "\"Cheer\""
-                      ],
+                      "parameters": ["kenney", "\"Cheer\""],
                       "subInstructions": []
                     },
                     {
@@ -510,11 +468,7 @@
                         "inverted": false,
                         "value": "ModVarScene"
                       },
-                      "parameters": [
-                        "switch_animation",
-                        "=",
-                        "1"
-                      ],
+                      "parameters": ["switch_animation", "=", "1"],
                       "subInstructions": []
                     }
                   ],
@@ -549,10 +503,7 @@
                 "inverted": false,
                 "value": "KeyPressed"
               },
-              "parameters": [
-                "",
-                "Space"
-              ],
+              "parameters": ["", "Space"],
               "subInstructions": []
             }
           ],
@@ -568,10 +519,7 @@
                     "inverted": false,
                     "value": "AnimationName"
                   },
-                  "parameters": [
-                    "kenney",
-                    "\"Cheer\""
-                  ],
+                  "parameters": ["kenney", "\"Cheer\""],
                   "subInstructions": []
                 },
                 {
@@ -579,11 +527,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "switch_animation",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["switch_animation", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -593,10 +537,7 @@
                     "inverted": false,
                     "value": "SetAnimationName"
                   },
-                  "parameters": [
-                    "kenney",
-                    "\"Duck\""
-                  ],
+                  "parameters": ["kenney", "\"Duck\""],
                   "subInstructions": []
                 },
                 {
@@ -604,11 +545,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "switch_animation",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["switch_animation", "=", "1"],
                   "subInstructions": []
                 }
               ],
@@ -624,10 +561,7 @@
                     "inverted": false,
                     "value": "AnimationName"
                   },
-                  "parameters": [
-                    "kenney",
-                    "\"Duck\""
-                  ],
+                  "parameters": ["kenney", "\"Duck\""],
                   "subInstructions": []
                 },
                 {
@@ -635,11 +569,7 @@
                     "inverted": false,
                     "value": "VarScene"
                   },
-                  "parameters": [
-                    "switch_animation",
-                    "=",
-                    "0"
-                  ],
+                  "parameters": ["switch_animation", "=", "0"],
                   "subInstructions": []
                 }
               ],
@@ -649,10 +579,7 @@
                     "inverted": false,
                     "value": "SetAnimationName"
                   },
-                  "parameters": [
-                    "kenney",
-                    "\"Cheer\""
-                  ],
+                  "parameters": ["kenney", "\"Cheer\""],
                   "subInstructions": []
                 },
                 {
@@ -660,11 +587,7 @@
                     "inverted": false,
                     "value": "ModVarScene"
                   },
-                  "parameters": [
-                    "switch_animation",
-                    "=",
-                    "1"
-                  ],
+                  "parameters": ["switch_animation", "=", "1"],
                   "subInstructions": []
                 }
               ],

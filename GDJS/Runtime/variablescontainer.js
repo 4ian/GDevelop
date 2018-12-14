@@ -12,12 +12,11 @@
  * @class VariablesContainer
  * @param {Object} initialVariablesData Optional object containing initial variables.
  */
-gdjs.VariablesContainer = function(initialVariablesData)
-{
-    if ( this._variables == undefined ) this._variables = new Hashtable();
-    if ( this._variablesArray == undefined ) this._variablesArray = [];
+gdjs.VariablesContainer = function(initialVariablesData) {
+  if (this._variables == undefined) this._variables = new Hashtable();
+  if (this._variablesArray == undefined) this._variablesArray = [];
 
-    if ( initialVariablesData != undefined ) this.initFrom(initialVariablesData);
+  if (initialVariablesData != undefined) this.initFrom(initialVariablesData);
 };
 
 /**
@@ -31,48 +30,51 @@ gdjs.VariablesContainer = function(initialVariablesData)
  * @param {Boolean} keepOldVariables If set to true, already existing variables won't be erased.
  */
 gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
-    if ( keepOldVariables == undefined ) keepOldVariables = false;
-    if ( !keepOldVariables ) {
-        gdjs.VariablesContainer._deletedVars = gdjs.VariablesContainer._deletedVars || [];
-        this._variables.keys(gdjs.VariablesContainer._deletedVars);
+  if (keepOldVariables == undefined) keepOldVariables = false;
+  if (!keepOldVariables) {
+    gdjs.VariablesContainer._deletedVars =
+      gdjs.VariablesContainer._deletedVars || [];
+    this._variables.keys(gdjs.VariablesContainer._deletedVars);
+  }
+
+  var that = this;
+  var i = 0;
+  for (var j = 0; j < data.length; ++j) {
+    var varData = data[j];
+
+    //Get the variable:
+    var variable = that.get(varData.name);
+    gdjs.Variable.call(variable, varData);
+
+    if (!keepOldVariables) {
+      //Register the variable in the extra array to ensure a fast lookup using getFromIndex.
+      if (i < that._variablesArray.length) that._variablesArray[i] = variable;
+      else that._variablesArray.push(variable);
+
+      ++i;
+
+      //Remove the variable from the list of variables to be deleted.
+      var idx = gdjs.VariablesContainer._deletedVars.indexOf(varData.name);
+      if (idx !== -1) gdjs.VariablesContainer._deletedVars[idx] = undefined;
     }
+  }
 
-    var that = this;
-    var i = 0;
-    for(var j = 0;j<data.length;++j) {
-        var varData = data[j];
+  if (!keepOldVariables) {
+    this._variablesArray.length = i;
 
-        //Get the variable:
-        var variable = that.get(varData.name);
-        gdjs.Variable.call(variable, varData);
-
-        if ( !keepOldVariables ) {
-            //Register the variable in the extra array to ensure a fast lookup using getFromIndex.
-            if ( i < that._variablesArray.length )
-                that._variablesArray[i] = variable;
-            else
-                that._variablesArray.push(variable);
-
-            ++i;
-
-            //Remove the variable from the list of variables to be deleted.
-            var idx = gdjs.VariablesContainer._deletedVars.indexOf(varData.name)
-            if (idx !== -1) gdjs.VariablesContainer._deletedVars[idx] = undefined;
-        }
-	}
-
-    if ( !keepOldVariables ) {
-        this._variablesArray.length = i;
-
-        //If we do not want to keep the already existing variables,
-        //remove all the variables not assigned above.
-        //(Here, remove means flag the variable as not existing, to avoid garbage creation ).
-        for(var i =0, len = gdjs.VariablesContainer._deletedVars.length;i<len;++i) {
-            var variableName = gdjs.VariablesContainer._deletedVars[i];
-            if ( variableName != undefined )
-                this._variables.get(variableName).setUndefinedInContainer();
-        }
+    //If we do not want to keep the already existing variables,
+    //remove all the variables not assigned above.
+    //(Here, remove means flag the variable as not existing, to avoid garbage creation ).
+    for (
+      var i = 0, len = gdjs.VariablesContainer._deletedVars.length;
+      i < len;
+      ++i
+    ) {
+      var variableName = gdjs.VariablesContainer._deletedVars[i];
+      if (variableName != undefined)
+        this._variables.get(variableName).setUndefinedInContainer();
     }
+  }
 };
 
 /**
@@ -81,7 +83,7 @@ gdjs.VariablesContainer.prototype.initFrom = function(data, keepOldVariables) {
  * @param {gdjs.Variable} variable The variable to be added
  */
 gdjs.VariablesContainer.prototype.add = function(name, variable) {
-	this._variables.put(name, variable);
+  this._variables.put(name, variable);
 };
 
 /**
@@ -90,10 +92,10 @@ gdjs.VariablesContainer.prototype.add = function(name, variable) {
  * @param {string} name Variable to be removed
  */
 gdjs.VariablesContainer.prototype.remove = function(name) {
-    var variable = this._variables.items[name];
-	if (variable) {
-        variable.setUndefinedInContainer();
-    }
+  var variable = this._variables.items[name];
+  if (variable) {
+    variable.setUndefinedInContainer();
+  }
 };
 
 /**
@@ -102,17 +104,19 @@ gdjs.VariablesContainer.prototype.remove = function(name) {
  * @return {gdjs.Variable} The specified variable. If not found, an empty variable is added to the container.
  */
 gdjs.VariablesContainer.prototype.get = function(name) {
-    var variable = this._variables.items[name];
-	if (!variable) { //Add automatically inexisting variables.
-        variable = new gdjs.Variable();
-        this._variables.put(name, variable);
-	} else {
-        if ( variable.isUndefinedInContainer() ) { //Reuse variables removed before.
-            gdjs.Variable.call(variable);
-        }
+  var variable = this._variables.items[name];
+  if (!variable) {
+    //Add automatically inexisting variables.
+    variable = new gdjs.Variable();
+    this._variables.put(name, variable);
+  } else {
+    if (variable.isUndefinedInContainer()) {
+      //Reuse variables removed before.
+      gdjs.Variable.call(variable);
     }
+  }
 
-	return variable;
+  return variable;
 };
 
 /**
@@ -126,17 +130,18 @@ gdjs.VariablesContainer.prototype.get = function(name) {
  * should not happen.
  */
 gdjs.VariablesContainer.prototype.getFromIndex = function(id) {
-	if ( id >= this._variablesArray.length ) { //Add automatically inexisting variables.
-        var variable = new gdjs.Variable();
-        return this._variables.put(name, variable);
-	}
-    else {
-        var variable = this._variablesArray[id];
-        if ( variable.isUndefinedInContainer() ) { //Reuse variables removed before.
-            gdjs.Variable.call(variable);
-        }
-        return variable;
+  if (id >= this._variablesArray.length) {
+    //Add automatically inexisting variables.
+    var variable = new gdjs.Variable();
+    return this._variables.put(name, variable);
+  } else {
+    var variable = this._variablesArray[id];
+    if (variable.isUndefinedInContainer()) {
+      //Reuse variables removed before.
+      gdjs.Variable.call(variable);
     }
+    return variable;
+  }
 };
 
 /**
@@ -145,10 +150,9 @@ gdjs.VariablesContainer.prototype.getFromIndex = function(id) {
  * @return {boolean} true if the variable exists.
  */
 gdjs.VariablesContainer.prototype.has = function(name) {
-    var variable = this._variables.items[name];
-	return variable && !variable.isUndefinedInContainer();
+  var variable = this._variables.items[name];
+  return variable && !variable.isUndefinedInContainer();
 };
-
 
 /**
  * "Bad" variable container, used by events when no other valid container can be found.
@@ -157,12 +161,24 @@ gdjs.VariablesContainer.prototype.has = function(name) {
  * @private
  */
 gdjs.VariablesContainer.badVariablesContainer = {
-    has: function() {return false;},
-    getFromIndex : function() { return gdjs.VariablesContainer.badVariable; },
-    get : function() { return gdjs.VariablesContainer.badVariable; },
-    remove : function() { return; },
-    add : function() { return; },
-    initFrom : function() { return; }
+  has: function() {
+    return false;
+  },
+  getFromIndex: function() {
+    return gdjs.VariablesContainer.badVariable;
+  },
+  get: function() {
+    return gdjs.VariablesContainer.badVariable;
+  },
+  remove: function() {
+    return;
+  },
+  add: function() {
+    return;
+  },
+  initFrom: function() {
+    return;
+  },
 };
 
 /**
@@ -172,21 +188,55 @@ gdjs.VariablesContainer.badVariablesContainer = {
  * @private
  */
 gdjs.VariablesContainer.badVariable = {
-    getChild : function() { return gdjs.VariablesContainer.badVariable; },
-    hasChild: function() {return false;},
-    isStructure: function() {return false;},
-    isNumber: function() {return true;},
-    removeChild : function() { return; },
-    setNumber : function() { return; },
-    setString : function() { return; },
-    getAsString : function() { return ""; },
-    getAsNumber : function() { return 0; },
-    getAllChildren : function() { return {}; },
-    add : function() { return; },
-    sub : function() { return; },
-    mul : function() { return; },
-    div : function() { return; },
-    concatenate : function() { return; },
-    setUndefinedInContainer : function() { return; },
-    isUndefinedInContainer : function() { return; }
+  getChild: function() {
+    return gdjs.VariablesContainer.badVariable;
+  },
+  hasChild: function() {
+    return false;
+  },
+  isStructure: function() {
+    return false;
+  },
+  isNumber: function() {
+    return true;
+  },
+  removeChild: function() {
+    return;
+  },
+  setNumber: function() {
+    return;
+  },
+  setString: function() {
+    return;
+  },
+  getAsString: function() {
+    return '';
+  },
+  getAsNumber: function() {
+    return 0;
+  },
+  getAllChildren: function() {
+    return {};
+  },
+  add: function() {
+    return;
+  },
+  sub: function() {
+    return;
+  },
+  mul: function() {
+    return;
+  },
+  div: function() {
+    return;
+  },
+  concatenate: function() {
+    return;
+  },
+  setUndefinedInContainer: function() {
+    return;
+  },
+  isUndefinedInContainer: function() {
+    return;
+  },
 };

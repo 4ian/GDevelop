@@ -15,7 +15,7 @@ module.exports = {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       "Physics2",
-      "Physics2 behavior",
+      "Physics Engine 2.0",
       "Simulate physics",
       "Florian Rival, Franco Maciel",
       "MIT"
@@ -340,7 +340,7 @@ module.exports = {
     // extension
       .addBehavior(
         "Physics2Behavior",
-        t("Physics2 behavior (beta)"),
+        t("Physics Engine 2.0 (beta)"),
         "Physics2Behavior",
         t("Simulate physics, the successor of the old physics behavior"),
         "",
@@ -349,8 +349,8 @@ module.exports = {
         physics2Behavior,
         sharedData
       )
-      .setIncludeFile("Extensions/Physics2/physics2runtimebehavior.js")
-      .addIncludeFile("Extensions/Physics2/box2d.js");
+      .setIncludeFile("Extensions/Physics2Behavior/physics2runtimebehavior.js")
+      .addIncludeFile("Extensions/Physics2Behavior/box2d.js");
 
 
 
@@ -453,7 +453,7 @@ module.exports = {
       .addParameter("behavior", t("Behavior"), "Physics2Behavior")
       .addParameter("expression", t("Value"))
       .getCodeExtraInformation()
-      .setIncludeFile("Extensions/Physics2/physics2tools.js")
+      .setIncludeFile("Extensions/Physics2Behavior/physics2tools.js")
       .setFunctionName("gdjs.physics2.setTimeScale");
 
     aut.addExpression(
@@ -2976,7 +2976,7 @@ module.exports = {
       .addParameter("objectList", t("Object"), "", false)
       .addCodeOnlyParameter("conditionInverted", "")
       .getCodeExtraInformation()
-      .setIncludeFile("Extensions/Physics2/physics2tools.js")
+      .setIncludeFile("Extensions/Physics2Behavior/physics2tools.js")
       .setFunctionName("gdjs.physics2.objectsCollide");
 
     return extension;

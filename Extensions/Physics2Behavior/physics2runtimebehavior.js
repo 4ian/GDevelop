@@ -164,15 +164,24 @@ gdjs.Physics2SharedData.prototype.removeJoint = function(jointId) {
     var joint = this.joints[jointId];
     // If we delete a joint attached to a gear joint, the gear will crash, so we must delete the gear joint first
     // Search in our joints list gear joints attached to this one we want to remove
-    for (var jId in this.joints) {
-      if (this.joints.hasOwnProperty(jId)) {
-        if (
-          this.joints[jId].GetType() === Box2D.e_gearJoint &&
-          (this.joints[jId].GetJoint1() === joint ||
-            this.joints[jId].GetJoint2() === joint)
-        ) {
-          // We could pass it a string, but lets do it right
-          this.removeJoint(parseInt(jId, 10));
+    // The joint can be attached to a gear joint if it's revolute or prismatic only
+    if (
+      joint.GetType() === Box2D.e_revoluteJoint ||
+      joint.GetType() === Box2D.e_prismaticJoint
+    ) {
+      for (var jId in this.joints) {
+        if (this.joints.hasOwnProperty(jId)) {
+          // Must check pointers becuase gears store non-casted joints (b2Joint)
+          if (
+            this.joints[jId].GetType() === Box2D.e_gearJoint &&
+            (Box2D.getPointer(this.joints[jId].GetJoint1()) ===
+              Box2D.getPointer(joint) ||
+              Box2D.getPointer(this.joints[jId].GetJoint2()) ===
+                Box2D.getPointer(joint))
+          ) {
+            // We could pass it a string, but lets do it right
+            this.removeJoint(parseInt(jId, 10));
+          }
         }
       }
     }
@@ -2909,11 +2918,11 @@ gdjs.Physics2RuntimeBehavior.prototype.addMotorJoint = function(
     )
   );
   jointDef.set_angularOffset(gdjs.toRad(offsetAngle));
+  jointDef.set_maxForce(maxForce >= 0 ? maxForce : 0);
+  jointDef.set_maxTorque(maxTorque >= 0 ? maxTorque : 0);
   jointDef.set_correctionFactor(
     correctionFactor < 0 ? 0 : correctionFactor > 1 ? 1 : correctionFactor
   );
-  jointDef.set_maxForce(maxForce >= 0 ? maxForce : 0);
-  jointDef.set_maxTorque(maxTorque >= 0 ? maxTorque : 0);
   jointDef.set_collideConnected(collideConnected);
   // Create the joint and get the id
   var jointId = this._sharedData.addJoint(

@@ -10,6 +10,7 @@ import ArrowDropRight from 'material-ui/svg-icons/navigation-arrow-drop-right';
  *
  * Supported options are:
  *  - click
+ *  - visible
  *  - type ('separator' and 'checkbox')
  *  - label
  *  - accelerator
@@ -24,6 +25,8 @@ export default class MaterialUIMenuImplementation {
 
   buildFromTemplate(template) {
     return template.map((item, id) => {
+      if (item.visible === false) return null;
+
       if (item.type === 'separator') {
         return <Divider key={'separator' + id} />;
       } else if (item.type === 'checkbox') {
@@ -75,7 +78,7 @@ export default class MaterialUIMenuImplementation {
           />
         );
       }
-    });
+    }).filter(Boolean);
   }
 
   showMenu() {

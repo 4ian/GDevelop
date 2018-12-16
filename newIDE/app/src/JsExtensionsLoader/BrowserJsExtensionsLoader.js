@@ -8,6 +8,10 @@ const gd = global.gd;
 
 const jsExtensions = [
   {
+    name: 'AdMob',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/AdMob/JsExtension.js'),
+  },
+  {
     name: 'FacebookInstantGames',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FacebookInstantGames/JsExtension.js'),
   },

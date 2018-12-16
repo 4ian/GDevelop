@@ -509,7 +509,8 @@ gdjs.Physics2RuntimeBehavior.prototype.getGravityY = function() {
 
 gdjs.Physics2RuntimeBehavior.prototype.setGravity = function(x, y) {
   // Check if there is no modification
-  if (this._sharedData.gravityX === x && this._sharedData.gravityY) return;
+  if (this._sharedData.gravityX === x && this._sharedData.gravityY === y)
+    return;
   // Change the gravity
   this._sharedData.gravityX = x;
   this._sharedData.gravityY = y;

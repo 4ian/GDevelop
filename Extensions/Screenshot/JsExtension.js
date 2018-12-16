@@ -27,7 +27,7 @@ module.exports = {
       .addAction(
         "TakeScreenshot",
         t("Take screenshot"),
-        t("Take a screenshot. (Desktop only)"),
+        t("Take a screenshot as png. (Desktop only)"),
         t("Take a screenshot and save at _PARAM0_"),
         t("Screenshot"),
         "JsPlatform/Extensions/take_screenshot24.png",

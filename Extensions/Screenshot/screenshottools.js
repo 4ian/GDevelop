@@ -21,7 +21,9 @@ gdjs.screenshot.takeScreenshot = function (savePath, runtimeScene) {
     fileSystem = electron.remote.require("fs");
     canvas = runtimeScene._renderer._pixiRenderer.view;
     content = canvas.toDataURL('image/png').replace('data:image/png;base64,', '');
-
-    fileSystem.writeFileSync(savePath, content, 'base64');
+    try {
+      fileSystem.writeFileSync(savePath, content, 'base64');
+    }
+    catch{ }
   }
 }

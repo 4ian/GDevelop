@@ -200,6 +200,34 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .MarkAsAdvanced()
       .SetManipulatedType("number");
 
+  obj.AddAction("ChangeWidth",
+                _("Width"),
+                _("Modify the width of an object."),
+                _("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+
+      .AddParameter("object", _("Object"), "Sprite")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value"))
+      .MarkAsAdvanced()
+      .SetManipulatedType("number");
+
+  obj.AddAction("ChangeHeight",
+                _("Height"),
+                _("Modify the height of an object."),
+                _("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+
+      .AddParameter("object", _("Object"), "Sprite")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value"))
+      .MarkAsAdvanced()
+      .SetManipulatedType("number");
+
   obj.AddCondition(
          "Animation",
          _("Current animation"),

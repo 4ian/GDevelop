@@ -30,8 +30,8 @@ module.exports = {
         t("Take a screenshot."),
         t("Take a screenshot and save at _PARAM0_"),
         t("Screenshot"),
-        "JsPlatform/Extensions/vibration_start24.png",
-        "JsPlatform/Extensions/vibration_start32.png"
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
       )
         .addParameter("string", t("Save path"), "", false)
         .addCodeOnlyParameter('currentScene', '')

@@ -131,7 +131,10 @@ export default class ExpressionField extends React.Component<Props, State> {
       {
         validatedValue: value,
       },
-      () => this._doValidation()
+      () => {
+        this._enqueueValidation.cancel();
+        this._doValidation();
+      }
     );
   };
 
@@ -184,7 +187,6 @@ export default class ExpressionField extends React.Component<Props, State> {
   }, 500);
 
   _doValidation = () => {
-    this._enqueueValidation.cancel();
     const {
       project,
       globalObjectsContainer,
@@ -255,11 +257,10 @@ export default class ExpressionField extends React.Component<Props, State> {
         <div style={styles.textFieldContainer}>
           <div style={styles.textFieldAndHightlightContainer}>
             <BackgroundHighlighting
-              value={value}
+              value={this.state.validatedValue}
               style={{ ...styles.input, ...backgroundHighlightingStyle }}
               highlights={this.state.errorHighlights}
             />
-            {/* TODO: Do validation on blur OR after 500 ms without change */}
             <SemiControlledTextField
               value={value}
               floatingLabelText={description}

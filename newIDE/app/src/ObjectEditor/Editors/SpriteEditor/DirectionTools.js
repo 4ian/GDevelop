@@ -143,7 +143,7 @@ export default class DirectionTools extends Component<Props, State> {
           <Dialog
             actions={
               <FlatButton
-                label="Close"
+                label="OK"
                 primary
                 onClick={() => this.openPreview(false)}
               />
@@ -158,6 +158,9 @@ export default class DirectionTools extends Component<Props, State> {
               spritesContainer={direction}
               resourcesLoader={resourcesLoader}
               project={project}
+              onBlur={() => this.saveTimeBetweenFrames()}
+              timeBetweenFrames={this.state.timeBetweenFrames}
+              onChangeTimeBetweenFrames={text => this.setState({ timeBetweenFrames: text })}
             />
           </Dialog>
         )}

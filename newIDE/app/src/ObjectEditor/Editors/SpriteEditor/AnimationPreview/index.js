@@ -1,11 +1,12 @@
 // @flow
 
 import React, { Component } from 'react';
-import { Line, Column } from '../../../../UI/Grid';
 import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from 'material-ui/svg-icons/av/replay';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 import Pause from 'material-ui/svg-icons/av/pause';
+import Timer from 'material-ui/svg-icons/image/timer';
+import TextField from 'material-ui/TextField';
 import { FlatButton } from 'material-ui';
 
 type Props = {
@@ -18,6 +19,22 @@ type State = {
   currentFrameIndex: number,
   currentFrameElapsedTime: number,
   paused: boolean,
+};
+
+const styles = {
+  container: {
+    paddingLeft: 12,
+    paddingRight: 12,
+    display: 'flex',
+    alignItems: 'center',
+  },
+  timeField: {
+    width: 75,
+  },
+  timeIcon: {
+    paddingLeft: 6,
+    paddingRight: 6,
+  },
 };
 
 export default class AnimationPreview extends Component<Props, State> {
@@ -57,9 +74,8 @@ export default class AnimationPreview extends Component<Props, State> {
   _updateAnimation = () => {
     const animationSpeedScale = 1;
 
-    const { spritesContainer } = this.props;
+    const { spritesContainer, timeBetweenFrames } = this.props;
     const { currentFrameIndex, currentFrameElapsedTime, paused } = this.state;
-    const timeBetweenFrames = spritesContainer.getTimeBetweenFrames();
 
     const elapsedTime = 1 / 60;
     let newFrameIndex = currentFrameIndex;
@@ -88,7 +104,7 @@ export default class AnimationPreview extends Component<Props, State> {
   };
 
   render() {
-    const { spritesContainer, resourcesLoader, project } = this.props;
+    const { spritesContainer, resourcesLoader, project, timeBetweenFrames, onChangeTimeBetweenFrames } = this.props;
     const { currentFrameIndex, paused } = this.state;
 
     const hasValidSprite =
@@ -104,20 +120,26 @@ export default class AnimationPreview extends Component<Props, State> {
           resourcesLoader={resourcesLoader}
           project={project}
         />
-        <Line>
-          <Column expand>
-            <FlatButton
-              icon={<Replay />}
-              label="Replay"
-              onClick={this.replay}
-            />
-            <FlatButton
-              icon={paused ? <PlayArrow /> : <Pause />}
-              label={paused ? 'Play' : 'Pause'}
-              onClick={paused ? this.play : this.pause}
-            />
-          </Column>
-        </Line>
+        <div style={styles.container}>
+          <Timer style={styles.timeIcon} />
+          <TextField
+            label="Time between frames"
+            value={timeBetweenFrames}
+            onChange={(e, text) => {onChangeTimeBetweenFrames(text); this.replay()}}
+            id="direction-time-between-frames"
+            style={styles.timeField}
+          />
+          <FlatButton
+            icon={<Replay />}
+            label="Replay"
+            onClick={this.replay}
+          />
+          <FlatButton
+            icon={paused ? <PlayArrow /> : <Pause />}
+            label={paused ? 'Play' : 'Pause'}
+            onClick={paused ? this.play : this.pause}
+          />
+        </div>
       </div>
     );
   }

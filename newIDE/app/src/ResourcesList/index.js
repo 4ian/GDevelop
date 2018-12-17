@@ -263,6 +263,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         click: () => {
           this._removeAllResourcesWithInvalidPath();
         },
+        enabled: hasElectron,
       },
     ];
   };

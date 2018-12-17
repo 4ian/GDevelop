@@ -118,39 +118,30 @@ export default class AnimationPreview extends Component<Props, State> {
           resourcesLoader={resourcesLoader}
           project={project}
         />
-        <Line>
-          <Column>
-            <Line noMargin>
-              <Timer style={styles.timeIcon} />
-              <TextField
-                label="Time between frames"
-                value={timeBetweenFrames}
-                onChange={(e, text) => {onChangeTimeBetweenFrames(text); this.replay()}}
-                id="direction-time-between-frames"
-                type="number"
-                step={0.01}
-                precision={1}
-                min={0.00}
-                max={5}
-                style={styles.timeField}
-                autoFocus={true}
-              />
-            </Line>
-          </Column>
-          <Column>
-            <Line noMargin>
-              <FlatButton
-              icon={<Replay />}
-              label="Replay"
-              onClick={this.replay}
-              />
-              <FlatButton
-                icon={paused ? <PlayArrow /> : <Pause />}
-                label={paused ? 'Play' : 'Pause'}
-                onClick={paused ? this.play : this.pause}
-              />
-            </Line>
-          </Column>
+        <Line noMargin>
+          <Timer style={styles.timeIcon} />
+          <TextField
+            value={timeBetweenFrames}
+            onChange={(e, text) => {onChangeTimeBetweenFrames(text); this.replay()}}
+            id="direction-time-between-frames"
+            type="number"
+            step={0.01}
+            precision={1}
+            min={0.00}
+            max={5}
+            style={styles.timeField}
+            autoFocus={true}
+          />
+          <FlatButton
+          icon={<Replay />}
+          label="Replay"
+          onClick={this.replay}
+          />
+          <FlatButton
+            icon={paused ? <PlayArrow /> : <Pause />}
+            label={paused ? 'Play' : 'Pause'}
+            onClick={paused ? this.play : this.pause}
+          />
         </Line>
       </div>
     );

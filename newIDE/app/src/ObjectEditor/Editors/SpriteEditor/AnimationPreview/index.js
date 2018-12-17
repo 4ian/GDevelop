@@ -133,6 +133,7 @@ export default class AnimationPreview extends Component<Props, State> {
                 min={0.00}
                 max={5}
                 style={styles.timeField}
+                autoFocus={true}
               />
             </Line>
           </Column>

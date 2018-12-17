@@ -95,6 +95,9 @@ export default class DirectionTools extends Component<Props, State> {
     this.setState({
       previewOpen: open,
     });
+    if (!open) {
+      this.saveTimeBetweenFrames()
+    };
   };
 
   render() {
@@ -163,7 +166,6 @@ export default class DirectionTools extends Component<Props, State> {
               spritesContainer={direction}
               resourcesLoader={resourcesLoader}
               project={project}
-              onBlur={() => this.saveTimeBetweenFrames()}
               timeBetweenFrames={this.state.timeBetweenFrames}
               onChangeTimeBetweenFrames={text => this.setState({ timeBetweenFrames: text })}
             />

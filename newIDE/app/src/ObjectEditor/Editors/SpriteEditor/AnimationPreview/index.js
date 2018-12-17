@@ -10,19 +10,19 @@ import Timer from 'material-ui/svg-icons/image/timer';
 import TextField from 'material-ui/TextField';
 import { FlatButton } from 'material-ui';
 
-type Props = {
+type Props = {|
   spritesContainer: Object,
   resourcesLoader: Object,
   project: Object,
   timeBetweenFrames: number,
   onChangeTimeBetweenFrames: number => void,
-};
+|};
 
-type State = {
+type State = {|
   currentFrameIndex: number,
   currentFrameElapsedTime: number,
   paused: boolean,
-};
+|};
 
 const styles = {
   timeField: {

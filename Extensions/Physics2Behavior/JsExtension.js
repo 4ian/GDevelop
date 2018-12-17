@@ -137,6 +137,7 @@ module.exports = {
         'type',
         new gd.PropertyDescriptor(behaviorContent.type)
           .setType('Choice')
+          .setName('Type')
           .addExtraInfo('Static')
           .addExtraInfo('Dynamic')
           .addExtraInfo('Kinematic')
@@ -146,23 +147,27 @@ module.exports = {
         new gd.PropertyDescriptor(
           behaviorContent.bullet ? 'true' : 'false'
         ).setType('Boolean')
+        .setName('Bullet')
       );
       behaviorProperties.set(
         'fixedRotation',
         new gd.PropertyDescriptor(
           behaviorContent.fixedRotation ? 'true' : 'false'
         ).setType('Boolean')
+        .setName('Fixed Rotation')
       );
       behaviorProperties.set(
         'canSleep',
         new gd.PropertyDescriptor(
           behaviorContent.canSleep ? 'true' : 'false'
         ).setType('Boolean')
+        .setName('Can Sleep')
       );
       behaviorProperties.set(
         'shape',
         new gd.PropertyDescriptor(behaviorContent.shape)
           .setType('Choice')
+          .setName('Shape')
           .addExtraInfo('Box')
           .addExtraInfo('Circle')
           // .addExtraInfo("Polygon") Needs an editor to be useful
@@ -173,60 +178,70 @@ module.exports = {
         new gd.PropertyDescriptor(
           behaviorContent.shapeDimensionA.toString(10)
         ).setType('Number')
+        .setName('Shape Dimension A')
       );
       behaviorProperties.set(
         'shapeDimensionB',
         new gd.PropertyDescriptor(
           behaviorContent.shapeDimensionB.toString(10)
         ).setType('Number')
+        .setName('Shape Dimension B')
       );
       behaviorProperties.set(
         'shapeOffsetX',
         new gd.PropertyDescriptor(
           behaviorContent.shapeOffsetX.toString(10)
         ).setType('Number')
+        .setName('Shape Offset X')
       );
       behaviorProperties.set(
         'shapeOffsetY',
         new gd.PropertyDescriptor(
           behaviorContent.shapeOffsetY.toString(10)
         ).setType('Number')
+        .setName('Shape Offset Y')
       );
       behaviorProperties.set(
         'density',
         new gd.PropertyDescriptor(behaviorContent.density.toString(10)).setType(
           'Number'
         )
+        .setName('Density')
       );
       behaviorProperties.set(
         'friction',
         new gd.PropertyDescriptor(
           behaviorContent.friction.toString(10)
         ).setType('Number')
+        .setName('Friction')
       );
       behaviorProperties.set(
         'restitution',
         new gd.PropertyDescriptor(
           behaviorContent.restitution.toString(10)
         ).setType('Number')
+        .setName('Restitution')
       );
       behaviorProperties.set(
         'linearDamping',
         new gd.PropertyDescriptor(
           behaviorContent.linearDamping.toString(10)
         ).setType('Number')
+        .setName('Linear Damping')
       );
       behaviorProperties.set(
         'angularDamping',
         new gd.PropertyDescriptor(
           behaviorContent.angularDamping.toString(10)
         ).setType('Number')
+        .setName('Angular Damping')
       );
       behaviorProperties.set(
         'gravityScale',
         new gd.PropertyDescriptor(
           behaviorContent.gravityScale.toString(10)
         ).setType('Number')
+        .setName('Gravity Scale')
       );
       // Transform the layers number into a binary string
       var layers = behaviorContent.layers.toString(2);
@@ -238,7 +253,9 @@ module.exports = {
       // Add zeros until the total size is 16
       if (layers.length < 16) layers = layers + '0'.repeat(16 - layers.length);
       // Expose the converted string
-      behaviorProperties.set('layers', new gd.PropertyDescriptor(layers));
+      behaviorProperties.set('layers', new gd.PropertyDescriptor(layers)
+        .setName('Layers')
+      );
       // Same than layers
       var masks = behaviorContent.masks.toString(2);
       masks = masks
@@ -246,7 +263,9 @@ module.exports = {
         .reverse()
         .join('');
       if (masks.length < 16) masks = masks + '0'.repeat(16 - masks.length);
-      behaviorProperties.set('masks', new gd.PropertyDescriptor(masks));
+      behaviorProperties.set('masks', new gd.PropertyDescriptor(masks)
+        .setName('Masks')
+      );
 
       return behaviorProperties;
     };

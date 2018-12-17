@@ -84,7 +84,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     if (field.valueType === 'boolean') {
       return (
         <InlineCheckbox
-          label={field.name}
+          label={field.getName(this.props.instances[0])}
           key={field.name}
           checked={this._getFieldValue(this.props.instances, field)}
           onCheck={(event, newValue) => {
@@ -100,7 +100,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           value={this._getFieldValue(this.props.instances, field)}
           key={field.name}
           id={field.name}
-          floatingLabelText={field.name}
+          floatingLabelText={field.getName(this.props.instances[0])}
           floatingLabelFixed
           onChange={newValue => {
             this.props.instances.forEach(i =>
@@ -123,7 +123,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
               '(Multiple values)'
             )}
             id={field.name}
-            floatingLabelText={field.name}
+            floatingLabelText={field.getName(this.props.instances[0])}
             floatingLabelFixed
             onChange={newValue => {
               this.props.instances.forEach(i =>
@@ -159,7 +159,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         <SelectField
           value={this._getFieldValue(this.props.instances, field)}
           key={field.name}
-          floatingLabelText={field.name}
+          floatingLabelText={field.getName(this.props.instances[0])}
           floatingLabelFixed
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
@@ -182,7 +182,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
             '(Multiple values)'
           )}
           key={field.name}
-          floatingLabelText={field.name}
+          floatingLabelText={field.getName(this.props.instances[0])}
           floatingLabelFixed
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
@@ -206,7 +206,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         key={field.name}
         fullWidth
         primary
-        label={field.getLabel(this.props.instances[0])}
+        label={field.getName(this.props.instances[0])}
         onClick={() => field.onClick(this.props.instances[0])}
       />
     );

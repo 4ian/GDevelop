@@ -202,7 +202,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddAction("ChangeWidth",
                 _("Width"),
-                _("Modify the width of an object."),
+                _("Change the width of a Sprite object."),
                 _("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
                 _("Size"),
                 "res/actions/scale24.png",
@@ -216,7 +216,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddAction("ChangeHeight",
                 _("Height"),
-                _("Modify the height of an object."),
+                _("Change the height of a Sprite object."),
                 _("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
                 _("Size"),
                 "res/actions/scale24.png",

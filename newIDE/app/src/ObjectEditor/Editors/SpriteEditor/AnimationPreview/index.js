@@ -13,6 +13,8 @@ type Props = {
   spritesContainer: Object,
   resourcesLoader: Object,
   project: Object,
+  timeBetweenFrames: number,
+  onChangeTimeBetweenFrames: number => void,
 };
 
 type State = {

@@ -1,6 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
+import { Line, Column } from '../../../../UI/Grid';
 import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from 'material-ui/svg-icons/av/replay';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
@@ -24,18 +25,13 @@ type State = {
 };
 
 const styles = {
-  container: {
-    paddingLeft: 12,
-    paddingRight: 12,
-    display: 'flex',
-    alignItems: 'center',
-  },
   timeField: {
     width: 75,
   },
   timeIcon: {
     paddingLeft: 6,
-    paddingRight: 6,
+    paddingRight: 8,
+    paddingTop: 6,
   },
 };
 
@@ -122,26 +118,38 @@ export default class AnimationPreview extends Component<Props, State> {
           resourcesLoader={resourcesLoader}
           project={project}
         />
-        <div style={styles.container}>
-          <Timer style={styles.timeIcon} />
-          <TextField
-            label="Time between frames"
-            value={timeBetweenFrames}
-            onChange={(e, text) => {onChangeTimeBetweenFrames(text); this.replay()}}
-            id="direction-time-between-frames"
-            style={styles.timeField}
-          />
-          <FlatButton
-            icon={<Replay />}
-            label="Replay"
-            onClick={this.replay}
-          />
-          <FlatButton
-            icon={paused ? <PlayArrow /> : <Pause />}
-            label={paused ? 'Play' : 'Pause'}
-            onClick={paused ? this.play : this.pause}
-          />
-        </div>
+        <Line>
+          <Column>
+            <Line noMargin>
+              <Timer style={styles.timeIcon} />
+              <TextField
+                label="Time between frames"
+                value={timeBetweenFrames}
+                onChange={(e, text) => {onChangeTimeBetweenFrames(text); this.replay()}}
+                id="direction-time-between-frames"
+                type="number"
+                step={0.01}
+                precision={1}
+                min={0.00}
+                max={5}
+              />
+            </Line>
+          </Column>
+          <Column>
+            <Line noMargin>
+              <FlatButton
+              icon={<Replay />}
+              label="Replay"
+              onClick={this.replay}
+              />
+              <FlatButton
+                icon={paused ? <PlayArrow /> : <Pause />}
+                label={paused ? 'Play' : 'Pause'}
+                onClick={paused ? this.play : this.pause}
+              />
+            </Line>
+          </Column>
+        </Line>
       </div>
     );
   }

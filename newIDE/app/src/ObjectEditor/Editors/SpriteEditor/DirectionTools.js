@@ -127,6 +127,11 @@ export default class DirectionTools extends Component<Props, State> {
           onBlur={() => this.saveTimeBetweenFrames()}
           id="direction-time-between-frames"
           style={styles.timeField}
+          type="number"
+          step={0.01}
+          precision={1}
+          min={0.00}
+          max={5}
         />
         <span style={styles.spacer} />
         <div style={styles.repeatContainer}>

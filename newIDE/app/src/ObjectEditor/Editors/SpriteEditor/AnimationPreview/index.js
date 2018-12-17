@@ -27,12 +27,10 @@ type State = {
 const styles = {
   timeField: {
     width: 75,
-    bottom: 6,
   },
   timeIcon: {
     paddingLeft: 6,
     paddingRight: 8,
-    paddingTop: 6,
   },
 };
 
@@ -119,7 +117,7 @@ export default class AnimationPreview extends Component<Props, State> {
           resourcesLoader={resourcesLoader}
           project={project}
         />
-        <Line noMargin>
+        <Line noMargin alignItems="center">
           <Timer style={styles.timeIcon} />
           <TextField
             value={timeBetweenFrames}

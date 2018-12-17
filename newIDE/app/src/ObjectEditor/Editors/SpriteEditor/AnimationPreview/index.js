@@ -1,7 +1,7 @@
 // @flow
 
 import React, { Component } from 'react';
-import { Line, Column } from '../../../../UI/Grid';
+import { Line } from '../../../../UI/Grid';
 import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from 'material-ui/svg-icons/av/replay';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
@@ -27,6 +27,7 @@ type State = {
 const styles = {
   timeField: {
     width: 75,
+    bottom: 6,
   },
   timeIcon: {
     paddingLeft: 6,

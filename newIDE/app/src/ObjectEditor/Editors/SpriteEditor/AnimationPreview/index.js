@@ -132,6 +132,7 @@ export default class AnimationPreview extends Component<Props, State> {
                 precision={1}
                 min={0.00}
                 max={5}
+                style={styles.timeField}
               />
             </Line>
           </Column>

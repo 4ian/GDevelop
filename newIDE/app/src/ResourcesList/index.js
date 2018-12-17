@@ -7,7 +7,7 @@ import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { createOrUpdateResource, getLocalResourceFullPath } from './ResourceUtils.js';
+import { createOrUpdateResource, getLocalResourceFullPath, resourceHasValidPath } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
 
 const path = optionalRequire('path');
@@ -138,6 +138,18 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
+  _removeAllResourcesWithInvalidPath = () => {
+    const project = this.props.project;
+    const resourcesManager = project.getResourcesManager();
+    resourcesManager.getAllResourceNames().toJSArray().forEach(resourceName => {
+      if (!resourceHasValidPath(project, resourceName)) {
+        resourcesManager.removeResource(resourceName)
+        console.info("Removed due to invalid path: " + resourceName)
+      }
+    });
+    this.forceUpdate();
+  };
+
   _editName = (resource: ?gdResource) => {
     this.setState(
       {
@@ -229,21 +241,27 @@ export default class ResourcesList extends React.Component<Props, State> {
       },
       { type: 'separator' },
       {
-        label: 'Remove All Unused Images',
+        label: 'Remove Unused Images',
         click: () => {
           this._removeUnusedResources('image');
         },
       },
       {
-        label: 'Remove All Unused Audio',
+        label: 'Remove Unused Audio',
         click: () => {
           this._removeUnusedResources('audio');
         },
       },
       {
-        label: 'Remove All Unused Fonts',
+        label: 'Remove Unused Fonts',
         click: () => {
           this._removeUnusedResources('font');
+        },
+      },
+      {
+        label: 'Remove Resources with Invalid Path',
+        click: () => {
+          this._removeAllResourcesWithInvalidPath();
         },
       },
     ];

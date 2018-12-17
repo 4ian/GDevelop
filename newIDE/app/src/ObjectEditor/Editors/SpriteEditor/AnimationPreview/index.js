@@ -128,7 +128,7 @@ export default class AnimationPreview extends Component<Props, State> {
             type="number"
             step={0.01}
             precision={1}
-            min={0.00}
+            min={0.01}
             max={5}
             style={styles.timeField}
             autoFocus={true}

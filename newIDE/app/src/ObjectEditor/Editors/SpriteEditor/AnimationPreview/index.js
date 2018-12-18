@@ -101,7 +101,13 @@ export default class AnimationPreview extends Component<Props, State> {
   };
 
   render() {
-    const { spritesContainer, resourcesLoader, project, timeBetweenFrames, onChangeTimeBetweenFrames } = this.props;
+    const {
+      spritesContainer,
+      resourcesLoader,
+      project,
+      timeBetweenFrames,
+      onChangeTimeBetweenFrames,
+    } = this.props;
     const { currentFrameIndex, paused } = this.state;
 
     const hasValidSprite =
@@ -121,7 +127,10 @@ export default class AnimationPreview extends Component<Props, State> {
           <Timer style={styles.timeIcon} />
           <TextField
             value={timeBetweenFrames}
-            onChange={(e, text) => {onChangeTimeBetweenFrames(text); this.replay()}}
+            onChange={(e, text) => {
+              onChangeTimeBetweenFrames(text);
+              this.replay();
+            }}
             id="direction-time-between-frames"
             type="number"
             step={0.01}
@@ -131,11 +140,7 @@ export default class AnimationPreview extends Component<Props, State> {
             style={styles.timeField}
             autoFocus={true}
           />
-          <FlatButton
-          icon={<Replay />}
-          label="Replay"
-          onClick={this.replay}
-          />
+          <FlatButton icon={<Replay />} label="Replay" onClick={this.replay} />
           <FlatButton
             icon={paused ? <PlayArrow /> : <Pause />}
             label={paused ? 'Play' : 'Pause'}

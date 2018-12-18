@@ -22,6 +22,7 @@ type State = {|
   currentFrameIndex: number,
   currentFrameElapsedTime: number,
   paused: boolean,
+  fps: number,
 |};
 
 const styles = {
@@ -39,6 +40,7 @@ export default class AnimationPreview extends Component<Props, State> {
     currentFrameIndex: 0,
     currentFrameElapsedTime: 0,
     paused: false,
+    fps: (1/this.props.timeBetweenFrames).toFixed(0),
   };
 
   nextUpdate = null;
@@ -108,7 +110,7 @@ export default class AnimationPreview extends Component<Props, State> {
       timeBetweenFrames,
       onChangeTimeBetweenFrames,
     } = this.props;
-    const { currentFrameIndex, paused } = this.state;
+    const { currentFrameIndex, paused, fps } = this.state;
 
     const hasValidSprite =
       currentFrameIndex < spritesContainer.getSpritesCount();
@@ -124,17 +126,33 @@ export default class AnimationPreview extends Component<Props, State> {
           project={project}
         />
         <Line noMargin alignItems="center">
+          <span style={styles.timeIcon}>FPS:</span>
+          <TextField
+            value={fps}
+            onChange={(e, text) => {
+              this.setState({fps:text})
+              onChangeTimeBetweenFrames((1/text).toFixed(4));
+              this.replay();
+            }}
+            id="direction-time-between-frames"
+            type="number"
+            step={1}
+            min={1}
+            max={100}
+            style={styles.timeField}
+          />
           <Timer style={styles.timeIcon} />
           <TextField
             value={timeBetweenFrames}
             onChange={(e, text) => {
               onChangeTimeBetweenFrames(text);
+              this.setState({fps:(1/text).toFixed(0)});
               this.replay();
             }}
             id="direction-time-between-frames"
             type="number"
-            step={0.01}
-            precision={1}
+            step={0.005}
+            precision={2}
             min={0.01}
             max={5}
             style={styles.timeField}

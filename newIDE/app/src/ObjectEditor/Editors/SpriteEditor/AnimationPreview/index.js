@@ -140,6 +140,7 @@ export default class AnimationPreview extends Component<Props, State> {
             min={1}
             max={100}
             style={styles.timeField}
+            autoFocus={true}
           />
           <Timer style={styles.timeIcon} />
           <TextField
@@ -156,7 +157,6 @@ export default class AnimationPreview extends Component<Props, State> {
             min={0.01}
             max={5}
             style={styles.timeField}
-            autoFocus={true}
           />
           <FlatButton icon={<Replay />} label="Replay" onClick={this.replay} />
           <FlatButton

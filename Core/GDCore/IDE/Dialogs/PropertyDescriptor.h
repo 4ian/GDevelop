@@ -19,7 +19,7 @@ class GD_CORE_API PropertyDescriptor {
    * value. \param propertyValue The value of the property.
    */
   PropertyDescriptor(gd::String propertyValue)
-      : currentValue(propertyValue), type("string"), name("") {}
+      : currentValue(propertyValue), type("string"), label("") {}
 
   /**
    * \brief Empty constructor creating an empty property to be displayed.
@@ -52,10 +52,10 @@ class GD_CORE_API PropertyDescriptor {
   }
 
   /**
-   * \brief Change the name displayed in the property grid.
+   * \brief Change the label displayed in the property grid.
    */
-  PropertyDescriptor& SetName(gd::String name_) {
-    name = name_;
+  PropertyDescriptor& SetLabel(gd::String label_) {
+    label = label_;
     return *this;
   }
 
@@ -73,7 +73,7 @@ class GD_CORE_API PropertyDescriptor {
 
   const gd::String& GetValue() const { return currentValue; }
   const gd::String& GetType() const { return type; }
-  const gd::String& GetName() const { return name; }
+  const gd::String& GetLabel() const { return label; }
   const std::vector<gd::String>& GetExtraInfo() const {
     return extraInformation;
   }
@@ -83,7 +83,7 @@ class GD_CORE_API PropertyDescriptor {
   gd::String
       type;  ///< The type of the property. This is arbitrary and interpreted by
              ///< the class responsible for updating the property grid.
-  gd::String name;  //< The user-friendly name
+  gd::String label;  //< The user-friendly property name
   std::vector<gd::String>
       extraInformation;  ///< Can be used to store for example the available
                          ///< choices, if a property is a displayed as a combo

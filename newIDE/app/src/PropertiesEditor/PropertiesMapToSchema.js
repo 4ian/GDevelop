@@ -56,10 +56,10 @@ export default (
 
         onUpdateProperty(instance, name, value);
       },
-      getName: instance => {
+      getLabel: instance => {
         const propertyName = getProperties(instance)
           .get(name)
-          .getName();
+          .getLabel();
         if (propertyName) return propertyName;
         return (
           name.charAt(0).toUpperCase() +

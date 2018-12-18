@@ -61,7 +61,13 @@ export default (
           .get(name)
           .getName();
         if (propertyName) return propertyName;
-        return name;
+        return (
+          name.charAt(0).toUpperCase() +
+          name
+            .slice(1)
+            .split(/(?=[A-Z])/)
+            .join(' ')
+        );
       },
     };
   });

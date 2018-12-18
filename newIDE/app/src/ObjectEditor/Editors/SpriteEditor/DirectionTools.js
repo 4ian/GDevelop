@@ -96,8 +96,8 @@ export default class DirectionTools extends Component<Props, State> {
       previewOpen: open,
     });
     if (!open) {
-      this.saveTimeBetweenFrames()
-    };
+      this.saveTimeBetweenFrames();
+    }
   };
 
   render() {
@@ -167,7 +167,8 @@ export default class DirectionTools extends Component<Props, State> {
               resourcesLoader={resourcesLoader}
               project={project}
               timeBetweenFrames={this.state.timeBetweenFrames}
-              onChangeTimeBetweenFrames={text => this.setState({ timeBetweenFrames: text })}
+              onChangeTimeBetweenFrames={text =>
+                this.setState({ timeBetweenFrames: text })}
             />
           </Dialog>
         )}

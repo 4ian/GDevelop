@@ -19,7 +19,10 @@ import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import ResourcesLoader from '../../../ResourcesLoader';
 import PointsEditor from './PointsEditor';
 import CollisionMasksEditor from './CollisionMasksEditor';
-import { deleteSpritesFromAnimation } from './Utils/SpriteObjectHelper';
+import {
+  deleteSpritesFromAnimation,
+  duplicateSpritesInAnimation,
+} from './Utils/SpriteObjectHelper';
 import { type EditorProps } from '../EditorProps.flow';
 import {
   type ResourceSource,
@@ -299,6 +302,19 @@ class AnimationsListContainer extends React.Component<
     });
   };
 
+  duplicateSelection = () => {
+    const { spriteObject } = this.props;
+
+    mapFor(0, spriteObject.getAnimationsCount(), index => {
+      const animation = spriteObject.getAnimation(index);
+      duplicateSpritesInAnimation(animation, this.state.selectedSprites);
+    });
+
+    this.setState({
+      selectedSprites: {},
+    });
+  };
+
   openSpriteContextMenu = (x, y, sprite, index) => {
     this.selectSprite(sprite, true);
     if (this.spriteContextMenu) this.spriteContextMenu.open(x, y);
@@ -350,8 +366,12 @@ class AnimationsListContainer extends React.Component<
             (this.spriteContextMenu = spriteContextMenu)}
           buildMenuTemplate={() => [
             {
-              label: 'Delete',
+              label: 'Delete selection',
               click: () => this.deleteSelection(),
+            },
+            {
+              label: 'Duplicate selection',
+              click: () => this.duplicateSelection(),
             },
           ]}
         />

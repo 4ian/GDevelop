@@ -612,7 +612,7 @@ void ObjectsEditor::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     if ( data && (data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject") )
     {
         bool globalObject = data->GetString() == "GlobalObject";
-        gd::ClassWithObjects & objects = !globalObject ? static_cast<gd::ClassWithObjects&>(layout) : project;
+        gd::ObjectsContainer & objects = !globalObject ? static_cast<gd::ObjectsContainer&>(layout) : project;
 
         //Be sure there is not already another object with this name
         unsigned int nameCheckResult = nameChecker.HasObjectOrGroupNamed(newName, globalObject);
@@ -982,7 +982,7 @@ void ObjectsEditor::OnDeleteSelected(wxCommandEvent& event)
         {
             bool globalObject = data->GetString() == "GlobalObject";
             gd::String objectName = objectsList->GetItemText( selection[i] );
-            gd::ClassWithObjects & objects = !globalObject ? static_cast<gd::ClassWithObjects&>(layout) : project;
+            gd::ObjectsContainer & objects = !globalObject ? static_cast<gd::ObjectsContainer&>(layout) : project;
             //Generate also a list containing the names of the objects deleted :
             if ( globalObject ) gObjectsDeleted.push_back(objectName);
             else  objectsDeleted.push_back(objectName);
@@ -1072,7 +1072,7 @@ void ObjectsEditor::OnMoveupSelected(wxCommandEvent& event)
     if ( data && (data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject") )
     {
         bool globalObject = data->GetString() == "GlobalObject";
-        gd::ClassWithObjects & objects = !globalObject ? static_cast<gd::ClassWithObjects&>(layout) : project;
+        gd::ObjectsContainer & objects = !globalObject ? static_cast<gd::ObjectsContainer&>(layout) : project;
         std::size_t index = objects.GetObjectPosition(name);
 
         if ( index >= objects.GetObjectsCount() )
@@ -1098,7 +1098,7 @@ void ObjectsEditor::OnMoveDownSelected(wxCommandEvent& event)
     if ( data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject" )
     {
         bool globalObject = data->GetString() == "GlobalObject";
-        gd::ClassWithObjects & objects = !globalObject ? static_cast<gd::ClassWithObjects&>(layout) : project;
+        gd::ObjectsContainer & objects = !globalObject ? static_cast<gd::ObjectsContainer&>(layout) : project;
         std::size_t index = objects.GetObjectPosition(name);
 
         if ( index >= objects.GetObjectsCount() )
@@ -1148,7 +1148,7 @@ void ObjectsEditor::OnCopySelected(wxCommandEvent& event)
     if ( data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject" )
     {
         bool globalObject = data->GetString() == "GlobalObject";
-        gd::ClassWithObjects & objects = !globalObject ? static_cast<gd::ClassWithObjects&>(layout) : project;
+        gd::ObjectsContainer & objects = !globalObject ? static_cast<gd::ObjectsContainer&>(layout) : project;
 
         if ( !objects.HasObjectNamed(name) )
             return;
@@ -1180,7 +1180,7 @@ void ObjectsEditor::OnCutSelected(wxCommandEvent& event)
     if ( data->GetString() == "GlobalObject" || data->GetString() == "LayoutObject" )
     {
         bool globalObject = data->GetString() == "GlobalObject";
-        gd::ClassWithObjects & objects = !globalObject ? static_cast<gd::ClassWithObjects&>(layout) : project;
+        gd::ObjectsContainer & objects = !globalObject ? static_cast<gd::ObjectsContainer&>(layout) : project;
 
         if ( !objects.HasObjectNamed(name) )
             return;
@@ -1230,7 +1230,7 @@ void ObjectsEditor::OnPasteSelected(wxCommandEvent& event)
     if ( clipboard->HasObject() )
     {
         bool globalObject = data->GetString() == "GlobalObject";
-        gd::ClassWithObjects & objects = !globalObject ? static_cast<gd::ClassWithObjects&>(layout) : project;
+        gd::ObjectsContainer & objects = !globalObject ? static_cast<gd::ObjectsContainer&>(layout) : project;
 
         //Add a new object of selected type to objects list
         std::unique_ptr<gd::Object> object = clipboard->GetObject();

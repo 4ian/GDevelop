@@ -88,6 +88,7 @@ const theme = {
   mosaicRootClassName: 'mosaic-gd-default-theme',
   eventsSheetRootClassName: 'gd-events-sheet-default-theme',
   tableRootClassName: 'gd-table-default-theme',
+  gdevelopIconsCSSFilter: '',
 };
 
 export type Theme = $Exact<typeof theme>;

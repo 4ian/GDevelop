@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import InlinePopover from './InlinePopover';
-import ParameterRenderingService from './InstructionEditor/ParameterRenderingService';
+import ParameterRenderingService from './ParameterRenderingService';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -11,7 +11,9 @@ const gd = global.gd;
 
 type Props = {|
   project: gdProject,
-  layout: gdLayout,
+  layout: ?gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
 
   open: boolean,
   onRequestClose: () => void,
@@ -112,6 +114,8 @@ export default class InlineParameterEditor extends React.Component<
           parameterMetadata={this.state.parameterMetadata}
           project={this.props.project}
           layout={this.props.layout}
+          globalObjectsContainer={this.props.globalObjectsContainer}
+          objectsContainer={this.props.objectsContainer}
           value={instruction.getParameter(this.props.parameterIndex)}
           instructionOrExpression={instruction}
           key={instruction.ptr}

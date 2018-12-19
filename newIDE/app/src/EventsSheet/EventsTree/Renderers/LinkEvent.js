@@ -9,7 +9,7 @@ import {
   selectableArea,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
-import ExternalEventsField from '../../InstructionEditor/ParameterFields/ExternalEventsField';
+import ExternalEventsField from '../../ParameterFields/ExternalEventsField';
 import { showWarningBox } from '../../../UI/Messages/MessageBox';
 import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;
@@ -102,6 +102,8 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
         >
           <ExternalEventsField
             project={this.props.project}
+            globalObjectsContainer={this.props.globalObjectsContainer}
+            objectsContainer={this.props.objectsContainer}
             value={target}
             onChange={text => {
               linkEvent.setTarget(text);

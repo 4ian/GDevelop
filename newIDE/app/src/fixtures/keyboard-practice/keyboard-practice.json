@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -102,6 +103,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/a1.png",
         "kind": "image",
+        "metadata": "",
         "name": "a1.png",
         "smoothed": true,
         "userAdded": false
@@ -110,6 +112,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/a2.png",
         "kind": "image",
+        "metadata": "",
         "name": "a2.png",
         "smoothed": true,
         "userAdded": true
@@ -118,6 +121,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/b1.png",
         "kind": "image",
+        "metadata": "",
         "name": "b1.png",
         "smoothed": true,
         "userAdded": true
@@ -126,6 +130,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/b2.png",
         "kind": "image",
+        "metadata": "",
         "name": "b2.png",
         "smoothed": true,
         "userAdded": true
@@ -134,6 +139,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/c1.png",
         "kind": "image",
+        "metadata": "",
         "name": "c1.png",
         "smoothed": true,
         "userAdded": true
@@ -142,6 +148,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/c2.png",
         "kind": "image",
+        "metadata": "",
         "name": "c2.png",
         "smoothed": true,
         "userAdded": false
@@ -150,6 +157,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/d1.png",
         "kind": "image",
+        "metadata": "",
         "name": "d1.png",
         "smoothed": true,
         "userAdded": true
@@ -158,6 +166,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/d2.png",
         "kind": "image",
+        "metadata": "",
         "name": "d2.png",
         "smoothed": true,
         "userAdded": false
@@ -166,6 +175,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/e1.png",
         "kind": "image",
+        "metadata": "",
         "name": "e1.png",
         "smoothed": true,
         "userAdded": false
@@ -174,6 +184,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/e2.png",
         "kind": "image",
+        "metadata": "",
         "name": "e2.png",
         "smoothed": true,
         "userAdded": true
@@ -182,6 +193,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/f1.png",
         "kind": "image",
+        "metadata": "",
         "name": "f1.png",
         "smoothed": true,
         "userAdded": true
@@ -190,6 +202,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/f2.png",
         "kind": "image",
+        "metadata": "",
         "name": "f2.png",
         "smoothed": true,
         "userAdded": false
@@ -198,6 +211,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/g1.png",
         "kind": "image",
+        "metadata": "",
         "name": "g1.png",
         "smoothed": true,
         "userAdded": false
@@ -206,6 +220,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/g2.png",
         "kind": "image",
+        "metadata": "",
         "name": "g2.png",
         "smoothed": true,
         "userAdded": true
@@ -214,6 +229,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/h1.png",
         "kind": "image",
+        "metadata": "",
         "name": "h1.png",
         "smoothed": true,
         "userAdded": true
@@ -222,6 +238,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/h2.png",
         "kind": "image",
+        "metadata": "",
         "name": "h2.png",
         "smoothed": true,
         "userAdded": false
@@ -230,6 +247,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/i1.png",
         "kind": "image",
+        "metadata": "",
         "name": "i1.png",
         "smoothed": true,
         "userAdded": true
@@ -238,6 +256,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/i2.png",
         "kind": "image",
+        "metadata": "",
         "name": "i2.png",
         "smoothed": true,
         "userAdded": false
@@ -246,6 +265,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/j1.png",
         "kind": "image",
+        "metadata": "",
         "name": "j1.png",
         "smoothed": true,
         "userAdded": true
@@ -254,6 +274,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/j2.png",
         "kind": "image",
+        "metadata": "",
         "name": "j2.png",
         "smoothed": true,
         "userAdded": false
@@ -262,6 +283,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/k1.png",
         "kind": "image",
+        "metadata": "",
         "name": "k1.png",
         "smoothed": true,
         "userAdded": true
@@ -270,6 +292,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/k2.png",
         "kind": "image",
+        "metadata": "",
         "name": "k2.png",
         "smoothed": true,
         "userAdded": false
@@ -278,6 +301,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/l1.png",
         "kind": "image",
+        "metadata": "",
         "name": "l1.png",
         "smoothed": true,
         "userAdded": false
@@ -286,6 +310,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/l2.png",
         "kind": "image",
+        "metadata": "",
         "name": "l2.png",
         "smoothed": true,
         "userAdded": false
@@ -294,6 +319,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/m1.png",
         "kind": "image",
+        "metadata": "",
         "name": "m1.png",
         "smoothed": true,
         "userAdded": true
@@ -302,6 +328,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/m2.png",
         "kind": "image",
+        "metadata": "",
         "name": "m2.png",
         "smoothed": true,
         "userAdded": false
@@ -310,6 +337,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/n1.png",
         "kind": "image",
+        "metadata": "",
         "name": "n1.png",
         "smoothed": true,
         "userAdded": false
@@ -318,6 +346,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/n2.png",
         "kind": "image",
+        "metadata": "",
         "name": "n2.png",
         "smoothed": true,
         "userAdded": false
@@ -326,6 +355,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/o1.png",
         "kind": "image",
+        "metadata": "",
         "name": "o1.png",
         "smoothed": true,
         "userAdded": false
@@ -334,6 +364,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/o2.png",
         "kind": "image",
+        "metadata": "",
         "name": "o2.png",
         "smoothed": true,
         "userAdded": true
@@ -342,6 +373,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/p1.png",
         "kind": "image",
+        "metadata": "",
         "name": "p1.png",
         "smoothed": true,
         "userAdded": true
@@ -350,6 +382,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/p2.png",
         "kind": "image",
+        "metadata": "",
         "name": "p2.png",
         "smoothed": true,
         "userAdded": true
@@ -358,6 +391,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/q1.png",
         "kind": "image",
+        "metadata": "",
         "name": "q1.png",
         "smoothed": true,
         "userAdded": true
@@ -366,6 +400,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/q2.png",
         "kind": "image",
+        "metadata": "",
         "name": "q2.png",
         "smoothed": true,
         "userAdded": true
@@ -374,6 +409,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/r1.png",
         "kind": "image",
+        "metadata": "",
         "name": "r1.png",
         "smoothed": true,
         "userAdded": false
@@ -382,6 +418,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/r2.png",
         "kind": "image",
+        "metadata": "",
         "name": "r2.png",
         "smoothed": true,
         "userAdded": true
@@ -390,6 +427,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/s1.png",
         "kind": "image",
+        "metadata": "",
         "name": "s1.png",
         "smoothed": true,
         "userAdded": true
@@ -398,6 +436,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/s2.png",
         "kind": "image",
+        "metadata": "",
         "name": "s2.png",
         "smoothed": true,
         "userAdded": false
@@ -406,6 +445,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/t1.png",
         "kind": "image",
+        "metadata": "",
         "name": "t1.png",
         "smoothed": true,
         "userAdded": true
@@ -414,6 +454,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/t2.png",
         "kind": "image",
+        "metadata": "",
         "name": "t2.png",
         "smoothed": true,
         "userAdded": true
@@ -422,6 +463,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/u1.png",
         "kind": "image",
+        "metadata": "",
         "name": "u1.png",
         "smoothed": true,
         "userAdded": true
@@ -430,6 +472,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/u2.png",
         "kind": "image",
+        "metadata": "",
         "name": "u2.png",
         "smoothed": true,
         "userAdded": false
@@ -438,6 +481,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/v1.png",
         "kind": "image",
+        "metadata": "",
         "name": "v1.png",
         "smoothed": true,
         "userAdded": true
@@ -446,6 +490,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/v2.png",
         "kind": "image",
+        "metadata": "",
         "name": "v2.png",
         "smoothed": true,
         "userAdded": true
@@ -454,6 +499,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/w1.png",
         "kind": "image",
+        "metadata": "",
         "name": "w1.png",
         "smoothed": true,
         "userAdded": false
@@ -462,6 +508,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/w2.png",
         "kind": "image",
+        "metadata": "",
         "name": "w2.png",
         "smoothed": true,
         "userAdded": false
@@ -470,6 +517,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/x1.png",
         "kind": "image",
+        "metadata": "",
         "name": "x1.png",
         "smoothed": true,
         "userAdded": true
@@ -478,6 +526,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/x2.png",
         "kind": "image",
+        "metadata": "",
         "name": "x2.png",
         "smoothed": true,
         "userAdded": false
@@ -486,6 +535,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/y1.png",
         "kind": "image",
+        "metadata": "",
         "name": "y1.png",
         "smoothed": true,
         "userAdded": true
@@ -494,6 +544,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/y2.png",
         "kind": "image",
+        "metadata": "",
         "name": "y2.png",
         "smoothed": true,
         "userAdded": true
@@ -502,6 +553,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/z1.png",
         "kind": "image",
+        "metadata": "",
         "name": "z1.png",
         "smoothed": true,
         "userAdded": false
@@ -510,6 +562,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/z2.png",
         "kind": "image",
+        "metadata": "",
         "name": "z2.png",
         "smoothed": true,
         "userAdded": true
@@ -518,6 +571,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/space1.png",
         "kind": "image",
+        "metadata": "",
         "name": "space1.png",
         "smoothed": true,
         "userAdded": false
@@ -526,6 +580,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/keyboard-practice/assets/keys/space2.png",
         "kind": "image",
+        "metadata": "",
         "name": "space2.png",
         "smoothed": true,
         "userAdded": true
@@ -4323,6 +4378,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -14,7 +14,7 @@ GDJS is composed of two parts:
 
 ### GDJS Runtime (game engine)
 
-The game engine is in the _Runtime_ folder. If you want to work on the engine directly, follow the [GDevelop 5 README about development of the game engine](https://github.com/4ian/GD/blob/master/newIDE/README.md#development-of-the-game-engine).
+The game engine is in the _Runtime_ folder. If you want to work on the engine directly, follow the [GDevelop 5 README about development of the game engine](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md#development-of-the-game-engine).
 
 To use the game engine, you can look into the **[GDJS Runtime (game engine) documentation](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation)**.
 

@@ -132,16 +132,9 @@ gdjs.ParticleEmitterObjectPixiRenderer = function(runtimeScene, runtimeObject, o
                                  max: objectData.emitterAngleB };
     }
 
-    if(objectData.angleParam === "Mutable"){
-        var mediumLifetime = (objectData.particleLifeTimeMin + objectData.particleLifeTimeMax)/2;
-        config.rotationSpeed = { min: objectData.particleAngle1/mediumLifetime,
-                                 max: objectData.particleAngle2/mediumLifetime };
-    }
-    else{
-        config.startRotation = { min: objectData.particleAngle1,
-                                 max: objectData.particleAngle2 };
-        config.rotationSpeed = { min: 0, max: 0 };
-    }
+    var mediumLifetime = (objectData.particleLifeTimeMin + objectData.particleLifeTimeMax)/2.0;
+    config.rotationSpeed = { min: objectData.particleAngle1/mediumLifetime,
+                             max: objectData.particleAngle2/mediumLifetime };
 
     config.blendMode = objectData.additive ? "ADD" : "NORMAL";
 

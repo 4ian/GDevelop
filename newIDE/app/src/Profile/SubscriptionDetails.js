@@ -32,8 +32,9 @@ export default ({ subscription, onChangeSubscription }: Props) =>
     <Column>
       <Line>
         <p>
-          You don't have any subscription. Get one to access to all online
-          services, including building your game for Android, Windows, macOS and Linux in one click!
+          If you don't have a subscription, consider getting one now. Accounts
+          allow you to access all of the online services. With just one click,
+          you can build your game for Android, Windows, macOS and Linux!
         </p>
       </Line>
       <Line justifyContent="center">

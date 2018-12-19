@@ -2,7 +2,7 @@
 <script src="/libGD.js"></script>
 
 <!-- Monaco Editor support -->
-<script src="/External/monaco-editor-min/vs/loader.js"></script>
+<script src="/external/monaco-editor-min/vs/loader.js"></script>
 <script>
     amdRequire = require;
     amdRequire.config({
@@ -12,7 +12,7 @@
     });
     window.MonacoEnvironment = {
         getWorkerUrl: function (workerId, label) {
-        return "External/monaco-editor-min/vs/base/worker/workerMain.js";
+        return "external/monaco-editor-min/vs/base/worker/workerMain.js";
         }
     };
 </script>

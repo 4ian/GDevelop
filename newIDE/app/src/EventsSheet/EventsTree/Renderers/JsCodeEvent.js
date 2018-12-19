@@ -3,7 +3,7 @@ import * as React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
 import InlinePopover from '../../InlinePopover';
-import ObjectField from '../../InstructionEditor/ParameterFields/ObjectField';
+import ObjectField from '../../ParameterFields/ObjectField';
 import {
   largeSelectedArea,
   largeSelectableArea,
@@ -179,6 +179,8 @@ export default class JsCodeEvent extends React.Component<
             <ObjectField
               project={this.props.project}
               layout={this.props.layout}
+              globalObjectsContainer={this.props.globalObjectsContainer}
+              objectsContainer={this.props.objectsContainer}
               value={parameterObjects}
               onChange={text => {
                 jsCodeEvent.setParameterObjects(text);

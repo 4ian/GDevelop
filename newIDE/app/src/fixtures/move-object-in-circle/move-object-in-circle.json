@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -108,6 +109,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/move-object-in-circle/rect_green.png",
         "kind": "image",
+        "metadata": "",
         "name": "rect_green.png",
         "smoothed": true,
         "userAdded": true
@@ -450,6 +452,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

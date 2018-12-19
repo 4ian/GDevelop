@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -111,6 +112,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/Pointer-Standard.png",
         "kind": "image",
+        "metadata": "",
         "name": "Pointer-Standard.png",
         "smoothed": true,
         "userAdded": true
@@ -119,6 +121,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/3DWall.png",
         "kind": "image",
+        "metadata": "",
         "name": "3DWall.png",
         "smoothed": true,
         "userAdded": true
@@ -127,6 +130,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/Pea-Happy.png",
         "kind": "image",
+        "metadata": "",
         "name": "Pea-Happy.png",
         "smoothed": true,
         "userAdded": true
@@ -135,6 +139,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/Target.png",
         "kind": "image",
+        "metadata": "",
         "name": "Flag-Pole.png",
         "smoothed": true,
         "userAdded": true
@@ -143,6 +148,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/Pea-Standard.png",
         "kind": "image",
+        "metadata": "",
         "name": "Pea-Standard.png",
         "smoothed": true,
         "userAdded": true
@@ -151,6 +157,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0001.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame2-0001.png",
         "smoothed": true,
         "userAdded": true
@@ -159,6 +166,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0002.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame2-0002.png",
         "smoothed": true,
         "userAdded": true
@@ -167,6 +175,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0003.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame2-0003.png",
         "smoothed": true,
         "userAdded": true
@@ -175,6 +184,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0004.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame2-0004.png",
         "smoothed": true,
         "userAdded": true
@@ -183,6 +193,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0005.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame2-0005.png",
         "smoothed": true,
         "userAdded": true
@@ -191,6 +202,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0006.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame2-0006.png",
         "smoothed": true,
         "userAdded": true
@@ -199,6 +211,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0007.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame2-0007.png",
         "smoothed": true,
         "userAdded": true
@@ -207,6 +220,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame2-0008.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame2-0008.png",
         "smoothed": true,
         "userAdded": true
@@ -215,6 +229,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10001.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame10001.png",
         "smoothed": true,
         "userAdded": true
@@ -223,6 +238,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10002.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame10002.png",
         "smoothed": true,
         "userAdded": true
@@ -231,6 +247,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10003.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame10003.png",
         "smoothed": true,
         "userAdded": true
@@ -239,6 +256,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10004.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame10004.png",
         "smoothed": true,
         "userAdded": true
@@ -247,6 +265,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10005.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame10005.png",
         "smoothed": true,
         "userAdded": true
@@ -255,6 +274,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10006.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame10006.png",
         "smoothed": true,
         "userAdded": true
@@ -263,6 +283,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10007.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame10007.png",
         "smoothed": true,
         "userAdded": true
@@ -271,6 +292,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/tank_frame10008.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank_frame10008.png",
         "smoothed": true,
         "userAdded": true
@@ -279,6 +301,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/DestroyedTank.png",
         "kind": "image",
+        "metadata": "",
         "name": "DestroyedTank.png",
         "smoothed": true,
         "userAdded": true
@@ -287,6 +310,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/ExplosionTexture.png",
         "kind": "image",
+        "metadata": "",
         "name": "Fire",
         "smoothed": true,
         "userAdded": true
@@ -295,6 +319,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/GrassDead.png",
         "kind": "image",
+        "metadata": "",
         "name": "GrassDead.png",
         "smoothed": true,
         "userAdded": true
@@ -303,6 +328,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/NodeMarker.png",
         "kind": "image",
+        "metadata": "",
         "name": "NodeMarker.png",
         "smoothed": true,
         "userAdded": true
@@ -311,6 +337,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding/symbol.png",
         "kind": "image",
+        "metadata": "",
         "name": "symbol.png",
         "smoothed": true,
         "userAdded": true
@@ -2560,6 +2587,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

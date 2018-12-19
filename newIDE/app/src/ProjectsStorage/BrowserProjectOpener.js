@@ -1,3 +1,4 @@
+import admob from '../fixtures/admob/admob.json';
 import advancedShapeBasedPainter from '../fixtures/advanced-shape-based-painter/advanced-shape-based-painter.json';
 import animationSpeedScale from '../fixtures/animation-speed-scale/animation-speed-scale.json';
 import asteroids from '../fixtures/asteroids/asteroids.json';
@@ -5,6 +6,7 @@ import basicAiWithPathfinding from '../fixtures/basic-ai-with-pathfinding/basic-
 import basicArtificialIntelligence from '../fixtures/basic-artificial-intelligence/basic-artificial-intelligence.json';
 import basicTopdownCarDriving from '../fixtures/basic-topdown-car-driving/basic-topdown-car-driving.json';
 import bombTheCrate from '../fixtures/bomb-the-crate/bomb-the-crate.json';
+import bouncingBallAndRope from '../fixtures/bouncing-ball-and-rope/bouncing-ball-and-rope.json';
 import breakout from '../fixtures/breakout/breakout.json';
 import buttons from '../fixtures/buttons/buttons.json';
 import carPhysics from '../fixtures/car-physics/car-physics.json';
@@ -15,11 +17,13 @@ import changeSpriteAnimation from '../fixtures/change-sprite-animation/change-sp
 import changeSpriteColor from '../fixtures/change-sprite-color/change-sprite-color.json';
 import characterSelection from '../fixtures/character-selection/character-selection.json';
 import controllerInput from '../fixtures/controller-input/controller-input.json';
-import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
-import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
 import createObjectWithMouseclick from '../fixtures/create-object-with-mouseclick/create-object-with-mouseclick.json';
 import customFont from '../fixtures/custom-font/custom-font.json';
 import customizeKeysWithLastpressedkey from '../fixtures/customize-keys-with-lastpressedkey/customize-keys-with-lastpressedkey.json';
+import customMousePointer from '../fixtures/custom-mouse-pointer/custom-mouse-pointer.json';
+import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
+import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
+import deviceVibration from '../fixtures/device-vibration/device-vibration.json';
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
 import dropCollectItemsFromStorage from '../fixtures/drop-collect-items-from-storage/drop-collect-items-from-storage.json';
 import exitApp from '../fixtures/exit-app/exit-app.json';
@@ -31,12 +35,15 @@ import inventorySystem from '../fixtures/inventory-system/inventory-system.json'
 import isometricGame from '../fixtures/isometric-game/isometric-game.json';
 import javascriptBlocksInPlatformer from '../fixtures/javascript-blocks-in-platformer/javascript-blocks-in-platformer.json';
 import keyboardPractice from '../fixtures/keyboard-practice/keyboard-practice.json';
+import levelEditor from '../fixtures/level-editor/level-editor.json';
 import loadImageFromUrl from '../fixtures/load-image-from-url/load-image-from-url.json';
 import magnet from '../fixtures/magnet/magnet.json';
 import manipulateTextObject from '../fixtures/manipulate-text-object/manipulate-text-object.json';
 import moveCameraToPosition from '../fixtures/move-camera-to-position/move-camera-to-position.json';
+import moveObjectBackAndForth from '../fixtures/move-object-back-and-forth/move-object-back-and-forth.json';
 import moveObjectInCircle from '../fixtures/move-object-in-circle/move-object-in-circle.json';
 import moveObjectTowardPosition from '../fixtures/move-object-toward-position/move-object-toward-position.json';
+import moveObjectWithMouseJoint from '../fixtures/move-object-with-mouse-joint/move-object-with-mouse-joint.json';
 import moveObjectWithPhysics from '../fixtures/move-object-with-physics/move-object-with-physics.json';
 import multitouch from '../fixtures/multitouch/multitouch.json';
 import objectGravity from '../fixtures/object-gravity/object-gravity.json';
@@ -54,6 +61,7 @@ import pathfindingBasics from '../fixtures/pathfinding-basics/pathfinding-basics
 import physics from '../fixtures/physics/physics.json';
 import pinObjectToAnother from '../fixtures/pin-object-to-another/pin-object-to-another.json';
 import pinObjectToAnotherMultipleParents from '../fixtures/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json';
+import planeAndClouds from '../fixtures/plane-and-clouds/plane-and-clouds.json';
 import platformer from '../fixtures/platformer/platformer.json';
 import platformerDoubleJump from '../fixtures/platformer-double-jump/platformer-double-jump.json';
 import playMusicOnMobile from '../fixtures/play-music-on-mobile/play-music-on-mobile.json';
@@ -70,6 +78,7 @@ import shootBullets from '../fixtures/shoot-bullets/shoot-bullets.json';
 import shootingBulletsExplanation from '../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
 import snapObjectToGrid from '../fixtures/snap-object-to-grid/snap-object-to-grid.json';
 import spaceShooter from '../fixtures/space-shooter/space-shooter.json';
+import spaceShooterWithFunctions from '../fixtures/space-shooter-with-functions/space-shooter-with-functions.json';
 import splashScreen from '../fixtures/splash-screen/splash-screen.json';
 import spriteFadeInOut from '../fixtures/sprite-fade-in-out/sprite-fade-in-out.json';
 import textEntryObject from '../fixtures/text-entry-object/text-entry-object.json';
@@ -80,10 +89,11 @@ import typeOnTextEffect from '../fixtures/type-on-text-effect/type-on-text-effec
 import zDepth from '../fixtures/z-depth/z-depth.json';
 import zombieLaser from '../fixtures/zombie-laser/zombie-laser.json';
 
-
 export default class BrowserProjectOpener {
   static readInternalFile(url) {
-    if (url === 'example://advanced-shape-based-painter') {
+    if (url === 'example://admob') {
+      return Promise.resolve(admob);
+    } else if (url === 'example://advanced-shape-based-painter') {
       return Promise.resolve(advancedShapeBasedPainter);
     } else if (url === 'example://animation-speed-scale') {
       return Promise.resolve(animationSpeedScale);
@@ -97,6 +107,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(basicTopdownCarDriving);
     } else if (url === 'example://bomb-the-crate') {
       return Promise.resolve(bombTheCrate);
+    } else if (url === 'example://bouncing-ball-and-rope') {
+      return Promise.resolve(bouncingBallAndRope);
     } else if (url === 'example://breakout') {
       return Promise.resolve(breakout);
     } else if (url === 'example://buttons') {
@@ -107,6 +119,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(pinObjectToAnother);
     } else if (url === 'example://pin-object-to-another-multiple-parents') {
       return Promise.resolve(pinObjectToAnotherMultipleParents);
+    } else if (url === 'example://plane-and-clouds') {
+      return Promise.resolve(planeAndClouds);
     } else if (url === 'example://center-object-within-another') {
       return Promise.resolve(centerObjectWithinAnother);
     } else if (url === 'example://change-position-of-object') {
@@ -125,12 +139,16 @@ export default class BrowserProjectOpener {
       return Promise.resolve(deviceOrientationBallgame);
     } else if (url === 'example://device-orientation-compass') {
       return Promise.resolve(deviceOrientationCompass);
+    } else if (url === 'example://device-vibration') {
+      return Promise.resolve(deviceVibration);
     } else if (url === 'example://create-object-with-mouseclick') {
       return Promise.resolve(createObjectWithMouseclick);
     } else if (url === 'example://custom-font') {
       return Promise.resolve(customFont);
     } else if (url === 'example://customize-keys-with-lastpressedkey') {
       return Promise.resolve(customizeKeysWithLastpressedkey);
+    } else if (url === 'example://custom-mouse-pointer') {
+      return Promise.resolve(customMousePointer);
     } else if (url === 'example://drag-camera-with-mouse') {
       return Promise.resolve(dragCameraWithMouse);
     } else if (url === 'example://drop-collect-items-from-storage') {
@@ -153,6 +171,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(javascriptBlocksInPlatformer);
     } else if (url === 'example://keyboard-practice') {
       return Promise.resolve(keyboardPractice);
+    } else if (url === 'example://level-editor') {
+      return Promise.resolve(levelEditor);
     } else if (url === 'example://load-image-from-url') {
       return Promise.resolve(loadImageFromUrl);
     } else if (url === 'example://magnet') {
@@ -161,10 +181,14 @@ export default class BrowserProjectOpener {
       return Promise.resolve(manipulateTextObject);
     } else if (url === 'example://move-camera-to-position') {
       return Promise.resolve(moveCameraToPosition);
+    } else if (url === 'example://move-object-back-and-forth') {
+      return Promise.resolve(moveObjectBackAndForth);
     } else if (url === 'example://move-object-in-circle') {
       return Promise.resolve(moveObjectInCircle);
     } else if (url === 'example://move-object-toward-position') {
       return Promise.resolve(moveObjectTowardPosition);
+    } else if (url === 'example://move-object-with-mouse-joint') {
+      return Promise.resolve(moveObjectWithMouseJoint);
     } else if (url === 'example://move-object-with-physics') {
       return Promise.resolve(moveObjectWithPhysics);
     } else if (url === 'example://multitouch') {
@@ -227,6 +251,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(snapObjectToGrid);
     } else if (url === 'example://space-shooter') {
       return Promise.resolve(spaceShooter);
+    } else if (url === 'example://space-shooter-with-functions') {
+      return Promise.resolve(spaceShooterWithFunctions);
     } else if (url === 'example://splash-screen') {
       return Promise.resolve(splashScreen);
     } else if (url === 'example://sprite-fade-in-out') {

@@ -23,6 +23,9 @@ gdjs.RuntimeGame = function(data, spec) {
   this._soundManager = new gdjs.SoundManager(
     data.resources ? data.resources.resources : undefined
   );
+  this._fontManager = new gdjs.FontManager(
+    data.resources ? data.resources.resources : undefined
+  );
   this._minFPS = data ? parseInt(data.properties.minFPS, 10) : 15;
 
   this._defaultWidth = data.properties.windowWidth; //Default size for scenes cameras
@@ -79,6 +82,14 @@ gdjs.RuntimeGame.prototype.getSoundManager = function() {
  */
 gdjs.RuntimeGame.prototype.getImageManager = function() {
   return this._imageManager;
+};
+
+/**
+ * Get the gdjs.FontManager of the RuntimeGame.
+ * @return {gdjs.FontManager} The font manager.
+ */
+gdjs.RuntimeGame.prototype.getFontManager = function() {
+  return this._fontManager;
 };
 
 /**
@@ -238,12 +249,15 @@ gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
  */
 gdjs.RuntimeGame.prototype.pause = function(enable) {
   this._paused = enable;
-}
+};
 
 /**
  * Load all assets, displaying progress in renderer.
  */
-gdjs.RuntimeGame.prototype.loadAllAssets = function(callback, progressCallback) {
+gdjs.RuntimeGame.prototype.loadAllAssets = function(
+  callback,
+  progressCallback
+) {
   var loadingScreen = new gdjs.LoadingScreenRenderer(
     this.getRenderer(),
     this._data.properties.loadingScreen
@@ -253,20 +267,33 @@ gdjs.RuntimeGame.prototype.loadAllAssets = function(callback, progressCallback) 
   var that = this;
   this._imageManager.loadTextures(
     function(count, total) {
-      var percent = Math.floor(count / allAssetsTotal * 100);
+      var percent = Math.floor((count / allAssetsTotal) * 100);
       loadingScreen.render(percent);
       if (progressCallback) progressCallback(percent);
     },
-    function() {
+    function(texturesTotalCount) {
       that._soundManager.preloadAudio(
         function(count, total) {
           loadingScreen.render(
-            Math.floor((allAssetsTotal - total + count) / allAssetsTotal * 100)
+            Math.floor(((texturesTotalCount + count) / allAssetsTotal) * 100)
           );
         },
-        function() {
-          loadingScreen.unload();
-          callback();
+        function(audioTotalCount) {
+          that._fontManager.loadFonts(
+            function(count, total) {
+              loadingScreen.render(
+                Math.floor(
+                  ((texturesTotalCount + audioTotalCount + count) /
+                    allAssetsTotal) *
+                    100
+                )
+              );
+            },
+            function() {
+              loadingScreen.unload();
+              callback();
+            }
+          );
         }
       );
     }
@@ -329,10 +356,15 @@ gdjs.RuntimeGame.prototype.startGameLoop = function() {
  * @param {?string} mode `adaptWidth` to change the width, `adaptHeight` to change the height. If not defined, will use the game "sizeOnStartupMode" .
  */
 gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
-  if (!gdjs.RuntimeGameRenderer || !gdjs.RuntimeGameRenderer.getScreenWidth || !gdjs.RuntimeGameRenderer.getScreenHeight)
+  if (
+    !gdjs.RuntimeGameRenderer ||
+    !gdjs.RuntimeGameRenderer.getScreenWidth ||
+    !gdjs.RuntimeGameRenderer.getScreenHeight
+  )
     return;
 
-  newMode = mode !== undefined ? mode : (this._data.properties.sizeOnStartupMode || '');
+  newMode =
+    mode !== undefined ? mode : this._data.properties.sizeOnStartupMode || '';
 
   var screenWidth = gdjs.RuntimeGameRenderer.getScreenWidth();
   var screenHeight = gdjs.RuntimeGameRenderer.getScreenHeight();
@@ -341,10 +373,10 @@ gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
   var renderer = this.getRenderer();
   var width = renderer.getCurrentWidth();
   var height = renderer.getCurrentHeight();
-  if (newMode === "adaptWidth") {
-    width = height * screenWidth / screenHeight;
-  } else if (newMode === "adaptHeight") {
-    height = width * screenHeight / screenWidth;
+  if (newMode === 'adaptWidth') {
+    width = (height * screenWidth) / screenHeight;
+  } else if (newMode === 'adaptHeight') {
+    height = (width * screenHeight) / screenWidth;
   }
 
   // Update the renderer size, and also the default size of the game so that
@@ -352,19 +384,21 @@ gdjs.RuntimeGame.prototype.adaptRendererSizeToFillScreen = function(mode) {
   renderer.setSize(width, height);
   this.setDefaultWidth(width);
   this.setDefaultHeight(height);
-}
+};
 
 /**
  * Start a profiler for the currently running scene.
  * @param {Function} onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
  */
-gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function(onProfilerStopped) {
+gdjs.RuntimeGame.prototype.startCurrentSceneProfiler = function(
+  onProfilerStopped
+) {
   var currentScene = this._sceneStack.getCurrentScene();
   if (!currentScene) return false;
 
   currentScene.startProfiler(onProfilerStopped);
   return true;
-}
+};
 
 /**
  * Stop the profiler for the currently running scene.
@@ -374,4 +408,4 @@ gdjs.RuntimeGame.prototype.stopCurrentSceneProfiler = function() {
   if (!currentScene) return null;
 
   currentScene.stopProfiler();
-}
+};

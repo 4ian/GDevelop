@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -108,6 +109,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/snap-object-to-grid/Block-Normal.png",
         "kind": "image",
+        "metadata": "",
         "name": "Block-Normal.png",
         "smoothed": true,
         "userAdded": true
@@ -116,6 +118,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/snap-object-to-grid/Pea-Standard.png",
         "kind": "image",
+        "metadata": "",
         "name": "Pea-Standard.png",
         "smoothed": true,
         "userAdded": true
@@ -578,6 +581,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

@@ -20,9 +20,10 @@ npm-debug.log
 public/libGD.js
 
 # Third party editors
-public/External/Piskel/piskel-editor
-public/External/Piskel/piskel-editor.zip
-public/External/monaco-editor-min
+public/external/Piskel/piskel-editor
+public/external/Piskel/piskel-editor.zip
+public/external/monaco-editor-min
+public/external/jfxr/jfxr-editor/
 
 # Resources
 public/res

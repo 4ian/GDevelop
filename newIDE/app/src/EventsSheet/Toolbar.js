@@ -4,37 +4,9 @@ import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import IconMenu from '../UI/Menu/IconMenu';
-import { mapFor } from '../Utils/MapFor';
-import flatten from 'lodash/flatten';
 import { adaptAcceleratorString } from '../UI/AcceleratorString';
-const gd = global.gd;
 
 export class Toolbar extends PureComponent {
-  componentWillMount() {
-    const allExtensions = gd
-      .asPlatform(gd.JsPlatform.get())
-      .getAllPlatformExtensions();
-
-    this.allEventsMetadata = flatten(
-      mapFor(0, allExtensions.size(), i => {
-        const extension = allExtensions.get(i);
-        const extensionEvents = extension.getAllEvents();
-
-        return extensionEvents
-          .keys()
-          .toJSArray()
-          .map(type => {
-            const metadata = extensionEvents.get(type);
-            return {
-              type,
-              fullName: metadata.getFullName(),
-              description: metadata.getDescription(),
-            };
-          });
-      })
-    );
-  }
-
   render() {
     const { t } = this.props;
 
@@ -52,7 +24,9 @@ export class Toolbar extends PureComponent {
             iconButtonElement={
               <ToolbarIcon
                 src="res/ribbon_default/bug32.png"
-                tooltip={t('Advanced preview options (debugger, network preview...)')}
+                tooltip={t(
+                  'Advanced preview options (debugger, network preview...)'
+                )}
               />
             }
             buildMenuTemplate={() => [
@@ -66,8 +40,8 @@ export class Toolbar extends PureComponent {
                 click: () => this.props.onOpenDebugger(),
               },
             ]}
-          />)
-        }
+          />
+        )}
         {this.props.showPreviewButton && <ToolbarSeparator />}
         <ToolbarIcon
           onClick={this.props.onAddStandardEvent}
@@ -93,7 +67,7 @@ export class Toolbar extends PureComponent {
             />
           }
           buildMenuTemplate={() =>
-            this.allEventsMetadata.map(metadata => {
+            this.props.allEventsMetadata.map(metadata => {
               return {
                 label: metadata.fullName,
                 click: () => this.props.onAddEvent(metadata.type),
@@ -123,7 +97,9 @@ export class Toolbar extends PureComponent {
         <ToolbarIcon
           onClick={() => this.props.onToggleSearchPanel()}
           src="res/ribbon_default/search32.png"
-          tooltip={`${t('Search in events')} ${adaptAcceleratorString('CmdOrCtrl+F')}`}
+          tooltip={`${t('Search in events')} ${adaptAcceleratorString(
+            'CmdOrCtrl+F'
+          )}`}
         />
         {this.props.onOpenSettings && <ToolbarSeparator />}
         {this.props.onOpenSettings && (

@@ -7,7 +7,7 @@
  * @file Tests covering common features of GDevelop C++ Platform.
  */
 #include "GDCore/CommonTools.h"
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCpp/Extensions/Builtin/RuntimeSceneTools.h"

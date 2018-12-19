@@ -1,10 +1,10 @@
-![GDevelop logo](https://raw.githubusercontent.com/4ian/GD/master/Core/docs/images/gdlogo.png "GDevelop logo")
+![GDevelop logo](https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/gdlogo.png "GDevelop logo")
 
-GDevelop is a full featured, open source game development software, allowing to create HTML5 and native games without any knowledge in a specific programming language. All the game logic is made thanks to an intuitive and powerful event based system.
+GDevelop is a full featured, open source game development software, allowing to create HTML5 and native games without any knowledge in a specific programming language. All the game logic is built up via an intuitive and powerful event based system.
 
-![GDevelop in action, used to add a trigger in a platformer game](https://raw.githubusercontent.com/4ian/GD/master/Core/docs/images/demo.gif "GDevelop in action, used to add a trigger in a platformer game")
+![GDevelop in action, used to add a trigger in a platformer game](https://raw.githubusercontent.com/4ian/GDevelop/master/Core/docs/images/demo.gif "GDevelop in action, used to add a trigger in a platformer game")
 
-Getting started [![Build Status](https://semaphoreci.com/api/v1/4ian/gd/branches/master/badge.svg)](https://semaphoreci.com/4ian/gd) [![Build Status](https://travis-ci.org/4ian/GD.svg?branch=master)](https://travis-ci.org/4ian/GD)
+Getting started [![Build Status](https://semaphoreci.com/api/v1/4ian/gd/branches/master/badge.svg)](https://semaphoreci.com/4ian/gd) [![Build Status](https://travis-ci.org/4ian/GDevelop.svg?branch=master)](https://travis-ci.org/4ian/GD)
 ---------------
 
 | ❔ I want to... | 🚀 What to do |
@@ -44,7 +44,7 @@ Links
 ### Development Roadmap
 
 * [GDevelop Roadmap on Trello.com](https://trello.com/b/qf0lM7k8/gdevelop-roadmap), for a global view of the features that could be added. Please vote and comment here for new features/requests.
-* [GitHub issue page](https://github.com/4ian/GD/issues), for technical issues and bugs.
+* [GitHub issue page](https://github.com/4ian/GDevelop/issues), for technical issues and bugs.
 
 ### Related projects and games
 

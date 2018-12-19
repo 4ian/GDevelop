@@ -34,7 +34,7 @@ namespace gd {
  * sometimes update them.
  *
  * \see ResourcesMergingHelper
- * \see gd::ImagesUsedInventorizer
+ * \see gd::ResourcesInUseHelper
  *
  * \see gd::LaunchResourceWorkerOnEvents
  *
@@ -63,6 +63,12 @@ class GD_CORE_API ArbitraryResourceWorker {
    * or a filename if no resource with this name exists.
    */
   virtual void ExposeAudio(gd::String &audioName);
+
+  /**
+   * \brief Expose a font, which is either a reference to a "font" resource,
+   * or a filename if no resource with this name exists.
+   */
+  virtual void ExposeFont(gd::String &fontName);
 
   /**
    * \brief Expose a shader.

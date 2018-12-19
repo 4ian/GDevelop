@@ -1,5 +1,6 @@
 // @flow
 import { openPiskel } from './LocalPiskelBridge';
+import { openJfxr } from './LocalJfxrBridge';
 import { type ResourceExternalEditor } from './ResourceExternalEditor.flow';
 import { sendExternalEditorOpened } from '../Utils/Analytics/EventSender';
 
@@ -15,6 +16,15 @@ const editors: Array<ResourceExternalEditor> = [
     edit: (options) => {
       sendExternalEditorOpened('piskel');
       return openPiskel(options);
+    },
+  },
+  {
+    name: 'Jfxr',
+    displayName: 'Create/Edit a Sound effect with Jfxr (*.wav)',
+    kind: 'audio',
+    edit: (options) => {
+      sendExternalEditorOpened('jfxr');
+      return openJfxr(options);
     },
   },
 ];

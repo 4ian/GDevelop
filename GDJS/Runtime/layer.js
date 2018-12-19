@@ -171,23 +171,31 @@ gdjs.Layer.prototype.convertCoords = function(x, y, cameraId) {
 	x /= Math.abs(this._zoomFactor);
 	y /= Math.abs(this._zoomFactor);
 
+	// Only compute angle and cos/sin once (allow heavy optimization from JS engines).
+	var angleInRadians = this._cameraRotation/180*Math.PI;
 	var tmp = x;
-	x = Math.cos(this._cameraRotation/180*3.14159)*x - Math.sin(this._cameraRotation/180*3.14159)*y;
-	y = Math.sin(this._cameraRotation/180*3.14159)*tmp + Math.cos(this._cameraRotation/180*3.14159)*y;
+	var cosValue = Math.cos(angleInRadians);
+	var sinValue = Math.sin(angleInRadians);
+	x = cosValue*x - sinValue*y;
+	y = sinValue*tmp + cosValue*y;
 
 	return [x + this.getCameraX(cameraId), y + this.getCameraY(cameraId)];
 };
 
 gdjs.Layer.prototype.convertInverseCoords = function(x, y, cameraId) {
-   x -= this.getCameraX(cameraId);
-   y -= this.getCameraY(cameraId);
+	x -= this.getCameraX(cameraId);
+	y -= this.getCameraY(cameraId);
 
+	// Only compute angle and cos/sin once (allow heavy optimization from JS engines).
+	var angleInRadians = this._cameraRotation/180*Math.PI;
 	var tmp = x;
-	x = Math.cos(-this._cameraRotation/180*3.14159)*x - Math.sin(-this._cameraRotation/180*3.14159)*y;
-	y = Math.sin(-this._cameraRotation/180*3.14159)*tmp + Math.cos(-this._cameraRotation/180*3.14159)*y;
+	var cosValue = Math.cos(-angleInRadians);
+	var sinValue = Math.sin(-angleInRadians);
+	x = cosValue*x - sinValue*y;
+	y = sinValue*tmp + cosValue*y;
 
-   x *= Math.abs(this._zoomFactor);
-   y *= Math.abs(this._zoomFactor);
+	x *= Math.abs(this._zoomFactor);
+	y *= Math.abs(this._zoomFactor);
 
 	return [x + this._width/2, y + this._height/2];
 };

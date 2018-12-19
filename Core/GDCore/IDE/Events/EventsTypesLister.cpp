@@ -4,7 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 #include "GDCore/IDE/Events/EventsTypesLister.h"
-#include <iostream>
 #include <map>
 #include <memory>
 #include <vector>

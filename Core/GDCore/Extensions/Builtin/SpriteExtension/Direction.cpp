@@ -15,7 +15,7 @@ using namespace std;
 
 namespace gd {
 
-Direction::Direction() : loop(false), timeBetweenFrame(1) {}
+Direction::Direction() : loop(false), timeBetweenFrame(0.08) {}
 
 Direction::~Direction(){};
 
@@ -75,6 +75,11 @@ void Direction::UnserializeFrom(const gd::SerializerElement& element) {
   SetTimeBetweenFrames(
       element.GetDoubleAttribute("timeBetweenFrames", 1, "tempsEntre"));
   SetLoop(element.GetBoolAttribute("looping", false, "boucle"));
+#if defined(GD_IDE_ONLY)
+  SetMetadata(element.HasAttribute("metadata") || element.HasChild("metadata")
+                  ? element.GetStringAttribute("metadata")
+                  : "");
+#endif
 
   const gd::SerializerElement& spritesElement =
       element.GetChild("sprites", 0, "Sprites");
@@ -182,6 +187,7 @@ void SaveSpritesDirection(const vector<Sprite>& sprites,
 void Direction::SerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("looping", IsLooping());
   element.SetAttribute("timeBetweenFrames", GetTimeBetweenFrames());
+  if (!GetMetadata().empty()) element.SetAttribute("metadata", GetMetadata());
   SaveSpritesDirection(sprites, element.AddChild("sprites"));
 }
 #endif

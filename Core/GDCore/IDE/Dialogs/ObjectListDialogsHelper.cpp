@@ -126,7 +126,7 @@ void ObjectListDialogsHelper::RefreshList(wxTreeCtrl* objectsList,
 wxTreeItemId ObjectListDialogsHelper::AddObjectsToList(
     wxTreeCtrl* objectsList,
     wxTreeItemId rootItem,
-    const gd::ClassWithObjects& objects,
+    const gd::ObjectsContainer& objects,
     bool globalObjects) {
   bool searching = searchText.empty() ? false : true;
 

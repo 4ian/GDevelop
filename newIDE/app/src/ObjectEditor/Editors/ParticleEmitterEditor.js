@@ -116,6 +116,7 @@ export default class ParticleEmitterEditor extends React.Component<
                   particleEmitterObject.setParticleTexture(resourceName);
                   this.forceUpdate();
                 }}
+                floatingLabelText="Select an image"
               />
             </Line>
             <Line>
@@ -410,6 +411,32 @@ export default class ParticleEmitterEditor extends React.Component<
               value={particleEmitterObject.getParticleSize2()}
               onChange={value => {
                 particleEmitterObject.setParticleSize2(parseFloat(value));
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+        </Line>
+        <Line>
+          <Column expand noMargin>
+            <SemiControlledTextField
+              floatingLabelText="Particle minimum rotation speed (degreed/second)"
+              fullWidth
+              type="number"
+              value={particleEmitterObject.getParticleAngle1()}
+              onChange={value => {
+                particleEmitterObject.setParticleAngle1(parseFloat(value));
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+          <Column expand noMargin>
+            <SemiControlledTextField
+              floatingLabelText="Particle maximum rotation speed (degreed/second)"
+              fullWidth
+              type="number"
+              value={particleEmitterObject.getParticleAngle2()}
+              onChange={value => {
+                particleEmitterObject.setParticleAngle2(parseFloat(value));
                 this.forceUpdate();
               }}
             />

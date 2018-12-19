@@ -3,6 +3,64 @@
  * See README.md for more information.
  */
 
+ const makeSpriteRuntimeObjectWithCustomHitBox = (runtimeScene) => new gdjs.SpriteRuntimeObject(runtimeScene, {
+	"name": "obj1",
+	"type": "Sprite",
+	"updateIfNotVisible": false,
+	"variables": [],
+	"behaviors": [],
+	"animations": [
+		{
+		"name": "NewObject2",
+		"useMultipleDirections": false,
+		"directions": [
+			{
+			"looping": false,
+			"timeBetweenFrames": 1,
+			"sprites": [
+				{
+				"hasCustomCollisionMask": true,
+				"image": "NewObject2-2.png",
+				"points": [],
+				"originPoint": {
+					"name": "origine",
+					"x": 32,
+					"y": 16
+				},
+				"centerPoint": {
+					"automatic": false,
+					"name": "centre",
+					"x": 64,
+					"y": 31
+				},
+				"customCollisionMask": [
+					[
+					{
+						"x": 12.5,
+						"y": 1
+					},
+					{
+						"x": 41.5,
+						"y": 2
+					},
+					{
+						"x": 55.5,
+						"y": 31
+					},
+					{
+						"x": 24.5,
+						"y": 30
+					}
+					]
+				]
+				}
+			]
+			}
+		]
+		}
+	]
+});
+
 describe('gdjs.SpriteRuntimeObject', function() {
 	var runtimeGame = new gdjs.RuntimeGame({variables: [], properties: {windowWidth: 800, windowHeight: 600}});
 	var runtimeScene = new gdjs.RuntimeScene(runtimeGame);
@@ -60,5 +118,23 @@ describe('gdjs.SpriteRuntimeObject', function() {
 			object.setAnimation(0);
 			expect(object.getAnimationName()).to.be('firstAnimation');
 		});
+	});
+
+	it('should properly compute hitboxes', function(){
+		// Create an object with a custom hitbox
+		const object = makeSpriteRuntimeObjectWithCustomHitBox(runtimeScene);
+
+		// Check the hitboxes without any rotation (only the non default origin
+		// which is at 32;16 is to be used).
+		expect(object.getHitBoxes()[0].vertices[0]).to.eql([12.5 - 32, 1 - 16]);
+		expect(object.getHitBoxes()[0].vertices[1]).to.eql([41.5 - 32, 2 - 16]);
+		expect(object.getHitBoxes()[0].vertices[2]).to.eql([55.5 - 32, 31 - 16]);
+		expect(object.getHitBoxes()[0].vertices[3]).to.eql([24.5 - 32, 30 - 16]);
+
+		object.setAngle(90);
+		expect(object.getHitBoxes()[0].vertices[0][0]).to.be.within(61.9999, 62.0001);
+		expect(object.getHitBoxes()[0].vertices[0][1]).to.be.within(-36.5001, -36.49999);
+		expect(object.getHitBoxes()[0].vertices[2][0]).to.be.within(31.999, 32.0001);
+		expect(object.getHitBoxes()[0].vertices[2][1]).to.be.within(6.4999, 6.5001);
 	});
 });

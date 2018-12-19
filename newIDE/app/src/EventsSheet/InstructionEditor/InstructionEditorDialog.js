@@ -1,7 +1,13 @@
-import React from 'react';
+// @flow
+import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import InstructionEditor from './index.js';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 
 const styles = {
   dialogContent: {
@@ -14,7 +20,26 @@ const styles = {
   },
 };
 
-export default class InstructionEditorDialog extends React.Component {
+type Props = {|
+  project: gdProject,
+  layout: ?gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
+  instruction: gdInstruction,
+  isCondition: boolean,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  style?: Object,
+
+  isNewInstruction: boolean,
+  onCancel: () => void,
+  onSubmit: () => void,
+  open: boolean,
+|};
+type State = {||};
+
+export default class InstructionEditorDialog extends React.Component<Props, State> {
   _getTitle() {
     if (this.props.isCondition) {
       return this.props.isNewInstruction
@@ -26,29 +51,30 @@ export default class InstructionEditorDialog extends React.Component {
   }
 
   render() {
+    const {isNewInstruction, onCancel, onSubmit, open, ...otherProps} = this.props;
     const actions = [
       <FlatButton
         label="Cancel"
         primary={false}
-        onClick={this.props.onCancel}
+        onClick={onCancel}
       />,
       <FlatButton
         label="Ok"
         primary={true}
         keyboardFocused={false}
-        onClick={this.props.onSubmit}
+        onClick={onSubmit}
       />,
     ];
 
     return (
       <Dialog
         actions={actions}
-        open={this.props.open}
-        onRequestClose={this.props.onCancel}
+        open={open}
+        onRequestClose={onCancel}
         contentStyle={styles.dialogContent}
         bodyStyle={styles.dialogBody}
       >
-        <InstructionEditor {...this.props} />
+        <InstructionEditor {...otherProps} />
       </Dialog>
     );
   }

@@ -5,14 +5,14 @@ var fs = require('fs');
 var sourceFile = '../../../Binaries/Output/libGD.js/Release/libGD.js';
 var destinationTestDirectory = '../node_modules/libGD.js-for-tests-only';
 
-if (!shell.mkdir('-p', destinationTestDirectory)) {
+if (shell.mkdir('-p', destinationTestDirectory).stderr) {
   shell.echo('❌ Error while creating node_modules folder for libGD.js');
 }
 
 if (shell.test('-f', sourceFile)) {
   if (
-    shell.cp(sourceFile, '../public') &&
-    shell.cp(sourceFile, destinationTestDirectory + '/index.js')
+    !shell.cp(sourceFile, '../public').stderr &&
+    !shell.cp(sourceFile, destinationTestDirectory + '/index.js').stderr
   ) {
     shell.echo(
       '✅ Copied libGD.js from Binaries/Output/libGD.js/Release to public and node_modules folder'
@@ -38,7 +38,7 @@ if (shell.test('-f', sourceFile)) {
 
   var file = fs.createWriteStream('../public/libGD.js');
   https.get(
-    'https://github.com/4ian/GDevelop.js/releases/download/5.0.0-beta34/libGD.js',
+    'https://github.com/4ian/GDevelop.js/releases/download/5.0.0-beta57/libGD.js',
     function(response) {
       if (response.statusCode !== 200) {
         shell.echo(
@@ -52,7 +52,7 @@ if (shell.test('-f', sourceFile)) {
         shell.echo('✅ libGD.js downloaded and stored in public/libGD.js');
 
         if (
-          shell.cp('../public/libGD.js', destinationTestDirectory + '/index.js')
+          !shell.cp('../public/libGD.js', destinationTestDirectory + '/index.js').stderr
         ) {
           shell.echo('✅ Copied libGD.js to node_modules folder');
         } else {

@@ -32,7 +32,6 @@ export const makeTestProject = gd => {
 
   // Create and expose some objects
   const shapePainterObject = new gd.ShapePainterObject('MyShapePainterObject');
-  const adMobObject = new gd.AdMobObject('MyAdMobObject');
   const textObject = new gd.TextObject('MyTextObject');
   const tiledSpriteObject = new gd.TiledSpriteObject('MyTiledSpriteObject');
   const panelSpriteObject = new gd.PanelSpriteObject('MyPanelSpriteObject');
@@ -129,8 +128,8 @@ export const makeTestProject = gd => {
   testLayoutInstance1.setY(15);
 
   // Add layers
-  testLayout.insertNewLayer("GUI", 0);
-  testLayout.insertNewLayer("OtherLayer", 1);
+  testLayout.insertNewLayer('GUI', 0);
+  testLayout.insertNewLayer('OtherLayer', 1);
 
   //Add a few variables
   const testLayoutVariables = testLayout.getVariables();
@@ -249,7 +248,9 @@ export const makeTestProject = gd => {
     const disabledStandardEvt = gd.asStandardEvent(disabledEvent);
     disabledStandardEvt.setDisabled(true);
     disabledStandardEvt.getConditions().push_back(makeKeyPressedCondition());
-    disabledStandardEvt.getActions().push_back(makeDeleteAction('YetAnotherObject'));
+    disabledStandardEvt
+      .getActions()
+      .push_back(makeDeleteAction('YetAnotherObject'));
 
     const subEvent = disabledStandardEvt
       .getSubEvents()
@@ -283,10 +284,54 @@ export const makeTestProject = gd => {
   // Empty layout
   const emptyLayout = project.insertNewLayout('EmptyLayout', 1);
 
+  // Events functions extension
+  const testEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+    'TestExt',
+    0
+  );
+  testEventsFunctionsExtension.setNamespace('MyExt');
+  testEventsFunctionsExtension.setVersion('1.1');
+  testEventsFunctionsExtension.setName('My name');
+  testEventsFunctionsExtension.setFullName('My descriptive name');
+  testEventsFunctionsExtension.setDescription('My description');
+
+  // Events function
+  const testEventsFunction = testEventsFunctionsExtension.insertNewEventsFunction(
+    'MyTestFunction',
+    0
+  );
+
+  const parameter1 = new gd.ParameterMetadata();
+  parameter1.setType('objectList');
+  parameter1.setName('MyObjectWithoutType');
+  parameter1.setDescription('The first object to be used');
+  const parameter2 = new gd.ParameterMetadata();
+  parameter2.setType('expression');
+  parameter2.setName('MyNumber');
+  parameter2.setDescription('Some number');
+  const parameter3 = new gd.ParameterMetadata();
+  parameter3.setType('string');
+  parameter3.setName('MyString');
+  parameter3.setDescription('Some string');
+  const parameter4 = new gd.ParameterMetadata();
+  parameter4.setType('objectList');
+  parameter4.setName('MySpriteObject');
+  parameter4.setDescription('The second object to be used, a sprite');
+  parameter4.setExtraInfo('Sprite');
+  testEventsFunction.getParameters().push_back(parameter1);
+  testEventsFunction.getParameters().push_back(parameter2);
+  testEventsFunction.getParameters().push_back(parameter3);
+  testEventsFunction.getParameters().push_back(parameter4);
+
+  testEventsFunction
+    .getEvents()
+    .insertNewEvent(project, 'BuiltinCommonInstructions::Standard', 0);
+
+  testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction2', 1);
+
   return {
     project,
     shapePainterObject,
-    adMobObject,
     textObject,
     tiledSpriteObject,
     panelSpriteObject,
@@ -300,5 +345,7 @@ export const makeTestProject = gd => {
     testExternalEvents1,
     testExternalEvents2,
     emptyLayout,
+    testEventsFunction,
+    testEventsFunctionsExtension,
   };
 };

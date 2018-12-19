@@ -8,12 +8,20 @@ const gd = global.gd;
 
 const jsExtensions = [
   {
+    name: 'AdMob',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/AdMob/JsExtension.js'),
+  },
+  {
     name: 'FacebookInstantGames',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/FacebookInstantGames/JsExtension.js'),
   },
   {
     name: 'DeviceSensors',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceSensors/JsExtension.js'),
+  },
+  {
+    name: 'DeviceVibration',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceVibration/JsExtension.js'),
   },
 ];
 

@@ -18,6 +18,7 @@ import browserResourceExternalEditors from './ResourcesList/BrowserResourceExter
 import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
 import { getBrowserExporters } from './Export/BrowserExporters';
 import BrowserJsExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
+import { makeBrowserS3EventsFunctionWriter } from './EventsFunctionsExtensionsLoader/BrowserS3EventsFunctionWriter';
 
 export const create = (authentification: Authentification) => {
   Window.setUpContextMenu();
@@ -43,8 +44,9 @@ export const create = (authentification: Authentification) => {
       authentification={authentification}
       extensionsLoader={new BrowserJsExtensionsLoader()}
       initialPathsOrURLsToOpen={appArguments['_']}
+      eventsFunctionWriter={makeBrowserS3EventsFunctionWriter()}
     />
   );
 
   return app;
-}
+};

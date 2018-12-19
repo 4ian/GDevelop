@@ -4,7 +4,6 @@ import PanelSpriteEditor from './Editors/PanelSpriteEditor';
 import SpriteEditor from './Editors/SpriteEditor';
 import EmptyEditor from './Editors/EmptyEditor';
 import ShapePainterEditor from './Editors/ShapePainterEditor';
-import AdMobEditor from './Editors/AdMobEditor';
 import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';
 const gd = global.gd;
 
@@ -67,11 +66,6 @@ export default {
       component: PanelSpriteEditor,
       newObjectCreator: () => new gd.PanelSpriteObject(''),
       castToObjectType: object => gd.asPanelSpriteObject(object),
-    },
-    'AdMobObject::AdMob': {
-      component: AdMobEditor,
-      newObjectCreator: () => new gd.AdMobObject(''),
-      castToObjectType: object => gd.asAdMobObject(object),
     },
     'TextObject::Text': {
       component: TextEditor,

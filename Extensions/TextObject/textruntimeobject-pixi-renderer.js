@@ -1,6 +1,7 @@
 gdjs.TextRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene)
 {
     this._object = runtimeObject;
+    this._fontManager = runtimeScene.getGame().getFontManager();
 
     if ( this._text === undefined ) this._text = new PIXI.Text(" ", {align:"left"});
     this._text.anchor.x = 0.5;
@@ -28,7 +29,7 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
 };
 
 gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
-    var fontName = this._object._fontName ? "\"gdjs_font_" + this._object._fontName + "\"" : 'Arial';
+    var fontName = "\"" + this._fontManager.getFontFamily(this._object._fontName) + "\"";
 
     var style = this._text.style;
     style.fontStyle = this._object._italic ? 'italic' : 'normal';
@@ -40,6 +41,10 @@ gdjs.TextRuntimeObjectPixiRenderer.prototype.updateStyle = function() {
         this._object._color[1],
         this._object._color[2]
     );
+    style.wordWrap = this._object._wrapping;
+    style.wordWrapWidth = this._object._wrappingWidth;
+    style.breakWords = true;
+    this.updatePosition();
 
     // Manually ask the PIXI object to re-render as we changed a style property
     // see http://www.html5gamedevs.com/topic/16924-change-text-style-post-render/

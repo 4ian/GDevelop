@@ -1,7 +1,7 @@
 // @flow
 
 type WatchedComponent = {
-    onHeightsChanged: (Function) => void
+    +onHeightsChanged: (Function) => void
 };
 
 /**
@@ -36,7 +36,7 @@ export default class EventHeightsCache {
 
   setEventHeight(event: gdBaseEvent, height: number) {
     const cachedHeight = this.eventHeights[event.ptr];
-    if (!cachedHeight || cachedHeight !== height) {
+    if (cachedHeight === undefined || cachedHeight !== height) {
       // console.log(event.ptr, 'has a new height', height, 'old:', cachedHeight);
       this._notifyComponent();
     }

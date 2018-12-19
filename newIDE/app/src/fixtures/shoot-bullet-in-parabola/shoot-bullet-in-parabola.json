@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -102,6 +103,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/shoot-bullet-in-parabola/Source.png",
         "kind": "image",
+        "metadata": "",
         "name": "Source.png",
         "smoothed": true,
         "userAdded": true
@@ -110,6 +112,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/shoot-bullet-in-parabola/Target.png",
         "kind": "image",
+        "metadata": "",
         "name": "Target.png",
         "smoothed": true,
         "userAdded": true
@@ -118,6 +121,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/shoot-bullet-in-parabola/Bullet.png",
         "kind": "image",
+        "metadata": "",
         "name": "Bullet.png",
         "smoothed": true,
         "userAdded": true
@@ -1048,6 +1052,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": [
     {

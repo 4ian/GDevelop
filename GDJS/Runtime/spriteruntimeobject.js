@@ -554,8 +554,13 @@ gdjs.SpriteRuntimeObject.prototype._transformToGlobal = function(x, y, result) {
 
     //Rotation
     var oldX = x;
-    x = cx + Math.cos(this.angle/180*3.14159)*(x-cx) - Math.sin(this.angle/180*3.14159)*(y-cy);
-    y = cy + Math.sin(this.angle/180*3.14159)*(oldX-cx) + Math.cos(this.angle/180*3.14159)*(y-cy);
+    var angleInRadians = this.angle/180*Math.PI;
+    var cosValue = Math.cos(angleInRadians); // Only compute cos and sin once (10% faster than doing it twice)
+    var sinValue = Math.sin(angleInRadians);
+    var xToCenterXDelta = x-cx;
+    var yToCenterYDelta = y-cy;
+    x = cx + cosValue*(xToCenterXDelta) - sinValue*(yToCenterYDelta);
+    y = cy + sinValue*(xToCenterXDelta) + cosValue*(yToCenterYDelta);
 
     result.length = 2;
     result[0] = x + this.getDrawableX();

@@ -570,16 +570,16 @@ gdjs.RuntimeObject.prototype.getCenterY = function() {
  * @private
  * @param {number} x The x coordinates of the force
  * @param {number} y The y coordinates of the force
- * @param {number} clearing Set the force clearing
+ * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype._getRecycledForce = function(x, y, clearing) {
+gdjs.RuntimeObject.prototype._getRecycledForce = function(x, y, multiplier) {
     if ( gdjs.RuntimeObject.forcesGarbage.length === 0 )
-        return new gdjs.Force(x, y, clearing);
+        return new gdjs.Force(x, y, multiplier);
     else {
         var recycledForce = gdjs.RuntimeObject.forcesGarbage.pop();
         recycledForce.setX(x);
         recycledForce.setY(y);
-        recycledForce.setClearing(clearing);
+        recycledForce.setMultiplier(multiplier);
         return recycledForce;
     }
 };
@@ -588,23 +588,24 @@ gdjs.RuntimeObject.prototype._getRecycledForce = function(x, y, clearing) {
  * Add a force to the object to move it.
  * @param {number} x The x coordinates of the force
  * @param {number} y The y coordinates of the force
- * @param {number} clearing Set the force clearing
+ * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addForce = function(x,y, clearing) {
-    this._forces.push(this._getRecycledForce(x, y, clearing));
+gdjs.RuntimeObject.prototype.addForce = function(x,y, multiplier) {
+    this._forces.push(this._getRecycledForce(x, y, multiplier));
 };
 
 /**
  * Add a force using polar coordinates.
  * @param {number} angle The angle of the force, in degrees.
  * @param {number} len The length of the force, in pixels.
- * @param {number} clearing Set the force clearing
+ * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, clearing) {
-    var forceX = Math.cos(angle/180*3.14159)*len;
-    var forceY = Math.sin(angle/180*3.14159)*len;
+gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, multiplier) {
+    var angleInRadians = angle/180*3.14159; //TODO: Benchmark with Math.PI
+    var forceX = Math.cos(angleInRadians)*len;
+    var forceY = Math.sin(angleInRadians)*len;
 
-    this._forces.push(this._getRecycledForce(forceX, forceY, clearing));
+    this._forces.push(this._getRecycledForce(forceX, forceY, multiplier));
 };
 
 /**
@@ -612,16 +613,16 @@ gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, clearing) {
  * @param {number} x The target x position
  * @param {number} y The target y position
  * @param {number} len The force length, in pixels.
- * @param {number} clearing Set the force clearing
+ * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, clearing) {
+gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, multiplier) {
 
     var angle = Math.atan2(y - (this.getDrawableY()+this.getCenterY()),
                            x - (this.getDrawableX()+this.getCenterX()));
 
     var forceX = Math.cos(angle)*len;
     var forceY = Math.sin(angle)*len;
-    this._forces.push(this._getRecycledForce(forceX, forceY, clearing));
+    this._forces.push(this._getRecycledForce(forceX, forceY, multiplier));
 };
 
 /**
@@ -629,14 +630,14 @@ gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, clearin
  * (Shortcut for addForceTowardPosition)
  * @param {gdjs.RuntimeObject} object The target object
  * @param {number} len The force length, in pixels.
- * @param {number} clearing Set the force clearing
+ * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addForceTowardObject = function(obj, len, clearing) {
+gdjs.RuntimeObject.prototype.addForceTowardObject = function(obj, len, multiplier) {
     if ( obj == null ) return;
 
     this.addForceTowardPosition(obj.getDrawableX() + obj.getCenterX(),
                                 obj.getDrawableY() + obj.getCenterY(),
-                                len, clearing);
+                                len, multiplier);
 };
 
 /**
@@ -661,14 +662,15 @@ gdjs.RuntimeObject.prototype.hasNoForces = function() {
  */
 gdjs.RuntimeObject.prototype.updateForces = function(elapsedTime) {
     for(var i = 0;i<this._forces.length;) {
-        if(this._forces[i].getClearing() === 0 || this._forces[i].getLength() <= 0.001)
-        {
-            gdjs.RuntimeObject.forcesGarbage.push(this._forces[i]);
+        var force = this._forces[i];
+        var multiplier = force.getMultiplier();
+        if (multiplier === 1) { // Permanent force
+            ++i;
+        } else if (multiplier === 0 || force.getLength() <= 0.001) { // Instant or force disappearing
+            gdjs.RuntimeObject.forcesGarbage.push(force);
             this._forces.remove(i);
-        }
-        else
-        {
-            this._forces[i].setLength(this._forces[i].getLength() - this._forces[i].getLength() * ( 1 - this._forces[i].getClearing() ) * elapsedTime);
+        } else { // Deprecated way of updating forces progressively.
+            force.setLength(force.getLength() - force.getLength() * ( 1 - multiplier ) * elapsedTime);
             ++i;
         }
     }
@@ -713,8 +715,10 @@ gdjs.RuntimeObject.prototype.averageForceAngleIs = function(angle, toleranceInDe
 
 /**
  * Get the hit boxes for the object.<br>
- * The default implementation returns a basic bouding box based on the result of getWidth and
- * getHeight. You should probably redefine updateHitBoxes instead of this function.
+ * The default implementation returns a basic bouding box based the size (getWidth and
+ * getHeight) and the center point of the object (getCenterX and getCenterY). 
+ * 
+ * You should probably redefine updateHitBoxes instead of this function.
  *
  * @return {Array} An array composed of polygon.
  */
@@ -732,35 +736,67 @@ gdjs.RuntimeObject.prototype.getHitBoxes = function() {
 };
 
 /**
- * Update the hit boxes for the object.<br>
- * The default implementation set a basic bouding box based on the result of getWidth and
- * getHeight.
+ * Update the hit boxes for the object.
+ * 
+ * The default implementation set a basic bounding box based on the size (getWidth and
+ * getHeight) and the center point of the object (getCenterX and getCenterY).
+ * Result is cached until invalidated (by a position change, angle change...).
  *
  * You should not call this function by yourself, it is called when necessary by getHitBoxes method.
  * However, you can redefine it if your object need custom hit boxes.
- *
  */
 gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
-
-    //Ensure we're using the default hitbox (a single rectangle)
     this.hitBoxes = this._defaultHitBoxes;
-
     var width = this.getWidth();
     var height = this.getHeight();
-    this.hitBoxes[0].vertices[0][0] =-width/2.0;
-    this.hitBoxes[0].vertices[0][1] =-height/2.0;
-    this.hitBoxes[0].vertices[1][0] =+width/2.0;
-    this.hitBoxes[0].vertices[1][1] =-height/2.0;
-    this.hitBoxes[0].vertices[2][0] =+width/2.0;
-    this.hitBoxes[0].vertices[2][1] =+height/2.0;
-    this.hitBoxes[0].vertices[3][0] =-width/2.0;
-    this.hitBoxes[0].vertices[3][1] =+height/2.0;
+    var centerX = this.getCenterX();
+    var centerY = this.getCenterY();
 
-    this.hitBoxes[0].rotate(this.getAngle()/180*3.14159);
-    this.hitBoxes[0].move(this.getDrawableX()+this.getCenterX(), this.getDrawableY()+this.getCenterY());
+    if (this.getCenterX() === width / 2 && this.getCenterY() === height / 2) {
+        this.hitBoxes[0].vertices[0][0] =-width/2.0;
+        this.hitBoxes[0].vertices[0][1] =-height/2.0;
+        this.hitBoxes[0].vertices[1][0] =+width/2.0;
+        this.hitBoxes[0].vertices[1][1] =-height/2.0;
+        this.hitBoxes[0].vertices[2][0] =+width/2.0;
+        this.hitBoxes[0].vertices[2][1] =+height/2.0;
+        this.hitBoxes[0].vertices[3][0] =-width/2.0;
+        this.hitBoxes[0].vertices[3][1] =+height/2.0;
+        -
+        this.hitBoxes[0].rotate(this.getAngle()/180*Math.PI);
+        this.hitBoxes[0].move(this.getDrawableX()+this.getCenterX(), this.getDrawableY()+this.getCenterY());
+    } else {
+        this.hitBoxes[0].vertices[0][0] = 0;
+        this.hitBoxes[0].vertices[0][1] = 0;
+        this.hitBoxes[0].vertices[1][0] = width;
+        this.hitBoxes[0].vertices[1][1] = 0;
+        this.hitBoxes[0].vertices[2][0] = width;
+        this.hitBoxes[0].vertices[2][1] = height;
+        this.hitBoxes[0].vertices[3][0] = 0;
+        this.hitBoxes[0].vertices[3][1] = height;
+
+        this.hitBoxes[0].move(-centerX, -centerY);
+        this.hitBoxes[0].rotate(this.getAngle()/180*Math.PI);
+        this.hitBoxes[0].move(this.getDrawableX()+centerX, this.getDrawableY()+centerY);
+    }
 };
 
-//Experimental
+/**
+ * @typedef {Object} AABB
+ * @property {Array} min The [x,y] coordinates of the top left point
+ * @property {Array} max The [x,y] coordinates of the bottom right point
+ */
+
+/**
+ * Get the AABB (axis aligned bounding box) for the object.
+ * 
+ * The default implementation uses either the position/size of the object (when angle is 0) or
+ * hitboxes (when angle is not 0) to compute the bounding box.
+ * Result is cached until invalidated (by a position change, angle change...).
+ * 
+ * You should probably redefine updateAABB instead of this function.
+ *
+ * @return {AABB} The bounding box (example: `{min: [10,5], max:[20,10]}`)
+ */
 gdjs.RuntimeObject.prototype.getAABB = function() {
     if ( this.hitBoxesDirty ) {
         this.updateHitBoxes();
@@ -771,11 +807,63 @@ gdjs.RuntimeObject.prototype.getAABB = function() {
     return this.aabb;
 };
 
+/**
+ * Get the AABB (axis aligned bounding box) to be used to determine if the object
+ * is visible on screen. The gdjs.RuntimeScene will hide the renderer object if
+ * the object is not visible on screen ("culling").
+ * 
+ * The default implementation uses the AABB returned by getAABB.
+ * 
+ * If `null` is returned, the object is assumed to be always visible.
+ *
+ * @return {?AABB} The bounding box (example: `{min: [10,5], max:[20,10]}`) or `null`.
+ */
+gdjs.RuntimeObject.prototype.getVisibilityAABB = function() {
+    return this.getAABB();
+};
+
+/**
+ * Update the AABB (axis aligned bounding box) for the object.
+ * 
+ * Default implementation uses either the position/size of the object (when angle is 0) or
+ * hitboxes (when angle is not 0) to compute the bounding box.
+ * 
+ * You should not call this function by yourself, it is called when necessary by getAABB method.
+ * However, you can redefine it if your object can have a faster implementation.
+ */
 gdjs.RuntimeObject.prototype.updateAABB = function() {
-    this.aabb.min[0] = this.getDrawableX();
-    this.aabb.min[1] = this.getDrawableY();
-    this.aabb.max[0] = this.aabb.min[0] + this.getWidth();
-    this.aabb.max[1] = this.aabb.min[1] + this.getHeight();
+    if (this.getAngle() === 0) {
+        // Fast/simple computation of AABB for non rotated object
+        // (works even for object with non default center/origin
+        // because we're using getDrawableX/Y)
+        this.aabb.min[0] = this.getDrawableX();
+        this.aabb.min[1] = this.getDrawableY();
+        this.aabb.max[0] = this.aabb.min[0] + this.getWidth();
+        this.aabb.max[1] = this.aabb.min[1] + this.getHeight();
+    } else {
+        // Use hitboxes if object is rotated to ensure that the AABB
+        // is properly bounding the whole object.
+        // Slower (10-15% slower).
+        var first = true;
+        for(var i = 0;i<this.hitBoxes.length;i++) {
+            for(var j = 0;j<this.hitBoxes[i].vertices.length;j++) {
+                var vertex = this.hitBoxes[i].vertices[j];
+    
+                if (first) { 
+                    this.aabb.min[0] = vertex[0];
+                    this.aabb.max[0] = vertex[0];
+                    this.aabb.min[1] = vertex[1];
+                    this.aabb.max[1] = vertex[1];
+                    first = false;
+                } else {
+                    this.aabb.min[0] = Math.min(this.aabb.min[0], vertex[0]);
+                    this.aabb.max[0] = Math.max(this.aabb.max[0], vertex[0]);
+                    this.aabb.min[1] = Math.min(this.aabb.min[1], vertex[1]);
+                    this.aabb.max[1] = Math.max(this.aabb.max[1], vertex[1]);
+                }
+            }
+        }
+    }
 };
 
 //Behaviors:

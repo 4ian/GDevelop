@@ -19,7 +19,7 @@ class ElectronEventsBridge extends Component {
     );
     ipcRenderer.on(
       'main-menu-close',
-      event => this.editor && this.editor.closeProject(() => {})
+      event => this.editor && this.editor.askToCloseProject(() => {})
     );
     ipcRenderer.on(
       'main-menu-export',

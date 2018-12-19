@@ -10,7 +10,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Animation.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/SpriteObject.h"
-#include "GDCore/Project/ClassWithObjects.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
 #include "GDCpp/Runtime/RuntimeGame.h"

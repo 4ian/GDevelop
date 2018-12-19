@@ -51,7 +51,7 @@ export class Toolbar extends PureComponent {
         )}
         {this.props.showObjectsList && (
           <ToolbarIcon
-            onClick={this.props.openObjectsGroupsList}
+            onClick={this.props.openObjectGroupsList}
             src={'res/ribbon_default/objectsgroups64.png'}
             tooltip={t('Open the objects groups editor')}
           />
@@ -147,6 +147,7 @@ export class Toolbar extends PureComponent {
             { label: '100%', click: () => this.props.setZoomFactor(1.0) },
             { label: '150%', click: () => this.props.setZoomFactor(1.5) },
             { label: '200%', click: () => this.props.setZoomFactor(2.0) },
+            { label: '400%', click: () => this.props.setZoomFactor(4.0) },
           ]}
         />
       </ToolbarGroup>

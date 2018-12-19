@@ -2,18 +2,30 @@
 import * as React from 'react';
 import { AutoSizer } from 'react-virtualized';
 import SortableVirtualizedItemList from '../UI/SortableVirtualizedItemList';
-import Paper from 'material-ui/Paper';
+import Background from '../UI/Background';
 import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
+import optionalRequire from '../Utils/OptionalRequire.js';
+import {
+  createOrUpdateResource,
+  getLocalResourceFullPath,
+  resourceHasValidPath,
+} from './ResourceUtils.js';
+import { type ResourceKind } from './ResourceSource.flow';
+
+const path = optionalRequire('path');
+const glob = optionalRequire('glob');
+const electron = optionalRequire('electron');
+const hasElectron = electron ? true : false;
+
+const IMAGE_EXTENSIONS = 'png,jpg,jpeg,PNG,JPG,JPEG';
+const AUDIO_EXTENSIONS = 'wav,mp3,ogg,WAV,MP3,OGG';
+const FONT_EXTENSIONS = 'ttf,ttc,TTF,TTC';
+
+const gd = global.gd;
 
 const styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    height: '100%',
-    flexDirection: 'column',
-  },
   listContainer: {
     flex: 1,
   },
@@ -79,6 +91,85 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
+  _locateResourceFile = (resource: gdResource) => {
+    const resourceFolderPath = path.dirname(
+      getLocalResourceFullPath(this.props.project, resource.getFile())
+    );
+    electron.shell.openItem(resourceFolderPath);
+  };
+
+  _openResourceFile = (resource: gdResource) => {
+    const resourceFilePath = getLocalResourceFullPath(
+      this.props.project,
+      resource.getFile()
+    );
+    electron.shell.openItem(resourceFilePath);
+  };
+
+  _copyResourceFilePath = (resource: gdResource) => {
+    const resourceFilePath = getLocalResourceFullPath(
+      this.props.project,
+      resource.getFile()
+    );
+    electron.clipboard.writeText(resourceFilePath);
+  };
+
+  _scanForNewResources = (
+    extensions: string,
+    createResource: () => gdResource
+  ) => {
+    const project = this.props.project;
+    const resourcesManager = project.getResourcesManager();
+    const projectPath = path.dirname(project.getProjectFile());
+
+    const getDirectories = (src, callback) => {
+      glob(src + '/**/*.{' + extensions + '}', callback);
+    };
+    getDirectories(projectPath, (err, res) => {
+      if (err) {
+        console.error('Error loading ', err);
+      } else {
+        res.forEach(pathFound => {
+          const fileName = path.relative(projectPath, pathFound);
+          if (!resourcesManager.hasResource(fileName)) {
+            createOrUpdateResource(project, createResource(), fileName);
+            console.info(`${fileName} added to project.`);
+          }
+        });
+      }
+      this.forceUpdate();
+    });
+  };
+
+  _removeUnusedResources = (resourceType: ResourceKind) => {
+    const { project } = this.props;
+    gd.ProjectResourcesAdder
+      .getAllUseless(project, resourceType)
+      .toJSArray()
+      .forEach(resourceName => {
+        console.info(
+          `Removing unused` + resourceType + ` resource: ${resourceName}`
+        );
+      });
+    gd.ProjectResourcesAdder.removeAllUseless(project, resourceType);
+    this.forceUpdate();
+  };
+
+  _removeAllResourcesWithInvalidPath = () => {
+    const { project } = this.props;
+    const resourcesManager = project.getResourcesManager();
+    resourcesManager
+      .getAllResourceNames()
+      .toJSArray()
+      .forEach(resourceName => {
+        if (!resourceHasValidPath(project, resourceName)) {
+          resourcesManager.removeResource(resourceName);
+          console.info('Removed due to invalid path: ' + resourceName);
+        }
+      });
+    this.forceUpdate();
+  };
+
   _editName = (resource: ?gdResource) => {
     this.setState(
       {
@@ -127,8 +218,81 @@ export default class ResourcesList extends React.Component<Props, State> {
         click: () => this._editName(resource),
       },
       {
-        label: 'Delete',
+        label: 'Remove',
         click: () => this._deleteResource(resource),
+      },
+      { type: 'separator' },
+      {
+        label: 'Open File',
+        click: () => this._openResourceFile(resource),
+        enabled: hasElectron,
+      },
+      {
+        label: 'Locate File',
+        click: () => this._locateResourceFile(resource),
+        enabled: hasElectron,
+      },
+      {
+        label: 'Copy File Path',
+        click: () => this._copyResourceFilePath(resource),
+        enabled: hasElectron,
+      },
+      { type: 'separator' },
+      {
+        label: 'Scan for Images',
+        click: () => {
+          this._scanForNewResources(
+            IMAGE_EXTENSIONS,
+            () => new gd.ImageResource()
+          );
+        },
+        enabled: hasElectron,
+      },
+      {
+        label: 'Scan for Audio',
+        click: () => {
+          this._scanForNewResources(
+            AUDIO_EXTENSIONS,
+            () => new gd.AudioResource()
+          );
+        },
+        enabled: hasElectron,
+      },
+      {
+        label: 'Scan for Fonts',
+        click: () => {
+          this._scanForNewResources(
+            FONT_EXTENSIONS,
+            () => new gd.FontResource()
+          );
+        },
+        enabled: hasElectron,
+      },
+      { type: 'separator' },
+      {
+        label: 'Remove Unused Images',
+        click: () => {
+          this._removeUnusedResources('image');
+        },
+      },
+      {
+        label: 'Remove Unused Audio',
+        click: () => {
+          this._removeUnusedResources('audio');
+        },
+      },
+      {
+        label: 'Remove Unused Fonts',
+        click: () => {
+          this._removeUnusedResources('font');
+        },
+      },
+      {
+        label: 'Remove Resources with Invalid Path',
+        click: () => {
+          this._removeAllResourcesWithInvalidPath();
+        },
+        enabled: hasElectron,
       },
     ];
   };
@@ -144,13 +308,13 @@ export default class ResourcesList extends React.Component<Props, State> {
       .map(resourceName => resourcesManager.getResource(resourceName));
     const filteredList = filterResourcesList(allResourcesList, searchText);
 
-    // Force List component to be mounted again if project or objectsContainer
+    // Force List component to be mounted again if project
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
     const listKey = project.ptr;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -166,9 +330,9 @@ export default class ResourcesList extends React.Component<Props, State> {
                 onRename={this._rename}
                 onSortEnd={({ oldIndex, newIndex }) =>
                   this._move(oldIndex, newIndex)}
-                helperClass="sortable-helper"
-                distance={30}
                 buildMenuTemplate={this._renderResourceMenuTemplate}
+                helperClass="sortable-helper"
+                distance={20}
               />
             )}
           </AutoSizer>
@@ -181,7 +345,7 @@ export default class ResourcesList extends React.Component<Props, State> {
               searchText: text,
             })}
         />
-      </Paper>
+      </Background>
     );
   }
 }

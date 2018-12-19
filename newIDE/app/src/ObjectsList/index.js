@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { ListItem } from 'material-ui/List';
-import Paper from 'material-ui/Paper';
+import Background from '../UI/Background';
 import SearchBar from 'material-ui-search-bar';
 import ObjectRow from './ObjectRow';
 import NewObjectDialog from './NewObjectDialog';
@@ -25,12 +25,6 @@ import { CLIPBOARD_KIND } from './ClipboardKind';
 
 const listItemHeight = 48;
 const styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    height: '100%',
-    flexDirection: 'column',
-  },
   listContainer: {
     flex: 1,
   },
@@ -59,7 +53,7 @@ class ObjectsList extends Component<*, *> {
   }
 
   render() {
-    let { height, width, fullList, project, selectedObjectName } = this.props;
+    let { height, width, fullList, project, selectedObjectNames } = this.props;
 
     return (
       <List
@@ -121,10 +115,12 @@ class ObjectsList extends Component<*, *> {
               onAddNewObject={this.props.onAddNewObject}
               editingName={nameBeingEdited}
               getThumbnail={this.props.getThumbnail}
-              selected={
-                objectWithContext.object.getName() === selectedObjectName
-              }
               onObjectSelected={this.props.onObjectSelected}
+              selected={
+                selectedObjectNames.indexOf(
+                  objectWithContext.object.getName()
+                ) !== -1
+              }
             />
           );
         }}
@@ -183,7 +179,7 @@ export default class ObjectsListContainer extends React.Component<
     )
       return true;
 
-    if (this.props.selectedObjectName !== nextProps.selectedObjectName)
+    if (this.props.selectedObjectNames !== nextProps.selectedObjectNames)
       return true;
 
     if (
@@ -343,6 +339,8 @@ export default class ObjectsListContainer extends React.Component<
   };
 
   _move = (oldIndex: number, newIndex: number) => {
+    if (!this.props.canMoveObjects) return;
+
     const { project, objectsContainer } = this.props;
 
     const isInContainerObjectsList =
@@ -363,6 +361,19 @@ export default class ObjectsListContainer extends React.Component<
     }
 
     this.forceUpdateList();
+  };
+
+  _onStartDraggingObject = ({ index }: { index: number }) => {
+    const { project, objectsContainer } = this.props;
+
+    const isInContainerObjectsList = index < this.containerObjectsList.length;
+    if (isInContainerObjectsList) {
+      this.props.onStartDraggingObject(objectsContainer.getObjectAt(index));
+    } else {
+      const projectIndex = index - this.containerObjectsList.length;
+
+      this.props.onStartDraggingObject(project.getObjectAt(projectIndex));
+    }
   };
 
   _setAsGlobalObject = (objectWithContext: ObjectWithContext) => {
@@ -424,7 +435,7 @@ export default class ObjectsListContainer extends React.Component<
     const listKey = project.ptr + ';' + objectsContainer.ptr;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (
@@ -437,7 +448,7 @@ export default class ObjectsListContainer extends React.Component<
                 height={height}
                 renamedObjectWithScope={this.state.renamedObjectWithScope}
                 getThumbnail={this.props.getThumbnail}
-                selectedObjectName={this.props.selectedObjectName}
+                selectedObjectNames={this.props.selectedObjectNames}
                 onObjectSelected={this.props.onObjectSelected}
                 onEditObject={this.props.onEditObject}
                 onCopyObject={this._copyObject}
@@ -451,10 +462,13 @@ export default class ObjectsListContainer extends React.Component<
                 onEditVariables={this._editVariables}
                 onDelete={this._deleteObject}
                 onRename={this._rename}
-                onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)}
+                onSortStart={this._onStartDraggingObject}
+                onSortEnd={({ oldIndex, newIndex }) => {
+                  this.props.onEndDraggingObject();
+                  this._move(oldIndex, newIndex);
+                }}
                 helperClass="sortable-helper"
-                distance={30}
+                distance={20}
               />
             )}
           </AutoSizer>
@@ -488,7 +502,7 @@ export default class ObjectsListContainer extends React.Component<
             emptyExplanationSecondMessage="For example, you can have a variable called Life representing the health of the object."
           />
         )}
-      </Paper>
+      </Background>
     );
   }
 }

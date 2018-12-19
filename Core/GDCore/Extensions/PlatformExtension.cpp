@@ -388,7 +388,7 @@ void PlatformExtension::SetNameSpace(gd::String nameSpace_) {
     return;
   }
 
-  nameSpace = nameSpace_ + "::";
+  nameSpace = nameSpace_ + GetNamespaceSeparator();
 }
 
 std::vector<gd::String> PlatformExtension::GetBuiltinExtensionsNames() {

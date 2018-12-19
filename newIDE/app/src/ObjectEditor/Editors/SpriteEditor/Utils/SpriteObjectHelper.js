@@ -1,5 +1,6 @@
 import { mapVector, mapFor } from '../../../../Utils/MapFor';
 import every from 'lodash/every';
+const gd = global.gd;
 
 /**
  * Return the specified animation, direction and sprite for a SpriteObject.
@@ -226,6 +227,36 @@ export const deleteSpritesFromAnimation = (animation, spritePtrs) => {
       spriteIndex--
     ) {
       if (spritesToDelete[spriteIndex]) direction.removeSprite(spriteIndex);
+    }
+  });
+};
+
+export const duplicateSpritesInAnimation = (animation, spritePtrs) => {
+  mapFor(0, animation.getDirectionsCount(), i => {
+    const direction = animation.getDirection(i);
+
+    const spritesToDuplicate = mapFor(0, direction.getSpritesCount(), j => {
+      const sprite = direction.getSprite(j);
+
+      return !!spritePtrs[sprite.ptr];
+    });
+
+    // Iterate from the end to the beginning to avoid invalidating indexes.
+    for (
+      let spriteIndex = direction.getSpritesCount() - 1;
+      spriteIndex >= 0;
+      spriteIndex--
+    ) {
+      if (spritesToDuplicate[spriteIndex]) {
+        const spriteToDuplicate = direction.getSprite(spriteIndex);
+        const newSprite = new gd.Sprite();
+        newSprite.setImageName(spriteToDuplicate.getImageName());
+        copySpritePoints(spriteToDuplicate, newSprite);
+        copySpritePolygons(spriteToDuplicate, newSprite);
+
+        direction.addSprite(newSprite);
+        direction.moveSprite(direction.getSpritesCount() - 1, spriteIndex);
+      }
     }
   });
 };

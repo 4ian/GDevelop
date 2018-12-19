@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -105,6 +106,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/terrain.png",
         "kind": "image",
+        "metadata": "",
         "name": "terrain.png",
         "smoothed": true,
         "userAdded": true
@@ -113,6 +115,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/barre.png",
         "kind": "image",
+        "metadata": "",
         "name": "barre.png",
         "smoothed": true,
         "userAdded": true
@@ -121,6 +124,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/balle.png",
         "kind": "image",
+        "metadata": "",
         "name": "balle.png",
         "smoothed": true,
         "userAdded": true
@@ -129,6 +133,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick.png",
         "kind": "image",
+        "metadata": "",
         "name": "brick.png",
         "smoothed": true,
         "userAdded": true
@@ -137,6 +142,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/balle-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "balle-1.png",
         "smoothed": true,
         "userAdded": false
@@ -145,6 +151,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-1-0.png",
         "kind": "image",
+        "metadata": "",
         "name": "brick-1-0.png",
         "smoothed": true,
         "userAdded": false
@@ -153,6 +160,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "brick-1.png",
         "smoothed": true,
         "userAdded": true
@@ -161,6 +169,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-green-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "brick-green-1.png",
         "smoothed": true,
         "userAdded": true
@@ -169,6 +178,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-red-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "brick-red-1.png",
         "smoothed": true,
         "userAdded": true
@@ -177,6 +187,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-yellow-1.png",
         "kind": "image",
+        "metadata": "",
         "name": "brick-yellow-1.png",
         "smoothed": true,
         "userAdded": true
@@ -185,6 +196,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-red.png",
         "kind": "image",
+        "metadata": "",
         "name": "brick-red.png",
         "smoothed": true,
         "userAdded": true
@@ -193,6 +205,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-green.png",
         "kind": "image",
+        "metadata": "",
         "name": "brick-green.png",
         "smoothed": true,
         "userAdded": true
@@ -201,6 +214,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/breakout/brick-yellow.png",
         "kind": "image",
+        "metadata": "",
         "name": "brick-yellow.png",
         "smoothed": true,
         "userAdded": true
@@ -1834,6 +1848,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [
     {
       "associatedLayout": "Pong",

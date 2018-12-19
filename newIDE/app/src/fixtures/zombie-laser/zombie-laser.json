@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -117,6 +118,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/TopDownSoldier.png",
         "kind": "image",
+        "metadata": "",
         "name": "TopDownSoldier.png",
         "smoothed": true,
         "userAdded": true
@@ -125,6 +127,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/TopDownWall.png",
         "kind": "image",
+        "metadata": "",
         "name": "TopDownWall.png",
         "smoothed": true,
         "userAdded": true
@@ -133,6 +136,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/TopDownZombie.png",
         "kind": "image",
+        "metadata": "",
         "name": "TopDownZombie.png",
         "smoothed": true,
         "userAdded": true
@@ -141,6 +145,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/Camera.png",
         "kind": "image",
+        "metadata": "",
         "name": "Camera.png",
         "smoothed": true,
         "userAdded": true
@@ -149,6 +154,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/2DWoodBox.jpg",
         "kind": "image",
+        "metadata": "",
         "name": "2DWoodBox.jpg",
         "smoothed": true,
         "userAdded": true
@@ -157,6 +163,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/block.png",
         "kind": "image",
+        "metadata": "",
         "name": "block.png",
         "smoothed": true,
         "userAdded": true
@@ -165,6 +172,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/dirtball.png",
         "kind": "image",
+        "metadata": "",
         "name": "dirtball.png",
         "smoothed": true,
         "userAdded": true
@@ -173,6 +181,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/Foliage.png",
         "kind": "image",
+        "metadata": "",
         "name": "Foliage.png",
         "smoothed": true,
         "userAdded": true
@@ -181,6 +190,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/symbol.png",
         "kind": "image",
+        "metadata": "",
         "name": "symbol.png",
         "smoothed": true,
         "userAdded": true
@@ -189,6 +199,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/zombie-laser/ExplosionTexture.png",
         "kind": "image",
+        "metadata": "",
         "name": "ExplosionTexture.png",
         "smoothed": true,
         "userAdded": true
@@ -3384,6 +3395,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

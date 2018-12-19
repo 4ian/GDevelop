@@ -11,9 +11,8 @@
 #include "GDCore/String.h"
 namespace gd {
 class EventsList;
-class Layout;
+class ObjectsContainer;
 class Platform;
-class Project;
 class ExternalEvents;
 class BaseEvent;
 class Instruction;
@@ -77,8 +76,8 @@ class GD_CORE_API EventsRefactorer {
    * events ).
    */
   static void RenameObjectInEvents(const gd::Platform& platform,
-                                   gd::Project& project,
-                                   gd::Layout& layout,
+                                   gd::ObjectsContainer& project,
+                                   gd::ObjectsContainer& layout,
                                    gd::EventsList& events,
                                    gd::String oldName,
                                    gd::String newName);
@@ -87,8 +86,8 @@ class GD_CORE_API EventsRefactorer {
    * Remove all actions or conditions using an object
    */
   static void RemoveObjectInEvents(const gd::Platform& platform,
-                                   gd::Project& project,
-                                   gd::Layout& layout,
+                                   gd::ObjectsContainer& project,
+                                   gd::ObjectsContainer& layout,
                                    gd::EventsList& events,
                                    gd::String name);
 
@@ -98,8 +97,8 @@ class GD_CORE_API EventsRefactorer {
    * \return A vector containing EventsSearchResult objects filled with events
    * containing the string
    */
-  static std::vector<EventsSearchResult> SearchInEvents(gd::Project& project,
-                                                        gd::Layout& layout,
+  static std::vector<EventsSearchResult> SearchInEvents(gd::ObjectsContainer& project,
+                                                        gd::ObjectsContainer& layout,
                                                         gd::EventsList& events,
                                                         gd::String search,
                                                         bool matchCase,
@@ -109,8 +108,8 @@ class GD_CORE_API EventsRefactorer {
   /**
    * Replace all occurrences of a gd::String in events
    */
-  static void ReplaceStringInEvents(gd::Project& project,
-                                    gd::Layout& layout,
+  static void ReplaceStringInEvents(gd::ObjectsContainer& project,
+                                    gd::ObjectsContainer& layout,
                                     gd::EventsList& events,
                                     gd::String toReplace,
                                     gd::String newString,
@@ -128,8 +127,8 @@ class GD_CORE_API EventsRefactorer {
    * \return true if something was modified.
    */
   static bool RenameObjectInActions(const gd::Platform& platform,
-                                    gd::Project& project,
-                                    gd::Layout& layout,
+                                    gd::ObjectsContainer& project,
+                                    gd::ObjectsContainer& layout,
                                     gd::InstructionsList& instructions,
                                     gd::String oldName,
                                     gd::String newName);
@@ -141,8 +140,8 @@ class GD_CORE_API EventsRefactorer {
    * \return true if something was modified.
    */
   static bool RenameObjectInConditions(const gd::Platform& platform,
-                                       gd::Project& project,
-                                       gd::Layout& layout,
+                                       gd::ObjectsContainer& project,
+                                       gd::ObjectsContainer& layout,
                                        gd::InstructionsList& instructions,
                                        gd::String oldName,
                                        gd::String newName);
@@ -153,8 +152,8 @@ class GD_CORE_API EventsRefactorer {
    * \return true if something was modified.
    */
   static bool RemoveObjectInConditions(const gd::Platform& platform,
-                                       gd::Project& project,
-                                       gd::Layout& layout,
+                                       gd::ObjectsContainer& project,
+                                       gd::ObjectsContainer& layout,
                                        gd::InstructionsList& conditions,
                                        gd::String name);
 
@@ -164,8 +163,8 @@ class GD_CORE_API EventsRefactorer {
    * \return true if something was modified.
    */
   static bool RemoveObjectInActions(const gd::Platform& platform,
-                                    gd::Project& project,
-                                    gd::Layout& layout,
+                                    gd::ObjectsContainer& project,
+                                    gd::ObjectsContainer& layout,
                                     gd::InstructionsList& conditions,
                                     gd::String name);
 
@@ -174,8 +173,8 @@ class GD_CORE_API EventsRefactorer {
    *
    * \return true if something was modified.
    */
-  static bool ReplaceStringInConditions(gd::Project& project,
-                                        gd::Layout& layout,
+  static bool ReplaceStringInConditions(gd::ObjectsContainer& project,
+                                        gd::ObjectsContainer& layout,
                                         gd::InstructionsList& conditions,
                                         gd::String toReplace,
                                         gd::String newString,
@@ -186,20 +185,20 @@ class GD_CORE_API EventsRefactorer {
    *
    * \return true if something was modified.
    */
-  static bool ReplaceStringInActions(gd::Project& project,
-                                     gd::Layout& layout,
+  static bool ReplaceStringInActions(gd::ObjectsContainer& project,
+                                     gd::ObjectsContainer& layout,
                                      gd::InstructionsList& conditions,
                                      gd::String toReplace,
                                      gd::String newString,
                                      bool matchCase);
 
-  static bool SearchStringInActions(gd::Project& project,
-                                    gd::Layout& layout,
+  static bool SearchStringInActions(gd::ObjectsContainer& project,
+                                    gd::ObjectsContainer& layout,
                                     gd::InstructionsList& actions,
                                     gd::String search,
                                     bool matchCase);
-  static bool SearchStringInConditions(gd::Project& project,
-                                       gd::Layout& layout,
+  static bool SearchStringInConditions(gd::ObjectsContainer& project,
+                                       gd::ObjectsContainer& layout,
                                        gd::InstructionsList& conditions,
                                        gd::String search,
                                        bool matchCase);

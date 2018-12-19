@@ -370,8 +370,8 @@
 		<Unit filename="GDCore/IDE/Events/ExpressionsCorrectnessTesting.h" />
 		<Unit filename="GDCore/IDE/ExtensionsLoader.cpp" />
 		<Unit filename="GDCore/IDE/ExtensionsLoader.h" />
-		<Unit filename="GDCore/IDE/Project/ImagesUsedInventorizer.cpp" />
-		<Unit filename="GDCore/IDE/Project/ImagesUsedInventorizer.h" />
+		<Unit filename="GDCore/IDE/Project/ResourcesInUseHelper.cpp" />
+		<Unit filename="GDCore/IDE/Project/ResourcesInUseHelper.h" />
 		<Unit filename="GDCore/Extensions/Metadata/MetadataProvider.cpp" />
 		<Unit filename="GDCore/Extensions/Metadata/MetadataProvider.h" />
 		<Unit filename="GDCore/IDE/PlatformLoader.cpp" />
@@ -406,8 +406,8 @@
 		<Unit filename="GDCore/Project/BehaviorsSharedData.h" />
 		<Unit filename="GDCore/Project/ChangesNotifier.cpp" />
 		<Unit filename="GDCore/Project/ChangesNotifier.h" />
-		<Unit filename="GDCore/Project/ClassWithObjects.cpp" />
-		<Unit filename="GDCore/Project/ClassWithObjects.h" />
+		<Unit filename="GDCore/Project/ObjectsContainer.cpp" />
+		<Unit filename="GDCore/Project/ObjectsContainer.h" />
 		<Unit filename="GDCore/Project/ExternalEvents.cpp" />
 		<Unit filename="GDCore/Project/ExternalEvents.h" />
 		<Unit filename="GDCore/Project/ExternalLayout.cpp" />

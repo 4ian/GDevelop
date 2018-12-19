@@ -4,8 +4,13 @@
  * reserved. This project is released under the MIT License.
  */
 #include "WholeProjectRefactorer.h"
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/DependenciesAnalyzer.h"
+#include "GDCore/IDE/Events/ArbitraryEventsWorker.h"
 #include "GDCore/IDE/Events/EventsRefactorer.h"
+#include "GDCore/IDE/Events/ExpressionsRenamer.h"
+#include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
@@ -15,6 +20,105 @@
 #include "GDCore/String.h"
 
 namespace gd {
+
+void WholeProjectRefactorer::ExposeProjectEvents(
+    gd::Project& project, gd::ArbitraryEventsWorker& worker) {
+  // See also gd::Project::ExposeResources for a method that traverse the whole
+  // project (this time for resources).
+
+  // Add layouts resources
+  for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
+    worker.Launch(project.GetLayout(s).GetEvents());
+  }
+  // Add external events resources
+  for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
+    worker.Launch(project.GetExternalEvents(s).GetEvents());
+  }
+  // Add events functions extensions resources
+  for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
+       e++) {
+    auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
+    for (auto&& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
+      worker.Launch(eventsFunction->GetEvents());
+    }
+  }
+}
+void WholeProjectRefactorer::RenameEventsFunctionsExtension(
+    gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::String& oldName,
+    const gd::String& newName) {
+  auto renameEventsFunction =
+      [&project, &oldName, &newName](const gd::EventsFunction& eventsFunction) {
+        auto separator = gd::PlatformExtension::GetNamespaceSeparator();
+        gd::String oldType = oldName + separator + eventsFunction.GetName();
+        gd::String newType = newName + separator + eventsFunction.GetName();
+
+        if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
+            eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+          gd::InstructionsTypeRenamer renamer =
+              gd::InstructionsTypeRenamer(project, oldType, newType);
+          ExposeProjectEvents(project, renamer);
+        } else if (eventsFunction.GetFunctionType() ==
+                       gd::EventsFunction::Expression ||
+                   eventsFunction.GetFunctionType() ==
+                       gd::EventsFunction::StringExpression) {
+          gd::ExpressionsRenamer renamer = gd::ExpressionsRenamer(
+              project.GetCurrentPlatform(), oldType, newType);
+          ExposeProjectEvents(project, renamer);
+        }
+      };
+
+  // Order is important: we first rename the expressions then the instructions,
+  // to avoid being unable to fetch the metadata (the types of parameters) of
+  // instructions after they are renamed.
+  for (auto&& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
+    if (eventsFunction->GetFunctionType() == gd::EventsFunction::Expression ||
+        eventsFunction->GetFunctionType() ==
+            gd::EventsFunction::StringExpression) {
+      renameEventsFunction(*eventsFunction);
+    }
+  }
+  for (auto&& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
+    if (eventsFunction->GetFunctionType() == gd::EventsFunction::Action ||
+        eventsFunction->GetFunctionType() == gd::EventsFunction::Condition) {
+      renameEventsFunction(*eventsFunction);
+    }
+  }
+}
+
+/**
+ * \brief Refactor the project after an events function is renamed
+ */
+void WholeProjectRefactorer::RenameEventsFunction(
+    gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::String& oldFunctionName,
+    const gd::String& newFunctionName) {
+  if (!eventsFunctionsExtension.HasEventsFunctionNamed(oldFunctionName)) return;
+
+  const gd::EventsFunction& eventsFunction =
+      eventsFunctionsExtension.GetEventsFunction(oldFunctionName);
+  auto separator = gd::PlatformExtension::GetNamespaceSeparator();
+  gd::String oldType =
+      eventsFunctionsExtension.GetName() + separator + oldFunctionName;
+  gd::String newType =
+      eventsFunctionsExtension.GetName() + separator + newFunctionName;
+
+  if (eventsFunction.GetFunctionType() == gd::EventsFunction::Action ||
+      eventsFunction.GetFunctionType() == gd::EventsFunction::Condition) {
+    gd::InstructionsTypeRenamer renamer =
+        gd::InstructionsTypeRenamer(project, oldType, newType);
+    ExposeProjectEvents(project, renamer);
+  } else if (eventsFunction.GetFunctionType() ==
+                 gd::EventsFunction::Expression ||
+             eventsFunction.GetFunctionType() ==
+                 gd::EventsFunction::StringExpression) {
+    gd::ExpressionsRenamer renamer =
+        gd::ExpressionsRenamer(project.GetCurrentPlatform(), oldType, newType);
+    ExposeProjectEvents(project, renamer);
+  }
+}
 
 void WholeProjectRefactorer::ObjectRemovedInLayout(gd::Project& project,
                                                    gd::Layout& layout,

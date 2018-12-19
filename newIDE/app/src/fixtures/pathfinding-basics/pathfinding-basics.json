@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -102,6 +103,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding-basics/manBlue_stand.png",
         "kind": "image",
+        "metadata": "",
         "name": "manBlue_stand.png",
         "smoothed": true,
         "userAdded": false
@@ -110,6 +112,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/pathfinding-basics/tile_205.png",
         "kind": "image",
+        "metadata": "",
         "name": "tile_205.png",
         "smoothed": true,
         "userAdded": false
@@ -895,6 +898,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

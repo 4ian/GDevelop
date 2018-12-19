@@ -19,6 +19,17 @@ const editors: Array<ResourceExternalEditor> = [
       );
     },
   },
+  {
+    name: 'jfxr-app',
+    displayName: 'Edit with Jfxr',
+    kind: 'audio',
+    edit: () => {
+      sendExternalEditorOpened('jfxr');
+      Window.showMessageBox(
+        'This feature is only supported in the desktop version for now!\nDownload it from GDevelop website.'
+      );
+    },
+  }
 ];
 
 export default editors;

@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -102,6 +103,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/move-camera-to-position/orange_sprite.png",
         "kind": "image",
+        "metadata": "",
         "name": "orange_sprite.png",
         "smoothed": true,
         "userAdded": true
@@ -110,6 +112,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/move-camera-to-position/bg_wood.png",
         "kind": "image",
+        "metadata": "",
         "name": "bg_wood.png",
         "smoothed": true,
         "userAdded": true
@@ -621,6 +624,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

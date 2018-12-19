@@ -97,7 +97,7 @@ gdjs.RuntimeGameCocosRenderer.getScreenHeight = function() {
 /**
  * Open the given URL in the system browser
  */
-gdjs.RuntimeGameCocosRenderer.prototype.openURL = function() {
+gdjs.RuntimeGameCocosRenderer.prototype.openURL = function(url) {
     // Try to detect the environment to use the most adapted
     // way of opening an URL.
     if (typeof cc !== "undefined" && cc.sys && cc.sys.openURL) {

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import Paper from 'material-ui/Paper';
+import Background from '../../UI/Background';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
@@ -8,12 +8,6 @@ import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 
 const styles = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    flex: 1,
-    width: '100%',
-  },
   imagePreview: { flex: 1 },
   propertiesContainer: {
     padding: 10,
@@ -103,12 +97,12 @@ export default class ResourcePropertiesEditor extends React.Component<
     const { resources } = this.props;
 
     return (
-      <Paper style={styles.container}>
+      <Background>
         {this._renderPreview()}
         {!resources || !resources.length
           ? this._renderEmpty()
           : this._renderResourcesProperties()}
-      </Paper>
+      </Background>
     );
   }
 }

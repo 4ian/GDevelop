@@ -60,6 +60,13 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
   };
 
   _getFieldValue(instances: Instances, field: Field, defaultValue?: any): any {
+    if (!instances[0]) {
+      console.log(
+        'PropertiesEditor._getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+      );
+      return defaultValue;
+    }
+
     let value = field.getValue(instances[0]);
     for (var i = 1; i < instances.length; ++i) {
       if (value !== field.getValue(instances[i])) {

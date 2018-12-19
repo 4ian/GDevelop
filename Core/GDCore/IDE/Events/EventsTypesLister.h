@@ -5,7 +5,6 @@
  */
 #ifndef EventsTypesLister_H
 #define EventsTypesLister_H
-#include <iostream>
 #include <map>
 #include <memory>
 #include <vector>

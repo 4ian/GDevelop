@@ -170,7 +170,12 @@ export default class PointsEditor extends Component {
           resourcesLoader={resourcesLoader}
           project={project}
         >
-          {hasValidSprite && <PointsPreview pointsContainer={sprite} />}
+          {hasValidSprite && (
+            <PointsPreview
+              pointsContainer={sprite}
+              onPointsUpdated={this._updatePoints}
+            />
+          )}
         </ImagePreview>
         <Line>
           <Column expand>

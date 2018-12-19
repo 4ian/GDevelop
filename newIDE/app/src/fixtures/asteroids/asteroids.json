@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -105,6 +106,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/debrish.png",
         "kind": "image",
+        "metadata": "",
         "name": "debrish.png",
         "smoothed": false,
         "userAdded": true
@@ -113,6 +115,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/larg_asteroid_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "larg_asteroid_1.png",
         "smoothed": false,
         "userAdded": true
@@ -121,6 +124,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/larg_asteroid_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "larg_asteroid_2.png",
         "smoothed": false,
         "userAdded": true
@@ -129,6 +133,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/larg_asteroid_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "larg_asteroid_3.png",
         "smoothed": false,
         "userAdded": true
@@ -137,6 +142,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/medium_asteroid_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "medium_asteroid_1.png",
         "smoothed": false,
         "userAdded": true
@@ -145,6 +151,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/medium_asteroid_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "medium_asteroid_2.png",
         "smoothed": false,
         "userAdded": true
@@ -153,6 +160,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/medium_asteroid_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "medium_asteroid_3.png",
         "smoothed": false,
         "userAdded": true
@@ -161,6 +169,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/small_asteroid_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "small_asteroid_1.png",
         "smoothed": false,
         "userAdded": true
@@ -169,6 +178,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/small_asteroid_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "small_asteroid_2.png",
         "smoothed": false,
         "userAdded": true
@@ -177,6 +187,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/asteroids/small_asteroid_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "small_asteroid_3.png",
         "smoothed": false,
         "userAdded": true
@@ -185,6 +196,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/ships/ship_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "ship_1.png",
         "smoothed": false,
         "userAdded": true
@@ -193,6 +205,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/ships/ship_bullet.png",
         "kind": "image",
+        "metadata": "",
         "name": "ship_bullet.png",
         "smoothed": false,
         "userAdded": true
@@ -201,6 +214,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/ships/ship_part_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "ship_part_1.png",
         "smoothed": false,
         "userAdded": true
@@ -209,6 +223,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/ships/ship_part_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "ship_part_2.png",
         "smoothed": false,
         "userAdded": true
@@ -217,6 +232,7 @@
         "alwaysLoaded": true,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/ships/ship_part_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "ship_part_3.png",
         "smoothed": false,
         "userAdded": true
@@ -225,6 +241,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight22.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight22.png",
         "smoothed": true,
         "userAdded": false
@@ -233,6 +250,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight23.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight23.png",
         "smoothed": true,
         "userAdded": false
@@ -241,6 +259,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight34.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight34.png",
         "smoothed": true,
         "userAdded": false
@@ -249,6 +268,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/asteroids/assets/gui/flatLight35.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatLight35.png",
         "smoothed": true,
         "userAdded": false
@@ -8194,6 +8214,7 @@
       ]
     }
   ],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

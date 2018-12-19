@@ -1,7 +1,8 @@
-import React, { Component } from 'react';
-
+// @flow
+import * as React from 'react';
+import uniq from 'lodash/uniq';
 import ObjectsList from '../ObjectsList';
-import ObjectsGroupsList from '../ObjectsGroupsList';
+import ObjectGroupsList from '../ObjectGroupsList';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 import InstancesEditor from '../InstancesEditor';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
@@ -10,7 +11,7 @@ import LayersList from '../LayersList';
 import LayerRemoveDialog from '../LayersList/LayerRemoveDialog';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
 import ObjectEditorDialog from '../ObjectEditor/ObjectEditorDialog';
-import ObjectsGroupEditorDialog from '../ObjectsGroupEditor/ObjectsGroupEditorDialog';
+import ObjectGroupEditorDialog from '../ObjectGroupEditor/ObjectGroupEditorDialog';
 import InstancesSelection from './InstancesSelection';
 import SetupGridDialog from './SetupGridDialog';
 import ScenePropertiesDialog from './ScenePropertiesDialog';
@@ -22,7 +23,7 @@ import {
 import Clipboard from '../Utils/Clipboard';
 import { passFullSize } from '../UI/FullSizeMeasurer';
 import { addScrollbars } from '../InstancesEditor/ScrollbarContainer';
-
+import { type PreviewOptions } from '../Export/PreviewLauncher.flow';
 import Drawer from 'material-ui/Drawer';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
@@ -31,8 +32,16 @@ import EditorBar from '../UI/EditorBar';
 import InfoBar from '../UI/Messages/InfoBar';
 import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import { shortenString } from '../Utils/StringHelpers';
+import { roundPosition } from '../Utils/GridHelpers';
 
 import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+import {
+  type HistoryState,
   undo,
   redo,
   canUndo,
@@ -41,6 +50,10 @@ import {
   saveToHistory,
 } from '../Utils/History';
 import PixiResourcesLoader from '../ObjectsRendering/PixiResourcesLoader';
+import {
+  type ObjectWithContext,
+  type GroupWithContext,
+} from '../ObjectsList/EnumerateObjects';
 const gd = global.gd;
 
 const INSTANCES_CLIPBOARD_KIND = 'Instances';
@@ -58,13 +71,69 @@ const styles = {
   },
 };
 
-export default class SceneEditor extends Component {
+type Props = {|
+  initialInstances: gdInitialInstancesContainer,
+  initialUiSettings: Object,
+  layout: gdLayout,
+  onEditObject: (object: gdObject) => void,
+  onOpenDebugger: () => void,
+  onOpenMoreSettings: () => void,
+  onPreview: (options: PreviewOptions) => void,
+  project: gdProject,
+  setToolbar: (?React.Node) => void,
+  showNetworkPreviewButton: boolean,
+  showObjectsList: boolean,
+  showPreviewButton: boolean,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
+  isActive: boolean,
+|};
+
+type State = {|
+  objectsListOpen: boolean,
+  instancesListOpen: boolean,
+  setupGridOpen: boolean,
+  scenePropertiesDialogOpen: boolean,
+  layersListOpen: boolean,
+  layerRemoveDialogOpen: boolean,
+  onCloseLayerRemoveDialog: ?(doRemove: boolean, newLayer: string) => void,
+  layerRemoved: ?string,
+  editedObjectWithContext: ?ObjectWithContext,
+  variablesEditedInstance: ?gdInitialInstance,
+  selectedObjectNames: Array<string>,
+
+  editedGroup: ?gdObjectGroup,
+
+  // State for "drag'n'dropping" from the objects list to the instances editor:
+  objectDraggedFromList: ?gdObject,
+  canDropDraggedObject: boolean,
+
+  uiSettings: Object,
+  history: HistoryState,
+
+  showObjectsListInfoBar: boolean,
+  layoutVariablesDialogOpen: boolean,
+  showPropertiesInfoBar: boolean,
+|};
+
+type CopyCutPasteOptions = { useLastCursorPosition?: boolean };
+
+export default class SceneEditor extends React.Component<Props, State> {
   static defaultProps = {
     showObjectsList: true,
     setToolbar: () => {},
   };
 
-  constructor(props) {
+  zOrderFinder: ?gd.HighestZOrderFinder;
+  instancesSelection: InstancesSelection;
+  editor: ?InstancesEditor;
+  contextMenu: ?ContextMenu;
+  editorMosaic: ?EditorMosaic;
+  _objectsList: ?ObjectsList;
+  _propertiesEditor: ?InstancePropertiesEditor;
+
+  constructor(props: Props) {
     super(props);
 
     this.instancesSelection = new InstancesSelection();
@@ -77,16 +146,24 @@ export default class SceneEditor extends Component {
       layerRemoveDialogOpen: false,
       onCloseLayerRemoveDialog: null,
       layerRemoved: null,
-      editedObjectWithContext: { object: null, global: null },
+      editedObjectWithContext: null,
       variablesEditedInstance: null,
-      selectedObjectName: null,
+      selectedObjectNames: [],
 
       editedGroup: null,
+
+      // State for "drag'n'dropping" from the objects list to the instances editor:
+      objectDraggedFromList: null,
+      canDropDraggedObject: false,
 
       uiSettings: props.initialUiSettings,
       history: getHistoryInitialState(props.initialInstances, {
         historyMaxSize: 50,
       }),
+
+      showObjectsListInfoBar: false,
+      layoutVariablesDialogOpen: false,
+      showPropertiesInfoBar: false,
     };
   }
 
@@ -112,7 +189,7 @@ export default class SceneEditor extends Component {
         showObjectsList={this.props.showObjectsList}
         instancesSelection={this.instancesSelection}
         openObjectsList={this.openObjectsList}
-        openObjectsGroupsList={this.openObjectsGroupsList}
+        openObjectGroupsList={this.openObjectGroupsList}
         openProperties={this.openProperties}
         deleteSelection={this.deleteSelection}
         toggleInstancesList={this.toggleInstancesList}
@@ -134,7 +211,7 @@ export default class SceneEditor extends Component {
     );
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Props) {
     if (
       this.props.layout !== nextProps.layout ||
       this.props.initialInstances !== nextProps.initialInstances ||
@@ -165,9 +242,9 @@ export default class SceneEditor extends Component {
     }
   };
 
-  openObjectsGroupsList = () => {
+  openObjectGroupsList = () => {
     if (!this.editorMosaic) return;
-    this.editorMosaic.openEditor('objects-groups-list');
+    this.editorMosaic.openEditor('object-groups-list');
   };
 
   toggleInstancesList = () => {
@@ -197,23 +274,33 @@ export default class SceneEditor extends Component {
     });
   };
 
-  openSetupGrid = (open = true) => {
+  openSetupGrid = (open: boolean = true) => {
     this.setState({ setupGridOpen: open });
   };
 
-  openSceneProperties = (open = true) => {
+  openSceneProperties = (open: boolean = true) => {
     this.setState({ scenePropertiesDialogOpen: open });
   };
 
-  editInstanceVariables = instance => {
+  openObjectEditor = () => {
+    if (!this.instancesSelection.hasSelectedInstances()) {
+      return;
+    }
+    const selectedInstanceObjectName = this.instancesSelection
+      .getSelectedInstances()[0]
+      .getObjectName();
+    this.editObjectByName(selectedInstanceObjectName);
+  };
+
+  editInstanceVariables = (instance: ?gdInitialInstance) => {
     this.setState({ variablesEditedInstance: instance });
   };
 
-  editLayoutVariables = (open = true) => {
+  editLayoutVariables = (open: boolean = true) => {
     this.setState({ layoutVariablesDialogOpen: open });
   };
 
-  editObject = editedObject => {
+  editObject = (editedObject: ?gdObject) => {
     const { project } = this.props;
     if (editedObject) {
       this.setState({
@@ -224,15 +311,12 @@ export default class SceneEditor extends Component {
       });
     } else {
       this.setState({
-        editedObjectWithContext: {
-          object: null,
-          global: null,
-        },
+        editedObjectWithContext: null,
       });
     }
   };
 
-  editObjectByName = objectName => {
+  editObjectByName = (objectName: string) => {
     const { project, layout } = this.props;
     if (layout.hasObjectNamed(objectName))
       this.editObject(layout.getObject(objectName));
@@ -240,11 +324,82 @@ export default class SceneEditor extends Component {
       this.editObject(project.getObject(objectName));
   };
 
-  editGroup = group => {
+  /**
+   * Called when an object is started to be dragged from the object list.
+   * See `_onPointerOverInstancesEditor`, `_onPointerOutInstancesEditor` and
+   * `_onPointerUpInstancesEditor` for the drag'n'drop workflow.
+   */
+  _onStartDraggingObjectFromList = (object: gdObject) => {
+    // "Hijack" the name of the object that is dragged in the objects list.
+    // We'll then listen to "pointer over" events to see if the object
+    // is the dragged on the instances editor.
+    this.setState({
+      objectDraggedFromList: object,
+    });
+  };
+
+  _onEndDraggingObjectFromList = () => {
+    // If the dragged object is not being dropped on the instances editor,
+    // clear the dragged object so that we don't keep it the state (otherwise
+    // we could think later that a dragging is still occuring when cursor
+    // is over the instances editor).
+    if (!this.state.canDropDraggedObject) {
+      this.setState({
+        objectDraggedFromList: null,
+      });
+    }
+  };
+
+  _onPointerOverInstancesEditor = () => {
+    // If an object is dragged, and cursor is over the instances editor,
+    // mark in the state that we can drop an instance of this object.
+    if (this.state.objectDraggedFromList && !this.state.canDropDraggedObject) {
+      this.setState({
+        canDropDraggedObject: true,
+      });
+    }
+  };
+
+  _onPointerOutInstancesEditor = () => {
+    // If cursor is going out of the instances editor,
+    // mark in the state that we cannot drop an instance anymore.
+    if (this.state.canDropDraggedObject) {
+      this.setState({
+        canDropDraggedObject: false,
+      });
+    }
+  };
+
+  _onPointerUpInstancesEditor = () => {
+    if (this.state.canDropDraggedObject) {
+      if (this.editor) {
+        const cursorPosition = this.editor.getLastCursorPosition();
+
+        if (this.state.objectDraggedFromList)
+          this._addInstance(
+            cursorPosition[0],
+            cursorPosition[1],
+            this.state.objectDraggedFromList.getName()
+          );
+      }
+      // Wait 30ms after dropping the object before reseting the canDropDraggedObject state boolean
+      // to ensure ObjectsList will be prevented to actually move object in the list.
+      setTimeout(
+        () =>
+          this.setState({
+            canDropDraggedObject: false,
+            objectDraggedFromList: null,
+          }),
+        30 // This value is very conservative, and timeout may not be needed at all
+      );
+    }
+  };
+
+  editGroup = (group: ?gdObjectGroup) => {
     this.setState({ editedGroup: group });
   };
 
-  setUiSettings = uiSettings => {
+  setUiSettings = (uiSettings: Object) => {
     this.setState({
       uiSettings: {
         ...this.state.uiSettings,
@@ -262,7 +417,7 @@ export default class SceneEditor extends Component {
       () => {
         // /!\ Force the instances editor to destroy and mount again the
         // renderers to avoid keeping any references to existing instances
-        this.editor.forceRemount();
+        if (this.editor) this.editor.forceRemount();
         this.updateToolbar();
       }
     );
@@ -277,44 +432,80 @@ export default class SceneEditor extends Component {
       () => {
         // /!\ Force the instances editor to destroy and mount again the
         // renderers to avoid keeping any references to existing instances
-        this.editor.forceRemount();
+        if (this.editor) this.editor.forceRemount();
         this.updateToolbar();
       }
     );
   };
 
-  _onObjectSelected = selectedObjectName => {
+  _onObjectSelected = (selectedObjectName: string) => {
+    if (!selectedObjectName) {
+      this.setState({
+        selectedObjectNames: [],
+      });
+    } else {
+      this.setState({
+        selectedObjectNames: [selectedObjectName],
+      });
+    }
+  };
+
+  _onAddInstanceUnderCursor = () => {
+    if (!this.state.selectedObjectNames.length || !this.editor) {
+      return;
+    }
+
+    const objectSelected = this.state.selectedObjectNames[0];
+    const cursorPosition = this.editor.getLastCursorPosition();
+    this._addInstance(cursorPosition[0], cursorPosition[1], objectSelected);
     this.setState({
-      selectedObjectName,
+      selectedObjectNames: [objectSelected],
     });
   };
 
-  _onAddInstance = (x, y, objectName = '') => {
-    const newInstanceObjectName = objectName || this.state.selectedObjectName;
-    if (!newInstanceObjectName) return;
+  _addInstance = (x: number, y: number, objectName: string) => {
+    if (!objectName) return;
 
     const instance = this.props.initialInstances.insertNewInitialInstance();
-    instance.setObjectName(newInstanceObjectName);
+    instance.setObjectName(objectName);
+    if (this.state.uiSettings.grid) {
+      x = roundPosition(
+        x,
+        this.state.uiSettings.gridWidth,
+        this.state.uiSettings.gridOffsetX
+      );
+      y = roundPosition(
+        y,
+        this.state.uiSettings.gridHeight,
+        this.state.uiSettings.gridOffsetY
+      );
+    }
     instance.setX(x);
     instance.setY(y);
-
     this.props.initialInstances.iterateOverInstances(this.zOrderFinder);
-    instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
+    if (this.zOrderFinder) {
+      instance.setZOrder(this.zOrderFinder.getHighestZOrder() + 1);
+    }
     this.setState(
       {
-        selectedObjectName: null,
+        selectedObjectNames: [],
         history: saveToHistory(this.state.history, this.props.initialInstances),
       },
       () => this.updateToolbar()
     );
   };
 
-  _onInstancesSelected = instances => {
+  _onInstancesSelected = (instances: Array<gdInitialInstance>) => {
+    this.setState({
+      selectedObjectNames: uniq(
+        instances.map(instance => instance.getObjectName())
+      ),
+    });
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
   };
 
-  _onInstancesMoved = instances => {
+  _onInstancesMoved = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
         history: saveToHistory(this.state.history, this.props.initialInstances),
@@ -323,7 +514,7 @@ export default class SceneEditor extends Component {
     );
   };
 
-  _onInstancesResized = instances => {
+  _onInstancesResized = (instances: Array<gdInitialInstance>) => {
     this.setState(
       {
         history: saveToHistory(this.state.history, this.props.initialInstances),
@@ -332,16 +523,25 @@ export default class SceneEditor extends Component {
     );
   };
 
-  _onInstancesModified = instances => {
+  _onInstancesRotated = (instances: Array<gdInitialInstance>) => {
+    this.setState(
+      {
+        history: saveToHistory(this.state.history, this.props.initialInstances),
+      },
+      () => this.forceUpdatePropertiesEditor()
+    );
+  };
+
+  _onInstancesModified = (instances: Array<gdInitialInstance>) => {
     this.forceUpdate();
     //TODO: Save for redo with debounce (and cancel on unmount)
   };
 
-  _onSelectInstances = (instances, centerView = true) => {
-    this.instancesSelection.clearSelection();
-    instances.forEach(instance =>
-      this.instancesSelection.selectInstance(instance)
-    );
+  _onSelectInstances = (
+    instances: Array<gdInitialInstance>,
+    centerView: boolean = true
+  ) => {
+    this.instancesSelection.selectInstances(instances, false);
 
     if (centerView) {
       if (this.editor) this.editor.centerViewOn(instances);
@@ -350,7 +550,7 @@ export default class SceneEditor extends Component {
     this.updateToolbar();
   };
 
-  _onRemoveLayer = (layerName, done) => {
+  _onRemoveLayer = (layerName: string, done: boolean => void) => {
     this.setState({
       layerRemoveDialogOpen: true,
       layerRemoved: layerName,
@@ -376,7 +576,7 @@ export default class SceneEditor extends Component {
             done(doRemove);
             // /!\ Force the instances editor to destroy and mount again the
             // renderers to avoid keeping any references to existing instances
-            this.editor.forceRemount();
+            if (this.editor) this.editor.forceRemount();
             this.updateToolbar();
           }
         );
@@ -384,12 +584,19 @@ export default class SceneEditor extends Component {
     });
   };
 
-  _onRenameLayer = (oldName, newName, done) => {
+  _onRenameLayer = (
+    oldName: string,
+    newName: string,
+    done: boolean => void
+  ) => {
     this.props.initialInstances.moveInstancesToLayer(oldName, newName);
     done(true);
   };
 
-  _onDeleteObject = (objectWithContext, done) => {
+  _onDeleteObject = (
+    objectWithContext: ObjectWithContext,
+    done: boolean => void
+  ) => {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
 
@@ -430,21 +637,36 @@ export default class SceneEditor extends Component {
     ) {
       showWarningBox('Another object with this name already exists.');
       return false;
+    } else if (!gd.Project.validateObjectName(newName)) {
+      showWarningBox(
+        'This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your object name.'
+      );
+      return false;
     }
+
     return true;
   };
 
-  _onRenameEditedObject = newName => {
+  _onRenameEditedObject = (newName: string) => {
     const { editedObjectWithContext } = this.state;
 
-    if (editedObjectWithContext.object) {
-      this._onRenameObject(editedObjectWithContext, newName);
+    if (editedObjectWithContext) {
+      this._onRenameObject(editedObjectWithContext, newName, () => {});
     }
   };
 
-  _onRenameObject = (objectWithContext, newName, done = () => {}) => {
+  _onRenameObject = (
+    objectWithContext: ObjectWithContext,
+    newName: string,
+    done: boolean => void
+  ) => {
     const { object, global } = objectWithContext;
     const { project, layout } = this.props;
+
+    if (!gd.Project.validateObjectName(newName)) {
+      done(false);
+      return;
+    }
 
     // Avoid triggering renaming refactoring if name has not really changed
     if (object.getName() !== newName) {
@@ -468,13 +690,20 @@ export default class SceneEditor extends Component {
     done(true);
   };
 
-  _onDeleteGroup = (groupWithScope, done) => {
-    //TODO
+  _onDeleteGroup = (
+    groupWithScope: GroupWithContext,
+    done: boolean => void
+  ) => {
+    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer)
     done(true);
   };
 
-  _onRenameGroup = (groupWithScope, newName, done) => {
-    //TODO
+  _onRenameGroup = (
+    groupWithScope: GroupWithContext,
+    newName: string,
+    done: boolean => void
+  ) => {
+    //TODO: implement and launch refactoring (using gd.WholeProjectRefactorer)
     done(true);
   };
 
@@ -485,10 +714,11 @@ export default class SceneEditor extends Component {
     );
 
     this.instancesSelection.clearSelection();
-    this.editor.clearHighlightedInstance();
+    if (this.editor) this.editor.clearHighlightedInstance();
 
     this.setState(
       {
+        selectedObjectNames: [],
         history: saveToHistory(this.state.history, this.props.initialInstances),
       },
       () => {
@@ -498,7 +728,7 @@ export default class SceneEditor extends Component {
     );
   };
 
-  setZoomFactor = zoomFactor => {
+  setZoomFactor = (zoomFactor: number) => {
     if (this.editor) this.editor.setZoomFactor(zoomFactor);
   };
 
@@ -510,33 +740,35 @@ export default class SceneEditor extends Component {
     if (this.editor) this.editor.zoomBy(-0.1);
   };
 
-  _onContextMenu = (x, y) => {
-    this.contextMenu.open(x, y);
+  _onContextMenu = (x: number, y: number) => {
+    if (this.contextMenu) this.contextMenu.open(x, y);
   };
 
-  copySelection = ({ useLastCursorPosition } = {}) => {
+  copySelection = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
     const serializedSelection = this.instancesSelection
       .getSelectedInstances()
       .map(instance => serializeToJSObject(instance));
 
-    const position = useLastCursorPosition
-      ? this.editor.getLastCursorPosition()
-      : this.editor.getLastContextMenuPosition();
-    Clipboard.set(INSTANCES_CLIPBOARD_KIND, {
-      x: position[0],
-      y: position[1],
-      instances: serializedSelection,
-    });
+    if (this.editor) {
+      const position = useLastCursorPosition
+        ? this.editor.getLastCursorPosition()
+        : this.editor.getLastContextMenuPosition();
+      Clipboard.set(INSTANCES_CLIPBOARD_KIND, {
+        x: position[0],
+        y: position[1],
+        instances: serializedSelection,
+      });
+    }
   };
 
-  cutSelection = options => {
+  cutSelection = (options: CopyCutPasteOptions = {}) => {
     this.copySelection(options);
     this.deleteSelection();
   };
 
-  paste = ({ useLastCursorPosition } = {}) => {
+  paste = ({ useLastCursorPosition }: CopyCutPasteOptions = {}) => {
     const clipboardContent = Clipboard.get(INSTANCES_CLIPBOARD_KIND);
-    if (!clipboardContent) return;
+    if (!clipboardContent || !this.editor) return;
 
     const position = useLastCursorPosition
       ? this.editor.getLastCursorPosition()
@@ -572,10 +804,10 @@ export default class SceneEditor extends Component {
   reloadResourcesFor = (object: gdObject) => {
     const { project } = this.props;
 
-    const imagesUsedInventorizer = new gd.ImagesUsedInventorizer();
-    object.exposeResources(imagesUsedInventorizer);
-    const objectResourceNames = imagesUsedInventorizer
-      .getAllUsedImages()
+    const resourcesInUse = new gd.ResourcesInUseHelper();
+    object.exposeResources(resourcesInUse);
+    const objectResourceNames = resourcesInUse
+      .getAllImages()
       .toNewVectorString()
       .toJSArray();
 
@@ -583,7 +815,9 @@ export default class SceneEditor extends Component {
       project,
       objectResourceNames,
       () => {},
-      () => this.editor.resetRenderersFor(object.getName())
+      () => {
+        if (this.editor) this.editor.resetRenderersFor(object.getName());
+      }
     );
   };
 
@@ -619,7 +853,7 @@ export default class SceneEditor extends Component {
           project={project}
           layout={layout}
           initialInstances={initialInstances}
-          onAddInstance={this._onAddInstance}
+          onAddInstance={this._addInstance}
           options={this.state.uiSettings}
           onChangeOptions={this.setUiSettings}
           instancesSelection={this.instancesSelection}
@@ -627,6 +861,10 @@ export default class SceneEditor extends Component {
           onInstancesSelected={this._onInstancesSelected}
           onInstancesMoved={this._onInstancesMoved}
           onInstancesResized={this._onInstancesResized}
+          onInstancesRotated={this._onInstancesRotated}
+          onPointerUp={this._onPointerUpInstancesEditor}
+          onPointerOver={this._onPointerOverInstancesEditor}
+          onPointerOut={this._onPointerOutInstancesEditor}
           onContextMenu={this._onContextMenu}
           onCopy={() => this.copySelection({ useLastCursorPosition: true })}
           onCut={() => this.cutSelection({ useLastCursorPosition: true })}
@@ -635,6 +873,7 @@ export default class SceneEditor extends Component {
           onRedo={this.redo}
           onZoomOut={this.zoomOut}
           onZoomIn={this.zoomIn}
+          showDropCursor={this.state.canDropDraggedObject}
           wrappedEditorRef={editor => (this.editor = editor)}
           pauseRendering={!isActive}
         />
@@ -642,9 +881,13 @@ export default class SceneEditor extends Component {
       'objects-list': (
         <MosaicWindow
           title="Objects"
-          selectedObjectName={
+          selectedObjectNames={
             this.state
-              .selectedObjectName /*Ensure MosaicWindow content is updated when selectedObjectName changes*/
+              .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/
+          }
+          canDropDraggedObject={
+            this.state
+              .canDropDraggedObject /*Ensure MosaicWindow content is updated when canDropDraggedObject changes*/
           }
         >
           <ObjectsList
@@ -653,8 +896,7 @@ export default class SceneEditor extends Component {
             )}
             project={project}
             objectsContainer={layout}
-            selectedObjectName={this.state.selectedObjectName}
-            onObjectSelected={this._onObjectSelected}
+            selectedObjectNames={this.state.selectedObjectNames}
             onEditObject={this.props.onEditObject || this.editObject}
             onDeleteObject={this._onDeleteObject}
             canRenameObject={(
@@ -663,15 +905,19 @@ export default class SceneEditor extends Component {
             ) => {
               return this._canObjectUseNewName(objectWithContext, newName);
             }}
+            onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
+            onStartDraggingObject={this._onStartDraggingObjectFromList}
+            onEndDraggingObject={this._onEndDraggingObjectFromList}
+            canMoveObjects={!this.state.canDropDraggedObject}
             ref={objectsList => (this._objectsList = objectsList)}
           />
         </MosaicWindow>
       ),
-      'objects-groups-list': (
-        <MosaicWindow title="Objects groups">
-          <ObjectsGroupsList
+      'object-groups-list': (
+        <MosaicWindow title="Object Groups">
+          <ObjectGroupsList
             project={project}
             objectsContainer={layout}
             onEditGroup={this.editGroup}
@@ -698,34 +944,47 @@ export default class SceneEditor extends Component {
             },
           }}
         />
-        <ObjectEditorDialog
-          open={!!this.state.editedObjectWithContext.object}
-          object={this.state.editedObjectWithContext.object}
-          project={project}
-          resourceSources={resourceSources}
-          resourceExternalEditors={resourceExternalEditors}
-          onChooseResource={onChooseResource}
-          onCancel={() => {
-            this.reloadResourcesFor(this.state.editedObjectWithContext.object);
-            this.editObject(null);
-          }}
-          canRenameObject={tryName => {
-            return this._canObjectUseNewName(
-              this.state.editedObjectWithContext,
-              tryName
-            );
-          }}
-          onRename={newName => {
-            this._onRenameEditedObject(newName);
-          }}
-          onApply={() => {
-            this.reloadResourcesFor(this.state.editedObjectWithContext.object);
-            this.editObject(null);
-            this.updateBehaviorsSharedData();
-            this.forceUpdateObjectsList();
-          }}
-        />
-        <ObjectsGroupEditorDialog
+        {this.state.editedObjectWithContext && (
+          <ObjectEditorDialog
+            open
+            object={this.state.editedObjectWithContext.object}
+            project={project}
+            resourceSources={resourceSources}
+            resourceExternalEditors={resourceExternalEditors}
+            onChooseResource={onChooseResource}
+            onCancel={() => {
+              if (this.state.editedObjectWithContext) {
+                this.reloadResourcesFor(
+                  this.state.editedObjectWithContext.object
+                );
+              }
+              this.editObject(null);
+            }}
+            canRenameObject={tryName => {
+              return (
+                this.state.editedObjectWithContext &&
+                this._canObjectUseNewName(
+                  this.state.editedObjectWithContext,
+                  tryName
+                )
+              );
+            }}
+            onRename={newName => {
+              this._onRenameEditedObject(newName);
+            }}
+            onApply={() => {
+              if (this.state.editedObjectWithContext) {
+                this.reloadResourcesFor(
+                  this.state.editedObjectWithContext.object
+                );
+              }
+              this.editObject(null);
+              this.updateBehaviorsSharedData();
+              this.forceUpdateObjectsList();
+            }}
+          />
+        )}
+        <ObjectGroupEditorDialog
           open={!!this.state.editedGroup}
           group={this.state.editedGroup}
           layout={layout}
@@ -775,15 +1034,15 @@ export default class SceneEditor extends Component {
           />
         </Drawer>
         <InfoBar
-          message="Touch/click on the scene to add the object"
-          show={!!this.state.selectedObjectName}
+          message="Drag and Drop the object to the scene or use the right click menu to add an instance of it."
+          show={!!this.state.selectedObjectNames.length}
         />
         <InfoBar
-          message="Objects panel is already opened: Use it to add and edit objects."
+          message="Objects panel is already opened: use it to add and edit objects."
           show={!!this.state.showObjectsListInfoBar}
         />
         <InfoBar
-          message="Properties panel is already opened"
+          message="Properties panel is already opened."
           show={!!this.state.showPropertiesInfoBar}
         />
         <SetupGridDialog
@@ -832,6 +1091,23 @@ export default class SceneEditor extends Component {
           ref={contextMenu => (this.contextMenu = contextMenu)}
           buildMenuTemplate={() => [
             {
+              label: this.state.selectedObjectNames.length
+                ? 'Add an Instance of ' +
+                  shortenString(this.state.selectedObjectNames[0], 7)
+                : '',
+              click: () => this._onAddInstanceUnderCursor(),
+              visible: this.state.selectedObjectNames.length > 0,
+            },
+            {
+              label: this.state.selectedObjectNames.length
+                ? 'Edit Object ' +
+                  shortenString(this.state.selectedObjectNames[0], 14)
+                : '',
+              click: () =>
+                this.editObjectByName(this.state.selectedObjectNames[0]),
+              visible: this.state.selectedObjectNames.length > 0,
+            },
+            {
               label: 'Scene properties',
               click: () => this.openSceneProperties(true),
             },
@@ -866,6 +1142,11 @@ export default class SceneEditor extends Component {
               click: this.redo,
               enabled: canRedo(this.state.history),
               accelerator: 'CmdOrCtrl+Shift+Z',
+            },
+            {
+              label: 'Delete',
+              click: () => this.deleteSelection(),
+              enabled: this.instancesSelection.hasSelectedInstances(),
             },
           ]}
         />

@@ -17,7 +17,9 @@ gdjs.CocosImageManager = function(resources)
 
     var that = this;
     resources.forEach(function(res) {
-        that._resources[res.name] = res;
+        if ( res.file && res.kind === "image" ) {
+            that._resources[res.name] = res;
+        }
     })
 
 };
@@ -67,6 +69,6 @@ gdjs.CocosImageManager.prototype.loadTextures = function(onProgress, onComplete)
     });
 
     cc.LoaderScene.preload(files, function () {
-        onComplete();
+        onComplete(files.length);
     });
 }

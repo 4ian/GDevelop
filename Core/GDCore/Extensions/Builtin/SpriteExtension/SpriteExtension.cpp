@@ -17,7 +17,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
   extension
       .SetExtensionInformation("Sprite",
                                _("Sprite"),
-                               _("Sprite are animated object which can be used for most elements of a game."),
+                               _("Sprite are animated object which can be used "
+                                 "for most elements of a game."),
                                "Florian Rival",
                                "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/sprite");
@@ -30,8 +31,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
 #if defined(GD_IDE_ONLY)
   obj.AddAction("Opacity",
-                _("Change object's opacity"),
-                _("Change the opacity of an object."),
+                _("Change Sprite opacity"),
+                _("Change the opacity of a Sprite. 0 is fully transparent, 255 "
+                  "is opaque (default)."),
                 _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
                 _("Visibility"),
                 "res/actions/opacity24.png",
@@ -39,7 +41,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
       .AddParameter("object", _("Object"), "Sprite")
       .AddParameter("operator", _("Modification's sign"))
-      .AddParameter("expression", _("Value"))
+      .AddParameter("expression", _("Value (between 0 and 255)"))
       .MarkAsSimple()
       .SetManipulatedType("number");
 
@@ -198,6 +200,34 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
       .MarkAsAdvanced()
       .SetManipulatedType("number");
 
+  obj.AddAction("ChangeWidth",
+                _("Width"),
+                _("Change the width of a Sprite object."),
+                _("Do _PARAM1__PARAM2_ to the width of _PARAM0_"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+
+      .AddParameter("object", _("Object"), "Sprite")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value"))
+      .MarkAsAdvanced()
+      .SetManipulatedType("number");
+
+  obj.AddAction("ChangeHeight",
+                _("Height"),
+                _("Change the height of a Sprite object."),
+                _("Do _PARAM1__PARAM2_ to the height of _PARAM0_"),
+                _("Size"),
+                "res/actions/scale24.png",
+                "res/actions/scale.png")
+
+      .AddParameter("object", _("Object"), "Sprite")
+      .AddParameter("operator", _("Modification's sign"))
+      .AddParameter("expression", _("Value"))
+      .MarkAsAdvanced()
+      .SetManipulatedType("number");
+
   obj.AddCondition(
          "Animation",
          _("Current animation"),
@@ -309,8 +339,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
 
   obj.AddCondition("Opacity",
                    _("Opacity"),
-                   _("Compare the opacity of an object, between 0 (fully "
-                     "transparent) to 255 (opaque)"),
+                   _("Compare the opacity of a Sprite, between 0 (fully "
+                     "transparent) to 255 (opaque)."),
                    _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Visibility"),
                    "res/conditions/opacity24.png",

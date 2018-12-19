@@ -22,6 +22,7 @@ ProfileEvent::~ProfileEvent() {}
 gd::String ProfileEvent::GenerateEventCode(
     gd::EventsCodeGenerator& codeGenerator,
     gd::EventsCodeGenerationContext& parentContext) {
+  if (!codeGenerator.HasProjectAndLayout()) return "/*Profiler not supported when generating code without layout*/";
   const gd::Layout& scene = codeGenerator.GetLayout();
   codeGenerator.AddIncludeFile("GDCpp/Extensions/Builtin/ProfileTools.h");
 

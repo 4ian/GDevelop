@@ -27,6 +27,7 @@ type Props = {|
   initialResourceName: string,
   onChange: string => void,
   floatingLabelText?: string,
+  hintText?: string,
 |};
 
 type State = {|
@@ -65,6 +66,11 @@ export default class ResourceSelector extends React.Component<Props, State> {
   allResourcesNames: Array<string>;
   defaultItems: Array<AutoCompleteItem>;
   autoCompleteData: ?Array<AutoCompleteItem>;
+  _autoComplete: ?AutoComplete;
+
+  focus() {
+    if (this._autoComplete) this._autoComplete.focus();
+  }
 
   componentWillReceiveProps(nextProps: Props) {
     if (nextProps.initialResourceName !== this.props.initialResourceName) {
@@ -139,6 +145,10 @@ export default class ResourceSelector extends React.Component<Props, State> {
         if (!this.state.notExistingError) {
           if (this.props.onChange) this.props.onChange(searchText);
         }
+
+        // Keep focusing the field after choosing something (won't do anything
+        // if we're just typing text).
+        this.focus();
       }
     );
   };
@@ -154,32 +164,66 @@ export default class ResourceSelector extends React.Component<Props, State> {
   };
 
   _editWith = (resourceExternalEditor: ResourceExternalEditor) => {
-    const { project, resourcesLoader } = this.props;
+    const { project, resourcesLoader, resourceKind } = this.props;
     const { resourceName } = this.state;
+    const resourcesManager = project.getResourcesManager();
+    const initialResource = resourcesManager.getResource(resourceName);
 
-    const resourceNames = [];
-    if (project.getResourcesManager().hasResource(resourceName)) {
-      resourceNames.push(resourceName);
+    let initialResourceMetadata = {};
+    const initialResourceMetadataRaw = initialResource.getMetadata();
+    if (initialResourceMetadataRaw) {
+      try {
+        initialResourceMetadata = JSON.parse(initialResourceMetadataRaw);
+      } catch (e) {
+        console.error('Malformed metadata', e);
+      }
+    };
+
+    if (resourceKind === 'image') {
+      const resourceNames = [];
+      if (resourcesManager.hasResource(resourceName)) {
+        resourceNames.push(resourceName);
+      }
+      const externalEditorOptions = {
+        project,
+        resourcesLoader,
+        singleFrame: true,
+        resourceNames,
+        extraOptions: {
+          fps: 0,
+          name: resourceName,
+          isLooping: false,
+          externalEditorData:initialResourceMetadata,
+        },
+        onChangesSaved: resources => {
+          if (!resources.length) return;
+
+          // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
+          resourcesLoader.burstUrlsCacheForResources(project, [
+            resources[0].name,
+          ]);
+          this.props.onChange(resources[0].name);
+        },
+      };
+      resourceExternalEditor.edit(externalEditorOptions);
+    } else if (resourceKind === 'audio') {
+      const externalEditorOptions = {
+        project,
+        resourcesLoader,
+        resourceNames: [resourceName],
+        extraOptions: {
+          initialResourceMetadata,
+        },
+        onChangesSaved: (newResourceData, newResourceName) => {
+          // Burst the ResourcesLoader cache to force audio to be reloaded (and not cached by the browser).
+          resourcesLoader.burstUrlsCacheForResources(project, [
+            newResourceName,
+          ]);
+          this.props.onChange(newResourceName);
+        },
+      };
+      resourceExternalEditor.edit(externalEditorOptions);
     }
-
-    resourceExternalEditor.edit({
-      project,
-      resourcesLoader,
-      singleFrame: true,
-      resourceNames,
-      extraOptions: {
-        fps: 0,
-        name: 'Image',
-        isLooping: false,
-      },
-      onChangesSaved: resources => {
-        if (!resources.length) return;
-
-        // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
-        resourcesLoader.burstUrlsCacheForResources(project, [resources[0].name]);
-        this.props.onChange(resources[0].name);
-      },
-    });
   };
 
   render() {
@@ -195,7 +239,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
       <div style={styles.container}>
         <AutoComplete
           {...defaultAutocompleteProps}
-          floatingLabelText={this.props.floatingLabelText || 'Select an image'}
+          floatingLabelText={this.props.floatingLabelText}
+          hintText={this.props.hintText}
           openOnFocus
           dataSource={this.autoCompleteData || []}
           onUpdateInput={this._onUpdate}
@@ -204,6 +249,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
           searchText={this.state.resourceName}
           fullWidth={this.props.fullWidth}
           style={styles.autoComplete}
+          ref={autoComplete => (this._autoComplete = autoComplete)}
         />
         {!!externalEditors.length && (
           <IconMenu

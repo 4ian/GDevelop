@@ -23,10 +23,12 @@ gdjs.LayerPixiRenderer.prototype.updatePosition = function() {
 	this._pixiContainer.scale.x = zoomFactor;
 	this._pixiContainer.scale.y = zoomFactor;
 
-	var centerX = (this._layer.getCameraX()*zoomFactor)*Math.cos(angle)
-        - (this._layer.getCameraY()*zoomFactor)*Math.sin(angle);
-	var centerY = (this._layer.getCameraX()*zoomFactor)*Math.sin(angle)
-        + (this._layer.getCameraY()*zoomFactor)*Math.cos(angle);
+    var cosValue = Math.cos(angle);
+    var sinValue = Math.sin(angle);
+	var centerX = (this._layer.getCameraX()*zoomFactor)*cosValue
+        - (this._layer.getCameraY()*zoomFactor)*sinValue;
+	var centerY = (this._layer.getCameraX()*zoomFactor)*sinValue
+        + (this._layer.getCameraY()*zoomFactor)*cosValue;
 
 	this._pixiContainer.position.x = -centerX;
 	this._pixiContainer.position.y = -centerY;

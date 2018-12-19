@@ -1,23 +1,37 @@
 // @flow
 
 import React, { Component } from 'react';
-import { Line, Column } from '../../../../UI/Grid';
+import { Line } from '../../../../UI/Grid';
 import ImagePreview from '../../../../ResourcesList/ResourcePreview/ImagePreview';
 import Replay from 'material-ui/svg-icons/av/replay';
 import PlayArrow from 'material-ui/svg-icons/av/play-arrow';
 import Pause from 'material-ui/svg-icons/av/pause';
+import Timer from 'material-ui/svg-icons/image/timer';
+import TextField from 'material-ui/TextField';
 import { FlatButton } from 'material-ui';
 
-type Props = {
+type Props = {|
   spritesContainer: Object,
   resourcesLoader: Object,
   project: Object,
-};
+  timeBetweenFrames: number,
+  onChangeTimeBetweenFrames: number => void,
+|};
 
-type State = {
+type State = {|
   currentFrameIndex: number,
   currentFrameElapsedTime: number,
   paused: boolean,
+|};
+
+const styles = {
+  timeField: {
+    width: 75,
+  },
+  timeIcon: {
+    paddingLeft: 6,
+    paddingRight: 8,
+  },
 };
 
 export default class AnimationPreview extends Component<Props, State> {
@@ -57,9 +71,8 @@ export default class AnimationPreview extends Component<Props, State> {
   _updateAnimation = () => {
     const animationSpeedScale = 1;
 
-    const { spritesContainer } = this.props;
+    const { spritesContainer, timeBetweenFrames } = this.props;
     const { currentFrameIndex, currentFrameElapsedTime, paused } = this.state;
-    const timeBetweenFrames = spritesContainer.getTimeBetweenFrames();
 
     const elapsedTime = 1 / 60;
     let newFrameIndex = currentFrameIndex;
@@ -88,7 +101,13 @@ export default class AnimationPreview extends Component<Props, State> {
   };
 
   render() {
-    const { spritesContainer, resourcesLoader, project } = this.props;
+    const {
+      spritesContainer,
+      resourcesLoader,
+      project,
+      timeBetweenFrames,
+      onChangeTimeBetweenFrames,
+    } = this.props;
     const { currentFrameIndex, paused } = this.state;
 
     const hasValidSprite =
@@ -104,19 +123,29 @@ export default class AnimationPreview extends Component<Props, State> {
           resourcesLoader={resourcesLoader}
           project={project}
         />
-        <Line>
-          <Column expand>
-            <FlatButton
-              icon={<Replay />}
-              label="Replay"
-              onClick={this.replay}
-            />
-            <FlatButton
-              icon={paused ? <PlayArrow /> : <Pause />}
-              label={paused ? 'Play' : 'Pause'}
-              onClick={paused ? this.play : this.pause}
-            />
-          </Column>
+        <Line noMargin alignItems="center">
+          <Timer style={styles.timeIcon} />
+          <TextField
+            value={timeBetweenFrames}
+            onChange={(e, text) => {
+              onChangeTimeBetweenFrames(text);
+              this.replay();
+            }}
+            id="direction-time-between-frames"
+            type="number"
+            step={0.01}
+            precision={1}
+            min={0.01}
+            max={5}
+            style={styles.timeField}
+            autoFocus={true}
+          />
+          <FlatButton icon={<Replay />} label="Replay" onClick={this.replay} />
+          <FlatButton
+            icon={paused ? <PlayArrow /> : <Pause />}
+            label={paused ? 'Play' : 'Pause'}
+            onClick={paused ? this.play : this.pause}
+          />
         </Line>
       </div>
     );

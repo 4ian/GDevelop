@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -105,6 +106,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/nuage_blanc_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "nuage_blanc_1.png",
         "smoothed": false,
         "userAdded": true
@@ -113,6 +115,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/nuages_gris_1.png",
         "kind": "image",
+        "metadata": "",
         "name": "nuages_gris_1.png",
         "smoothed": false,
         "userAdded": true
@@ -121,6 +124,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/nuages_gris_2.png",
         "kind": "image",
+        "metadata": "",
         "name": "nuages_gris_2.png",
         "smoothed": false,
         "userAdded": true
@@ -129,6 +133,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/nuages_gris_3.png",
         "kind": "image",
+        "metadata": "",
         "name": "nuages_gris_3.png",
         "smoothed": false,
         "userAdded": true
@@ -137,6 +142,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/rain.png",
         "kind": "image",
+        "metadata": "",
         "name": "rain.png",
         "smoothed": true,
         "userAdded": true
@@ -145,6 +151,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/rain/logo_inrain.png",
         "kind": "image",
+        "metadata": "",
         "name": "logo_inrain.png",
         "smoothed": false,
         "userAdded": true
@@ -843,6 +850,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

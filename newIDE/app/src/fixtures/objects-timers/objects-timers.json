@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -105,6 +106,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/objects-timers/player.png",
         "kind": "image",
+        "metadata": "",
         "name": "player.png",
         "smoothed": true,
         "userAdded": false
@@ -113,6 +115,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/objects-timers/Pea-Happy.png",
         "kind": "image",
+        "metadata": "",
         "name": "Pea-Happy.png",
         "smoothed": true,
         "userAdded": false
@@ -1020,6 +1023,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

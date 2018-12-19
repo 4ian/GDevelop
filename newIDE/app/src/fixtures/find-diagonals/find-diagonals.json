@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -102,6 +103,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/find-diagonals/Box.png",
         "kind": "image",
+        "metadata": "",
         "name": "Box.png",
         "smoothed": true,
         "userAdded": true
@@ -110,6 +112,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/find-diagonals/Diagonals.png",
         "kind": "image",
+        "metadata": "",
         "name": "Diagonals.png",
         "smoothed": true,
         "userAdded": true
@@ -118,6 +121,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/find-diagonals/Square.png",
         "kind": "image",
+        "metadata": "",
         "name": "Square.png",
         "smoothed": true,
         "userAdded": true
@@ -2650,6 +2654,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

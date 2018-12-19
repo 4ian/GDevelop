@@ -12,9 +12,40 @@ const styles = {
     flexDirection: 'column',
   },
   tabTemplateStyle: {
+    width: '100%',
+    position: 'relative',
+    textAlign: 'initial',
     height: '100%',
   },
 };
+
+/**
+ * This is to override the default material-ui tab template used to wrap the content of each tab element.
+ * 2 changes (**please port them to your new implementation if you change the tabs**):
+ * 
+ * 1) Instead of setting the "height" of hidden tabs to "0", we set "display" to "none" to avoid
+ * messing with components (in particular components where you can scroll: when collapsed because of height=0,
+ * they will lose they scrolling position).
+ * 
+ * 2) shouldComponentUpdate is used to avoid updating the content of a tab that is not selected.
+ * 
+ * Rest of the implementation is the same.
+ */
+class TabTemplate extends Component {
+  shouldComponentUpdate(nextProps) {
+    return this.props.selected || nextProps.selected;
+  }
+
+  render() {
+    const { children, selected, style } = this.props;
+    const templateStyle = { ...styles.tabTemplateStyle, ...style };
+    if (!selected) {
+      templateStyle.display = 'none';
+    }
+  
+    return <div style={templateStyle}>{children}</div>;
+  }
+}
 
 export class ThemableTabs extends Component {
   render() {
@@ -37,7 +68,7 @@ export class ThemableTabs extends Component {
     return (
       <MaterialUITabs
         style={styles.tabsContainerStyle}
-        tabTemplateStyle={styles.tabTemplateStyle}
+        tabTemplate={TabTemplate}
         contentContainerStyle={contentContainerStyle}
         tabItemContainerStyle={tabItemContainerStyle}
         inkBarStyle={{ display: 'none' }}

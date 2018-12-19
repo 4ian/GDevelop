@@ -121,7 +121,7 @@ double SerializerElement::GetDoubleAttribute(const gd::String& name,
   return defaultValue;
 }
 
-bool SerializerElement::HasAttribute(const gd::String& name) {
+bool SerializerElement::HasAttribute(const gd::String& name) const {
   return attributes.find(name) != attributes.end();
 }
 

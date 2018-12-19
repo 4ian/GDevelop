@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -105,6 +106,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/object-selection/TankB1.png",
         "kind": "image",
+        "metadata": "",
         "name": "TankB1.png",
         "smoothed": false,
         "userAdded": true
@@ -113,6 +115,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/object-selection/tankV1.png",
         "kind": "image",
+        "metadata": "",
         "name": "tankV1.png",
         "smoothed": false,
         "userAdded": true
@@ -744,6 +747,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

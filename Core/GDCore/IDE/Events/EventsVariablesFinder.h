@@ -11,17 +11,9 @@
 #include "GDCore/String.h"
 namespace gd {
 class Instruction;
-}
-namespace gd {
 class Platform;
-}
-namespace gd {
 class Object;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
 }
 

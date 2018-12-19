@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -108,6 +109,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/car-physics/car-body.png",
         "kind": "image",
+        "metadata": "",
         "name": "car-body.png",
         "smoothed": true,
         "userAdded": true
@@ -116,6 +118,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/car-physics/tire.png",
         "kind": "image",
+        "metadata": "",
         "name": "tire.png",
         "smoothed": true,
         "userAdded": true
@@ -124,6 +127,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/car-physics/brickWall.png",
         "kind": "image",
+        "metadata": "",
         "name": "brickWall.png",
         "smoothed": true,
         "userAdded": true
@@ -132,6 +136,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/car-physics/flatDark23.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark23.png",
         "smoothed": true,
         "userAdded": false
@@ -140,6 +145,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/car-physics/flatDark24.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark24.png",
         "smoothed": true,
         "userAdded": true
@@ -1516,6 +1522,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

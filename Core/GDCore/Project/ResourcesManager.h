@@ -10,14 +10,8 @@
 #include "GDCore/String.h"
 namespace gd {
 class Project;
-}
-namespace gd {
 class ResourceFolder;
-}
-namespace gd {
 class SerializerElement;
-}
-namespace gd {
 class PropertyDescriptor;
 }
 class wxPaintDC;
@@ -48,7 +42,7 @@ class GD_CORE_API Resource {
    */
   virtual void SetKind(const gd::String& newKind) { kind = newKind; }
 
-  /** \brief Return the name of the object.
+  /** \brief Return the kind of the resource.
    */
   virtual const gd::String& GetKind() const { return kind; }
 
@@ -90,6 +84,18 @@ class GD_CORE_API Resource {
    * the resource.
    */
   gd::String GetAbsoluteFile(const gd::Project& game) const;
+
+  /**
+   * \brief Set the metadata (any string) associated to the resource.
+   * \note Can be used by external editors to store extra information, for
+   * example the configuration used to produce a sound.
+   */
+  virtual void SetMetadata(const gd::String& metadata_) { metadata = metadata_; }
+
+  /**
+   * \brief Return the (optional) metadata associated to the resource
+   */
+  virtual const gd::String& GetMetadata() const { return metadata; }
 
 #if !defined(GD_NO_WX_GUI)
   /**
@@ -150,6 +156,7 @@ class GD_CORE_API Resource {
  private:
   gd::String kind;
   gd::String name;
+  gd::String metadata;
   bool userAdded;  ///< True if the resource was added by the user, and not
                    ///< automatically by GDevelop.
 
@@ -256,6 +263,34 @@ class GD_CORE_API AudioResource : public Resource {
 };
 
 /**
+ * \brief Describe a font file used by a project.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_CORE_API FontResource : public Resource {
+ public:
+  FontResource() : Resource() { SetKind("font"); };
+  virtual ~FontResource(){};
+  virtual FontResource* Clone() const override {
+    return new FontResource(*this);
+  }
+
+  virtual const gd::String& GetFile() const override { return file; };
+  virtual void SetFile(const gd::String& newFile) override;
+
+#if defined(GD_IDE_ONLY)
+  virtual bool UseFile() override { return true; }
+  void SerializeTo(SerializerElement& element) const override;
+#endif
+
+  void UnserializeFrom(const SerializerElement& element) override;
+
+ private:
+  gd::String file;
+};
+
+/**
  * \brief Inventory all resources used by a project
  *
  * \see Resource
@@ -291,7 +326,7 @@ class GD_CORE_API ResourcesManager {
   /**
    * \brief Get a list containing the names of all resources.
    */
-  std::vector<gd::String> GetAllResourceNames();
+  std::vector<gd::String> GetAllResourceNames() const;
 
 #if defined(GD_IDE_ONLY)
   /**

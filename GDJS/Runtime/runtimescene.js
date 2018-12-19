@@ -15,31 +15,31 @@ gdjs.RuntimeScene = function(runtimeGame)
 {
     this._eventsFunction = null;
     this._instances = new Hashtable(); //Contains the instances living on the scene
-	this._instancesCache = new Hashtable(); //Used to recycle destroyed instance instead of creating new ones.
+    this._instancesCache = new Hashtable(); //Used to recycle destroyed instance instead of creating new ones.
     this._objects = new Hashtable(); //Contains the objects data stored in the project
     this._objectsCtor = new Hashtable();
     this._layers = new Hashtable();
-	this._initialBehaviorSharedData = new Hashtable();
+    this._initialBehaviorSharedData = new Hashtable();
     this._renderer = new gdjs.RuntimeSceneRenderer(this,
         runtimeGame ? runtimeGame.getRenderer() : null);
     this._variables = new gdjs.VariablesContainer();
     this._runtimeGame = runtimeGame;
     this._lastId = 0;
-	this._name = "";
+    this._name = "";
     this._timeManager = new gdjs.TimeManager(Date.now());
     this._gameStopRequested = false;
     this._requestedScene = "";
-	this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
-	
-	/** @type gdjs.RuntimeObject[] */
+    this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
+    
+    /** @type gdjs.RuntimeObject[] */
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
-	
-	/** @type gdjs.RuntimeObject[] */
-	this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
-	
-	/** @type gdjs.Profiler */
-	this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
-	this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
+    
+    /** @type gdjs.RuntimeObject[] */
+    this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
+    
+    /** @type gdjs.Profiler */
+    this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
+    this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
 
     this.onCanvasResized();
 };
@@ -59,38 +59,38 @@ gdjs.RuntimeScene.prototype.onCanvasResized = function() {
  * @see gdjs.RuntimeGame#getSceneData
  */
 gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
-	if ( sceneData === undefined ) {
-		console.error("loadFromScene was called without a scene");
-		return;
-	}
+    if ( sceneData === undefined ) {
+        console.error("loadFromScene was called without a scene");
+        return;
+    }
 
-	if ( this._isLoaded ) this.unloadScene();
+    if ( this._isLoaded ) this.unloadScene();
 
-	//Setup main properties
+    //Setup main properties
     if (this._runtimeGame) this._runtimeGame.getRenderer().setWindowTitle(sceneData.title);
-	this._name = sceneData.name;
-	this.setBackgroundColor(parseInt(sceneData.r, 10),
-			parseInt(sceneData.v, 10),
-			parseInt(sceneData.b, 10));
+    this._name = sceneData.name;
+    this.setBackgroundColor(parseInt(sceneData.r, 10),
+            parseInt(sceneData.v, 10),
+            parseInt(sceneData.b, 10));
 
-	//Load layers
-	for(var i = 0, len = sceneData.layers.length;i<len;++i) {
-		var layerData = sceneData.layers[i];
+    //Load layers
+    for(var i = 0, len = sceneData.layers.length;i<len;++i) {
+        var layerData = sceneData.layers[i];
 
-		this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
-		//console.log("Created layer : \""+name+"\".");
-	}
+        this._layers.put(layerData.name, new gdjs.Layer(layerData, this));
+        //console.log("Created layer : \""+name+"\".");
+    }
 
     //Load variables
     this._variables = new gdjs.VariablesContainer(sceneData.variables);
 
-	//Cache the initial shared data of the behaviors
-	for(var i = 0, len = sceneData.behaviorsSharedData.length;i<len;++i) {
-		var data = sceneData.behaviorsSharedData[i];
+    //Cache the initial shared data of the behaviors
+    for(var i = 0, len = sceneData.behaviorsSharedData.length;i<len;++i) {
+        var data = sceneData.behaviorsSharedData[i];
 
-		//console.log("Initializing shared data for "+data.name);
-		this._initialBehaviorSharedData.put(data.name, data);
-	}
+        //console.log("Initializing shared data for "+data.name);
+        this._initialBehaviorSharedData.put(data.name, data);
+    }
 
     var that = this;
     function loadObject(objData) {
@@ -100,19 +100,19 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
         that._objects.put(objectName, objData);
         that._instances.put(objectName, []); //Also reserve an array for the instances
         that._instancesCache.put(objectName, []); //and for cached instances
-		//And cache the constructor for the performance sake:
-		that._objectsCtor.put(objectName, gdjs.getObjectConstructor(objectType));
+        //And cache the constructor for the performance sake:
+        that._objectsCtor.put(objectName, gdjs.getObjectConstructor(objectType));
     }
 
     //Load objects: Global objects first...
     var initialGlobalObjectsData = this.getGame().getInitialObjectsData();
-	for(var i = 0, len = initialGlobalObjectsData.length;i<len;++i) {
-		loadObject(initialGlobalObjectsData[i]);
-	}
-	//...then the scene objects
+    for(var i = 0, len = initialGlobalObjectsData.length;i<len;++i) {
+        loadObject(initialGlobalObjectsData[i]);
+    }
+    //...then the scene objects
     this._initialObjectsData = sceneData.objects;
-	for(var i = 0, len = this._initialObjectsData.length;i<len;++i) {
-		loadObject(this._initialObjectsData[i]);
+    for(var i = 0, len = this._initialObjectsData.length;i<len;++i) {
+        loadObject(this._initialObjectsData[i]);
     }
 
     //Create initial instances of objects
@@ -121,41 +121,40 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     //Set up the function to be executed at each tick
     var module = gdjs[sceneData.mangledName+"Code"];
     if ( module && module.func )
-    	this._eventsFunction = module.func;
+        this._eventsFunction = module.func;
     else {
         console.log("Warning: no function found for running logic of scene " + this._name);
-    	this._eventsFunction = (function() {});
+        this._eventsFunction = (function() {});
     }
 
-    this._eventsContext = new gdjs.EventsContext();
+    this._onceTriggers = new gdjs.OnceTriggers();
 
     //Call global callback
-	for(var i = 0;i<gdjs.callbacksRuntimeSceneLoaded.length;++i) {
-		gdjs.callbacksRuntimeSceneLoaded[i](this);
-	}
+    for(var i = 0;i<gdjs.callbacksRuntimeSceneLoaded.length;++i) {
+        gdjs.callbacksRuntimeSceneLoaded[i](this);
+    }
 
-	if (sceneData.stopSoundsOnStartup && this._runtimeGame)
-		this._runtimeGame.getSoundManager().clearAll();
+    if (sceneData.stopSoundsOnStartup && this._runtimeGame)
+        this._runtimeGame.getSoundManager().clearAll();
 
     this._isLoaded = true;
-	this._timeManager.reset();
+    this._timeManager.reset();
 };
 
 gdjs.RuntimeScene.prototype.unloadScene = function() {
-	if ( !this._isLoaded ) return;
+    if ( !this._isLoaded ) return;
 
-	if (this._profiler) this.stopProfiler();
+    if (this._profiler) this.stopProfiler();
 
     if (this._renderer && this._renderer.onSceneUnloaded)
         this._renderer.onSceneUnloaded();
 
-    this._eventsContext = new gdjs.EventsContext();
-	for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloaded.length;++i) {
-		gdjs.callbacksRuntimeSceneUnloaded[i](this);
-	}
+    for(var i = 0;i < gdjs.callbacksRuntimeSceneUnloaded.length;++i) {
+        gdjs.callbacksRuntimeSceneUnloaded[i](this);
+    }
 
-	// It should not be necessary to reset these variables, but this help
-	// ensuring that all memory related to the RuntimeScene is released immediately.
+    // It should not be necessary to reset these variables, but this help
+    // ensuring that all memory related to the RuntimeScene is released immediately.
     this._layers = new Hashtable();
     this._variables = new gdjs.VariablesContainer();
     this._initialBehaviorSharedData = new Hashtable();
@@ -169,7 +168,7 @@ gdjs.RuntimeScene.prototype.unloadScene = function() {
     this._instancesRemoved = [];
 
     this._lastId = 0;
-    this._eventsContext = null;
+    this._onceTriggers = null;
 
     this._isLoaded = false;
 
@@ -188,16 +187,16 @@ gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos) {
     for(var i = 0, len = data.length;i<len;++i) {
         var instanceData = data[i];
         var objectName = instanceData.name;
-		var newObject = this.createObject(objectName);
+        var newObject = this.createObject(objectName);
 
-		if ( newObject !== null ) {
+        if ( newObject !== null ) {
             newObject.setPosition(parseFloat(instanceData.x) + xPos, parseFloat(instanceData.y) + yPos);
             newObject.setZOrder(parseFloat(instanceData.zOrder));
             newObject.setAngle(parseFloat(instanceData.angle));
             newObject.setLayer(instanceData.layer);
             newObject.getVariables().initFrom(instanceData.initialVariables, true);
             newObject.extraInitializationFromInitialInstance(instanceData);
-		}
+        }
     }
 };
 
@@ -211,7 +210,7 @@ gdjs.RuntimeScene.prototype.createObjectsFrom = function(data, xPos, yPos) {
  * @param {Function} func The function to be called.
  */
 gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
-	this._eventsFunction = func;
+    this._eventsFunction = func;
 };
 
 /**
@@ -220,41 +219,48 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  * or a game stop was requested.
  */
 gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
-	if (this._profiler) this._profiler.beginFrame();
-	
-	this._requestedChange = gdjs.RuntimeScene.CONTINUE;
-	this._timeManager.update(elapsedTime, this._runtimeGame.getMinimalFramerate());
-	
+    if (this._profiler) this._profiler.beginFrame();
+    
+    this._requestedChange = gdjs.RuntimeScene.CONTINUE;
+    this._timeManager.update(elapsedTime, this._runtimeGame.getMinimalFramerate());
+    
     if (this._profiler) this._profiler.begin("objects (pre-events)");
-	this._updateObjectsPreEvents();
-	if (this._profiler) this._profiler.end("objects (pre-events)");
-	
+    this._updateObjectsPreEvents();
+    if (this._profiler) this._profiler.end("objects (pre-events)");
+    
     if (this._profiler) this._profiler.begin("events");
-	this._eventsFunction(this, this._eventsContext);
-	if (this._profiler) this._profiler.end("events");
-	
+    this._eventsFunction(this);
+    if (this._profiler) this._profiler.end("events");
+    
     if (this._profiler) this._profiler.begin("objects (post-events)");
-	this._updateObjects();
-	if (this._profiler) this._profiler.end("objects (post-events)");
-	
+    this._updateObjectsPostEvents();
+    if (this._profiler) this._profiler.end("objects (post-events)");
+    
     if (this._profiler) this._profiler.begin("objects (visibility)");
-	this._updateObjectsVisibility();
-	if (this._profiler) this._profiler.end("objects (visibility)");
-	
+    this._updateObjectsVisibility();
+    if (this._profiler) this._profiler.end("objects (visibility)");
+    
     if (this._profiler) this._profiler.begin("render");
-	this.render();
-	if (this._profiler) this._profiler.end("render");
-	
+
+    // Uncomment to enable debug rendering (look for the implementation in the renderer
+    // to see what is rendered)
+    // if (this._layersCameraCoordinates) {
+    //  this.getRenderer().renderDebugDraw(this._allInstancesList, this._layersCameraCoordinates); //TODO
+    // }
+
+    this.render();
+    if (this._profiler) this._profiler.end("render");
+    
     if (this._profiler) this._profiler.endFrame();
 
-	return !!this.getRequestedChange();
+    return !!this.getRequestedChange();
 };
 
 /**
  * Render the PIXI container associated to the runtimeScene.
  */
 gdjs.RuntimeScene.prototype.render = function() {
-	this._renderer.render();
+    this._renderer.render();
 };
 
 gdjs.RuntimeScene.prototype._updateLayersCameraCoordinates = function() {
@@ -283,42 +289,43 @@ gdjs.RuntimeScene.prototype._updateLayersCameraCoordinates = function() {
  * @private
  */
 gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
-	if (this._timeManager.isFirstFrame()) {
-		this._constructListOfAllInstances();
-		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
-			var object = this._allInstancesList[i];
+    if (this._timeManager.isFirstFrame()) {
+        this._constructListOfAllInstances();
+        for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
+            var object = this._allInstancesList[i];
             var rendererObject = object.getRendererObject();
 
             if (rendererObject)
                 object.getRendererObject().visible = !object.isHidden();
-		}
+        }
 
-		return;
-	} else {
-		//After first frame, optimise rendering by setting only objects
-		//near camera as visible.
+        return;
+    } else {
+        //After first frame, optimise rendering by setting only objects
+        //near camera as visible.
         this._updateLayersCameraCoordinates();
-		this._constructListOfAllInstances();
-		for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
-			var object = this._allInstancesList[i];
-			var cameraCoords = this._layersCameraCoordinates[object.getLayer()];
+        this._constructListOfAllInstances();
+        for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
+            var object = this._allInstancesList[i];
+            var cameraCoords = this._layersCameraCoordinates[object.getLayer()];
             var rendererObject = object.getRendererObject();
 
-			if (!cameraCoords || !rendererObject) continue;
+            if (!cameraCoords || !rendererObject) continue;
 
-			if (object.isHidden()) {
-				rendererObject.visible = false;
-			} else {
-				var aabb = object.getAABB();
-				if (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
-					aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1]) {
-        			rendererObject.visible = false;
-				} else {
+            if (object.isHidden()) {
+                rendererObject.visible = false;
+            } else {
+                var aabb = object.getVisibilityAABB();
+                if (aabb && // If no AABB is returned, the object should always be visible
+                    (aabb.min[0] > cameraCoords[2] || aabb.min[1] > cameraCoords[3] ||
+                    aabb.max[0] < cameraCoords[0] || aabb.max[1] < cameraCoords[1])) {
+                    rendererObject.visible = false;
+                } else {
                     rendererObject.visible = true;
-				}
-			}
-		}
-	}
+                }
+            }
+        }
+    }
 };
 
 /**
@@ -333,13 +340,13 @@ gdjs.RuntimeScene.prototype._updateObjectsVisibility = function() {
  * @private
  */
 gdjs.RuntimeScene.prototype._cacheOrClearRemovedInstances = function() {
-	for(var k =0, lenk=this._instancesRemoved.length;k<lenk;++k) {
-		//Cache the instance to recycle it into a new instance later.
-		var cache = this._instancesCache.get(this._instancesRemoved[k].getName());
-		if ( cache.length < 128 ) cache.push(this._instancesRemoved[k]);
-	}
+    for(var k =0, lenk=this._instancesRemoved.length;k<lenk;++k) {
+        //Cache the instance to recycle it into a new instance later.
+        var cache = this._instancesCache.get(this._instancesRemoved[k].getName());
+        if ( cache.length < 128 ) cache.push(this._instancesRemoved[k]);
+    }
 
-	this._instancesRemoved.length = 0;
+    this._instancesRemoved.length = 0;
 };
 
 /**
@@ -353,18 +360,18 @@ gdjs.RuntimeScene.prototype._constructListOfAllInstances = function() {
             var list = this._instances.items[name];
 
             var oldSize = currentListSize;
-    		currentListSize += list.length;
+            currentListSize += list.length;
 
-    		for(var j = 0, lenj = list.length;j<lenj;++j) {
+            for(var j = 0, lenj = list.length;j<lenj;++j) {
                 if (oldSize+j < this._allInstancesList.length)
-    			    this._allInstancesList[oldSize+j] = list[j];
+                    this._allInstancesList[oldSize+j] = list[j];
                 else
                     this._allInstancesList.push(list[j]);
-    		}
+            }
         }
     }
 
-	this._allInstancesList.length = currentListSize;
+    this._allInstancesList.length = currentListSize;
 };
 
 /**
@@ -373,29 +380,11 @@ gdjs.RuntimeScene.prototype._constructListOfAllInstances = function() {
  */
 gdjs.RuntimeScene.prototype._updateObjectsPreEvents = function() {
 
-	//It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
-	//may delete the objects.
-	this._constructListOfAllInstances();
-	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
-		this._allInstancesList[i].stepBehaviorsPreEvents(this);
-	}
-
-	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
-};
-
-/**
- * Update the objects (update positions, time management...)
- * @private
- */
-gdjs.RuntimeScene.prototype._updateObjects = function() {
-	this._cacheOrClearRemovedInstances();
-
-	//It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
-	//may delete the objects.
-	this._constructListOfAllInstances();
-	for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
+    //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
+    //may delete the objects.
+    this._constructListOfAllInstances();
+    for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
         var obj = this._allInstancesList[i];
-
         var elapsedTime = obj.getElapsedTime(this);
         if (!obj.hasNoForces()) {
             var averageForce = obj.getAverageForce();
@@ -408,18 +397,35 @@ gdjs.RuntimeScene.prototype._updateObjects = function() {
         } else {
             obj.update(this);
         }
-		obj.stepBehaviorsPostEvents(this);
         obj.updateTimers(elapsedTime);
-	}
+        this._allInstancesList[i].stepBehaviorsPreEvents(this);
+    }
 
-	this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
+    this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
+};
+
+/**
+ * Update the objects (update positions, time management...)
+ * @private
+ */
+gdjs.RuntimeScene.prototype._updateObjectsPostEvents = function() {
+    this._cacheOrClearRemovedInstances();
+
+    //It is *mandatory* to create and iterate on a external list of all objects, as the behaviors
+    //may delete the objects.
+    this._constructListOfAllInstances();
+    for( var i = 0, len = this._allInstancesList.length;i<len;++i) {
+        this._allInstancesList[i].stepBehaviorsPostEvents(this);
+    }
+
+    this._cacheOrClearRemovedInstances(); //Some behaviors may have request objects to be deleted.
 };
 
 /**
  * Change the background color
  */
 gdjs.RuntimeScene.prototype.setBackgroundColor = function(r,g,b) {
-	this._backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
+    this._backgroundColor = parseInt(gdjs.rgbToHex(r,g,b),16);
 };
 
 gdjs.RuntimeScene.prototype.getBackgroundColor = function() {
@@ -430,7 +436,7 @@ gdjs.RuntimeScene.prototype.getBackgroundColor = function() {
  * Get the name of the scene.
  */
 gdjs.RuntimeScene.prototype.getName = function() {
-	return this._name;
+    return this._name;
 };
 
 /**
@@ -441,17 +447,17 @@ gdjs.RuntimeScene.prototype.updateObjectsForces = function() {
         if (this._instances.items.hasOwnProperty(name)) {
             var list = this._instances.items[name];
 
-        	for(var j = 0, listLen = list.length;j<listLen;++j) {
-        		var obj = list[j];
-        		if (!obj.hasNoForces()) {
-        			var averageForce = obj.getAverageForce();
+            for(var j = 0, listLen = list.length;j<listLen;++j) {
+                var obj = list[j];
+                if (!obj.hasNoForces()) {
+                    var averageForce = obj.getAverageForce();
                     var elapsedTimeInSeconds = obj.getElapsedTime(this) / 1000;
 
-        			obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
-        			obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
-        			obj.updateForces(elapsedTimeInSeconds);
-        		}
-        	}
+                    obj.setX(obj.getX() + averageForce.getX() * elapsedTimeInSeconds);
+                    obj.setY(obj.getY() + averageForce.getY() * elapsedTimeInSeconds);
+                    obj.updateForces(elapsedTimeInSeconds);
+                }
+            }
         }
     }
 };
@@ -461,12 +467,12 @@ gdjs.RuntimeScene.prototype.updateObjectsForces = function() {
  * @param obj The object to be added.
  */
 gdjs.RuntimeScene.prototype.addObject = function(obj) {
-	if ( !this._instances.containsKey(obj.name) ) {
-		console.log("RuntimeScene.addObject: No objects called \""+obj.name+"\"! Adding it.");
-		this._instances.put(obj.name, []);
-	}
+    if ( !this._instances.containsKey(obj.name) ) {
+        console.log("RuntimeScene.addObject: No objects called \""+obj.name+"\"! Adding it.");
+        this._instances.put(obj.name, []);
+    }
 
-	this._instances.get(obj.name).push(obj);
+    this._instances.get(obj.name).push(obj);
 };
 
 /**
@@ -475,12 +481,12 @@ gdjs.RuntimeScene.prototype.addObject = function(obj) {
  * @return {gdjs.RuntimeObject[]} The list of objects with the given name
  */
 gdjs.RuntimeScene.prototype.getObjects = function(name){
-	if ( !this._instances.containsKey(name) ) {
-		console.log("RuntimeScene.getObjects: No instances called \""+name+"\"! Adding it.");
-		this._instances.put(name, []);
-	}
+    if ( !this._instances.containsKey(name) ) {
+        console.log("RuntimeScene.getObjects: No instances called \""+name+"\"! Adding it.");
+        this._instances.put(name, []);
+    }
 
-	return this._instances.get(name);
+    return this._instances.get(name);
 };
 
 /**
@@ -491,26 +497,26 @@ gdjs.RuntimeScene.prototype.getObjects = function(name){
  */
 gdjs.RuntimeScene.prototype.createObject = function(objectName){
 
-	if ( !this._objectsCtor.containsKey(objectName) ||
-		!this._objects.containsKey(objectName) )
-		return null; //There is no such object in this scene.
+    if ( !this._objectsCtor.containsKey(objectName) ||
+        !this._objects.containsKey(objectName) )
+        return null; //There is no such object in this scene.
 
-	//Create a new object using the object constructor ( cached during loading )
-	//and the stored object's data:
-	var cache = this._instancesCache.get(objectName);
-	var ctor = this._objectsCtor.get(objectName);
-	var obj = null;
-	if ( cache.length === 0 ) {
-		obj = new ctor(this, this._objects.get(objectName));
-	}
-	else {
-		//Reuse an objet destroyed before:
-		obj = cache.pop();
-		ctor.call(obj, this, this._objects.get(objectName));
-	}
+    //Create a new object using the object constructor ( cached during loading )
+    //and the stored object's data:
+    var cache = this._instancesCache.get(objectName);
+    var ctor = this._objectsCtor.get(objectName);
+    var obj = null;
+    if ( cache.length === 0 ) {
+        obj = new ctor(this, this._objects.get(objectName));
+    }
+    else {
+        //Reuse an objet destroyed before:
+        obj = cache.pop();
+        ctor.call(obj, this, this._objects.get(objectName));
+    }
 
-	this.addObject(obj);
-	return obj;
+    this.addObject(obj);
+    return obj;
 };
 
 /**
@@ -518,56 +524,56 @@ gdjs.RuntimeScene.prototype.createObject = function(objectName){
  * @param {gdjs.RuntimeObject} object The object to be removed.
  */
 gdjs.RuntimeScene.prototype.markObjectForDeletion = function(obj) {
-	//Add to the objects removed list.
-	//The objects will be sent to the instances cache or really deleted from memory later.
-	if ( this._instancesRemoved.indexOf(obj) === -1 ) this._instancesRemoved.push(obj);
+    //Add to the objects removed list.
+    //The objects will be sent to the instances cache or really deleted from memory later.
+    if ( this._instancesRemoved.indexOf(obj) === -1 ) this._instancesRemoved.push(obj);
 
     //Delete from the living instances.
-	if ( this._instances.containsKey(obj.getName()) ) {
-		var objId = obj.id;
-		var allInstances = this._instances.get(obj.getName());
-		for(var i = 0, len = allInstances.length;i<len;++i) {
-			if (allInstances[i].id == objId) {
-				allInstances.remove(i);
-				break;
-			}
-		}
-	}
+    if ( this._instances.containsKey(obj.getName()) ) {
+        var objId = obj.id;
+        var allInstances = this._instances.get(obj.getName());
+        for(var i = 0, len = allInstances.length;i<len;++i) {
+            if (allInstances[i].id == objId) {
+                allInstances.remove(i);
+                break;
+            }
+        }
+    }
 
-	//Notify the object it was removed from the scene
-	obj.onDeletedFromScene(this);
-	for(var j = 0, lenj = obj._behaviors.length;j<lenj;++j) {
-		obj._behaviors[j].ownerRemovedFromScene();
-	}
+    //Notify the object it was removed from the scene
+    obj.onDeletedFromScene(this);
+    for(var j = 0, lenj = obj._behaviors.length;j<lenj;++j) {
+        obj._behaviors[j].ownerRemovedFromScene();
+    }
 
-	//Call global callback
-	for(var j = 0;j<gdjs.callbacksObjectDeletedFromScene.length;++j) {
-		gdjs.callbacksObjectDeletedFromScene[j](this, obj);
-	}
+    //Call global callback
+    for(var j = 0;j<gdjs.callbacksObjectDeletedFromScene.length;++j) {
+        gdjs.callbacksObjectDeletedFromScene[j](this, obj);
+    }
 
-	return;
+    return;
 };
 
 /**
  * Create an identifier for a new object of the scene.
  */
 gdjs.RuntimeScene.prototype.createNewUniqueId = function() {
-	this._lastId++;
-	return this._lastId;
+    this._lastId++;
+    return this._lastId;
 };
 
 /**
  * Get the renderer associated to the RuntimeScene.
  */
 gdjs.RuntimeScene.prototype.getRenderer = function() {
-	return this._renderer;
+    return this._renderer;
 };
 
 /**
  * Get the runtimeGame associated to the RuntimeScene.
  */
 gdjs.RuntimeScene.prototype.getGame = function() {
-	return this._runtimeGame;
+    return this._runtimeGame;
 };
 
 /**
@@ -575,7 +581,7 @@ gdjs.RuntimeScene.prototype.getGame = function() {
  * @return The container holding the variables of the scene.
  */
 gdjs.RuntimeScene.prototype.getVariables = function() {
-	return this._variables;
+    return this._variables;
 };
 
 /**
@@ -583,11 +589,11 @@ gdjs.RuntimeScene.prototype.getVariables = function() {
  * @param {string} name The name of the behavior
  */
 gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
-	if ( this._initialBehaviorSharedData.containsKey(name) ) {
-		return this._initialBehaviorSharedData.get(name);
-	}
+    if ( this._initialBehaviorSharedData.containsKey(name) ) {
+        return this._initialBehaviorSharedData.get(name);
+    }
 
-	return null;
+    return null;
 };
 
 /**
@@ -595,18 +601,18 @@ gdjs.RuntimeScene.prototype.getInitialSharedDataForBehavior = function(name) {
  * @param {gdjs.Layer} name The name of the layer
  */
 gdjs.RuntimeScene.prototype.getLayer = function(name) {
-	if ( this._layers.containsKey(name) )
-		return this._layers.get(name);
+    if ( this._layers.containsKey(name) )
+        return this._layers.get(name);
 
-	return this._layers.get("");
+    return this._layers.get("");
 };
 
 gdjs.RuntimeScene.prototype.hasLayer = function(name) {
-	return this._layers.containsKey(name);
+    return this._layers.containsKey(name);
 };
 
 gdjs.RuntimeScene.prototype.getAllLayerNames = function(result) {
-	this._layers.keys(result);
+    this._layers.keys(result);
 };
 
 /**
@@ -614,7 +620,7 @@ gdjs.RuntimeScene.prototype.getAllLayerNames = function(result) {
  * @return {gdjs.TimeManager} The gdjs.TimeManager of the scene.
  */
 gdjs.RuntimeScene.prototype.getTimeManager = function() {
-	return this._timeManager;
+    return this._timeManager;
 };
 
 /**
@@ -622,7 +628,7 @@ gdjs.RuntimeScene.prototype.getTimeManager = function() {
  * @return {gdjs.SoundManager} The gdjs.SoundManager of the game.
  */
 gdjs.RuntimeScene.prototype.getSoundManager = function() {
-	return this._runtimeGame.getSoundManager();
+    return this._runtimeGame.getSoundManager();
 };
 
 //The flags to describe the change request by a scene:
@@ -637,7 +643,7 @@ gdjs.RuntimeScene.STOP_GAME = 5;
  * Return the value of the scene change that is requested.
  */
 gdjs.RuntimeScene.prototype.getRequestedChange = function() {
-	return this._requestedChange;
+    return this._requestedChange;
 };
 
 /**
@@ -646,7 +652,7 @@ gdjs.RuntimeScene.prototype.getRequestedChange = function() {
  * See requestChange.
  */
 gdjs.RuntimeScene.prototype.getRequestedScene = function() {
-	return this._requestedScene;
+    return this._requestedScene;
 };
 
 /**
@@ -656,15 +662,15 @@ gdjs.RuntimeScene.prototype.getRequestedScene = function() {
  * @param {string} sceneName The name of the new scene to launch, if applicable.
  */
 gdjs.RuntimeScene.prototype.requestChange = function(change, sceneName) {
-	this._requestedChange = change;
-	this._requestedScene = sceneName;
+    this._requestedChange = change;
+    this._requestedScene = sceneName;
 };
 
 /**
  * Get the profiler associated with the scene, or null if none.
  */
 gdjs.RuntimeScene.prototype.getProfiler = function() {
-	return this._profiler;
+    return this._profiler;
 }
 
 /**
@@ -673,24 +679,31 @@ gdjs.RuntimeScene.prototype.getProfiler = function() {
  * @param {Function} onProfilerStopped Function to be called when the profiler is stopped. Will be passed the profiler as argument.
  */
 gdjs.RuntimeScene.prototype.startProfiler = function(onProfilerStopped) {
-	if (this._profiler) return;
+    if (this._profiler) return;
 
-	this._profiler = new gdjs.Profiler();
-	this._onProfilerStopped = onProfilerStopped;
+    this._profiler = new gdjs.Profiler();
+    this._onProfilerStopped = onProfilerStopped;
 }
 
 /**
  * Stop the profiler being run on the scene.
  */
 gdjs.RuntimeScene.prototype.stopProfiler = function() {
-	if (!this._profiler) return null;
+    if (!this._profiler) return null;
 
-	var oldProfiler = this._profiler;
-	var onProfilerStopped = this._onProfilerStopped;
-	this._profiler = null;
-	this._onProfilerStopped = null;
+    var oldProfiler = this._profiler;
+    var onProfilerStopped = this._onProfilerStopped;
+    this._profiler = null;
+    this._onProfilerStopped = null;
 
-	if (onProfilerStopped) {
-		onProfilerStopped(oldProfiler);
-	}
+    if (onProfilerStopped) {
+        onProfilerStopped(oldProfiler);
+    }
+}
+
+/**
+ * Get the structure containing the triggers for "Trigger once" conditions.
+ */
+gdjs.RuntimeScene.prototype.getOnceTriggers = function() {
+    return this._onceTriggers;
 }

@@ -15,6 +15,8 @@ module.exports = function(config) {
       '../Runtime/pixi-renderers/*.js',
       '../Runtime/howler-sound-manager/howler.min.js',
       '../Runtime/howler-sound-manager/howler-sound-manager.js',
+      '../Runtime/fontfaceobserver-font-manager/fontfaceobserver.js',
+      '../Runtime/fontfaceobserver-font-manager/fontfaceobserver-font-manager.js',
       '../Runtime/timemanager.js',
       '../Runtime/runtimeobject.js',
       '../Runtime/runtimescene.js',
@@ -28,7 +30,7 @@ module.exports = function(config) {
       '../Runtime/runtimegame.js',
       '../Runtime/variable.js',
       '../Runtime/variablescontainer.js',
-      '../Runtime/eventscontext.js',
+      '../Runtime/oncetriggers.js',
       '../Runtime/runtimescene.js',
       '../Runtime/runtimebehavior.js',
       '../Runtime/runtimeobject.js',
@@ -54,7 +56,11 @@ module.exports = function(config) {
       //All tests files:
       './tests/init.js',
       '../../Extensions/**/tests/**.spec.js',
-      './tests/**/*.js'
+      './tests/**/*.js',
+
+      //All benchmark files:
+      './benchmarks/init.js',
+      './benchmarks/**/*.js'
     ]
   });
 };

@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -108,6 +109,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/police.png",
         "kind": "image",
+        "metadata": "",
         "name": "police.png",
         "smoothed": true,
         "userAdded": true
@@ -116,6 +118,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/voiture.png",
         "kind": "image",
+        "metadata": "",
         "name": "voiture.png",
         "smoothed": true,
         "userAdded": true
@@ -124,6 +127,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/Skycraper.png",
         "kind": "image",
+        "metadata": "",
         "name": "Skycraper.png",
         "smoothed": true,
         "userAdded": true
@@ -132,6 +136,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/Barn.png",
         "kind": "image",
+        "metadata": "",
         "name": "Barn.png",
         "smoothed": true,
         "userAdded": true
@@ -140,6 +145,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/Batiment.png",
         "kind": "image",
+        "metadata": "",
         "name": "Batiment.png",
         "smoothed": true,
         "userAdded": true
@@ -148,6 +154,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/Mur3D.png",
         "kind": "image",
+        "metadata": "",
         "name": "Mur3D.png",
         "smoothed": true,
         "userAdded": true
@@ -156,6 +163,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/Shop.png",
         "kind": "image",
+        "metadata": "",
         "name": "Shop.png",
         "smoothed": true,
         "userAdded": true
@@ -164,6 +172,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/Herbe.png",
         "kind": "image",
+        "metadata": "",
         "name": "Herbe.png",
         "smoothed": true,
         "userAdded": true
@@ -172,6 +181,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/RouteHorizontale.png",
         "kind": "image",
+        "metadata": "",
         "name": "RouteHorizontale.png",
         "smoothed": true,
         "userAdded": true
@@ -180,6 +190,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/RouteVerticale.png",
         "kind": "image",
+        "metadata": "",
         "name": "RouteVerticale.png",
         "smoothed": true,
         "userAdded": true
@@ -188,6 +199,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/etincelle.png",
         "kind": "image",
+        "metadata": "",
         "name": "etincelle.png",
         "smoothed": true,
         "userAdded": true
@@ -196,6 +208,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/smoke1.png",
         "kind": "image",
+        "metadata": "",
         "name": "smoke1.png",
         "smoothed": true,
         "userAdded": true
@@ -204,6 +217,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/smoke2.png",
         "kind": "image",
+        "metadata": "",
         "name": "smoke2.png",
         "smoothed": true,
         "userAdded": true
@@ -212,6 +226,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/smoke3.png",
         "kind": "image",
+        "metadata": "",
         "name": "smoke3.png",
         "smoothed": true,
         "userAdded": true
@@ -220,6 +235,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/frein.png",
         "kind": "image",
+        "metadata": "",
         "name": "frein.png",
         "smoothed": true,
         "userAdded": true
@@ -228,6 +244,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/flatDark23.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark23.png",
         "smoothed": true,
         "userAdded": true
@@ -236,6 +253,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/flatDark24.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark24.png",
         "smoothed": true,
         "userAdded": true
@@ -244,6 +262,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/flatDark35.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark35.png",
         "smoothed": true,
         "userAdded": true
@@ -252,6 +271,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/flatDark36.png",
         "kind": "image",
+        "metadata": "",
         "name": "flatDark36.png",
         "smoothed": true,
         "userAdded": true
@@ -259,6 +279,7 @@
       {
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-topdown-car-driving/vroom.wav",
         "kind": "audio",
+        "metadata": "",
         "name": "vroom.wav",
         "userAdded": true
       }
@@ -3492,6 +3513,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

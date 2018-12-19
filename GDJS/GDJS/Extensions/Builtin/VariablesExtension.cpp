@@ -71,10 +71,11 @@ VariablesExtension::VariablesExtension() {
               expressionCode, codeGenerator, context);
           gd::ExpressionParser parser(
               instruction.GetParameters()[2].GetPlainString());
-          if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                          codeGenerator.GetProject(),
-                                          codeGenerator.GetLayout(),
-                                          callbacks) ||
+          if (!parser.ParseMathExpression(
+                  codeGenerator.GetPlatform(),
+                  codeGenerator.GetGlobalObjectsAndGroups(),
+                  codeGenerator.GetObjectsAndGroups(),
+                  callbacks) ||
               expressionCode.empty())
             expressionCode = "0";
         }
@@ -116,10 +117,11 @@ VariablesExtension::VariablesExtension() {
               expressionCode, codeGenerator, context);
           gd::ExpressionParser parser(
               instruction.GetParameters()[2].GetPlainString());
-          if (!parser.ParseStringExpression(codeGenerator.GetPlatform(),
-                                            codeGenerator.GetProject(),
-                                            codeGenerator.GetLayout(),
-                                            callbacks) ||
+          if (!parser.ParseStringExpression(
+                  codeGenerator.GetPlatform(),
+                  codeGenerator.GetGlobalObjectsAndGroups(),
+                  codeGenerator.GetObjectsAndGroups(),
+                  callbacks) ||
               expressionCode.empty())
             expressionCode = "\"\"";
         }
@@ -156,10 +158,11 @@ VariablesExtension::VariablesExtension() {
               expressionCode, codeGenerator, context);
           gd::ExpressionParser parser(
               instruction.GetParameters()[2].GetPlainString());
-          if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                          codeGenerator.GetProject(),
-                                          codeGenerator.GetLayout(),
-                                          callbacks) ||
+          if (!parser.ParseMathExpression(
+                  codeGenerator.GetPlatform(),
+                  codeGenerator.GetGlobalObjectsAndGroups(),
+                  codeGenerator.GetObjectsAndGroups(),
+                  callbacks) ||
               expressionCode.empty())
             expressionCode = "0";
         }
@@ -202,10 +205,11 @@ VariablesExtension::VariablesExtension() {
                   expressionCode, codeGenerator, context);
               gd::ExpressionParser parser(
                   instruction.GetParameters()[2].GetPlainString());
-              if (!parser.ParseStringExpression(codeGenerator.GetPlatform(),
-                                                codeGenerator.GetProject(),
-                                                codeGenerator.GetLayout(),
-                                                callbacks) ||
+              if (!parser.ParseStringExpression(
+                      codeGenerator.GetPlatform(),
+                      codeGenerator.GetGlobalObjectsAndGroups(),
+                      codeGenerator.GetObjectsAndGroups(),
+                      callbacks) ||
                   expressionCode.empty())
                 expressionCode = "\"\"";
             }

@@ -1,5 +1,5 @@
 // @flow
-import {type ResourceKind} from './ResourceSource.flow';
+import { type ResourceKind } from './ResourceSource.flow';
 import ResourcesLoader from '../ResourcesLoader';
 
 /**
@@ -8,15 +8,22 @@ import ResourcesLoader from '../ResourcesLoader';
 export type ExternalEditorOpenOptions = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
-  singleFrame: boolean, // If set to true, edition should be limited to a single frame
+  singleFrame?: boolean, // If set to true, edition should be limited to a single frame
   resourceNames: Array<string>,
   onChangesSaved: (
-    Array<{ path: string, name: string, originalIndex: ?number }>, newName: string
+    Array<{
+      path?: string,
+      name: string,
+      originalIndex: ?number,
+      metadata?: ?Object,
+    }>,
+    newName: string,
+    metadata?: ?Object
   ) => void,
   extraOptions: {
-    name: string,
-    isLooping: boolean,
-    fps: number,
+    name?: string,
+    isLooping?: boolean,
+    fps?: number,
   },
 |};
 
@@ -24,5 +31,5 @@ export type ResourceExternalEditor = {
   name: string,
   displayName: string,
   kind: ResourceKind,
-  edit: (ExternalEditorOpenOptions) => void,
+  edit: ExternalEditorOpenOptions => void,
 };

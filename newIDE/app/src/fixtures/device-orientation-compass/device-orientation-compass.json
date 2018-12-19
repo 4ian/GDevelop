@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -102,6 +103,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-compass/img/compass.png",
         "kind": "image",
+        "metadata": "",
         "name": "compass.png",
         "smoothed": true,
         "userAdded": false
@@ -110,6 +112,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/device-orientation-compass/img/needle.png",
         "kind": "image",
+        "metadata": "",
         "name": "needle.png",
         "smoothed": true,
         "userAdded": false
@@ -348,6 +351,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

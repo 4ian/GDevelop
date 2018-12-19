@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -102,6 +103,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/play.png",
         "kind": "image",
+        "metadata": "",
         "name": "play.png",
         "smoothed": true,
         "userAdded": true
@@ -110,6 +112,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/pause.png",
         "kind": "image",
+        "metadata": "",
         "name": "pause.png",
         "smoothed": true,
         "userAdded": false
@@ -118,6 +121,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/sound_on.png",
         "kind": "image",
+        "metadata": "",
         "name": "sound_on.png",
         "smoothed": true,
         "userAdded": true
@@ -126,6 +130,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/sound_off.png",
         "kind": "image",
+        "metadata": "",
         "name": "sound_off.png",
         "smoothed": true,
         "userAdded": true
@@ -134,6 +139,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/music_play (1).png",
         "kind": "image",
+        "metadata": "",
         "name": "music_play (1).png",
         "smoothed": true,
         "userAdded": true
@@ -142,6 +148,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/music_pause.png",
         "kind": "image",
+        "metadata": "",
         "name": "music_pause.png",
         "smoothed": true,
         "userAdded": true
@@ -150,6 +157,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/volume_background.png",
         "kind": "image",
+        "metadata": "",
         "name": "volume_background.png",
         "smoothed": true,
         "userAdded": false
@@ -158,6 +166,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/volume_slider.png",
         "kind": "image",
+        "metadata": "",
         "name": "volume_slider.png",
         "smoothed": true,
         "userAdded": true
@@ -166,6 +175,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/toggle-music-play-sound/slider_button.png",
         "kind": "image",
+        "metadata": "",
         "name": "slider_button.png",
         "smoothed": true,
         "userAdded": true
@@ -1930,6 +1940,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

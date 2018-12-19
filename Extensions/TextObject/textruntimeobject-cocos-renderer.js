@@ -1,6 +1,7 @@
 gdjs.TextRuntimeObjectCocosRenderer = function(runtimeObject, runtimeScene)
 {
     this._object = runtimeObject;
+    this._fontManager = runtimeScene.getGame().getFontManager();
 
     this._text = new cc.LabelTTF(" ", "Arial", 38);
     this._text.disableStroke();
@@ -27,13 +28,14 @@ gdjs.TextRuntimeObjectCocosRenderer.prototype.updateStyle = function() {
     this._text.setFontSize(this._object._characterSize);
     this._text.setFontFillColor(cc.color(this._object._color[0],
         this._object._color[1], this._object._color[2]));
+    this._text._setBoundingWidth(this._object._wrapping ? this._object._wrappingWidth : 0);
 
     var fontName = !this._object._fontName ? 
         'Arial' : 
         (
             gdjs.CocosTools.isHTML5() ?
-            'gdjs_font_' + this._object._fontName :
-            'res/' + this._object._fontName
+            this._fontManager.getFontFamily(this._object._fontName) :
+            'res/' + this._fontManager.getFontFile(this._object._fontName)
         );
     this._text.setFontName(fontName);
 };

@@ -77,6 +77,14 @@ Object {
         "type": "Width",
       },
     },
+    "Timers": Object {
+      "Timer value": Object {
+        "displayedName": "Timer value",
+        "fullGroupName": "Common expressions for all objects/Timers",
+        "name": "ObjectTimerElapsedTime",
+        "type": "ObjectTimerElapsedTime",
+      },
+    },
     "Variables": Object {
       "Object's variable": Object {
         "displayedName": "Object's variable",

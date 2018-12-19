@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -114,6 +115,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/bordure2.png",
         "kind": "image",
+        "metadata": "",
         "name": "bordure2.png",
         "smoothed": true,
         "userAdded": true
@@ -122,6 +124,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV1.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank1",
         "smoothed": false,
         "userAdded": true
@@ -130,6 +133,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV2.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank2",
         "smoothed": false,
         "userAdded": true
@@ -138,6 +142,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV3.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank3",
         "smoothed": false,
         "userAdded": true
@@ -146,6 +151,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV4.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank4",
         "smoothed": false,
         "userAdded": true
@@ -154,6 +160,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV5.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank5",
         "smoothed": false,
         "userAdded": true
@@ -162,6 +169,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV6.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank6",
         "smoothed": false,
         "userAdded": true
@@ -170,6 +178,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/tankV7.png",
         "kind": "image",
+        "metadata": "",
         "name": "tank7",
         "smoothed": false,
         "userAdded": true
@@ -178,6 +187,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/bordure.png",
         "kind": "image",
+        "metadata": "",
         "name": "bordure.png",
         "smoothed": false,
         "userAdded": true
@@ -186,6 +196,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/TankB1.png",
         "kind": "image",
+        "metadata": "",
         "name": "TankB1.png",
         "smoothed": false,
         "userAdded": true
@@ -194,6 +205,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/basic-artificial-intelligence/alert.png",
         "kind": "image",
+        "metadata": "",
         "name": "alert.png",
         "smoothed": true,
         "userAdded": false
@@ -1954,6 +1966,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

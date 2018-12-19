@@ -7,6 +7,7 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
@@ -105,6 +106,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeCircle.png",
         "kind": "image",
+        "metadata": "",
         "name": "ShapeCircle.png",
         "smoothed": true,
         "userAdded": true
@@ -113,6 +115,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeCircleBorder.png",
         "kind": "image",
+        "metadata": "",
         "name": "ShapeCircleBorder.png",
         "smoothed": true,
         "userAdded": true
@@ -121,6 +124,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeRect.png",
         "kind": "image",
+        "metadata": "",
         "name": "ShapeRect.png",
         "smoothed": true,
         "userAdded": true
@@ -129,6 +133,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeRectBorder.png",
         "kind": "image",
+        "metadata": "",
         "name": "ShapeRectBorder.png",
         "smoothed": true,
         "userAdded": true
@@ -137,6 +142,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/ShapeLine.png",
         "kind": "image",
+        "metadata": "",
         "name": "ShapeLine.png",
         "smoothed": true,
         "userAdded": true
@@ -145,6 +151,7 @@
         "alwaysLoaded": false,
         "file": "https://df5lqcdudryde.cloudfront.net/examples/advanced-shape-based-painter/BarSelector.png",
         "kind": "image",
+        "metadata": "",
         "name": "BarSelector.png",
         "smoothed": true,
         "userAdded": true
@@ -2628,6 +2635,7 @@
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

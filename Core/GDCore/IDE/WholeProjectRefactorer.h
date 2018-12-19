@@ -8,22 +8,51 @@
 #include <vector>
 namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class String;
-}
+class EventsFunctionsExtension;
+class ArbitraryEventsWorker;
+}  // namespace gd
 
 namespace gd {
 
 /**
  * \brief Tool functions to do refactoring on the whole project after
  * changes like deletion or renaming of an object.
- */
+ *
+ * \TODO Ideally ObjectRenamedInLayout, ObjectRemovedInLayout,
+ * GlobalObjectRenamed, GlobalObjectRemoved would be implemented using
+ * ExposeProjectEvents.
+ **/
 class GD_CORE_API WholeProjectRefactorer {
  public:
+  /**
+   * \brief Call the specified worker on all events of the project (layout,
+   * external events, events functions...)
+   *
+   * This should be the preferred way to traverse all the events of a project.
+   */
+  static void ExposeProjectEvents(gd::Project& project,
+                                  gd::ArbitraryEventsWorker& worker);
+
+  /**
+   * \brief Refactor the project after an events function extension is renamed
+   */
+  static void RenameEventsFunctionsExtension(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::String& oldName,
+      const gd::String& newName);
+
+  /**
+   * \brief Refactor the project after an events function is renamed
+   */
+  static void RenameEventsFunction(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::String& oldFunctionName,
+      const gd::String& newFunctionName);
+
   /**
    * \brief Refactor the project after an object is renamed in a layout
    *

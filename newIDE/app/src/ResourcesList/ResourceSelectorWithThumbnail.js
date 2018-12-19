@@ -19,6 +19,7 @@ type Props = {|
   resourceName: string,
   onChange: (string) => void,
   floatingLabelText?: string,
+  hintText?: string,
 |};
 
 const ResourceSelectorWithThumbnail = ({
@@ -30,6 +31,7 @@ const ResourceSelectorWithThumbnail = ({
   resourceName,
   onChange,
   floatingLabelText,
+  hintText,
 }: Props) => {
   return (
     <div style={{ flex: 1, display: 'flex', alignItems: 'flex-end' }}>
@@ -45,6 +47,7 @@ const ResourceSelectorWithThumbnail = ({
           initialResourceName={resourceName}
           onChange={onChange}
           floatingLabelText={floatingLabelText}
+          hintText={hintText}
         />
       </div>
       <ResourceThumbnail

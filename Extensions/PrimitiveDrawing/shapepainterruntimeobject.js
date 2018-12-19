@@ -41,6 +41,10 @@ gdjs.ShapePainterRuntimeObject.prototype.stepBehaviorsPreEvents = function(runti
     gdjs.RuntimeObject.prototype.stepBehaviorsPreEvents.call(this, runtimeScene);
 };
 
+gdjs.ShapePainterRuntimeObject.prototype.getVisibilityAABB = function() {
+    return this._absoluteCoordinates ? null : this.getAABB();
+};
+
 gdjs.ShapePainterRuntimeObject.prototype.drawRectangle = function(x1, y1, x2, y2) {
     this._renderer.drawRectangle(x1, y1, x2, y2);
 };
@@ -95,12 +99,16 @@ gdjs.ShapePainterRuntimeObject.prototype.getOutlineOpacity = function() {
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.setX = function(x) {
-    this.x = x;
+    if ( x === this.x ) return;
+
+    gdjs.RuntimeObject.prototype.setX.call(this, x);
     this._renderer.updateXPosition();
 };
 
 gdjs.ShapePainterRuntimeObject.prototype.setY = function(y) {
-    this.y = y;
+    if ( y === this.y ) return;
+
+    gdjs.RuntimeObject.prototype.setY.call(this, y);
     this._renderer.updateYPosition();
 };
 

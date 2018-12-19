@@ -156,7 +156,8 @@ class ExporterHelper {
    * important. \param additionalSpec JSON string that will be passed to the
    * gdjs.RuntimeGame object.
    */
-  bool ExportPixiIndexFile(gd::String source,
+  bool ExportPixiIndexFile(const gd::Project &project,
+                           gd::String source,
                            gd::String exportDir,
                            const std::vector<gd::String> &includesFiles,
                            gd::String additionalSpec = "");

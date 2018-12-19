@@ -72,7 +72,7 @@ export default class DirectionTools extends Component<Props, State> {
   saveTimeBetweenFrames = () => {
     const { direction } = this.props;
 
-    const newTime = parseFloat(this.state.timeBetweenFrames);
+    const newTime = Math.max(parseFloat(this.state.timeBetweenFrames), 0.00001);
     const newTimeIsValid = !isNaN(newTime);
 
     if (newTimeIsValid) direction.setTimeBetweenFrames(newTime);
@@ -95,6 +95,9 @@ export default class DirectionTools extends Component<Props, State> {
     this.setState({
       previewOpen: open,
     });
+    if (!open) {
+      this.saveTimeBetweenFrames();
+    }
   };
 
   render() {
@@ -127,6 +130,11 @@ export default class DirectionTools extends Component<Props, State> {
           onBlur={() => this.saveTimeBetweenFrames()}
           id="direction-time-between-frames"
           style={styles.timeField}
+          type="number"
+          step={0.01}
+          precision={1}
+          min={0.01}
+          max={5}
         />
         <span style={styles.spacer} />
         <div style={styles.repeatContainer}>
@@ -143,7 +151,7 @@ export default class DirectionTools extends Component<Props, State> {
           <Dialog
             actions={
               <FlatButton
-                label="Close"
+                label="OK"
                 primary
                 onClick={() => this.openPreview(false)}
               />
@@ -158,6 +166,9 @@ export default class DirectionTools extends Component<Props, State> {
               spritesContainer={direction}
               resourcesLoader={resourcesLoader}
               project={project}
+              timeBetweenFrames={this.state.timeBetweenFrames}
+              onChangeTimeBetweenFrames={text =>
+                this.setState({ timeBetweenFrames: text })}
             />
           </Dialog>
         )}

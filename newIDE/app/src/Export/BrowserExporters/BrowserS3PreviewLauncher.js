@@ -5,25 +5,9 @@ import BrowserPreviewLinkDialog from './BrowserPreviewLinkDialog';
 import { findGDJS } from './BrowserS3GDJSFinder';
 import assignIn from 'lodash/assignIn';
 import { type PreviewOptions } from '../PreviewLauncher.flow';
-import { GDevelopGamesPreview } from '../../Utils/GDevelopServices/ApiConfigs';
+import { getBaseUrl } from '../../Utils/GDevelopServices/Preview';
 import { makeTimestampedId } from '../../Utils/TimestampedId';
-const awsS3 = require('aws-sdk/clients/s3');
 const gd = global.gd;
-
-const {
-  destinationBucket,
-  accessKeyId,
-  secretAccessKey,
-  region,
-  destinationBucketBaseUrl,
-} = GDevelopGamesPreview;
-
-const awsS3Client = new awsS3({
-  accessKeyId: accessKeyId,
-  secretAccessKey: secretAccessKey,
-  region: region,
-  correctClockSkew: true,
-});
 
 type State = {|
   showPreviewLinkDialog: boolean,
@@ -62,12 +46,10 @@ export default class BrowserS3PreviewLauncher extends React.Component<
 
         const prefix = makeTimestampedId();
 
-        const outputDir = destinationBucketBaseUrl + prefix;
+        const outputDir = getBaseUrl() + prefix;
         const browserS3FileSystem = new BrowserS3FileSystem({
           filesContent,
-          awsS3Client,
-          bucket: destinationBucket,
-          bucketBaseUrl: destinationBucketBaseUrl,
+          bucketBaseUrl: getBaseUrl(),
           prefix,
         });
         const fileSystem = assignIn(
@@ -75,7 +57,7 @@ export default class BrowserS3PreviewLauncher extends React.Component<
           browserS3FileSystem
         );
         const exporter = new gd.Exporter(fileSystem, gdjsRoot);
-        exporter.setCodeOutputDirectory(destinationBucketBaseUrl + prefix);
+        exporter.setCodeOutputDirectory(getBaseUrl() + prefix);
 
         resolve({
           exporter,

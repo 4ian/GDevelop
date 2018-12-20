@@ -302,12 +302,15 @@ export default class ResourcesList extends React.Component<Props, State> {
     const { searchText } = this.state;
 
     const resourcesManager = project.getResourcesManager();
-    const allResourcesList = resourcesManager
-      .getAllResourceNames()
-      .toJSArray()
-      .map(resourceName => resourcesManager.getResource(resourceName));
-    const filteredList = filterResourcesList(allResourcesList, searchText);
-
+    const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
+    const allResourceItems = resourceNames.map(resourceName =>
+      resourcesManager.getResource(resourceName)
+    );
+    const resourcesWithMissingPath = resourceNames.filter(
+      resourceName => !resourceHasValidPath(project, resourceName)
+    );
+    const filteredList = filterResourcesList(allResourceItems, searchText);
+    console.log(resourceNames)
     // Force List component to be mounted again if project
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
@@ -333,6 +336,7 @@ export default class ResourcesList extends React.Component<Props, State> {
                 buildMenuTemplate={this._renderResourceMenuTemplate}
                 helperClass="sortable-helper"
                 distance={20}
+                errorItemsList={resourcesWithMissingPath}
               />
             )}
           </AutoSizer>

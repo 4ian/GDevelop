@@ -34,6 +34,7 @@ const styles = {
 type State = {|
   renamedResource: ?gdResource,
   searchText: string,
+  resourcesWithMissingPath: Array<string>,
 |};
 
 type Props = {|

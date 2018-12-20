@@ -40,7 +40,7 @@ export default class AnimationPreview extends Component<Props, State> {
     currentFrameIndex: 0,
     currentFrameElapsedTime: 0,
     paused: false,
-    fps: Math.round(1/this.props.timeBetweenFrames),
+    fps: Math.round(1 / this.props.timeBetweenFrames),
   };
 
   nextUpdate = null;
@@ -133,7 +133,7 @@ export default class AnimationPreview extends Component<Props, State> {
               const fps = parseFloat(text);
               if (fps > 0) {
                 this.setState({ fps });
-                onChangeTimeBetweenFrames(parseFloat((1/fps).toFixed(4)));
+                onChangeTimeBetweenFrames(parseFloat((1 / fps).toFixed(4)));
                 this.replay();
               }
             }}
@@ -151,8 +151,8 @@ export default class AnimationPreview extends Component<Props, State> {
             onChange={(e, text) => {
               const time = parseFloat(text);
               if (time > 0) {
-                this.setState({fps: Math.round(1/time)});
-                onChangeTimeBetweenFrames(time);  
+                this.setState({ fps: Math.round(1 / time) });
+                onChangeTimeBetweenFrames(time);
                 this.replay();
               }
             }}

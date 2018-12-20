@@ -62,6 +62,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   state: State = {
     renamedResource: null,
     searchText: '',
+    resourcesWithMissingPath:[],
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
@@ -297,6 +298,17 @@ export default class ResourcesList extends React.Component<Props, State> {
     ];
   };
 
+  componentDidMount() {
+    const { project } = this.props;
+    const resourcesManager = project.getResourcesManager();
+    const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
+    this.setState({
+        resourcesWithMissingPath: resourceNames.filter(
+          resourceName => !resourceHasValidPath(project, resourceName)
+        )
+    });
+  };
+
   render() {
     const { project, selectedResource, onSelectResource } = this.props;
     const { searchText } = this.state;
@@ -305,9 +317,6 @@ export default class ResourcesList extends React.Component<Props, State> {
     const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
     const allResourceItems = resourceNames.map(resourceName =>
       resourcesManager.getResource(resourceName)
-    );
-    const resourcesWithMissingPath = resourceNames.filter(
-      resourceName => !resourceHasValidPath(project, resourceName)
     );
     const filteredList = filterResourcesList(allResourceItems, searchText);
 
@@ -336,7 +345,7 @@ export default class ResourcesList extends React.Component<Props, State> {
                 buildMenuTemplate={this._renderResourceMenuTemplate}
                 helperClass="sortable-helper"
                 distance={20}
-                errorItemsList={resourcesWithMissingPath}
+                errorItemsList={this.state.resourcesWithMissingPath}
               />
             )}
           </AutoSizer>

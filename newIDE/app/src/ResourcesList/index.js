@@ -310,7 +310,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       resourceName => !resourceHasValidPath(project, resourceName)
     );
     const filteredList = filterResourcesList(allResourceItems, searchText);
-    console.log(resourceNames)
+
     // Force List component to be mounted again if project
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.

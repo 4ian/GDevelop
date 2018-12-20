@@ -40,7 +40,7 @@ export default class AnimationPreview extends Component<Props, State> {
     currentFrameIndex: 0,
     currentFrameElapsedTime: 0,
     paused: false,
-    fps: parseFloat((1/this.props.timeBetweenFrames).toFixed(0)),
+    fps: Math.round(1/this.props.timeBetweenFrames),
   };
 
   nextUpdate = null;
@@ -130,9 +130,12 @@ export default class AnimationPreview extends Component<Props, State> {
           <TextField
             value={fps}
             onChange={(e, text) => {
-              this.setState({fps: parseFloat(text)});
-              onChangeTimeBetweenFrames(parseFloat((1/text).toFixed(4)));
-              this.replay();
+              const fps = parseFloat(text);
+              if (fps > 0) {
+                this.setState({ fps });
+                onChangeTimeBetweenFrames(parseFloat((1/fps).toFixed(4)));
+                this.replay();
+              }
             }}
             id="direction-time-between-frames"
             type="number"
@@ -146,9 +149,12 @@ export default class AnimationPreview extends Component<Props, State> {
           <TextField
             value={timeBetweenFrames}
             onChange={(e, text) => {
-              onChangeTimeBetweenFrames(parseFloat(text));
-              this.setState({fps: parseFloat((1/text).toFixed(0))});
-              this.replay();
+              const time = parseFloat(text);
+              if (time > 0) {
+                this.setState({fps: Math.round(1/time)});
+                onChangeTimeBetweenFrames(time);  
+                this.replay();
+              }
             }}
             id="direction-time-between-frames"
             type="number"

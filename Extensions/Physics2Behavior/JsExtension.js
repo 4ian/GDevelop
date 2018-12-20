@@ -232,6 +232,9 @@ module.exports = {
           .setType('Number')
           .setLabel('Gravity Scale')
       );
+
+      // Waiting for a layers/masks editor
+      /*
       // Transform the layers number into a binary string
       var layers = behaviorContent.layers.toString(2);
       // Reverse the string (so the first layer bit is shown at the left)
@@ -257,6 +260,7 @@ module.exports = {
         'masks',
         new gd.PropertyDescriptor(masks).setLabel('Masks')
       );
+      */
 
       return behaviorProperties;
     };

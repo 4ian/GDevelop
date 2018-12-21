@@ -34,7 +34,7 @@ const styles = {
 type State = {|
   renamedResource: ?gdResource,
   searchText: string,
-  erroredItems: {[string]: boolean},
+  resourcesWithMissingPath: {[string]: boolean},
 |};
 
 type Props = {|
@@ -63,7 +63,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   state: State = {
     renamedResource: null,
     searchText: '',
-    resourcesWithMissingPath: {'': false},
+    resourcesWithMissingPath: {},
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {

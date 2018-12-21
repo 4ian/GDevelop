@@ -210,9 +210,7 @@ class GD_CORE_API ExpressionParser2 {
       }
     } else {
       factor = ReadUntilWhitespace(type);
-      factor->diagnostic = RaiseTypeError(
-          _("You must enter a text, number or a valid expression call."),
-          expressionStartPosition);
+      factor->diagnostic = RaiseEmptyError(type, expressionStartPosition);
     }
 
     return factor;
@@ -702,6 +700,24 @@ class GD_CORE_API ExpressionParser2 {
       const gd::String &message, size_t beginningPosition) {
     return std::move(gd::make_unique<ExpressionParserError>(
         "type_error", message, beginningPosition, GetCurrentPosition()));
+  }
+
+  std::unique_ptr<ExpressionParserError> RaiseEmptyError(
+      const gd::String &type, size_t beginningPosition) {
+    gd::String message;
+    if (type == "number") {
+      message = _("You must enter a number or a valid expression call.");
+    } else if (type == "string") {
+      message = _("You must enter a text or a valid expression call.");
+    } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      message = _("You must enter a variable name.");
+    } else if (type == "identifier") {
+      message = _("You must enter a valid name.");
+    } else {
+      message = _("You must enter a valid expression.");
+    }
+
+    return std::move(RaiseTypeError(message, beginningPosition));
   }
   ///@}
 

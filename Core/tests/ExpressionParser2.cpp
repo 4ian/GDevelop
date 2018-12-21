@@ -53,7 +53,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "You must enter a text, number or a valid expression call.");
+              "You must enter a text or a valid expression call.");
     }
     {
       auto node = parser.ParseExpression("string", "abcd");
@@ -282,7 +282,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "You must enter a text, number or a valid expression call.");
+              "You must enter a number or a valid expression call.");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
     }
     {
@@ -319,6 +319,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
   }
 
   SECTION("Invalid numbers") {
+    {
+      auto node = parser.ParseExpression("number", "");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You must enter a number or a valid expression call.");
+      REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 0);
+    }
     {
       auto node = parser.ParseExpression("number", "abcd");
       REQUIRE(node != nullptr);
@@ -400,7 +411,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "You must enter a text, number or a valid expression call.");
+              "You must enter a number or a valid expression call.");
       REQUIRE(validator.GetErrors()[0]->GetStartPosition() == 2);
     }
   }
@@ -486,14 +497,25 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   SECTION("Invalid identifiers") {
     {
-      auto node = parser.ParseExpression("identifier", "Hello + World1");
+      auto node = parser.ParseExpression("identifier", "");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "Operators (+, -, /, *) can't be used there. Remove the operator.");
+              "You must enter a valid name.");
+    }
+    {
+      auto node = parser.ParseExpression("identifier", "Hello + World1");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(
+          validator.GetErrors()[0]->GetMessage() ==
+          "Operators (+, -, /, *) can't be used there. Remove the operator.");
     }
   }
 
@@ -688,6 +710,19 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
   }
 
+  SECTION("Invalid variables") {
+    {
+      auto node = parser.ParseExpression("scenevar", "");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
+              "You must enter a variable name.");
+    }
+  }
+
   SECTION("Valid variables") {
     {
       auto node = parser.ParseExpression("scenevar", "myVariable");
@@ -739,8 +774,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   SECTION("Fuzzy/random tests") {
     {
-      auto testExpression = [&parser](const gd::String & expression) {
-        auto testExpressionWithType = [&parser, &expression](const gd::String & type) {
+      auto testExpression = [&parser](const gd::String &expression) {
+        auto testExpressionWithType = [&parser,
+                                       &expression](const gd::String &type) {
           auto node = parser.ParseExpression(type, expression);
           REQUIRE(node != nullptr);
           gd::ExpressionValidator validator;
@@ -758,15 +794,25 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       };
 
       REQUIRE_NOTHROW(testExpression(""));
-      REQUIRE_NOTHROW(testExpression("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
-      REQUIRE_NOTHROW(testExpression("2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2[]"));
+      REQUIRE_NOTHROW(
+          testExpression("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                         "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                         "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"));
+      REQUIRE_NOTHROW(testExpression(
+          "2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/"
+          "2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/"
+          "2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/"
+          "2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/"
+          "2/2/2/2/2/2/2/2/2/2/2/2/2/2/2/2[]"));
       REQUIRE_NOTHROW(testExpression("-043jovn"));
       REQUIRE_NOTHROW(testExpression("-043jo\t\t\r\n+==\t-vn"));
       REQUIRE_NOTHROW(testExpression("--=frpvlf-=3ok"));
       REQUIRE_NOTHROW(testExpression("-[][\\][\\][]]"));
       REQUIRE_NOTHROW(testExpression("r3o4f-kef03-34=-pf[w]"));
       REQUIRE_NOTHROW(testExpression("-=-+))(_OK*UJKL}{\""));
-      REQUIRE_NOTHROW(testExpression("\\|\"\\|\"\\|\"w|\"\\\"\\\" \\\\\\\\\" fweewf \fe'f\fwe'\te'w\f'reg[pto43o]"));
+      REQUIRE_NOTHROW(
+          testExpression("\\|\"\\|\"\\|\"w|\"\\\"\\\" \\\\\\\\\" fweewf "
+                         "\fe'f\fwe'\te'w\f'reg[pto43o]"));
     }
   }
 }

@@ -382,7 +382,9 @@ storiesOf('ParameterFields', module)
   ))
   .add('ExpressionField (with errors)', () => (
     <ValueStateHolder
-      initialValue={'Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3\n-Test2()+3-/2//2 \n+ 3()'}
+      initialValue={
+        'Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3\n-Test2()+3-/2//2 \n+ 3()'
+      }
       render={(value, onChange) => (
         <ExpressionField
           project={project}

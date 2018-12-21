@@ -100,7 +100,7 @@ class GD_CORE_API ExpressionCodeGenerator : public ExpressionParser2NodeWorker {
       const std::vector<std::unique_ptr<ExpressionNode>>& parameters,
       const ExpressionMetadata& expressionMetadata,
       size_t initialParameterIndex);
-  static gd::String GenerateDefaultValue(const gd::String& type);
+  gd::String GenerateDefaultValue(const gd::String& type);
   static std::vector<gd::Expression> PrintParameters(
       const std::vector<std::unique_ptr<ExpressionNode>>& parameters);
 

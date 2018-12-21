@@ -493,7 +493,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "Operators (+, -, /, *) should not be used there.");
+              "Operators (+, -, /, *) can't be used there. Remove the operator.");
     }
   }
 

@@ -141,17 +141,17 @@ gd::String ExpressionCodeGenerator::GenerateExpressionCode(
   auto node = parser.ParseExpression(type, expression, objectName);
   gd::ExpressionValidator validator;
   node->Visit(validator);
+
+  ExpressionCodeGenerator generator(codeGenerator, context);
   if (!validator.GetErrors().empty()) {
     std::cout << "Error: \"" << validator.GetErrors()[0]->GetMessage()
               << "\" in: \"" << expression << "\" (" << type << ")"
               << std::endl;
 
-    return GenerateDefaultValue(type);
+    return generator.GenerateDefaultValue(type);
   }
 
-  ExpressionCodeGenerator generator(codeGenerator, context);
   node->Visit(generator);
-
   return generator.GetOutput();
 }
 
@@ -440,6 +440,10 @@ std::vector<gd::Expression> ExpressionCodeGenerator::PrintParameters(
 
 gd::String ExpressionCodeGenerator::GenerateDefaultValue(
     const gd::String& type) {
+  if (gd::ParameterMetadata::IsExpression("variable", type)) {
+    return codeGenerator.GenerateBadVariable();
+  }
+
   return (type == "string" || type == "identifier") ? "\"\"" : "0";
 }
 

@@ -131,7 +131,8 @@ class GD_CORE_API ExpressionParser2 {
     return std::move(op);
   }
 
-  std::unique_ptr<ExpressionNode> Term(const gd::String &type, const gd::String &objectName) {
+  std::unique_ptr<ExpressionNode> Term(const gd::String &type,
+                                       const gd::String &objectName) {
     SkipWhitespace();
 
     std::unique_ptr<ExpressionNode> factor = Factor(type, objectName);
@@ -155,7 +156,8 @@ class GD_CORE_API ExpressionParser2 {
     return factor;
   };
 
-  std::unique_ptr<ExpressionNode> Factor(const gd::String &type, const gd::String &objectName) {
+  std::unique_ptr<ExpressionNode> Factor(const gd::String &type,
+                                         const gd::String &objectName) {
     SkipWhitespace();
 
     size_t expressionStartPosition = GetCurrentPosition();
@@ -515,7 +517,13 @@ class GD_CORE_API ExpressionParser2 {
     } else if (type == "identifier") {
       return gd::make_unique<ExpressionParserError>(
           "invalid_operator",
-          _("Operators (+, -, /, *) should not be used there."),
+          _("Operators (+, -, /, *) can't be used there. Remove the operator."),
+          GetCurrentPosition());
+    } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      return gd::make_unique<ExpressionParserError>(
+          "invalid_operator",
+          _("Operators (+, -, /, *) can't be used in variable names. Remove "
+            "the operator from the variable name."),
           GetCurrentPosition());
     }
 
@@ -523,8 +531,7 @@ class GD_CORE_API ExpressionParser2 {
   }
 
   std::unique_ptr<ExpressionParserDiagnostic> ValidateUnaryOperator(
-    const gd::String &type, gd::String::value_type operatorChar 
-  ) {
+      const gd::String &type, gd::String::value_type operatorChar) {
     if (type == "number") {
       if (operatorChar == '+' || operatorChar == '-') {
         return gd::make_unique<ExpressionParserDiagnostic>();
@@ -532,19 +539,27 @@ class GD_CORE_API ExpressionParser2 {
 
       return gd::make_unique<ExpressionParserError>(
           "invalid_operator",
-          _("You've used an \"unary\" operator that is not supported. Operator should be "
+          _("You've used an \"unary\" operator that is not supported. Operator "
+            "should be "
             "either + or -."),
           GetCurrentPosition());
     } else if (type == "string") {
       return gd::make_unique<ExpressionParserError>(
           "invalid_operator",
           _("You've used an operator that is not supported. Only + can be used "
-            "to concatenate texts, and must be placed between two texts (or expressions)."),
+            "to concatenate texts, and must be placed between two texts (or "
+            "expressions)."),
           GetCurrentPosition());
     } else if (type == "identifier") {
       return gd::make_unique<ExpressionParserError>(
           "invalid_operator",
-          _("Operators (+, -, /, *) should not be used there."),
+          _("Operators (+, -) can't be used there. Remove the operator."),
+          GetCurrentPosition());
+    } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
+      return gd::make_unique<ExpressionParserError>(
+          "invalid_operator",
+          _("Operators (+, -) can't be used in variable names. Remove "
+            "the operator from the variable name."),
           GetCurrentPosition());
     }
 
@@ -596,7 +611,8 @@ class GD_CORE_API ExpressionParser2 {
         DOT.find(expression[currentPosition]) == gd::String::npos &&
         QUOTE.find(expression[currentPosition]) == gd::String::npos &&
         BRACKETS.find(expression[currentPosition]) == gd::String::npos &&
-        EXPRESSION_OPERATORS.find(expression[currentPosition]) == gd::String::npos&&
+        EXPRESSION_OPERATORS.find(expression[currentPosition]) ==
+            gd::String::npos &&
         TERM_OPERATORS.find(expression[currentPosition]) == gd::String::npos) {
       return true;
     }

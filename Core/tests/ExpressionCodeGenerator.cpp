@@ -221,6 +221,17 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
               "parameter not existing in the nodes */ \"\")");
     }
     {
+      // Using GenerateExpressionCode, the default value of 0 should be returned
+      // as expression is invalid.
+      REQUIRE(
+          gd::ExpressionCodeGenerator::GenerateExpressionCode(
+              codeGenerator,
+              context,
+              "number",
+              "MyExtension::GetNumberWith2Params(MyExtension::GetNumber())") ==
+          "0");
+    }
+    {
       auto node = parser.ParseExpression("number", "MyExtension::Idontexist()");
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
@@ -240,6 +251,45 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "getNumberWith2Params(1, \"2\")");
+    }
+  }
+  SECTION("Invalid variables") {
+    {
+      // Test an empty expression
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "scenevar", "") == "fakeBadVariable");
+    }
+    {
+      // Test a unary operator
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "objectvar", "-") ==
+              "fakeBadVariable");
+    }
+    {
+      // Test an operator
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "globalvar", "/") ==
+              "fakeBadVariable");
+    }
+  }
+  SECTION("Invalid variables, using operators") {
+    {
+      // Test a unary operator
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "objectvar", "-(var1)") ==
+              "fakeBadVariable");
+    }
+    {
+      // Test an operator
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "globalvar", "var1+var2") ==
+              "fakeBadVariable");
+    }
+    {
+      // Test multiple operators
+      REQUIRE(gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator, context, "globalvar", "var1/var2/var3/var4") ==
+              "fakeBadVariable");
     }
   }
   SECTION("Valid function calls with variables") {

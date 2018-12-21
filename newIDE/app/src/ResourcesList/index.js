@@ -63,7 +63,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   state: State = {
     renamedResource: null,
     searchText: '',
-    resourcesWithMissingPath:{},
+    resourcesWithMissingPath: {'': false},
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {

@@ -40,7 +40,7 @@ type ItemsListProps = {
   renamedItem: ?Item,
   addNewItemLabel: React.Node | string,
   buildMenuTemplate: Item => any,
-  errorItemsList: Array<string>,
+  erroredItems: {[string]: boolean},
 };
 
 class ItemsList extends React.Component<ItemsListProps, *> {
@@ -59,7 +59,7 @@ class ItemsList extends React.Component<ItemsListProps, *> {
       addNewItemLabel,
       renamedItem,
       getThumbnail,
-      errorItemsList,
+      erroredItems,
     } = this.props;
 
     return (
@@ -97,7 +97,7 @@ class ItemsList extends React.Component<ItemsListProps, *> {
               selected={item === selectedItem}
               onItemSelected={this.props.onItemSelected}
               buildMenuTemplate={this.props.buildMenuTemplate}
-              hasErrors={errorItemsList.includes(item.getName())}
+              hasErrors={!!erroredItems[item.getName()]}
             />
           );
         }}

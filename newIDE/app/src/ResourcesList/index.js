@@ -34,7 +34,7 @@ const styles = {
 type State = {|
   renamedResource: ?gdResource,
   searchText: string,
-  resourcesWithMissingPath: Array<string>,
+  erroredItems: {[string]: boolean},
 |};
 
 type Props = {|
@@ -303,11 +303,11 @@ export default class ResourcesList extends React.Component<Props, State> {
     const { project } = this.props;
     const resourcesManager = project.getResourcesManager();
     const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
-    this.setState({
-        resourcesWithMissingPath: resourceNames.filter(
-          resourceName => !resourceHasValidPath(project, resourceName)
-        )
+    const resourcesWithMissingPath = {};
+    resourceNames.forEach(resourceName => {
+      resourcesWithMissingPath[resourceName] = !resourceHasValidPath(project, resourceName)
     });
+    this.setState({ resourcesWithMissingPath });
   };
 
   render() {
@@ -315,11 +315,11 @@ export default class ResourcesList extends React.Component<Props, State> {
     const { searchText } = this.state;
 
     const resourcesManager = project.getResourcesManager();
-    const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
-    const allResourceItems = resourceNames.map(resourceName =>
-      resourcesManager.getResource(resourceName)
-    );
-    const filteredList = filterResourcesList(allResourceItems, searchText);
+    const allResourcesList = resourcesManager
+      .getAllResourceNames()
+      .toJSArray()
+      .map(resourceName => resourcesManager.getResource(resourceName));
+    const filteredList = filterResourcesList(allResourcesList, searchText);
 
     // Force List component to be mounted again if project
     // has been changed. Avoid accessing to invalid objects that could
@@ -346,7 +346,7 @@ export default class ResourcesList extends React.Component<Props, State> {
                 buildMenuTemplate={this._renderResourceMenuTemplate}
                 helperClass="sortable-helper"
                 distance={20}
-                errorItemsList={this.state.resourcesWithMissingPath}
+                erroredItems={this.state.resourcesWithMissingPath}
               />
             )}
           </AutoSizer>

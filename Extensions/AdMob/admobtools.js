@@ -19,16 +19,16 @@ gdjs.adMob = {
   videoLoading: false,
   videoReady: false,
   videoShowing: false,
-  videoReward: false
+  videoReward: false,
 };
 
 gdjs.adMob._getPlatformName = function() {
   if (/(android)/i.test(navigator.userAgent)) {
-    return "android";
+    return 'android';
   } else if (/(ipod|iphone|ipad)/i.test(navigator.userAgent)) {
-    return "ios";
+    return 'ios';
   } else {
-    return "windowsPhone";
+    return 'windowsPhone';
   }
 };
 
@@ -78,14 +78,21 @@ gdjs.adMob.loadBanner = function(
   displayOnLoading,
   testMode
 ) {
-  if (typeof admob === "undefined") return;
+  if (typeof admob === 'undefined') return;
+
+  if (
+    gdjs.adMob.bannerLoading ||
+    gdjs.adMob.bannerReady ||
+    gdjs.adMob.bannerExists
+  )
+    return;
 
   admob.banner.config({
-    id: gdjs.adMob._getPlatformName() === "android" ? androidID : iosID, // Support Android & iOS
+    id: gdjs.adMob._getPlatformName() === 'android' ? androidID : iosID, // Support Android & iOS
     bannerAtTop: atTop,
     overlap: overlap,
     autoShow: displayOnLoading,
-    isTesting: testMode
+    isTesting: testMode,
   });
   admob.banner.prepare();
 
@@ -99,7 +106,7 @@ gdjs.adMob.loadBanner = function(
 };
 
 gdjs.adMob.showBanner = function() {
-  if (typeof admob === "undefined") return;
+  if (typeof admob === 'undefined') return;
 
   // This block is needed because the banner event listeners bug
   if (gdjs.adMob.bannerReady) {
@@ -113,7 +120,7 @@ gdjs.adMob.showBanner = function() {
 };
 
 gdjs.adMob.hideBanner = function() {
-  if (typeof admob === "undefined") return;
+  if (typeof admob === 'undefined') return;
 
   if (gdjs.adMob.bannerExists) gdjs.adMob.bannerShowing = false;
 
@@ -121,7 +128,7 @@ gdjs.adMob.hideBanner = function() {
 };
 
 gdjs.adMob.removeBanner = function() {
-  if (typeof admob === "undefined") return;
+  if (typeof admob === 'undefined') return;
 
   // These lines are needed because the banner event listeners bug
   gdjs.adMob.bannerExists = false;
@@ -149,12 +156,19 @@ gdjs.adMob.loadInterstitial = function(
   displayOnLoading,
   testMode
 ) {
-  if (typeof admob === "undefined") return;
+  if (typeof admob === 'undefined') return;
+
+  if (
+    gdjs.adMob.interstitialLoading ||
+    gdjs.adMob.interstitialReady ||
+    gdjs.adMob.interstitialShowing
+  )
+    return;
 
   admob.interstitial.config({
-    id: gdjs.adMob._getPlatformName() === "android" ? androidID : iosID, // Support Android & iOS
+    id: gdjs.adMob._getPlatformName() === 'android' ? androidID : iosID, // Support Android & iOS
     autoShow: displayOnLoading,
-    isTesting: testMode
+    isTesting: testMode,
   });
   admob.interstitial.prepare();
 
@@ -163,7 +177,7 @@ gdjs.adMob.loadInterstitial = function(
 };
 
 gdjs.adMob.showInterstitial = function() {
-  if (typeof admob === "undefined") return;
+  if (typeof admob === 'undefined') return;
 
   admob.interstitial.show();
 };
@@ -189,12 +203,19 @@ gdjs.adMob.existVideoReward = function(markAsClaimed) {
 };
 
 gdjs.adMob.loadVideo = function(androidID, iosID, displayOnLoading, testMode) {
-  if (typeof admob === "undefined") return;
+  if (typeof admob === 'undefined') return;
+
+  if (
+    gdjs.adMob.videoLoading ||
+    gdjs.adMob.videoReady ||
+    gdjs.adMob.videoShowing
+  )
+    return;
 
   admob.rewardvideo.config({
-    id: gdjs.adMob._getPlatformName() === "android" ? androidID : iosID, // Support Android & iOS
+    id: gdjs.adMob._getPlatformName() === 'android' ? androidID : iosID, // Support Android & iOS
     autoShow: displayOnLoading,
-    isTesting: testMode
+    isTesting: testMode,
   });
   admob.rewardvideo.prepare();
 
@@ -203,7 +224,7 @@ gdjs.adMob.loadVideo = function(androidID, iosID, displayOnLoading, testMode) {
 };
 
 gdjs.adMob.showVideo = function() {
-  if (typeof admob === "undefined") return;
+  if (typeof admob === 'undefined') return;
 
   admob.rewardvideo.show();
 };
@@ -214,7 +235,7 @@ gdjs.adMob.claimVideoReward = function() {
 
 // Banner event listeners
 document.addEventListener(
-  "admob.banner.events.LOAD",
+  'admob.banner.events.LOAD',
   function() {
     gdjs.adMob.bannerReady = true;
     gdjs.adMob.bannerLoading = false;
@@ -223,7 +244,7 @@ document.addEventListener(
 );
 
 document.addEventListener(
-  "admob.banner.events.LOAD_FAIL",
+  'admob.banner.events.LOAD_FAIL',
   function() {
     gdjs.adMob.bannerLoading = false;
   },
@@ -254,7 +275,7 @@ document.addEventListener(
 
 // Interstitial event listeners
 document.addEventListener(
-  "admob.interstitial.events.LOAD",
+  'admob.interstitial.events.LOAD',
   function() {
     gdjs.adMob.interstitialReady = true;
     gdjs.adMob.interstitialLoading = false;
@@ -263,7 +284,7 @@ document.addEventListener(
 );
 
 document.addEventListener(
-  "admob.interstitial.events.LOAD_FAIL",
+  'admob.interstitial.events.LOAD_FAIL',
   function() {
     gdjs.adMob.interstitialLoading = false;
   },
@@ -271,7 +292,7 @@ document.addEventListener(
 );
 
 document.addEventListener(
-  "admob.interstitial.events.OPEN",
+  'admob.interstitial.events.OPEN',
   function() {
     gdjs.adMob.interstitialShowing = true;
     gdjs.adMob.interstitialReady = false;
@@ -280,7 +301,7 @@ document.addEventListener(
 );
 
 document.addEventListener(
-  "admob.interstitial.events.CLOSE",
+  'admob.interstitial.events.CLOSE',
   function() {
     gdjs.adMob.interstitialShowing = false;
   },
@@ -289,7 +310,7 @@ document.addEventListener(
 
 // Reward video event listeners
 document.addEventListener(
-  "admob.rewardvideo.events.LOAD",
+  'admob.rewardvideo.events.LOAD',
   function() {
     gdjs.adMob.videoReady = true;
     gdjs.adMob.videoLoading = false;
@@ -298,7 +319,7 @@ document.addEventListener(
 );
 
 document.addEventListener(
-  "admob.rewardvideo.events.LOAD_FAIL",
+  'admob.rewardvideo.events.LOAD_FAIL',
   function() {
     gdjs.adMob.videoLoading = false;
   },
@@ -306,7 +327,7 @@ document.addEventListener(
 );
 
 document.addEventListener(
-  "admob.rewardvideo.events.OPEN",
+  'admob.rewardvideo.events.OPEN',
   function() {
     gdjs.adMob.videoShowing = true;
     gdjs.adMob.videoReady = false;
@@ -315,7 +336,7 @@ document.addEventListener(
 );
 
 document.addEventListener(
-  "admob.rewardvideo.events.CLOSE",
+  'admob.rewardvideo.events.CLOSE',
   function() {
     gdjs.adMob.videoShowing = false;
   },
@@ -323,7 +344,7 @@ document.addEventListener(
 );
 
 document.addEventListener(
-  "admob.rewardvideo.events.REWARD",
+  'admob.rewardvideo.events.REWARD',
   function() {
     gdjs.adMob.videoReward = true;
   },

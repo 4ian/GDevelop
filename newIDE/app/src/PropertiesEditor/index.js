@@ -78,13 +78,26 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     return value;
   }
 
+  _getFieldLabel(instances: Instances, field: Field): any {
+    if (!instances[0]) {
+      console.log(
+        'PropertiesEditor._getFieldLabel was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+      );
+      return field.name;
+    }
+
+    if (field.getLabel) return field.getLabel(instances[0]);
+
+    return field.name;
+  }
+
   _renderEditField = (field: Field) => {
     if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
     if (field.valueType === 'boolean') {
       return (
         <InlineCheckbox
-          label={field.name}
+          label={this._getFieldLabel(this.props.instances, field)}
           key={field.name}
           checked={this._getFieldValue(this.props.instances, field)}
           onCheck={(event, newValue) => {
@@ -100,7 +113,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           value={this._getFieldValue(this.props.instances, field)}
           key={field.name}
           id={field.name}
-          floatingLabelText={field.name}
+          floatingLabelText={this._getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
           onChange={newValue => {
             this.props.instances.forEach(i =>
@@ -123,7 +136,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
               '(Multiple values)'
             )}
             id={field.name}
-            floatingLabelText={field.name}
+            floatingLabelText={this._getFieldLabel(this.props.instances, field)}
             floatingLabelFixed
             onChange={newValue => {
               this.props.instances.forEach(i =>
@@ -159,7 +172,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         <SelectField
           value={this._getFieldValue(this.props.instances, field)}
           key={field.name}
-          floatingLabelText={field.name}
+          floatingLabelText={this._getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
@@ -182,7 +195,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
             '(Multiple values)'
           )}
           key={field.name}
-          floatingLabelText={field.name}
+          floatingLabelText={this._getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
@@ -206,7 +219,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         key={field.name}
         fullWidth
         primary
-        label={field.getLabel(this.props.instances[0])}
+        label={this._getFieldLabel(this.props.instances, field)}
         onClick={() => field.onClick(this.props.instances[0])}
       />
     );

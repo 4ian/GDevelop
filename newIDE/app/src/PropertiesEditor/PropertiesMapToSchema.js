@@ -56,6 +56,19 @@ export default (
 
         onUpdateProperty(instance, name, value);
       },
+      getLabel: instance => {
+        const propertyName = getProperties(instance)
+          .get(name)
+          .getLabel();
+        if (propertyName) return propertyName;
+        return (
+          name.charAt(0).toUpperCase() +
+          name
+            .slice(1)
+            .split(/(?=[A-Z])/)
+            .join(' ')
+        );
+      },
     };
   });
 

@@ -34,6 +34,7 @@ const styles = {
 type State = {|
   renamedResource: ?gdResource,
   searchText: string,
+  resourcesWithMissingPath: { [string]: boolean },
 |};
 
 type Props = {|
@@ -62,6 +63,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   state: State = {
     renamedResource: null,
     searchText: '',
+    resourcesWithMissingPath: {},
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
@@ -296,6 +298,20 @@ export default class ResourcesList extends React.Component<Props, State> {
     ];
   };
 
+  componentDidMount() {
+    const { project } = this.props;
+    const resourcesManager = project.getResourcesManager();
+    const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
+    const resourcesWithMissingPath = {};
+    resourceNames.forEach(resourceName => {
+      resourcesWithMissingPath[resourceName] = !resourceHasValidPath(
+        project,
+        resourceName
+      );
+    });
+    this.setState({ resourcesWithMissingPath });
+  }
+
   render() {
     const { project, selectedResource, onSelectResource } = this.props;
     const { searchText } = this.state;
@@ -333,6 +349,7 @@ export default class ResourcesList extends React.Component<Props, State> {
                 buildMenuTemplate={this._renderResourceMenuTemplate}
                 helperClass="sortable-helper"
                 distance={20}
+                erroredItems={this.state.resourcesWithMissingPath}
               />
             )}
           </AutoSizer>

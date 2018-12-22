@@ -78,6 +78,8 @@ const theme = {
     separatorColor: '#e0e0e0',
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: '#ffffff',
+    errorTextColor: '#ff2e16',
+    selectedErrorBackgroundColor: '#ff2e16',
   },
   emptyMessage: {
     shadowColor: '#FFFFFF',

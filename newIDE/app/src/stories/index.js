@@ -1737,7 +1737,6 @@ storiesOf('ProjectManager', module)
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}
-      showEventsFunctionsExtensions={true}
       eventsFunctionsExtensionsError={null}
       onReloadEventsFunctionsExtensions={action(
         'onReloadEventsFunctionsExtensions'
@@ -1775,7 +1774,6 @@ storiesOf('ProjectManager', module)
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}
-      showEventsFunctionsExtensions={true}
       eventsFunctionsExtensionsError={
         new Error('Fake error during code generation')
       }

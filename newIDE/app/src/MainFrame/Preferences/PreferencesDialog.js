@@ -45,7 +45,6 @@ export default class PreferencesDialog extends Component<Props, State> {
             setThemeName,
             setCodeEditorThemeName,
             setAutoDownloadUpdates,
-            setShowEventsFunctionsExtensions,
           }) => (
             <Column noMargin>
               <Line noMargin>
@@ -88,16 +87,6 @@ export default class PreferencesDialog extends Component<Props, State> {
                   toggled={values.autoDownloadUpdates}
                   labelPosition="right"
                   label="Auto download and install updates (recommended)"
-                />
-              </Line>
-              <Line>
-                <Toggle
-                  onToggle={(e, check) =>
-                    setShowEventsFunctionsExtensions(check)
-                  }
-                  toggled={values.showEventsFunctionsExtensions}
-                  labelPosition="right"
-                  label="Activate events functions (alpha, please report any bugs)"
                 />
               </Line>
             </Column>

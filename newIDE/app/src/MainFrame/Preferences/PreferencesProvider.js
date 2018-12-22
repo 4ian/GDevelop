@@ -25,9 +25,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
     setAutoDownloadUpdates: this._setAutoDownloadUpdates.bind(this),
     checkUpdates: this._checkUpdates.bind(this),
-    setShowEventsFunctionsExtensions: this._setShowEventsFunctionsExtensions.bind(
-      this
-    ),
   };
 
   componentDidMount() {
@@ -64,18 +61,6 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           autoDownloadUpdates,
-        },
-      }),
-      () => this._persistValuesToLocalStorage(this.state)
-    );
-  }
-
-  _setShowEventsFunctionsExtensions(enable: boolean) {
-    this.setState(
-      state => ({
-        values: {
-          ...state.values,
-          showEventsFunctionsExtensions: enable,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

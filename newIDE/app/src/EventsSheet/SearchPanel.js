@@ -44,7 +44,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
     if (this.searchTextField) {
       this.searchTextField.focus();
     }
-  }
+  };
 
   launchSearch = () => {
     const { searchText, searchInSelection, matchCase } = this.state;
@@ -99,10 +99,13 @@ export default class SearchPanel extends PureComponent<Props, State> {
         <Column>
           <Line alignItems="baseline">
             <TextField
-              ref={_searchTextField => this.searchTextField = _searchTextField}
+              ref={_searchTextField =>
+                (this.searchTextField = _searchTextField)
+              }
               hintText="Text to search"
               onChange={(e, searchText) =>
-                this.setState({ searchText, searchDirty: true })}
+                this.setState({ searchText, searchDirty: true })
+              }
               value={searchText}
               fullWidth
             />
@@ -149,8 +152,8 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 {resultsCount === null || resultsCount === undefined
                   ? ''
                   : resultsCount !== 0
-                    ? `${resultsCount} results`
-                    : `No results`}
+                  ? `${resultsCount} results`
+                  : `No results`}
               </p>
               <IconButton
                 disabled={!resultsCount}

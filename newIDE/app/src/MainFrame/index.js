@@ -195,13 +195,17 @@ export default class MainFrame extends React.Component<Props, State> {
         console.info(`Loaded ${successLoadingResults.length} JS extensions.`);
         if (failLoadingResults.length) {
           console.error(
-            `⚠️ Unable to load ${failLoadingResults.length} JS extensions. Please check these errors:`,
+            `⚠️ Unable to load ${
+              failLoadingResults.length
+            } JS extensions. Please check these errors:`,
             failLoadingResults
           );
         }
         if (dangerousLoadingResults.length) {
           console.error(
-            `💣 Dangerous exceptions while loading ${dangerousLoadingResults.length} JS extensions. 🔥 Please check these errors as they will CRASH GDevelop:`,
+            `💣 Dangerous exceptions while loading ${
+              dangerousLoadingResults.length
+            } JS extensions. 🔥 Please check these errors as they will CRASH GDevelop:`,
             dangerousLoadingResults
           );
         }
@@ -317,7 +321,7 @@ export default class MainFrame extends React.Component<Props, State> {
         this.setState(
           {
             currentProject: null,
-          }, 
+          },
           () => {
             this.updateToolbar();
             cb();
@@ -702,7 +706,8 @@ export default class MainFrame extends React.Component<Props, State> {
             this.openLayout(name, {
               openEventsEditor: true,
               openSceneEditor: false,
-            })}
+            })
+          }
           resourceSources={this.props.resourceSources}
           onChooseResource={this._onChooseResource}
           resourceExternalEditors={this.props.resourceExternalEditors}
@@ -741,7 +746,8 @@ export default class MainFrame extends React.Component<Props, State> {
                 this.openLayout(name, {
                   openEventsEditor: true,
                   openSceneEditor: false,
-                })}
+                })
+              }
               resourceSources={this.props.resourceSources}
               onChooseResource={this._onChooseResource}
               resourceExternalEditors={this.props.resourceExternalEditors}
@@ -1195,7 +1201,8 @@ export default class MainFrame extends React.Component<Props, State> {
                     onOpenPreferences={() => this.openPreferences(true)}
                     onOpenResources={() => this.openResources()}
                     onOpenPlatformSpecificAssets={() =>
-                      this.openPlatformSpecificAssets()}
+                      this.openPlatformSpecificAssets()
+                    }
                     onChangeSubscription={() => this.openSubscription(true)}
                     showEventsFunctionsExtensions={
                       !!eventsFunctionWriter &&
@@ -1330,7 +1337,8 @@ export default class MainFrame extends React.Component<Props, State> {
                     ref={dialog =>
                       (this._resourceSourceDialogs[
                         resourceSource.name
-                      ] = dialog)}
+                      ] = dialog)
+                    }
                   />
                 );
               })}

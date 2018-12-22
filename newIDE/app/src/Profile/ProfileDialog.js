@@ -51,14 +51,13 @@ export default class ProfileDialog extends Component<Props, State> {
             actions={actions}
             secondaryActions={[
               <HelpButton key="help" helpPagePath="/interface/profile" />,
-              userProfile.authenticated &&
-                userProfile.profile && (
-                  <FlatButton
-                    label="Logout"
-                    key="logout"
-                    onClick={userProfile.onLogout}
-                  />
-                ),
+              userProfile.authenticated && userProfile.profile && (
+                <FlatButton
+                  label="Logout"
+                  key="logout"
+                  onClick={userProfile.onLogout}
+                />
+              ),
             ]}
             onRequestClose={onClose}
             open={open}

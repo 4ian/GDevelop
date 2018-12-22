@@ -73,7 +73,8 @@ export default (props: Props) => (
       // TODO: onEdit and onCall could benefit from a "forward" utility function
       // (can also be applied in DebuggerContent.js)
       onEdit={(path, newValue) =>
-        props.onEdit(['_variables'].concat(path), newValue)}
+        props.onEdit(['_variables'].concat(path), newValue)
+      }
       onCall={(path, args) => props.onCall(['_variables'].concat(path), args)}
     />
   </div>

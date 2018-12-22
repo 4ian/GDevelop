@@ -82,7 +82,7 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
         style={styles.container}
       >
         <span style={styles.title}>
-          Include events from {' '}
+          Include events from{' '}
           <i
             className={classNames({
               [selectableArea]: true,
@@ -111,7 +111,8 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
             }}
             isInline
             ref={externalEventsField =>
-              (this._externalEventsField = externalEventsField)}
+              (this._externalEventsField = externalEventsField)
+            }
           />
         </InlinePopover>
       </div>

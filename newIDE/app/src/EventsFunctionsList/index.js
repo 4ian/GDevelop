@@ -195,7 +195,8 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
                 renamedItem={this.state.renamedEventsFunction}
                 onRename={this._rename}
                 onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)}
+                  this._move(oldIndex, newIndex)
+                }
                 buildMenuTemplate={this._renderEventsFunctionMenuTemplate}
                 helperClass="sortable-helper"
                 distance={20}
@@ -209,7 +210,8 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
           onChange={text =>
             this.setState({
               searchText: text,
-            })}
+            })
+          }
         />
       </Background>
     );

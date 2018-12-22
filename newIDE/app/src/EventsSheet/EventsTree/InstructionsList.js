@@ -104,7 +104,8 @@ class InstructionsList extends React.Component<Props, *> {
           onClick={() => onInstructionClick(instructionContext)}
           onDoubleClick={() => onInstructionDoubleClick(instructionContext)}
           onContextMenu={(x, y) =>
-            onInstructionContextMenu(x, y, instructionContext)}
+            onInstructionContextMenu(x, y, instructionContext)
+          }
           onParameterClick={(domEvent, parameterIndex) =>
             onParameterClick({
               isCondition: instructionContext.isCondition,
@@ -113,7 +114,8 @@ class InstructionsList extends React.Component<Props, *> {
               indexInList: instructionContext.indexInList,
               parameterIndex,
               domEvent,
-            })}
+            })
+          }
           selection={selection}
           onAddNewSubInstruction={onAddNewInstruction}
           onMoveToSubInstruction={onMoveToInstruction}
@@ -137,9 +139,9 @@ class InstructionsList extends React.Component<Props, *> {
       : 'Add action';
     return connectDropTarget(
       <div
-        className={`${areConditions
-          ? conditionsContainer
-          : actionsContainer} ${extraClassName || ''}`}
+        className={`${
+          areConditions ? conditionsContainer : actionsContainer
+        } ${extraClassName || ''}`}
         style={style}
       >
         {instructions}

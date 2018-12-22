@@ -8,7 +8,7 @@
     "flow-bin": "0.78.0",
     "flow-coverage-report": "^0.4.0",
     "follow-redirects": "^1.2.3",
-    "prettier": "1.7.0",
+    "prettier": "1.15.3",
     "react-scripts": "1.0.17",
     "shelljs": "^0.7.7",
     "unzip2": "^0.2.5"
@@ -64,6 +64,7 @@
     "start": "npm run import-resources && react-scripts start",
     "build": "npm run import-resources && react-scripts build",
     "format": "prettier --write \"src/**/*.js\"",
+    "check-format": "prettier --list-different \"src/**/*.js\"",
     "test": "react-scripts test --env=jsdom",
     "flow": "flow",
     "storybook": "start-storybook -p 9009 -s public",

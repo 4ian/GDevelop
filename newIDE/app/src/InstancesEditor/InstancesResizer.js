@@ -37,14 +37,14 @@ export default class InstancesResizer {
 
   _getSizeDeltaX(proportional, initialSize) {
     if (proportional && Math.abs(this.totalDeltaX) < Math.abs(this.totalDeltaY))
-      return initialSize.width / initialSize.height * this.totalDeltaY;
+      return (initialSize.width / initialSize.height) * this.totalDeltaY;
 
     return this.totalDeltaX;
   }
 
   _getSizeDeltaY(proportional, initialSize) {
     if (proportional && Math.abs(this.totalDeltaY) < Math.abs(this.totalDeltaX))
-      return initialSize.height / initialSize.width * this.totalDeltaX;
+      return (initialSize.height / initialSize.width) * this.totalDeltaX;
 
     return this.totalDeltaY;
   }

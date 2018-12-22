@@ -20,11 +20,15 @@ Bridge.prototype.connectTo = function(port) {
 
   var that = this;
   this.client = new this.net.Socket();
-  this.client.connect(port, 'localhost', function() {
-    console.log('Connection made on port', port);
-    that.connected = true;
-    if (that._onConnected) that._onConnected();
-  });
+  this.client.connect(
+    port,
+    'localhost',
+    function() {
+      console.log('Connection made on port', port);
+      that.connected = true;
+      if (that._onConnected) that._onConnected();
+    }
+  );
 
   let data = '';
   const nullCharacterBuffer = Buffer.from([0]);

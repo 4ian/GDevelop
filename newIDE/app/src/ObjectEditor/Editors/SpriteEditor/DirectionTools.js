@@ -168,7 +168,8 @@ export default class DirectionTools extends Component<Props, State> {
               project={project}
               timeBetweenFrames={this.state.timeBetweenFrames}
               onChangeTimeBetweenFrames={text =>
-                this.setState({ timeBetweenFrames: text })}
+                this.setState({ timeBetweenFrames: text })
+              }
             />
           </Dialog>
         )}

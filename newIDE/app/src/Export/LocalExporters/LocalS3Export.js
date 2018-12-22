@@ -88,11 +88,7 @@ export default class LocalS3Export extends Component {
     LocalExport.prepareExporter()
       .then(({ exporter }) => {
         const exportOptions = new gd.MapStringBoolean();
-        exporter.exportWholePixiProject(
-          project,
-          outputDir,
-          exportOptions
-        );
+        exporter.exportWholePixiProject(project, outputDir, exportOptions);
         exportOptions.delete();
         exporter.delete();
 

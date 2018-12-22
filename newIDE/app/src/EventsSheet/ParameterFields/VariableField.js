@@ -105,16 +105,15 @@ export default class VariableField extends Component<Props, State> {
           openOnFocus={!this.props.isInline}
           ref={field => (this._field = field)}
         />
-        {this.props.onOpenDialog &&
-          !this.props.isInline && (
-            <RaisedButton
-              label="..."
-              disabled={!this.props.variablesContainer}
-              primary
-              style={styles.moreButton}
-              onClick={this.props.onOpenDialog}
-            />
-          )}
+        {this.props.onOpenDialog && !this.props.isInline && (
+          <RaisedButton
+            label="..."
+            disabled={!this.props.variablesContainer}
+            primary
+            style={styles.moreButton}
+            onClick={this.props.onOpenDialog}
+          />
+        )}
       </div>
     );
   }

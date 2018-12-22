@@ -59,7 +59,7 @@ export default class CollisionMasksPreview extends React.Component<
   /**
    * Move a vertex with the mouse. A similar dragging implementation is done in
    * PointsPreview (but with div and img elements).
-   * 
+   *
    * If custom zoom is added, this should be adapted to properly set vertex coordinates.
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */

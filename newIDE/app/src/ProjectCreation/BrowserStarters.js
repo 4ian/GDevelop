@@ -48,7 +48,8 @@ export default class BrowserStarters extends Component {
                 primaryText="Isometric game"
                 secondaryText={
                   <p>
-                    An example of an isometric game where you can explore a map with your character.
+                    An example of an isometric game where you can explore a map
+                    with your character.
                   </p>
                 }
                 secondaryTextLines={2}
@@ -57,7 +58,7 @@ export default class BrowserStarters extends Component {
                   this.props.onOpen('example://isometric-game');
                 }}
               />
-            </List> 
+            </List>
             <Line alignItems="center" justifyContent="center">
               <RaisedButton
                 label="See examples"

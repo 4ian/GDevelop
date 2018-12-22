@@ -36,7 +36,7 @@ type ItemsListProps = {
   onAddNewItem?: () => void,
   onRename: (Item, string) => void,
   getThumbnail?: Item => string,
-  onItemSelected: ?Item => void,
+  onItemSelected: (?Item) => void,
   renamedItem: ?Item,
   addNewItemLabel: React.Node | string,
   buildMenuTemplate: Item => any,

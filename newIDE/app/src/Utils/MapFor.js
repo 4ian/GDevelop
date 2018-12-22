@@ -22,4 +22,4 @@ module.exports = {
   mapFor,
   mapReverseFor,
   mapVector,
-}
+};

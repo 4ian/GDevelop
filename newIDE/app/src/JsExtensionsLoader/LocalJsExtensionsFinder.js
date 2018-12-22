@@ -5,9 +5,7 @@ const optionalRequire = require('../Utils/OptionalRequire');
 const path = optionalRequire('path');
 const fs = optionalRequire('fs');
 
-const checkIfPathHasJsExtensionModule = (
-  extensionFolderPath
-) => {
+const checkIfPathHasJsExtensionModule = extensionFolderPath => {
   return new Promise(resolve => {
     const jsExtensionModulePath = path.join(
       extensionFolderPath,
@@ -25,7 +23,7 @@ const checkIfPathHasJsExtensionModule = (
 
 const findJsExtensionModules = ({ filterExamples }) => {
   return new Promise((resolve, reject) => {
-    findGDJS((gdjsRoot) => {
+    findGDJS(gdjsRoot => {
       if (!gdjsRoot) {
         return reject();
       }
@@ -42,8 +40,8 @@ const findJsExtensionModules = ({ filterExamples }) => {
         const filteredExtensionFolders = extensionFolders.filter(folder => {
           if (!filterExamples) return true;
 
-          return folder.indexOf("Example") === -1;
-        })
+          return folder.indexOf('Example') === -1;
+        });
 
         Promise.all(
           filteredExtensionFolders.map(extensionFolder =>
@@ -61,4 +59,4 @@ const findJsExtensionModules = ({ filterExamples }) => {
 
 module.exports = {
   findJsExtensionModules,
-}
+};

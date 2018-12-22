@@ -167,11 +167,21 @@ describe('SpriteObjectHelper', () => {
         expect(haveSameCollisionMasks(sprite1, sprite2)).toBe(true);
         expect(haveSameCollisionMasks(sprite2, sprite1)).toBe(true);
 
-        sprite2.getCustomCollisionMask().at(0).getVertices().at(1).set_x(-20);
+        sprite2
+          .getCustomCollisionMask()
+          .at(0)
+          .getVertices()
+          .at(1)
+          .set_x(-20);
         expect(haveSameCollisionMasks(sprite1, sprite2)).toBe(false);
         expect(haveSameCollisionMasks(sprite2, sprite1)).toBe(false);
 
-        sprite1.getCustomCollisionMask().at(0).getVertices().at(1).set_x(-20);
+        sprite1
+          .getCustomCollisionMask()
+          .at(0)
+          .getVertices()
+          .at(1)
+          .set_x(-20);
         expect(haveSameCollisionMasks(sprite1, sprite2)).toBe(true);
         expect(haveSameCollisionMasks(sprite2, sprite1)).toBe(true);
       }

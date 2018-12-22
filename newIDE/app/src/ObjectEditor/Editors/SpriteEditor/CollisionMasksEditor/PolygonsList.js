@@ -80,9 +80,11 @@ class PolygonsListBody extends Component<PolygonsListBodyProps, void> {
               verticeX={vertice.get_x()}
               verticeY={vertice.get_y()}
               onChangeVerticeX={newValue =>
-                this.updateVerticeX(vertice, newValue)}
+                this.updateVerticeX(vertice, newValue)
+              }
               onChangeVerticeY={newValue =>
-                this.updateVerticeY(vertice, newValue)}
+                this.updateVerticeY(vertice, newValue)
+              }
               onRemove={() => {
                 gd.removeFromVectorVector2f(polygon.getVertices(), j);
                 this._onPolygonUpdated();

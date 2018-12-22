@@ -64,6 +64,7 @@
     "start": "npm run import-resources && react-scripts start",
     "build": "npm run import-resources && react-scripts build",
     "format": "prettier --write \"src/**/*.js\"",
+    "check-format": "prettier --list-different \"src/**/*.js\"",
     "test": "react-scripts test --env=jsdom",
     "flow": "flow",
     "storybook": "start-storybook -p 9009 -s public",

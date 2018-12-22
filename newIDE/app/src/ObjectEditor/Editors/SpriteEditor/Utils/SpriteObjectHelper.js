@@ -205,7 +205,10 @@ export const allSpritesHaveSameCollisionMasksAs = (
   return every(
     mapFor(0, animation.getDirectionsCount(), i => {
       const direction = animation.getDirection(i);
-      return allDirectionSpritesHaveSameCollisionMasksAs(originalSprite, direction);
+      return allDirectionSpritesHaveSameCollisionMasksAs(
+        originalSprite,
+        direction
+      );
     })
   );
 };

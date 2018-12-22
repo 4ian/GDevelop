@@ -47,31 +47,38 @@ export default class Authentification {
   };
 
   createAccount = (form: LoginForm): Promise<void> => {
-    return firebase
-      .auth()
-      // $FlowFixMe - Outdated definitions?
-      .createUserAndRetrieveDataWithEmailAndPassword(form.email, form.password)
-      .then(userCredentials => {
-        this.user = userCredentials.user;
-      })
-      .catch(error => {
-        console.error('Error while creating account:', error);
-        throw error;
-      });
+    return (
+      firebase
+        .auth()
+        // $FlowFixMe - Outdated definitions?
+        .createUserAndRetrieveDataWithEmailAndPassword(
+          form.email,
+          form.password
+        )
+        .then(userCredentials => {
+          this.user = userCredentials.user;
+        })
+        .catch(error => {
+          console.error('Error while creating account:', error);
+          throw error;
+        })
+    );
   };
 
   login = (form: LoginForm): Promise<void> => {
-    return firebase
-      .auth()
-      // $FlowFixMe - Outdated definitions?
-      .signInAndRetrieveDataWithEmailAndPassword(form.email, form.password)
-      .then(userCredentials => {
-        this.user = userCredentials.user;
-      })
-      .catch(error => {
-        console.error('Error while login:', error);
-        throw error;
-      });
+    return (
+      firebase
+        .auth()
+        // $FlowFixMe - Outdated definitions?
+        .signInAndRetrieveDataWithEmailAndPassword(form.email, form.password)
+        .then(userCredentials => {
+          this.user = userCredentials.user;
+        })
+        .catch(error => {
+          console.error('Error while login:', error);
+          throw error;
+        })
+    );
   };
 
   forgotPassword = (form: LoginForm): Promise<void> => {

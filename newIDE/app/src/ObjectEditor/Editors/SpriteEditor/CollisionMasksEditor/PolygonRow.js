@@ -5,7 +5,12 @@ import Delete from 'material-ui/svg-icons/action/delete';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';
 
-const ThemablePolygonRow = ({ onRemove, isConvex, verticesCount, muiTheme }) => {
+const ThemablePolygonRow = ({
+  onRemove,
+  isConvex,
+  verticesCount,
+  muiTheme,
+}) => {
   return (
     <TableRow
       style={{

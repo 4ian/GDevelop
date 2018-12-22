@@ -97,16 +97,19 @@ class ObjectsList extends Component<*, *> {
                   : undefined
               }
               onEditVariables={() =>
-                this.props.onEditVariables(objectWithContext.object)}
+                this.props.onEditVariables(objectWithContext.object)
+              }
               onEditName={() => this.props.onEditName(objectWithContext)}
               onDelete={() => this.props.onDelete(objectWithContext)}
               onCopyObject={() => this.props.onCopyObject(objectWithContext)}
               onCutObject={() => this.props.onCutObject(objectWithContext)}
               onDuplicateObject={() =>
-                this.props.onDuplicateObject(objectWithContext)}
+                this.props.onDuplicateObject(objectWithContext)
+              }
               onPasteObject={() => this.props.onPasteObject(objectWithContext)}
               onRename={newName =>
-                this.props.onRename(objectWithContext, newName)}
+                this.props.onRename(objectWithContext, newName)
+              }
               onSetAsGlobalObject={
                 objectWithContext.global
                   ? undefined
@@ -457,7 +460,8 @@ export default class ObjectsListContainer extends React.Component<
                 onSetAsGlobalObject={this._setAsGlobalObject}
                 onPasteObject={this._pasteAndRename}
                 onAddNewObject={() =>
-                  this.setState({ newObjectDialogOpen: true })}
+                  this.setState({ newObjectDialogOpen: true })
+                }
                 onEditName={this._editName}
                 onEditVariables={this._editVariables}
                 onDelete={this._deleteObject}
@@ -479,7 +483,8 @@ export default class ObjectsListContainer extends React.Component<
           onChange={text =>
             this.setState({
               searchText: text,
-            })}
+            })
+          }
         />
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog

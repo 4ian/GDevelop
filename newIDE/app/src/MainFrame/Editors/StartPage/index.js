@@ -81,15 +81,14 @@ class StartPage extends BaseEditor {
                   language to learn.
                 </p>
               </Paper>
-              {!project &&
-                canOpen && (
-                  <RaisedButton
-                    label="Open a project"
-                    fullWidth
-                    onClick={onOpen}
-                    primary
-                  />
-                )}
+              {!project && canOpen && (
+                <RaisedButton
+                  label="Open a project"
+                  fullWidth
+                  onClick={onOpen}
+                  primary
+                />
+              )}
               {!project && (
                 <RaisedButton
                   label="Create a new project"
@@ -128,28 +127,30 @@ class StartPage extends BaseEditor {
               <FlatButton
                 label="Gdevelop Forums"
                 onClick={() =>
-                  Window.openExternalURL('http://forum.compilgames.net')}
+                  Window.openExternalURL('http://forum.compilgames.net')
+                }
               />
               <FlatButton
                 label="Help and tutorials"
                 onClick={() =>
                   Window.openExternalURL(
                     'http://wiki.compilgames.net/doku.php/gdevelop5/start'
-                  )}
+                  )
+                }
               />
             </div>
             <div>
               <IconButton
                 iconClassName="icon-facebook"
                 onClick={() =>
-                  Window.openExternalURL(
-                    'https://www.facebook.com/GameDevelop'
-                  )}
+                  Window.openExternalURL('https://www.facebook.com/GameDevelop')
+                }
               />
               <IconButton
                 iconClassName="icon-twitter"
                 onClick={() =>
-                  Window.openExternalURL('https://twitter.com/game_develop')}
+                  Window.openExternalURL('https://twitter.com/game_develop')
+                }
               />
             </div>
           </Line>

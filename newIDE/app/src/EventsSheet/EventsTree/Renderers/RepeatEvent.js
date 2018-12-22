@@ -27,11 +27,14 @@ const styles = {
   },
 };
 
-export default class RepeatEvent extends React.Component<EventRendererProps, *> {
-state = {
-      editing: false,
-      anchorEl: null,
-    };
+export default class RepeatEvent extends React.Component<
+  EventRendererProps,
+  *
+> {
+  state = {
+    editing: false,
+    anchorEl: null,
+  };
 
   edit = (domEvent: any) => {
     this.setState({

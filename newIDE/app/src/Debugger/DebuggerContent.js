@@ -55,7 +55,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
 
   openProfiler = () => {
     if (this._editors) this._editors.openEditor('profiler', 'bottom');
-  }
+  };
 
   render() {
     const {
@@ -76,7 +76,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
 
     return (
       <EditorMosaic
-        ref={editors => this._editors = editors}
+        ref={editors => (this._editors = editors)}
         editors={{
           inspectors: (
             <MosaicWindow
@@ -100,7 +100,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
                         this.setState({
                           selectedInspector,
                           selectedInspectorFullPath,
-                        })}
+                        })
+                      }
                     />
                   </Line>
                 </Column>
@@ -115,7 +116,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
                   <RawContentInspector
                     gameData={get(gameData, selectedInspectorFullPath, null)}
                     onEdit={(path, newValue) =>
-                      onEdit(selectedInspectorFullPath.concat(path), newValue)}
+                      onEdit(selectedInspectorFullPath.concat(path), newValue)
+                    }
                   />
                 ) : (
                   selectedInspector.renderInspector(
@@ -154,7 +156,8 @@ export default class DebuggerContent extends React.Component<Props, State> {
                       onCheck={(e, enabled) =>
                         this.setState({
                           rawMode: enabled,
-                        })}
+                        })
+                      }
                     />
                   </div>
                 </Line>

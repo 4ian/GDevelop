@@ -24,7 +24,11 @@ export default ({
     activeStep={
       exportStep === 'export'
         ? 0
-        : exportStep === 'compress' ? 1 : exportStep === 'done' ? 2 : undefined
+        : exportStep === 'compress'
+        ? 1
+        : exportStep === 'done'
+        ? 2
+        : undefined
     }
     orientation="vertical"
   >
@@ -58,17 +62,17 @@ export default ({
     <Step>
       <StepLabel>Export finished</StepLabel>
       <StepContent>
-        <Line expand>You can now create a game on Facebook Instant Games, if not already done, and upload the archive generated.</Line>
         <Line expand>
-            <FlatButton
-              label="Open folder"
-              onClick={onOpenExportFolder}
-            />
-            <RaisedButton
-              label="Learn more about Instant Games publication"
-              primary
-              onClick={onOpenLearnMore}
-            />
+          You can now create a game on Facebook Instant Games, if not already
+          done, and upload the archive generated.
+        </Line>
+        <Line expand>
+          <FlatButton label="Open folder" onClick={onOpenExportFolder} />
+          <RaisedButton
+            label="Learn more about Instant Games publication"
+            primary
+            onClick={onOpenLearnMore}
+          />
         </Line>
       </StepContent>
     </Step>

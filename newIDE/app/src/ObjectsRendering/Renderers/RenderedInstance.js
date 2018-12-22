@@ -27,7 +27,7 @@ function RenderedInstance(
  * Convert an angle from degrees to radians.
  */
 RenderedInstance.toRad = function(angleInDegrees) {
-  return angleInDegrees / 180 * 3.14159;
+  return (angleInDegrees / 180) * 3.14159;
 };
 
 /**

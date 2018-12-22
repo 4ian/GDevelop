@@ -1,7 +1,10 @@
 // @flow
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
-import { createOrUpdateResource, getLocalResourceFullPath } from './ResourceUtils.js';
+import {
+  createOrUpdateResource,
+  getLocalResourceFullPath,
+} from './ResourceUtils.js';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -22,7 +25,7 @@ export const openPiskel = ({
 }: ExternalEditorOpenOptions) => {
   if (!electron || !ipcRenderer) return;
 
-  const resources = resourceNames.map((resourceName, originalIndex) => { 
+  const resources = resourceNames.map((resourceName, originalIndex) => {
     let resourcePath = getLocalResourceFullPath(project, resourceName);
     return {
       resourcePath,
@@ -44,7 +47,9 @@ export const openPiskel = ({
   ipcRenderer.on(
     'piskel-changes-saved',
     (event, outputResources, newAnimationName, externalEditorData) => {
-      const metadata = externalEditorData.data ? { pskl: externalEditorData } : null;
+      const metadata = externalEditorData.data
+        ? { pskl: externalEditorData }
+        : null;
 
       const resourcesManager = project.getResourcesManager();
       outputResources.forEach(resource => {
@@ -56,15 +61,15 @@ export const openPiskel = ({
       if (externalEditorData.singleFrame) {
         if (metadata) {
           resourcesManager
-          .getResource(path.relative(projectPath, outputResources[0].path))
-          .setMetadata(JSON.stringify(metadata));
-        };
+            .getResource(path.relative(projectPath, outputResources[0].path))
+            .setMetadata(JSON.stringify(metadata));
+        }
         onChangesSaved(outputResources, newAnimationName);
       } else {
         // In case there are multiple frames, pass back the metadata to the editor and let it store it at an appropriate place.
         // (For example, for sprites, SpritesList.js will save it in the metadata of the gd.Direction).
         onChangesSaved(outputResources, newAnimationName, metadata);
-      }  
+      }
     }
   );
 

@@ -14,7 +14,10 @@ const styles = {
   },
 };
 
-export default class TrueFalseField extends Component<ParameterFieldProps, void> {
+export default class TrueFalseField extends Component<
+  ParameterFieldProps,
+  void
+> {
   focus() {}
 
   render() {

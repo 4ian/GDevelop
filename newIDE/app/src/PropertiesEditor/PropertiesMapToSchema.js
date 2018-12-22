@@ -12,7 +12,11 @@ import { type Schema, type Instance } from '.';
 export default (
   properties: gdMapStringPropertyDescriptor,
   getProperties: (instance: Instance) => any,
-  onUpdateProperty: (instance: Instance, propertyName: string, newValue: string) => void
+  onUpdateProperty: (
+    instance: Instance,
+    propertyName: string,
+    newValue: string
+  ) => void
 ): Schema => {
   const propertyNames = properties.keys();
   const propertyFields = mapFor(0, propertyNames.size(), i => {

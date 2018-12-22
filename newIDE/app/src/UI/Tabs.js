@@ -22,13 +22,13 @@ const styles = {
 /**
  * This is to override the default material-ui tab template used to wrap the content of each tab element.
  * 2 changes (**please port them to your new implementation if you change the tabs**):
- * 
+ *
  * 1) Instead of setting the "height" of hidden tabs to "0", we set "display" to "none" to avoid
  * messing with components (in particular components where you can scroll: when collapsed because of height=0,
  * they will lose they scrolling position).
- * 
+ *
  * 2) shouldComponentUpdate is used to avoid updating the content of a tab that is not selected.
- * 
+ *
  * Rest of the implementation is the same.
  */
 class TabTemplate extends Component {
@@ -42,7 +42,7 @@ class TabTemplate extends Component {
     if (!selected) {
       templateStyle.display = 'none';
     }
-  
+
     return <div style={templateStyle}>{children}</div>;
   }
 }

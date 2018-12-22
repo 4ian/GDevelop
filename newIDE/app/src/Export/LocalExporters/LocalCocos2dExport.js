@@ -103,7 +103,8 @@ export default class LocalCocos2dExport extends Component {
             onToggle={(e, check) =>
               this.setState({
                 debugMode: check,
-              })}
+              })
+            }
             toggled={this.state.debugMode}
             labelPosition="right"
             label="Debug mode (show FPS counter and stats in the bottom left)"
@@ -134,7 +135,8 @@ export default class LocalCocos2dExport extends Component {
               onClick={() =>
                 this.setState({
                   exportFinishedDialogOpen: false,
-                })}
+                })
+              }
             />,
           ]}
           secondaryActions={

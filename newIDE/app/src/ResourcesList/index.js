@@ -143,8 +143,7 @@ export default class ResourcesList extends React.Component<Props, State> {
 
   _removeUnusedResources = (resourceType: ResourceKind) => {
     const { project } = this.props;
-    gd.ProjectResourcesAdder
-      .getAllUseless(project, resourceType)
+    gd.ProjectResourcesAdder.getAllUseless(project, resourceType)
       .toJSArray()
       .forEach(resourceName => {
         console.info(
@@ -329,7 +328,8 @@ export default class ResourcesList extends React.Component<Props, State> {
                 renamedItem={this.state.renamedResource}
                 onRename={this._rename}
                 onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)}
+                  this._move(oldIndex, newIndex)
+                }
                 buildMenuTemplate={this._renderResourceMenuTemplate}
                 helperClass="sortable-helper"
                 distance={20}
@@ -343,7 +343,8 @@ export default class ResourcesList extends React.Component<Props, State> {
           onChange={text =>
             this.setState({
               searchText: text,
-            })}
+            })
+          }
         />
       </Background>
     );

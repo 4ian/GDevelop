@@ -22,7 +22,7 @@ const styles = {
 type Props = {
   index: number,
   item: Item,
-  onRename: (string) => void,
+  onRename: string => void,
   editingName: boolean,
   getThumbnail?: () => string,
   selected: true,

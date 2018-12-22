@@ -65,7 +65,7 @@ void ParameterEditorLauncher::LaunchEditor(wxWindow * parent, gd::Project & proj
 
         return;
     }
-    else if ( metadata.GetType() == "expression" )
+    else if ( metadata.GetType() == "expression" || metadata.GetType() == "forceMultiplier" )
     {
         gd::EditExpressionDialog dialog(parent, editCtrl->GetValue(), project, layout);
         if ( dialog.ShowModal() == 1 )

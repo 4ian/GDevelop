@@ -7,8 +7,22 @@ import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
+import {
+  createOrUpdateResource,
+  getLocalResourceFullPath,
+  resourceHasValidPath,
+} from './ResourceUtils.js';
+import { type ResourceKind } from './ResourceSource.flow';
+
 const path = optionalRequire('path');
 const glob = optionalRequire('glob');
+const electron = optionalRequire('electron');
+const hasElectron = electron ? true : false;
+
+const IMAGE_EXTENSIONS = 'png,jpg,jpeg,PNG,JPG,JPEG';
+const AUDIO_EXTENSIONS = 'wav,mp3,ogg,WAV,MP3,OGG';
+const FONT_EXTENSIONS = 'ttf,ttc,TTF,TTC';
+
 const gd = global.gd;
 
 const styles = {
@@ -77,27 +91,48 @@ export default class ResourcesList extends React.Component<Props, State> {
     this.props.onDeleteResource(resource);
   };
 
-  _scanForNewResources = () => {
+  _locateResourceFile = (resource: gdResource) => {
+    const resourceFolderPath = path.dirname(
+      getLocalResourceFullPath(this.props.project, resource.getFile())
+    );
+    electron.shell.openItem(resourceFolderPath);
+  };
+
+  _openResourceFile = (resource: gdResource) => {
+    const resourceFilePath = getLocalResourceFullPath(
+      this.props.project,
+      resource.getFile()
+    );
+    electron.shell.openItem(resourceFilePath);
+  };
+
+  _copyResourceFilePath = (resource: gdResource) => {
+    const resourceFilePath = getLocalResourceFullPath(
+      this.props.project,
+      resource.getFile()
+    );
+    electron.clipboard.writeText(resourceFilePath);
+  };
+
+  _scanForNewResources = (
+    extensions: string,
+    createResource: () => gdResource
+  ) => {
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
-    console.log('Scanning the project folder for new resources...');
     const projectPath = path.dirname(project.getProjectFile());
 
     const getDirectories = (src, callback) => {
-      glob(src + '/**/*.{png,jpg,jpeg,PNG,JPG,JPEG}', callback);
+      glob(src + '/**/*.{' + extensions + '}', callback);
     };
     getDirectories(projectPath, (err, res) => {
       if (err) {
-        console.log('Error loading ', err);
+        console.error('Error loading ', err);
       } else {
         res.forEach(pathFound => {
           const fileName = path.relative(projectPath, pathFound);
           if (!resourcesManager.hasResource(fileName)) {
-            const imageResource = new gd.ImageResource();
-            imageResource.setFile(fileName);
-            imageResource.setName(fileName);
-            resourcesManager.addResource(imageResource);
-            imageResource.delete();
+            createOrUpdateResource(project, createResource(), fileName);
             console.info(`${fileName} added to project.`);
           }
         });
@@ -106,15 +141,31 @@ export default class ResourcesList extends React.Component<Props, State> {
     });
   };
 
-  _removeAllUnusedImages = () => {
+  _removeUnusedResources = (resourceType: ResourceKind) => {
     const { project } = this.props;
-    gd.ProjectResourcesAdder
-      .getAllUseless(project, 'image')
+    gd.ProjectResourcesAdder.getAllUseless(project, resourceType)
       .toJSArray()
-      .forEach(imageName => {
-        console.info(`Removing unused image resource: ${imageName}`);
+      .forEach(resourceName => {
+        console.info(
+          `Removing unused` + resourceType + ` resource: ${resourceName}`
+        );
       });
-    gd.ProjectResourcesAdder.removeAllUseless(project, 'image');
+    gd.ProjectResourcesAdder.removeAllUseless(project, resourceType);
+    this.forceUpdate();
+  };
+
+  _removeAllResourcesWithInvalidPath = () => {
+    const { project } = this.props;
+    const resourcesManager = project.getResourcesManager();
+    resourcesManager
+      .getAllResourceNames()
+      .toJSArray()
+      .forEach(resourceName => {
+        if (!resourceHasValidPath(project, resourceName)) {
+          resourcesManager.removeResource(resourceName);
+          console.info('Removed due to invalid path: ' + resourceName);
+        }
+      });
     this.forceUpdate();
   };
 
@@ -171,16 +222,76 @@ export default class ResourcesList extends React.Component<Props, State> {
       },
       { type: 'separator' },
       {
+        label: 'Open File',
+        click: () => this._openResourceFile(resource),
+        enabled: hasElectron,
+      },
+      {
+        label: 'Locate File',
+        click: () => this._locateResourceFile(resource),
+        enabled: hasElectron,
+      },
+      {
+        label: 'Copy File Path',
+        click: () => this._copyResourceFilePath(resource),
+        enabled: hasElectron,
+      },
+      { type: 'separator' },
+      {
         label: 'Scan for Images',
         click: () => {
-          this._scanForNewResources();
+          this._scanForNewResources(
+            IMAGE_EXTENSIONS,
+            () => new gd.ImageResource()
+          );
+        },
+        enabled: hasElectron,
+      },
+      {
+        label: 'Scan for Audio',
+        click: () => {
+          this._scanForNewResources(
+            AUDIO_EXTENSIONS,
+            () => new gd.AudioResource()
+          );
+        },
+        enabled: hasElectron,
+      },
+      {
+        label: 'Scan for Fonts',
+        click: () => {
+          this._scanForNewResources(
+            FONT_EXTENSIONS,
+            () => new gd.FontResource()
+          );
+        },
+        enabled: hasElectron,
+      },
+      { type: 'separator' },
+      {
+        label: 'Remove Unused Images',
+        click: () => {
+          this._removeUnusedResources('image');
         },
       },
       {
-        label: 'Remove All Unused Images',
+        label: 'Remove Unused Audio',
         click: () => {
-          this._removeAllUnusedImages();
+          this._removeUnusedResources('audio');
         },
+      },
+      {
+        label: 'Remove Unused Fonts',
+        click: () => {
+          this._removeUnusedResources('font');
+        },
+      },
+      {
+        label: 'Remove Resources with Invalid Path',
+        click: () => {
+          this._removeAllResourcesWithInvalidPath();
+        },
+        enabled: hasElectron,
       },
     ];
   };
@@ -217,7 +328,8 @@ export default class ResourcesList extends React.Component<Props, State> {
                 renamedItem={this.state.renamedResource}
                 onRename={this._rename}
                 onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)}
+                  this._move(oldIndex, newIndex)
+                }
                 buildMenuTemplate={this._renderResourceMenuTemplate}
                 helperClass="sortable-helper"
                 distance={20}
@@ -231,7 +343,8 @@ export default class ResourcesList extends React.Component<Props, State> {
           onChange={text =>
             this.setState({
               searchText: text,
-            })}
+            })
+          }
         />
       </Background>
     );

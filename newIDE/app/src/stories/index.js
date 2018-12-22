@@ -30,14 +30,18 @@ import CollisionMasksEditor from '../ObjectEditor/Editors/SpriteEditor/Collision
 import EmptyEditor from '../ObjectEditor/Editors/EmptyEditor';
 import ImageThumbnail from '../ResourcesList/ResourceThumbnail/ImageThumbnail';
 import ShapePainterEditor from '../ObjectEditor/Editors/ShapePainterEditor';
-import ExternalEventsField from '../EventsSheet/InstructionEditor/ParameterFields/ExternalEventsField';
-import LayerField from '../EventsSheet/InstructionEditor/ParameterFields/LayerField';
-import MouseField from '../EventsSheet/InstructionEditor/ParameterFields/MouseField';
-import SceneVariableField from '../EventsSheet/InstructionEditor/ParameterFields/SceneVariableField';
-import ObjectVariableField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectVariableField';
-import KeyField from '../EventsSheet/InstructionEditor/ParameterFields/KeyField';
-import ExpressionField from '../EventsSheet/InstructionEditor/ParameterFields/ExpressionField';
-import StringField from '../EventsSheet/InstructionEditor/ParameterFields/StringField';
+import ExternalEventsField from '../EventsSheet/ParameterFields/ExternalEventsField';
+import LayerField from '../EventsSheet/ParameterFields/LayerField';
+import MouseField from '../EventsSheet/ParameterFields/MouseField';
+import SceneVariableField from '../EventsSheet/ParameterFields/SceneVariableField';
+import ObjectVariableField from '../EventsSheet/ParameterFields/ObjectVariableField';
+import KeyField from '../EventsSheet/ParameterFields/KeyField';
+import ExpressionField from '../EventsSheet/ParameterFields/ExpressionField';
+import StringField from '../EventsSheet/ParameterFields/StringField';
+import ColorExpressionField from '../EventsSheet/ParameterFields/ColorExpressionField';
+import TrueFalseField from '../EventsSheet/ParameterFields/TrueFalseField';
+import YesNoField from '../EventsSheet/ParameterFields/YesNoField';
+import ForceMultiplierField from '../EventsSheet/ParameterFields/ForceMultiplierField';
 import ObjectsList from '../ObjectsList';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import InstancePropertiesEditor from '../InstancesEditor/InstancePropertiesEditor';
@@ -58,7 +62,7 @@ import ResourcesLoader from '../ResourcesLoader';
 import VariablesList from '../VariablesList';
 import ExpressionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/ExpressionSelector';
 import InstructionSelector from '../EventsSheet/InstructionEditor/InstructionOrExpressionSelector/InstructionSelector';
-import ParameterRenderingService from '../EventsSheet/InstructionEditor/ParameterRenderingService';
+import ParameterRenderingService from '../EventsSheet/ParameterRenderingService';
 import { ErrorFallbackComponent } from '../UI/ErrorBoundary';
 import { makeTestProject } from '../fixtures/TestProject';
 import CreateProfile from '../Profile/CreateProfile';
@@ -101,7 +105,7 @@ import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
 import i18n from '../UI/i18n';
-import ObjectField from '../EventsSheet/InstructionEditor/ParameterFields/ObjectField';
+import ObjectField from '../EventsSheet/ParameterFields/ObjectField';
 import { getInitialSelection } from '../EventsSheet/SelectionHandler';
 import EventsFunctionConfigurationEditor from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor';
 import EventsFunctionsList from '../EventsFunctionsList';
@@ -481,6 +485,87 @@ storiesOf('ParameterFields', module)
       initialValue={'Variable1'}
       render={(value, onChange) => (
         <ObjectVariableField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
+      )}
+    />
+  ))
+  .add('ParameterColorField', () => (
+    <ValueStateHolder
+      initialValue={'"123;342;345"'}
+      render={(value, onChange) => (
+        <ColorExpressionField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
+      )}
+    />
+  ))
+  .add('ParameterColorField (inline)', () => (
+    <ValueStateHolder
+      initialValue={'"123;342;345"'}
+      render={(value, onChange) => (
+        <ColorExpressionField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          isInline
+        />
+      )}
+    />
+  ))
+  .add('TrueFalseField', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <TrueFalseField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          isInline
+        />
+      )}
+    />
+  ))
+  .add('YesNoField', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <YesNoField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          isInline
+        />
+      )}
+    />
+  ))
+  .add('ForceMultiplierField', () => (
+    <ValueStateHolder
+      initialValue={''}
+      render={(value, onChange) => (
+        <ForceMultiplierField
+          value={value}
+          onChange={onChange}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+        />
+      )}
+    />
+  ))
+  .add('ForceMultiplierField (with a deprecated value)', () => (
+    <ValueStateHolder
+      initialValue={'0.8'}
+      render={(value, onChange) => (
+        <ForceMultiplierField
           value={value}
           onChange={onChange}
           globalObjectsContainer={project}
@@ -914,7 +999,8 @@ storiesOf('EventsSheet', module)
           onOpenExternalEvents={action('Open external events')}
           resourceSources={[]}
           onChooseResource={source =>
-            action('Choose resource from source', source)}
+            action('Choose resource from source', source)
+          }
           resourceExternalEditors={[]}
           onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
@@ -939,7 +1025,8 @@ storiesOf('EventsSheet', module)
           onOpenExternalEvents={action('Open external events')}
           resourceSources={[]}
           onChooseResource={source =>
-            action('Choose resource from source', source)}
+            action('Choose resource from source', source)
+          }
           resourceExternalEditors={[]}
           onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
@@ -1070,7 +1157,8 @@ storiesOf('TiledSpriteEditor', module)
         project={project}
         resourceSources={[]}
         onChooseResource={source =>
-          action('Choose resource from source', source)}
+          action('Choose resource from source', source)
+        }
         resourceExternalEditors={[]}
       />
     </SerializedObjectDisplay>
@@ -1086,7 +1174,8 @@ storiesOf('PanelSpriteEditor', module)
         project={project}
         resourceSources={[]}
         onChooseResource={source =>
-          action('Choose resource from source', source)}
+          action('Choose resource from source', source)
+        }
         resourceExternalEditors={[]}
       />
     </SerializedObjectDisplay>
@@ -1102,7 +1191,8 @@ storiesOf('SpriteEditor and related editors', module)
         project={project}
         resourceSources={[]}
         onChooseResource={source =>
-          action('Choose resource from source', source)}
+          action('Choose resource from source', source)
+        }
         resourceExternalEditors={[]}
       />
     </SerializedObjectDisplay>
@@ -1597,7 +1687,8 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           setToolbar={() => {}}
           resourceSources={[]}
           onChooseResource={source =>
-            action('Choose resource from source', source)}
+            action('Choose resource from source', source)
+          }
           resourceExternalEditors={[]}
         />
       </div>

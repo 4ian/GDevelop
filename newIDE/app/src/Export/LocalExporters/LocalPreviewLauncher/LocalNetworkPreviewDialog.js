@@ -54,20 +54,19 @@ export default class LocalNetworkDialog extends React.Component<Props, {}> {
           </Line>
         )}
         {!error && !url && <PlaceholderLoader />}
-        {!error &&
-          url && (
-            <div>
-              <Line>
-                Your preview is ready! On your mobile or tablet, open your
-                browser and enter in the address bar:
-              </Line>
-              <TextField value={url} fullWidth />
-              <Line>
-                Please note that your device should be connected on the same
-                network as this computer.
-              </Line>
-            </div>
-          )}
+        {!error && url && (
+          <div>
+            <Line>
+              Your preview is ready! On your mobile or tablet, open your browser
+              and enter in the address bar:
+            </Line>
+            <TextField value={url} fullWidth />
+            <Line>
+              Please note that your device should be connected on the same
+              network as this computer.
+            </Line>
+          </div>
+        )}
       </Dialog>
     );
   }

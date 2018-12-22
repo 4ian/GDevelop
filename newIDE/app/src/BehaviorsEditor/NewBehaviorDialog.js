@@ -100,7 +100,8 @@ export default class NewBehaviorDialog extends Component {
                   this.props.onChoose(
                     behaviorMetadata.type,
                     behaviorMetadata.defaultName
-                  )}
+                  )
+                }
               />
             );
           })}

@@ -23,9 +23,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 #if defined(GD_IDE_ONLY)
   extension
       .AddCondition("VarScene",
-                    _("Value of a variable"),
+                    _("Value of a scene variable"),
                     _("Compare the value of a scene variable."),
-                    _("Variable _PARAM0_ is _PARAM1__PARAM2_"),
+                    _("Scene variable _PARAM0_ is _PARAM1__PARAM2_"),
                     _("Variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
@@ -36,9 +36,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddCondition("VarSceneTxt",
-                    _("Text of a variable"),
+                    _("Text of a scene variable"),
                     _("Compare the text of a scene variable."),
-                    _("The text of variable _PARAM0_ is _PARAM1__PARAM2_"),
+                    _("The text of scene variable _PARAM0_ is _PARAM1__PARAM2_"),
                     _("Variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
@@ -51,8 +51,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
       .AddCondition(
           "VariableChildExists",
           _("Child existence"),
-          _("Return true if the specified child of the variable exists."),
-          _("Child _PARAM1_ of variable _PARAM0_ exists"),
+          _("Return true if the specified child of the scene variable exists."),
+          _("Child _PARAM1_ of scene variable _PARAM0_ exists"),
           _("Variables/Structures"),
           "res/conditions/var24.png",
           "res/conditions/var.png")
@@ -76,8 +76,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddCondition("VarSceneDef",
                     _("Test if a scene variable is defined"),
-                    _("Test if the scene variable exist."),
-                    _("Variable _PARAM0_ is defined"),
+                    _("Test if the scene variable exists."),
+                    _("Scene variable _PARAM0_ is defined"),
                     _("Variables"),
                     "res/conditions/var24.png",
                     "res/conditions/var.png")
@@ -129,9 +129,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("ModVarScene",
-                 _("Value of a variable"),
+                 _("Value of a scene variable"),
                  _("Modify the value of a scene variable."),
-                 _("Do _PARAM1__PARAM2_ to variable _PARAM0_"),
+                 _("Do _PARAM1__PARAM2_ to scene variable _PARAM0_"),
                  _("Variables"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
@@ -142,9 +142,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("ModVarSceneTxt",
-                 _("String of a variable"),
+                 _("String of a scene variable"),
                  _("Modify the text of a scene variable."),
-                 _("Do _PARAM1__PARAM2_ to the text of variable _PARAM0_"),
+                 _("Do _PARAM1__PARAM2_ to the text of scene variable _PARAM0_"),
                  _("Variables"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
@@ -185,8 +185,8 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
   extension
       .AddAction("VariableRemoveChild",
                  _("Remove a child"),
-                 _("Remove a child from a variable."),
-                 _("Remove child _PARAM1_ from variable _PARAM0_"),
+                 _("Remove a child from a scene variable."),
+                 _("Remove child _PARAM1_ from scene variable _PARAM0_"),
                  _("Variables/Structure"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
@@ -208,9 +208,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddAction("VariableClearChildren",
-                 _("Clear variable"),
-                 _("Remove all the children from the variable."),
-                 _("Clear children from variable _PARAM0_"),
+                 _("Clear scene variable"),
+                 _("Remove all the children from the scene variable."),
+                 _("Clear children from scene variable _PARAM0_"),
                  _("Variables/Structure"),
                  "res/actions/var24.png",
                  "res/actions/var.png")
@@ -230,7 +230,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddExpression("GlobalVariableChildCount",
-                     _("Global variable number of children"),
+                     _("Number of children of a global variable"),
                      _("Get the number of children of a global variable"),
                      _("Variables"),
                      "res/actions/var.png")
@@ -238,7 +238,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddExpression("VariableChildCount",
-                     _("Scene variable number of children"),
+                     _("Number of children of a scene variable"),
                      _("Get the number of children of a scene variable"),
                      _("Variables"),
                      "res/actions/var.png")
@@ -246,15 +246,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddExpression("Variable",
-                     _("Scene variables"),
-                     _("Scene variables"),
+                     _("Value of a scene variable"),
+                     _("Value of a scene variable"),
                      _("Variables"),
                      "res/actions/var.png")
       .AddParameter("scenevar", _("Variable"));
 
   extension
       .AddStrExpression("VariableString",
-                        _("Scene variables"),
+                        _("Text of a scene variable"),
                         _("Text of a scene variable"),
                         _("Variables"),
                         "res/actions/var.png")
@@ -262,15 +262,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsVariablesExtension(
 
   extension
       .AddExpression("GlobalVariable",
-                     _("Global variables"),
-                     _("Global variable"),
+                     _("Value of a global variable"),
+                     _("Value of a global variable"),
                      _("Variables"),
                      "res/actions/var.png")
       .AddParameter("globalvar", _("Name of the global variable"));
 
   extension
       .AddStrExpression("GlobalVariableString",
-                        _("Global variables"),
+                        _("Text of a global variable"),
                         _("Text of a global variable"),
                         _("Variables"),
                         "res/actions/var.png")

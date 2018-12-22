@@ -88,25 +88,28 @@ export class ObjectEditorDialog extends Component<*, StateType> {
             />
           </Column>
         </Line>
-        {currentTab === 'properties' &&
-          EditorComponent && (
-            <EditorComponent
-              object={this.props.object}
-              project={this.props.project}
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this.props.onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              onSizeUpdated={() =>
-                this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
-              objectName={this.props.objectName}
-            />
-          )}
+        {currentTab === 'properties' && EditorComponent && (
+          <EditorComponent
+            object={this.props.object}
+            project={this.props.project}
+            resourceSources={this.props.resourceSources}
+            onChooseResource={this.props.onChooseResource}
+            resourceExternalEditors={this.props.resourceExternalEditors}
+            onSizeUpdated={
+              () =>
+                this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
+            }
+            objectName={this.props.objectName}
+          />
+        )}
         {currentTab === 'behaviors' && (
           <BehaviorsEditor
             object={this.props.object}
             project={this.props.project}
-            onSizeUpdated={() =>
-              this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+            onSizeUpdated={
+              () =>
+                this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
+            }
           />
         )}
       </Dialog>

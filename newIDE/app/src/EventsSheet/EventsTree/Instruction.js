@@ -25,6 +25,7 @@ import {
   type ConnectDropTarget,
 } from 'react-dnd';
 import DropIndicator from './DropIndicator';
+import ParameterRenderingService from '../ParameterRenderingService';
 const gd = global.gd;
 const instrFormatter = gd.InstructionSentenceFormatter.get();
 instrFormatter.loadTypesFormattingFromConfig();
@@ -128,9 +129,13 @@ class Instruction extends React.Component<Props, *> {
                 [parameterType]: true,
               })}
               onClick={domEvent =>
-                this.props.onParameterClick(domEvent, parameterIndex)}
+                this.props.onParameterClick(domEvent, parameterIndex)
+              }
             >
-              {formattedTexts.getString(i)}
+              {ParameterRenderingService.renderParameterString(
+                parameterType,
+                formattedTexts.getString(i)
+              )}
             </span>
           );
         })}

@@ -90,8 +90,9 @@ gdjs.VariablesContainer.prototype.add = function(name, variable) {
  * @param {string} name Variable to be removed
  */
 gdjs.VariablesContainer.prototype.remove = function(name) {
-	if ( this._variables.containsKey(name) ) {
-        this._variables.get(name).setUndefinedInContainer();
+    var variable = this._variables.items[name];
+	if (variable) {
+        variable.setUndefinedInContainer();
     }
 };
 
@@ -101,13 +102,11 @@ gdjs.VariablesContainer.prototype.remove = function(name) {
  * @return {gdjs.Variable} The specified variable. If not found, an empty variable is added to the container.
  */
 gdjs.VariablesContainer.prototype.get = function(name) {
-    var variable = null;
-	if ( !this._variables.containsKey(name) ) { //Add automatically inexisting variables.
+    var variable = this._variables.items[name];
+	if (!variable) { //Add automatically inexisting variables.
         variable = new gdjs.Variable();
         this._variables.put(name, variable);
-	}
-    else {
-        variable = this._variables.get(name);
+	} else {
         if ( variable.isUndefinedInContainer() ) { //Reuse variables removed before.
             gdjs.Variable.call(variable);
         }
@@ -146,7 +145,8 @@ gdjs.VariablesContainer.prototype.getFromIndex = function(id) {
  * @return {boolean} true if the variable exists.
  */
 gdjs.VariablesContainer.prototype.has = function(name) {
-	return this._variables.containsKey(name) && !this._variables.get(name).isUndefinedInContainer();
+    var variable = this._variables.items[name];
+	return variable && !variable.isUndefinedInContainer();
 };
 
 

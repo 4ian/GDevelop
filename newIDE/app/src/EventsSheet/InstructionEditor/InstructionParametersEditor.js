@@ -4,7 +4,7 @@ import Divider from 'material-ui/Divider';
 import Toggle from 'material-ui/Toggle';
 import { mapFor } from '../../Utils/MapFor';
 import EmptyMessage from '../../UI/EmptyMessage';
-import ParameterRenderingService from './ParameterRenderingService';
+import ParameterRenderingService from '../ParameterRenderingService';
 import HelpButton from '../../UI/HelpButton';
 import {
   type ResourceSource,
@@ -70,7 +70,7 @@ export default class InstructionParametersEditor extends React.Component<
       }, 300); // Let the time to the dialog that is potentially containing the InstructionParametersEditor to finish its transition.
     }
   }
-  
+
   focus() {
     // Verify that there is a field to focus.
     if (

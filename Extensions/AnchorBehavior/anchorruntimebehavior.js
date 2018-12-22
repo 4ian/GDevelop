@@ -45,9 +45,6 @@ gdjs.AnchorRuntimeBehavior.prototype.onActivate = function() {
 };
 
 gdjs.AnchorRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
-};
-
-gdjs.AnchorRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
     var game = runtimeScene.getGame();
     var rendererWidth = game.getRenderer().getCurrentWidth();
     var rendererHeight = game.getRenderer().getCurrentHeight();
@@ -159,4 +156,7 @@ gdjs.AnchorRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
         if(this._topEdgeAnchor != gdjs.AnchorRuntimeBehavior.VerticalAnchor.NONE)
             this.owner.setY(topLeftCoord[1] + this.owner.getY() - this.owner.getDrawableY());
     }
+};
+
+gdjs.AnchorRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 };

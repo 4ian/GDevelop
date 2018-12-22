@@ -570,16 +570,16 @@ gdjs.RuntimeObject.prototype.getCenterY = function() {
  * @private
  * @param {number} x The x coordinates of the force
  * @param {number} y The y coordinates of the force
- * @param {number} clearing Set the force clearing
+ * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype._getRecycledForce = function(x, y, clearing) {
+gdjs.RuntimeObject.prototype._getRecycledForce = function(x, y, multiplier) {
     if ( gdjs.RuntimeObject.forcesGarbage.length === 0 )
-        return new gdjs.Force(x, y, clearing);
+        return new gdjs.Force(x, y, multiplier);
     else {
         var recycledForce = gdjs.RuntimeObject.forcesGarbage.pop();
         recycledForce.setX(x);
         recycledForce.setY(y);
-        recycledForce.setClearing(clearing);
+        recycledForce.setMultiplier(multiplier);
         return recycledForce;
     }
 };
@@ -588,24 +588,24 @@ gdjs.RuntimeObject.prototype._getRecycledForce = function(x, y, clearing) {
  * Add a force to the object to move it.
  * @param {number} x The x coordinates of the force
  * @param {number} y The y coordinates of the force
- * @param {number} clearing Set the force clearing
+ * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addForce = function(x,y, clearing) {
-    this._forces.push(this._getRecycledForce(x, y, clearing));
+gdjs.RuntimeObject.prototype.addForce = function(x,y, multiplier) {
+    this._forces.push(this._getRecycledForce(x, y, multiplier));
 };
 
 /**
  * Add a force using polar coordinates.
  * @param {number} angle The angle of the force, in degrees.
  * @param {number} len The length of the force, in pixels.
- * @param {number} clearing Set the force clearing
+ * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, clearing) {
+gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, multiplier) {
     var angleInRadians = angle/180*3.14159; //TODO: Benchmark with Math.PI
     var forceX = Math.cos(angleInRadians)*len;
     var forceY = Math.sin(angleInRadians)*len;
 
-    this._forces.push(this._getRecycledForce(forceX, forceY, clearing));
+    this._forces.push(this._getRecycledForce(forceX, forceY, multiplier));
 };
 
 /**
@@ -613,16 +613,16 @@ gdjs.RuntimeObject.prototype.addPolarForce = function(angle, len, clearing) {
  * @param {number} x The target x position
  * @param {number} y The target y position
  * @param {number} len The force length, in pixels.
- * @param {number} clearing Set the force clearing
+ * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, clearing) {
+gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, multiplier) {
 
     var angle = Math.atan2(y - (this.getDrawableY()+this.getCenterY()),
                            x - (this.getDrawableX()+this.getCenterX()));
 
     var forceX = Math.cos(angle)*len;
     var forceY = Math.sin(angle)*len;
-    this._forces.push(this._getRecycledForce(forceX, forceY, clearing));
+    this._forces.push(this._getRecycledForce(forceX, forceY, multiplier));
 };
 
 /**
@@ -630,14 +630,14 @@ gdjs.RuntimeObject.prototype.addForceTowardPosition = function(x,y, len, clearin
  * (Shortcut for addForceTowardPosition)
  * @param {gdjs.RuntimeObject} object The target object
  * @param {number} len The force length, in pixels.
- * @param {number} clearing Set the force clearing
+ * @param {number} multiplier Set the force multiplier
  */
-gdjs.RuntimeObject.prototype.addForceTowardObject = function(obj, len, clearing) {
+gdjs.RuntimeObject.prototype.addForceTowardObject = function(obj, len, multiplier) {
     if ( obj == null ) return;
 
     this.addForceTowardPosition(obj.getDrawableX() + obj.getCenterX(),
                                 obj.getDrawableY() + obj.getCenterY(),
-                                len, clearing);
+                                len, multiplier);
 };
 
 /**
@@ -662,14 +662,15 @@ gdjs.RuntimeObject.prototype.hasNoForces = function() {
  */
 gdjs.RuntimeObject.prototype.updateForces = function(elapsedTime) {
     for(var i = 0;i<this._forces.length;) {
-        if(this._forces[i].getClearing() === 0 || this._forces[i].getLength() <= 0.001)
-        {
-            gdjs.RuntimeObject.forcesGarbage.push(this._forces[i]);
+        var force = this._forces[i];
+        var multiplier = force.getMultiplier();
+        if (multiplier === 1) { // Permanent force
+            ++i;
+        } else if (multiplier === 0 || force.getLength() <= 0.001) { // Instant or force disappearing
+            gdjs.RuntimeObject.forcesGarbage.push(force);
             this._forces.remove(i);
-        }
-        else
-        {
-            this._forces[i].setLength(this._forces[i].getLength() - this._forces[i].getLength() * ( 1 - this._forces[i].getClearing() ) * elapsedTime);
+        } else { // Deprecated way of updating forces progressively.
+            force.setLength(force.getLength() - force.getLength() * ( 1 - multiplier ) * elapsedTime);
             ++i;
         }
     }
@@ -780,6 +781,12 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
 };
 
 /**
+ * @typedef {Object} AABB
+ * @property {Array} min The [x,y] coordinates of the top left point
+ * @property {Array} max The [x,y] coordinates of the bottom right point
+ */
+
+/**
  * Get the AABB (axis aligned bounding box) for the object.
  * 
  * The default implementation uses either the position/size of the object (when angle is 0) or
@@ -788,7 +795,7 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
  * 
  * You should probably redefine updateAABB instead of this function.
  *
- * @return The bounding box (example: {min: [10,5], max:[20,10]})
+ * @return {AABB} The bounding box (example: `{min: [10,5], max:[20,10]}`)
  */
 gdjs.RuntimeObject.prototype.getAABB = function() {
     if ( this.hitBoxesDirty ) {
@@ -798,6 +805,21 @@ gdjs.RuntimeObject.prototype.getAABB = function() {
     }
 
     return this.aabb;
+};
+
+/**
+ * Get the AABB (axis aligned bounding box) to be used to determine if the object
+ * is visible on screen. The gdjs.RuntimeScene will hide the renderer object if
+ * the object is not visible on screen ("culling").
+ * 
+ * The default implementation uses the AABB returned by getAABB.
+ * 
+ * If `null` is returned, the object is assumed to be always visible.
+ *
+ * @return {?AABB} The bounding box (example: `{min: [10,5], max:[20,10]}`) or `null`.
+ */
+gdjs.RuntimeObject.prototype.getVisibilityAABB = function() {
+    return this.getAABB();
 };
 
 /**

@@ -1,5 +1,10 @@
+// @flow
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
+import {
+  createOrUpdateResource,
+  getLocalResourceFullPath,
+} from './ResourceUtils.js';
 
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
@@ -19,40 +24,36 @@ export const openJfxr = ({
 }: ExternalEditorOpenOptions) => {
   if (!electron || !ipcRenderer) return;
   const projectPath = path.dirname(project.getProjectFile());
-
-  let initialResourcePath = '';
-  initialResourcePath = resourcesLoader.getFullUrl(project, resourceNames[0]);
-  initialResourcePath = initialResourcePath.substring(
-    7,
-    initialResourcePath.lastIndexOf('?cache=')
+  const initialResourcePath = getLocalResourceFullPath(
+    project,
+    resourceNames[0]
   );
 
-  const jfxrData = {
+  const externalEditorData = {
     resourcePath: initialResourcePath,
-    metadata: extraOptions.initialResourceMetadata,
+    // $FlowFixMe - TODO: There is an error here to be solved.
+    externalEditorData: extraOptions.initialResourceMetadata,
     projectPath,
   };
 
   ipcRenderer.removeAllListeners('jfxr-changes-saved');
-  ipcRenderer.on('jfxr-changes-saved', (event, newFilePath, fileMetadata) => {
+  ipcRenderer.on(
+    'jfxr-changes-saved',
+    (event, newFilePath, externalEditorData) => {
+      const resourceName = path.relative(projectPath, newFilePath);
+      createOrUpdateResource(project, new gd.AudioResource(), resourceName);
 
-    const resourceName = path.relative(projectPath, newFilePath); // TODO: move into a generic createOrUpdateResource function that piskel can also use in app/src/ResourcesList/ResourceUtils.js
-    const resourcesManager = project.getResourcesManager();
-    if (resourcesManager.hasResource(resourceName)) {
-      resourcesManager.removeResource(resourceName)
+      const metadata = {
+        jfxr: externalEditorData,
+      };
+      project
+        .getResourcesManager()
+        .getResource(resourceName)
+        .setMetadata(JSON.stringify(metadata));
+      // $FlowFixMe - TODO: There is an error here to be solved.
+      onChangesSaved([{ metadata }], resourceName);
     }
-    const audioResource = new gd.AudioResource();
-    audioResource.setFile(resourceName);
-    audioResource.setName(resourceName);
-    resourcesManager.addResource(audioResource);
-    audioResource.delete();
+  );
 
-    const newMetadata = {
-      jfxr: fileMetadata,
-    };
-    resourcesManager.getResource(resourceName).setMetadata(JSON.stringify(newMetadata));
-    onChangesSaved([{ metadata: newMetadata }], resourceName);
-  });
-
-  ipcRenderer.send('jfxr-create-wav', jfxrData);
+  ipcRenderer.send('jfxr-create-wav', externalEditorData);
 };

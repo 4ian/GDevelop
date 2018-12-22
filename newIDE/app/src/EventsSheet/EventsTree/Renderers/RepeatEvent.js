@@ -10,7 +10,7 @@ import {
   disabledText,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
-import DefaultField from '../../InstructionEditor/ParameterFields/DefaultField';
+import DefaultField from '../../ParameterFields/DefaultField';
 import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;
 
@@ -27,11 +27,14 @@ const styles = {
   },
 };
 
-export default class RepeatEvent extends React.Component<EventRendererProps, *> {
-state = {
-      editing: false,
-      anchorEl: null,
-    };
+export default class RepeatEvent extends React.Component<
+  EventRendererProps,
+  *
+> {
+  state = {
+    editing: false,
+    anchorEl: null,
+  };
 
   edit = (domEvent: any) => {
     this.setState({

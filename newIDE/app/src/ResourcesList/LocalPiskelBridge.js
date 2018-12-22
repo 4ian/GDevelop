@@ -1,6 +1,10 @@
 // @flow
 import optionalRequire from '../Utils/OptionalRequire.js';
 import { type ExternalEditorOpenOptions } from './ResourceExternalEditor.flow';
+import {
+  createOrUpdateResource,
+  getLocalResourceFullPath,
+} from './ResourceUtils.js';
 const electron = optionalRequire('electron');
 const path = optionalRequire('path');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
@@ -22,21 +26,16 @@ export const openPiskel = ({
   if (!electron || !ipcRenderer) return;
 
   const resources = resourceNames.map((resourceName, originalIndex) => {
-    let resourcePath = resourcesLoader.getResourceFullUrl(
-      project,
-      resourceName
-    );
-
-    //TODO: check if this is necessary or if resourcesLoader should be updated.
-    resourcePath = resourcePath.substring(
-      7,
-      resourcePath.lastIndexOf('?cache=')
-    );
-    return { resourcePath, resourceName, originalIndex };
+    let resourcePath = getLocalResourceFullPath(project, resourceName);
+    return {
+      resourcePath,
+      resourceName,
+      originalIndex,
+    };
   });
 
   const projectPath = path.dirname(project.getProjectFile());
-  const completePiskelOptions = {
+  const externalEditorData = {
     ...extraOptions,
     resources,
     singleFrame,
@@ -47,20 +46,33 @@ export const openPiskel = ({
   ipcRenderer.removeAllListeners('piskel-changes-saved');
   ipcRenderer.on(
     'piskel-changes-saved',
-    (event, outputResources, newAnimationName) => {
+    (event, outputResources, newAnimationName, externalEditorData) => {
+      const metadata = externalEditorData.data
+        ? { pskl: externalEditorData }
+        : null;
+
       const resourcesManager = project.getResourcesManager();
       outputResources.forEach(resource => {
-        const imageResource = new gd.ImageResource();
         resource.name = path.relative(projectPath, resource.path); // Still needed for onChangesSaved()
-        imageResource.setFile(resource.name);
-        imageResource.setName(resource.name);
-        resourcesManager.addResource(imageResource);
-        imageResource.delete();
+        createOrUpdateResource(project, new gd.ImageResource(), resource.name);
       });
-      onChangesSaved(outputResources, newAnimationName);
+
+      // in case this is for a single frame object, save the metadata in the Image object
+      if (externalEditorData.singleFrame) {
+        if (metadata) {
+          resourcesManager
+            .getResource(path.relative(projectPath, outputResources[0].path))
+            .setMetadata(JSON.stringify(metadata));
+        }
+        onChangesSaved(outputResources, newAnimationName);
+      } else {
+        // In case there are multiple frames, pass back the metadata to the editor and let it store it at an appropriate place.
+        // (For example, for sprites, SpritesList.js will save it in the metadata of the gd.Direction).
+        onChangesSaved(outputResources, newAnimationName, metadata);
+      }
     }
   );
 
   // Issue the event to open piskel
-  ipcRenderer.send('piskel-open-then-load-animation', completePiskelOptions);
+  ipcRenderer.send('piskel-open-then-load-animation', externalEditorData);
 };

@@ -22,23 +22,20 @@ export default ({ subscription, limit, onChangeSubscription }: Props) => {
         You have {Math.max(limit.max - limit.current, 0)} remaining builds for
         today (out of {limit.max}).
       </p>
-      {hasSubscription &&
-        limit.limitReached && (
-          <p>
-            Need more power? You can upgrade to a new plan to increase the
-            limit!
-          </p>
-        )}
-      {hasSubscription &&
-        limit.limitReached && (
-          <Line justifyContent="center" alignItems="center">
-            <RaisedButton
-              label="Upgrade my account"
-              onClick={onChangeSubscription}
-              primary
-            />
-          </Line>
-        )}
+      {hasSubscription && limit.limitReached && (
+        <p>
+          Need more power? You can upgrade to a new plan to increase the limit!
+        </p>
+      )}
+      {hasSubscription && limit.limitReached && (
+        <Line justifyContent="center" alignItems="center">
+          <RaisedButton
+            label="Upgrade my account"
+            onClick={onChangeSubscription}
+            primary
+          />
+        </Line>
+      )}
       {noSubscription && (
         <p>You don't have a subscription. Get one to increase the limits!</p>
       )}

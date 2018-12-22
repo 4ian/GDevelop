@@ -39,7 +39,10 @@ type Props = {|
 |};
 type State = {||};
 
-export default class InstructionEditorDialog extends React.Component<Props, State> {
+export default class InstructionEditorDialog extends React.Component<
+  Props,
+  State
+> {
   _getTitle() {
     if (this.props.isCondition) {
       return this.props.isNewInstruction
@@ -51,13 +54,15 @@ export default class InstructionEditorDialog extends React.Component<Props, Stat
   }
 
   render() {
-    const {isNewInstruction, onCancel, onSubmit, open, ...otherProps} = this.props;
+    const {
+      isNewInstruction,
+      onCancel,
+      onSubmit,
+      open,
+      ...otherProps
+    } = this.props;
     const actions = [
-      <FlatButton
-        label="Cancel"
-        primary={false}
-        onClick={onCancel}
-      />,
+      <FlatButton label="Cancel" primary={false} onClick={onCancel} />,
       <FlatButton
         label="Ok"
         primary={true}

@@ -141,7 +141,8 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
           disableAlpha
           color={this.state.backgroundColor}
           onChangeComplete={color =>
-            this.setState({ backgroundColor: color.rgb })}
+            this.setState({ backgroundColor: color.rgb })
+          }
         />
         <Checkbox
           checked={this.state.shouldStopSoundsOnStartup}
@@ -149,7 +150,8 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
           onCheck={(e, check) =>
             this.setState({
               shouldStopSoundsOnStartup: check,
-            })}
+            })
+          }
         />
         <RaisedButton
           label="Edit scene variables"

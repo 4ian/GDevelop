@@ -4,16 +4,16 @@ const path = optionalRequire('path');
 var fs = optionalRequire('fs-extra');
 
 export const findEmptyPath = basePath => {
-    if (!path) return basePath;
+  if (!path) return basePath;
 
-    const folderName = generateName('My project', name => {
-      try {
-        fs.accessSync(path.join(basePath, name));
-      } catch (ex) {
-        return false;
-      }
-      return true;
-    });
+  const folderName = generateName('My project', name => {
+    try {
+      fs.accessSync(path.join(basePath, name));
+    } catch (ex) {
+      return false;
+    }
+    return true;
+  });
 
-    return path.join(basePath, folderName);
-  };
+  return path.join(basePath, folderName);
+};

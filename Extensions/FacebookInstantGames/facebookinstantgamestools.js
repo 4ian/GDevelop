@@ -4,7 +4,24 @@
  * @static
  * @private
  */
-gdjs.evtTools.facebookInstantGames = {};
+gdjs.evtTools.facebookInstantGames = {
+  _preloadedInterstitial: null,
+  _preloadedInterstitialLoading: false,
+  _preloadedInterstitialLoaded: false,
+  _preloadedRewardedVideo: null,
+  _preloadedRewardedVideoLoading: false,
+  _preloadedRewardedVideoLoaded: false
+};
+
+gdjs.evtTools.facebookInstantGames.areAdsSupported = function() {
+  if (typeof FBInstant === "undefined") return false;
+
+  var supportedAPIs = FBInstant.getSupportedAPIs();
+  return (
+    supportedAPIs.indexOf("getInterstitialAdAsync") !== -1 &&
+    supportedAPIs.indexOf("getRewardedVideoAsync") !== -1
+  );
+};
 
 gdjs.evtTools.facebookInstantGames.getPlayerId = function() {
   if (typeof FBInstant === "undefined") return "";
@@ -102,7 +119,9 @@ gdjs.evtTools.facebookInstantGames.getPlayerEntry = function(
     })
     .then(function(entry) {
       rankVariable.setNumber(entry.getRank() === null ? -1 : entry.getRank());
-      scoreVariable.setNumber(entry.getScore() === null ? -1 : entry.getScore());
+      scoreVariable.setNumber(
+        entry.getScore() === null ? -1 : entry.getScore()
+      );
       gdjs.evtTools.network.jsonToVariableStructure(
         entry.getExtraData(),
         extraDataVariable
@@ -113,9 +132,123 @@ gdjs.evtTools.facebookInstantGames.getPlayerEntry = function(
     });
 };
 
-if (typeof FBInstant === "undefined" && typeof window !== "undefined") {
-  console.log("Creating a mocked version of Facebook Instant Games");
+gdjs.evtTools.facebookInstantGames.loadInterstitialAd = function(
+  adPlacementId,
+  errorVariable
+) {
+  if (typeof FBInstant === "undefined") return;
 
+  if (
+    gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading ||
+    gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded
+  )
+    return;
+
+  gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading = true;
+  FBInstant.getInterstitialAdAsync(adPlacementId)
+    .then(function(interstitial) {
+      gdjs.evtTools.facebookInstantGames._preloadedInterstitial = interstitial;
+      return interstitial.loadAsync();
+    })
+    .then(function() {
+      gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading = false;
+      gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded = true;
+      console.info("Facebook Instant Games interstitial preloaded.");
+    })
+    .catch(function(err) {
+      gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoading = false;
+      gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded = false;
+      console.error("Interstitial failed to preload: " + err.message);
+      errorVariable.setString(error.message || "Unknown error");
+    });
+};
+
+gdjs.evtTools.facebookInstantGames.showInterstitialAd = function(
+  errorVariable
+) {
+  if (typeof FBInstant === "undefined") return;
+
+  if (!gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded) return;
+
+  gdjs.evtTools.facebookInstantGames._preloadedInterstitial
+    .showAsync()
+    .then(function() {
+      console.info("Facebook Instant Games interstitial shown.");
+    })
+    .catch(function(err) {
+      console.error("Interstitial failed to show: " + err.message);
+      errorVariable.setString(error.message || "Unknown error");
+    })
+    .then(function() {
+      gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded = false;
+    });
+};
+
+gdjs.evtTools.facebookInstantGames.isInterstitialAdReady = function() {
+  return gdjs.evtTools.facebookInstantGames._preloadedInterstitialLoaded;
+};
+
+gdjs.evtTools.facebookInstantGames.loadRewardedVideo = function(
+  adPlacementId,
+  errorVariable
+) {
+  if (typeof FBInstant === "undefined") return;
+
+  if (
+    gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading ||
+    gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded
+  )
+    return;
+
+  gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading = true;
+  FBInstant.getRewardedVideoAsync(adPlacementId)
+    .then(function(rewardedVideo) {
+      gdjs.evtTools.facebookInstantGames._preloadedRewardedVideo = rewardedVideo;
+      return rewardedVideo.loadAsync();
+    })
+    .then(function() {
+      gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading = false;
+      gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded = true;
+      console.info("Facebook Instant Games rewarded video preloaded.");
+    })
+    .catch(function(err) {
+      gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoading = false;
+      gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded = false;
+      console.error("Rewarded video failed to preload: " + err.message);
+      errorVariable.setString(error.message || "Unknown error");
+    });
+};
+
+gdjs.evtTools.facebookInstantGames.showRewardedVideo = function(errorVariable) {
+  if (typeof FBInstant === "undefined") return;
+
+  if (!gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded) return;
+
+  gdjs.evtTools.facebookInstantGames._preloadedRewardedVideo
+    .showAsync()
+    .then(function() {
+      console.info("Facebook Instant Games rewarded video shown.");
+    })
+    .catch(function(err) {
+      console.error("Rewarded video failed to show: " + err.message);
+      errorVariable.setString(error.message || "Unknown error");
+    })
+    .then(function() {
+      gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded = false;
+    });
+};
+
+gdjs.evtTools.facebookInstantGames.isRewardedVideoReady = function() {
+  return gdjs.evtTools.facebookInstantGames._preloadedRewardedVideoLoaded;
+};
+
+if (typeof FBInstant === "undefined" && typeof window !== "undefined") {
+  console.log("Creating a mocked version of Facebook Instant Games.");
+
+  /**
+   * A mocked Leaderboard, part of the mock of FBInstant.
+   * @class MockedLeaderboard
+   */
   function MockedLeaderboard() {
     this._playerScore = null;
     this._playerRank = null;
@@ -147,6 +280,49 @@ if (typeof FBInstant === "undefined" && typeof window !== "undefined") {
     });
   };
 
+  /**
+   * A mocked RewardedVideo, part of the mock of FBInstant.
+   * @class RewardedVideo
+   */
+  function MockedRewardedVideo() {
+    this._isLoaded = false;
+  }
+  MockedRewardedVideo.prototype.loadAsync = function() {
+    this._isLoaded = true;
+    return Promise.resolve();
+  };
+  MockedRewardedVideo.prototype.showAsync = function() {
+    if (this._isLoaded) {
+      console.info(
+        "In a real Instant Game, a video reward should have been shown to the user."
+      );
+      return Promise.resolve();
+    }
+    return Promise.reject(new Error("Rewarded video is not loaded."));
+  };
+
+  /**
+   * A mocked MockedInterstitial, part of the mock of FBInstant.
+   * @class MockedInterstitial
+   */
+  function MockedInterstitial() {
+    this._isLoaded = false;
+  }
+  MockedInterstitial.prototype.loadAsync = function() {
+    this._isLoaded = true;
+    return Promise.resolve();
+  };
+  MockedInterstitial.prototype.showAsync = function() {
+    if (this._isLoaded) {
+      console.info(
+        "In a real Instant Game, an interstitial should have been shown to the user."
+      );
+      return Promise.resolve();
+    }
+    return Promise.reject(new Error("Interstitial is not loaded."));
+  };
+
+  var supportedAPIs = [];
   var FBInstantMock = {
     _mockedPlayerData: {},
     _mockedLeaderboards: {},
@@ -176,8 +352,30 @@ if (typeof FBInstant === "undefined" && typeof window !== "undefined") {
           new MockedLeaderboard();
         resolve(FBInstantMock._mockedLeaderboards[leaderboardName]);
       });
+    },
+    getInterstitialAdAsync: function() {
+      return Promise.resolve(new MockedInterstitial());
+    },
+    getRewardedVideoAsync: function() {
+      return Promise.resolve(new MockedRewardedVideo());
+    },
+    getSupportedAPIs: function() {
+      return supportedAPIs;
     }
   };
+
+  // Retrieve the name of the supported APIs in our mock.
+  for (var property in FBInstantMock) {
+    if (typeof FBInstantMock[property] == "object") {
+      for (var subProperty in FBInstantMock[property]) {
+        if (typeof FBInstantMock[property][subProperty] == "function") {
+          supportedAPIs.push(property + "." + subProperty);
+        }
+      }
+    } else if (typeof FBInstantMock[property] == "function") {
+      supportedAPIs.push(property);
+    }
+  }
 
   window.FBInstant = FBInstantMock;
 }

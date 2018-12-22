@@ -257,7 +257,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddAction("PlaySound",
                  _("Play a sound"),
                  _("Play a sound."),
-                 _("Play the sound _PARAM1_, vol.: _PARAM3_, loop: _PARAM2_)"),
+                 _("Play the sound _PARAM1_, vol.: _PARAM3_, loop: _PARAM2_"),
                  _("Audio"),
                  "res/actions/son24.png",
                  "res/actions/son.png")
@@ -276,7 +276,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsAudioExtension(
       .AddAction("PlayMusic",
                  _("Play a music file"),
                  _("Play a music file."),
-                 _("Play the music _PARAM1_, vol.: _PARAM3_, loop: _PARAM2_)"),
+                 _("Play the music _PARAM1_, vol.: _PARAM3_, loop: _PARAM2_"),
                  _("Audio"),
                  "res/actions/music24.png",
                  "res/actions/music.png")

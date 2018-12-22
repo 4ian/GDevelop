@@ -28,7 +28,9 @@ export default [
             {
               title: 'Choose an audio file',
               properties,
-              filters: [{ name: 'Audio files', extensions: ['wav', 'mp3', 'ogg'] }],
+              filters: [
+                { name: 'Audio files', extensions: ['wav', 'mp3', 'ogg'] },
+              ],
               defaultPath: projectPath,
             },
             paths => {

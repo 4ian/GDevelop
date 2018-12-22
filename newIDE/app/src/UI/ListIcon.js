@@ -30,8 +30,8 @@ export default class ListIcon extends PureComponent {
               filter: !isGDevelopIcon
                 ? undefined
                 : disabled
-                  ? 'grayscale(100%)'
-                  : muiTheme.gdevelopIconsCSSFilter,
+                ? 'grayscale(100%)'
+                : muiTheme.gdevelopIconsCSSFilter,
             }}
           >
             <img

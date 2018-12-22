@@ -235,40 +235,38 @@ export default class CollisionMasksEditor extends Component {
             />
           </Column>
         </Line>
-        {!!sprite &&
-          !sprite.isCollisionMaskAutomatic() && (
-            <React.Fragment>
-              <PolygonsList
-                polygons={sprite.getCustomCollisionMask()}
-                onPolygonsUpdated={this._updateCollisionMasks}
-                spriteWidth={spriteWidth}
-                spriteHeight={spriteHeight}
+        {!!sprite && !sprite.isCollisionMaskAutomatic() && (
+          <React.Fragment>
+            <PolygonsList
+              polygons={sprite.getCustomCollisionMask()}
+              onPolygonsUpdated={this._updateCollisionMasks}
+              spriteWidth={spriteWidth}
+              spriteHeight={spriteHeight}
+            />
+            <Line justifyContent="center">
+              <FlatButton
+                label="Restore the default collision mask"
+                primary={false}
+                onClick={() => this._onSetCollisionMaskAutomatic(true)}
               />
-              <Line justifyContent="center">
-                <FlatButton
-                  label="Restore the default collision mask"
-                  primary={false}
-                  onClick={() => this._onSetCollisionMaskAutomatic(true)}
-                />
-              </Line>
-            </React.Fragment>
-          )}
-        {!!sprite &&
-          sprite.isCollisionMaskAutomatic() && (
-            <React.Fragment>
-              <EmptyMessage>
-                This sprite uses the default collision mask, a rectangle that is
-                as large as the sprite.
-              </EmptyMessage>
-              <Line justifyContent="center">
-                <FlatButton
-                  label="Use a custom collision mask"
-                  primary={false}
-                  onClick={() => this._onSetCollisionMaskAutomatic(false)}
-                />
-              </Line>
-            </React.Fragment>
-          )}
+            </Line>
+          </React.Fragment>
+        )}
+        {!!sprite && sprite.isCollisionMaskAutomatic() && (
+          <React.Fragment>
+            <EmptyMessage>
+              This sprite uses the default collision mask, a rectangle that is
+              as large as the sprite.
+            </EmptyMessage>
+            <Line justifyContent="center">
+              <FlatButton
+                label="Use a custom collision mask"
+                primary={false}
+                onClick={() => this._onSetCollisionMaskAutomatic(false)}
+              />
+            </Line>
+          </React.Fragment>
+        )}
         {!sprite && (
           <EmptyMessage>
             Choose an animation and frame to edit the collision masks

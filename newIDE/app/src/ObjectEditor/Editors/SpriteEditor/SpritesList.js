@@ -22,6 +22,7 @@ import {
 } from '../../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 const gd = global.gd;
+const path = require('path');
 
 const SPRITE_SIZE = 100; //TODO: Factor with Thumbnail
 
@@ -220,6 +221,16 @@ export default class SpritesList extends Component<Props, void> {
       allDirectionSpritesHaveSamePoints,
     } = checkDirectionPointsAndCollisionsMasks(direction);
 
+    let externalEditorData = {};
+    const metadataRaw = direction.getMetadata();
+    if (metadataRaw) {
+      try {
+        externalEditorData = JSON.parse(metadataRaw);
+      } catch (e) {
+        console.error('Malformed metadata', e);
+      }
+    }
+
     externalEditor.edit({
       project,
       resourcesLoader,
@@ -230,10 +241,15 @@ export default class SpritesList extends Component<Props, void> {
           direction.getTimeBetweenFrames() > 0
             ? 1 / direction.getTimeBetweenFrames()
             : 1,
-        name: animationName ? `${animationName}` : `${objectName}`,
+        name:
+          animationName ||
+          (resourceNames.length > 0
+            ? path.basename(resourceNames[0], path.extname(resourceNames[0]))
+            : objectName),
         isLooping: direction.isLooping(),
+        externalEditorData,
       },
-      onChangesSaved: (resources, newAnimationName) => {
+      onChangesSaved: (resources, newAnimationName, metadata) => {
         const newDirection = new gd.Direction();
         newDirection.setTimeBetweenFrames(direction.getTimeBetweenFrames());
         newDirection.setLoop(direction.isLooping());
@@ -256,6 +272,11 @@ export default class SpritesList extends Component<Props, void> {
           newDirection.addSprite(sprite);
           sprite.delete();
         });
+
+        // set metadata if there is such on the direction
+        if (metadata) {
+          newDirection.setMetadata(JSON.stringify(metadata));
+        }
 
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);

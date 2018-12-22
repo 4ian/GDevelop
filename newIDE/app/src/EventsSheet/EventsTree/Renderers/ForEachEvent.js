@@ -10,7 +10,7 @@ import {
   disabledText,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
-import ObjectField from '../../InstructionEditor/ParameterFields/ObjectField';
+import ObjectField from '../../ParameterFields/ObjectField';
 import { type EventRendererProps } from './EventRenderer.flow';
 const gd = global.gd;
 
@@ -27,7 +27,10 @@ const styles = {
   },
 };
 
-export default class ForEachEvent extends React.Component<EventRendererProps, *> {
+export default class ForEachEvent extends React.Component<
+  EventRendererProps,
+  *
+> {
   state = {
     editing: false,
     anchorEl: null,

@@ -62,8 +62,7 @@ export default class ResourcePropertiesEditor extends React.Component<
     const resourceSchema = propertiesMapToSchema(
       properties,
       resource => resource.getProperties(project),
-      (resource, name, value) =>
-        resource.updateProperty(name, value, project)
+      (resource, name, value) => resource.updateProperty(name, value, project)
     );
 
     return (

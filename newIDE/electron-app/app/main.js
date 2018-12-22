@@ -124,7 +124,7 @@ app.on("ready", function() {
     electron.shell.openExternal(url);
   });
 
-  ipcMain.on("piskel-open-then-load-animation", (event, piskelData) => {
+  ipcMain.on("piskel-open-then-load-animation", (event, externalEditorData) => {
     loadModalWindow({
       parentWindow: mainWindow,
       devTools,
@@ -132,7 +132,7 @@ app.on("ready", function() {
       indexSubPath: "piskel/piskel-index.html",
       backgroundColor: "#000000",
       onReady: piskelWindow => {
-        piskelWindow.webContents.send("piskel-load-animation", piskelData),
+        piskelWindow.webContents.send("piskel-load-animation", externalEditorData),
           piskelWindow.show();
       }
     });
@@ -140,17 +140,18 @@ app.on("ready", function() {
 
   ipcMain.on(
     "piskel-changes-saved",
-    (event, imageResources, newAnimationName) => {
+    (event, imageResources, newAnimationName, externalEditorData) => {
       mainWindow.webContents.send(
         "piskel-changes-saved",
         imageResources,
-        newAnimationName
+        newAnimationName,
+        externalEditorData
       );
     }
   );
 
   // JFXR sound effect generator
-  ipcMain.on("jfxr-create-wav", (event, jfxrData) => {
+  ipcMain.on("jfxr-create-wav", (event, externalEditorData) => {
     loadModalWindow({
       parentWindow: mainWindow,
       devTools,
@@ -160,17 +161,17 @@ app.on("ready", function() {
       relativeHeight: 0.8,
       backgroundColor: "#000000",
       onReady: jfxrWindow => {
-        jfxrWindow.webContents.send("jfxr-open", jfxrData);
+        jfxrWindow.webContents.send("jfxr-open", externalEditorData);
         jfxrWindow.show();
       }
     });
   });
 
-  ipcMain.on("jfxr-changes-saved", (event, newFilePath, fileMetadata) => {
+  ipcMain.on("jfxr-changes-saved", (event, newFilePath, externalEditorData) => {
     mainWindow.webContents.send(
       "jfxr-changes-saved",
       newFilePath,
-      fileMetadata
+      externalEditorData
     );
   });
 

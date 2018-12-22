@@ -178,6 +178,7 @@ export default class ResourceSelector extends React.Component<Props, State> {
         console.error('Malformed metadata', e);
       }
     }
+
     if (resourceKind === 'image') {
       const resourceNames = [];
       if (resourcesManager.hasResource(resourceName)) {
@@ -190,8 +191,9 @@ export default class ResourceSelector extends React.Component<Props, State> {
         resourceNames,
         extraOptions: {
           fps: 0,
-          name: 'Image',
+          name: resourceName,
           isLooping: false,
+          externalEditorData: initialResourceMetadata,
         },
         onChangesSaved: resources => {
           if (!resources.length) return;
@@ -260,7 +262,8 @@ export default class ResourceSelector extends React.Component<Props, State> {
               externalEditors.map(externalEditor => ({
                 label: externalEditor.displayName,
                 click: () => this._editWith(externalEditor),
-              }))}
+              }))
+            }
           />
         )}
       </div>

@@ -64,14 +64,10 @@ export default class LocalExport extends Component {
     LocalExport.prepareExporter()
       .then(({ exporter }) => {
         const exportOptions = new gd.MapStringBoolean();
-        exporter.exportWholePixiProject(
-          project,
-          outputDir,
-          exportOptions
-        );
+        exporter.exportWholePixiProject(project, outputDir, exportOptions);
         exportOptions.delete();
         exporter.delete();
-        
+
         this.setState({
           exportFinishedDialogOpen: true,
         });
@@ -136,7 +132,8 @@ export default class LocalExport extends Component {
               onClick={() =>
                 this.setState({
                   exportFinishedDialogOpen: false,
-                })}
+                })
+              }
             />,
           ]}
           modal

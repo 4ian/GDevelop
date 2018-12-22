@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import InlinePopover from './InlinePopover';
-import ParameterRenderingService from './InstructionEditor/ParameterRenderingService';
+import ParameterRenderingService from './ParameterRenderingService';
 import {
   type ResourceSource,
   type ChooseResourceFunction,

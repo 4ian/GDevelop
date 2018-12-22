@@ -15,12 +15,13 @@ This project is released under the MIT License.
 #include "TextObject.h"
 
 void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "TextObject",
-      _("Text object"),
-      _("This Extension enables the use of an object that displays text."),
-      "Florian Rival and Victor Levasseur",
-      "Open source (MIT License)")
+  extension
+      .SetExtensionInformation(
+          "TextObject",
+          _("Text object"),
+          _("This Extension enables the use of an object that displays text."),
+          "Florian Rival and Victor Levasseur",
+          "Open source (MIT License)")
       .SetExtensionHelpPath("/objects/text");
 
   gd::ObjectMetadata& obj =
@@ -65,7 +66,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("Font",
                 _("Font"),
-                _("Modify the font of the text."),
+                _("Change the font of the text."),
                 _("Change font of _PARAM0_ to _PARAM1_"),
                 _("Font"),
                 "res/actions/font24.png",
@@ -78,7 +79,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddAction("Size",
                 _("Size"),
-                _("Modify the size of the text."),
+                _("Change the size of the text."),
                 _("Do _PARAM1__PARAM2_ to the size of the text of _PARAM0_"),
                 _(""),
                 "res/actions/characterSize24.png",
@@ -94,7 +95,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddCondition("Size",
                    _("Size"),
-                   _("Test the size of the text"),
+                   _("Compare the size of the text"),
                    _("The size of the text of _PARAM0_ is _PARAM1__PARAM2_"),
                    _(""),
                    "res/conditions/characterSize24.png",
@@ -122,8 +123,9 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TextObject/TextObject.h");
 
   obj.AddAction("Opacity",
-                _("Opacity"),
-                _("Modify the opacity of a Text object."),
+                _("Change Text Opacity"),
+                _("Change the opacity of a Text. 0 is fully transparent, 255 "
+                  "is opaque (default)."),
                 _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
                 _(""),
                 "res/actions/opacity24.png",
@@ -139,7 +141,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddCondition("Opacity",
                    _("Opacity"),
-                   _("Test the value of the opacity of a Text object."),
+                   _("Compare the opacity of a Text object, between 0 (fully "
+                     "transparent) to 255 (opaque)."),
                    _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
                    _(""),
                    "res/conditions/opacity24.png",
@@ -167,7 +170,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddCondition("Smoothed",
                    _("Smoothing"),
-                   _("Test if an object is smoothed"),
+                   _("Check if an object is smoothed"),
                    _("_PARAM0_ is smoothed"),
                    _("Style"),
                    "res/conditions/opacity24.png",
@@ -192,7 +195,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddCondition("IsBold",
                    _("Bold"),
-                   _("Test if the bold style is activated"),
+                   _("Check if the bold style is activated"),
                    _("_PARAM0_ bold style is set"),
                    _("Style"),
                    "res/conditions/bold.png",
@@ -217,7 +220,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddCondition("IsItalic",
                    _("Italic"),
-                   _("Test if the italic style is activated"),
+                   _("Check if the italic style is activated"),
                    _("_PARAM0_ italic style is set"),
                    _("Style"),
                    "res/conditions/italic.png",
@@ -242,7 +245,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddCondition("IsUnderlined",
                    _("Underlined"),
-                   _("Test if the underlined style of an object is set."),
+                   _("Check if the underlined style of an object is set."),
                    _("_PARAM0_ underlined style is activated"),
                    _("Style"),
                    "res/conditions/underline.png",
@@ -270,7 +273,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
 
   obj.AddCondition("Angle",
                    _("Angle"),
-                   _("Test the value of the angle of a Text object."),
+                   _("Compare the value of the angle of a Text object."),
                    _("The angle of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Rotation"),
                    "res/conditions/rotate24.png",
@@ -283,13 +286,15 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetManipulatedType("number")
       .SetIncludeFile("TextObject/TextObject.h");
 
-  obj.AddAction("SetWrapping",
-                _("Wrapping"),
-                _("De/activate word wrapping. Note that word wrapping is a graphical option,\nyou can't get the number of lines displayed"),
-                _("Set word wrapping style of _PARAM0_: _PARAM1_"),
-                _("Style"),
-                "res/actions/wordWrap24.png",
-                "res/actions/wordWrap.png")
+  obj.AddAction(
+         "SetWrapping",
+         _("Wrapping"),
+         _("De/activate word wrapping. Note that word wrapping is a graphical "
+           "option,\nyou can't get the number of lines displayed"),
+         _("Set word wrapping style of _PARAM0_: _PARAM1_"),
+         _("Style"),
+         "res/actions/wordWrap24.png",
+         "res/actions/wordWrap.png")
 
       .AddParameter("object", _("Object"), "Text")
       .AddParameter("yesorno", _("Wrapping"));
@@ -331,8 +336,8 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
       .SetManipulatedType("number");
 
   obj.AddExpression("Opacity",
-                    _("Opacity"),
-                    _("Opacity"),
+                    _("Opacity of a Text object"),
+                    _("Opacity of a Text object"),
                     _("Opacity"),
                     "res/actions/opacity.png")
       .AddParameter("object", _("Object"), "Text")

@@ -34,7 +34,7 @@ const styles = {
 type State = {|
   renamedResource: ?gdResource,
   searchText: string,
-  resourcesWithMissingPath: {[string]: boolean},
+  resourcesWithMissingPath: { [string]: boolean },
 |};
 
 type Props = {|
@@ -304,10 +304,13 @@ export default class ResourcesList extends React.Component<Props, State> {
     const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
     const resourcesWithMissingPath = {};
     resourceNames.forEach(resourceName => {
-      resourcesWithMissingPath[resourceName] = !resourceHasValidPath(project, resourceName)
+      resourcesWithMissingPath[resourceName] = !resourceHasValidPath(
+        project,
+        resourceName
+      );
     });
     this.setState({ resourcesWithMissingPath });
-  };
+  }
 
   render() {
     const { project, selectedResource, onSelectResource } = this.props;

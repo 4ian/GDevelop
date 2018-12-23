@@ -61,7 +61,10 @@ export const selectLocalResourcePath = (project, options) => {
         const resources = paths.map(resourcePath => {
           return options.forEachPath(resourcePath);
         });
-        options.callback();
+
+        if (options.callback) {
+          options.callback();
+        }   
         return resolve(resources);
       }
     );

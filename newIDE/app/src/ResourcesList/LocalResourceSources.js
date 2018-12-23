@@ -2,8 +2,7 @@ import { Component } from 'react';
 import optionalRequire from '../Utils/OptionalRequire.js';
 import {selectLocalResourcePath} from './ResourceUtils.js';
 const path = optionalRequire('path');
-const electron = optionalRequire('electron');
-const dialog = electron ? electron.remote.dialog : null;
+
 const gd = global.gd;
 
 export default [

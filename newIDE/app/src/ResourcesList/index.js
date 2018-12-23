@@ -107,7 +107,6 @@ export default class ResourcesList extends React.Component<Props, State> {
       extensions: RESOURCE_EXTENSIONS[resource.getKind()].split(','),
       forEachPath: resourcePath => {
         resource.setFile(path.relative(projectPath, resourcePath))
-        // return resourcePath
       },
       callback: () => {
         this.forceCheckMissingPaths();

@@ -43,7 +43,7 @@ export default [
                 audioResource.setName(path.relative(projectPath, resourcePath));
 
                 return audioResource;
-              });
+              }); // make reusable?
               return resolve(resources);
             }
           );

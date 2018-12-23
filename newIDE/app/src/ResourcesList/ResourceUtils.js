@@ -1,6 +1,9 @@
 // @flow
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire.js';
+const electron = optionalRequire('electron');
+const dialog = electron ? electron.remote.dialog : null;
+const path = optionalRequire('path');
 const fs = optionalRequire('fs');
 
 export const createOrUpdateResource = (
@@ -33,4 +36,34 @@ export const resourceHasValidPath = (
 ) => {
   const resourcePath = getLocalResourceFullPath(project, resourceName);
   return fs.existsSync(resourcePath);
+};
+
+export const selectLocalResourcePath = (project, options) => {
+  return new Promise((resolve, reject) => {
+    if (!dialog) return reject('Not supported');
+
+    const properties = ['openFile'];
+    if (options.multiSelections) properties.push('multiSelections');
+    const projectPath = path.dirname(project.getProjectFile());
+
+    const browserWindow = electron.remote.getCurrentWindow();
+    dialog.showOpenDialog(
+      browserWindow,
+      {
+        title: options.title,
+        properties,
+        filters: [{ name: options.name, extensions: options.extensions }],
+        defaultPath: projectPath,
+      },
+      paths => {
+        if (!paths) return resolve([]);
+
+        const resources = paths.map(resourcePath => {
+          return options.forEachPath(resourcePath);
+        });
+        options.callback();
+        return resolve(resources);
+      }
+    );
+  });
 };

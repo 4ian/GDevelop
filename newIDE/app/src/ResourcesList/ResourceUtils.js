@@ -38,7 +38,17 @@ export const resourceHasValidPath = (
   return fs.existsSync(resourcePath);
 };
 
-export const selectLocalResourcePath = (project, options) => {
+export const selectLocalResourcePath = (
+  project: gdProject,
+  options: {
+    multiSelections: boolean,
+    title: string,
+    name: string,
+    extensions: Array<string>,
+    forEachPath: any,
+    callback?: ?() => any,
+  }
+) => {
   return new Promise((resolve, reject) => {
     if (!dialog) return reject('Not supported');
 
@@ -64,7 +74,7 @@ export const selectLocalResourcePath = (project, options) => {
 
         if (options.callback) {
           options.callback();
-        }   
+        }
         return resolve(resources);
       }
     );

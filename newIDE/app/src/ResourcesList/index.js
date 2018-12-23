@@ -25,7 +25,7 @@ const RESOURCE_EXTENSIONS = {
   image: 'png,jpg,jpeg,PNG,JPG,JPEG',
   audio: 'wav,mp3,ogg,WAV,MP3,OGG',
   font: 'ttf,ttc,TTF,TTC',
-}
+};
 
 const gd = global.gd;
 
@@ -98,15 +98,15 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   _setResourcePath = (resource: gdResource) => {
-    const {project} = this.props
+    const { project } = this.props;
     const projectPath = path.dirname(project.getProjectFile());
     const options = {
       multiSelections: false,
-      title:'Choose a resource file',
+      title: 'Choose a resource file',
       name: 'Resource files',
       extensions: RESOURCE_EXTENSIONS[resource.getKind()].split(','),
       forEachPath: resourcePath => {
-        resource.setFile(path.relative(projectPath, resourcePath))
+        resource.setFile(path.relative(projectPath, resourcePath));
       },
       callback: () => {
         this.forceCheckMissingPaths();
@@ -341,8 +341,8 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    this.forceCheckMissingPaths()
-  };
+    this.forceCheckMissingPaths();
+  }
 
   render() {
     const { project, selectedResource, onSelectResource } = this.props;

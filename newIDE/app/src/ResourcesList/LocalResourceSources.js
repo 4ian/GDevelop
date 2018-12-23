@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import {selectLocalResourcePath} from './ResourceUtils.js';
+import { selectLocalResourcePath } from './ResourceUtils.js';
 const path = optionalRequire('path');
 
 const gd = global.gd;
@@ -15,7 +15,6 @@ export default [
         project,
         multiSelections = true
       ): Promise<Array<any>> => {
-
         const options = {
           multiSelections,
           title: 'Choose an audio file',
@@ -28,9 +27,9 @@ export default [
             audioResource.setName(path.relative(projectPath, resourcePath));
 
             return audioResource;
-          }
+          },
         };
-        return selectLocalResourcePath(project, options)
+        return selectLocalResourcePath(project, options);
       };
 
       render() {
@@ -47,7 +46,6 @@ export default [
         project,
         multiSelections = true
       ): Promise<Array<any>> => {
-
         const options = {
           multiSelections,
           title: 'Choose an image',
@@ -60,9 +58,9 @@ export default [
             imageResource.setName(path.relative(projectPath, resourcePath));
 
             return imageResource;
-          }
+          },
         };
-        return selectLocalResourcePath(project, options)
+        return selectLocalResourcePath(project, options);
       };
 
       render() {
@@ -79,7 +77,6 @@ export default [
         project,
         multiSelections = true
       ): Promise<Array<any>> => {
-
         const options = {
           multiSelections,
           title: 'Choose a font file',
@@ -92,9 +89,9 @@ export default [
             fontResource.setName(path.relative(projectPath, resourcePath));
 
             return fontResource;
-          }
+          },
         };
-        return selectLocalResourcePath(project, options)
+        return selectLocalResourcePath(project, options);
       };
 
       render() {

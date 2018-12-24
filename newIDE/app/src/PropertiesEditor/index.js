@@ -13,12 +13,14 @@ export type Instance = Object; // This could be improved using generics.
 export type Instances = Array<Instance>;
 export type Field = Object;
 export type Schema = Array<Field>;
+export type Project = Object;
 
 type Props = {|
   onInstancesModified?: Instances => void,
   instances: Instances,
   schema: Schema,
   mode?: 'column' | 'row',
+  project?: Project,
 |};
 
 const styles = {
@@ -225,8 +227,34 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     );
   };
 
+  _renderDialog = (field: Field) => {
+    const EditorComponent = field.getDialog();
+
+    return (
+      <EditorComponent
+        key={field.name}
+        behavior={this.props.instances[0]}
+        project={this.props.project}
+      />
+    );
+  };
+
   render() {
     const { mode } = this.props;
+
+    for (var i = 0, len = this.props.schema.length; i < len; i++) {
+      if (this.props.schema[i].getDialog) {
+        return (
+          <div
+            style={
+              mode === 'row' ? styles.rowContainer : styles.columnContainer
+            }
+          >
+            {this._renderDialog(this.props.schema[i])}
+          </div>
+        );
+      }
+    }
 
     return (
       <div

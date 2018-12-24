@@ -182,6 +182,7 @@ export default class BehaviorsEditor extends Component {
                     <PropertiesEditor
                       schema={propertiesSchema}
                       instances={[behavior]}
+                      project={project}
                     />
                   ) : (
                     <EmptyMessage>

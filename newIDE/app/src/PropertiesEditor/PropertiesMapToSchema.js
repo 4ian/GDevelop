@@ -1,6 +1,7 @@
 // @flow
 import { mapFor } from '../Utils/MapFor';
 import { type Schema, type Instance } from '.';
+import PropertiesRenderingService from './PropertiesRenderingService';
 
 /**
  * Transform a MapStringPropertyDescriptor to a schema that can be used in PropertiesEditor.
@@ -27,11 +28,15 @@ export default (
       .getExtraInfo()
       .toJSArray()
       .map(value => ({ value, label: value }));
+    const dialog = PropertiesRenderingService.getDialogComponent(
+      property.getExtraInfo().toJSArray()[0]
+    );
 
     return {
       name,
       valueType,
       getChoices: valueType === 'choice' ? () => choices : undefined,
+      getDialog: valueType === 'dialog' ? () => dialog : undefined,
       getValue: instance => {
         // Instance custom properties are always stored as string, cast them if necessary
         const rawValue = getProperties(instance)

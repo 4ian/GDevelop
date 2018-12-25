@@ -27,6 +27,7 @@ type State = {|
   packageName: string,
   orientation: string,
   adMobAppId: string,
+  scaleMode: 'linear' | 'nearest',
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
 |};
@@ -49,6 +50,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
       adMobAppId: project.getAdMobAppId(),
+      scaleMode: project.getScaleMode(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
     };
@@ -74,6 +76,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName,
       orientation,
       adMobAppId,
+      scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
     } = this.state;
@@ -85,6 +88,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setPackageName(packageName);
     project.setOrientation(orientation);
     project.setAdMobAppId(adMobAppId);
+    project.setScaleMode(scaleMode);
     project.setSizeOnStartupMode(sizeOnStartupMode);
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
 
@@ -116,6 +120,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName,
       orientation,
       adMobAppId,
+      scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
     } = this.state;
@@ -190,6 +195,22 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             <MenuItem value="default" primaryText="Platform default" />
             <MenuItem value="landscape" primaryText="Landscape" />
             <MenuItem value="portrait" primaryText="Portrait" />
+          </SelectField>
+          <SelectField
+            fullWidth
+            floatingLabelText={'Scale mode (also called "Sampling")'}
+            floatingLabelFixed
+            value={scaleMode}
+            onChange={(e, i, value) => this.setState({ scaleMode: value })}
+          >
+            <MenuItem
+              value="linear"
+              primaryText="Linear (antialiased rendering, good for most games)"
+            />
+            <MenuItem
+              value="nearest"
+              primaryText="Nearest (no antialiasing, good for pixel perfect games)"
+            />
           </SelectField>
           <SelectField
             fullWidth

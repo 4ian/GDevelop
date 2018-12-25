@@ -55,6 +55,14 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(parentEle
     this._pixiRenderer.view.tabindex = "1"; //Ensure that the canvas has the focus.
     this.resize();
 
+    // Handle scale mode
+    if (this._game.getScaleMode() === "nearest") {
+        this._pixiRenderer.view.style["image-rendering"] = "-moz-crisp-edges";
+        this._pixiRenderer.view.style["image-rendering"] = "-webkit-optimize-contrast";
+        this._pixiRenderer.view.style["image-rendering"] = "-webkit-crisp-edges";
+        this._pixiRenderer.view.style["image-rendering"] = "pixelated";
+    }
+
     //Handle resize
     var that = this;
     window.addEventListener("resize", function() {

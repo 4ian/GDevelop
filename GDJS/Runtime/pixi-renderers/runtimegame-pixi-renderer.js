@@ -17,9 +17,10 @@ gdjs.RuntimeGamePixiRenderer = function(game, width, height, forceFullscreen)
     
     /** @type {PIXI.SystemRenderer} */
     this._pixiRenderer = null;
-    this._canvasArea = null;
-    this._currentWidth = width; //Current size of the canvas
-    this._currentHeight = height;
+    this._currentWidth = width; // Current width of the renderer (not the canvas)
+    this._currentHeight = height; // Current height of the renderer (not the canvas)
+    this._canvasWidth = width; // Current width of the canvas (might be scaled down/up compared to renderer)
+    this._canvasHeight = height; // Current height of the canvas (might be scaled down/up compared to renderer)
     this._keepRatio = true;
     this._reduceIfNeed = true;
     this._marginLeft = this._marginTop = this._marginRight = this._marginBottom = 0;
@@ -65,14 +66,14 @@ gdjs.RuntimeGamePixiRenderer.prototype.createStandardCanvas = function(parentEle
 };
 
 /**
- * Get the current width of the canvas.
+ * Get the current width of the renderer.
  */
 gdjs.RuntimeGamePixiRenderer.prototype.getCurrentWidth = function() {
     return this._currentWidth;
 };
 
 /**
- * Get the current height of the canvas.
+ * Get the current height of the renderer.
  */
 gdjs.RuntimeGamePixiRenderer.prototype.getCurrentHeight = function() {
     return this._currentHeight;
@@ -116,7 +117,8 @@ gdjs.RuntimeGamePixiRenderer.prototype.resize = function() {
     }
 
     // Set the canvas size.
-    // Resizing is done according to the settings.
+    // Resizing is done according to the settings. This is a "CSS" resize
+    // only, so won't create visual artifacts during the rendering.
     var reduceIfNeed = this._reduceIfNeed;
     var isFullPage = this._forceFullscreen || this._isFullPage || this._isFullscreen;
     var isFullscreen = this._forceFullscreen || this._isFullscreen;
@@ -147,6 +149,10 @@ gdjs.RuntimeGamePixiRenderer.prototype.resize = function() {
     this._pixiRenderer.view.style["left"] = ((marginLeft+(maxWidth-canvasWidth)/2)+"px");
     this._pixiRenderer.view.style.width = canvasWidth+"px";
     this._pixiRenderer.view.style.height = canvasHeight+"px";
+    
+    // Store the canvas size for fast access to it.
+    this._canvasWidth = canvasWidth;
+    this._canvasHeight = canvasHeight;
 };
 
 /**
@@ -239,8 +245,8 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(manager, wi
         }
 
         //Handle the fact that the game is stretched to fill the canvas.
-        pos[0] *= that._game.getDefaultWidth()/canvas.width;
-        pos[1] *= that._game.getDefaultHeight()/canvas.height;
+        pos[0] *= that._game.getDefaultWidth()/that._canvasWidth;
+        pos[1] *= that._game.getDefaultHeight()/that._canvasHeight;
 
         return pos;
     }

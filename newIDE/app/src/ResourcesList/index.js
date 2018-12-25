@@ -13,7 +13,6 @@ import {
   resourceHasValidPath,
   RESOURCE_EXTENSIONS,
 } from './ResourceUtils.js';
-// import ResourcesLoader from '../ResourcesLoader';
 import { type ResourceKind } from './ResourceSource.flow';
 
 const path = optionalRequire('path');

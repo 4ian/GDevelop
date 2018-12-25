@@ -107,7 +107,7 @@ export default class ResourcePropertiesEditor extends React.Component<
           </Column>
           <Column>
             <FlatButton
-              label="Set File"
+              label="Choose File"
               primary={false}
               onClick={() => {
                 this._setResourcePath();

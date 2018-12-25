@@ -576,7 +576,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 src="res/ribbon_default/projectManager32.png"
               />
             }
-            initiallyOpen={false}
+            initiallyOpen={true}
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
             nestedItems={[

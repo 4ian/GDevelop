@@ -847,6 +847,8 @@ export default class MainFrame extends React.Component<Props, State> {
               }}
               isActive={isActive}
               ref={editorRef}
+              onChooseResource={this._onChooseResource}
+              resourceSources={this.props.resourceSources}
             />
           ),
           key: 'resources',

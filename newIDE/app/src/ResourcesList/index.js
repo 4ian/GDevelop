@@ -296,7 +296,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     ];
   };
 
-  forceCheckMissingPaths = () => {
+  checkMissingPaths = () => {
     const { project } = this.props;
     const resourcesManager = project.getResourcesManager();
     const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
@@ -312,7 +312,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    this.forceCheckMissingPaths();
+    this.checkMissingPaths();
   }
 
   render() {

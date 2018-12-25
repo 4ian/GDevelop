@@ -6,16 +6,13 @@ import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-import {
-  selectLocalResourcePath,
-  RESOURCE_EXTENSIONS,
-} from '../../ResourcesList/ResourceUtils.js';
-import optionalRequire from '../../Utils/OptionalRequire.js';
-
 import FlatButton from 'material-ui/FlatButton';
 import { Column, Line } from '../../UI/Grid';
 
-const path = optionalRequire('path');
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../../ResourcesList/ResourceSource.flow';
 
 const styles = {
   imagePreview: { flex: 1 },
@@ -32,6 +29,8 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   resources: Array<gdResource>,
   onUpdateProperties: () => void,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
 |};
 
 export default class ResourcePropertiesEditor extends React.Component<
@@ -66,24 +65,25 @@ export default class ResourcePropertiesEditor extends React.Component<
   }
 
   _setResourcePath = () => {
-    const { project, resources, onUpdateProperties } = this.props;
-    const projectPath = path.dirname(project.getProjectFile());
+    const {
+      resources,
+      onUpdateProperties,
+      onChooseResource,
+      resourceSources,
+    } = this.props;
     const resource = resources[0];
+    const sources = resourceSources.filter(
+      source => source.kind === resource.getKind()
+    );
+    if (!sources.length) return;
+    onChooseResource(sources[0].name).then(resources => {
+      if (!resources.length) return; // No path was chosen by the user.
+      resource.setFile(resources[0].getFile());
+      resources.forEach(resource => resource.delete()); // Important, we are responsible for deleting the resources that were given to us. Otherwise we have a memory leak.
 
-    const options = {
-      multiSelections: false,
-      title: 'Choose a resource file',
-      name: 'Resource files',
-      extensions: RESOURCE_EXTENSIONS[resource.getKind()].split(','),
-      forEachPath: resourcePath => {
-        resource.setFile(path.relative(projectPath, resourcePath));
-      },
-      callback: () => {
-        onUpdateProperties();
-        this.forceUpdate();
-      },
-    };
-    selectLocalResourcePath(this.props.project, options);
+      onUpdateProperties();
+      this.forceUpdate();
+    });
   };
 
   _renderResourcesProperties() {
@@ -101,15 +101,13 @@ export default class ResourcePropertiesEditor extends React.Component<
         <Line expand alignItems="center" style={styles.propertiesContainer}>
           <Column expand>
             <PropertiesEditor
-              // expand
               schema={this.schema.concat(resourceSchema)}
               instances={resources}
             />
           </Column>
           <Column>
-            <div />
             <FlatButton
-              label="Set Path"
+              label="Set File"
               primary={false}
               onClick={() => {
                 this._setResourcePath();

@@ -6,6 +6,16 @@ import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import {
+  selectLocalResourcePath,
+  RESOURCE_EXTENSIONS,
+} from '../../ResourcesList/ResourceUtils.js';
+import optionalRequire from '../../Utils/OptionalRequire.js';
+
+import FlatButton from 'material-ui/FlatButton';
+import { Column, Line } from '../../UI/Grid';
+
+const path = optionalRequire('path');
 
 const styles = {
   imagePreview: { flex: 1 },
@@ -21,6 +31,7 @@ type Props = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   resources: Array<gdResource>,
+  onUpdateProperties: () => void,
 |};
 
 export default class ResourcePropertiesEditor extends React.Component<
@@ -54,9 +65,29 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
   }
 
+  _setResourcePath = () => {
+    const { project, resources, onUpdateProperties } = this.props;
+    const projectPath = path.dirname(project.getProjectFile());
+    const resource = resources[0];
+
+    const options = {
+      multiSelections: false,
+      title: 'Choose a resource file',
+      name: 'Resource files',
+      extensions: RESOURCE_EXTENSIONS[resource.getKind()].split(','),
+      forEachPath: resourcePath => {
+        resource.setFile(path.relative(projectPath, resourcePath));
+      },
+      callback: () => {
+        onUpdateProperties();
+        this.forceUpdate();
+      },
+    };
+    selectLocalResourcePath(this.props.project, options);
+  };
+
   _renderResourcesProperties() {
     const { resources, project } = this.props;
-
     //TODO: Multiple resources support
     const properties = resources[0].getProperties(project);
     const resourceSchema = propertiesMapToSchema(
@@ -66,14 +97,26 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
 
     return (
-      <div
-        style={styles.propertiesContainer}
-        key={resources.map(resource => '' + resource.ptr).join(';')}
-      >
-        <PropertiesEditor
-          schema={this.schema.concat(resourceSchema)}
-          instances={resources}
-        />
+      <div key={resources.map(resource => '' + resource.ptr).join(';')}>
+        <Line expand alignItems="center" style={styles.propertiesContainer}>
+          <Column expand>
+            <PropertiesEditor
+              // expand
+              schema={this.schema.concat(resourceSchema)}
+              instances={resources}
+            />
+          </Column>
+          <Column>
+            <div />
+            <FlatButton
+              label="Set Path"
+              primary={false}
+              onClick={() => {
+                this._setResourcePath();
+              }}
+            />
+          </Column>
+        </Line>
       </div>
     );
   }
@@ -86,6 +129,7 @@ export default class ResourcePropertiesEditor extends React.Component<
       <ResourcePreview
         style={styles.imagePreview}
         resourceName={resources[0].getName()}
+        resourcePath={resources[0].getFile()}
         resourcesLoader={resourcesLoader}
         project={project}
       />

@@ -253,6 +253,7 @@ type Props = {|
   onChangeSubscription: () => void,
   eventsFunctionsExtensionsError: ?Error,
   onReloadEventsFunctionsExtensions: () => void,
+  openProjectManager?: boolean => void,
   freezeUpdate: boolean,
 |};
 
@@ -557,6 +558,7 @@ export default class ProjectManager extends React.Component<Props, State> {
       project,
       eventsFunctionsExtensionsError,
       onReloadEventsFunctionsExtensions,
+      openProjectManager,
     } = this.props;
     const { renamedItemKind, renamedItemName, searchText } = this.state;
 
@@ -622,7 +624,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                     src="res/ribbon_default/image32.png"
                   />
                 }
-                onClick={() => this.props.onOpenResources()}
+                onClick={() => {
+                  this.props.onOpenResources();
+                  if (openProjectManager) {
+                    openProjectManager(false);
+                  }
+                }}
               />,
             ]}
           />

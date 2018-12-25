@@ -1166,6 +1166,7 @@ export default class MainFrame extends React.Component<Props, State> {
             />
             {currentProject && (
               <ProjectManager
+                openProjectManager={this.openProjectManager}
                 project={currentProject}
                 onOpenExternalEvents={this.openExternalEvents}
                 onOpenLayout={this.openLayout}

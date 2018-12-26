@@ -28,7 +28,7 @@ module.exports = {
         "TakeScreenshot",
         t("Take screenshot"),
         t("Take a screenshot of the game, and save it to a png file (supported only when running on Windows/Linux/macOS)."),
-        t("Take a screenshot and save at _PARAM0_"),
+        t("Take a screenshot and save at _PARAM1_"),
         t("Screenshot"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"

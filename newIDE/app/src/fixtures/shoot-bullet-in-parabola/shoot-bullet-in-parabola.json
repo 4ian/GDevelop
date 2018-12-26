@@ -14,6 +14,7 @@
     "orientation": "default",
     "packageName": "com.example.gamename",
     "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\shoot-bullet-in-parabola\\shoot-bullet-in-parabola.json",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": true,
     "version": "1.0.0",

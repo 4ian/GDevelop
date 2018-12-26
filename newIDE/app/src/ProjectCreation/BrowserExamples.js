@@ -74,6 +74,7 @@ const exampleNames = [
   'physics',
   'pin-object-to-another-multiple-parents',
   'pin-object-to-another',
+  'pixel-perfect-platform-game',
   'plane-and-clouds',
   'platformer-double-jump',
   'platformer',

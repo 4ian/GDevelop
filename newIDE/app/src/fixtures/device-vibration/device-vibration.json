@@ -14,6 +14,7 @@
     "orientation": "portrait",
     "packageName": "com.example.gamename",
     "projectFile": "/home/matthias/Programme/GD_MyFork/testprojects/mobile-vibration/mobile-vibration.json",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptHeight",
     "useExternalSourceFiles": false,
     "version": "1.0.0",

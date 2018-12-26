@@ -8,8 +8,8 @@ describe('gdjs.Polygon', function() {
     rect3.move(50, 50);
 
     const benchmarkSuite = makeBenchmarkSuite({
-      benchmarksCount: 60,
-      iterationsCount: 60000,
+      benchmarksCount: 20,
+      iterationsCount: 30000,
     });
     benchmarkSuite
       .add('collisionTest between two overlapping rectangles', i => {

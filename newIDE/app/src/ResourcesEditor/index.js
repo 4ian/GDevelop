@@ -136,7 +136,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             ref={propertiesEditor =>
               (this._propertiesEditor = propertiesEditor)
             }
-            onUpdateProperties={() => {
+            onResourcePathUpdated={() => {
               if (this._resourcesList) {
                 this._resourcesList.checkMissingPaths();
               }

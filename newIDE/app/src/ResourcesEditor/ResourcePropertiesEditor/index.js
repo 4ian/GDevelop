@@ -6,8 +6,6 @@ import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-import FlatButton from 'material-ui/FlatButton';
-import { Column, Line } from '../../UI/Grid';
 
 import {
   type ResourceSource,
@@ -28,7 +26,7 @@ type Props = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   resources: Array<gdResource>,
-  onUpdateProperties: () => void,
+  onResourcePathUpdated: () => void,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
 |};
@@ -48,10 +46,12 @@ export default class ResourcePropertiesEditor extends React.Component<
     },
     {
       name: 'File',
-      valueType: 'string',
+      valueType: 'string-with-button',
       getValue: (resource: gdResource) => resource.getFile(),
       setValue: (resource: gdResource, newValue: string) =>
         resource.setFile(newValue),
+      buttonLabel: 'Choose file',
+      onEditButtonClick: () => this._chooseResourcePath(),
     },
   ];
 
@@ -64,10 +64,10 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
   }
 
-  _setResourcePath = () => {
+  _chooseResourcePath = () => {
     const {
       resources,
-      onUpdateProperties,
+      onResourcePathUpdated,
       onChooseResource,
       resourceSources,
     } = this.props;
@@ -81,7 +81,7 @@ export default class ResourcePropertiesEditor extends React.Component<
       resource.setFile(resources[0].getFile());
       resources.forEach(resource => resource.delete()); // Important, we are responsible for deleting the resources that were given to us. Otherwise we have a memory leak.
 
-      onUpdateProperties();
+      onResourcePathUpdated();
       this.forceUpdate();
     });
   };
@@ -97,24 +97,14 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
 
     return (
-      <div key={resources.map(resource => '' + resource.ptr).join(';')}>
-        <Line expand alignItems="center" style={styles.propertiesContainer}>
-          <Column expand>
-            <PropertiesEditor
-              schema={this.schema.concat(resourceSchema)}
-              instances={resources}
-            />
-          </Column>
-          <Column>
-            <FlatButton
-              label="Choose File"
-              primary={false}
-              onClick={() => {
-                this._setResourcePath();
-              }}
-            />
-          </Column>
-        </Line>
+      <div
+        style={styles.propertiesContainer}
+        key={resources.map(resource => '' + resource.ptr).join(';')}
+      >
+        <PropertiesEditor
+          schema={this.schema.concat(resourceSchema)}
+          instances={resources}
+        />
       </div>
     );
   }

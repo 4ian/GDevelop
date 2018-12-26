@@ -1,5 +1,5 @@
 describe('gdjs.VariablesContainer', function() {
-  it.only('benchmark convertCoords and convertInverseCoords', function() {
+  it('benchmark convertCoords and convertInverseCoords', function() {
     this.timeout(20000);
     var container = new gdjs.VariablesContainer();
 

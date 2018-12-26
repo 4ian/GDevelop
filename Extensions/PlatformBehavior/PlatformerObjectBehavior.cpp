@@ -179,8 +179,7 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene& scene) {
   // Move the object on x axis.
   double oldX = object->GetX();
   if (requestedDeltaX != 0) {
-    double tentativeNewX = object->GetX() + requestedDeltaX;
-    object->SetX(roundCoordinates ? GDRound(tentativeNewX) : tentativeNewX);
+    object->SetX(object->GetX() + requestedDeltaX);
     bool tryRounding = true;
     // Colliding: Try to push out from the solid.
     // Note that jump thru are never obstacle on X axis.

@@ -85,6 +85,10 @@ SpriteExtension::SpriteExtension() {
       .AddCodeOnlyParameter(
           "currentScene",
           "")  // We need an extra parameter pointing to the scene.
+      .AddParameter("yesorno",
+                    _("Consider objects touching each other, but not "
+                      "overlapping, as in collision (default: no)"))
+      .SetHidden()
       .SetFunctionName(
           "gdjs.evtTools.object.hitBoxesCollisionTest");  // No pixel perfect
                                                           // collision for now

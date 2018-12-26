@@ -128,8 +128,9 @@ gdjs.Polygon.createRectangle = function(width, height) {
  * @return {boolean} true if polygons are overlapping
  * @param {gdjs.Polygon} p1 The first polygon
  * @param {gdjs.Polygon} p2 The second polygon
+ * @param {boolean | undefined} ignoreTouchingEdges If true, then edges that are touching each other, without the polygons actually overlapping, won't be considered in collision.
  */
-gdjs.Polygon.collisionTest = function(p1,p2) {
+gdjs.Polygon.collisionTest = function(p1, p2, ignoreTouchingEdges) {
     //Algorithm core :
 
     p1.computeEdges();
@@ -169,7 +170,7 @@ gdjs.Polygon.collisionTest = function(p1,p2) {
 
         //If the projections on the axis do not overlap, then their is no collision
         var dist = gdjs.Polygon.distance(minMaxA[0], minMaxA[1], minMaxB[0], minMaxB[1]);
-        if (dist > 0) {
+        if (dist > 0 || (dist === 0 && ignoreTouchingEdges)) {
             result.collision = false;
             result.move_axis[0] = 0;
             result.move_axis[1] = 0;

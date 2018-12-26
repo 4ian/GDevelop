@@ -728,6 +728,7 @@ export default class MainFrame extends React.Component<Props, State> {
     this.setState({ editorTabs: tabsWithSceneAndEventsEditors }, () =>
       this.updateToolbar()
     );
+    this.openProjectManager(false);
   };
 
   openExternalEvents = (name: string) => {
@@ -759,6 +760,7 @@ export default class MainFrame extends React.Component<Props, State> {
       },
       () => this.updateToolbar()
     );
+    this.openProjectManager(false);
   };
 
   openExternalLayout = (name: string) => {
@@ -792,6 +794,7 @@ export default class MainFrame extends React.Component<Props, State> {
       },
       () => this.updateToolbar()
     );
+    this.openProjectManager(false);
   };
 
   openEventsFunctionsExtension = (name: string) => {
@@ -1191,7 +1194,10 @@ export default class MainFrame extends React.Component<Props, State> {
                 onCloseProject={this.askToCloseProject}
                 onExportProject={this.openExportDialog}
                 onOpenPreferences={() => this.openPreferences(true)}
-                onOpenResources={() => this.openResources()}
+                onOpenResources={() => {
+                  this.openResources();
+                  this.openProjectManager(false);
+                }}
                 onOpenPlatformSpecificAssets={() =>
                   this.openPlatformSpecificAssets()
                 }

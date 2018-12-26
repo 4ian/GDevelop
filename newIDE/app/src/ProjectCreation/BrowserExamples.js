@@ -69,6 +69,8 @@ const exampleNames = [
   'particles-various-effects',
   'pathfinding-basics',
   'pathfinding',
+  'physics-joints-demo',
+  'physics-joints-settings-demo',
   'physics',
   'pin-object-to-another-multiple-parents',
   'pin-object-to-another',

@@ -96,6 +96,10 @@ TEST_CASE("Serializer", "[common]") {
           "{\"hello\": {\"world\": [{},[],3,\"4\"],\"world2\": [-1,\"-2\","
           "{\"-3\": [-4]}]}}";
       REQUIRE(unserializeAndSerializeToJSON(test1) == test1);
+      gd::String test2 =
+          "{\"hello\": {\"world\": [{},[],3,4],\"world2\": [-1,\"-2\","
+          "{\"-3\": [-4]}]}}";
+      REQUIRE(unserializeAndSerializeToJSON(test2) == test2);
     }
   }
 

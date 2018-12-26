@@ -122,7 +122,7 @@ gdjs.evtTools.input.keysNameToCode = {
     "RShift": 16,
     "RAlt": 18,
     "LControl": 17,
-    "LShift": 1,
+    "LShift": 16,
     "LAlt": 18,
     "LSystem": 91,
     "RSystem": 91,

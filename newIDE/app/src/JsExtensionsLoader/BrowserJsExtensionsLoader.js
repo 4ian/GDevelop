@@ -23,6 +23,10 @@ const jsExtensions = [
     name: 'DeviceVibration',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceVibration/JsExtension.js'),
   },
+  {
+    name: 'Physics2',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Physics2Behavior/JsExtension.js'),
+  },
 ];
 
 /**

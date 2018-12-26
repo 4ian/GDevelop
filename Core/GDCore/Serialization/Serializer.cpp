@@ -461,7 +461,7 @@ size_t ParseJSONObject(const std::string& jsonStr,
   {
     std::string str;
     size_t endPos = pos;
-    const std::string separators = " \n,}";
+    const std::string separators = " \n,}]";
     while (endPos < jsonStr.length() &&
            separators.find_first_of(jsonStr[endPos]) == std::string::npos) {
       endPos++;

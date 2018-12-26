@@ -75,7 +75,6 @@ import {
   type UpdateStatus,
 } from './UpdaterTools';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import PreferencesContext from './Preferences/PreferencesContext';
 
 const gd = global.gd;
 
@@ -1139,7 +1138,6 @@ export default class MainFrame extends React.Component<Props, State> {
       authentification,
       previewLauncher,
       resourceExternalEditors,
-      eventsFunctionWriter,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||

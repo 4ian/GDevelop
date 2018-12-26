@@ -20,9 +20,11 @@ const ThemablePointRow = ({
   isAutomatic,
   muiTheme,
 }) => (
-  <TableRow style={{
-    backgroundColor: muiTheme.list.itemsBackgroundColor,
-  }}>
+  <TableRow
+    style={{
+      backgroundColor: muiTheme.list.itemsBackgroundColor,
+    }}
+  >
     <TableRowColumn style={styles.handleColumn}>
       {/* <DragHandle /> Reordering point is not supported for now */}
     </TableRowColumn>
@@ -75,7 +77,5 @@ const ThemablePointRow = ({
   </TableRow>
 );
 
-const PointRow = muiThemeable()(
-  ThemablePointRow
-);
+const PointRow = muiThemeable()(ThemablePointRow);
 export default PointRow;

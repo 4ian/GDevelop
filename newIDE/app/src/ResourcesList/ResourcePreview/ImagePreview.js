@@ -101,8 +101,7 @@ export default class ImagePreview extends React.Component<Props, State> {
       imageWidth,
       imageHeight,
     });
-    if (this.props.onSize)
-      this.props.onSize(imageWidth, imageHeight);
+    if (this.props.onSize) this.props.onSize(imageWidth, imageHeight);
   };
 
   render() {
@@ -133,17 +132,17 @@ export default class ImagePreview extends React.Component<Props, State> {
             crossOrigin="anonymous"
           />
         )}
-        {canDisplayOverlays &&
-          children && <div style={{ ...overlayStyle, ...styles.box }} />}
-        {canDisplayOverlays &&
-          children && (
-            <div style={overlayStyle}>
-              {React.cloneElement(children, {
-                imageWidth,
-                imageHeight,
-              })}
-            </div>
-          )}
+        {canDisplayOverlays && children && (
+          <div style={{ ...overlayStyle, ...styles.box }} />
+        )}
+        {canDisplayOverlays && children && (
+          <div style={overlayStyle}>
+            {React.cloneElement(children, {
+              imageWidth,
+              imageHeight,
+            })}
+          </div>
+        )}
       </div>
     );
   }

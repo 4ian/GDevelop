@@ -49,7 +49,7 @@ export class CodeEditor extends React.Component<Props, State> {
         }
       });
     }
-  }
+  };
 
   setupEditorCompletions = (editor: any, monaco: any) => {
     if (!monacoCompletionsInitialized) {
@@ -91,6 +91,13 @@ export class CodeEditor extends React.Component<Props, State> {
       .catch(this.handleLoadError);
   }
 
+  _handleContextMenu = (event: SyntheticEvent<>) => {
+    // Prevent right click to bubble up and trigger the context menu
+    // of the event.
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
   render() {
     const { MonacoEditor, error } = this.state;
     if (error) {
@@ -107,21 +114,23 @@ export class CodeEditor extends React.Component<Props, State> {
     }
 
     return (
-      <PreferencesContext.Consumer>
-        {({ values }) => (
-          <MonacoEditor
-            width={this.props.width || 600}
-            height="400"
-            language="javascript"
-            theme={values.codeEditorThemeName}
-            value={this.props.value}
-            onChange={this.props.onChange}
-            editorWillMount={this.setupEditorThemes}
-            editorDidMount={this.setupEditorCompletions}
-            options={monacoEditorOptions}
-          />
-        )}
-      </PreferencesContext.Consumer>
+      <div onContextMenu={this._handleContextMenu}>
+        <PreferencesContext.Consumer>
+          {({ values }) => (
+            <MonacoEditor
+              width={this.props.width || 600}
+              height="400"
+              language="javascript"
+              theme={values.codeEditorThemeName}
+              value={this.props.value}
+              onChange={this.props.onChange}
+              editorWillMount={this.setupEditorThemes}
+              editorDidMount={this.setupEditorCompletions}
+              options={monacoEditorOptions}
+            />
+          )}
+        </PreferencesContext.Consumer>
+      </div>
     );
   }
 }

@@ -65,6 +65,44 @@ TEST_CASE("Serializer", "[common]") {
     REQUIRE(json == originalJSON);
   }
 
+  SECTION("Idempotency of unserializing and serializing again") {
+    auto unserializeAndSerializeToJSON = [](const gd::String& originalJSON) {
+      SerializerElement element = Serializer::FromJSON(originalJSON);
+      return Serializer::ToJSON(element);
+    };
+
+    SECTION("Strings and numbers") {
+      gd::String test1 = "\"\"";
+      REQUIRE(unserializeAndSerializeToJSON(test1) == test1);
+      gd::String test2 = "123.455";
+      REQUIRE(unserializeAndSerializeToJSON(test2) == test2);
+    }
+    SECTION("Objects") {
+      gd::String test1 = "{}";
+      REQUIRE(unserializeAndSerializeToJSON(test1) == test1);
+      gd::String test2 = "{\"a\": 1}";
+      REQUIRE(unserializeAndSerializeToJSON(test2) == test2);
+      gd::String test3 = "{\"a\": 1,\"b\": {\"c\": 2}}";
+      REQUIRE(unserializeAndSerializeToJSON(test3) == test3);
+    }
+    SECTION("Arrays") {
+      gd::String test1 = "[]";
+      REQUIRE(unserializeAndSerializeToJSON(test1) == test1);
+      gd::String test2 = "[1,2]";
+      REQUIRE(unserializeAndSerializeToJSON(test2) == test2);
+    }
+    SECTION("Mixed") {
+      gd::String test1 =
+          "{\"hello\": {\"world\": [{},[],3,\"4\"],\"world2\": [-1,\"-2\","
+          "{\"-3\": [-4]}]}}";
+      REQUIRE(unserializeAndSerializeToJSON(test1) == test1);
+      gd::String test2 =
+          "{\"hello\": {\"world\": [{},[],3,4],\"world2\": [-1,\"-2\","
+          "{\"-3\": [-4]}]}}";
+      REQUIRE(unserializeAndSerializeToJSON(test2) == test2);
+    }
+  }
+
   SECTION("Splitter") {
     SECTION("Split elements") {
       // Create some elements

@@ -78,9 +78,15 @@ class ThemableInstructionOrExpressionSelector extends Component {
         return (
           <ListItem
             key={key}
-            style={{borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`}}
+            style={{
+              borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+            }}
             nestedListStyle={styles.groupListItemNestedList}
-            primaryText={<div style={{color: muiTheme.listItem.groupTextColor}}>{key}</div>}
+            primaryText={
+              <div style={{ color: muiTheme.listItem.groupTextColor }}>
+                {key}
+              </div>
+            }
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
             nestedItems={this._renderTree(instructionOrGroup)}
@@ -122,7 +128,8 @@ class ThemableInstructionOrExpressionSelector extends Component {
             this.setState({
               search: text,
               searchResults: this._computeSearchResults(text),
-            })}
+            })
+          }
           onRequestSearch={this._onSubmitSearch}
           style={styles.searchBar}
           ref={searchBar => (this._searchBar = searchBar)}

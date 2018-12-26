@@ -9,6 +9,7 @@ const {
   loadSerializedProject,
 } = require('./lib/LocalProjectOpener');
 const { writeProjectJSONFile } = require('./lib/LocalProjectWriter');
+const makeExtensionsLoader = require('./lib/LocalJsExtensionsLoader');
 const { getExampleNames } = require('./lib/ExamplesLoader');
 const fs = require('fs');
 
@@ -35,28 +36,36 @@ const updateResources = (project, baseUrl) => {
   project.exposeResources(worker);
 };
 
-getExampleNames().then(exampleNames =>
-  Promise.all(
-    exampleNames.map(exampleName => {
-      return readProjectJSONFile(
-        `../resources/examples/${exampleName}/${exampleName}.json`
-      )
-        .then(projectObject => {
-          console.log(`Example "${exampleName}" loaded.`);
-          const project = loadSerializedProject(gd, projectObject);
-          updateResources(project, baseUrl + '/' + exampleName);
-          fs.mkdir(`../src/fixtures/${exampleName}`, () => {
-            writeProjectJSONFile(
-              gd,
-              project,
-              `../src/fixtures/${exampleName}/${exampleName}.json`
-            );
-            console.log(`Update of "${exampleName}" done.`);
+const extensionsLoader = makeExtensionsLoader({ gd, filterExamples: false });
+extensionsLoader
+  .loadAllExtensions()
+  .then(loadingResults => {
+    console.info('Loaded extensions', loadingResults);
+
+    return getExampleNames();
+  })
+  .then(exampleNames =>
+    Promise.all(
+      exampleNames.map(exampleName => {
+        return readProjectJSONFile(
+          `../resources/examples/${exampleName}/${exampleName}.json`
+        )
+          .then(projectObject => {
+            console.log(`Example "${exampleName}" loaded.`);
+            const project = loadSerializedProject(gd, projectObject);
+            updateResources(project, baseUrl + '/' + exampleName);
+            fs.mkdir(`../src/fixtures/${exampleName}`, () => {
+              writeProjectJSONFile(
+                gd,
+                project,
+                `../src/fixtures/${exampleName}/${exampleName}.json`
+              );
+              console.log(`Update of "${exampleName}" done.`);
+            });
+          })
+          .catch(error => {
+            console.error('Error caught:', error);
           });
-        })
-        .catch(error => {
-          console.error('Error caught:', error);
-        });
-    })
-  )
-);
+      })
+    )
+  );

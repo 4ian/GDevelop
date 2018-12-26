@@ -37,20 +37,19 @@ export default class SceneVariableField extends React.Component<
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
         />
-        {this.state.editorOpen &&
-          layout && (
-            <VariablesEditorDialog
-              open={this.state.editorOpen}
-              variablesContainer={layout.getVariables()}
-              onCancel={() => this.setState({ editorOpen: false })}
-              onApply={() => {
-                this.setState({ editorOpen: false });
-                if (this._field) this._field.forceUpdateVariables();
-              }}
-              emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
-              emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
-            />
-          )}
+        {this.state.editorOpen && layout && (
+          <VariablesEditorDialog
+            open={this.state.editorOpen}
+            variablesContainer={layout.getVariables()}
+            onCancel={() => this.setState({ editorOpen: false })}
+            onApply={() => {
+              this.setState({ editorOpen: false });
+              if (this._field) this._field.forceUpdateVariables();
+            }}
+            emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
+            emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
+          />
+        )}
       </React.Fragment>
     );
   }

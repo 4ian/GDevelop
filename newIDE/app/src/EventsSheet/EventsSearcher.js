@@ -62,7 +62,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
 
   reset() {
     if (this.state.eventsSearchResults) this.state.eventsSearchResults.delete();
-    
+
     this._resultEvents = null;
     this.setState({
       eventsSearchResults: null,

@@ -50,18 +50,17 @@ export default class ObjectVariableField extends React.Component<
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
         />
-        {this.state.editorOpen &&
-          variablesContainer && (
-            <VariablesEditorDialog
-              open={this.state.editorOpen}
-              variablesContainer={variablesContainer}
-              onCancel={() => this.setState({ editorOpen: false })}
-              onApply={() => {
-                this.setState({ editorOpen: false });
-                if (this._field) this._field.forceUpdateVariables();
-              }}
-            />
-          )}
+        {this.state.editorOpen && variablesContainer && (
+          <VariablesEditorDialog
+            open={this.state.editorOpen}
+            variablesContainer={variablesContainer}
+            onCancel={() => this.setState({ editorOpen: false })}
+            onApply={() => {
+              this.setState({ editorOpen: false });
+              if (this._field) this._field.forceUpdateVariables();
+            }}
+          />
+        )}
       </div>
     );
   }

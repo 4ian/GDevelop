@@ -17,30 +17,30 @@ const ThemableVerticeRow = ({
   onChangeVerticeY,
   muiTheme,
 }) => (
-  <TableRow style={{
-    backgroundColor: muiTheme.list.itemsBackgroundColor,
-  }}>
+  <TableRow
+    style={{
+      backgroundColor: muiTheme.list.itemsBackgroundColor,
+    }}
+  >
     <TableRowColumn style={styles.handleColumn}>
       {/* <DragHandle /> Reordering vertices is not supported for now */}
     </TableRowColumn>
-    <TableRowColumn>
-      {hasWarning && <Warning />}
+    <TableRowColumn>{hasWarning && <Warning />}</TableRowColumn>
+    <TableRowColumn style={styles.coordinateColumn}>
+      <TextField
+        value={verticeX}
+        type="number"
+        id="vertice-x"
+        onChange={(e, value) => onChangeVerticeX(parseFloat(value || 0, 10))}
+      />
     </TableRowColumn>
     <TableRowColumn style={styles.coordinateColumn}>
-       <TextField
-          value={verticeX}
-          type="number"
-          id="vertice-x"
-          onChange={(e, value) => onChangeVerticeX(parseFloat(value || 0, 10))}
-        />
-    </TableRowColumn>
-    <TableRowColumn style={styles.coordinateColumn}>
-        <TextField
-          value={verticeY}
-          type="number"
-          id="vertice-y"
-          onChange={(e, value) => onChangeVerticeY(parseFloat(value || 0, 10))}
-        />
+      <TextField
+        value={verticeY}
+        type="number"
+        id="vertice-y"
+        onChange={(e, value) => onChangeVerticeY(parseFloat(value || 0, 10))}
+      />
     </TableRowColumn>
     <TableRowColumn style={styles.toolColumn}>
       {!!onRemove && (
@@ -52,7 +52,5 @@ const ThemableVerticeRow = ({
   </TableRow>
 );
 
-const PointRow = muiThemeable()(
-  ThemableVerticeRow
-);
+const PointRow = muiThemeable()(ThemableVerticeRow);
 export default PointRow;

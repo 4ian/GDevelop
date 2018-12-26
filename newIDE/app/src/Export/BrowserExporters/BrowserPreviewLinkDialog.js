@@ -28,11 +28,7 @@ export default class BrowserPreviewLinkDialog extends Component {
     if (!open || !url) return null;
 
     const actions = [
-      <FlatButton
-        label="Launch the preview"
-        primary
-        onClick={this._onOpen}
-      />,
+      <FlatButton label="Launch the preview" primary onClick={this._onOpen} />,
     ];
 
     return (

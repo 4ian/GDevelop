@@ -8,6 +8,8 @@ import ExamplesSearchbar from './ExamplesSearchbar';
 import ExamplesInformation from './ExamplesInformation';
 import Window from '../Utils/Window';
 import { fuzzyOrEmptyFilter } from '../Utils/FuzzyOrEmptyFilter';
+import optionalRequire from '../Utils/OptionalRequire.js';
+const electron = optionalRequire('electron');
 
 type ExtensionUsage = Array<{
   fullName: string,
@@ -155,21 +157,24 @@ export default class LocalExamples extends React.Component<Props, State> {
                       secondaryText={exampleInformation.description}
                       secondaryTextLines={2}
                       onClick={() =>
-                        this.props.onCreateFromExample(exampleName)}
+                        this.props.onCreateFromExample(exampleName)
+                      }
                     />
                   );
                 })}
               {!this.props.exampleNames && <PlaceholderLoader />}
             </List>
-            <Column expand>
-              <p>Want to contribute to the examples?</p>
-              <Line alignItems="center" justifyContent="center">
-                <RaisedButton
-                  label="Submit your example"
-                  onClick={this._submitExample}
-                />
-              </Line>
-            </Column>
+            {!!electron && (
+              <Column expand>
+                <p>Want to contribute to the examples?</p>
+                <Line alignItems="center" justifyContent="center">
+                  <RaisedButton
+                    label="Submit your example"
+                    onClick={this._submitExample}
+                  />
+                </Line>
+              </Column>
+            )}
           </Column>
         </Line>
       </Column>

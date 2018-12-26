@@ -21,7 +21,7 @@ export default class FpsLimiter {
     const delta = now - this._lastFrameTime;
 
     if (delta > this._interval || this._forceUpdate) {
-      this._lastFrameTime = now - delta % this._interval;
+      this._lastFrameTime = now - (delta % this._interval);
       this._forceUpdate = false;
       return true;
     }

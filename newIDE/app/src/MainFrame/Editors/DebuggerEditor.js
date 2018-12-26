@@ -42,7 +42,8 @@ export default class DebuggerEditor extends BaseEditor {
         <Debugger {...this.props} ref={editor => (this.editor = editor)} />
         <SubscriptionChecker
           ref={subscriptionChecker =>
-            (this._subscriptionChecker = subscriptionChecker)}
+            (this._subscriptionChecker = subscriptionChecker)
+          }
           onChangeSubscription={() => {
             if (this.props.onChangeSubscription)
               this.props.onChangeSubscription();

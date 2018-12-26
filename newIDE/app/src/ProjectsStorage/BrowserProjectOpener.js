@@ -59,6 +59,8 @@ import particlesVariousEffects from '../fixtures/particles-various-effects/parti
 import pathfinding from '../fixtures/pathfinding/pathfinding.json';
 import pathfindingBasics from '../fixtures/pathfinding-basics/pathfinding-basics.json';
 import physics from '../fixtures/physics/physics.json';
+import physicsJointsDemo from '../fixtures/physics-joints-demo/physics-joints-demo.json';
+import physicsJointsSettingsDemo from '../fixtures/physics-joints-settings-demo/physics-joints-settings-demo.json';
 import pinObjectToAnother from '../fixtures/pin-object-to-another/pin-object-to-another.json';
 import pinObjectToAnotherMultipleParents from '../fixtures/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json';
 import planeAndClouds from '../fixtures/plane-and-clouds/plane-and-clouds.json';
@@ -219,6 +221,10 @@ export default class BrowserProjectOpener {
       return Promise.resolve(pathfindingBasics);
     } else if (url === 'example://physics') {
       return Promise.resolve(physics);
+    } else if (url === 'example://physics-joints-demo') {
+      return Promise.resolve(physicsJointsDemo);
+    } else if (url === 'example://physics-joints-settings-demo') {
+      return Promise.resolve(physicsJointsSettingsDemo);
     } else if (url === 'example://platformer') {
       return Promise.resolve(platformer);
     } else if (url === 'example://platformer-double-jump') {

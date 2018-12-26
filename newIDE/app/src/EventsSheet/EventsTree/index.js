@@ -53,10 +53,7 @@ type EventsContainerProps = {|
   onParameterClick: ParameterContext => void,
 
   onEventClick: (eventContext: EventContext) => void,
-  onEventContextMenu: (
-    x: number,
-    y: number
-  ) => void,
+  onEventContextMenu: (x: number, y: number) => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
 |};
@@ -134,7 +131,9 @@ const getNodeKey = ({ treeIndex }) => treeIndex;
 
 const ThemableSortableTree = ({ muiTheme, className, ...otherProps }) => (
   <SortableTreeWithoutDndContext
-    className={`${eventsTree} ${muiTheme.eventsSheetRootClassName} ${className}`}
+    className={`${eventsTree} ${
+      muiTheme.eventsSheetRootClassName
+    } ${className}`}
     {...otherProps}
   />
 );
@@ -363,18 +362,22 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         onInstructionClick={this.props.onInstructionClick}
         onInstructionDoubleClick={this.props.onInstructionDoubleClick}
         onParameterClick={this.props.onParameterClick}
-        onEventClick={() => this.props.onEventClick({
-          eventsList: node.eventsList,
-          event: node.event,
-          indexInList: node.indexInList,
-          isCondition: node.isCondition,
-        })}
-        onEventContextMenu={(x, y) => this.props.onEventContextMenu(x, y, {
-          eventsList: node.eventsList,
-          event: node.event,
-          indexInList: node.indexInList,
-          isCondition: node.isCondition,
-        })}
+        onEventClick={() =>
+          this.props.onEventClick({
+            eventsList: node.eventsList,
+            event: node.event,
+            indexInList: node.indexInList,
+            isCondition: node.isCondition,
+          })
+        }
+        onEventContextMenu={(x, y) =>
+          this.props.onEventContextMenu(x, y, {
+            eventsList: node.eventsList,
+            event: node.event,
+            indexInList: node.indexInList,
+            isCondition: node.isCondition,
+          })
+        }
         onInstructionContextMenu={this.props.onInstructionContextMenu}
         onInstructionsListContextMenu={this.props.onInstructionsListContextMenu}
         onOpenExternalEvents={this.props.onOpenExternalEvents}

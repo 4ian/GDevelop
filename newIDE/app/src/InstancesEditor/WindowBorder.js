@@ -33,9 +33,9 @@ export default class WindowBorder {
     this.pixiRectangle.lineStyle(
       1,
       rgbToHexNumber(
-        (128 + this.layout.getBackgroundColorRed() % 256),
-        (128 + this.layout.getBackgroundColorBlue() % 256),
-        (128 + this.layout.getBackgroundColorGreen() % 256)
+        128 + (this.layout.getBackgroundColorRed() % 256),
+        128 + (this.layout.getBackgroundColorBlue() % 256),
+        128 + (this.layout.getBackgroundColorGreen() % 256)
       ),
       1
     );

@@ -999,7 +999,8 @@ storiesOf('EventsSheet', module)
           onOpenExternalEvents={action('Open external events')}
           resourceSources={[]}
           onChooseResource={source =>
-            action('Choose resource from source', source)}
+            action('Choose resource from source', source)
+          }
           resourceExternalEditors={[]}
           onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
@@ -1024,7 +1025,8 @@ storiesOf('EventsSheet', module)
           onOpenExternalEvents={action('Open external events')}
           resourceSources={[]}
           onChooseResource={source =>
-            action('Choose resource from source', source)}
+            action('Choose resource from source', source)
+          }
           resourceExternalEditors={[]}
           onOpenDebugger={action('open debugger')}
           onOpenLayout={action('open layout')}
@@ -1155,7 +1157,8 @@ storiesOf('TiledSpriteEditor', module)
         project={project}
         resourceSources={[]}
         onChooseResource={source =>
-          action('Choose resource from source', source)}
+          action('Choose resource from source', source)
+        }
         resourceExternalEditors={[]}
       />
     </SerializedObjectDisplay>
@@ -1171,7 +1174,8 @@ storiesOf('PanelSpriteEditor', module)
         project={project}
         resourceSources={[]}
         onChooseResource={source =>
-          action('Choose resource from source', source)}
+          action('Choose resource from source', source)
+        }
         resourceExternalEditors={[]}
       />
     </SerializedObjectDisplay>
@@ -1187,7 +1191,8 @@ storiesOf('SpriteEditor and related editors', module)
         project={project}
         resourceSources={[]}
         onChooseResource={source =>
-          action('Choose resource from source', source)}
+          action('Choose resource from source', source)
+        }
         resourceExternalEditors={[]}
       />
     </SerializedObjectDisplay>
@@ -1682,7 +1687,8 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           setToolbar={() => {}}
           resourceSources={[]}
           onChooseResource={source =>
-            action('Choose resource from source', source)}
+            action('Choose resource from source', source)
+          }
           resourceExternalEditors={[]}
         />
       </div>
@@ -1731,7 +1737,6 @@ storiesOf('ProjectManager', module)
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}
-      showEventsFunctionsExtensions={true}
       eventsFunctionsExtensionsError={null}
       onReloadEventsFunctionsExtensions={action(
         'onReloadEventsFunctionsExtensions'
@@ -1769,7 +1774,6 @@ storiesOf('ProjectManager', module)
       onOpenResources={action('onOpenResources')}
       onOpenPlatformSpecificAssets={action('onOpenPlatformSpecificAssets')}
       onChangeSubscription={action('onChangeSubscription')}
-      showEventsFunctionsExtensions={true}
       eventsFunctionsExtensionsError={
         new Error('Fake error during code generation')
       }

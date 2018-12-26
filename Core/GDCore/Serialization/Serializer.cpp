@@ -193,7 +193,7 @@ gd::String ValueToJSON(const SerializerValue& val) {
 
 gd::String Serializer::ToJSON(const SerializerElement& element) {
   if (element.IsValueUndefined()) {
-    if (!element.ConsideredAsArrayOf().empty()) {
+    if (element.ConsideredAsArray()) {
       // Store the element as an array in JSON:
       gd::String str = "[";
       bool firstChild = true;
@@ -201,7 +201,9 @@ gd::String Serializer::ToJSON(const SerializerElement& element) {
       if (element.GetAllAttributes().size() > 0) {
         std::cout
             << "WARNING: A SerializerElement is considered as an array of "
-            << element.ConsideredAsArrayOf()
+            << (element.ConsideredAsArrayOf().empty()
+                    ? "[unnamed elements]"
+                    : element.ConsideredAsArrayOf())
             << " but has attributes. These attributes won't be saved!"
             << std::endl;
       }
@@ -215,9 +217,11 @@ gd::String Serializer::ToJSON(const SerializerElement& element) {
         if (children[i].first != element.ConsideredAsArrayOf()) {
           std::cout
               << "WARNING: A SerializerElement is considered as an array of "
-              << element.ConsideredAsArrayOf() << " but has a children called "
-              << children[i].first << ". This children won't be saved!"
-              << std::endl;
+              << (element.ConsideredAsArrayOf().empty()
+                      ? "[unnamed elements]"
+                      : element.ConsideredAsArrayOf())
+              << " but has a child called \"" << children[i].first
+              << "\". This child won't be saved!" << std::endl;
           continue;
         }
 
@@ -422,6 +426,7 @@ size_t ParseJSONObject(const std::string& jsonStr,
     return pos + 1;
   } else if (jsonStr[pos] == '[')  // Array
   {
+    element.ConsiderAsArray();
     unsigned int index = 0;
     while (index == 0 || jsonStr[pos] == ',') {
       pos++;
@@ -456,7 +461,7 @@ size_t ParseJSONObject(const std::string& jsonStr,
   {
     std::string str;
     size_t endPos = pos;
-    const std::string separators = " \n,}";
+    const std::string separators = " \n,}]";
     while (endPos < jsonStr.length() &&
            separators.find_first_of(jsonStr[endPos]) == std::string::npos) {
       endPos++;

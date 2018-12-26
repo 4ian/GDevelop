@@ -204,11 +204,13 @@ export default class EventsSheet extends React.Component<Props, State> {
       <Toolbar
         allEventsMetadata={this.state.allEventsMetadata}
         onAddStandardEvent={() =>
-          this.addNewEvent('BuiltinCommonInstructions::Standard')}
+          this.addNewEvent('BuiltinCommonInstructions::Standard')
+        }
         onAddSubEvent={this.addSubEvents}
         canAddSubEvent={hasEventSelected(this.state.selection)}
         onAddCommentEvent={() =>
-          this.addNewEvent('BuiltinCommonInstructions::Comment')}
+          this.addNewEvent('BuiltinCommonInstructions::Comment')
+        }
         onAddEvent={this.addNewEvent}
         canRemove={hasSomethingSelected(this.state.selection)}
         onRemove={this.deleteSelection}
@@ -281,12 +283,12 @@ export default class EventsSheet extends React.Component<Props, State> {
     if (context) {
       insertions = [context];
     } else if (hasEventsSelected) {
-      insertions = getSelectedEventContexts(
-        this.state.selection
-      ).map(selectedEvent => ({
-        eventsList: selectedEvent.eventsList,
-        indexInList: selectedEvent.indexInList,
-      }));
+      insertions = getSelectedEventContexts(this.state.selection).map(
+        selectedEvent => ({
+          eventsList: selectedEvent.eventsList,
+          indexInList: selectedEvent.indexInList,
+        })
+      );
     } else {
       insertions = [
         {
@@ -598,26 +600,26 @@ export default class EventsSheet extends React.Component<Props, State> {
       'unserializeFrom',
       this.props.project
     );
-    getSelectedInstructionsContexts(
-      this.state.selection
-    ).forEach(instructionContext => {
-      instructionContext.instrsList.insertInstructions(
-        instructionsList,
-        0,
-        instructionsList.size(),
-        instructionContext.indexInList
-      );
-    });
-    getSelectedInstructionsListsContexts(
-      this.state.selection
-    ).forEach(instructionsListContext => {
-      instructionsListContext.instrsList.insertInstructions(
-        instructionsList,
-        0,
-        instructionsList.size(),
-        instructionsListContext.instrsList.size()
-      );
-    });
+    getSelectedInstructionsContexts(this.state.selection).forEach(
+      instructionContext => {
+        instructionContext.instrsList.insertInstructions(
+          instructionsList,
+          0,
+          instructionsList.size(),
+          instructionContext.indexInList
+        );
+      }
+    );
+    getSelectedInstructionsListsContexts(this.state.selection).forEach(
+      instructionsListContext => {
+        instructionsListContext.instrsList.insertInstructions(
+          instructionsList,
+          0,
+          instructionsList.size(),
+          instructionsListContext.instrsList.size()
+        );
+      }
+    );
     instructionsList.delete();
 
     this._saveChangesToHistory(() => {
@@ -634,15 +636,15 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   _invertSelectedConditions = () => {
-    getSelectedInstructionsContexts(
-      this.state.selection
-    ).forEach(instructionContext => {
-      if (instructionContext.isCondition) {
-        instructionContext.instruction.setInverted(
-          !instructionContext.instruction.isInverted()
-        );
+    getSelectedInstructionsContexts(this.state.selection).forEach(
+      instructionContext => {
+        if (instructionContext.isCondition) {
+          instructionContext.instruction.setInverted(
+            !instructionContext.instruction.isInverted()
+          );
+        }
       }
-    });
+    );
 
     this._saveChangesToHistory(() => {
       if (this._eventsTree) this._eventsTree.forceEventsUpdate();
@@ -818,10 +820,8 @@ export default class EventsSheet extends React.Component<Props, State> {
               onEventClick={this.selectEvent}
               onEventContextMenu={this.openEventContextMenu}
               onAddNewEvent={context =>
-                this.addNewEvent(
-                  'BuiltinCommonInstructions::Standard',
-                  context
-                )}
+                this.addNewEvent('BuiltinCommonInstructions::Standard', context)
+              }
               onOpenExternalEvents={onOpenExternalEvents}
               onOpenLayout={onOpenLayout}
               searchResults={eventsSearchResultEvents}
@@ -832,9 +832,11 @@ export default class EventsSheet extends React.Component<Props, State> {
               <SearchPanel
                 ref={searchPanel => (this._searchPanel = searchPanel)}
                 onSearchInEvents={inputs =>
-                  this._searchInEvents(searchInEvents, inputs)}
+                  this._searchInEvents(searchInEvents, inputs)
+                }
                 onReplaceInEvents={inputs =>
-                  this._replaceInEvents(replaceInEvents, inputs)}
+                  this._replaceInEvents(replaceInEvents, inputs)
+                }
                 resultsCount={
                   eventsSearchResultEvents
                     ? eventsSearchResultEvents.length
@@ -842,13 +844,16 @@ export default class EventsSheet extends React.Component<Props, State> {
                 }
                 hasEventSelected={hasEventSelected(this.state.selection)}
                 onGoToPreviousSearchResult={() =>
-                  this._ensureEventUnfolded(goToPreviousSearchResult)}
+                  this._ensureEventUnfolded(goToPreviousSearchResult)
+                }
                 onGoToNextSearchResult={() =>
-                  this._ensureEventUnfolded(goToNextSearchResult)}
+                  this._ensureEventUnfolded(goToNextSearchResult)
+                }
               />
             )}
-            {events &&
-              events.getEventsCount() === 0 && <EmptyEventsPlaceholder />}
+            {events && events.getEventsCount() === 0 && (
+              <EmptyEventsPlaceholder />
+            )}
             <InlineParameterEditor
               open={this.state.inlineEditing}
               anchorEl={this.state.inlineEditingAnchorEl}
@@ -877,7 +882,8 @@ export default class EventsSheet extends React.Component<Props, State> {
             />
             <ContextMenu
               ref={eventContextMenu =>
-                (this.eventContextMenu = eventContextMenu)}
+                (this.eventContextMenu = eventContextMenu)
+              }
               buildMenuTemplate={() => [
                 {
                   label: 'Copy',
@@ -945,7 +951,8 @@ export default class EventsSheet extends React.Component<Props, State> {
             />
             <ContextMenu
               ref={instructionContextMenu =>
-                (this.instructionContextMenu = instructionContextMenu)}
+                (this.instructionContextMenu = instructionContextMenu)
+              }
               buildMenuTemplate={() => [
                 {
                   label: 'Copy',
@@ -991,7 +998,8 @@ export default class EventsSheet extends React.Component<Props, State> {
             />
             <ContextMenu
               ref={instructionsListContextMenu =>
-                (this.instructionsListContextMenu = instructionsListContextMenu)}
+                (this.instructionsListContextMenu = instructionsListContextMenu)
+              }
               buildMenuTemplate={() => [
                 {
                   label: 'Paste',

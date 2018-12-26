@@ -10,6 +10,7 @@ import ArrowDropRight from 'material-ui/svg-icons/navigation-arrow-drop-right';
  *
  * Supported options are:
  *  - click
+ *  - visible
  *  - type ('separator' and 'checkbox')
  *  - label
  *  - accelerator
@@ -23,59 +24,63 @@ export default class MaterialUIMenuImplementation {
   }
 
   buildFromTemplate(template) {
-    return template.map((item, id) => {
-      if (item.type === 'separator') {
-        return <Divider key={'separator' + id} />;
-      } else if (item.type === 'checkbox') {
-        return (
-          <MenuItem
-            key={item.label}
-            primaryText={item.label}
-            secondaryText={
-              item.accelerator
-                ? adaptAcceleratorString(item.accelerator)
-                : undefined
-            }
-            checked={item.checked}
-            insetChildren={!item.checked}
-            disabled={item.enabled === false}
-            onClick={() => {
-              if (item.click) {
-                item.click();
-                this._onClose();
+    return template
+      .map((item, id) => {
+        if (item.visible === false) return null;
+
+        if (item.type === 'separator') {
+          return <Divider key={'separator' + id} />;
+        } else if (item.type === 'checkbox') {
+          return (
+            <MenuItem
+              key={item.label}
+              primaryText={item.label}
+              secondaryText={
+                item.accelerator
+                  ? adaptAcceleratorString(item.accelerator)
+                  : undefined
               }
-            }}
-            rightIcon={item.submenu ? <ArrowDropRight /> : undefined}
-            menuItems={
-              item.submenu ? this.buildFromTemplate(item.submenu) : undefined
-            }
-          />
-        );
-      } else {
-        return (
-          <MenuItem
-            key={item.label}
-            primaryText={item.label}
-            secondaryText={
-              item.accelerator
-                ? adaptAcceleratorString(item.accelerator)
-                : undefined
-            }
-            disabled={item.enabled === false}
-            onClick={() => {
-              if (item.click) {
-                item.click();
-                this._onClose();
+              checked={item.checked}
+              insetChildren={!item.checked}
+              disabled={item.enabled === false}
+              onClick={() => {
+                if (item.click) {
+                  item.click();
+                  this._onClose();
+                }
+              }}
+              rightIcon={item.submenu ? <ArrowDropRight /> : undefined}
+              menuItems={
+                item.submenu ? this.buildFromTemplate(item.submenu) : undefined
               }
-            }}
-            rightIcon={item.submenu ? <ArrowDropRight /> : undefined}
-            menuItems={
-              item.submenu ? this.buildFromTemplate(item.submenu) : undefined
-            }
-          />
-        );
-      }
-    });
+            />
+          );
+        } else {
+          return (
+            <MenuItem
+              key={item.label}
+              primaryText={item.label}
+              secondaryText={
+                item.accelerator
+                  ? adaptAcceleratorString(item.accelerator)
+                  : undefined
+              }
+              disabled={item.enabled === false}
+              onClick={() => {
+                if (item.click) {
+                  item.click();
+                  this._onClose();
+                }
+              }}
+              rightIcon={item.submenu ? <ArrowDropRight /> : undefined}
+              menuItems={
+                item.submenu ? this.buildFromTemplate(item.submenu) : undefined
+              }
+            />
+          );
+        }
+      })
+      .filter(Boolean);
   }
 
   showMenu() {

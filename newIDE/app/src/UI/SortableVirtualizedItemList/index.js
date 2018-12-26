@@ -36,10 +36,11 @@ type ItemsListProps = {
   onAddNewItem?: () => void,
   onRename: (Item, string) => void,
   getThumbnail?: Item => string,
-  onItemSelected: ?Item => void,
+  onItemSelected: (?Item) => void,
   renamedItem: ?Item,
   addNewItemLabel: React.Node | string,
   buildMenuTemplate: Item => any,
+  erroredItems?: { [string]: boolean },
 };
 
 class ItemsList extends React.Component<ItemsListProps, *> {
@@ -58,6 +59,7 @@ class ItemsList extends React.Component<ItemsListProps, *> {
       addNewItemLabel,
       renamedItem,
       getThumbnail,
+      erroredItems,
     } = this.props;
 
     return (
@@ -95,6 +97,7 @@ class ItemsList extends React.Component<ItemsListProps, *> {
               selected={item === selectedItem}
               onItemSelected={this.props.onItemSelected}
               buildMenuTemplate={this.props.buildMenuTemplate}
+              hasErrors={erroredItems ? !!erroredItems[item.getName()] : false}
             />
           );
         }}

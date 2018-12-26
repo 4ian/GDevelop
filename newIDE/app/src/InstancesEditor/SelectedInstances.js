@@ -93,7 +93,13 @@ export default class InstancesSelection {
     return this.pixiContainer;
   }
 
-  _renderButton(show, buttonObject, canvasPosition, size, shape = RECTANGLE_BUTTON_SHAPE) {
+  _renderButton(
+    show,
+    buttonObject,
+    canvasPosition,
+    size,
+    shape = RECTANGLE_BUTTON_SHAPE
+  ) {
     buttonObject.clear();
     if (!show) {
       buttonObject.hitArea = new PIXI.Rectangle(0, 0, 0, 0);

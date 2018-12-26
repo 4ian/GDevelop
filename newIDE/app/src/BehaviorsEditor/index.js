@@ -162,7 +162,8 @@ export default class BehaviorsEditor extends Component {
                       hintText="Behavior name"
                       disabled
                       onChange={(e, text) =>
-                        this._onChangeBehaviorName(behavior, text)}
+                        this._onChangeBehaviorName(behavior, text)
+                      }
                     />
                   </span>
                   <span style={styles.behaviorTools}>

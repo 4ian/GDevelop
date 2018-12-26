@@ -61,7 +61,7 @@ export default class PointsPreview extends React.Component<Props, State> {
   /**
    * Move a point with the mouse. A similar dragging implementation is done in
    * CollisionMasksPreview (but with svg elements).
-   * 
+   *
    * If custom zoom is added, this should be adapted to properly set point coordinates.
    * TODO: This could be optimized by avoiding the forceUpdate (not sure if worth it though).
    */
@@ -92,8 +92,8 @@ export default class PointsPreview extends React.Component<Props, State> {
       kind === pointKindIdentifiers.ORIGIN
         ? 'res/originPoint.png'
         : kind === pointKindIdentifiers.CENTER
-          ? 'res/centerPoint.png'
-          : 'res/point.png';
+        ? 'res/centerPoint.png'
+        : 'res/point.png';
     return (
       <img
         src={imageSrc}

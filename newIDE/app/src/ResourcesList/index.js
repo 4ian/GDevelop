@@ -7,7 +7,11 @@ import SearchBar from 'material-ui-search-bar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { filterResourcesList } from './EnumerateResources';
 import optionalRequire from '../Utils/OptionalRequire.js';
-import { createOrUpdateResource, getLocalResourceFullPath } from './ResourceUtils.js';
+import {
+  createOrUpdateResource,
+  getLocalResourceFullPath,
+  resourceHasValidPath,
+} from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
 
 const path = optionalRequire('path');
@@ -30,6 +34,7 @@ const styles = {
 type State = {|
   renamedResource: ?gdResource,
   searchText: string,
+  resourcesWithMissingPath: { [string]: boolean },
 |};
 
 type Props = {|
@@ -58,6 +63,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   state: State = {
     renamedResource: null,
     searchText: '',
+    resourcesWithMissingPath: {},
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
@@ -88,21 +94,32 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   _locateResourceFile = (resource: gdResource) => {
-    const resourceFolderPath = path.dirname(getLocalResourceFullPath(this.props.project, resource.getFile()));
+    const resourceFolderPath = path.dirname(
+      getLocalResourceFullPath(this.props.project, resource.getFile())
+    );
     electron.shell.openItem(resourceFolderPath);
   };
 
   _openResourceFile = (resource: gdResource) => {
-    const resourceFilePath = getLocalResourceFullPath(this.props.project, resource.getFile());
+    const resourceFilePath = getLocalResourceFullPath(
+      this.props.project,
+      resource.getFile()
+    );
     electron.shell.openItem(resourceFilePath);
   };
 
   _copyResourceFilePath = (resource: gdResource) => {
-    const resourceFilePath = getLocalResourceFullPath(this.props.project, resource.getFile());
+    const resourceFilePath = getLocalResourceFullPath(
+      this.props.project,
+      resource.getFile()
+    );
     electron.clipboard.writeText(resourceFilePath);
   };
-  
-  _scanForNewResources = (extensions: string, createResource: () => gdResource) => {
+
+  _scanForNewResources = (
+    extensions: string,
+    createResource: () => gdResource
+  ) => {
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
     const projectPath = path.dirname(project.getProjectFile());
@@ -117,9 +134,9 @@ export default class ResourcesList extends React.Component<Props, State> {
         res.forEach(pathFound => {
           const fileName = path.relative(projectPath, pathFound);
           if (!resourcesManager.hasResource(fileName)) {
-            createOrUpdateResource(project, createResource(), fileName)
+            createOrUpdateResource(project, createResource(), fileName);
             console.info(`${fileName} added to project.`);
-          };
+          }
         });
       }
       this.forceUpdate();
@@ -128,13 +145,29 @@ export default class ResourcesList extends React.Component<Props, State> {
 
   _removeUnusedResources = (resourceType: ResourceKind) => {
     const { project } = this.props;
-    gd.ProjectResourcesAdder
-      .getAllUseless(project, resourceType)
+    gd.ProjectResourcesAdder.getAllUseless(project, resourceType)
       .toJSArray()
       .forEach(resourceName => {
-        console.info(`Removing unused` + resourceType + ` resource: ${resourceName}`);
+        console.info(
+          `Removing unused` + resourceType + ` resource: ${resourceName}`
+        );
       });
     gd.ProjectResourcesAdder.removeAllUseless(project, resourceType);
+    this.forceUpdate();
+  };
+
+  _removeAllResourcesWithInvalidPath = () => {
+    const { project } = this.props;
+    const resourcesManager = project.getResourcesManager();
+    resourcesManager
+      .getAllResourceNames()
+      .toJSArray()
+      .forEach(resourceName => {
+        if (!resourceHasValidPath(project, resourceName)) {
+          resourcesManager.removeResource(resourceName);
+          console.info('Removed due to invalid path: ' + resourceName);
+        }
+      });
     this.forceUpdate();
   };
 
@@ -209,45 +242,75 @@ export default class ResourcesList extends React.Component<Props, State> {
       {
         label: 'Scan for Images',
         click: () => {
-          this._scanForNewResources(IMAGE_EXTENSIONS, () => new gd.ImageResource());
+          this._scanForNewResources(
+            IMAGE_EXTENSIONS,
+            () => new gd.ImageResource()
+          );
         },
         enabled: hasElectron,
       },
       {
         label: 'Scan for Audio',
         click: () => {
-          this._scanForNewResources(AUDIO_EXTENSIONS, () => new gd.AudioResource());
+          this._scanForNewResources(
+            AUDIO_EXTENSIONS,
+            () => new gd.AudioResource()
+          );
         },
         enabled: hasElectron,
       },
       {
         label: 'Scan for Fonts',
         click: () => {
-          this._scanForNewResources(FONT_EXTENSIONS, () => new gd.FontResource());
+          this._scanForNewResources(
+            FONT_EXTENSIONS,
+            () => new gd.FontResource()
+          );
         },
         enabled: hasElectron,
       },
       { type: 'separator' },
       {
-        label: 'Remove All Unused Images',
+        label: 'Remove Unused Images',
         click: () => {
           this._removeUnusedResources('image');
         },
       },
       {
-        label: 'Remove All Unused Audio',
+        label: 'Remove Unused Audio',
         click: () => {
           this._removeUnusedResources('audio');
         },
       },
       {
-        label: 'Remove All Unused Fonts',
+        label: 'Remove Unused Fonts',
         click: () => {
           this._removeUnusedResources('font');
         },
       },
+      {
+        label: 'Remove Resources with Invalid Path',
+        click: () => {
+          this._removeAllResourcesWithInvalidPath();
+        },
+        enabled: hasElectron,
+      },
     ];
   };
+
+  componentDidMount() {
+    const { project } = this.props;
+    const resourcesManager = project.getResourcesManager();
+    const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
+    const resourcesWithMissingPath = {};
+    resourceNames.forEach(resourceName => {
+      resourcesWithMissingPath[resourceName] = !resourceHasValidPath(
+        project,
+        resourceName
+      );
+    });
+    this.setState({ resourcesWithMissingPath });
+  }
 
   render() {
     const { project, selectedResource, onSelectResource } = this.props;
@@ -281,10 +344,12 @@ export default class ResourcesList extends React.Component<Props, State> {
                 renamedItem={this.state.renamedResource}
                 onRename={this._rename}
                 onSortEnd={({ oldIndex, newIndex }) =>
-                  this._move(oldIndex, newIndex)}
+                  this._move(oldIndex, newIndex)
+                }
                 buildMenuTemplate={this._renderResourceMenuTemplate}
                 helperClass="sortable-helper"
                 distance={20}
+                erroredItems={this.state.resourcesWithMissingPath}
               />
             )}
           </AutoSizer>
@@ -295,7 +360,8 @@ export default class ResourcesList extends React.Component<Props, State> {
           onChange={text =>
             this.setState({
               searchText: text,
-            })}
+            })
+          }
         />
       </Background>
     );

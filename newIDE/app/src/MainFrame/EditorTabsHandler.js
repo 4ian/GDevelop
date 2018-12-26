@@ -199,7 +199,8 @@ export const closeEventsFunctionsExtensionTabs = (
           !editorTab.editorRef ||
           !editorTab.editorRef.getEventsFunctionsExtension ||
           !editorTab.editorRef.getEventsFunctionsExtension() ||
-          editorTab.editorRef.getEventsFunctionsExtension() !== eventsFunctionsExtension
+          editorTab.editorRef.getEventsFunctionsExtension() !==
+            eventsFunctionsExtension
         );
       }),
     },

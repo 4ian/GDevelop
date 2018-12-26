@@ -37,19 +37,18 @@ export default class GlobalVariableField extends React.Component<
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
         />
-        {this.state.editorOpen &&
-          project && (
-            <VariablesEditorDialog
-              open={this.state.editorOpen}
-              variablesContainer={project.getVariables()}
-              onCancel={() => this.setState({ editorOpen: false })}
-              onApply={() => {
-                this.setState({ editorOpen: false });
-                if (this._field) this._field.forceUpdateVariables();
-              }}
-              emptyExplanationMessage="Global variables are variables that are persisted across the scenes during the game."
-            />
-          )}
+        {this.state.editorOpen && project && (
+          <VariablesEditorDialog
+            open={this.state.editorOpen}
+            variablesContainer={project.getVariables()}
+            onCancel={() => this.setState({ editorOpen: false })}
+            onApply={() => {
+              this.setState({ editorOpen: false });
+              if (this._field) this._field.forceUpdateVariables();
+            }}
+            emptyExplanationMessage="Global variables are variables that are persisted across the scenes during the game."
+          />
+        )}
       </div>
     );
   }

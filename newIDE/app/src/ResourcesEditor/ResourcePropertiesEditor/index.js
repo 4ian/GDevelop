@@ -50,7 +50,6 @@ export default class ResourcePropertiesEditor extends React.Component<
       getValue: (resource: gdResource) => resource.getFile(),
       setValue: (resource: gdResource, newValue: string) =>
         resource.setFile(newValue),
-      buttonLabel: 'Choose file',
       onEditButtonClick: () => this._chooseResourcePath(),
     },
   ];

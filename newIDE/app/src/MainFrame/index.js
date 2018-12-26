@@ -1152,7 +1152,6 @@ export default class MainFrame extends React.Component<Props, State> {
         <div className="main-frame">
           <ProjectTitlebar project={currentProject} />
           <Drawer
-            docked={false}
             open={projectManagerOpen}
             containerStyle={styles.drawerContent}
             width={320}

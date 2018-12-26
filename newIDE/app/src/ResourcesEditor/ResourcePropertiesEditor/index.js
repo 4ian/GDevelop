@@ -7,6 +7,11 @@ import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../../ResourcesList/ResourceSource.flow';
+
 const styles = {
   imagePreview: { flex: 1 },
   propertiesContainer: {
@@ -21,6 +26,9 @@ type Props = {|
   project: gdProject,
   resourcesLoader: typeof ResourcesLoader,
   resources: Array<gdResource>,
+  onResourcePathUpdated: () => void,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
 |};
 
 export default class ResourcePropertiesEditor extends React.Component<
@@ -42,6 +50,7 @@ export default class ResourcePropertiesEditor extends React.Component<
       getValue: (resource: gdResource) => resource.getFile(),
       setValue: (resource: gdResource, newValue: string) =>
         resource.setFile(newValue),
+      onEditButtonClick: () => this._chooseResourcePath(),
     },
   ];
 
@@ -54,9 +63,30 @@ export default class ResourcePropertiesEditor extends React.Component<
     );
   }
 
+  _chooseResourcePath = () => {
+    const {
+      resources,
+      onResourcePathUpdated,
+      onChooseResource,
+      resourceSources,
+    } = this.props;
+    const resource = resources[0];
+    const sources = resourceSources.filter(
+      source => source.kind === resource.getKind()
+    );
+    if (!sources.length) return;
+    onChooseResource(sources[0].name).then(resources => {
+      if (!resources.length) return; // No path was chosen by the user.
+      resource.setFile(resources[0].getFile());
+      resources.forEach(resource => resource.delete()); // Important, we are responsible for deleting the resources that were given to us. Otherwise we have a memory leak.
+
+      onResourcePathUpdated();
+      this.forceUpdate();
+    });
+  };
+
   _renderResourcesProperties() {
     const { resources, project } = this.props;
-
     //TODO: Multiple resources support
     const properties = resources[0].getProperties(project);
     const resourceSchema = propertiesMapToSchema(
@@ -86,6 +116,7 @@ export default class ResourcePropertiesEditor extends React.Component<
       <ResourcePreview
         style={styles.imagePreview}
         resourceName={resources[0].getName()}
+        resourcePath={resources[0].getFile()}
         resourcesLoader={resourcesLoader}
         project={project}
       />

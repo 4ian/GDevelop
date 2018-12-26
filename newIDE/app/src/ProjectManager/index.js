@@ -622,7 +622,9 @@ export default class ProjectManager extends React.Component<Props, State> {
                     src="res/ribbon_default/image32.png"
                   />
                 }
-                onClick={() => this.props.onOpenResources()}
+                onClick={() => {
+                  this.props.onOpenResources();
+                }}
               />,
             ]}
           />

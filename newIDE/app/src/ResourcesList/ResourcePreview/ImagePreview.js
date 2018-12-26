@@ -34,6 +34,7 @@ const styles = {
 type Props = {|
   project: gdProject,
   resourceName: string,
+  resourcePath?: string,
   resourcesLoader: typeof ResourcesLoader,
   children?: any,
   style?: Object,
@@ -63,7 +64,8 @@ export default class ImagePreview extends React.Component<Props, State> {
     if (
       newProps.resourceName !== this.props.resourceName ||
       newProps.project !== this.props.project ||
-      newProps.resourcesLoader !== this.props.resourcesLoader
+      newProps.resourcesLoader !== this.props.resourcesLoader ||
+      newProps.resourcePath !== this.props.resourcePath
     ) {
       this.setState(this._loadFrom(newProps));
     }

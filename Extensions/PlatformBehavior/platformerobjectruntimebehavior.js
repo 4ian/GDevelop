@@ -8,12 +8,24 @@ Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
  * considered as a platform by objects having PlatformerObject Behavior.
  *
  * @class PlatformerObjectRuntimeBehavior
+ * @augments {gdjs.RuntimeBehavior}
  * @constructor
  */
 gdjs.PlatformerObjectRuntimeBehavior = function(runtimeScene, behaviorData, owner)
 {
     gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
 
+    // To achieve pixel-perfect precision when positioning object on platform or
+    // handling collision with "walls", edges of the hitboxes must be ignored during
+    // collision checks, so that two overlapping edges are not considered as colliding.
+    // For example, if a character is 10px width and is at position (0, 0), it must not be
+    // considered as colliding with a platform which is at position (10, 0). Edges will
+    // still be overlapping (because character hitbox right edge is at X position 10 and
+    // platform hitbox left edge is also at X position 10).
+    // This parameter "_ignoreTouchingEdges" will be passed to all collision handling functions.
+    this._ignoreTouchingEdges = true;
+
+    this._roundCoordinates = behaviorData.roundCoordinates;
     this._gravity = behaviorData.gravity;
     this._maxFallingSpeed = behaviorData.maxFallingSpeed;
     this._acceleration = behaviorData.acceleration;
@@ -142,6 +154,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
     if ( requestedDeltaX !== 0 ) {
         var floorPlatformId = this._floorPlatform !== null ? this._floorPlatform.owner.id : null;
         object.setX(object.getX()+requestedDeltaX);
+        var tryRounding = true;
         //Colliding: Try to push out from the solid.
         //Note that jump thru are never obstacle on X axis.
         while ( this._isCollidingWith(this._potentialCollidingObjects, floorPlatformId, /*excludeJumpthrus=*/true) ) {
@@ -159,7 +172,14 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
                 object.setY(object.getY()+1);
             }
 
-            object.setX(Math.floor(object.getX())+(requestedDeltaX > 0 ? -1 : 1));
+            if (tryRounding) {
+                // First try rounding the position as this might be sufficient to get the object
+                // out of the wall.
+                object.setX(Math.round(object.getX()));
+                tryRounding = false;
+            } else {
+                object.setX(Math.round(object.getX())+(requestedDeltaX > 0 ? -1 : 1));
+            }
             this._currentSpeed = 0; //Collided with a wall
         }
     }
@@ -263,7 +283,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
 
     //Follow the floor
     if ( this._isOnFloor ) {
-        if ( gdjs.RuntimeObject.collisionTest(object, this._floorPlatform.owner) ) {
+        if ( gdjs.RuntimeObject.collisionTest(object, this._floorPlatform.owner, this._ignoreTouchingEdges) ) {
             //Floor is getting up, as the object is colliding with it.
             var oldY = object.getY();
             var step = 0;
@@ -272,7 +292,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
                 if ( step >= Math.floor(Math.abs(requestedDeltaX*this._slopeClimbingFactor)) ) { //Slope is too step ( > 50% )
 
                     object.setY(object.getY()-(Math.abs(requestedDeltaX*this._slopeClimbingFactor)-step)); //Try to add the decimal part.
-                    if ( gdjs.RuntimeObject.collisionTest(object, this._floorPlatform.owner) )
+                    if ( gdjs.RuntimeObject.collisionTest(object, this._floorPlatform.owner, this._ignoreTouchingEdges) )
                         stillInFloor = true; //Too steep.
 
                     break;
@@ -282,7 +302,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
                 object.setY(object.getY()-1);
                 step++;
             }
-            while ( gdjs.RuntimeObject.collisionTest(object, this._floorPlatform.owner ) );
+            while ( gdjs.RuntimeObject.collisionTest(object, this._floorPlatform.owner, this._ignoreTouchingEdges) );
 
             if ( stillInFloor ) {
                 object.setY(oldY); //Unable to follow the floor ( too steep ): Go back to the original position.
@@ -291,7 +311,8 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
         } else {
             //Floor is flat or get down.
             var oldY = object.getY();
-            object.setY(object.getY()+1);
+            var tentativeStartY = object.getY()+1;
+            object.setY(this._roundCoordinates ? Math.round(tentativeStartY) : tentativeStartY);
             var step = 0;
             var noMoreOnFloor = false;
             while ( !this._isCollidingWith(this._potentialCollidingObjects) ) {
@@ -341,7 +362,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype.doStepPreEvents = function(runtim
         //In priority, check if the last floor platform is still the floor.
         var oldY = object.getY();
         object.setY(object.getY()+1);
-        if ( this._isOnFloor && gdjs.RuntimeObject.collisionTest(object, this._floorPlatform.owner ) ) {
+        if ( this._isOnFloor && gdjs.RuntimeObject.collisionTest(object, this._floorPlatform.owner, this._ignoreTouchingEdges) ) {
             //Still on the same floor
             this._floorLastX = this._floorPlatform.owner.getX();
             this._floorLastY = this._floorPlatform.owner.getY();
@@ -442,7 +463,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._isCollidingWith = function(candi
         if ( platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER ) continue;
         if ( excludeJumpThrus && platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.JUMPTHRU ) continue;
 
-        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
+        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner, this._ignoreTouchingEdges) )
             return true;
     }
 
@@ -470,7 +491,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._separateFromPlatforms = function
         objects.push(platform.owner);
     }
 
-    return this.owner.separateFromObjects(objects);
+    return this.owner.separateFromObjects(objects, this._ignoreTouchingEdges);
 };
 
 /**
@@ -486,7 +507,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._isCollidingWithExcluding = funct
 
         if (exceptTheseOnes && this._isIn(exceptTheseOnes, platform.owner.id)) continue;
         if ( platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.LADDER ) continue;
-        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
+        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner, this._ignoreTouchingEdges) )
             return true;
     }
 
@@ -505,7 +526,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._getCollidingPlatform = function(
 
         if ( platform.getPlatformType() !== gdjs.PlatformRuntimeBehavior.LADDER
             && !this._isIn(this._overlappedJumpThru, platform.owner.id)
-            && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
+            && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner, this._ignoreTouchingEdges) ) {
                 return platform;
         }
     }
@@ -526,7 +547,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._updateOverlappedJumpThru = funct
         var platform = this._potentialCollidingObjects[i];
 
         if ( platform.getPlatformType() === gdjs.PlatformRuntimeBehavior.JUMPTHRU
-            && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) ) {
+            && gdjs.RuntimeObject.collisionTest(this.owner, platform.owner, this._ignoreTouchingEdges) ) {
                 this._overlappedJumpThru.push(platform);
         }
     }
@@ -542,7 +563,7 @@ gdjs.PlatformerObjectRuntimeBehavior.prototype._isOverlappingLadder = function()
         var platform = this._potentialCollidingObjects[i];
 
         if ( platform.getPlatformType() !== gdjs.PlatformRuntimeBehavior.LADDER ) continue;
-        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner) )
+        if ( gdjs.RuntimeObject.collisionTest(this.owner, platform.owner, this._ignoreTouchingEdges) )
             return true;
     }
 

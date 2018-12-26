@@ -176,15 +176,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .MarkAsAdvanced();
 
-  obj.AddAction("AddForceXY",
-                _("Add a force"),
-                _("Add a force to an object. The object will move according to "
-                  "all of the forces it has."),
-                _("Add to _PARAM0_ _PARAM3_ force of _PARAM1_ p/s on X axis and "
-                  "_PARAM2_ p/s on Y axis"),
-                _("Movement"),
-                "res/actions/force24.png",
-                "res/actions/force.png")
+  obj.AddAction(
+         "AddForceXY",
+         _("Add a force"),
+         _("Add a force to an object. The object will move according to "
+           "all of the forces it has."),
+         _("Add to _PARAM0_ _PARAM3_ force of _PARAM1_ p/s on X axis and "
+           "_PARAM2_ p/s on Y axis"),
+         _("Movement"),
+         "res/actions/force24.png",
+         "res/actions/force.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("expression", _("Speed on X axis (in pixels per second)"))
@@ -551,13 +552,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("yesorno", _("Activate?"))
       .MarkAsAdvanced();
 
-  obj.AddAction("AddForceVers",
-                _("Add a force to move toward an object"),
-                _("Add a force to an object to make it move toward another."),
-                _("Move _PARAM0_ to _PARAM1_ with _PARAM3_ force of _PARAM2_ pixels"),
-                _("Movement"),
-                "res/actions/forceVers24.png",
-                "res/actions/forceVers.png")
+  obj.AddAction(
+         "AddForceVers",
+         _("Add a force to move toward an object"),
+         _("Add a force to an object to make it move toward another."),
+         _("Move _PARAM0_ to _PARAM1_ with _PARAM3_ force of _PARAM2_ pixels"),
+         _("Movement"),
+         "res/actions/forceVers24.png",
+         "res/actions/forceVers.png")
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectPtr", _("Target Object"))
@@ -640,6 +642,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
       .AddParameter("object", _("Object"))
       .AddParameter("objectList", _("Objects"))
+      .AddParameter("yesorno",
+                    _("Ignore objects that are touching each other on their "
+                      "edges, but are not overlapping (default: no)"),
+                    "",
+                    true)
+      .SetDefaultValue("no")
       .MarkAsSimple();
 
   obj.AddCondition("CollisionPoint",
@@ -654,13 +662,14 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("expression", _("Y position of the point"))
       .MarkAsSimple();
 
-  obj.AddCondition("ObjectTimer",
-                   _("Value of a timer"),
-                   _("Test the elapsed time of a timer."),
-                   _("The timer _PARAM1_ of _PARAM0_ is greater than _PARAM2_ seconds"),
-                   _("Timers"),
-                   "res/conditions/timer24.png",
-                   "res/conditions/timer.png")
+  obj.AddCondition(
+         "ObjectTimer",
+         _("Value of a timer"),
+         _("Test the elapsed time of a timer."),
+         _("The timer _PARAM1_ of _PARAM0_ is greater than _PARAM2_ seconds"),
+         _("Timers"),
+         "res/conditions/timer24.png",
+         "res/conditions/timer.png")
       .AddParameter("object", _("Object"))
       .AddParameter("string", _("Timer's name"))
       .AddParameter("expression", _("Time in seconds"));
@@ -863,10 +872,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectvar", _("Variable"));
 
   obj.AddExpression("ObjectTimerElapsedTime",
-                     _("Timer value"),
-                     _("Value of a timer"),
-                     _("Timers"),
-                     "res/actions/time.png")
+                    _("Timer value"),
+                    _("Value of a timer"),
+                    _("Timers"),
+                    "res/actions/time.png")
       .AddParameter("object", _("Object"))
       .AddParameter("string", _("Timer's name"));
 
@@ -1046,6 +1055,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddParameter("objectList", _("Object"))
       .AddParameter("objectList", _("Object"))
       .AddCodeOnlyParameter("conditionInverted", "")
+      .AddCodeOnlyParameter("currentScene", "")
+      .AddParameter("yesorno",
+                    _("Ignore objects that are touching each other on their "
+                      "edges, but are not overlapping (default: no)"),
+                    "",
+                    true)
+      .SetDefaultValue("no")
       .MarkAsSimple();
 
   extension

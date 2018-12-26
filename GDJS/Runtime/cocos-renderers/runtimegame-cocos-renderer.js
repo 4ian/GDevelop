@@ -116,7 +116,7 @@ gdjs.RuntimeGameCocosRenderer.prototype.stopGame = function() {
  * Get the canvas DOM element.
  */
 gdjs.RuntimeGameCocosRenderer.prototype.getCanvas = function() {
-    return cc._canvas;
+    return cc.game.canvas;
 }
 
 /**

@@ -20,6 +20,8 @@ gdjs.screenshot.takeScreenshot = function (runtimeScene, savePath) {
 
     if (canvas) {
       const content = canvas.toDataURL('image/png').replace('data:image/png;base64,', '');
+      if (savePath.toLowerCase().indexOf('.png') == -1) savePath += '.png';
+
       fileSystem.writeFile(savePath, content, 'base64', (err) => {
         if (err) {
           console.error("Unable to save the screenshot at path: " + savePath);

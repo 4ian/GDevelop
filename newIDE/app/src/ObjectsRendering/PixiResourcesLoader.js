@@ -12,7 +12,7 @@ const invalidTexture = PIXI.Texture.fromImage('res/error48.png');
 /**
  * Expose functions to load PIXI textures or fonts, given the names of
  * resources and a gd.Project.
- * 
+ *
  * This internally uses ResourcesLoader to get the URL of the resources.
  */
 export default class PixiResourcesLoader {
@@ -83,7 +83,7 @@ export default class PixiResourcesLoader {
   }
 
   /**
-   * Return the PIXI texture represented by the given resource. 
+   * Return the PIXI texture represented by the given resource.
    * If not loaded, it will load it.
    * @returns The PIXI.Texture to be used. It can be loading, so you
    * should listen to PIXI.Texture `update` event, and refresh your object
@@ -149,15 +149,13 @@ export default class PixiResourcesLoader {
       return Promise.resolve('Arial');
     }
 
-    return loadFontFace(
-      fontFamily,
-      `url("${fullFilename}")`,
-      {}
-    ).then(loadedFace => {
-      loadedFontFamilies[resourceName] = fontFamily;
+    return loadFontFace(fontFamily, `url("${fullFilename}")`, {}).then(
+      loadedFace => {
+        loadedFontFamilies[resourceName] = fontFamily;
 
-      return fontFamily;
-    });
+        return fontFamily;
+      }
+    );
   }
 
   /**

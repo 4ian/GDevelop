@@ -229,7 +229,7 @@ export default class SpritesList extends Component<Props, void> {
       } catch (e) {
         console.error('Malformed metadata', e);
       }
-    };
+    }
 
     externalEditor.edit({
       project,
@@ -241,7 +241,11 @@ export default class SpritesList extends Component<Props, void> {
           direction.getTimeBetweenFrames() > 0
             ? 1 / direction.getTimeBetweenFrames()
             : 1,
-            name: animationName || ((resourceNames.length > 0) ? path.basename(resourceNames[0], path.extname(resourceNames[0])) : objectName),
+        name:
+          animationName ||
+          (resourceNames.length > 0
+            ? path.basename(resourceNames[0], path.extname(resourceNames[0]))
+            : objectName),
         isLooping: direction.isLooping(),
         externalEditorData,
       },
@@ -271,9 +275,9 @@ export default class SpritesList extends Component<Props, void> {
 
         // set metadata if there is such on the direction
         if (metadata) {
-          newDirection.setMetadata(JSON.stringify(metadata))
+          newDirection.setMetadata(JSON.stringify(metadata));
         }
-        
+
         // Burst the ResourcesLoader cache to force images to be reloaded (and not cached by the browser).
         resourcesLoader.burstUrlsCacheForResources(project, resourceNames);
         onReplaceByDirection(newDirection);

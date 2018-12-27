@@ -2,7 +2,7 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
 import classNames from 'classnames';
-import { type EventRendererProps } from './EventRenderer.flow'
+import { type EventRendererProps } from './EventRenderer.flow';
 import { rgbToHex } from '../../../Utils/ColorTransformer';
 import {
   largeSelectedArea,
@@ -37,7 +37,10 @@ type State = {|
   height: number,
 |};
 
-export default class CommentEvent extends React.Component<EventRendererProps, State> {
+export default class CommentEvent extends React.Component<
+  EventRendererProps,
+  State
+> {
   state = {
     editing: false,
     height: 0,

@@ -834,13 +834,6 @@ Object {
         "type": "Sprite",
       },
     },
-    "Collision": Object {
-      "Collision (Pixel perfect)": Object {
-        "displayedName": "Collision (Pixel perfect)",
-        "fullGroupName": "Sprite/Collision",
-        "type": "Collision",
-      },
-    },
     "Direction": Object {
       "Current direction": Object {
         "displayedName": "Current direction",
@@ -1078,13 +1071,13 @@ Object {
         "type": "VariableChildExists",
       },
     },
-    "Text of a variable": Object {
-      "displayedName": "Text of a variable",
+    "Text of a scene variable": Object {
+      "displayedName": "Text of a scene variable",
       "fullGroupName": "Variables",
       "type": "VarSceneTxt",
     },
-    "Value of a variable": Object {
-      "displayedName": "Value of a variable",
+    "Value of a scene variable": Object {
+      "displayedName": "Value of a scene variable",
       "fullGroupName": "Variables",
       "type": "VarScene",
     },
@@ -1290,6 +1283,11 @@ Array [
     "type": "ChangeDirection",
   },
   Object {
+    "displayedName": "Height",
+    "fullGroupName": "Sprite/Size",
+    "type": "ChangeHeight",
+  },
+  Object {
     "displayedName": "Scale",
     "fullGroupName": "Sprite/Size",
     "type": "ChangeScale",
@@ -1310,6 +1308,11 @@ Array [
     "type": "ChangeSprite",
   },
   Object {
+    "displayedName": "Width",
+    "fullGroupName": "Sprite/Size",
+    "type": "ChangeWidth",
+  },
+  Object {
     "displayedName": "Flip the object horizontally",
     "fullGroupName": "Sprite/Effects",
     "type": "FlipX",
@@ -1320,7 +1323,7 @@ Array [
     "type": "FlipY",
   },
   Object {
-    "displayedName": "Change object's opacity",
+    "displayedName": "Change Sprite opacity",
     "fullGroupName": "Sprite/Visibility",
     "type": "Opacity",
   },
@@ -1360,17 +1363,17 @@ Array [
     "type": "ModVarGlobalTxt",
   },
   Object {
-    "displayedName": "Value of a variable",
+    "displayedName": "Value of a scene variable",
     "fullGroupName": "Variables",
     "type": "ModVarScene",
   },
   Object {
-    "displayedName": "String of a variable",
+    "displayedName": "String of a scene variable",
     "fullGroupName": "Variables",
     "type": "ModVarSceneTxt",
   },
   Object {
-    "displayedName": "Clear variable",
+    "displayedName": "Clear scene variable",
     "fullGroupName": "Variables/Structure",
     "type": "VariableClearChildren",
   },
@@ -1875,7 +1878,7 @@ Array [
     "type": "TextObject::ChangeColor",
   },
   Object {
-    "displayedName": "Opacity",
+    "displayedName": "Change Text Opacity",
     "fullGroupName": "Text object/",
     "type": "TextObject::Opacity",
   },
@@ -2500,11 +2503,6 @@ Array [
     "type": "Vitesse",
   },
   Object {
-    "displayedName": "Collision (Pixel perfect)",
-    "fullGroupName": "Sprite/Collision",
-    "type": "Collision",
-  },
-  Object {
     "displayedName": "Animation paused",
     "fullGroupName": "Sprite/Animations and images",
     "type": "AnimStopped",
@@ -2600,12 +2598,12 @@ Array [
     "type": "VarGlobalTxt",
   },
   Object {
-    "displayedName": "Value of a variable",
+    "displayedName": "Value of a scene variable",
     "fullGroupName": "Variables",
     "type": "VarScene",
   },
   Object {
-    "displayedName": "Text of a variable",
+    "displayedName": "Text of a scene variable",
     "fullGroupName": "Variables",
     "type": "VarSceneTxt",
   },

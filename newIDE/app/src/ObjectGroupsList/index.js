@@ -91,7 +91,8 @@ class GroupsList extends Component<*, *> {
               onEditName={() => this.props.onEditName(groupWithContext)}
               onDelete={() => this.props.onDelete(groupWithContext)}
               onRename={newName =>
-                this.props.onRename(groupWithContext, newName)}
+                this.props.onRename(groupWithContext, newName)
+              }
               editingName={nameBeingEdited}
               isGlobalGroup={groupWithContext.global}
             />
@@ -294,7 +295,8 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
                 onDelete={this._onDelete}
                 onRename={this._onRename}
                 onSortEnd={({ oldIndex, newIndex }) =>
-                  this._onMove(oldIndex, newIndex)}
+                  this._onMove(oldIndex, newIndex)
+                }
                 helperClass="sortable-helper"
                 distance={20}
               />
@@ -307,7 +309,8 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
           onChange={text =>
             this.setState({
               searchText: text,
-            })}
+            })
+          }
         />
       </Background>
     );

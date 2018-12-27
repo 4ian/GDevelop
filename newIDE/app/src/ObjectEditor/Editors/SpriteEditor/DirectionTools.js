@@ -131,8 +131,8 @@ export default class DirectionTools extends Component<Props, State> {
           id="direction-time-between-frames"
           style={styles.timeField}
           type="number"
-          step={0.01}
-          precision={1}
+          step={0.005}
+          precision={2}
           min={0.01}
           max={5}
         />
@@ -168,7 +168,8 @@ export default class DirectionTools extends Component<Props, State> {
               project={project}
               timeBetweenFrames={this.state.timeBetweenFrames}
               onChangeTimeBetweenFrames={text =>
-                this.setState({ timeBetweenFrames: text })}
+                this.setState({ timeBetweenFrames: text })
+              }
             />
           </Dialog>
         )}

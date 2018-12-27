@@ -7,6 +7,11 @@ import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import InfoBar from '../UI/Messages/InfoBar';
 import ResourcesLoader from '../ResourcesLoader';
 
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+
 const styles = {
   container: {
     display: 'flex',
@@ -30,6 +35,8 @@ type Props = {
     newName: string,
     cb: (boolean) => void
   ) => void,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
 };
 
 export default class ResourcesEditor extends React.Component<Props, State> {
@@ -52,7 +59,8 @@ export default class ResourcesEditor extends React.Component<Props, State> {
         onOpenProperties={this.openProperties}
         canDelete={!!this.state.selectedResource}
         onDeleteSelection={() =>
-          this.deleteResource(this.state.selectedResource)}
+          this.deleteResource(this.state.selectedResource)
+        }
       />
     );
   }
@@ -105,7 +113,12 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   };
 
   render() {
-    const { project, onRenameResource } = this.props;
+    const {
+      project,
+      onRenameResource,
+      onChooseResource,
+      resourceSources,
+    } = this.props;
     const { selectedResource } = this.state;
 
     const editors = {
@@ -121,7 +134,15 @@ export default class ResourcesEditor extends React.Component<Props, State> {
             project={project}
             resourcesLoader={this.resourcesLoader}
             ref={propertiesEditor =>
-              (this._propertiesEditor = propertiesEditor)}
+              (this._propertiesEditor = propertiesEditor)
+            }
+            onResourcePathUpdated={() => {
+              if (this._resourcesList) {
+                this._resourcesList.checkMissingPaths();
+              }
+            }}
+            onChooseResource={onChooseResource}
+            resourceSources={resourceSources}
           />
         </MosaicWindow>
       ),

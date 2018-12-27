@@ -93,8 +93,9 @@ class ColorPicker extends React.Component<Props, State> {
           <div
             style={{
               ...styles.color,
-              background: `rgba(${displayedColor.r}, ${displayedColor.g}, ${displayedColor.b}, ${displayedColor.a ||
-                1})`,
+              background: `rgba(${displayedColor.r}, ${displayedColor.g}, ${
+                displayedColor.b
+              }, ${displayedColor.a || 1})`,
             }}
           >
             {color ? null : '?'}

@@ -11,7 +11,12 @@ import CloseButton from './CloseButton';
 import 'react-mosaic-component/react-mosaic-component.css';
 import './style.css';
 
-const addRightNode = (currentNode, newNode, splitPercentage, direction = 'row') => {
+const addRightNode = (
+  currentNode,
+  newNode,
+  splitPercentage,
+  direction = 'row'
+) => {
   if (currentNode.second && typeof currentNode.second !== 'string') {
     return {
       ...currentNode,
@@ -29,8 +34,9 @@ const addRightNode = (currentNode, newNode, splitPercentage, direction = 'row') 
 
 const ThemableMosaicWithoutDragDropContext = props => (
   <RMMosaicWithoutDragDropContext
-    className={`${props.muiTheme
-      .mosaicRootClassName} mosaic-blueprint-theme mosaic-gd-theme`}
+    className={`${
+      props.muiTheme.mosaicRootClassName
+    } mosaic-blueprint-theme mosaic-gd-theme`}
     {...props}
   />
 );
@@ -72,7 +78,8 @@ export default class ThemableEditorMosaic extends Component {
     return (
       <MosaicWithoutDragDropContext
         renderTile={(editorName, path) =>
-          React.cloneElement(editors[editorName], { path })}
+          React.cloneElement(editors[editorName], { path })
+        }
         value={this.state.mosaicNode}
         onChange={this._onChange}
       />

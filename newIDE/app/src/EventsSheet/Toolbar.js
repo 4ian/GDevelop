@@ -72,7 +72,8 @@ export class Toolbar extends PureComponent {
                 label: metadata.fullName,
                 click: () => this.props.onAddEvent(metadata.type),
               };
-            })}
+            })
+          }
         />
         <ToolbarSeparator />
         <ToolbarIcon

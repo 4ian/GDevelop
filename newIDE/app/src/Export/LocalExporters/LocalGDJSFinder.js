@@ -9,16 +9,16 @@ const process = optionalRequire('process');
 var isDarwin = process && /^darwin/.test(process.platform);
 
 const tryPath = (
-  path/*: string*/,
-  onExists/*: string => void*/,
-  onNoAccess/*: Function*/
+  path /*: string*/,
+  onExists /*: string => void*/,
+  onNoAccess /*: Function*/
 ) =>
   fs.access(path, fs.constants.R_OK, err => {
     if (!err) onExists(path);
     else onNoAccess();
   });
 
-const findGDJS = (cb/*: (?string) => void*/) => {
+const findGDJS = (cb /*: (?string) => void*/) => {
   if (!path || !process || !fs) return '';
 
   const appPath = app ? app.getAppPath() : process.cwd();
@@ -49,5 +49,5 @@ const findGDJS = (cb/*: (?string) => void*/) => {
 };
 
 module.exports = {
-  findGDJS
-}
+  findGDJS,
+};

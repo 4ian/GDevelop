@@ -93,16 +93,18 @@ export default ({ build, onDownload }: Props) => {
   ) : build.status === 'complete' ? (
     <React.Fragment>
       <Line expand>
-        {buttons.filter(button => !!build[button.key]).map((button, index) => (
-          <React.Fragment key={button.key}>
-            {index !== 0 && <Spacer />}
-            <RaisedButton
-              label={button.displayName}
-              primary
-              onClick={() => onDownload(button.key)}
-            />
-          </React.Fragment>
-        ))}
+        {buttons
+          .filter(button => !!build[button.key])
+          .map((button, index) => (
+            <React.Fragment key={button.key}>
+              {index !== 0 && <Spacer />}
+              <RaisedButton
+                label={button.displayName}
+                primary
+                onClick={() => onDownload(button.key)}
+              />
+            </React.Fragment>
+          ))}
         <FlatButton label="See logs" onClick={() => onDownload('logsKey')} />
       </Line>
       <Line expand>{config && config.completeDescription}</Line>

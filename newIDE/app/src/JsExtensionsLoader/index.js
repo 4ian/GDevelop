@@ -26,9 +26,9 @@ const t = _ => _; //TODO: Implement support for i18n for extensions.
  */
 const runExtensionSanityTests = (
   gd,
-  extension/*: gdPlatformExtension*/,
-  jsExtensionModule/*: JsExtensionModule*/
-)/*: ExtensionLoadingResult*/ => {
+  extension /*: gdPlatformExtension*/,
+  jsExtensionModule /*: JsExtensionModule*/
+) => /*: ExtensionLoadingResult*/ {
   if (!jsExtensionModule.runExtensionSanityTests) {
     return {
       error: true,
@@ -58,9 +58,9 @@ const runExtensionSanityTests = (
  */
 const loadExtension = (
   gd,
-  platform/*: gdPlatform*/,
-  jsExtensionModule/*: JsExtensionModule*/
-)/*: ExtensionLoadingResult*/ => {
+  platform /*: gdPlatform*/,
+  jsExtensionModule /*: JsExtensionModule*/
+) => /*: ExtensionLoadingResult*/ {
   if (!jsExtensionModule.createExtension) {
     return {
       message:
@@ -88,7 +88,11 @@ const loadExtension = (
   }
 
   try {
-    const testsResult = runExtensionSanityTests(gd, extension, jsExtensionModule);
+    const testsResult = runExtensionSanityTests(
+      gd,
+      extension,
+      jsExtensionModule
+    );
     if (testsResult.error) {
       extension.delete();
       return testsResult;
@@ -114,4 +118,4 @@ const loadExtension = (
 module.exports = {
   runExtensionSanityTests,
   loadExtension,
-}
+};

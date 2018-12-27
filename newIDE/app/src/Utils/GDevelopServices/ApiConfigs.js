@@ -26,8 +26,8 @@ export const GDevelopGamesPreview = {
     secretAccessKey: gdevelopGamesPreviewOptions.secretAccessKey,
     region: gdevelopGamesPreviewOptions.region,
     correctClockSkew: true,
-  })
-}
+  }),
+};
 
 if (
   !gdevelopGamesPreviewOptions.accessKeyId ||
@@ -42,13 +42,13 @@ if (
 }
 
 export const GDevelopFirebaseConfig = {
-  apiKey: "AIzaSyAnX9QMacrIl3yo4zkVFEVhDppGVDDewBc",
-  authDomain: "gdevelop-services.firebaseapp.com",
-  databaseURL: "https://gdevelop-services.firebaseio.com",
-  projectId: "gdevelop-services",
-  storageBucket: "gdevelop-services.appspot.com",
-  messagingSenderId: "44882707384"
-};;
+  apiKey: 'AIzaSyAnX9QMacrIl3yo4zkVFEVhDppGVDDewBc',
+  authDomain: 'gdevelop-services.firebaseapp.com',
+  databaseURL: 'https://gdevelop-services.firebaseio.com',
+  projectId: 'gdevelop-services',
+  storageBucket: 'gdevelop-services.appspot.com',
+  messagingSenderId: '44882707384',
+};
 
 export const GDevelopUsageApi = {
   baseUrl: isDev

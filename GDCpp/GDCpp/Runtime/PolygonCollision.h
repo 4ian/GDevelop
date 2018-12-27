@@ -35,11 +35,18 @@ struct RaycastResult {
  * http://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection and
  * http://stackoverflow.com/questions/5742329/problem-with-collision-response-sat
  *
+ * \param p1 The first polygon
+ * \param p2 The second polygon
+ * \param ignoreTouchingEdges If true, then edges that are touching each other,
+ * without the polygons actually overlapping, won't be considered in collision.
+ *
  * \return true if polygons are overlapping
  *
  * \ingroup GameEngine
  */
-CollisionResult GD_API PolygonCollisionTest(Polygon2d& p1, Polygon2d& p2);
+CollisionResult GD_API PolygonCollisionTest(Polygon2d& p1,
+                                            Polygon2d& p2,
+                                            bool ignoreTouchingEdges = false);
 
 /**
  * Do a raycast test.

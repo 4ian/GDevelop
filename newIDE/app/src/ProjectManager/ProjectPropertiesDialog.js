@@ -27,14 +27,12 @@ type State = {|
   packageName: string,
   orientation: string,
   adMobAppId: string,
+  scaleMode: 'linear' | 'nearest',
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
 |};
 
-class ProjectPropertiesDialog extends React.Component<
-  Props,
-  State
-> {
+class ProjectPropertiesDialog extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = this._loadFrom(props.project);
@@ -52,6 +50,7 @@ class ProjectPropertiesDialog extends React.Component<
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
       adMobAppId: project.getAdMobAppId(),
+      scaleMode: project.getScaleMode(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
     };
@@ -77,6 +76,7 @@ class ProjectPropertiesDialog extends React.Component<
       packageName,
       orientation,
       adMobAppId,
+      scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
     } = this.state;
@@ -88,6 +88,7 @@ class ProjectPropertiesDialog extends React.Component<
     project.setPackageName(packageName);
     project.setOrientation(orientation);
     project.setAdMobAppId(adMobAppId);
+    project.setScaleMode(scaleMode);
     project.setSizeOnStartupMode(sizeOnStartupMode);
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
 
@@ -119,6 +120,7 @@ class ProjectPropertiesDialog extends React.Component<
       packageName,
       orientation,
       adMobAppId,
+      scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
     } = this.state;
@@ -146,7 +148,8 @@ class ProjectPropertiesDialog extends React.Component<
             onChange={value =>
               this.setState({
                 windowDefaultWidth: Math.max(0, parseInt(value, 10)),
-              })}
+              })
+            }
           />
           <SemiControlledTextField
             floatingLabelText="Game's window height"
@@ -156,7 +159,8 @@ class ProjectPropertiesDialog extends React.Component<
             onChange={value =>
               this.setState({
                 windowDefaultHeight: Math.max(0, parseInt(value, 10)),
-              })}
+              })
+            }
           />
           <SemiControlledTextField
             floatingLabelText="Author name"
@@ -194,11 +198,28 @@ class ProjectPropertiesDialog extends React.Component<
           </SelectField>
           <SelectField
             fullWidth
+            floatingLabelText={'Scale mode (also called "Sampling")'}
+            floatingLabelFixed
+            value={scaleMode}
+            onChange={(e, i, value) => this.setState({ scaleMode: value })}
+          >
+            <MenuItem
+              value="linear"
+              primaryText="Linear (antialiased rendering, good for most games)"
+            />
+            <MenuItem
+              value="nearest"
+              primaryText="Nearest (no antialiasing, good for pixel perfect games)"
+            />
+          </SelectField>
+          <SelectField
+            fullWidth
             floatingLabelText="Fullscreen/game size mode"
             floatingLabelFixed
             value={sizeOnStartupMode}
             onChange={(e, i, value) =>
-              this.setState({ sizeOnStartupMode: value })}
+              this.setState({ sizeOnStartupMode: value })
+            }
           >
             <MenuItem value="" primaryText="No changes to the game size" />
             <MenuItem
@@ -238,7 +259,8 @@ class ProjectPropertiesDialog extends React.Component<
         </Dialog>
         <SubscriptionChecker
           ref={subscriptionChecker =>
-            (this._subscriptionChecker = subscriptionChecker)}
+            (this._subscriptionChecker = subscriptionChecker)
+          }
           onChangeSubscription={() => {
             this.props.onClose();
             this.props.onChangeSubscription();

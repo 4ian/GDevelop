@@ -31,13 +31,16 @@ double GD_API PickedObjectsCount(
 bool GD_API HitBoxesCollision(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists2,
-    bool conditionInverted) {
-  return TwoObjectListsTest(objectsLists1,
-                            objectsLists2,
-                            conditionInverted,
-                            [](RuntimeObject *obj1, RuntimeObject *obj2) {
-                              return obj1->IsCollidingWith(obj2);
-                            });
+    bool conditionInverted,
+    RuntimeScene & /*scene*/,
+    bool ignoreTouchingEdges) {
+  return TwoObjectListsTest(
+      objectsLists1,
+      objectsLists2,
+      conditionInverted,
+      [ignoreTouchingEdges](RuntimeObject *obj1, RuntimeObject *obj2) {
+        return obj1->IsCollidingWith(obj2, ignoreTouchingEdges);
+      });
 }
 
 bool GD_API ObjectsTurnedToward(

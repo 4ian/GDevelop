@@ -30,6 +30,10 @@ class ElectronEventsBridge extends Component {
       event => this.editor && this.editor.openCreateDialog()
     );
     ipcRenderer.on(
+      'main-menu-open-project-manager',
+      event => this.editor && this.editor.openProjectManager()
+    );
+    ipcRenderer.on(
       'main-menu-open-start-page',
       event => this.editor && this.editor.openStartPage()
     );

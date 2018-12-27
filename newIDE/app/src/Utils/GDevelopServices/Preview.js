@@ -22,4 +22,4 @@ export const uploadObject = (params: UploadedObject): Promise<any> => {
 
 export const getBaseUrl = () => {
   return GDevelopGamesPreview.options.destinationBucketBaseUrl;
-}
+};

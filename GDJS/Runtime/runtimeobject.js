@@ -1039,9 +1039,10 @@ gdjs.RuntimeObject.prototype.getTimerElapsedTimeInSeconds = function(timerName) 
 /**
  * Separate the object from others objects, using their hitboxes.
  * @param objects Objects
+ * @param {boolean | undefined} ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
  * @return true if the object was moved
  */
-gdjs.RuntimeObject.prototype.separateFromObjects = function(objects) {
+gdjs.RuntimeObject.prototype.separateFromObjects = function(objects, ignoreTouchingEdges) {
    var moved = false;
    var xMove = 0; var yMove = 0;
    var hitBoxes = this.getHitBoxes();
@@ -1053,7 +1054,7 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objects) {
 
            for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
                for(var l = 0, lenl = otherHitBoxes.length;l<lenl;++l) {
-                   var result = gdjs.Polygon.collisionTest(hitBoxes[k], otherHitBoxes[l]);
+                   var result = gdjs.Polygon.collisionTest(hitBoxes[k], otherHitBoxes[l], ignoreTouchingEdges);
                    if ( result.collision ) {
                        xMove += result.move_axis[0];
                        yMove += result.move_axis[1];
@@ -1072,9 +1073,10 @@ gdjs.RuntimeObject.prototype.separateFromObjects = function(objects) {
 /**
  * Separate the object from others objects, using their hitboxes.
  * @param objectsLists Tables of objects
+ * @param {boolean | undefined} ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
  * @return true if the object was moved
  */
-gdjs.RuntimeObject.prototype.separateFromObjectsList = function(objectsLists) {
+gdjs.RuntimeObject.prototype.separateFromObjectsList = function(objectsLists, ignoreTouchingEdges) {
     var moved = false;
     var xMove = 0; var yMove = 0;
     var hitBoxes = this.getHitBoxes();
@@ -1090,7 +1092,7 @@ gdjs.RuntimeObject.prototype.separateFromObjectsList = function(objectsLists) {
 
                     for(var k = 0, lenk = hitBoxes.length;k<lenk;++k) {
                         for(var l = 0, lenl = otherHitBoxes.length;l<lenl;++l) {
-                            var result = gdjs.Polygon.collisionTest(hitBoxes[k], otherHitBoxes[l]);
+                            var result = gdjs.Polygon.collisionTest(hitBoxes[k], otherHitBoxes[l], ignoreTouchingEdges);
                             if ( result.collision ) {
                                 xMove += result.move_axis[0];
                                 yMove += result.move_axis[1];
@@ -1255,11 +1257,12 @@ gdjs.RuntimeObject.prototype.separateObjectsWithForces = function(objectsLists, 
 /**
  * Return true if the hitboxes of two objects are overlapping
  * @static
- * @param obj1 The first runtimeObject
- * @param obj2 The second runtimeObject
+ * @param {gdjs.RuntimeObject} obj1 The first runtimeObject
+ * @param {gdjs.RuntimeObject} obj2 The second runtimeObject
+ * @param {boolean | undefined} ignoreTouchingEdges If true, then edges that are touching each other, without the hitbox polygons actually overlapping, won't be considered in collision.
+ * @return {boolean} true if obj1 and obj2 are in collision
  */
-gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
-
+gdjs.RuntimeObject.collisionTest = function(obj1, obj2, ignoreTouchingEdges) {
     //First check if bounding circle are too far.
     var o1w = obj1.getWidth();
     var o1h = obj1.getHeight();
@@ -1279,7 +1282,7 @@ gdjs.RuntimeObject.collisionTest = function(obj1, obj2) {
     var hitBoxes2 = obj2.getHitBoxes();
     for(var k = 0, lenBoxes1 = hitBoxes1.length;k<lenBoxes1;++k) {
         for(var l = 0, lenBoxes2 = hitBoxes2.length;l<lenBoxes2;++l) {
-            if ( gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l]).collision ) {
+            if ( gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l], ignoreTouchingEdges).collision) {
                 return true;
             }
         }

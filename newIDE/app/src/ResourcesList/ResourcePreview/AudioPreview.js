@@ -22,6 +22,7 @@ type Props = {|
   resourcesLoader: typeof ResourcesLoader,
   children?: any,
   style?: Object,
+  resourcePath?: string,
 |};
 
 /**

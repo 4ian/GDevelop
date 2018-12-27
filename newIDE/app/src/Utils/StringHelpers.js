@@ -6,4 +6,4 @@ export const shortenString = (str: string, maxLength: number) => {
 
 export const makeNonBreakable = (str: string) => {
   return str.replace(/\s/g, '\xa0'); // Non-breakable space is char 0xa0 (160 dec)
-}
+};

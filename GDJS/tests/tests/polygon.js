@@ -15,4 +15,34 @@ describe('gdjs.Polygon', function() {
 		gdjs.Polygon.project([1/Math.sqrt(2), 1/Math.sqrt(2)], rect, res)
 		expect(res).to.eql([-25.45584412271571, 25.45584412271571]);
 	});
+	it('can check for collisions, with touching edges', function(){
+    	var rect1 = gdjs.Polygon.createRectangle(10, 20);
+    	var rect2 = gdjs.Polygon.createRectangle(10, 20);
+		rect2.move(10, 0);
+
+		let result = null;
+		result = gdjs.Polygon.collisionTest(rect1, rect2, /*ignoreTouchingEdges=*/false);
+		expect(result.collision).to.eql(true);
+		expect(result.move_axis).to.eql([0, 0]);
+
+		rect2.move(-2, 0);
+		result = gdjs.Polygon.collisionTest(rect1, rect2, /*ignoreTouchingEdges=*/false);
+		expect(result.collision).to.eql(true);
+		expect(result.move_axis).to.eql([-2, 0]);
+	});
+	it('can check for collisions, with ignored touching edges', function(){
+		var rect1 = gdjs.Polygon.createRectangle(10, 20);
+		var rect2 = gdjs.Polygon.createRectangle(10, 20);
+		rect2.move(10, 0);
+
+		let result = null;
+		result = gdjs.Polygon.collisionTest(rect1, rect2, /*ignoreTouchingEdges=*/true);
+		expect(result.collision).to.eql(false);
+		expect(result.move_axis).to.eql([0, 0]);
+
+		rect2.move(-2, 0);
+		result = gdjs.Polygon.collisionTest(rect1, rect2, /*ignoreTouchingEdges=*/true);
+		expect(result.collision).to.eql(true);
+		expect(result.move_axis).to.eql([-2, 0]);
+	});
 });

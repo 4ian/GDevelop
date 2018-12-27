@@ -84,24 +84,19 @@ export default class SpriteSelector extends React.Component<Props, void> {
               );
             })}
           </SelectField>
-          {hasValidAnimation &&
-            animation.getDirectionsCount() > 1 && (
-              <SelectField
-                floatingLabelText="Direction"
-                value={this.props.directionIndex}
-                onChange={(e, i, value) => chooseDirection(value)}
-              >
-                {mapFor(0, animation.getDirectionsCount(), i => {
-                  return (
-                    <MenuItem
-                      value={i}
-                      key={i}
-                      primaryText={`Direction #${i}`}
-                    />
-                  );
-                })}
-              </SelectField>
-            )}
+          {hasValidAnimation && animation.getDirectionsCount() > 1 && (
+            <SelectField
+              floatingLabelText="Direction"
+              value={this.props.directionIndex}
+              onChange={(e, i, value) => chooseDirection(value)}
+            >
+              {mapFor(0, animation.getDirectionsCount(), i => {
+                return (
+                  <MenuItem value={i} key={i} primaryText={`Direction #${i}`} />
+                );
+              })}
+            </SelectField>
+          )}
           {hasValidDirection && (
             <SelectField
               floatingLabelText="Frame"

@@ -265,36 +265,35 @@ export default class ExpressionField extends React.Component<Props, State> {
             onClick={this._openExpressionPopover}
           />
         )}
-        {this.state.parametersDialogOpen &&
-          this.state.selectedExpressionInfo && (
-            <ExpressionParametersEditorDialog
-              open={true}
-              project={project}
-              layout={layout}
-              globalObjectsContainer={globalObjectsContainer}
-              objectsContainer={objectsContainer}
-              expressionMetadata={this.state.selectedExpressionInfo.metadata}
-              onDone={parameterValues => {
-                if (!this.state.selectedExpressionInfo) return;
+        {this.state.parametersDialogOpen && this.state.selectedExpressionInfo && (
+          <ExpressionParametersEditorDialog
+            open={true}
+            project={project}
+            layout={layout}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            expressionMetadata={this.state.selectedExpressionInfo.metadata}
+            onDone={parameterValues => {
+              if (!this.state.selectedExpressionInfo) return;
 
-                this.insertExpression(
-                  this.state.selectedExpressionInfo,
-                  parameterValues
-                );
-                this.setState({
-                  parametersDialogOpen: false,
-                  selectedExpressionInfo: null,
-                });
-              }}
-              onRequestClose={() => {
-                this.setState({
-                  parametersDialogOpen: false,
-                  selectedExpressionInfo: null,
-                });
-              }}
-              parameterRenderingService={parameterRenderingService}
-            />
-          )}
+              this.insertExpression(
+                this.state.selectedExpressionInfo,
+                parameterValues
+              );
+              this.setState({
+                parametersDialogOpen: false,
+                selectedExpressionInfo: null,
+              });
+            }}
+            onRequestClose={() => {
+              this.setState({
+                parametersDialogOpen: false,
+                selectedExpressionInfo: null,
+              });
+            }}
+            parameterRenderingService={parameterRenderingService}
+          />
+        )}
       </div>
     );
   }

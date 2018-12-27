@@ -844,7 +844,8 @@ export default class SceneEditor extends React.Component<Props, State> {
             editInstanceVariables={this.editInstanceVariables}
             onEditObjectByName={this.editObjectByName}
             ref={propertiesEditor =>
-              (this._propertiesEditor = propertiesEditor)}
+              (this._propertiesEditor = propertiesEditor)
+            }
           />
         </MosaicWindow>
       ),

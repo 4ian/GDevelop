@@ -90,7 +90,8 @@ export default class ExamplesSearchbar extends Component<Props> {
               onClick={() =>
                 onExtensionNameChosen(
                   chosenExtensionName === value ? '' : value
-                )}
+                )
+              }
             >
               {text}
             </Chip>

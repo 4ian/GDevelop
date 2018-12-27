@@ -39,11 +39,11 @@ export default class ViewPosition {
     var viewRotation = 0;
     var tmp = x;
     x =
-      Math.cos(viewRotation / 180 * Math.PI) * x -
-      Math.sin(viewRotation / 180 * Math.PI) * y;
+      Math.cos((viewRotation / 180) * Math.PI) * x -
+      Math.sin((viewRotation / 180) * Math.PI) * y;
     y =
-      Math.sin(viewRotation / 180 * Math.PI) * tmp +
-      Math.cos(viewRotation / 180 * Math.PI) * y;
+      Math.sin((viewRotation / 180) * Math.PI) * tmp +
+      Math.cos((viewRotation / 180) * Math.PI) * y;
 
     return [x + this.viewX, y + this.viewY];
   };
@@ -59,11 +59,11 @@ export default class ViewPosition {
     var viewRotation = -0;
     var tmp = x;
     x =
-      Math.cos(viewRotation / 180 * Math.PI) * x -
-      Math.sin(viewRotation / 180 * Math.PI) * y;
+      Math.cos((viewRotation / 180) * Math.PI) * x -
+      Math.sin((viewRotation / 180) * Math.PI) * y;
     y =
-      Math.sin(viewRotation / 180 * Math.PI) * tmp +
-      Math.cos(viewRotation / 180 * Math.PI) * y;
+      Math.sin((viewRotation / 180) * Math.PI) * tmp +
+      Math.cos((viewRotation / 180) * Math.PI) * y;
 
     x *= Math.abs(this._pixiContainer.scale.x);
     y *= Math.abs(this._pixiContainer.scale.y);

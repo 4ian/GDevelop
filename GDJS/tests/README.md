@@ -1,20 +1,26 @@
-These are the tests for the GDevelop HTML5 game engine.
+These are the tests for the GDevelop JavaScript game engine.
 
 ## Launching tests
 
 Make sure you have [Node.js](https://nodejs.org/) installed. Update dependencies:
 
-    npm install
+```bash
+cd GDJS/tests
+npm install
+```
 
 Then launch tests:
 
-    npm test
+```bash
+npm test #This will use Chrome Headless
+npm test:firefox #To run tests using Firefox
+```
 
 ## About the tests
 
 ### Unit tests
 
-Tests are launched using PhantomJS. You need Firefox installed as PhantomJS launch an instance of Firefox and run tests in it.
+Tests are launched using Chrome. You need Chrome installed to run them. You can change the browser by modifying the package.json "test" command and install the appropriate karma package.
 
 Tests are located in **tests** folder for the game engine, or directly in the folder of the tested extensions. 
 

@@ -69,6 +69,7 @@ script:
   - cd newIDE/app
   - npm test
   - npm run flow
+  - npm run check-format
   - cd ../..
 #GDJS game engine tests, disabled on Travis CI because ChromeHeadless can't be started.
 #See them running on Semaphore-CI instead: https://semaphoreci.com/4ian/gd

@@ -16,7 +16,9 @@ import ObjectVariableField from './ParameterFields/ObjectVariableField';
 import LayerField from './ParameterFields/LayerField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
 import ColorExpressionField from './ParameterFields/ColorExpressionField';
-import ForceMultiplierField, {renderForceMultiplierString} from './ParameterFields/ForceMultiplierField';
+import ForceMultiplierField, {
+  renderForceMultiplierString,
+} from './ParameterFields/ForceMultiplierField';
 const gd = global.gd;
 
 const components = {
@@ -45,19 +47,18 @@ const components = {
 };
 
 const stringRenderers = {
-  forceMultiplier: renderForceMultiplierString
-}
+  forceMultiplier: renderForceMultiplierString,
+};
 
 export default {
   components,
-  getParameterComponent: (type: string) =>  {
+  getParameterComponent: (type: string) => {
     const fieldType = gd.ParameterMetadata.isObject(type) ? 'object' : type;
 
-    if (components.hasOwnProperty(fieldType))
-      return components[fieldType];
+    if (components.hasOwnProperty(fieldType)) return components[fieldType];
     else return components.default;
   },
-  renderParameterString: (type: string, value: string) =>  {
+  renderParameterString: (type: string, value: string) => {
     return stringRenderers[type] ? stringRenderers[type](value) : value;
   },
 };

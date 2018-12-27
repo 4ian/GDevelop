@@ -23,6 +23,10 @@ const jsExtensions = [
     name: 'DeviceVibration',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/DeviceVibration/JsExtension.js'),
   },
+  {
+    name: 'Physics2',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Physics2Behavior/JsExtension.js'),
+  },
 ];
 
 /**
@@ -31,7 +35,9 @@ const jsExtensions = [
  * for the web-app where everything must be bundled.
  */
 export default class BrowserJsExtensionsLoader implements JsExtensionsLoader {
-  loadAllExtensions(): Promise<Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>> {
+  loadAllExtensions(): Promise<
+    Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
+  > {
     return Promise.resolve(
       jsExtensions.map(({ name, extensionModule }) => ({
         extensionModulePath: 'internal-extension://' + name,

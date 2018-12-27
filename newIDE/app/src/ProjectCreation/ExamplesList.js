@@ -157,7 +157,8 @@ export default class LocalExamples extends React.Component<Props, State> {
                       secondaryText={exampleInformation.description}
                       secondaryTextLines={2}
                       onClick={() =>
-                        this.props.onCreateFromExample(exampleName)}
+                        this.props.onCreateFromExample(exampleName)
+                      }
                     />
                   );
                 })}

@@ -348,8 +348,8 @@ Object {
   },
   "Text object": Object {
     "Opacity": Object {
-      "Opacity": Object {
-        "displayedName": "Opacity",
+      "Opacity of a Text object": Object {
+        "displayedName": "Opacity of a Text object",
         "fullGroupName": "Text object/Opacity",
         "name": "Opacity",
         "type": "Opacity",

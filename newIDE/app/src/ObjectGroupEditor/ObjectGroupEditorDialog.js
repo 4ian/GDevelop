@@ -39,8 +39,10 @@ export class ObjectGroupEditorDialog extends Component {
           group={group}
           project={this.props.project}
           layout={this.props.layout}
-          onSizeUpdated={() =>
-            this.forceUpdate() /*Force update to ensure dialog is properly positionned*/}
+          onSizeUpdated={
+            () =>
+              this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
+          }
         />
       </Dialog>
     );

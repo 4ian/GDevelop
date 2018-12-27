@@ -27,9 +27,7 @@ const parseColor = (rgbColor: string) => {
   };
 };
 
-export default class ParameterColorField extends Component<
-  ParameterFieldProps
-> {
+export default class ParameterColorField extends Component<ParameterFieldProps> {
   _field: ?GenericExpressionField;
 
   focus() {

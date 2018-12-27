@@ -29,7 +29,9 @@ bool GD_API ObjectsTurnedToward(
 bool GD_API HitBoxesCollision(
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists1,
     std::map<gd::String, std::vector<RuntimeObject *> *> objectsLists2,
-    bool conditionInverted);
+    bool conditionInverted,
+    RuntimeScene &scene,
+    bool ignoreTouchingEdges = false);
 
 /**
  * Only used internally by GD events generated code.

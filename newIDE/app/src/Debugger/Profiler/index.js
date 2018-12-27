@@ -23,21 +23,25 @@ type Props = {|
 
 export default class Profiler extends React.Component<Props, void> {
   render() {
-    const {
-      onStart,
-      onStop,
-      profilerOutput,
-      profilingInProgress,
-    } = this.props;
+    const { onStart, onStop, profilerOutput, profilingInProgress } = this.props;
 
     return (
       <Background>
         <Line alignItems="center" justifyContent="center">
-          {!profilingInProgress && profilerOutput && (<p>Last run collected on {profilerOutput.stats.framesCount} frames.</p>)
-          }
-          {!profilingInProgress && profilerOutput && <RaisedButton label="Restart" onClick={onStart} />}
-          {!profilingInProgress && !profilerOutput && <RaisedButton label="Start profiling" onClick={onStart} />}
-          {profilingInProgress && <RaisedButton label="Stop profiling" onClick={onStop} />}
+          {!profilingInProgress && profilerOutput && (
+            <p>
+              Last run collected on {profilerOutput.stats.framesCount} frames.
+            </p>
+          )}
+          {!profilingInProgress && profilerOutput && (
+            <RaisedButton label="Restart" onClick={onStart} />
+          )}
+          {!profilingInProgress && !profilerOutput && (
+            <RaisedButton label="Start profiling" onClick={onStart} />
+          )}
+          {profilingInProgress && (
+            <RaisedButton label="Stop profiling" onClick={onStop} />
+          )}
         </Line>
         {profilingInProgress && (
           <Line alignItems="center">
@@ -46,7 +50,9 @@ export default class Profiler extends React.Component<Props, void> {
         )}
         <div style={styles.tableContainer}>
           {profilerOutput && (
-            <MeasuresTable profilerMeasures={profilerOutput.framesAverageMeasures} />
+            <MeasuresTable
+              profilerMeasures={profilerOutput.framesAverageMeasures}
+            />
           )}
           {!profilerOutput && (
             <EmptyMessage>

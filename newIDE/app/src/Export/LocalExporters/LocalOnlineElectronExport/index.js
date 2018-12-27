@@ -303,7 +303,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
               label="Linux (AppImage)"
               checked={this.state.targets.indexOf('linuxAppImage') !== -1}
               onCheck={(e, checked) =>
-                this._setTarget('linuxAppImage', checked)}
+                this._setTarget('linuxAppImage', checked)
+              }
             />
             {userProfile.authenticated && (
               <Line justifyContent="center">

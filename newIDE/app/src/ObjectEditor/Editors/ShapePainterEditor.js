@@ -7,7 +7,10 @@ import ColorField from '../../UI/ColorField';
 import { type EditorProps } from './EditorProps.flow';
 const gd = global.gd;
 
-export default class PanelSpriteEditor extends React.Component<EditorProps, void> {
+export default class PanelSpriteEditor extends React.Component<
+  EditorProps,
+  void
+> {
   render() {
     const { object } = this.props;
     const shapePainterObject = gd.asShapePainterObject(object);

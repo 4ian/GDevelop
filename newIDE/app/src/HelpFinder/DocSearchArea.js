@@ -151,11 +151,16 @@ export default class DocSearchArea extends React.Component<Props, State> {
             <p>Examples:</p>
             <Column expand>
               <p>
-                Coins in platformer<br />
-                Export on Android<br />
-                Add a score<br />
-                Move enemies<br />
-                ...<br />
+                Coins in platformer
+                <br />
+                Export on Android
+                <br />
+                Add a score
+                <br />
+                Move enemies
+                <br />
+                ...
+                <br />
               </p>
             </Column>
           </React.Fragment>

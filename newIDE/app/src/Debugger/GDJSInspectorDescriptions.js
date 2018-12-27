@@ -92,8 +92,9 @@ export const getInspectorDescriptions = (
                     return null;
 
                   return {
-                    label: `${objectName} (${instances.items[objectName]
-                      .length})`,
+                    label: `${objectName} (${
+                      instances.items[objectName].length
+                    })`,
                     key: ['items', objectName],
                     renderInspector: () => null,
                     getSubInspectors: instancesList =>

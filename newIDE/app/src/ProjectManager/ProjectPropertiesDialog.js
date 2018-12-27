@@ -9,6 +9,7 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SubscriptionChecker from '../Profile/SubscriptionChecker';
 import { translate, type TranslatorProps } from 'react-i18next';
 import { getErrors, displayProjectErrorsBox } from './ProjectErrorsChecker';
+import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 
 type Props = TranslatorProps & {|
   project: gdProject,
@@ -212,6 +213,16 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               primaryText="Nearest (no antialiasing, good for pixel perfect games)"
             />
           </SelectField>
+          {scaleMode === 'nearest' && (
+            <DismissableAlertMessage
+              identifier="use-non-smoothed-textures"
+              kind="info"
+            >
+              To obtain the best pixel-perfect effect possible, go in the
+              resources editor and disable the Smoothing for all images of your
+              game.
+            </DismissableAlertMessage>
+          )}
           <SelectField
             fullWidth
             floatingLabelText="Fullscreen/game size mode"

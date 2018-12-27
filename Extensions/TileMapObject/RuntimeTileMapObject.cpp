@@ -290,7 +290,7 @@ bool GD_EXTENSION_API SingleTileCollision(std::map<gd::String, std::vector<Runti
 
         for(std::vector<Polygon2d>::iterator hitboxIt = objectHitboxes.begin(); hitboxIt != objectHitboxes.end(); ++hitboxIt)
         {
-            if(PolygonCollisionTest(tileHitbox, *hitboxIt).collision)
+            if(PolygonCollisionTest(tileHitbox, *hitboxIt, false).collision)
             {
                 return true;
             }

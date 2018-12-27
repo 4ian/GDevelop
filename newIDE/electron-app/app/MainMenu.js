@@ -96,6 +96,13 @@ const buildMainMenuFor = window => {
     label: 'View',
     submenu: [
       {
+        label: 'Show Project Manager',
+        accelerator: 'CommandOrControl+Alt+P',
+        click() {
+          window.webContents.send('main-menu-open-project-manager');
+        },
+      },
+      {
         label: 'Show Start Page',
         click() {
           window.webContents.send('main-menu-open-start-page');

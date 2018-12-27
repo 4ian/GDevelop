@@ -263,10 +263,17 @@ class GD_API RuntimeObject {
 
   /**
    * \brief Check collision between two objects using their hitboxes.
+   *
    * \note If bounding circles of objects are not colliding, hit boxes are not
-   * tested. \param other The other object for collision to be tested against.
+   * tested.
+   *
+   * \param other The other object for collision to be tested against.
+   *
+   * \param ignoreTouchingEdges If true, then edges that are touching each
+   * other, without the hitbox polygons actually overlapping, won't be
+   * considered in collision.
    */
-  bool IsCollidingWith(RuntimeObject* other);
+  bool IsCollidingWith(RuntimeObject* other, bool ignoreTouchingEdges = false);
 
   /**
    * \brief Check if a point is inside the object collision hitboxes.
@@ -291,11 +298,19 @@ class GD_API RuntimeObject {
   /**
    * \brief Check collision with each object of the list using their hitboxes,
    * and move the object according to the sum of the move vector returned by
-   * each collision test. \note Bounding circles of objects are *not* checked.
+   * each collision test.
+   *
+   * \note Bounding circles of objects are *not* checked.
+   *
    * \param objects The vector of objects to be used.
+   * \param ignoreTouchingEdges If true, then edges that are touching each
+   * other, without the hitbox polygons actually overlapping, won't be
+   * considered in collision.
+   *
    * \return true if the object was moved.
    */
-  bool SeparateFromObjects(const std::vector<RuntimeObject*>& objects);
+  bool SeparateFromObjects(const std::vector<RuntimeObject*>& objects,
+                           bool ignoreTouchingEdges = false);
 
   /**
    * \brief Return true if the cursor is on the object
@@ -571,7 +586,8 @@ class GD_API RuntimeObject {
   double GetDistanceWithObject(RuntimeObject* other);
 
   bool SeparateFromObjects(
-      std::map<gd::String, std::vector<RuntimeObject*>*> pickedObjectLists);
+      std::map<gd::String, std::vector<RuntimeObject*>*> pickedObjectLists,
+      bool ignoreTouchingEdges = false);
 
   /** \deprecated
    */

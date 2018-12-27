@@ -26,7 +26,9 @@ This project is released under the MIT License.
 #endif
 
 PlatformerObjectBehavior::PlatformerObjectBehavior()
-    : gravity(1000),
+    : ignoreTouchingEdges(true),
+      roundCoordinates(true),
+      gravity(1000),
       maxFallingSpeed(700),
       acceleration(1500),
       deceleration(1500),
@@ -178,6 +180,7 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene& scene) {
   double oldX = object->GetX();
   if (requestedDeltaX != 0) {
     object->SetX(object->GetX() + requestedDeltaX);
+    bool tryRounding = true;
     // Colliding: Try to push out from the solid.
     // Note that jump thru are never obstacle on X axis.
     while (IsCollidingWith(
@@ -198,7 +201,14 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene& scene) {
         object->SetY(object->GetY() + 1);
       }
 
-      object->SetX(floor(object->GetX()) + (requestedDeltaX > 0 ? -1 : 1));
+      if (tryRounding) {
+        // First try rounding the position as this might be sufficient to get
+        // the object out of the wall.
+        object->SetX(GDRound(object->GetX()));
+        tryRounding = false;
+      } else {
+        object->SetX(GDRound(object->GetX()) + (requestedDeltaX > 0 ? -1 : 1));
+      }
       currentSpeed = 0;  // Collided with a wall
     }
   }
@@ -310,7 +320,8 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene& scene) {
 
   // Follow the floor
   if (isOnFloor) {
-    if (object->IsCollidingWith(floorPlatform->GetObject())) {
+    if (object->IsCollidingWith(floorPlatform->GetObject(),
+                                ignoreTouchingEdges)) {
       // Floor is getting up, as the object is colliding with it.
       double oldY = object->GetY();
       int step = 0;
@@ -324,7 +335,8 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene& scene) {
           object->SetY(object->GetY() -
                        (std::abs(requestedDeltaX * slopeClimbingFactor) -
                         (double)step));  // Try to add the decimal part.
-          if (object->IsCollidingWith(floorPlatform->GetObject()))
+          if (object->IsCollidingWith(floorPlatform->GetObject(),
+                                      ignoreTouchingEdges))
             stillInFloor = true;  // Too steep.
 
           break;
@@ -333,7 +345,8 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene& scene) {
         // Try to get out of the floor.
         object->SetY(object->GetY() - 1);
         step++;
-      } while (object->IsCollidingWith(floorPlatform->GetObject()));
+      } while (object->IsCollidingWith(floorPlatform->GetObject(),
+                                       ignoreTouchingEdges));
 
       if (stillInFloor) {
         object->SetY(oldY);  // Unable to follow the floor ( too steep ): Go
@@ -343,7 +356,9 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene& scene) {
     } else {
       // Floor is flat or get down.
       double oldY = object->GetY();
-      object->SetY(object->GetY() + 1);
+      double tentativeStartY = object->GetY() + 1;
+      object->SetY(roundCoordinates ? GDRound(tentativeStartY)
+                                    : tentativeStartY);
       int step = 0;
       bool noMoreOnFloor = false;
       while (!IsCollidingWith(potentialObjects)) {
@@ -408,7 +423,8 @@ void PlatformerObjectBehavior::DoStepPreEvents(RuntimeScene& scene) {
     // In priority, check if the last floor platform is still the floor.
     double oldY = object->GetY();
     object->SetY(object->GetY() + 1);
-    if (isOnFloor && object->IsCollidingWith(floorPlatform->GetObject())) {
+    if (isOnFloor && object->IsCollidingWith(floorPlatform->GetObject(),
+                                             ignoreTouchingEdges)) {
       // Still on the same floor
       floorLastX = floorPlatform->GetObject()->GetX();
       floorLastY = floorPlatform->GetObject()->GetY();
@@ -486,7 +502,7 @@ bool PlatformerObjectBehavior::SeparateFromPlatforms(
     objects.push_back((*it)->GetObject());
   }
 
-  return object->SeparateFromObjects(objects);
+  return object->SeparateFromObjects(objects, ignoreTouchingEdges);
 }
 
 std::set<PlatformBehavior*> PlatformerObjectBehavior::GetPlatformsCollidingWith(
@@ -501,7 +517,8 @@ std::set<PlatformBehavior*> PlatformerObjectBehavior::GetPlatformsCollidingWith(
     if (exceptTheseOnes.find(*it) != exceptTheseOnes.end()) continue;
     if ((*it)->GetPlatformType() == PlatformBehavior::Ladder) continue;
 
-    if (object->IsCollidingWith((*it)->GetObject())) result.insert(*it);
+    if (object->IsCollidingWith((*it)->GetObject(), ignoreTouchingEdges))
+      result.insert(*it);
   }
 
   return result;
@@ -520,7 +537,8 @@ bool PlatformerObjectBehavior::IsCollidingWith(
         (*it)->GetPlatformType() == PlatformBehavior::Jumpthru)
       continue;
 
-    if (object->IsCollidingWith((*it)->GetObject())) return true;
+    if (object->IsCollidingWith((*it)->GetObject(), ignoreTouchingEdges))
+      return true;
   }
 
   return false;
@@ -535,7 +553,8 @@ bool PlatformerObjectBehavior::IsCollidingWith(
     if (exceptTheseOnes.find(*it) != exceptTheseOnes.end()) continue;
     if ((*it)->GetPlatformType() == PlatformBehavior::Ladder) continue;
 
-    if (object->IsCollidingWith((*it)->GetObject())) return true;
+    if (object->IsCollidingWith((*it)->GetObject(), ignoreTouchingEdges))
+      return true;
   }
 
   return false;
@@ -549,7 +568,8 @@ std::set<PlatformBehavior*> PlatformerObjectBehavior::GetJumpthruCollidingWith(
        ++it) {
     if ((*it)->GetPlatformType() != PlatformBehavior::Jumpthru) continue;
 
-    if (object->IsCollidingWith((*it)->GetObject())) result.insert(*it);
+    if (object->IsCollidingWith((*it)->GetObject(), ignoreTouchingEdges))
+      result.insert(*it);
   }
 
   return result;
@@ -561,7 +581,8 @@ bool PlatformerObjectBehavior::IsOverlappingLadder(
        it != candidates.end();
        ++it) {
     if ((*it)->GetPlatformType() != PlatformBehavior::Ladder) continue;
-    if (object->IsCollidingWith((*it)->GetObject())) return true;
+    if (object->IsCollidingWith((*it)->GetObject(), ignoreTouchingEdges))
+      return true;
   }
 
   return false;
@@ -630,6 +651,7 @@ void PlatformerObjectBehavior::SimulateControl(const gd::String& input) {
 
 void PlatformerObjectBehavior::UnserializeFrom(
     const gd::SerializerElement& element) {
+  roundCoordinates = element.GetBoolAttribute("roundCoordinates", false);
   gravity = element.GetDoubleAttribute("gravity");
   maxFallingSpeed = element.GetDoubleAttribute("maxFallingSpeed");
   acceleration = element.GetDoubleAttribute("acceleration");
@@ -646,6 +668,7 @@ void PlatformerObjectBehavior::UnserializeFrom(
 #if defined(GD_IDE_ONLY)
 void PlatformerObjectBehavior::SerializeTo(
     gd::SerializerElement& element) const {
+  element.SetAttribute("roundCoordinates", roundCoordinates);
   element.SetAttribute("gravity", gravity);
   element.SetAttribute("maxFallingSpeed", maxFallingSpeed);
   element.SetAttribute("acceleration", acceleration);
@@ -681,6 +704,9 @@ PlatformerObjectBehavior::GetProperties(gd::Project& project) const {
       gd::String::From(yGrabOffset));
   properties[_("Grab tolerance on X axis")].SetValue(
       gd::String::From(xGrabTolerance));
+  properties[_("Round coordinates")]
+      .SetValue(roundCoordinates ? "true" : "false")
+      .SetType("Boolean");
 
   return properties;
 }
@@ -688,8 +714,9 @@ PlatformerObjectBehavior::GetProperties(gd::Project& project) const {
 bool PlatformerObjectBehavior::UpdateProperty(const gd::String& name,
                                               const gd::String& value,
                                               gd::Project& project) {
-  if (name == _("Default controls"))
-    ignoreDefaultControls = (value == "0");
+  if (name == _("Default controls")) ignoreDefaultControls = (value == "0");
+  if (name == _("Round coordinates"))
+    roundCoordinates = (value == "1");
   else if (name == _("Can grab platform ledges"))
     canGrabPlatforms = (value == "1");
   else if (name == _("Grab offset on Y axis"))

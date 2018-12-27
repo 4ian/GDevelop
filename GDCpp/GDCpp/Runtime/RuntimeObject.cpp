@@ -283,7 +283,8 @@ double RuntimeObject::GetDistanceWithObject(RuntimeObject *object) {
 }
 
 bool RuntimeObject::SeparateFromObjects(
-    std::map<gd::String, std::vector<RuntimeObject *> *> pickedObjectLists) {
+    std::map<gd::String, std::vector<RuntimeObject *> *> pickedObjectLists,
+    bool ignoreTouchingEdges) {
   vector<RuntimeObject *> objects;
   for (std::map<gd::String, std::vector<RuntimeObject *> *>::const_iterator it =
            pickedObjectLists.begin();
@@ -296,11 +297,11 @@ bool RuntimeObject::SeparateFromObjects(
     }
   }
 
-  return SeparateFromObjects(objects);
+  return SeparateFromObjects(objects, ignoreTouchingEdges);
 }
 
 bool RuntimeObject::SeparateFromObjects(
-    const std::vector<RuntimeObject *> &objects) {
+    const std::vector<RuntimeObject *> &objects, bool ignoreTouchingEdges) {
   bool moved = false;
   sf::Vector2f moveVector;
   for (std::size_t j = 0; j < objects.size(); ++j) {
@@ -309,8 +310,8 @@ bool RuntimeObject::SeparateFromObjects(
       vector<Polygon2d> otherHitBoxes = objects[j]->GetHitBoxes(GetAABB());
       for (std::size_t k = 0; k < hitBoxes.size(); ++k) {
         for (std::size_t l = 0; l < otherHitBoxes.size(); ++l) {
-          CollisionResult result =
-              PolygonCollisionTest(hitBoxes[k], otherHitBoxes[l]);
+          CollisionResult result = PolygonCollisionTest(
+              hitBoxes[k], otherHitBoxes[l], ignoreTouchingEdges);
           if (result.collision) {
             moveVector += result.move_axis;
             moved = true;
@@ -368,7 +369,8 @@ void RuntimeObject::Rotate(float speed, RuntimeScene &scene) {
   SetAngle(GetAngle() + speed * timeDelta);
 }
 
-bool RuntimeObject::IsCollidingWith(RuntimeObject *obj2) {
+bool RuntimeObject::IsCollidingWith(RuntimeObject *obj2,
+                                    bool ignoreTouchingEdges) {
   // First check if bounding circle are too far.
   RuntimeObject *obj1 = this;
   float o1w = obj1->GetWidth();
@@ -397,7 +399,9 @@ bool RuntimeObject::IsCollidingWith(RuntimeObject *obj2) {
   vector<Polygon2d> obj2Hitboxes = obj2->GetHitBoxes(objRect);
   for (std::size_t k = 0; k < objHitboxes.size(); ++k) {
     for (std::size_t l = 0; l < obj2Hitboxes.size(); ++l) {
-      if (PolygonCollisionTest(objHitboxes[k], obj2Hitboxes[l]).collision)
+      if (PolygonCollisionTest(
+              objHitboxes[k], obj2Hitboxes[l], ignoreTouchingEdges)
+              .collision)
         return true;
     }
   }

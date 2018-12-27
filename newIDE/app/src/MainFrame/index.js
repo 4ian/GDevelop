@@ -75,6 +75,7 @@ import {
   type UpdateStatus,
 } from './UpdaterTools';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import EmptyMessage from '../UI/EmptyMessage';
 
 const gd = global.gd;
 
@@ -728,6 +729,7 @@ export default class MainFrame extends React.Component<Props, State> {
     this.setState({ editorTabs: tabsWithSceneAndEventsEditors }, () =>
       this.updateToolbar()
     );
+    this.openProjectManager(false);
   };
 
   openExternalEvents = (name: string) => {
@@ -759,6 +761,7 @@ export default class MainFrame extends React.Component<Props, State> {
       },
       () => this.updateToolbar()
     );
+    this.openProjectManager(false);
   };
 
   openExternalLayout = (name: string) => {
@@ -792,6 +795,7 @@ export default class MainFrame extends React.Component<Props, State> {
       },
       () => this.updateToolbar()
     );
+    this.openProjectManager(false);
   };
 
   openEventsFunctionsExtension = (name: string) => {
@@ -821,6 +825,7 @@ export default class MainFrame extends React.Component<Props, State> {
       },
       () => this.updateToolbar()
     );
+    this.openProjectManager(false);
   };
 
   openResources = () => {
@@ -846,6 +851,8 @@ export default class MainFrame extends React.Component<Props, State> {
               }}
               isActive={isActive}
               ref={editorRef}
+              onChooseResource={this._onChooseResource}
+              resourceSources={this.props.resourceSources}
             />
           ),
           key: 'resources',
@@ -1191,7 +1198,10 @@ export default class MainFrame extends React.Component<Props, State> {
                 onCloseProject={this.askToCloseProject}
                 onExportProject={this.openExportDialog}
                 onOpenPreferences={() => this.openPreferences(true)}
-                onOpenResources={() => this.openResources()}
+                onOpenResources={() => {
+                  this.openResources();
+                  this.openProjectManager(false);
+                }}
                 onOpenPlatformSpecificAssets={() =>
                   this.openPlatformSpecificAssets()
                 }
@@ -1202,6 +1212,11 @@ export default class MainFrame extends React.Component<Props, State> {
                 }
                 freezeUpdate={!projectManagerOpen}
               />
+            )}
+            {!currentProject && (
+              <EmptyMessage>
+                To begin, open or create a new project.
+              </EmptyMessage>
             )}
           </Drawer>
           <Toolbar

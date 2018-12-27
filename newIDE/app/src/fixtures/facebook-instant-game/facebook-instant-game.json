@@ -14,6 +14,7 @@
     "orientation": "landscape",
     "packageName": "com.example.gamename",
     "projectFile": "/Users/florianrival/GDevelop projects/My project1153/facebook-instant-game.json",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "version": "1.0.0",

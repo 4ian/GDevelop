@@ -2158,6 +2158,27 @@ module.exports = {
       }
     ]
   },
+  "pixel-perfect-platform-game": {
+    "description": "Very simple example showing the settings to have a pixel-perfect platform game (also applicable to other kind of games).",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      }
+    ]
+  },
   "plane-and-clouds": {
     "description": "Show how to randomly generate clouds to create an infinite sky.",
     "usedExtensions": [

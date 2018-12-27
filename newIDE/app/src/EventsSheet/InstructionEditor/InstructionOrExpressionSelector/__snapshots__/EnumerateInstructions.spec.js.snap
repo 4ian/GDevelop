@@ -834,13 +834,6 @@ Object {
         "type": "Sprite",
       },
     },
-    "Collision": Object {
-      "Collision (Pixel perfect)": Object {
-        "displayedName": "Collision (Pixel perfect)",
-        "fullGroupName": "Sprite/Collision",
-        "type": "Collision",
-      },
-    },
     "Direction": Object {
       "Current direction": Object {
         "displayedName": "Current direction",
@@ -2508,11 +2501,6 @@ Array [
     "displayedName": "Speed",
     "fullGroupName": "Common conditions for all objects/Movement",
     "type": "Vitesse",
-  },
-  Object {
-    "displayedName": "Collision (Pixel perfect)",
-    "fullGroupName": "Sprite/Collision",
-    "type": "Collision",
   },
   Object {
     "displayedName": "Animation paused",

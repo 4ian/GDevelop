@@ -75,6 +75,7 @@ import {
   type UpdateStatus,
 } from './UpdaterTools';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import EmptyMessage from '../UI/EmptyMessage';
 
 const gd = global.gd;
 
@@ -1212,6 +1213,7 @@ export default class MainFrame extends React.Component<Props, State> {
                 freezeUpdate={!projectManagerOpen}
               />
             )}
+            {!currentProject && <EmptyMessage>To begin, open or create a new project.</EmptyMessage>}
           </Drawer>
           <Toolbar
             ref={toolbar => (this.toolbar = toolbar)}

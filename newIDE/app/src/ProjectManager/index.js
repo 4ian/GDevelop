@@ -265,6 +265,8 @@ type State = {|
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
+  _searchBar: ?SearchBar;
+
   state = {
     renamedItemKind: null,
     renamedItemName: '',
@@ -279,6 +281,13 @@ export default class ProjectManager extends React.Component<Props, State> {
     // so the prop freezeUpdate allow to ask the component to stop
     // updating, for example when hidden.
     return !nextProps.freezeUpdate;
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    // Typical usage (don't forget to compare props):
+    if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
+      if (this._searchBar) this._searchBar.focus();
+    }
   }
 
   _onEditName = (kind: ?string, name: string) => {
@@ -872,6 +881,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           />
         </List>
         <SearchBar
+          ref={searchBar => this._searchBar = searchBar}
           value={searchText}
           onRequestSearch={() => {}}
           onChange={text =>

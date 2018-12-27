@@ -16,11 +16,9 @@ export type EventRendererProps = {
   onUpdate: () => void,
   selected: boolean,
   onAddNewInstruction: Function,
-  onMoveToInstruction: (
-    destinationContext: InstructionContext,
-  ) => void,
+  onMoveToInstruction: (destinationContext: InstructionContext) => void,
   onMoveToInstructionsList: (
-    destinationContext: InstructionsListContext,
+    destinationContext: InstructionsListContext
   ) => void,
   onInstructionClick: InstructionContext => void,
   onInstructionDoubleClick: InstructionContext => void,
@@ -33,8 +31,8 @@ export type EventRendererProps = {
   onParameterClick: ParameterContext => void,
   selection: any,
 
-  onOpenLayout: (string) => void,
-  onOpenExternalEvents: (string) => void,
+  onOpenLayout: string => void,
+  onOpenExternalEvents: string => void,
 
   leftIndentWidth: number,
 };

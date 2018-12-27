@@ -4,152 +4,164 @@
  */
 
 .gd-events-sheet-dark-theme.events-tree {
-    font-family: -apple-system, ".SFNSText-Regular", "San Francisco", Roboto, "Segoe UI", "Helvetica Neue", "Lucida Grande", sans-serif !important;
-    font-size: 14px !important;
-    background: #303030;
+  font-family: -apple-system, '.SFNSText-Regular', 'San Francisco', Roboto,
+    'Segoe UI', 'Helvetica Neue', 'Lucida Grande', sans-serif !important;
+  font-size: 14px !important;
+  background: #303030;
+}
+
+/**
+ * Ensure scroll is only on Y direction, preventing the display
+ * of horizontal scrollbar.
+ */
+ .gd-events-sheet-dark-theme .rst__virtualScrollOverride {
+  overflow-x: hidden !important;
 }
 
 /**
  * Draggable handle on the left of an event
  */
 .gd-events-sheet-dark-theme .rst__moveHandle {
-    background: #494949  !important;
-    border: 1px solid #494949  !important;
+  background: #494949 !important;
+  border: 1px solid #494949 !important;
 }
 
 /**
  * Scaffolding lines on the left
  */
-.gd-events-sheet-dark-theme .rst__lineHalfHorizontalRight::before, .rst__lineFullVertical::after, .rst__lineHalfVerticalTop::after, .rst__lineHalfVerticalBottom::after {
-    background-color: #AAA;
+.gd-events-sheet-dark-theme .rst__lineHalfHorizontalRight::before,
+.rst__lineFullVertical::after,
+.rst__lineHalfVerticalTop::after,
+.rst__lineHalfVerticalBottom::after {
+  background-color: #aaa;
 }
 
 /**
  * Selectable area (instructions)
  */
 .gd-events-sheet-dark-theme .selectable:hover {
-    background-color: rgba(0,0,0, 0.1);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .gd-events-sheet-dark-theme .selectable.selected {
-    background-color: rgba(0,0,0, 0.1);
-    border: 1px #4ab0e4 dashed !important;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: 1px #4ab0e4 dashed !important;
 }
 
 /**
  * Large selectable area (events)
  */
 .gd-events-sheet-dark-theme .large-selectable {
-    border: 1px #303030 solid !important;
+  border: 1px #303030 solid !important;
 }
 .gd-events-sheet-dark-theme .large-selectable.large-selected {
-    border: 1px #4ab0e4 dashed !important;
+  border: 1px #4ab0e4 dashed !important;
 }
 
 /**
  * Executable events (standard events, repeat, for each, while...) container
  */
 .gd-events-sheet-dark-theme .executable-event-container {
-    border-bottom: 1px solid black;
+  border-bottom: 1px solid black;
 }
 
 /**
  * Conditions and actions containers
  */
 
- .gd-events-sheet-dark-theme .conditions-container {
-    background: #494949;
-    color: rgb(209, 209, 209);
-    border-right: 1px solid black;
-    padding-left: 5px;
-    padding-right: 5px;
-    min-width: 0; /* Prevent container to growing outside its parent */
+.gd-events-sheet-dark-theme .conditions-container {
+  background: #494949;
+  color: rgb(209, 209, 209);
+  border-right: 1px solid black;
+  padding-left: 5px;
+  padding-right: 5px;
+  min-width: 0; /* Prevent container to growing outside its parent */
 }
 
 .gd-events-sheet-dark-theme .actions-container {
-    background: #303030;
-    color: rgb(209, 209, 209);
-    padding-left: 5px;
-    padding-right: 5px;
-    min-width: 0; /* Prevent container to growing outside its parent */
+  background: #303030;
+  color: rgb(209, 209, 209);
+  padding-left: 5px;
+  padding-right: 5px;
+  min-width: 0; /* Prevent container to growing outside its parent */
 }
 
 .gd-events-sheet-dark-theme .sub-instructions-container {
-    margin-left: 9px;
-    margin-top: 1px;
-    border-right: none;
-    border-left: 1px solid #303030;
+  margin-left: 9px;
+  margin-top: 1px;
+  border-right: none;
+  border-left: 1px solid #303030;
 }
 
 /**
  * Instructions parameters color scheme
  */
- .gd-events-sheet-dark-theme .instruction-parameter {
-    color: #93E500;
+.gd-events-sheet-dark-theme .instruction-parameter {
+  color: #93e500;
 }
 
 .gd-events-sheet-dark-theme .instruction-parameter.expression {
-    color: #E8DC59;
+  color: #e8dc59;
 }
 
 .gd-events-sheet-dark-theme .instruction-parameter.object,
 .gd-events-sheet-dark-theme .instruction-parameter.objectPtr,
 .gd-events-sheet-dark-theme .instruction-parameter.objectList,
 .gd-events-sheet-dark-theme .instruction-parameter.objectListWithoutPicking {
-    color: #B77CFF;
-    font-style: italic;
+  color: #b77cff;
+  font-style: italic;
 }
 
 .gd-events-sheet-dark-theme .instruction-parameter.behavior {
-    color: #FF9200;
+  color: #ff9200;
 }
 
 .gd-events-sheet-dark-theme .instruction-parameter.operator {
-    color: #FF0071;
+  color: #ff0071;
 }
 
 .gd-events-sheet-dark-theme .instruction-parameter.objectvar {
-    color: #18DCF2;
+  color: #18dcf2;
 }
 
 .gd-events-sheet-dark-theme .instruction-parameter.scenevar {
-    color: #18DCF2;
+  color: #18dcf2;
 }
 
 .gd-events-sheet-dark-theme .instruction-parameter.globalvar {
-    color: #18DCF2;
+  color: #18dcf2;
 }
 
 /**
  * Search results highlight
  */
- .gd-events-sheet-dark-theme .rst__rowSearchMatch {
-    outline: none;
-    border-left: solid 3px #18DCF2;
+.gd-events-sheet-dark-theme .rst__rowSearchMatch {
+  outline: none;
+  border-left: solid 3px #18dcf2;
 }
 
 .gd-events-sheet-dark-theme .rst__rowSearchFocus {
-    outline: none;
-    border-left: solid 5px #18DCF2;
+  outline: none;
+  border-left: solid 5px #18dcf2;
 }
 
 /**
 * Drag'n'drop indicator (events)
 */
 .gd-events-sheet-dark-theme .drop-indicator {
-    border-top: 2px solid #18DCF2;
-    height: 0;
-    margin-top: -1px;
-    margin-bottom: -1px;
-    width: '100%';
-    box-sizing: 'border-box';
+  border-top: 2px solid #18dcf2;
+  height: 0;
+  margin-top: -1px;
+  margin-bottom: -1px;
+  width: '100%';
+  box-sizing: 'border-box';
 }
 
 .gd-events-sheet-dark-theme .cant-drop-indicator {
-    border-top: 2px solid #FF5C5C;
-    height: 0;
-    margin-top: -1px;
-    margin-bottom: -1px;
-    width: '100%';
-    box-sizing: 'border-box';
+  border-top: 2px solid #ff5c5c;
+  height: 0;
+  margin-top: -1px;
+  margin-bottom: -1px;
+  width: '100%';
+  box-sizing: 'border-box';
 }

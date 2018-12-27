@@ -51,10 +51,12 @@ export const enumerateObjects = (
       ? []
       : mapFor(0, project.getObjectsCount(), i => project.getObjectAt(i))
           .filter(filterObject)
-          .map((object: gdObject): ObjectWithContext => ({
-            object,
-            global: true,
-          }));
+          .map(
+            (object: gdObject): ObjectWithContext => ({
+              object,
+              global: true,
+            })
+          );
 
   const allObjectsList: ObjectWithContextList = containerObjectsList.concat(
     projectObjectsList
@@ -67,7 +69,9 @@ export const enumerateObjects = (
   };
 };
 
-export const enumerateObjectTypes = (project: gdProject): Array<EnumeratedObjectMetadata> => {
+export const enumerateObjectTypes = (
+  project: gdProject
+): Array<EnumeratedObjectMetadata> => {
   const platform = project.getCurrentPlatform();
   const extensionsList = platform.getAllPlatformExtensions();
 

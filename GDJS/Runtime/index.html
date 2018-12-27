@@ -29,7 +29,6 @@
 
 </head>
 <body>
-    <div id="canvasArea"></div>
 
     <!-- GDJS_CUSTOM_HTML -->
 	<script>
@@ -43,8 +42,7 @@
         var game = new gdjs.RuntimeGame(gdjs.projectData, {}/*GDJS_ADDITIONAL_SPEC*/);
 
         //Create a renderer
-        var canvasArea = document.getElementById("canvasArea");
-        game.getRenderer().createStandardCanvas(canvasArea);
+        game.getRenderer().createStandardCanvas(document.body);
 
         //Bind keyboards/mouse/touch events
         game.getRenderer().bindStandardEvents(game.getInputManager(), window, document);

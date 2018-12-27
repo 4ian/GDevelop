@@ -34,7 +34,11 @@ const transformVariable = variable => {
 };
 
 const transform = variablesContainer => {
-  if (!variablesContainer || !variablesContainer._variables || !variablesContainer._variables.items)
+  if (
+    !variablesContainer ||
+    !variablesContainer._variables ||
+    !variablesContainer._variables.items
+  )
     return null;
 
   return mapValues(variablesContainer._variables.items, transformVariable);

@@ -133,23 +133,23 @@ export default class ExportDialog extends Component {
                   )}
             </List>
             <Line justifyContent="center" alignItems="center">
-            {!showExperimental ? (
-              <FlatButton
-                key="toggle-experimental"
-                icon={<Visibility />}
-                primary={false}
-                onClick={() => this._showExperimental(true)}
-                label="Show experimental exports"
-              />
-            ) : (
-              <FlatButton
-                key="toggle-experimental"
-                icon={<VisibilityOff />}
-                primary={false}
-                onClick={() => this._showExperimental(false)}
-                label="Hide experimental exports"
-              />
-            )}
+              {!showExperimental ? (
+                <FlatButton
+                  key="toggle-experimental"
+                  icon={<Visibility />}
+                  primary={false}
+                  onClick={() => this._showExperimental(true)}
+                  label="Show experimental exports"
+                />
+              ) : (
+                <FlatButton
+                  key="toggle-experimental"
+                  icon={<VisibilityOff />}
+                  primary={false}
+                  onClick={() => this._showExperimental(false)}
+                  label="Hide experimental exports"
+                />
+              )}
             </Line>
           </React.Fragment>
         )}

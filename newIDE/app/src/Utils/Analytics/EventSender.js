@@ -13,7 +13,7 @@ let client = null;
 
 export const installAnalyticsEvents = (authentification: Authentification) => {
   if (isDev) {
-    console.info("Development build - Analytics disabled");
+    console.info('Development build - Analytics disabled');
     return;
   }
 

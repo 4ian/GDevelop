@@ -51,12 +51,12 @@ export default class ExternalEventsField extends Component<
       return;
     }
 
-    const externalEvents = enumerateExternalEvents(
-      project
-    ).map(externalEvents => ({
-      text: externalEvents.getName(),
-      value: externalEvents.getName(),
-    }));
+    const externalEvents = enumerateExternalEvents(project).map(
+      externalEvents => ({
+        text: externalEvents.getName(),
+        value: externalEvents.getName(),
+      })
+    );
     const layouts = enumerateLayouts(project).map(layout => ({
       text: layout.getName(),
       value: layout.getName(),

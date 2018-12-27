@@ -14,6 +14,7 @@
     "orientation": "default",
     "packageName": "com.example.gamename",
     "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\play-stop-sprite-animation\\game.json",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",

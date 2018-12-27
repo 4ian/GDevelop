@@ -17,7 +17,9 @@ export default (props: PropsType) => {
   if (!helpPagePath) return null;
 
   return (
-    <IconButton onClick={() => Window.openExternalURL(getHelpLink(helpPagePath))}>
+    <IconButton
+      onClick={() => Window.openExternalURL(getHelpLink(helpPagePath))}
+    >
       <HelpOutline />
     </IconButton>
   );

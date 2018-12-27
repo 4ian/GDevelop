@@ -202,9 +202,6 @@ BaseObjectExtension::BaseObjectExtension() {
   GetAllConditions()["NbObjet"].SetFunctionName(
       "gdjs.evtTools.object.pickedObjectsCount");
   GetAllConditions()["CollisionNP"]
-      .AddCodeOnlyParameter(
-          "currentScene",
-          "")  // We need an extra parameter pointing to the scene.
       .SetFunctionName("gdjs.evtTools.object.hitBoxesCollisionTest");
   GetAllConditions()["Raycast"].SetFunctionName(
       "gdjs.evtTools.object.raycastObject");

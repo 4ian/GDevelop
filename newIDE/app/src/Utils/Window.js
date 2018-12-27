@@ -91,11 +91,13 @@ export default class Window {
 
     const argumentsObject = {};
     const params = new URLSearchParams(window.location.search);
-    params.forEach((value, name) => argumentsObject[name] = value);
+    params.forEach((value, name) => (argumentsObject[name] = value));
 
     // Emulate the minimist behavior of putting the arguments without option
     // in "_".
-    argumentsObject._ = argumentsObject.project ? [argumentsObject.project] : [];
+    argumentsObject._ = argumentsObject.project
+      ? [argumentsObject.project]
+      : [];
 
     return argumentsObject;
   }
@@ -132,7 +134,7 @@ export default class Window {
         // visible selection has changed. Try to wait to show the menu until after that, otherwise the
         // visible selection will update after the menu dismisses and look weird.
         setTimeout(function() {
-          menu.popup({window: electron.remote.getCurrentWindow()});
+          menu.popup({ window: electron.remote.getCurrentWindow() });
         }, 30);
       });
     } else if (document) {

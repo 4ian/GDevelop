@@ -18,9 +18,10 @@ export const getBrowserExporters = () => [
   },
   {
     name: 'Facebook Instant Games',
-    renderIcon: (props) => <Facebook {...props}/>,
+    renderIcon: props => <Facebook {...props} />,
     helpPage: '/publishing/publishing-to-facebook-instant-games',
-    description: 'Package your game as a Facebook Instant Games that can be played on Facebook Messenger.',
+    description:
+      'Package your game as a Facebook Instant Games that can be played on Facebook Messenger.',
     key: 'localfacebookinstantgames',
     ExportComponent: BrowserExport,
   },
@@ -52,17 +53,19 @@ export const getBrowserExporters = () => [
   },
   {
     name: 'Windows/macOS/Linux',
-    renderIcon: (props) => <LaptopMac {...props}/>,
+    renderIcon: props => <LaptopMac {...props} />,
     helpPage: '/publishing/windows-macos-linux',
-    description: 'Package your game as an app for Windows, macOS or Linux directly from GDevelop.',
+    description:
+      'Package your game as an app for Windows, macOS or Linux directly from GDevelop.',
     key: 'localonlineelectronexport',
     ExportComponent: BrowserExport,
   },
   {
     name: 'Windows/macOS/Linux (manual)',
-    renderIcon: (props) => <LaptopMac {...props}/>,
+    renderIcon: props => <LaptopMac {...props} />,
     helpPage: '/publishing/windows-macos-linux-with-electron',
-    description: 'Build the game locally and export it manually to Windows, macOS or Linux with third-party developer tools.',
+    description:
+      'Build the game locally and export it manually to Windows, macOS or Linux with third-party developer tools.',
     key: 'localelectronexport',
     ExportComponent: BrowserExport,
     advanced: true,

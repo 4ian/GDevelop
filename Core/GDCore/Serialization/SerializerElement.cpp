@@ -6,10 +6,10 @@ namespace gd {
 
 SerializerElement SerializerElement::nullElement;
 
-SerializerElement::SerializerElement() : valueUndefined(true) {}
+SerializerElement::SerializerElement() : valueUndefined(true), isArray(false) {}
 
 SerializerElement::SerializerElement(const SerializerValue& value)
-    : valueUndefined(false), elementValue(value) {}
+    : valueUndefined(false), elementValue(value), isArray(false) {}
 
 SerializerElement::~SerializerElement() {}
 

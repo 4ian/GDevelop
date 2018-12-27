@@ -12,8 +12,8 @@ type State = {|
 |};
 
 export default class BehaviorField extends React.Component<
-ParameterFieldProps,
-State
+  ParameterFieldProps,
+  State
 > {
   state = { errorText: null, focused: false, text: null };
   _description: ?string;

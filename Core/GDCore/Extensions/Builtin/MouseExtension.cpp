@@ -18,7 +18,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
           _("Built-in extension that enables the use of a mouse"),
           "Florian Rival",
           "Open source (MIT License)")
-      .SetExtensionHelpPath("/events/mouse-touch");
+      .SetExtensionHelpPath("/all-features/mouse-touch");
 
 #if defined(GD_IDE_ONLY)
   extension

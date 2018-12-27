@@ -377,7 +377,7 @@ gdjs.SkeletonRuntimeObject.slotObjectCollisionTest = function(skl, obj, slotPath
     var hitBoxes2 = obj.getHitBoxes();
     for(var k=0, lenBoxes1=hitBoxes1.length; k<lenBoxes1; ++k){
         for(var l=0, lenBoxes2=hitBoxes2.length; l<lenBoxes2; ++l){
-            if (gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l]).collision){
+            if (gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l], false).collision){
                 return true;
             }
         }
@@ -393,7 +393,7 @@ gdjs.SkeletonRuntimeObject.slotSlotCollisionTest = function(skl1, skl2, slotPath
 
     for(var k=0, lenBoxes1=hitBoxes1.length; k<lenBoxes1; ++k){
         for(var l=0, lenBoxes2=hitBoxes2.length; l<lenBoxes2; ++l){
-            if (gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l]).collision){
+            if (gdjs.Polygon.collisionTest(hitBoxes1[k], hitBoxes2[l], false).collision){
                 return true;
             }
         }

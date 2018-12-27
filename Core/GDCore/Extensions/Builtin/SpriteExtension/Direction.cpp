@@ -15,7 +15,7 @@ using namespace std;
 
 namespace gd {
 
-Direction::Direction() : loop(false), timeBetweenFrame(1) {}
+Direction::Direction() : loop(false), timeBetweenFrame(0.08) {}
 
 Direction::~Direction(){};
 

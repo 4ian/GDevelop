@@ -27,7 +27,10 @@ const styles = {
   },
 };
 
-export default class ForEachEvent extends React.Component<EventRendererProps, *> {
+export default class ForEachEvent extends React.Component<
+  EventRendererProps,
+  *
+> {
   state = {
     editing: false,
     anchorEl: null,

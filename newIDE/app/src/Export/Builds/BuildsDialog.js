@@ -13,9 +13,9 @@ type State = {||};
 
 export default class BuildsDialog extends Component<Props, State> {
   _onBuildsUpdated = () => {
-    // Force the Dialog repositioning 
-    this.forceUpdate(); 
-  }
+    // Force the Dialog repositioning
+    this.forceUpdate();
+  };
 
   render() {
     const { open, onClose } = this.props;

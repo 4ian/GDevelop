@@ -23,7 +23,7 @@ namespace gd {
 class GD_CORE_API SerializerElement {
  public:
   SerializerElement();
-  SerializerElement(const SerializerValue & value);
+  SerializerElement(const SerializerValue &value);
   virtual ~SerializerElement();
 
   /** \name Value
@@ -179,17 +179,36 @@ class GD_CORE_API SerializerElement {
    */
   ///@{
   /**
+   * \brief Consider that the element is an array of elements, without specific
+   * name for the children element.
+   *
+   * When serialized to a format accepting arrays (like JSON), the element will
+   * be serialized to an array.
+   */
+  void ConsiderAsArray() const { isArray = true; };
+
+  /**
+   * \brief Check if the element is considered as an array containing its
+   * children.
+   *
+   * As possible, this should be serialized to an array (possible JSON, but not
+   * in XML).
+   */
+  bool ConsideredAsArray() const { return isArray; };
+
+  /**
    * \brief Consider that the element is an array for elements with the given
    * name.
    *
    * In this case, no child with a different name should be added. When
-   * serialized to format accepting arrays, the element will be serialized to an
-   * array.
+   * serialized to a format accepting arrays (like JSON), the element will be
+   * serialized to an array.
    *
    * \param name The name of the children.
    */
   void ConsiderAsArrayOf(const gd::String &name,
                          const gd::String &deprecatedName = "") const {
+    ConsiderAsArray();
     arrayOf = name;
     deprecatedArrayOf = deprecatedName;
   };
@@ -261,8 +280,10 @@ class GD_CORE_API SerializerElement {
   std::map<gd::String, SerializerValue> attributes;
   std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement> > >
       children;
-  mutable gd::String arrayOf;
-  mutable gd::String deprecatedArrayOf;
+  mutable bool isArray;        ///< true if element is considered as an array
+  mutable gd::String arrayOf;  ///< The name of the children (was useful for XML
+                               ///< parsed elements).
+  mutable gd::String deprecatedArrayOf;  ///< Alternate name for children
 };
 
 }  // namespace gd

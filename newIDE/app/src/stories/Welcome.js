@@ -75,7 +75,8 @@ export default class Welcome extends React.Component {
           dangerouslySetInnerHTML={{ __html: `<pre>${codeBlock}</pre>` }}
         />
         <p>
-          Usually we create stories with smaller UI components in the app.<br />
+          Usually we create stories with smaller UI components in the app.
+          <br />
           Have a look at the{' '}
           <a
             style={styles.link}

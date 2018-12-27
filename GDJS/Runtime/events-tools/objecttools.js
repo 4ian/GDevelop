@@ -200,9 +200,9 @@ gdjs.evtTools.object.pickObjectsIf = function(predicate, objectsLists, negatePre
     return isTrue;
 };
 
-gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene) {
+gdjs.evtTools.object.hitBoxesCollisionTest = function(objectsLists1, objectsLists2, inverted, runtimeScene, ignoreTouchingEdges) {
     return gdjs.evtTools.object.twoListsTest(gdjs.RuntimeObject.collisionTest,
-        objectsLists1, objectsLists2, inverted);
+        objectsLists1, objectsLists2, inverted, ignoreTouchingEdges);
 };
 
 gdjs.evtTools.object._distanceBetweenObjects = function(obj1, obj2, distance) {

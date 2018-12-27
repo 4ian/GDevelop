@@ -8,16 +8,20 @@ const nodeRequire = require('node-require-function')(arguments);
  *
  * @param {string} moduleName The name of the module. For example: `fs`.
  */
-const optionalRequire = (moduleName, config = {
-  rethrowException: false,
-}) => {
+const optionalRequire = (
+  moduleName,
+  config = {
+    rethrowException: false,
+  }
+) => {
   try {
-    if (global.require) { 
+    if (global.require) {
       // Electron will expose require on global object. Use it, with an
       // expression to avoid webpack to try to bundle the call to require.
       return global['require'](moduleName);
-    } else if (nodeRequire) { //Node.js
-      // nodeRequire is Node.js' require function that is properly extracted 
+    } else if (nodeRequire) {
+      //Node.js
+      // nodeRequire is Node.js' require function that is properly extracted
       // by node-require-function when running on Node.js
       return nodeRequire(moduleName);
     }
@@ -27,9 +31,12 @@ const optionalRequire = (moduleName, config = {
   } catch (ex) {
     if (config.rethrowException) throw ex;
 
-    console.error('Exception while requiring module (from optionalRequire):', ex);
+    console.error(
+      'Exception while requiring module (from optionalRequire):',
+      ex
+    );
     return null;
   }
-}
+};
 
 module.exports = optionalRequire;

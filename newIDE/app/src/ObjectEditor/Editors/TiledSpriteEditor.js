@@ -43,7 +43,7 @@ export default class TiledSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={tiledSpriteObject.getWidth()}
-            onChange={ value => {
+            onChange={value => {
               tiledSpriteObject.setWidth(parseInt(value, 10));
               this.forceUpdate();
             }}
@@ -53,7 +53,7 @@ export default class TiledSpriteEditor extends React.Component<
             fullWidth
             type="number"
             value={tiledSpriteObject.getHeight()}
-            onChange={ value => {
+            onChange={value => {
               tiledSpriteObject.setHeight(parseInt(value, 10));
               this.forceUpdate();
             }}

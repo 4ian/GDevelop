@@ -32,6 +32,8 @@ gdjs.RuntimeGame = function(data, spec) {
   this._defaultHeight = data.properties.windowHeight;
   this._originalWidth = data.properties.windowWidth; //Original size of the game, won't be changed.
   this._originalHeight = data.properties.windowHeight;
+  /** @type {string} */
+  this._scaleMode = data.properties.scaleMode || 'linear';
   this._renderer = new gdjs.RuntimeGameRenderer(
     this,
     this._defaultWidth,
@@ -240,6 +242,13 @@ gdjs.RuntimeGame.prototype.setDefaultHeight = function(height) {
  */
 gdjs.RuntimeGame.prototype.getMinimalFramerate = function() {
   return this._minFPS;
+};
+
+/**
+ * Return the scale mode of the game ("linear" or "nearest").
+ */
+gdjs.RuntimeGame.prototype.getScaleMode = function() {
+  return this._scaleMode;
 };
 
 /**

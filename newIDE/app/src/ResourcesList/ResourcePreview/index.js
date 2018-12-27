@@ -8,6 +8,7 @@ import AudioPreview from './AudioPreview';
 type Props = {|
   project: gdProject,
   resourceName: string,
+  resourcePath?: string,
   resourcesLoader: typeof ResourcesLoader,
   children?: any,
   style?: Object,
@@ -31,7 +32,8 @@ export default class ResourcePreview extends React.Component<Props, State> {
   componentWillReceiveProps(newProps: Props) {
     if (
       newProps.resourceName !== this.props.resourceName ||
-      newProps.project !== this.props.project
+      newProps.project !== this.props.project ||
+      newProps.resourcePath !== this.props.resourcePath
     ) {
       this.setState(this._loadFrom(newProps));
     }
@@ -62,6 +64,7 @@ export default class ResourcePreview extends React.Component<Props, State> {
             children={this.props.children}
             style={this.props.style}
             onSize={this.props.onSize}
+            resourcePath={this.props.resourcePath}
           />
         );
       case 'audio':
@@ -72,6 +75,7 @@ export default class ResourcePreview extends React.Component<Props, State> {
             resourcesLoader={this.props.resourcesLoader}
             children={this.props.children}
             style={this.props.style}
+            resourcePath={this.props.resourcePath}
           />
         );
       default:

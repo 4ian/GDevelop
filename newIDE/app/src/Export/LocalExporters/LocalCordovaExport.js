@@ -155,7 +155,8 @@ class LocalCordovaExport extends Component<Props, State> {
               onClick={() =>
                 this.setState({
                   exportFinishedDialogOpen: false,
-                })}
+                })
+              }
             />,
           ]}
           secondaryActions={

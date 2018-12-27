@@ -22,8 +22,8 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCore/IDE/wxTools/SafeYield.h"
-#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ChangesNotifier.h"
+#include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/ImageManager.h"
@@ -73,6 +73,7 @@ Project::Project()
       maxFPS(60),
       minFPS(10),
       verticalSync(false),
+      scaleMode("linear"),
       sizeOnStartupMode("adaptWidth"),
       imageManager(std::make_shared<ImageManager>())
 #if defined(GD_IDE_ONLY)
@@ -636,6 +637,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       propElement.GetChild("minFPS", 0, "FPSmin").GetValue().GetInt());
   SetVerticalSyncActivatedByDefault(
       propElement.GetChild("verticalSync").GetValue().GetBool());
+  SetScaleMode(propElement.GetStringAttribute("scaleMode", "linear"));
   SetSizeOnStartupMode(propElement.GetStringAttribute("sizeOnStartupMode", ""));
 #if defined(GD_IDE_ONLY)
   SetAuthor(propElement.GetChild("author", 0, "Auteur").GetValue().GetString());
@@ -913,6 +915,7 @@ void Project::SerializeTo(SerializerElement& element) const {
   propElement.AddChild("minFPS").SetValue(GetMinimumFPS());
   propElement.AddChild("verticalSync")
       .SetValue(IsVerticalSynchronizationEnabledByDefault());
+  propElement.SetAttribute("scaleMode", scaleMode);
   propElement.SetAttribute("sizeOnStartupMode", sizeOnStartupMode);
   propElement.SetAttribute("projectFile", gameFile);
   propElement.SetAttribute("folderProject", folderProject);
@@ -1006,9 +1009,9 @@ gd::String Project::GetBadObjectNameWarning() {
 }
 
 void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
-  // See also gd::WholeProjectRefactorer::ExposeProjectEvents for a method that traverse the whole
-  // project (this time for events).
-  // Ideally, this method could be moved outside of gd::Project.
+  // See also gd::WholeProjectRefactorer::ExposeProjectEvents for a method that
+  // traverse the whole project (this time for events). Ideally, this method
+  // could be moved outside of gd::Project.
 
   // Add project resources
   worker.ExposeResources(&GetResourcesManager());
@@ -1033,7 +1036,8 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // Add events functions extensions resources
   for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
     auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
+    for (auto&& eventsFunction :
+         eventsFunctionsExtension.GetEventsFunctions()) {
       LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
     }
   }
@@ -1248,6 +1252,7 @@ void Project::Init(const gd::Project& game) {
   maxFPS = game.maxFPS;
   minFPS = game.minFPS;
   verticalSync = game.verticalSync;
+  scaleMode = game.scaleMode;
   sizeOnStartupMode = game.sizeOnStartupMode;
 
 #if defined(GD_IDE_ONLY)

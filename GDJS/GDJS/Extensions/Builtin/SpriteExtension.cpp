@@ -67,6 +67,12 @@ SpriteExtension::SpriteExtension() {
       .SetGetter("getScale");
   spriteConditions["ScaleWidth"].SetFunctionName("getScaleX");
   spriteConditions["ScaleHeight"].SetFunctionName("getScaleY");
+  spriteActions["ChangeWidth"]
+      .SetFunctionName("setWidth")
+      .SetGetter("getWidth");
+  spriteActions["ChangeHeight"]
+      .SetFunctionName("setHeight")
+      .SetGetter("getHeight");
   spriteActions["TourneVersPos"].SetFunctionName("rotateTowardPosition");
   spriteActions["TourneVers"].SetFunctionName("turnTowardObject");
   spriteActions["ChangeColor"].SetFunctionName("setColor");
@@ -79,6 +85,10 @@ SpriteExtension::SpriteExtension() {
       .AddCodeOnlyParameter(
           "currentScene",
           "")  // We need an extra parameter pointing to the scene.
+      .AddParameter("yesorno",
+                    _("Consider objects touching each other, but not "
+                      "overlapping, as in collision (default: no)"))
+      .SetHidden()
       .SetFunctionName(
           "gdjs.evtTools.object.hitBoxesCollisionTest");  // No pixel perfect
                                                           // collision for now

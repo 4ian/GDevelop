@@ -40,7 +40,7 @@ export const setupAutocompletions = (monaco: any) => {
     const runtimePath = path.join(gdjsRoot, 'Runtime');
     const extensionsPath = path.join(runtimePath, 'Extensions');
     const eventToolsPath = path.join(runtimePath, 'events-tools');
-    
+
     importAllJsFilesFromFolder(runtimePath);
     importAllJsFilesFromFolder(eventToolsPath);
     fs.readdir(extensionsPath, (error: ?Error, folderNames: Array<string>) => {

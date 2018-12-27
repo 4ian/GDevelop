@@ -26,7 +26,10 @@ import {
 } from '../Utils/SelectionHandler';
 import { CLIPBOARD_KIND } from './ClipboardKind';
 import Clipboard from '../Utils/Clipboard';
-import { serializeToJSObject, unserializeFromJSObject } from '../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
 const gd = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
@@ -88,10 +91,18 @@ export default class VariablesList extends Component<Props, State> {
 
     const variables = Clipboard.get(CLIPBOARD_KIND);
     variables.forEach(({ name, serializedVariable }) => {
-      const newName = newNameGenerator(name, (name) => variablesContainer.has(name), 'CopyOf');
+      const newName = newNameGenerator(
+        name,
+        name => variablesContainer.has(name),
+        'CopyOf'
+      );
       const newVariable = new gd.Variable();
       unserializeFromJSObject(newVariable, serializedVariable);
-      variablesContainer.insert(newName, newVariable, variablesContainer.count())
+      variablesContainer.insert(
+        newName,
+        newVariable,
+        variablesContainer.count()
+      );
       newVariable.delete();
     });
     this.forceUpdate();
@@ -218,7 +229,8 @@ export default class VariablesList extends Component<Props, State> {
         showSelectionCheckbox={this.state.mode === 'select'}
         isSelected={!!this.state.selectedVariables[variable.ptr]}
         onSelect={select =>
-          this._selectVariable({ name, ptr: variable.ptr, variable }, select)}
+          this._selectVariable({ name, ptr: variable.ptr, variable }, select)
+        }
       />
     );
   }

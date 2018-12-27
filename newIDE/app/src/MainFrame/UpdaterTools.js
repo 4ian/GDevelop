@@ -14,7 +14,8 @@ export type UpdateStatus = {
 };
 
 export const getUpdateNotificationTitle = (updateStatus: UpdateStatus) => {
-  if (updateStatus.status === 'update-available') return 'A new update is available!';
+  if (updateStatus.status === 'update-available')
+    return 'A new update is available!';
 
   return '';
 };

@@ -5,20 +5,20 @@ It uses GDevelop [core C++ classes compiled to Javascript](https://github.com/4i
 
 ![GDevelop editor](https://raw.githubusercontent.com/4ian/GDevelop/master/newIDE/gd-ide-screenshot.png "GDevelop editor")
 
-## Installation
+## 1) Installation 💻 
 
 Make sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) installed. [Yarn](https://yarnpkg.com) is optional.
 
 ```bash
 git clone https://github.com/4ian/GDevelop.git
 cd GDevelop/newIDE/app
-npm install #or yarn
+npm install # or yarn
 ```
 
-## Development
+## 2) Development 🤓
 
 ```bash
-npm start #or yarn start
+npm start # or yarn start
 ```
 
 This will open the app in your web browser.
@@ -31,11 +31,11 @@ Images resources, GDJS Runtime, extensions will be copied in resources, and [lib
 
 ### Development of the standalone app
 
-You can run the app with Electron. **Make sure that you've run `yarn start` in `app` folder before** (see above).
+You can run the app with Electron. **Make sure that you've run `npm start` (or `yarn start`) in `app` folder before** (see above).
 
 ```bash
 cd newIDE/electron-app
-npm install #or yarn
+npm install # or yarn
 
 #For macOS:
 ./node_modules/electron/dist/Electron.app/Contents/MacOS/Electron app
@@ -60,17 +60,18 @@ You can run a [storybook](https://github.com/storybooks/storybook) that is used 
 
 ```bash
 cd newIDE/app
-npm run storybook #or yarn storybook
+npm run storybook # or yarn storybook
 ```
 
 ### Tests
 
-Unit tests and type checking can be launched with this command:
+Unit tests, type checking and auto-formatting of the code can be launched with these commands:
 
 ```bash
 cd newIDE/app
-npm run test #or yarn test
-npm run flow #or yarn flow
+npm run test # or yarn test
+npm run flow # or yarn flow
+npm run format # or yarn format
 ```
 
 ### Theming
@@ -99,9 +100,9 @@ Any text editor is fine, but it's a good idea to have one with *Prettier* (code 
 
 👉 You can use [Visual Studio Code](https://code.visualstudio.com) with these extensions: [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [Flow Language Support](https://github.com/flowtype/flow-for-vscode).
 
-## Building and deploying the standalone app
+## (Optional) Building and deploying the standalone app 📦
 
-> This section is only for maintainers that want to deploy the "official app" on the GDevelop website. If you're working on contributions for GDevelop, you won't need it.
+> 🖐 This section is only for maintainers that want to deploy the "official app" on the GDevelop website. If you're working on contributions for GDevelop, you won't need it.
 
 ### Desktop version
 
@@ -109,7 +110,7 @@ First, update version number which is read in `newIDE/electron-app/app/package.j
 
 ```bash
 cd newIDE/electron-app
-yarn build #or npm run build
+yarn build # or npm run build
 ```
 
 This will build and package the Electron app for Windows, macOS and Linux (according to your OS). The output are stored inside `newIDE/electron-app/dist`.
@@ -125,20 +126,21 @@ GH_TOKEN=xxx yarn build --mac --win --linux tar.gz --publish always
 
 ```bash
 cd newIDE/web-app
-yarn deploy #or npm run deploy
+yarn deploy # or npm run deploy
 ```
 
-## Current status and how to contribute
+## 3) How to contribute? 😎
 
-This new editor is always in development. Check the [the roadmap for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap). For example:
+The editor, the game engine and extensions are always in development. Your contribution is welcome!
 
-- [ ] Support for translations (See an [example of a component that can be translated](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/MainFrame/Toolbar.js#L44))
-- [ ] Support for native games
-- [ ] More [examples](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/ProjectCreation/BrowserExamples.js)
-- [ ] More [tutorials](http://wiki.compilgames.net/doku.php/gdevelop5/start)
-- [ ] Add more [keyboard shortcuts](https://github.com/4ian/GDevelop/blob/master/newIDE/app/src/UI/KeyboardShortcuts/index.js)
-- [ ] Make [drawers movable/draggable like the properties panel and the objects editor](https://trello.com/c/GOdj2Lk5/132-allow-panels-to-be-dragged-in-a-separate-window-in-addition-to-the-main-window).
+* Check the [the **roadmap** for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
+  
+  You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
 
-You can contribute by picking anything here or anything that you think is missing or could be improved in GD5! If you don't know how to start, it's a good idea to play a bit with the editor and see if there is something that is unavailable and that you can add or fix.
+* Follow the [Development](https://github.com/4ian/GDevelop/tree/master/newIDE#development) section of the README to set up GDevelop and start modifying either **the editor** or **[the game engine/extensions](https://github.com/4ian/GDevelop/tree/master/newIDE#development-of-the-game-engine-or-extensions)**.
 
-This project was bootstrapped with [Create React App](https://github.com/facebookincubator/create-react-app). Check out their documentation for common tasks or help about using it.
+* To submit your changes, you have first to create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
+
+* Before pushing your changes, make sure that your code is properly formatted. Run `npm run format` (or `yarn format`) in newIDE/app folder.
+
+* Finally, make sure that the tests pass (refer to this README and to the [game engine README](https://github.com/4ian/GDevelop/tree/master/GDJS)) for learning how to run tests.

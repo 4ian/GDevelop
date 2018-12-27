@@ -97,6 +97,7 @@ export default class ObjectSelector extends React.Component<Props, State> {
     return (
       <AutoComplete
         {...defaultAutocompleteProps}
+        hintText="Choose an object"
         searchText={this.state.focused ? this.state.text : value}
         onFocus={() => {
           this.setState({

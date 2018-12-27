@@ -1,11 +1,15 @@
-# GDevelop Javascript Platform (HTML5 game engine)
+# GDevelop JavaScript Platform (HTML5 game engine)
 
-GDevelop Javascript Platform (GDJS) is the game engine for making
+GDevelop JavaScript Platform (GDJS) is the game engine for making
 _HTML5/Javascript_ based games with GDevelop.
 
 > 📚 **Game developer, searching for the documentation?** Go to the **[GDJS Runtime (game engine) documentation](http://4ian.github.io/GD-Documentation/GDJS%20Documentation)**.
 
-## Development
+## 1) Installation 💻
+
+To do changes in the game engine or create extensions, [install the development version (click here to learn more)](https://github.com/4ian/GDevelop/tree/master/newIDE).
+
+## 2) Development 🤓
 
 GDJS is composed of two parts:
 
@@ -18,16 +22,24 @@ The game engine is in the _Runtime_ folder. If you want to work on the engine di
 
 To use the game engine, you can look into the **[GDJS Runtime (game engine) documentation](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation)**.
 
+To run tests for the game engine, go to `GDJS/tests`, run `npm install` and `npm test`. More information in the [README for the tests](https://github.com/4ian/GDevelop/tree/master/GDJS/tests).
+
 ### GDJS Platform (exporters, code generation...)
 
 Check the [GDJS Platform](http://4ian.github.io/GD-Documentation/GDJS%20Documentation/index.html) documentation, or the [full GDevelop developers documentation](http://4ian.github.io/GD-Documentation/).
 
-## Contributing
+## 3) How to contribute 😎
 
 Any contribution is welcome! Whether you want to submit a bug report, a feature request
 or any pull request to add a feature, do not hesitate to get in touch.
 
+* Check the [the **roadmap** for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
+  
+* Follow the [Development](https://github.com/4ian/GDevelop/tree/master/newIDE#development) section of the README to set up GDevelop and start modifying either **the editor** or **[the game engine/extensions](https://github.com/4ian/GDevelop/tree/master/newIDE#development-of-the-game-engine-or-extensions)**.
+
+* To submit your changes, you have first to create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
+
 ## License
 
-GDJS is distributed under the MIT license: See license.txt for
+GDJS is distributed under the MIT license: see license.txt for
 more information.

@@ -59,8 +59,11 @@ import particlesVariousEffects from '../fixtures/particles-various-effects/parti
 import pathfinding from '../fixtures/pathfinding/pathfinding.json';
 import pathfindingBasics from '../fixtures/pathfinding-basics/pathfinding-basics.json';
 import physics from '../fixtures/physics/physics.json';
+import physicsJointsDemo from '../fixtures/physics-joints-demo/physics-joints-demo.json';
+import physicsJointsSettingsDemo from '../fixtures/physics-joints-settings-demo/physics-joints-settings-demo.json';
 import pinObjectToAnother from '../fixtures/pin-object-to-another/pin-object-to-another.json';
 import pinObjectToAnotherMultipleParents from '../fixtures/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json';
+import pixelPerfectPlatformGame from '../fixtures/pixel-perfect-platform-game/pixel-perfect-platform-game.json';
 import planeAndClouds from '../fixtures/plane-and-clouds/plane-and-clouds.json';
 import platformer from '../fixtures/platformer/platformer.json';
 import platformerDoubleJump from '../fixtures/platformer-double-jump/platformer-double-jump.json';
@@ -119,6 +122,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(pinObjectToAnother);
     } else if (url === 'example://pin-object-to-another-multiple-parents') {
       return Promise.resolve(pinObjectToAnotherMultipleParents);
+    } else if (url === 'example://pixel-perfect-platform-game') {
+      return Promise.resolve(pixelPerfectPlatformGame);
     } else if (url === 'example://plane-and-clouds') {
       return Promise.resolve(planeAndClouds);
     } else if (url === 'example://center-object-within-another') {
@@ -219,6 +224,10 @@ export default class BrowserProjectOpener {
       return Promise.resolve(pathfindingBasics);
     } else if (url === 'example://physics') {
       return Promise.resolve(physics);
+    } else if (url === 'example://physics-joints-demo') {
+      return Promise.resolve(physicsJointsDemo);
+    } else if (url === 'example://physics-joints-settings-demo') {
+      return Promise.resolve(physicsJointsSettingsDemo);
     } else if (url === 'example://platformer') {
       return Promise.resolve(platformer);
     } else if (url === 'example://platformer-double-jump') {

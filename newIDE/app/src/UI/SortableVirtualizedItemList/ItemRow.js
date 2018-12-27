@@ -22,12 +22,13 @@ const styles = {
 type Props = {
   index: number,
   item: Item,
-  onRename: (string) => void,
+  onRename: string => void,
   editingName: boolean,
   getThumbnail?: () => string,
   selected: true,
   onItemSelected: () => void,
   buildMenuTemplate: Item => any,
+  hasErrors: boolean,
 };
 
 class ThemableItemRow extends React.Component<Props, *> {
@@ -58,7 +59,14 @@ class ThemableItemRow extends React.Component<Props, *> {
   };
 
   render() {
-    const { item, selected, style, getThumbnail, muiTheme } = this.props;
+    const {
+      item,
+      selected,
+      style,
+      getThumbnail,
+      hasErrors,
+      muiTheme,
+    } = this.props;
 
     const itemName = item.getName();
     const label = this.props.editingName ? (
@@ -90,8 +98,11 @@ class ThemableItemRow extends React.Component<Props, *> {
     const itemStyle = {
       borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
       backgroundColor: selected
-        ? muiTheme.listItem.selectedBackgroundColor
+        ? hasErrors
+          ? muiTheme.listItem.selectedErrorBackgroundColor
+          : muiTheme.listItem.selectedBackgroundColor
         : undefined,
+      color: hasErrors ? muiTheme.listItem.errorTextColor : undefined,
     };
 
     return (

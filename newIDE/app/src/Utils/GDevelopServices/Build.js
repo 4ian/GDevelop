@@ -35,7 +35,11 @@ export const buildElectron = (
       axios.post(
         `${GDevelopBuildApi.baseUrl}/build?userId=${encodeURIComponent(
           userId
-        )}&key=${encodeURIComponent(key)}&type=electron-build&targets=${encodeURIComponent(targets.join(','))}`,
+        )}&key=${encodeURIComponent(
+          key
+        )}&type=electron-build&targets=${encodeURIComponent(
+          targets.join(',')
+        )}`,
         null,
         {
           params: {},

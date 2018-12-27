@@ -235,13 +235,14 @@ export default class SubscriptionDialog extends Component<Props, State> {
             ))}
             <Column>
               <Line>
-            <EmptyMessage>
-              Subscriptions can be stopped at any time. GDevelop uses Stripe.com
-              for secure payment. No credit card data is stored by GDevelop:
-              everything is managed by Stripe secure infrastructure.
-            </EmptyMessage>
+                <EmptyMessage>
+                  Subscriptions can be stopped at any time. GDevelop uses
+                  Stripe.com for secure payment. No credit card data is stored
+                  by GDevelop: everything is managed by Stripe secure
+                  infrastructure.
+                </EmptyMessage>
               </Line>
-              </Column>
+            </Column>
             {!userProfile.authenticated && (
               <PlaceholderMessage>
                 <p>

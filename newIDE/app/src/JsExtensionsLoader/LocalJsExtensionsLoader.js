@@ -6,7 +6,7 @@ const { findJsExtensionModules } = require('./LocalJsExtensionsFinder');
 
 /**
  * Loader that will find all JS extensions declared in GDJS/Runtime/Extensions/xxx/JsExtension.js.
- * If you add a new extension and also want it to be available for the web-app version, add it in 
+ * If you add a new extension and also want it to be available for the web-app version, add it in
  * BrowserJsExtensionsLoader.js
  */
 module.exports = function makeExtensionloader({ gd, filterExamples }) {
@@ -36,7 +36,11 @@ module.exports = function makeExtensionloader({ gd, filterExamples }) {
               if (extensionModule) {
                 return {
                   extensionModulePath,
-                  result: loadExtension(gd, gd.JsPlatform.get(), extensionModule),
+                  result: loadExtension(
+                    gd,
+                    gd.JsPlatform.get(),
+                    extensionModule
+                  ),
                 };
               }
 

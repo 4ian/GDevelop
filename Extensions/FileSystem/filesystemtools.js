@@ -9,13 +9,14 @@ gdjs.filesystem = {}
 
 /**
  * Get the path to 'Desktop' folder.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to the desktop folder
  */
-gdjs.filesystem.getFolderDesktop = function (runtimeScene) {
+gdjs.filesystem.getDesktopPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('desktop') ? electron.getPath('desktop') : '';
+    return electron.getPath('desktop') || '';
   } else {
     return '';
   }
@@ -23,13 +24,14 @@ gdjs.filesystem.getFolderDesktop = function (runtimeScene) {
 
 /**
  * Get the path to 'Documents' folder.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to the documents folder
  */
-gdjs.filesystem.getFolderDocuments = function (runtimeScene) {
+gdjs.filesystem.getDocumentsPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('documents') ? electron.getPath('documents') : '';
+    return electron.getPath('documents') || '';
   } else {
     return '';
   }
@@ -37,13 +39,14 @@ gdjs.filesystem.getFolderDocuments = function (runtimeScene) {
 
 /**
  * Get the path to 'Pictures' folder.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to the pictures folder
  */
-gdjs.filesystem.getFolderPictures = function (runtimeScene) {
+gdjs.filesystem.getPicturesPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('pictures') ? electron.getPath('pictures') : '';
+    return electron.getPath('pictures') || '';
   } else {
     return '';
   }
@@ -51,13 +54,14 @@ gdjs.filesystem.getFolderPictures = function (runtimeScene) {
 
 /**
  * Get the path to this applications 'executable' folder.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to this applications executable folder
  */
-gdjs.filesystem.getFolderExecutable = function (runtimeScene) {
+gdjs.filesystem.getExecutablePath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('exe') ? electron.getPath('exe') : '';
+    return electron.getPath('exe') || '';
   } else {
     return '';
   }
@@ -65,13 +69,14 @@ gdjs.filesystem.getFolderExecutable = function (runtimeScene) {
 
 /**
  * Get the path to 'userdata' folder.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to userdata folder
  */
-gdjs.filesystem.getFolderUserdata = function (runtimeScene) {
+gdjs.filesystem.getUserdataPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('userData') ? electron.getPath('userData') : '';
+    return electron.getPath('userData') || '';
   } else {
     return '';
   }
@@ -79,13 +84,14 @@ gdjs.filesystem.getFolderUserdata = function (runtimeScene) {
 
 /**
  * Get the path to 'temp' folder.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to temp folder
  */
-gdjs.filesystem.getFolderTemp = function (runtimeScene) {
+gdjs.filesystem.getTempPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('temp') ? electron.getPath('temp') : '';
+    return electron.getPath('temp') || '';
   } else {
     return '';
   }

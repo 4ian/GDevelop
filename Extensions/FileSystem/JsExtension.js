@@ -25,7 +25,7 @@ module.exports = {
 
     extension
       .addStrExpression(
-        "SpecialFolderDesktop",
+        "DesktopPath",
         t("Desktop folder"),
         t("Get the path to the desktop folder."),
         t("Special folders/Windows, Linux, MacOS"),
@@ -37,11 +37,11 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getFolderDesktop");
+      .setFunctionName("gdjs.filesystem.getDesktopPath");
 
     extension
       .addStrExpression(
-        "SpecialFolderDocuments",
+        "DocumentsPath",
         t("Documents folder"),
         t("Get the path to the documents folder."),
         t("Special folders/Windows, Linux, MacOS"),
@@ -53,11 +53,11 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getFolderDocuments");
+      .setFunctionName("gdjs.filesystem.getDocumentsPath");
 
-      extension
+    extension
       .addStrExpression(
-        "SpecialFolderPictures",
+        "PicturesPath",
         t("Pictures folder"),
         t("Get the path to the pictures folder."),
         t("Special folders/Windows, Linux, MacOS"),
@@ -69,11 +69,11 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getFolderPictures");
+      .setFunctionName("gdjs.filesystem.getPicturesPath");
 
-      extension
+    extension
       .addStrExpression(
-        "SpecialFolderExecutable",
+        "ExecutablePath",
         t("This games executable folder"),
         t("Get the path to this games executable folder."),
         t("Special folders/Windows, Linux, MacOS"),
@@ -85,11 +85,11 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getFolderExecutable");
+      .setFunctionName("gdjs.filesystem.getExecutablePath");
 
-      extension
+    extension
       .addStrExpression(
-        "SpecialFolderUserdata",
+        "UserdataPath",
         t("Userdata folder (For application settings)"),
         t("Get the path to userdata folder. (For application settings)"),
         t("Special folders/Windows, Linux, MacOS"),
@@ -101,11 +101,11 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getFolderUserdata");
+      .setFunctionName("gdjs.filesystem.getUserdataPath");
 
-      extension
+    extension
       .addStrExpression(
-        "SpecialFolderTemp",
+        "TempPath",
         t("Temp folder"),
         t("Get the path to temp folder."),
         t("Special folders/Windows, Linux, MacOS"),
@@ -117,7 +117,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getFolderTemp");
+      .setFunctionName("gdjs.filesystem.getTempPath");
 
     return extension;
   },

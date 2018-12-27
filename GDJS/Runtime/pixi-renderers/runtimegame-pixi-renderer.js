@@ -199,7 +199,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.setFullScreen = function(enable) {
     if (this._isFullscreen !== enable) {
         this._isFullscreen = !!enable;
 
-        var electron = gdjs.RuntimeGamePixiRenderer.getElectron();
+        var electron = this.getElectron();
         if (electron) { // Use Electron BrowserWindow API
             var browserWindow = electron.remote.getCurrentWindow();
             if (browserWindow) {
@@ -408,7 +408,7 @@ gdjs.RuntimeGamePixiRenderer.prototype.openURL = function(url) {
 gdjs.RuntimeGamePixiRenderer.prototype.stopGame = function() {
     // Try to detect the environment to use the most adapted
     // way of closing the app
-    var electron = gdjs.RuntimeGamePixiRenderer.getElectron();
+    var electron = this.getElectron();
     if (electron) {
         var browserWindow = electron.remote.getCurrentWindow();
         if (browserWindow) {
@@ -422,9 +422,16 @@ gdjs.RuntimeGamePixiRenderer.prototype.stopGame = function() {
 }
 
 /**
+ * Get the canvas DOM element.
+ */
+gdjs.RuntimeGamePixiRenderer.prototype.getCanvas = function() {
+    return this._pixiRenderer.view;
+}
+
+/**
  * Get the electron module, if running as a electron renderer process.
  */
-gdjs.RuntimeGamePixiRenderer.getElectron = function() {
+gdjs.RuntimeGamePixiRenderer.prototype.getElectron = function() {
     if (typeof require !== "undefined") {
         return require('electron');
     }

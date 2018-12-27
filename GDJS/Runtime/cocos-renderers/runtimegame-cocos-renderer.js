@@ -111,3 +111,21 @@ gdjs.RuntimeGameCocosRenderer.prototype.openURL = function(url) {
 gdjs.RuntimeGameCocosRenderer.prototype.stopGame = function() {
     // TODO - Not implemented as not useful for most games on mobile and browsers
 }
+
+/**
+ * Get the canvas DOM element.
+ */
+gdjs.RuntimeGameCocosRenderer.prototype.getCanvas = function() {
+    return cc.game.canvas;
+}
+
+/**
+ * Get the electron module, if running as a electron renderer process.
+ */
+gdjs.RuntimeGameCocosRenderer.prototype.getElectron = function() {
+    if (typeof require !== "undefined") {
+        return require('electron');
+    }
+
+    return null;
+}

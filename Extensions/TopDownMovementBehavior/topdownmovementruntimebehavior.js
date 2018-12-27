@@ -23,6 +23,7 @@ gdjs.TopDownMovementRuntimeBehavior = function(runtimeScene, behaviorData, owner
     this._rotateObject = behaviorData.rotateObject;
     this._angleOffset = behaviorData.angleOffset;
     this._ignoreDefaultControls = behaviorData.ignoreDefaultControls;
+    this._angle = 0; // The latest angle of movement, in degrees.
 
     //Attributes used when moving
     this._xVelocity = 0;
@@ -84,6 +85,15 @@ gdjs.TopDownMovementRuntimeBehavior.prototype.isMoving = function() {
 };
 gdjs.TopDownMovementRuntimeBehavior.prototype.getSpeed = function() {
     return Math.sqrt(this._xVelocity*this._xVelocity+this._yVelocity*this._yVelocity);
+};
+gdjs.TopDownMovementRuntimeBehavior.prototype.getXVelocity = function() {
+    return this._xVelocity;
+};
+gdjs.TopDownMovementRuntimeBehavior.prototype.getYVelocity = function() {
+    return this._yVelocity;
+};
+gdjs.TopDownMovementRuntimeBehavior.prototype.getAngle = function() {
+    return this._angle;
 };
 
 gdjs.TopDownMovementRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene)
@@ -159,8 +169,11 @@ gdjs.TopDownMovementRuntimeBehavior.prototype.doStepPreEvents = function(runtime
     object.setY(object.getY()+this._yVelocity*timeDelta);
 
     //Also update angle if needed
-    if ( (this._xVelocity !== 0 || this._yVelocity !== 0) && this._rotateObject ) {
-        object.rotateTowardAngle(directionInDeg+this._angleOffset, this._angularSpeed, runtimeScene);
+    if ( (this._xVelocity !== 0 || this._yVelocity !== 0) ) {
+        this._angle = directionInDeg;
+        if (this._rotateObject) {
+            object.rotateTowardAngle(directionInDeg+this._angleOffset, this._angularSpeed, runtimeScene);
+        }
     }
 
     this._leftKey = false;

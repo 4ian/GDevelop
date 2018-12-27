@@ -32,13 +32,13 @@ class GD_EXTENSION_API TopDownMovementBehavior : public Behavior {
   virtual Behavior* Clone() const { return new TopDownMovementBehavior(*this); }
 
   // Configuration:
-  bool DiagonalsAllowed() { return allowDiagonals; };
-  float GetAcceleration() { return acceleration; };
-  float GetDeceleration() { return deceleration; };
-  float GetMaxSpeed() { return maxSpeed; };
-  float GetAngularMaxSpeed() { return angularMaxSpeed; };
-  bool IsObjectRotated() { return rotateObject; }
-  float GetAngleOffset() { return angleOffset; };
+  bool DiagonalsAllowed() const { return allowDiagonals; };
+  float GetAcceleration() const { return acceleration; };
+  float GetDeceleration() const { return deceleration; };
+  float GetMaxSpeed() const { return maxSpeed; };
+  float GetAngularMaxSpeed() const { return angularMaxSpeed; };
+  bool IsObjectRotated() const { return rotateObject; }
+  float GetAngleOffset() const { return angleOffset; };
 
   void SetAllowDiagonals(bool allowDiagonals_) {
     allowDiagonals = allowDiagonals_;
@@ -52,8 +52,11 @@ class GD_EXTENSION_API TopDownMovementBehavior : public Behavior {
   void SetRotateObject(bool rotateObject_) { rotateObject = rotateObject_; };
   void SetAngleOffset(float angleOffset_) { angleOffset = angleOffset_; };
 
-  bool IsMoving() { return xVelocity != 0 || yVelocity != 0; };
-  float GetSpeed();
+  bool IsMoving() const { return xVelocity != 0 || yVelocity != 0; };
+  float GetSpeed() const;
+  float GetXVelocity() const { return xVelocity; };
+  float GetYVelocity() const { return yVelocity; };
+  float GetAngle() const { return angle; };
 
   void IgnoreDefaultControls(bool ignore = true) {
     ignoreDefaultControls = ignore;
@@ -100,6 +103,7 @@ class GD_EXTENSION_API TopDownMovementBehavior : public Behavior {
   float xVelocity;
   float yVelocity;
   float angularSpeed;
+  float angle;  // The latest angle of movement, in degrees.
 
   bool ignoreDefaultControls;  ///< If set to true, do not track the default
                                ///< inputs.

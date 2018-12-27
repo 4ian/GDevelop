@@ -16,7 +16,7 @@ gdjs.filesystem.getDesktopPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('desktop') || '';
+    return electron.remote.app.getPath('desktop') || '';
   } else {
     return '';
   }
@@ -31,7 +31,7 @@ gdjs.filesystem.getDocumentsPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('documents') || '';
+    return electron.remote.app.getPath('documents') || '';
   } else {
     return '';
   }
@@ -46,7 +46,7 @@ gdjs.filesystem.getPicturesPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('pictures') || '';
+    return electron.remote.app.getPath('pictures') || '';
   } else {
     return '';
   }
@@ -61,7 +61,7 @@ gdjs.filesystem.getExecutablePath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('exe') || '';
+    return electron.remote.app.getPath('exe') || '';
   } else {
     return '';
   }
@@ -76,7 +76,7 @@ gdjs.filesystem.getUserdataPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('userData') || '';
+    return electron.remote.app.getPath('userData') || '';
   } else {
     return '';
   }
@@ -91,7 +91,7 @@ gdjs.filesystem.getTempPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
-    return electron.getPath('temp') || '';
+    return electron.remote.app.getPath('temp') || '';
   } else {
     return '';
   }

@@ -824,6 +824,7 @@ export default class MainFrame extends React.Component<Props, State> {
       },
       () => this.updateToolbar()
     );
+    this.openProjectManager(false);
   };
 
   openResources = () => {

@@ -881,7 +881,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           />
         </List>
         <SearchBar
-          ref={searchBar => this._searchBar = searchBar}
+          ref={searchBar => (this._searchBar = searchBar)}
           value={searchText}
           onRequestSearch={() => {}}
           onChange={text =>

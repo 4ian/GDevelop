@@ -1213,7 +1213,11 @@ export default class MainFrame extends React.Component<Props, State> {
                 freezeUpdate={!projectManagerOpen}
               />
             )}
-            {!currentProject && <EmptyMessage>To begin, open or create a new project.</EmptyMessage>}
+            {!currentProject && (
+              <EmptyMessage>
+                To begin, open or create a new project.
+              </EmptyMessage>
+            )}
           </Drawer>
           <Toolbar
             ref={toolbar => (this.toolbar = toolbar)}

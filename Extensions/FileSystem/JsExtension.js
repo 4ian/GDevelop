@@ -28,7 +28,7 @@ module.exports = {
         "DesktopPath",
         t("Desktop folder"),
         t("Get the path to the desktop folder."),
-        t("Special folders/Windows, Linux, MacOS"),
+        t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -44,7 +44,7 @@ module.exports = {
         "DocumentsPath",
         t("Documents folder"),
         t("Get the path to the documents folder."),
-        t("Special folders/Windows, Linux, MacOS"),
+        t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -60,7 +60,7 @@ module.exports = {
         "PicturesPath",
         t("Pictures folder"),
         t("Get the path to the pictures folder."),
-        t("Special folders/Windows, Linux, MacOS"),
+        t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -76,7 +76,7 @@ module.exports = {
         "ExecutablePath",
         t("This games executable folder"),
         t("Get the path to this games executable folder."),
-        t("Special folders/Windows, Linux, MacOS"),
+        t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -92,7 +92,7 @@ module.exports = {
         "UserdataPath",
         t("Userdata folder (For application settings)"),
         t("Get the path to userdata folder. (For application settings)"),
-        t("Special folders/Windows, Linux, MacOS"),
+        t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -108,7 +108,7 @@ module.exports = {
         "TempPath",
         t("Temp folder"),
         t("Get the path to temp folder."),
-        t("Special folders/Windows, Linux, MacOS"),
+        t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -118,6 +118,22 @@ module.exports = {
         "Extensions/FileSystem/filesystemtools.js"
       )
       .setFunctionName("gdjs.filesystem.getTempPath");
+
+      extension
+      .addStrExpression(
+        "PathDelimiter",
+        t("Path delimiter"),
+        t("Get the operating system agnostic path delimiter."),
+        t("Filesystem/Windows, Linux, MacOS"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/FileSystem/filesystemtools.js"
+      )
+      .setFunctionName("gdjs.filesystem.getPathDelimiter");
 
     return extension;
   },

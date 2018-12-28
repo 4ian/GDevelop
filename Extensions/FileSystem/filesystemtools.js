@@ -96,3 +96,19 @@ gdjs.filesystem.getTempPath = function (runtimeScene) {
     return '';
   }
 }
+
+/**
+ * Get the path delimiter specific to the operating system.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
+ * @return {string} The path delimiter
+ */
+gdjs.filesystem.getPathDelimiter = function (runtimeScene) {
+  const electron = runtimeScene.getGame().getRenderer().getElectron();
+  const path = require('path');
+
+  if (electron && path) {
+    return path.sep || '';
+  } else {
+    return '';
+  }
+}

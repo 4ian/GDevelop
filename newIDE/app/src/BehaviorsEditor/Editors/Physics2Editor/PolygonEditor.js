@@ -1,11 +1,18 @@
 // @flow
 import * as React from 'react';
-import Checkbox from 'material-ui/Checkbox';
+import { Line } from '../../../UI/Grid';
 
-type Props = {||};
+type Vertice = {
+  x: number,
+  y: number,
+};
+
+type Props = {|
+  vertices: Array<Vertice>,
+|};
 
 export default class PolygonEditor extends React.Component<Props> {
   render() {
-    return <Checkbox label={'Checky'} />;
+    return <Line />;
   }
 }

@@ -9,6 +9,12 @@ import MenuItem from 'material-ui/MenuItem';
 import Edit from 'material-ui/svg-icons/image/edit';
 import IconButton from 'material-ui/IconButton';
 
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
+
 export type Instance = Object; // This could be improved using generics.
 export type Instances = Array<Instance>;
 export type Field = Object;
@@ -21,6 +27,9 @@ type Props = {|
   schema: Schema,
   mode?: 'column' | 'row',
   project?: Project,
+  resourceSources?: Array<ResourceSource>,
+  onChooseResource?: ChooseResourceFunction,
+  resourceExternalEditors?: Array<ResourceExternalEditor>,
 |};
 
 const styles = {
@@ -235,6 +244,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         key={field.name}
         behavior={this.props.instances[0]}
         project={this.props.project}
+        resourceSources={this.props.resourceSources}
+        onChooseResource={this.props.onChooseResource}
+        resourceExternalEditors={this.props.resourceExternalEditors}
       />
     );
   };

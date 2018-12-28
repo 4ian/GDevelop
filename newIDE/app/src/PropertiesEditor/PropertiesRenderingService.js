@@ -7,8 +7,13 @@ const components = {
 
 export default {
   components,
-  getDialogComponent: (type: string) => {
-    if (components.hasOwnProperty(type)) return components[type];
-    else return null;
+  getDialogComponent: (property: Object) => {
+    const extraInfoArray = property.getExtraInfo().toJSArray();
+    if (!extraInfoArray) return null;
+    
+    if (components.hasOwnProperty(extraInfoArray[0]))
+      return components[extraInfoArray[0]];
+    
+    return null;
   },
 };

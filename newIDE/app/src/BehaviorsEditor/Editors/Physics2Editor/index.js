@@ -5,14 +5,54 @@ import Checkbox from 'material-ui/Checkbox';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
+import ImagePreview from '../../../ResourcesList/ResourcePreview/ImagePreview';
+import ResourceSelector from '../../../ResourcesList/ResourceSelector';
+import ResourcesLoader from '../../../ResourcesLoader';
+import ShapePreview from './ShapePreview.js';
 import PolygonEditor from './PolygonEditor.js';
+import {
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../../../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
 
 type Props = {|
   behavior: Object,
   project: Object,
+  resourceSources: Array<ResourceSource>,
+  onChooseResource: ChooseResourceFunction,
+  resourceExternalEditors: Array<ResourceExternalEditor>,
 |};
 
-export default class Physics2Editor extends React.Component<Props> {
+type State = {|
+  image: string,
+  imageWidth: number,
+  imageHeight: number,
+|};
+
+export default class Physics2Editor extends React.Component<Props, State> {
+
+  resourcesLoader: typeof ResourcesLoader;
+
+  constructor(props: Props) {
+    super(props);
+
+    this.resourcesLoader = ResourcesLoader;
+
+    this.state = {
+      image: '',
+      imageWidth: 9,
+      imageHeight: 0,
+    };
+  }
+
+  _setImageSize = (width: number, height: number) => {
+    this.setState({
+      imageWidth: width,
+      imageHeight: height,
+    });
+  }
+
   _isBitEnabled(bitsValue: number, i: number) {
     return !!(bitsValue & (1 << i));
   }
@@ -29,7 +69,6 @@ export default class Physics2Editor extends React.Component<Props> {
     pos: number,
     spacing: boolean
   ) {
-    const { behavior, project } = this.props;
     const bitValues = parseInt(
       properties.get(isLayer ? 'layers' : 'masks').getValue(),
       10
@@ -64,13 +103,21 @@ export default class Physics2Editor extends React.Component<Props> {
     );
   }
 
-  renderNumericProperty(properties: Object, name: string) {
+  renderNumericProperty(
+    properties: Object,
+    name: string,
+    limit: boolean,
+    min: number,
+    step: number
+  ) {
     return (
       <SemiControlledTextField
         value={properties.get(name).getValue()}
         key={name}
         floatingLabelText={properties.get(name).getLabel()}
         floatingLabelFixed
+        min={limit ? min : undefined}
+        step={step}
         onChange={newValue => {
           this.props.behavior.updateProperty(
             name,
@@ -88,6 +135,7 @@ export default class Physics2Editor extends React.Component<Props> {
     const { behavior, project } = this.props;
     const properties = behavior.getProperties(project);
     const bits = Array(16).fill(null);
+    const shape = properties.get('shape').getValue();
 
     return (
       <Column>
@@ -188,56 +236,177 @@ export default class Physics2Editor extends React.Component<Props> {
           </SelectField>
         </Line>
         <Line>
-          <SemiControlledTextField
-            value={properties.get('shapeDimensionA').getValue()}
-            key={'shapeDimensionA'}
-            floatingLabelText={properties.get('shapeDimensionA').getLabel()}
-            floatingLabelFixed
-            onChange={newValue => {
-              behavior.updateProperty('shapeDimensionA', newValue, project);
-              this.forceUpdate();
-            }}
-            type="number"
-          />
-          <SemiControlledTextField
-            value={properties.get('shapeDimensionB').getValue()}
-            key={'shapeDimensionB'}
-            floatingLabelText={properties.get('shapeDimensionB').getLabel()}
-            floatingLabelFixed
-            onChange={newValue => {
-              behavior.updateProperty('shapeDimensionB', newValue, project);
-              this.forceUpdate();
-            }}
-            type="number"
-          />
-          {this.renderNumericProperty(properties, 'shapeOffsetX')}
-          {this.renderNumericProperty(properties, 'shapeOffsetY')}
+          {shape !== 'Polygon' && (
+            <SemiControlledTextField
+              value={properties
+                .get(shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA')
+                .getValue()}
+              key={'shapeDimensionA'}
+              floatingLabelText={
+                shape === 'Circle'
+                  ? 'Radius'
+                  : shape === 'Edge'
+                  ? 'Length'
+                  : 'Width'
+              }
+              floatingLabelFixed
+              min={0}
+              onChange={newValue => {
+                behavior.updateProperty(
+                  shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA',
+                  newValue,
+                  project
+                );
+                this.forceUpdate();
+              }}
+              type="number"
+            />
+          )}
+          {shape !== 'Polygon' && shape !== 'Circle' && (
+            <SemiControlledTextField
+              value={properties
+                .get(shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB')
+                .getValue()}
+              key={'shapeDimensionB'}
+              floatingLabelText={shape === 'Edge' ? 'Angle' : 'Height'}
+              floatingLabelFixed
+              min={shape === 'Edge' ? undefined : 0}
+              onChange={newValue => {
+                behavior.updateProperty(
+                  shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB',
+                  newValue,
+                  project
+                );
+                this.forceUpdate();
+              }}
+              type="number"
+            />
+          )}
+          {shape === 'Polygon' && (
+            <SelectField
+              floatingLabelText={properties.get('polygonOrigin').getLabel()}
+              floatingLabelFixed
+              value={properties.get('polygonOrigin').getValue()}
+              onChange={(e, index, newValue) => {
+                behavior.updateProperty('polygonOrigin', newValue, project);
+                this.forceUpdate();
+              }}
+            >
+              {[
+                <MenuItem
+                  key={'center'}
+                  value={'Center'}
+                  primaryText={'Center'}
+                />,
+                <MenuItem
+                  key={'origin'}
+                  value={'Origin'}
+                  primaryText={'Origin'}
+                />,
+                <MenuItem
+                  key={'topLeft'}
+                  value={'TopLeft'}
+                  primaryText={'Top-Left'}
+                />,
+              ]}
+            </SelectField>
+          )}
+          {this.renderNumericProperty(properties, 'shapeOffsetX', false, 0, 1)}
+          {this.renderNumericProperty(properties, 'shapeOffsetY', false, 0, 1)}
         </Line>
         <Line>
-          <PolygonEditor />
+          <Column>
+            <Line>
+              <div style={{width: '100%'}}>
+                <ImagePreview
+                  resourceName={this.state.image}
+                  project={this.props.project}
+                  resourcesLoader={this.resourcesLoader}
+                  onSize={this._setImageSize}
+                >
+                  <ShapePreview
+                    shape={properties.get('shape').getValue()}
+                    dimensionA={parseFloat(properties.get('shapeDimensionA').getValue())}
+                    dimensionB={parseFloat(properties.get('shapeDimensionB').getValue())}
+                    offsetX={parseFloat(properties.get('shapeOffsetX').getValue())}
+                    offsetY={parseFloat(properties.get('shapeOffsetY').getValue())}
+                    polygonOrigin={properties.get('polygonOrigin').getValue()}
+                    vertices={JSON.parse(properties.get('vertices').getValue())}
+                    width={this.state.imageWidth}
+                    height={this.state.imageHeight}
+                  />
+                </ImagePreview>
+              </div>
+            </Line>
+            <Line>
+              <ResourceSelector
+                project={this.props.project}
+                resourceSources={this.props.resourceSources}
+                onChooseResource={this.props.onChooseResource}
+                resourceExternalEditors={this.props.resourceExternalEditors}
+                resourcesLoader={this.resourcesLoader}
+                resourceKind={'image'}
+                initialResourceName={''}
+                fullWidth={false}
+                onChange={resourceName => {
+                  this.setState({ image: resourceName });
+                  this.forceUpdate();
+                }}
+              />
+            </Line>
+          </Column>
+          {shape === 'Polygon' && (
+            <PolygonEditor
+              vertices={JSON.parse(properties.get('vertices').getValue())}
+            />
+          )}
         </Line>
         <Line>
           <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(properties, 'density')}
+            {this.renderNumericProperty(properties, 'density', true, 0, 0.1)}
           </div>
           <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(properties, 'gravityScale')}
-          </div>
-        </Line>
-        <Line>
-          <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(properties, 'friction')}
-          </div>
-          <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(properties, 'restitution')}
+            {this.renderNumericProperty(
+              properties,
+              'gravityScale',
+              false,
+              0,
+              0.1
+            )}
           </div>
         </Line>
         <Line>
           <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(properties, 'linearDamping')}
+            {this.renderNumericProperty(properties, 'friction', true, 0, 0.1)}
           </div>
           <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(properties, 'angularDamping')}
+            {this.renderNumericProperty(
+              properties,
+              'restitution',
+              true,
+              0,
+              0.1
+            )}
+          </div>
+        </Line>
+        <Line>
+          <div style={{ width: '50%' }}>
+            {this.renderNumericProperty(
+              properties,
+              'linearDamping',
+              false,
+              0,
+              0.05
+            )}
+          </div>
+          <div style={{ width: '50%' }}>
+            {this.renderNumericProperty(
+              properties,
+              'angularDamping',
+              false,
+              0,
+              0.05
+            )}
           </div>
         </Line>
         <Line>

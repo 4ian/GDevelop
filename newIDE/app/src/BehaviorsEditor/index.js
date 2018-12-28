@@ -183,6 +183,9 @@ export default class BehaviorsEditor extends Component {
                       schema={propertiesSchema}
                       instances={[behavior]}
                       project={project}
+                      resourceSources={this.props.resourceSources}
+                      onChooseResource={this.props.onChooseResource}
+                      resourceExternalEditors={this.props.resourceExternalEditors}
                     />
                   ) : (
                     <EmptyMessage>

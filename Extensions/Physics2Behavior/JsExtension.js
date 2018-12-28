@@ -49,22 +49,26 @@ module.exports = {
       }
       if (propertyName === 'shapeDimensionA') {
         newValue = parseFloat(newValue);
-        if (newValue < 0) newValue = 0;
+        if (newValue !== newValue) return false;
         behaviorContent.shapeDimensionA = newValue;
         return true;
       }
       if (propertyName === 'shapeDimensionB') {
         newValue = parseFloat(newValue);
-        if (newValue < 0) newValue = 0;
+        if (newValue !== newValue) return false;
         behaviorContent.shapeDimensionB = newValue;
         return true;
       }
       if (propertyName === 'shapeOffsetX') {
-        behaviorContent.shapeOffsetX = parseFloat(newValue);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.shapeOffsetX = newValue;
         return true;
       }
       if (propertyName === 'shapeOffsetY') {
-        behaviorContent.shapeOffsetY = parseFloat(newValue);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.shapeOffsetY = newValue;
         return true;
       }
       if (propertyName === 'polygonOrigin') {
@@ -76,33 +80,37 @@ module.exports = {
         return true;
       }
       if (propertyName === 'density') {
-        newValue = parseFloat(newValue);
-        if (newValue < 0) newValue = 0;
-        behaviorContent.density = newValue;
+        behaviorContent.density = parseFloat(newValue);
         return true;
       }
       if (propertyName === 'friction') {
         newValue = parseFloat(newValue);
-        if (newValue < 0) newValue = 0;
+        if (newValue !== newValue) return false;
         behaviorContent.friction = newValue;
         return true;
       }
       if (propertyName === 'restitution') {
         newValue = parseFloat(newValue);
-        if (newValue < 0) newValue = 0;
+        if (newValue !== newValue) return false;
         behaviorContent.restitution = newValue;
         return true;
       }
       if (propertyName === 'linearDamping') {
-        behaviorContent.linearDamping = parseFloat(newValue);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.linearDamping = newValue;
         return true;
       }
       if (propertyName === 'angularDamping') {
-        behaviorContent.angularDamping = parseFloat(newValue);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.angularDamping = newValue;
         return true;
       }
       if (propertyName === 'gravityScale') {
-        behaviorContent.gravityScale = parseFloat(newValue);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.gravityScale = newValue;
         return true;
       }
       if (propertyName === 'layers') {
@@ -160,7 +168,7 @@ module.exports = {
           .addExtraInfo('Box')
           .addExtraInfo('Circle')
           .addExtraInfo('Edge')
-          .addExtraInfo("Polygon")
+          .addExtraInfo('Polygon')
       );
       behaviorProperties.set(
         'shapeDimensionA',
@@ -188,7 +196,7 @@ module.exports = {
       );
       behaviorProperties.set(
         'polygonOrigin',
-        new gd.PropertyDescriptor(behaviorContent.polygonOrigin || "Center")
+        new gd.PropertyDescriptor(behaviorContent.polygonOrigin || 'Center')
           .setType('Choice')
           .setLabel('Polygon Origin')
           .addExtraInfo('Center')
@@ -197,8 +205,9 @@ module.exports = {
       );
       behaviorProperties.set(
         'vertices',
-        new gd.PropertyDescriptor(JSON.stringify(behaviorContent.vertices || []))
-          .setLabel('Vertices')
+        new gd.PropertyDescriptor(
+          JSON.stringify(behaviorContent.vertices || [])
+        ).setLabel('Vertices')
       );
       behaviorProperties.set(
         'density',
@@ -239,14 +248,14 @@ module.exports = {
       behaviorProperties.set(
         'layers',
         new gd.PropertyDescriptor(behaviorContent.layers.toString(10))
-        .setType('Number')
-        .setLabel('Layers')
+          .setType('Number')
+          .setLabel('Layers')
       );
       behaviorProperties.set(
         'masks',
         new gd.PropertyDescriptor(behaviorContent.masks.toString(10))
-        .setType('Number')
-        .setLabel('Masks')
+          .setType('Number')
+          .setLabel('Masks')
       );
 
       return behaviorProperties;
@@ -263,7 +272,7 @@ module.exports = {
         shapeDimensionB: 0,
         shapeOffsetX: 0,
         shapeOffsetY: 0,
-        polygonOrigin: "Center",
+        polygonOrigin: 'Center',
         vertices: [],
         density: 1.0,
         friction: 0.3,
@@ -283,23 +292,27 @@ module.exports = {
       newValue
     ) {
       if (propertyName === 'gravityX') {
-        sharedContent.gravityX = parseInt(newValue, 10);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.gravityX = newValue;
         return true;
       }
       if (propertyName === 'gravityY') {
-        sharedContent.gravityY = parseInt(newValue, 10);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.gravityY = newValue;
         return true;
       }
       if (propertyName === 'scaleX') {
         newValue = parseInt(newValue, 10);
-        if (newValue <= 0) newValue = 1;
-        sharedContent.scaleX = newValue;
+        if (newValue !== newValue) return false;
+        behaviorContent.scaleX = newValue;
         return true;
       }
       if (propertyName === 'scaleY') {
         newValue = parseInt(newValue, 10);
-        if (newValue <= 0) newValue = 1;
-        sharedContent.scaleY = newValue;
+        if (newValue !== newValue) return false;
+        behaviorContent.scaleY = newValue;
         return true;
       }
 

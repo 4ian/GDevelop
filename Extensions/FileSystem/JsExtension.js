@@ -32,8 +32,8 @@ module.exports = {
       ),
       t("The path _PARAM0_ exists"),
       t("Filesystem/Windows, Linux, MacOS"),
-      "JsPlatform/Extensions/take_screenshot24.png",
-      "JsPlatform/Extensions/take_screenshot32.png"
+      "JsPlatform/Extensions/filesystem_path_exists24.png",
+      "JsPlatform/Extensions/filesystem_path_exists32.png"
     )
     .addParameter("string", t("Path to file or directory"), "", false)
     .getCodeExtraInformation()
@@ -49,8 +49,8 @@ module.exports = {
         t("Create a new directory at the specified path."),
         t("Create directory _PARAM0_"),
         t("Filesystem/Windows, Linux, MacOS"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/filesystem_create_folder24.png",
+        "JsPlatform/Extensions/filesystem_create_folder32.png"
       )
       .addParameter("string", t("Directory"), "", false)
       .getCodeExtraInformation()
@@ -65,8 +65,8 @@ module.exports = {
         t("Desktop folder"),
         t("Get the path to the desktop folder."),
         t("Filesystem/Windows, Linux, MacOS"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/filesystem_folder24.png",
+        "JsPlatform/Extensions/filesystem_folder32.png"
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -81,8 +81,8 @@ module.exports = {
         t("Documents folder"),
         t("Get the path to the documents folder."),
         t("Filesystem/Windows, Linux, MacOS"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/filesystem_folder24.png",
+        "JsPlatform/Extensions/filesystem_folder32.png"
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -97,8 +97,8 @@ module.exports = {
         t("Pictures folder"),
         t("Get the path to the pictures folder."),
         t("Filesystem/Windows, Linux, MacOS"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/filesystem_folder24.png",
+        "JsPlatform/Extensions/filesystem_folder32.png"
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -113,8 +113,8 @@ module.exports = {
         t("This games executable folder"),
         t("Get the path to this games executable folder."),
         t("Filesystem/Windows, Linux, MacOS"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/filesystem_folder24.png",
+        "JsPlatform/Extensions/filesystem_folder32.png"
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -129,8 +129,8 @@ module.exports = {
         t("Userdata folder (For application settings)"),
         t("Get the path to userdata folder. (For application settings)"),
         t("Filesystem/Windows, Linux, MacOS"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/filesystem_folder24.png",
+        "JsPlatform/Extensions/filesystem_folder32.png"
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -145,8 +145,8 @@ module.exports = {
         t("Temp folder"),
         t("Get the path to temp folder."),
         t("Filesystem/Windows, Linux, MacOS"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/filesystem_folder24.png",
+        "JsPlatform/Extensions/filesystem_folder32.png"
       )
       .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
@@ -161,8 +161,8 @@ module.exports = {
         t("Path delimiter"),
         t("Get the operating system agnostic path delimiter."),
         t("Filesystem/Windows, Linux, MacOS"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/filesystem_folder24.png",
+        "JsPlatform/Extensions/filesystem_folder32.png"
       )
       .getCodeExtraInformation()
       .setIncludeFile(

@@ -4,6 +4,8 @@ import {
   type ExtensionLoadingResult,
   loadExtension,
 } from '.';
+import ObjectsEditorService from '../ObjectEditor/ObjectsEditorService';
+import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 const gd = global.gd;
 
 const jsExtensions = [
@@ -27,22 +29,64 @@ const jsExtensions = [
     name: 'Physics2',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Physics2Behavior/JsExtension.js'),
   },
+  {
+    name: 'ExampleJsExtension',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/ExampleJsExtension/JsExtension.js'),
+  },
 ];
+
+type MakeExtensionsLoaderArguments = {|
+  objectsEditorService: typeof ObjectsEditorService,
+  objectsRenderingService: typeof ObjectsRenderingService,
+  filterExamples: boolean,
+|};
 
 /**
  * Loader that load all JS extensions required in this file.
  * Extensions are usually auto-discovered when declared in Extensions/xxx/JsExtension.js, but not
  * for the web-app where everything must be bundled.
  */
-export default class BrowserJsExtensionsLoader implements JsExtensionsLoader {
-  loadAllExtensions(): Promise<
-    Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
-  > {
-    return Promise.resolve(
-      jsExtensions.map(({ name, extensionModule }) => ({
-        extensionModulePath: 'internal-extension://' + name,
-        result: loadExtension(gd, gd.JsPlatform.get(), extensionModule),
-      }))
-    );
-  }
+export default function makeExtensionsLoader({
+  objectsEditorService,
+  objectsRenderingService,
+  filterExamples,
+}: MakeExtensionsLoaderArguments): JsExtensionsLoader {
+  return {
+    loadAllExtensions(): Promise<
+      Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
+    > {
+      return Promise.resolve(
+        jsExtensions
+          .filter(({ name }) => !filterExamples || !name.includes('Example'))
+          .map(({ name, extensionModule }) => {
+            // Load any editor for objects, if we have somewhere where
+            // to register them.
+            if (
+              objectsEditorService &&
+              extensionModule.registerEditorConfigurations
+            ) {
+              extensionModule.registerEditorConfigurations(
+                objectsEditorService
+              );
+            }
+
+            // Load any renderer for objects, if we have somewhere where
+            // to register them.
+            if (
+              objectsRenderingService &&
+              extensionModule.registerInstanceRenderers
+            ) {
+              extensionModule.registerInstanceRenderers(
+                objectsRenderingService
+              );
+            }
+
+            return {
+              extensionModulePath: 'internal-extension://' + name,
+              result: loadExtension(gd, gd.JsPlatform.get(), extensionModule),
+            };
+          })
+      );
+    },
+  };
 }

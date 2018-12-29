@@ -18,8 +18,10 @@ import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
-import makeExtensionloader from './JsExtensionsLoader/LocalJsExtensionsLoader';
+import makeExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
 import { makeLocalEventsFunctionWriter } from './EventsFunctionsExtensionsLoader/LocalEventsFunctionWriter';
+import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
+import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
 const gd = global.gd;
 
 export const create = (authentification: Authentification) => {
@@ -63,8 +65,10 @@ export const create = (authentification: Authentification) => {
           resourceSources={localResourceSources}
           resourceExternalEditors={localResourceExternalEditors}
           authentification={authentification}
-          extensionsLoader={makeExtensionloader({
+          extensionsLoader={makeExtensionsLoader({
             gd,
+            objectsEditorService: ObjectsEditorService,
+            objectsRenderingService: ObjectsRenderingService,
             filterExamples: !Window.isDev(),
           })}
           initialPathsOrURLsToOpen={appArguments['_']}

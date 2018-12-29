@@ -17,7 +17,9 @@ import browserResourceSources from './ResourcesList/BrowserResourceSources';
 import browserResourceExternalEditors from './ResourcesList/BrowserResourceExternalEditors';
 import BrowserS3PreviewLauncher from './Export/BrowserExporters/BrowserS3PreviewLauncher';
 import { getBrowserExporters } from './Export/BrowserExporters';
-import BrowserJsExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
+import makeExtensionsLoader from './JsExtensionsLoader/BrowserJsExtensionsLoader';
+import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
+import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
 import { makeBrowserS3EventsFunctionWriter } from './EventsFunctionsExtensionsLoader/BrowserS3EventsFunctionWriter';
 
 export const create = (authentification: Authentification) => {
@@ -42,7 +44,11 @@ export const create = (authentification: Authentification) => {
       resourceSources={browserResourceSources}
       resourceExternalEditors={browserResourceExternalEditors}
       authentification={authentification}
-      extensionsLoader={new BrowserJsExtensionsLoader()}
+      extensionsLoader={makeExtensionsLoader({
+        objectsEditorService: ObjectsEditorService,
+        objectsRenderingService: ObjectsRenderingService,
+        filterExamples: !Window.isDev(),
+      })}
       initialPathsOrURLsToOpen={appArguments['_']}
       eventsFunctionWriter={makeBrowserS3EventsFunctionWriter()}
     />

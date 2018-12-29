@@ -1007,6 +1007,11 @@ Object {
         "fullGroupName": "Top-down movement/Movement",
         "type": "TopDownMovementBehavior::Acceleration",
       },
+      "Angle of movement": Object {
+        "displayedName": "Angle of movement",
+        "fullGroupName": "Top-down movement/Movement",
+        "type": "TopDownMovementBehavior::Angle",
+      },
       "Angular maximum speed": Object {
         "displayedName": "Angular maximum speed",
         "fullGroupName": "Top-down movement/Movement",
@@ -1041,6 +1046,16 @@ Object {
         "displayedName": "Speed",
         "fullGroupName": "Top-down movement/Movement",
         "type": "TopDownMovementBehavior::Speed",
+      },
+      "Speed on X axis": Object {
+        "displayedName": "Speed on X axis",
+        "fullGroupName": "Top-down movement/Movement",
+        "type": "TopDownMovementBehavior::XVelocity",
+      },
+      "Speed on Y axis": Object {
+        "displayedName": "Speed on Y axis",
+        "fullGroupName": "Top-down movement/Movement",
+        "type": "TopDownMovementBehavior::YVelocity",
       },
     },
   },
@@ -1583,7 +1598,7 @@ Array [
     "type": "StopSoundCanal",
   },
   Object {
-    "displayedName": "Delete a file",
+    "displayedName": "Clear a storage",
     "fullGroupName": "Storage",
     "type": "DeleteFichier",
   },
@@ -1618,12 +1633,12 @@ Array [
     "type": "LireFichierTxt",
   },
   Object {
-    "displayedName": "Load a structured file in memory",
+    "displayedName": "Load a storage in memory",
     "fullGroupName": "Storage",
     "type": "LoadFile",
   },
   Object {
-    "displayedName": "Close a structured file",
+    "displayedName": "Close a storage",
     "fullGroupName": "Storage",
     "type": "UnloadFile",
   },
@@ -2913,6 +2928,11 @@ Array [
     "type": "TopDownMovementBehavior::Acceleration",
   },
   Object {
+    "displayedName": "Angle of movement",
+    "fullGroupName": "Top-down movement/Movement",
+    "type": "TopDownMovementBehavior::Angle",
+  },
+  Object {
     "displayedName": "Rotation offset",
     "fullGroupName": "Top-down movement/Movement",
     "type": "TopDownMovementBehavior::AngleOffset",
@@ -2951,6 +2971,16 @@ Array [
     "displayedName": "Speed",
     "fullGroupName": "Top-down movement/Movement",
     "type": "TopDownMovementBehavior::Speed",
+  },
+  Object {
+    "displayedName": "Speed on X axis",
+    "fullGroupName": "Top-down movement/Movement",
+    "type": "TopDownMovementBehavior::XVelocity",
+  },
+  Object {
+    "displayedName": "Speed on Y axis",
+    "fullGroupName": "Top-down movement/Movement",
+    "type": "TopDownMovementBehavior::YVelocity",
   },
   Object {
     "displayedName": "Angle",

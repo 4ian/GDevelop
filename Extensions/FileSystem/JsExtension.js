@@ -24,6 +24,44 @@ module.exports = {
     ).setExtensionHelpPath("/all-features/filesystem");
 
     extension
+    .addCondition(
+      "PathExists",
+      t("File or directory exists"),
+      t(
+        "Check if the file or directory exists."
+      ),
+      t("The path _PARAM1_ exists"),
+      t("Filesystem/Windows, Linux, MacOS"),
+      "JsPlatform/Extensions/take_screenshot24.png",
+      "JsPlatform/Extensions/take_screenshot32.png"
+    )
+    .addCodeOnlyParameter('currentScene', '')
+    .addParameter("string", t("Path to file or directory"), "", false)
+    .getCodeExtraInformation()
+    .setIncludeFile(
+      "Extensions/FileSystem/filesystemtools.js"
+    )
+    .setFunctionName("gdjs.filesystem.pathExists");
+
+    extension
+      .addAction(
+        "MakeDirectory",
+        t("Create a directory"),
+        t("Create a new directory at the specified path."),
+        t("Create directory _PARAM1_"),
+        t("Filesystem/Windows, Linux, MacOS"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addCodeOnlyParameter('currentScene', '')
+      .addParameter("string", t("Directory"), "", false)
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/FileSystem/filesystemtools.js"
+      )
+      .setFunctionName("gdjs.filesystem.getMakeDirectory");
+
+    extension
       .addStrExpression(
         "DesktopPath",
         t("Desktop folder"),

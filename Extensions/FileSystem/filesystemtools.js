@@ -112,3 +112,35 @@ gdjs.filesystem.getPathDelimiter = function (runtimeScene) {
     return '';
   }
 }
+
+/**
+ * Create a new directory at the given path.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
+ * @param {string} directory The path to create a new directory
+ */
+gdjs.filesystem.getMakeDirectory = function (runtimeScene, directory) {
+  const electron = runtimeScene.getGame().getRenderer().getElectron();
+
+  if (electron) {
+    const filesystem = require('fs');
+    if (!filesystem.existsSync(directory))
+      filesystem.mkdirSync(directory);
+  }
+}
+
+/**
+ * Check if the file or directory exists.
+ * @param {gdjs.RuntimeScene} runtimeScene The current scene
+ * @param {string} directory The path to the file or directory
+ * @return {boolean} True if fhe file or directory exists
+ */
+gdjs.filesystem.pathExists = function (runtimeScene, path) {
+  const electron = runtimeScene.getGame().getRenderer().getElectron();
+  
+  if (electron) {
+    const filesystem = require('fs');
+    return filesystem.existsSync(path) ? 1 : 0;
+  } else {
+    return 0;
+  }
+}

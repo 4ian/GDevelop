@@ -1,18 +1,18 @@
 /**
  * @memberof gdjs
- * @class filesystem
+ * @class fileSystem
  * @static
  * @private
  */
 
-gdjs.filesystem = {}
+gdjs.fileSystem = {}
 
 /**
  * Get the path to 'Desktop' folder.
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to the desktop folder
  */
-gdjs.filesystem.getDesktopPath = function (runtimeScene) {
+gdjs.fileSystem.getDesktopPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
@@ -27,7 +27,7 @@ gdjs.filesystem.getDesktopPath = function (runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to the documents folder
  */
-gdjs.filesystem.getDocumentsPath = function (runtimeScene) {
+gdjs.fileSystem.getDocumentsPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
@@ -42,7 +42,7 @@ gdjs.filesystem.getDocumentsPath = function (runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to the pictures folder
  */
-gdjs.filesystem.getPicturesPath = function (runtimeScene) {
+gdjs.fileSystem.getPicturesPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
@@ -57,7 +57,7 @@ gdjs.filesystem.getPicturesPath = function (runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to this applications executable folder
  */
-gdjs.filesystem.getExecutablePath = function (runtimeScene) {
+gdjs.fileSystem.getExecutablePath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
@@ -72,7 +72,7 @@ gdjs.filesystem.getExecutablePath = function (runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to userdata folder
  */
-gdjs.filesystem.getUserdataPath = function (runtimeScene) {
+gdjs.fileSystem.getUserdataPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
@@ -87,7 +87,7 @@ gdjs.filesystem.getUserdataPath = function (runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to temp folder
  */
-gdjs.filesystem.getTempPath = function (runtimeScene) {
+gdjs.fileSystem.getTempPath = function (runtimeScene) {
   const electron = runtimeScene.getGame().getRenderer().getElectron();
 
   if (electron) {
@@ -99,14 +99,12 @@ gdjs.filesystem.getTempPath = function (runtimeScene) {
 
 /**
  * Get the path delimiter specific to the operating system.
- * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path delimiter
  */
-gdjs.filesystem.getPathDelimiter = function (runtimeScene) {
-  const electron = runtimeScene.getGame().getRenderer().getElectron();
-  const path = require('path');
+gdjs.fileSystem.getPathDelimiter = function () {
+  const path = typeof require !== 'undefined' ? require('path') : null;
 
-  if (electron && path) {
+  if (path) {
     return path.sep || '';
   } else {
     return '';
@@ -115,32 +113,28 @@ gdjs.filesystem.getPathDelimiter = function (runtimeScene) {
 
 /**
  * Create a new directory at the given path.
- * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @param {string} directory The path to create a new directory
  */
-gdjs.filesystem.getMakeDirectory = function (runtimeScene, directory) {
-  const electron = runtimeScene.getGame().getRenderer().getElectron();
+gdjs.fileSystem.makeDirectory = function (directory) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
 
-  if (electron) {
-    const filesystem = require('fs');
-    if (!filesystem.existsSync(directory))
-      filesystem.mkdirSync(directory);
+  if (fileSystem) {
+    if (!fileSystem.existsSync(directory))
+      fileSystem.mkdirSync(directory);
   }
 }
 
 /**
  * Check if the file or directory exists.
- * @param {gdjs.RuntimeScene} runtimeScene The current scene
- * @param {string} directory The path to the file or directory
+ * @param {string} path The path to the file or directory
  * @return {boolean} True if fhe file or directory exists
  */
-gdjs.filesystem.pathExists = function (runtimeScene, path) {
-  const electron = runtimeScene.getGame().getRenderer().getElectron();
-  
-  if (electron) {
-    const filesystem = require('fs');
-    return filesystem.existsSync(path) ? 1 : 0;
+gdjs.fileSystem.pathExists = function (path) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+
+  if (fileSystem) {
+    return fileSystem.existsSync(path);
   } else {
-    return 0;
+    return false;
   }
 }

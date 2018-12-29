@@ -30,36 +30,34 @@ module.exports = {
       t(
         "Check if the file or directory exists."
       ),
-      t("The path _PARAM1_ exists"),
+      t("The path _PARAM0_ exists"),
       t("Filesystem/Windows, Linux, MacOS"),
       "JsPlatform/Extensions/take_screenshot24.png",
       "JsPlatform/Extensions/take_screenshot32.png"
     )
-    .addCodeOnlyParameter('currentScene', '')
     .addParameter("string", t("Path to file or directory"), "", false)
     .getCodeExtraInformation()
     .setIncludeFile(
       "Extensions/FileSystem/filesystemtools.js"
     )
-    .setFunctionName("gdjs.filesystem.pathExists");
+    .setFunctionName("gdjs.fileSystem.pathExists");
 
     extension
       .addAction(
         "MakeDirectory",
         t("Create a directory"),
         t("Create a new directory at the specified path."),
-        t("Create directory _PARAM1_"),
+        t("Create directory _PARAM0_"),
         t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addCodeOnlyParameter('currentScene', '')
       .addParameter("string", t("Directory"), "", false)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getMakeDirectory");
+      .setFunctionName("gdjs.fileSystem.makeDirectory");
 
     extension
       .addStrExpression(
@@ -75,7 +73,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getDesktopPath");
+      .setFunctionName("gdjs.fileSystem.getDesktopPath");
 
     extension
       .addStrExpression(
@@ -91,7 +89,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getDocumentsPath");
+      .setFunctionName("gdjs.fileSystem.getDocumentsPath");
 
     extension
       .addStrExpression(
@@ -107,7 +105,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getPicturesPath");
+      .setFunctionName("gdjs.fileSystem.getPicturesPath");
 
     extension
       .addStrExpression(
@@ -123,7 +121,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getExecutablePath");
+      .setFunctionName("gdjs.fileSystem.getExecutablePath");
 
     extension
       .addStrExpression(
@@ -139,7 +137,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getUserdataPath");
+      .setFunctionName("gdjs.fileSystem.getUserdataPath");
 
     extension
       .addStrExpression(
@@ -155,7 +153,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getTempPath");
+      .setFunctionName("gdjs.fileSystem.getTempPath");
 
       extension
       .addStrExpression(
@@ -166,12 +164,11 @@ module.exports = {
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addCodeOnlyParameter('currentScene', '')
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.filesystem.getPathDelimiter");
+      .setFunctionName("gdjs.fileSystem.getPathDelimiter");
 
     return extension;
   },

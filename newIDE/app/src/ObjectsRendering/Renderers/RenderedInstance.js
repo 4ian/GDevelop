@@ -1,6 +1,6 @@
 /**
- * RenderedInstance represents the object associated to an instance
- * when it is rendered in a scene editor (see SceneAreaCtrl).
+ * RenderedInstance is the base class used for creating renderers of instances,
+ * which display on the scene editor, using Pixi.js, the instance of an object (see InstancesEditor).
  *
  * @class RenderedInstance
  * @constructor
@@ -20,7 +20,7 @@ function RenderedInstance(
   this._project = project;
   this._layout = layout;
   this._pixiResourcesLoader = pixiResourcesLoader;
-  this.wasUsed = true; //Used by SceneAreaCtrl to track rendered instance that are not used anymore.
+  this.wasUsed = true; //Used by InstancesRenderer to track rendered instance that are not used anymore.
 }
 
 /**

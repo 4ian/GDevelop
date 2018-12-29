@@ -141,6 +141,4 @@ The editor, the game engine and extensions are always in development. Your contr
 
 * To submit your changes, you have first to create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
 
-* Before pushing your changes, make sure that your code is properly formatted. Run `npm run format` (or `yarn format`) in newIDE/app folder.
-
 * Finally, make sure that the tests pass (refer to this README and to the [game engine README](https://github.com/4ian/GDevelop/tree/master/GDJS)) for learning how to run tests.

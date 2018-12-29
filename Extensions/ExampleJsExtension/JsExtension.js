@@ -262,7 +262,7 @@ module.exports = {
     };
     dummyObject.setRawJSONContent(
       JSON.stringify({
-        property1: "Initial value",
+        property1: "Hello world",
         property2: true,
         property3: 123
       })
@@ -311,13 +311,18 @@ module.exports = {
       return instanceProperties;
     };
 
-    extension.addObject(
-      "DummyObject",
-      t("Dummy object for testing"),
-      t("This dummy object does nothing"),
-      "CppPlatform/Extensions/topdownmovementicon.png",
-      dummyObject
-    );
+    extension
+      .addObject(
+        "DummyObject",
+        t("Dummy object for testing"),
+        t("This dummy object does nothing"),
+        "CppPlatform/Extensions/topdownmovementicon.png",
+        dummyObject
+      )
+      .setIncludeFile("Extensions/ExampleJsExtension/dummyruntimeobject.js")
+      .addIncludeFile(
+        "Extensions/ExampleJsExtension/dummyruntimeobject-pixi-renderer.js"
+      );
 
     return extension;
   },
@@ -325,10 +330,10 @@ module.exports = {
    * You can optionally add sanity tests that will check the basic working
    * of your extension behaviors/objects by instanciating behaviors/objects
    * and setting the property to a given value.
-   * 
+   *
    * If you don't have any tests, you can simply return an empty array like this:
    * `runExtensionSanityTests: function(gd, extension) { return []; }`
-   * 
+   *
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
@@ -351,5 +356,116 @@ module.exports = {
         "Testing value"
       )
     ];
+  },
+  /**
+   * Register editors for objects.
+   * 
+   * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
+   */
+  registerEditorConfigurations: function(objectsEditorService) {
+    objectsEditorService.registerEditorConfiguration(
+      "MyDummyExtension::DummyObject",
+      objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor()
+    );
+  },
+  /**
+   * Register renderers for instance of objects on the scene editor.
+   * 
+   * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
+   */
+  registerInstanceRenderers: function(objectsRenderingService) {
+    const RenderedInstance = objectsRenderingService.RenderedInstance;
+    const PIXI = objectsRenderingService.PIXI;
+
+    /**
+     * Renderer for instances of DummyObject inside the IDE.
+     *
+     * @extends RenderedInstance
+     * @class RenderedDummyObjectInstance
+     * @constructor
+     */
+    function RenderedDummyObjectInstance(
+      project,
+      layout,
+      instance,
+      associatedObject,
+      pixiContainer,
+      pixiResourcesLoader
+    ) {
+      RenderedInstance.call(
+        this,
+        project,
+        layout,
+        instance,
+        associatedObject,
+        pixiContainer,
+        pixiResourcesLoader
+      );
+
+      //Setup the PIXI object:
+      this._pixiObject = new PIXI.Text("This is a dummy object", {
+        align: "left"
+      });
+      this._pixiObject.anchor.x = 0.5;
+      this._pixiObject.anchor.y = 0.5;
+      this._pixiContainer.addChild(this._pixiObject);
+      this.update();
+    }
+    RenderedDummyObjectInstance.prototype = Object.create(
+      RenderedInstance.prototype
+    );
+
+    /**
+     * Return the path to the thumbnail of the specified object.
+     */
+    RenderedDummyObjectInstance.getThumbnail = function(
+      project,
+      resourcesLoader,
+      object
+    ) {
+      return "CppPlatform/Extensions/texticon24.png";
+    };
+
+    /**
+     * This is called to update the PIXI object on the scene editor
+     */
+    RenderedDummyObjectInstance.prototype.update = function() {
+      // Read a property from the object
+      const property1Value = this._associatedObject
+        .getProperties(this.project)
+        .get("My first property")
+        .getValue();
+      this._pixiObject.text = property1Value;
+
+      // Read position and angle from the instance
+      this._pixiObject.position.x =
+        this._instance.getX() + this._pixiObject.width / 2;
+      this._pixiObject.position.y =
+        this._instance.getY() + this._pixiObject.height / 2;
+      this._pixiObject.rotation = RenderedInstance.toRad(
+        this._instance.getAngle()
+      );
+      // Custom size can be read in instance.getCustomWidth() and 
+      // instance.getCustomHeight()
+    };
+
+    /**
+     * Return the width of the instance, when it's not resized.
+     */
+    RenderedDummyObjectInstance.prototype.getDefaultWidth = function() {
+      return this._pixiObject.width;
+    };
+
+    /**
+     * Return the height of the instance, when it's not resized.
+     */
+    RenderedDummyObjectInstance.prototype.getDefaultHeight = function() {
+      return this._pixiObject.height;
+    };
+
+    objectsRenderingService.registerInstanceRenderer(
+      "MyDummyExtension::DummyObject",
+      RenderedDummyObjectInstance
+    );
   }
 };

@@ -9,7 +9,7 @@ are provided by _extensions_. These extensions are composed of two parts:
 > Note that some GDevelop extensions are declared in C++, in files called `JsExtension.cpp`. If you want to edit them,
 > refer to the paragraph about them at the end.
 
-## Getting started
+## 1) Installation 💻
 
 To modify extensions, you need to have the development version of GDevelop running. Make sure to have [Git](https://git-scm.com/) and [Node.js](https://nodejs.org) installed. [Yarn](https://yarnpkg.com) is optional.
 
@@ -21,7 +21,7 @@ npm install #or yarn
 
 Refer to the [GDevelop IDE Readme](./README.md) for more information about the installation.
 
-## Development
+## 2) Development 🤓
 
 - First, run [GDevelop with Electron](https://github.com/4ian/GDevelop/blob/master/newIDE/README.md#development-of-the-standalone-app).
 
@@ -43,7 +43,7 @@ Refer to the [GDevelop IDE Readme](./README.md) for more information about the i
 
   > ⚠️ Always check the developer console after reloading GDevelop. If there is any error signaled, click on it to see what went wrong. You may have done a syntax error or mis-used an API.
 
-### Implement your feature for the game engine
+### 2.1) Implement your feature for the game engine 👾
 
 > ℹ️ Implement your extension in file called `extensionnametools.js` (for general functions), `objectnameruntimeobject.js` (for objects) or `behaviornameruntimebehavior.js` (for behaviors). See then the next section for declaring these files and the content of the extension to the IDE.
 
@@ -66,11 +66,13 @@ Read about [`gdjs.RuntimeBehavior`](file:///Users/florianrival/Projects/F/GD/doc
 
 #### How to create an object by extending `gdjs.RuntimeObject`
 
-> 👋 There is still no examples for objects, as declaring objects is not yet fully exposed to JavaScript extensions. Your help is welcome to expose this feature!
+See example in [dummyruntimeobject.js](../Extensions/ExampleJsExtension/dummyruntimeobject.js) (the object itself) and [dummyruntimeobject-pixi-renderer.js](../Extensions/ExampleJsExtension/dummyruntimeobject-pixi-renderer.js) (the renderer, using PIXI.js).
+
+You'll be interested in the constructor (to initialize things), `update` (called every frame) and the other methods. In the PIXI renderer, check the constructor (where PIXI objects are created). Other methods depend on the renderer.
 
 Read about [`gdjs.RuntimeObject`](file:///Users/florianrival/Projects/F/GD/docs/GDJS%20Runtime%20Documentation/gdjs.RuntimeObject.html), the base class inherited by all objects.
 
-### How to declare your extension to the IDE
+### 2.2) Declare your extension to the IDE 👋
 
 > ℹ️ Declaration must be done in a file called `JsExtension.js`. Your extension must be in Extensions folder, in its own directory.
 
@@ -102,17 +104,38 @@ Add a behavior using [`addBehavior`](http://4ian.github.io/GD-Documentation/GDCo
 - For the behavior, create a `new gd.BehaviorJsImplementation()` and define `updateProperty` and `getProperties`.
 - For the shared data (which are properties shared between all behaviors of the same type), if you don't have the need for it, just pass `new gd.BehaviorsSharedData()`. If you need shared data, create a `new gd.BehaviorSharedDataJsImplementation()` and define `updateProperty` and `getProperties`.
 
-> ⚠️ Like other functions to declare extensions, make sure that you've not forgotten to declare a function and that all arguments are correct. 
+> ⚠️ Like other functions to declare extensions, make sure that you've not forgotten to declare a function and that all arguments are correct.
 
 > 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
 
 #### Declare objects
 
-> 👋 Declaring objects is not yet fully exposed to JavaScript extensions. Your help is welcome to expose this feature!
-
-Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a554baca486909e8741e902133cceeec0). The last  parameter is the `gd.Object` representing the object:
+Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a554baca486909e8741e902133cceeec0). The last parameter is the `gd.Object` representing the object:
 
 - Create a `new gd.ObjectJsImplementation()` and define `updateProperty` and `getProperties` (for the object properties) and `updateInitialInstanceProperty` and `getInitialInstanceProperties` (for the optional properties that are attached to each instance).
+
+> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
+
+> ℹ️ After doing this, you can actually see your object in GDevelop! Read the next sections to see how to add an editor and a renderer for instances on the scene editor.
+
+#### Declare object editor
+
+To add an editor to your object, implement the function `registerEditorConfigurations` in your extension module. For now, only a default editor, displaying the object properties, is supported:
+
+```js
+registerEditorConfigurations: function(objectsEditorService) {
+  objectsEditorService.registerEditorConfiguration(
+    "MyDummyExtension::DummyObject", // Replace by your extension and object type names.
+    objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor()
+  );
+}
+```
+
+> 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
+
+#### Declare the Pixi.js renderer for the instance of your object in the scene editor
+
+Finally, to have the instances of your object displayed properly on the scene editor, implement the function `registerInstanceRenderers` in your extension module. The function is passed an object called `objectsRenderingService`, containing [RenderedInstance](./app/src/ObjectsRendering/Renderers/RenderedInstance.js), the "base class" for instance renderers, and PIXI, which give you access to [Pixi.js rendering engine](https://github.com/pixijs/pixi.js), used in the editor to render the scene.
 
 > 👉 See an example in the [example extension _JsExtension.js_ file](../Extensions/ExampleJsExtension/JsExtension.js).
 
@@ -120,9 +143,7 @@ Add an object using [`addObject`](http://4ian.github.io/GD-Documentation/GDCore%
 
 > 👋 Declaring events is not yet exposed to JavaScript extensions. Your help is welcome to expose this feature!
 
-
-
-## Starting a new extension from scratch
+## 3) Starting a new extension from scratch 🚀
 
 If you want to start a new extension:
 
@@ -136,16 +157,22 @@ If you want to start a new extension:
   .setIncludeFile("Extensions/FacebookInstantGames/facebookinstantgamestools.js")
   ```
 
-## Current status and how to contribute
+## 4) How to contribute? 😎
 
-Declaring extensions in JavaScript is still new, and enhancements are possible to exploit the full potential of extensions:
+If you have ideas or are creating a new extension, your contribution is welcome!
 
-- [ ] Add support for objects and events
-- [ ] Document how to add custom icons
-- [ ] Add a button to reload extensions without reloading GDevelop IDE entirely.
-- [ ] Create a "watcher" script that automatically run `node import-GDJS-Runtime` anytime a change is made.
+- To submit your extension, you have first to create a Fork on GitHub (use the Fork button on the top right), then [create a Pull Request](https://help.github.com/articles/creating-a-pull-request-from-a-fork/).
 
-## Development of extensions declared in C++ (`JsExtension.cpp` or `Extension.cpp`)
+- Check the [the **roadmap** for ideas and features planned](https://trello.com/b/qf0lM7k8/gdevelop-roadmap).
+
+- A few enhancements are also possible to exploit the full potential of extensions:
+
+  - [ ] Add support for events
+  - [ ] Document how to add custom icons
+  - [ ] Add a button to reload extensions without reloading GDevelop IDE entirely.
+  - [ ] Create a "watcher" script that automatically run `node import-GDJS-Runtime` anytime a change is made.
+
+## 4) Note on the development of extensions declared in C++ (`JsExtension.cpp` or `Extension.cpp`)
 
 The majority of extensions are still declared in C++ for being compatible with GDevelop 4.
 Check the sources in [Extensions folder](https://github.com/4ian/GDevelop/tree/master/Extensions) and install [GDevelop.js](https://github.com/4ian/GDevelop.js). You'll then be able to make changes in C++ source files and have this reflected in the editor.

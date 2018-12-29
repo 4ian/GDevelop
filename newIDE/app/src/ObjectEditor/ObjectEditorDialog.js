@@ -164,7 +164,7 @@ export default class ObjectEditorDialogContainer extends Component<*, *> {
     this.setState({
       dialogComponent: withSerializableObject(ObjectEditorDialog, {
         propName: 'object',
-        newObjectCreator: editorConfiguration.newObjectCreator,
+        newObjectCreator: () => editorConfiguration.createNewObject(object),
         useProjectToUnserialize: true,
       }),
       editorComponent: editorConfiguration.component,

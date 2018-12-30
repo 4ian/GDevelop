@@ -5,6 +5,7 @@ import PreferencesContext, {
   initialPreferences,
   type Preferences,
   type PreferencesValues,
+  type AlertMessageIdentifier,
 } from './PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
@@ -25,6 +26,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
     setAutoDownloadUpdates: this._setAutoDownloadUpdates.bind(this),
     checkUpdates: this._checkUpdates.bind(this),
+    showAlertMessage: this._showAlertMessage.bind(this),
   };
 
   componentDidMount() {
@@ -78,6 +80,21 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     } else {
       ipcRenderer.send('updates-check');
     }
+  }
+
+  _showAlertMessage(identifier: AlertMessageIdentifier, show: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          hiddenAlertMessages: {
+            ...state.hiddenAlertMessages,
+            [identifier]: !show,
+          },
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
   }
 
   _loadValuesFromLocalStorage(): ?PreferencesValues {

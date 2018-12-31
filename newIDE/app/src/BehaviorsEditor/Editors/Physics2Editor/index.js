@@ -30,6 +30,54 @@ type State = {|
   imageHeight: number,
 |};
 
+function NumericProperty(props: {|
+  properties: gdMapStringPropertyDescriptor,
+  propertyName: string,
+  step: number,
+  onUpdate: (newValue: number) => void,
+|}) {
+  const { properties, propertyName, step, onUpdate } = props;
+
+  return (
+    <SemiControlledTextField
+      value={properties.get(propertyName).getValue()}
+      key={propertyName}
+      floatingLabelText={properties.get(propertyName).getLabel()}
+      floatingLabelFixed
+      step={step}
+      onChange={onUpdate}
+      type="number"
+    />
+  );
+}
+
+function BitProperty(props: {|
+  enabled: boolean,
+  propertyName: string,
+  pos: number,
+  spacing: boolean,
+  onUpdate: (enabled: boolean) => void,
+|}) {
+  const { enabled, propertyName, pos, spacing, onUpdate } = props;
+
+  return (
+    <div style={{ width: spacing ? '7.5%' : '5%' }}>
+      {
+        <Checkbox
+          checked={enabled}
+          onCheck={(e, checked) => onUpdate(checked)}
+        />
+      }
+      {spacing && (
+        <div
+          style={{ width: '33%' }}
+          key={propertyName + '-space' + pos.toString(10)}
+        />
+      )}
+    </div>
+  );
+}
+
 export default class Physics2Editor extends React.Component<Props, State> {
   resourcesLoader: typeof ResourcesLoader;
 
@@ -40,7 +88,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
 
     this.state = {
       image: '',
-      imageWidth: 9,
+      imageWidth: 0,
       imageHeight: 0,
     };
   }
@@ -52,114 +100,14 @@ export default class Physics2Editor extends React.Component<Props, State> {
     });
   };
 
-  _isPolygonConvex(properties: Object) {
-    const vertices = JSON.parse(properties.get('vertices').getValue());
-    // Get edges
-    var edges = [];
-    var v1 = null;
-    var v2 = null;
-    for (var i = 0; i < vertices.length; i++) {
-      v1 = vertices[i];
-      if (i + 1 >= vertices.length) v2 = vertices[0];
-      else v2 = vertices[i + 1];
-      edges.push({ x: v2.x - v1.x, y: v2.y - v1.y });
-    }
-    // Check convexity
-    if (edges.length < 3) return false;
-
-    const zProductIsPositive =
-      edges[0].x * edges[0 + 1].y - edges[0].y * edges[0 + 1].x > 0;
-
-    for (i = 1; i < edges.length - 1; ++i) {
-      var zCrossProduct =
-        edges[i].x * edges[i + 1].y - edges[i].y * edges[i + 1].x;
-      if (zCrossProduct > 0 !== zProductIsPositive) return false;
-    }
-
-    var lastZCrossProduct =
-      edges[edges.length - 1].x * edges[0].y -
-      edges[edges.length - 1].y * edges[0].x;
-    if (lastZCrossProduct > 0 !== zProductIsPositive) return false;
-
-    return true;
+  _isBitEnabled(bitsValue: number, pos: number) {
+    return !!(bitsValue & (1 << pos));
   }
 
-  _isBitEnabled(bitsValue: number, i: number) {
-    return !!(bitsValue & (1 << i));
-  }
-
-  _enableBit(bitsValue: number, i: number, enable: boolean) {
-    if (enable) bitsValue |= 1 << i;
-    else bitsValue &= ~(1 << i);
+  _enableBit(bitsValue: number, pos: number, enable: boolean) {
+    if (enable) bitsValue |= 1 << pos;
+    else bitsValue &= ~(1 << pos);
     return bitsValue;
-  }
-
-  renderBitProperty(
-    properties: Object,
-    isLayer: boolean,
-    pos: number,
-    spacing: boolean
-  ) {
-    const bitValues = parseInt(
-      properties.get(isLayer ? 'layers' : 'masks').getValue(),
-      10
-    );
-
-    return (
-      <div
-        style={{ width: spacing ? '7.5%' : '5%' }}
-        key={(isLayer ? 'layer' : 'mask') + `${pos}`}
-      >
-        {
-          <Checkbox
-            checked={this._isBitEnabled(bitValues, pos)}
-            onCheck={(e, checked) => {
-              const newValue = this._enableBit(bitValues, pos, checked);
-              this.props.behavior.updateProperty(
-                isLayer ? 'layers' : 'masks',
-                newValue.toString(10),
-                this.props.project
-              );
-              this.forceUpdate();
-            }}
-          />
-        }
-        {spacing && (
-          <div
-            style={{ width: '33%' }}
-            key={(isLayer ? 'layers' : 'masks') + 'space' + pos.toString(10)}
-          />
-        )}
-      </div>
-    );
-  }
-
-  renderNumericProperty(
-    properties: Object,
-    name: string,
-    limit: boolean,
-    min: number,
-    step: number
-  ) {
-    return (
-      <SemiControlledTextField
-        value={properties.get(name).getValue()}
-        key={name}
-        floatingLabelText={properties.get(name).getLabel()}
-        floatingLabelFixed
-        min={limit ? min : undefined}
-        step={step}
-        onChange={newValue => {
-          this.props.behavior.updateProperty(
-            name,
-            newValue,
-            this.props.project
-          );
-          this.forceUpdate();
-        }}
-        type="number"
-      />
-    );
   }
 
   render() {
@@ -182,6 +130,8 @@ export default class Physics2Editor extends React.Component<Props, State> {
     const properties = behavior.getProperties(project);
     const bits = Array(16).fill(null);
     const shape = properties.get('shape').getValue();
+    const layersValues = parseInt(properties.get('layers').getValue(), 10);
+    const masksValues = parseInt(properties.get('masks').getValue(), 10);
 
     return (
       <Column>
@@ -216,7 +166,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
           </SelectField>
         </Line>
         <Line>
-          <div style={{ width: '33%' }}>
+          <Column expand>
             <Checkbox
               label={properties.get('bullet').getLabel()}
               checked={properties.get('bullet').getValue() === 'true'}
@@ -225,8 +175,8 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 this.forceUpdate();
               }}
             />
-          </div>
-          <div style={{ width: '33%' }}>
+          </Column>
+          <Column expand>
             <Checkbox
               label={properties.get('fixedRotation').getLabel()}
               checked={properties.get('fixedRotation').getValue() === 'true'}
@@ -239,8 +189,8 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 this.forceUpdate();
               }}
             />
-          </div>
-          <div style={{ width: '33%' }}>
+          </Column>
+          <Column expand>
             <Checkbox
               label={properties.get('canSleep').getLabel()}
               checked={properties.get('canSleep').getValue() === 'true'}
@@ -253,7 +203,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 this.forceUpdate();
               }}
             />
-          </div>
+          </Column>
         </Line>
         <Line>
           <SelectField
@@ -265,20 +215,14 @@ export default class Physics2Editor extends React.Component<Props, State> {
               this.forceUpdate();
             }}
           >
-            {[
-              <MenuItem key={'box'} value={'Box'} primaryText={'Box'} />,
-              <MenuItem
-                key={'circle'}
-                value={'Circle'}
-                primaryText={'Circle'}
-              />,
-              <MenuItem key={'edge'} value={'Edge'} primaryText={'Edge'} />,
-              <MenuItem
-                key={'polygon'}
-                value={'Polygon'}
-                primaryText={'Polygon'}
-              />,
-            ]}
+            <MenuItem key={'box'} value={'Box'} primaryText={'Box'} />
+            <MenuItem key={'circle'} value={'Circle'} primaryText={'Circle'} />
+            <MenuItem key={'edge'} value={'Edge'} primaryText={'Edge'} />
+            <MenuItem
+              key={'polygon'}
+              value={'Polygon'}
+              primaryText={'Polygon'}
+            />
           </SelectField>
         </Line>
         <Line>
@@ -357,53 +301,71 @@ export default class Physics2Editor extends React.Component<Props, State> {
               ]}
             </SelectField>
           )}
-          {this.renderNumericProperty(properties, 'shapeOffsetX', false, 0, 1)}
-          {this.renderNumericProperty(properties, 'shapeOffsetY', false, 0, 1)}
+          <NumericProperty
+            properties={properties}
+            propertyName={'shapeOffsetX'}
+            step={1}
+            onUpdate={newValue => {
+              behavior.updateProperty('shapeOffsetX', newValue, project);
+              this.forceUpdate();
+            }}
+          />
+          <NumericProperty
+            properties={properties}
+            propertyName={'shapeOffsetY'}
+            step={1}
+            onUpdate={newValue => {
+              this.props.behavior.updateProperty(
+                'shapeOffsetY',
+                newValue,
+                this.props.project
+              );
+              this.forceUpdate();
+            }}
+          />
         </Line>
         <Line>
-          <Column>
+          <Column expand>
             <Line>
-              <div style={{ width: '100%' }}>
-                <ImagePreview
-                  resourceName={this.state.image}
-                  project={this.props.project}
-                  resourcesLoader={this.resourcesLoader}
-                  onSize={this._setImageSize}
-                >
-                  <ShapePreview
-                    shape={properties.get('shape').getValue()}
-                    dimensionA={parseFloat(
-                      properties.get('shapeDimensionA').getValue()
-                    )}
-                    dimensionB={parseFloat(
-                      properties.get('shapeDimensionB').getValue()
-                    )}
-                    offsetX={parseFloat(
-                      properties.get('shapeOffsetX').getValue()
-                    )}
-                    offsetY={parseFloat(
-                      properties.get('shapeOffsetY').getValue()
-                    )}
-                    polygonOrigin={properties.get('polygonOrigin').getValue()}
-                    vertices={JSON.parse(properties.get('vertices').getValue())}
-                    width={this.state.imageWidth}
-                    height={this.state.imageHeight}
-                    onMoveVertex={(index, newX, newY) => {
-                      let vertices = JSON.parse(
-                        properties.get('vertices').getValue()
-                      );
-                      vertices[index].x = newX;
-                      vertices[index].y = newY;
-                      behavior.updateProperty(
-                        'vertices',
-                        JSON.stringify(vertices),
-                        project
-                      );
-                      this.forceUpdate();
-                    }}
-                  />
-                </ImagePreview>
-              </div>
+              <ImagePreview
+                resourceName={this.state.image}
+                project={this.props.project}
+                resourcesLoader={this.resourcesLoader}
+                onSize={this._setImageSize}
+              >
+                <ShapePreview
+                  shape={properties.get('shape').getValue()}
+                  dimensionA={parseFloat(
+                    properties.get('shapeDimensionA').getValue()
+                  )}
+                  dimensionB={parseFloat(
+                    properties.get('shapeDimensionB').getValue()
+                  )}
+                  offsetX={parseFloat(
+                    properties.get('shapeOffsetX').getValue()
+                  )}
+                  offsetY={parseFloat(
+                    properties.get('shapeOffsetY').getValue()
+                  )}
+                  polygonOrigin={properties.get('polygonOrigin').getValue()}
+                  vertices={JSON.parse(properties.get('vertices').getValue())}
+                  width={this.state.imageWidth}
+                  height={this.state.imageHeight}
+                  onMoveVertex={(index, newX, newY) => {
+                    let vertices = JSON.parse(
+                      properties.get('vertices').getValue()
+                    );
+                    vertices[index].x = newX;
+                    vertices[index].y = newY;
+                    behavior.updateProperty(
+                      'vertices',
+                      JSON.stringify(vertices),
+                      project
+                    );
+                    this.forceUpdate();
+                  }}
+                />
+              </ImagePreview>
             </Line>
             <Line>
               <ResourceSelector
@@ -453,6 +415,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 let vertices = JSON.parse(
                   properties.get('vertices').getValue()
                 );
+                if (vertices.length >= 8) return;
                 vertices.push({ x: 0, y: 0 });
                 behavior.updateProperty(
                   'vertices',
@@ -473,7 +436,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 );
                 this.forceUpdate();
               }}
-              hasWarning={!this._isPolygonConvex(properties)}
             />
           )}
         </Line>
@@ -491,59 +453,116 @@ export default class Physics2Editor extends React.Component<Props, State> {
           />
         </Line>
         <Line>
-          <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(properties, 'density', true, 0, 0.1)}
-          </div>
-          <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(
-              properties,
-              'gravityScale',
-              false,
-              0,
-              0.1
-            )}
-          </div>
+          <Column expand>
+            <NumericProperty
+              properties={properties}
+              propertyName={'density'}
+              step={0.1}
+              onUpdate={newValue => {
+                behavior.updateProperty(
+                  'density',
+                  newValue > 0 ? newValue : 0,
+                  project
+                );
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+          <Column expand>
+            <NumericProperty
+              properties={properties}
+              propertyName={'gravityScale'}
+              step={0.1}
+              onUpdate={newValue => {
+                behavior.updateProperty('gravityScale', newValue, project);
+                this.forceUpdate();
+              }}
+            />
+          </Column>
         </Line>
         <Line>
-          <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(properties, 'friction', true, 0, 0.1)}
-          </div>
-          <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(
-              properties,
-              'restitution',
-              true,
-              0,
-              0.1
-            )}
-          </div>
+          <Column expand>
+            <NumericProperty
+              properties={properties}
+              propertyName={'friction'}
+              step={0.1}
+              onUpdate={newValue => {
+                behavior.updateProperty(
+                  'friction',
+                  newValue > 0 ? newValue : 0,
+                  project
+                );
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+          <Column expand>
+            <NumericProperty
+              properties={properties}
+              propertyName={'restitution'}
+              step={0.1}
+              onUpdate={newValue => {
+                behavior.updateProperty(
+                  'restitution',
+                  newValue > 0 ? newValue : 0,
+                  project
+                );
+                this.forceUpdate();
+              }}
+            />
+          </Column>
         </Line>
         <Line>
-          <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(
-              properties,
-              'linearDamping',
-              false,
-              0,
-              0.05
-            )}
-          </div>
-          <div style={{ width: '50%' }}>
-            {this.renderNumericProperty(
-              properties,
-              'angularDamping',
-              false,
-              0,
-              0.05
-            )}
-          </div>
+          <Column expand>
+            <NumericProperty
+              properties={properties}
+              propertyName={'linearDamping'}
+              step={0.05}
+              onUpdate={newValue => {
+                behavior.updateProperty('linearDamping', newValue, project);
+                this.forceUpdate();
+              }}
+            />
+          </Column>
+          <Column expand>
+            <NumericProperty
+              properties={properties}
+              propertyName={'angularDamping'}
+              step={0.05}
+              onUpdate={newValue => {
+                behavior.updateProperty('angularDamping', newValue, project);
+                this.forceUpdate();
+              }}
+            />
+          </Column>
         </Line>
         <Line>
           <label style={{ width: '10%' }}>
             {properties.get('layers').getLabel()}
           </label>
           {bits.map((value, index) => {
-            return this.renderBitProperty(properties, true, index, index === 7);
+            return (
+              <BitProperty
+                enabled={this._isBitEnabled(layersValues, index)}
+                propertyName={'layers'}
+                pos={index}
+                spacing={index === 7}
+                onUpdate={enabled => {
+                  const newValue = this._enableBit(
+                    layersValues,
+                    index,
+                    enabled
+                  );
+                  this.props.behavior.updateProperty(
+                    'layers',
+                    newValue.toString(10),
+                    this.props.project
+                  );
+                  this.forceUpdate();
+                }}
+                key={`layer${index}`}
+              />
+            );
           })}
         </Line>
         <Line>
@@ -551,11 +570,23 @@ export default class Physics2Editor extends React.Component<Props, State> {
             {properties.get('masks').getLabel()}
           </label>
           {bits.map((value, index) => {
-            return this.renderBitProperty(
-              properties,
-              false,
-              index,
-              index === 7
+            return (
+              <BitProperty
+                enabled={this._isBitEnabled(masksValues, index)}
+                propertyName={'masks'}
+                pos={index}
+                spacing={index === 7}
+                onUpdate={enabled => {
+                  const newValue = this._enableBit(masksValues, index, enabled);
+                  this.props.behavior.updateProperty(
+                    'masks',
+                    newValue.toString(10),
+                    this.props.project
+                  );
+                  this.forceUpdate();
+                }}
+                key={`mask${index}`}
+              />
             );
           })}
         </Line>

@@ -1,10 +1,6 @@
 // @flow
 import * as React from 'react';
-
-type Vertex = {
-  x: number,
-  y: number,
-};
+import { type Vertex } from './PolygonEditor';
 
 type Props = {|
   shape: string,

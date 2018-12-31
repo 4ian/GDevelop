@@ -19,14 +19,13 @@ export type Instance = Object; // This could be improved using generics.
 export type Instances = Array<Instance>;
 export type Field = Object;
 export type Schema = Array<Field>;
-export type Project = Object;
 
 type Props = {|
   onInstancesModified?: Instances => void,
   instances: Instances,
   schema: Schema,
   mode?: 'column' | 'row',
-  project?: Project,
+  project?: gdProject,
   resourceSources?: Array<ResourceSource>,
   onChooseResource?: ChooseResourceFunction,
   resourceExternalEditors?: Array<ResourceExternalEditor>,

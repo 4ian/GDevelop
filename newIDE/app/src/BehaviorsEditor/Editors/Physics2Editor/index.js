@@ -18,7 +18,7 @@ import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExte
 
 type Props = {|
   behavior: Object,
-  project: Object,
+  project: gdProject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
@@ -51,6 +51,38 @@ export default class Physics2Editor extends React.Component<Props, State> {
       imageWidth: width,
       imageHeight: height,
     });
+  };
+
+  _isPolygonConvex(properties: Object) {
+    const vertices = JSON.parse(properties.get('vertices').getValue());
+    // Get edges
+    var edges = [];
+    var v1 = null;
+    var v2 = null;
+    for (var i = 0; i < vertices.length; i++) {
+      v1 = vertices[i];
+      if (i + 1 >= vertices.length) v2 = vertices[0];
+      else v2 = vertices[i + 1];
+      edges.push({ x: v2.x - v1.x, y: v2.y - v1.y });
+    }
+    // Check convexity
+    if (edges.length < 3) return false;
+
+    const zProductIsPositive =
+      edges[0].x * edges[0 + 1].y - edges[0].y * edges[0 + 1].x > 0;
+
+    for (i = 1; i < edges.length - 1; ++i) {
+      var zCrossProduct =
+        edges[i].x * edges[i + 1].y - edges[i].y * edges[i + 1].x;
+      if (zCrossProduct > 0 !== zProductIsPositive) return false;
+    }
+
+    var lastZCrossProduct =
+      edges[edges.length - 1].x * edges[0].y -
+      edges[edges.length - 1].y * edges[0].x;
+    if (lastZCrossProduct > 0 !== zProductIsPositive) return false;
+
+    return true;
   }
 
   _isBitEnabled(bitsValue: number, i: number) {
@@ -77,7 +109,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
     return (
       <div
         style={{ width: spacing ? '7.5%' : '5%' }}
-        key={(isLayer ? 'layer' : 'mask') + pos.toString(10)}
+        key={(isLayer ? 'layer' : 'mask') + `${pos}`}
       >
         {
           <Checkbox
@@ -133,6 +165,21 @@ export default class Physics2Editor extends React.Component<Props, State> {
 
   render() {
     const { behavior, project } = this.props;
+
+    // Parsing error temporary workaround
+    if (
+      !Array.isArray(
+        JSON.parse(
+          behavior
+            .getProperties()
+            .get('vertices')
+            .getValue()
+        )
+      )
+    ) {
+      behavior.updateProperty('vertices', '[]', project);
+    }
+
     const properties = behavior.getProperties(project);
     const bits = Array(16).fill(null);
     const shape = properties.get('shape').getValue();
@@ -317,7 +364,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
         <Line>
           <Column>
             <Line>
-              <div style={{width: '100%'}}>
+              <div style={{ width: '100%' }}>
                 <ImagePreview
                   resourceName={this.state.image}
                   project={this.props.project}
@@ -326,14 +373,35 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 >
                   <ShapePreview
                     shape={properties.get('shape').getValue()}
-                    dimensionA={parseFloat(properties.get('shapeDimensionA').getValue())}
-                    dimensionB={parseFloat(properties.get('shapeDimensionB').getValue())}
-                    offsetX={parseFloat(properties.get('shapeOffsetX').getValue())}
-                    offsetY={parseFloat(properties.get('shapeOffsetY').getValue())}
+                    dimensionA={parseFloat(
+                      properties.get('shapeDimensionA').getValue()
+                    )}
+                    dimensionB={parseFloat(
+                      properties.get('shapeDimensionB').getValue()
+                    )}
+                    offsetX={parseFloat(
+                      properties.get('shapeOffsetX').getValue()
+                    )}
+                    offsetY={parseFloat(
+                      properties.get('shapeOffsetY').getValue()
+                    )}
                     polygonOrigin={properties.get('polygonOrigin').getValue()}
                     vertices={JSON.parse(properties.get('vertices').getValue())}
                     width={this.state.imageWidth}
                     height={this.state.imageHeight}
+                    onMoveVertex={(index, newX, newY) => {
+                      let vertices = JSON.parse(
+                        properties.get('vertices').getValue()
+                      );
+                      vertices[index].x = newX;
+                      vertices[index].y = newY;
+                      behavior.updateProperty(
+                        'vertices',
+                        JSON.stringify(vertices),
+                        project
+                      );
+                      this.forceUpdate();
+                    }}
                   />
                 </ImagePreview>
               </div>
@@ -358,8 +426,70 @@ export default class Physics2Editor extends React.Component<Props, State> {
           {shape === 'Polygon' && (
             <PolygonEditor
               vertices={JSON.parse(properties.get('vertices').getValue())}
+              onChangeVertexX={(newValue, index) => {
+                let vertices = JSON.parse(
+                  properties.get('vertices').getValue()
+                );
+                vertices[index].x = newValue;
+                behavior.updateProperty(
+                  'vertices',
+                  JSON.stringify(vertices),
+                  project
+                );
+                this.forceUpdate();
+              }}
+              onChangeVertexY={(newValue, index) => {
+                let vertices = JSON.parse(
+                  properties.get('vertices').getValue()
+                );
+                vertices[index].y = newValue;
+                behavior.updateProperty(
+                  'vertices',
+                  JSON.stringify(vertices),
+                  project
+                );
+                this.forceUpdate();
+              }}
+              onAdd={() => {
+                let vertices = JSON.parse(
+                  properties.get('vertices').getValue()
+                );
+                vertices.push({ x: 0, y: 0 });
+                behavior.updateProperty(
+                  'vertices',
+                  JSON.stringify(vertices),
+                  project
+                );
+                this.forceUpdate();
+              }}
+              onRemove={index => {
+                let vertices = JSON.parse(
+                  properties.get('vertices').getValue()
+                );
+                vertices.splice(index, 1);
+                behavior.updateProperty(
+                  'vertices',
+                  JSON.stringify(vertices),
+                  project
+                );
+                this.forceUpdate();
+              }}
+              hasWarning={!this._isPolygonConvex(properties)}
             />
           )}
+        </Line>
+        <Line>
+          <SemiControlledTextField // Debug vertices raw content
+            value={properties.get('vertices').getValue()}
+            key={'verticesText'}
+            floatingLabelText={'Raw Vertices'}
+            floatingLabelFixed
+            onChange={newValue => {
+              behavior.updateProperty('vertices', newValue, project);
+              this.forceUpdate();
+            }}
+            type="text"
+          />
         </Line>
         <Line>
           <div style={{ width: '50%' }}>

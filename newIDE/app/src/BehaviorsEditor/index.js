@@ -185,7 +185,9 @@ export default class BehaviorsEditor extends Component {
                       project={project}
                       resourceSources={this.props.resourceSources}
                       onChooseResource={this.props.onChooseResource}
-                      resourceExternalEditors={this.props.resourceExternalEditors}
+                      resourceExternalEditors={
+                        this.props.resourceExternalEditors
+                      }
                     />
                   ) : (
                     <EmptyMessage>

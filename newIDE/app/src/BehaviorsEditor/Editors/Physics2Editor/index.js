@@ -31,7 +31,6 @@ type State = {|
 |};
 
 export default class Physics2Editor extends React.Component<Props, State> {
-
   resourcesLoader: typeof ResourcesLoader;
 
   constructor(props: Props) {

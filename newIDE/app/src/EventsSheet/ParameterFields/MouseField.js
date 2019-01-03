@@ -21,15 +21,16 @@ export default class RelationalOperatorField extends Component {
       >
         <MenuItem value="Left" primaryText="Left" />
         <MenuItem value="Right" primaryText="Right" />
-        <MenuItem value="Middle" primaryText="Middle (native games only)" />
-        <MenuItem
+        <MenuItem value="Middle" primaryText="Middle" />
+        {/* TODO: Add support for these buttons in the game engine
+         <MenuItem
           value="XButton1"
-          primaryText="Special button #1 (native games only)"
+          primaryText="Special button #1"
         />
         <MenuItem
           value="XButton2"
-          primaryText="Special button #2 (native games only)"
-        />
+          primaryText="Special button #2"
+        /> */}
       </SelectField>
     );
   }

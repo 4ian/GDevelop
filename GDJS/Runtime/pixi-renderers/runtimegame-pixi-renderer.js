@@ -296,13 +296,11 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(manager, wi
         manager.onMouseMove(pos[0], pos[1]);
     };
     renderer.view.onmousedown = function(e){
-		console.log("Pressed : " + e.button);
         manager.onMouseButtonPressed(e.button === 2 ? 1 : 0 || e.button === 1 ? 2 : 0);
         if (window.focus !== undefined) window.focus();
         return false;
     };
     renderer.view.onmouseup = function(e){
-		console.log("Released : " + e.button);
         manager.onMouseButtonReleased(e.button === 2 ? 1 : 0 || e.button === 1 ? 2 : 0);
         return false;
     };

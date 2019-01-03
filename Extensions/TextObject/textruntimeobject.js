@@ -20,6 +20,7 @@ gdjs.TextRuntimeObject = function(runtimeScene, objectData)
     this._italic = objectData.italic;
     this._underlined = objectData.underlined;
     this._color = [objectData.color.r, objectData.color.g, objectData.color.b];
+    this.opacity = 255;
     this._wrapping = false;
     this._wrappingWidth = 1;
 

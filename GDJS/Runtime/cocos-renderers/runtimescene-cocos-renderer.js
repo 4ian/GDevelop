@@ -110,11 +110,15 @@ gdjs.RuntimeSceneCocosRenderer.prototype.makeEventListeners = function() {
         },
         onMouseDown: function(event) {
             that._runtimeScene.getGame().getInputManager().onMouseButtonPressed(
-                event.getButton() === 0 ? 0 : 1);
+                event.getButton() === cc.EventMouse.BUTTON_RIGHT ? gdjs.InputManager.MOUSE_RIGHT_BUTTON : 
+                (event.getButton() === cc.EventMouse.BUTTON_MIDDLE ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON :
+                gdjs.InputManager.MOUSE_LEFT_BUTTON));
         },
         onMouseUp: function(event) {
             that._runtimeScene.getGame().getInputManager().onMouseButtonReleased(
-                event.getButton() === 0 ? 0 : 1);
+                event.getButton() === cc.EventMouse.BUTTON_RIGHT ? gdjs.InputManager.MOUSE_RIGHT_BUTTON : 
+                (event.getButton() === cc.EventMouse.BUTTON_MIDDLE ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON :
+                gdjs.InputManager.MOUSE_LEFT_BUTTON));
         },
         onMouseScroll: function(event) {
             that._runtimeScene.getGame().getInputManager().onMouseWheel(

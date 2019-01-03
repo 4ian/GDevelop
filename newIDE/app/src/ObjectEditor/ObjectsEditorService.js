@@ -66,6 +66,7 @@ export default {
       component: PanelSpriteEditor,
       newObjectCreator: () => new gd.PanelSpriteObject(''),
       castToObjectType: object => gd.asPanelSpriteObject(object),
+      helpPagePath: '/objects/panel_sprite',
     },
     'TextObject::Text': {
       component: TextEditor,

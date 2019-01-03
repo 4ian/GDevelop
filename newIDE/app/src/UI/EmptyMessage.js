@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react';
 import ThemeConsumer from './Theme/ThemeConsumer';
 import BackgroundText from './BackgroundText';

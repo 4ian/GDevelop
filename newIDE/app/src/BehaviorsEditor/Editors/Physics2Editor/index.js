@@ -10,19 +10,9 @@ import ResourceSelector from '../../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../../ResourcesLoader';
 import ShapePreview from './ShapePreview.js';
 import PolygonEditor from './PolygonEditor.js';
-import {
-  type ResourceSource,
-  type ChooseResourceFunction,
-} from '../../../ResourcesList/ResourceSource.flow';
-import { type ResourceExternalEditor } from '../../../ResourcesList/ResourceExternalEditor.flow';
+import { type BehaviorEditorProps } from '../BehaviorEditorProps.flow';
 
-type Props = {|
-  behavior: Object,
-  project: gdProject,
-  resourceSources: Array<ResourceSource>,
-  onChooseResource: ChooseResourceFunction,
-  resourceExternalEditors: Array<ResourceExternalEditor>,
-|};
+type Props = BehaviorEditorProps;
 
 type State = {|
   image: string,
@@ -34,7 +24,7 @@ function NumericProperty(props: {|
   properties: gdMapStringPropertyDescriptor,
   propertyName: string,
   step: number,
-  onUpdate: (newValue: number) => void,
+  onUpdate: (newValue: string) => void,
 |}) {
   const { properties, propertyName, step, onUpdate } = props;
 
@@ -461,7 +451,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               onUpdate={newValue => {
                 behavior.updateProperty(
                   'density',
-                  newValue > 0 ? newValue : 0,
+                  parseFloat(newValue) > 0 ? newValue : '0',
                   project
                 );
                 this.forceUpdate();
@@ -489,7 +479,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               onUpdate={newValue => {
                 behavior.updateProperty(
                   'friction',
-                  newValue > 0 ? newValue : 0,
+                  parseFloat(newValue) > 0 ? newValue : '0',
                   project
                 );
                 this.forceUpdate();
@@ -504,7 +494,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               onUpdate={newValue => {
                 behavior.updateProperty(
                   'restitution',
-                  newValue > 0 ? newValue : 0,
+                  parseFloat(newValue) > 0 ? newValue : '0',
                   project
                 );
                 this.forceUpdate();

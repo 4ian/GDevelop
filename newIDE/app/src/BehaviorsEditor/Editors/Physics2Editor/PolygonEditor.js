@@ -14,7 +14,7 @@ import IconButton from 'material-ui/IconButton';
 import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import Delete from 'material-ui/svg-icons/action/delete';
 
-type Vertex = {|
+export type Vertex = {|
   x: number,
   y: number,
 |};
@@ -86,7 +86,9 @@ export default class PolygonEditor extends React.Component<Props> {
           {vertices.map((value, index) => {
             return (
               <TableRow key={`vertexRow${index}`}>
-                <TableRowColumn>{!this._isPolygonConvex(vertices) && <Warning />}</TableRowColumn>
+                <TableRowColumn>
+                  {!this._isPolygonConvex(vertices) && <Warning />}
+                </TableRowColumn>
                 <TableRowColumn>
                   <SemiControlledTextField
                     value={value.x.toString(10)}

@@ -126,12 +126,6 @@ module.exports = {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
 
       behaviorProperties.set(
-        'dialog',
-        new gd.PropertyDescriptor(behaviorContent.type)
-          .setType('Dialog')
-          .addExtraInfo('physics2')
-      );
-      behaviorProperties.set(
         'type',
         new gd.PropertyDescriptor(behaviorContent.type)
           .setType('Choice')

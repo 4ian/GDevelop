@@ -21,11 +21,11 @@ describe('gdjs.DraggableRuntimeBehavior', function() {
 		//Drag'n'drop
 		runtimeScene.renderAndStep();
 		runtimeGame.getInputManager().onMouseMove(450, 500);
-		runtimeGame.getInputManager().onMouseButtonPressed(0);
+		runtimeGame.getInputManager().onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
 		runtimeScene.renderAndStep();
 		runtimeGame.getInputManager().onMouseMove(750, 600);
 		runtimeScene.renderAndStep();
-		runtimeGame.getInputManager().onMouseButtonReleased(0);
+		runtimeGame.getInputManager().onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
 		runtimeScene.renderAndStep();
 
 		expect(object.getX()).to.be(750);
@@ -40,11 +40,11 @@ describe('gdjs.DraggableRuntimeBehavior', function() {
 
 		//Start dragging again
 		runtimeGame.getInputManager().onMouseMove(750, 600);
-		runtimeGame.getInputManager().onMouseButtonPressed(0);
+		runtimeGame.getInputManager().onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
 		runtimeScene.renderAndStep();
 		runtimeGame.getInputManager().onMouseMove(850, 700);
 		runtimeScene.renderAndStep();
-		runtimeGame.getInputManager().onMouseButtonReleased(0);
+		runtimeGame.getInputManager().onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
 		runtimeScene.renderAndStep();
 
 		expect(object.getX()).to.be(850);

@@ -296,17 +296,22 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(manager, wi
         manager.onMouseMove(pos[0], pos[1]);
     };
     renderer.view.onmousedown = function(e){
-        manager.onMouseButtonPressed(e.button === 2 ? 1 : e.button === 1 ? 2 : 0);
+        manager.onMouseButtonPressed(e.button === 2 ? gdjs.InputManager.MOUSE_RIGHT_BUTTON : 
+            e.button === 1 ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON : 
+            gdjs.InputManager.MOUSE_LEFT_BUTTON);
         if (window.focus !== undefined) window.focus();
         return false;
     };
     renderer.view.onmouseup = function(e){
-        manager.onMouseButtonReleased(e.button === 2 ? 1 : e.button === 1 ? 2 : 0);
+        manager.onMouseButtonReleased(e.button === 2 ? gdjs.InputManager.MOUSE_RIGHT_BUTTON : 
+            e.button === 1 ? gdjs.InputManager.MOUSE_MIDDLE_BUTTON : 
+            gdjs.InputManager.MOUSE_LEFT_BUTTON);
         return false;
     };
     renderer.view.onmouseout = function(e){
-        manager.onMouseButtonReleased(0);
-        manager.onMouseButtonReleased(1);
+        manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
+        manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
+        manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_MIDDLE_BUTTON);
         manager.onMouseWheel(0);
         return false;
     };

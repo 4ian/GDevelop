@@ -69,19 +69,13 @@ function BitProperty(props: {|
 }
 
 export default class Physics2Editor extends React.Component<Props, State> {
-  resourcesLoader: typeof ResourcesLoader;
+  resourcesLoader = ResourcesLoader;
 
-  constructor(props: Props) {
-    super(props);
-
-    this.resourcesLoader = ResourcesLoader;
-
-    this.state = {
-      image: '',
-      imageWidth: 0,
-      imageHeight: 0,
-    };
-  }
+  state = {
+    image: '',
+    imageWidth: 0,
+    imageHeight: 0,
+  };
 
   _setImageSize = (width: number, height: number) => {
     this.setState({

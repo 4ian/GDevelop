@@ -3,15 +3,10 @@ import * as React from 'react';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import EmptyMessage from '../../UI/EmptyMessage';
+import { Column } from '../../UI/Grid';
 import { type BehaviorEditorProps } from './BehaviorEditorProps.flow';
 
 type Props = BehaviorEditorProps;
-
-const styles = {
-  propertiesContainer: {
-    padding: 10,
-  },
-};
 
 export default class BehaviorPropertiesEditor extends React.Component<Props> {
   render() {
@@ -25,7 +20,7 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
     );
 
     return (
-      <div style={styles.propertiesContainer}>
+      <Column>
         {propertiesSchema.length ? (
           <PropertiesEditor
             schema={propertiesSchema}
@@ -37,7 +32,7 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
             events to interact with the object and this behavior.
           </EmptyMessage>
         )}
-      </div>
+      </Column>
     );
   }
 }

@@ -48,13 +48,15 @@ export default class PolygonEditor extends React.Component<Props> {
     for (i = 1; i < edges.length - 1; ++i) {
       var zCrossProduct =
         edges[i].x * edges[i + 1].y - edges[i].y * edges[i + 1].x;
-      if (zCrossProduct > 0 !== zProductIsPositive) return false;
+      var zCrossProductIsPositive = zCrossProduct > 0;
+      if (zCrossProductIsPositive !== zProductIsPositive) return false;
     }
 
     var lastZCrossProduct =
       edges[edges.length - 1].x * edges[0].y -
       edges[edges.length - 1].y * edges[0].x;
-    if (lastZCrossProduct > 0 !== zProductIsPositive) return false;
+    var lastZCrossProductIsPositive = lastZCrossProduct > 0;
+    if (lastZCrossProductIsPositive !== zProductIsPositive) return false;
 
     return true;
   }

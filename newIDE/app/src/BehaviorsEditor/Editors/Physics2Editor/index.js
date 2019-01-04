@@ -97,20 +97,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
   render() {
     const { behavior, project } = this.props;
 
-    // Parsing error temporary workaround
-    if (
-      !Array.isArray(
-        JSON.parse(
-          behavior
-            .getProperties()
-            .get('vertices')
-            .getValue()
-        )
-      )
-    ) {
-      behavior.updateProperty('vertices', '[]', project);
-    }
-
     const properties = behavior.getProperties(project);
     const bits = Array(16).fill(null);
     const shape = properties.get('shape').getValue();
@@ -422,19 +408,6 @@ export default class Physics2Editor extends React.Component<Props, State> {
               }}
             />
           )}
-        </Line>
-        <Line>
-          <SemiControlledTextField // Debug vertices raw content
-            value={properties.get('vertices').getValue()}
-            key={'verticesText'}
-            floatingLabelText={'Raw Vertices'}
-            floatingLabelFixed
-            onChange={newValue => {
-              behavior.updateProperty('vertices', newValue, project);
-              this.forceUpdate();
-            }}
-            type="text"
-          />
         </Line>
         <Line>
           <Column expand>

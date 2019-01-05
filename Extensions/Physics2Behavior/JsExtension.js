@@ -1076,8 +1076,21 @@ module.exports = {
       .setFunctionName('setLinearVelocityX')
       .setManipulatedType('number')
       .setGetter('getLinearVelocityX');
-
-    aut
+	
+	aut
+      .addExpression(
+        'LinearVelocityX',
+        t('Linear velocity X'),
+        t('Get an objects linear velocity on X.'),
+        t('Velocity'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getLinearVelocityX');
+    
+	aut
       .addCondition(
         'LinearVelocityY',
         t('Linear velocity Y'),
@@ -1113,7 +1126,20 @@ module.exports = {
       .setFunctionName('setLinearVelocityY')
       .setManipulatedType('number')
       .setGetter('getLinearVelocityY');
-
+	
+	aut
+      .addExpression(
+        'LinearVelocityY',
+        t('Linear velocity Y'),
+        t('Get an objects linear velocity on Y.'),
+        t('Velocity'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getLinearVelocityY');  
+	  
     aut
       .addCondition(
         'LinearVelocityLength',
@@ -1132,6 +1158,19 @@ module.exports = {
       .setFunctionName('getLinearVelocityLength')
       .setManipulatedType('number');
 
+	aut
+      .addExpression(
+        'LinearVelocityLength',
+        t('Linear velocity Length'),
+        t('Get an objects linear velocity length.'),
+        t('Velocity'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getLinearVelocityLength');  
+	  
     aut
       .addCondition(
         'AngularVelocity',
@@ -1169,6 +1208,19 @@ module.exports = {
       .setManipulatedType('number')
       .setGetter('getAngularVelocity');
 
+	aut
+      .addExpression(
+        'AngularVelocity',
+        t('Angular velocity'),
+        t('Get an objects Angular velocity.'),
+        t('Velocity'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getAngularVelocity');  
+	  
     // Forces and impulses
     aut
       .addAction(

@@ -273,10 +273,9 @@ gdjs.Physics2RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
 };
 
 gdjs.Physics2RuntimeBehavior.getPolygon = function(verticesData) {
+  if (!verticesData) return null;
+
   var polygon = new gdjs.Polygon();
-
-  if (!verticesData) return polygon;
-
   var maxVertices = 8;
   for (
     var i = 0, len = verticesData.length;

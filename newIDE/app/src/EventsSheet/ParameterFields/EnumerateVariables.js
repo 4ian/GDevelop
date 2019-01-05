@@ -4,7 +4,7 @@ import { mapFor } from '../../Utils/MapFor';
 
 export const enumerateVariables = (
   variablesContainer: ?gdVariablesContainer
-) => {
+): Array<string> => {
   if (!variablesContainer) {
     return [];
   }

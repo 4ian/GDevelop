@@ -288,25 +288,25 @@ module.exports = {
       if (propertyName === 'gravityX') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.gravityX = newValue;
+        sharedContent.gravityX = newValue;
         return true;
       }
       if (propertyName === 'gravityY') {
         newValue = parseFloat(newValue);
         if (newValue !== newValue) return false;
-        behaviorContent.gravityY = newValue;
+        sharedContent.gravityY = newValue;
         return true;
       }
       if (propertyName === 'scaleX') {
         newValue = parseInt(newValue, 10);
         if (newValue !== newValue) return false;
-        behaviorContent.scaleX = newValue;
+        sharedContent.scaleX = newValue;
         return true;
       }
       if (propertyName === 'scaleY') {
         newValue = parseInt(newValue, 10);
         if (newValue !== newValue) return false;
-        behaviorContent.scaleY = newValue;
+        sharedContent.scaleY = newValue;
         return true;
       }
 

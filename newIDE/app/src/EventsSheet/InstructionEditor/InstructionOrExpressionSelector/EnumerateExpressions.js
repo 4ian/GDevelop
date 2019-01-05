@@ -1,4 +1,5 @@
-// @flow weak
+// @flow
+import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
 const gd = global.gd;
 
 const GROUP_DELIMITER = '/';
@@ -50,7 +51,7 @@ const enumerateExtensionExpressions = (
   return allExpressions;
 };
 
-export const enumerateExpressions = type => {
+export const enumerateExpressions = (type: string) => {
   const freeExpressions = [];
   const objectsExpressions = [];
   const behaviorsExpressions = [];
@@ -136,7 +137,10 @@ export const enumerateExpressions = type => {
   };
 };
 
-export const filterExpressions = (list, searchText) => {
+export const filterExpressions = (
+  list: Array<InstructionOrExpressionInformation>,
+  searchText: string
+): Array<InstructionOrExpressionInformation> => {
   if (!searchText) return list;
   const lowercaseSearchText = searchText.toLowerCase();
 

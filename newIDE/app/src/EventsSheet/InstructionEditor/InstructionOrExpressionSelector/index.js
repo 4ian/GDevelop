@@ -1,8 +1,13 @@
+// @flow
 import React, { Component } from 'react';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
+import ListIcon from '../../../UI/ListIcon';
 import SearchBar from 'material-ui-search-bar';
 import keys from 'lodash/keys';
 import muiThemeable from 'material-ui/styles/muiThemeable';
+import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+import { type InstructionOrExpressionTreeNode } from './CreateTree';
+
 const SelectableList = makeSelectable(List);
 
 const styles = {
@@ -15,14 +20,29 @@ const styles = {
   },
 };
 
-class ThemableInstructionOrExpressionSelector extends Component {
+type Props = {|
+  muiTheme: any,
+  focusOnMount?: boolean,
+  instructionsInfo: Array<InstructionOrExpressionInformation>,
+  instructionsInfoTree: InstructionOrExpressionTreeNode,
+  selectedType: string,
+  onChoose: (type: string, InstructionOrExpressionInformation) => void,
+  style?: Object,
+|};
+type State = {|
+  search: string,
+  searchResults: Array<InstructionOrExpressionInformation>,
+|};
+
+class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
   state = {
     search: '',
     searchResults: [],
   };
+  _searchBar: ?SearchBar;
 
   componentDidMount() {
-    if (this.props.focusOnMount) {
+    if (this.props.focusOnMount && this._searchBar) {
       this._searchBar.focus();
     }
   }
@@ -31,7 +51,10 @@ class ThemableInstructionOrExpressionSelector extends Component {
     if (this._searchBar) this._searchBar.focus();
   };
 
-  _matchCritera(instructionInfo, lowercaseSearch) {
+  _matchCritera(
+    instructionInfo: InstructionOrExpressionInformation,
+    lowercaseSearch: string
+  ) {
     const { displayedName, fullGroupName } = instructionInfo;
     return (
       displayedName.toLowerCase().indexOf(lowercaseSearch) !== -1 ||
@@ -39,15 +62,11 @@ class ThemableInstructionOrExpressionSelector extends Component {
     );
   }
 
-  _computeSearchResults = search => {
+  _computeSearchResults = (search: string) => {
     const lowercaseSearch = this.state.search.toLowerCase();
-    return keys(this.props.instructionsInfo)
-      .map(key => {
-        return this.props.instructionsInfo[key];
-      })
-      .filter(instructionInfo =>
-        this._matchCritera(instructionInfo, lowercaseSearch)
-      );
+    return this.props.instructionsInfo.filter(instructionInfo =>
+      this._matchCritera(instructionInfo, lowercaseSearch)
+    );
   };
 
   _onSubmitSearch = () => {
@@ -57,19 +76,22 @@ class ThemableInstructionOrExpressionSelector extends Component {
     this.props.onChoose(searchResults[0].type, searchResults[0]);
   };
 
-  _renderTree(instructionInfoTree) {
+  _renderTree(instructionInfoTree: InstructionOrExpressionTreeNode) {
     const { muiTheme } = this.props;
 
     return Object.keys(instructionInfoTree).map(key => {
+      // $FlowFixMe
       const instructionOrGroup = instructionInfoTree[key];
+      if (!instructionOrGroup) return null;
 
-      if (instructionOrGroup.hasOwnProperty('type')) {
+      if (typeof instructionOrGroup.type === 'string') {
         return (
           <ListItem
             key={key}
             primaryText={key}
             value={instructionOrGroup.type}
             onClick={() => {
+              // $FlowFixMe
               this.props.onChoose(instructionOrGroup.type, instructionOrGroup);
             }}
           />
@@ -89,7 +111,10 @@ class ThemableInstructionOrExpressionSelector extends Component {
             }
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
-            nestedItems={this._renderTree(instructionOrGroup)}
+            nestedItems={
+              // $FlowFixMe
+              this._renderTree(instructionOrGroup)
+            }
           />
         );
       }
@@ -101,7 +126,6 @@ class ThemableInstructionOrExpressionSelector extends Component {
       return (
         <ListItem
           key={instructionInfo.type}
-          style={styles.listItem}
           primaryText={instructionInfo.displayedName}
           secondaryText={instructionInfo.fullGroupName}
           value={instructionInfo.type}

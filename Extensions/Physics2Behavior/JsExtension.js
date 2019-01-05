@@ -49,86 +49,78 @@ module.exports = {
       }
       if (propertyName === 'shapeDimensionA') {
         newValue = parseFloat(newValue);
-        if (newValue < 0) newValue = 0;
+        if (newValue !== newValue) return false;
         behaviorContent.shapeDimensionA = newValue;
         return true;
       }
       if (propertyName === 'shapeDimensionB') {
         newValue = parseFloat(newValue);
-        if (newValue < 0) newValue = 0;
+        if (newValue !== newValue) return false;
         behaviorContent.shapeDimensionB = newValue;
         return true;
       }
       if (propertyName === 'shapeOffsetX') {
-        behaviorContent.shapeOffsetX = parseFloat(newValue);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.shapeOffsetX = newValue;
         return true;
       }
       if (propertyName === 'shapeOffsetY') {
-        behaviorContent.shapeOffsetY = parseFloat(newValue);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.shapeOffsetY = newValue;
+        return true;
+      }
+      if (propertyName === 'polygonOrigin') {
+        behaviorContent.polygonOrigin = newValue;
+        return true;
+      }
+      if (propertyName === 'vertices') {
+        behaviorContent.vertices = JSON.parse(newValue);
         return true;
       }
       if (propertyName === 'density') {
-        newValue = parseFloat(newValue);
-        if (newValue < 0) newValue = 0;
-        behaviorContent.density = newValue;
+        behaviorContent.density = parseFloat(newValue);
         return true;
       }
       if (propertyName === 'friction') {
         newValue = parseFloat(newValue);
-        if (newValue < 0) newValue = 0;
+        if (newValue !== newValue) return false;
         behaviorContent.friction = newValue;
         return true;
       }
       if (propertyName === 'restitution') {
         newValue = parseFloat(newValue);
-        if (newValue < 0) newValue = 0;
+        if (newValue !== newValue) return false;
         behaviorContent.restitution = newValue;
         return true;
       }
       if (propertyName === 'linearDamping') {
-        behaviorContent.linearDamping = parseFloat(newValue);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.linearDamping = newValue;
         return true;
       }
       if (propertyName === 'angularDamping') {
-        behaviorContent.angularDamping = parseFloat(newValue);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.angularDamping = newValue;
         return true;
       }
       if (propertyName === 'gravityScale') {
-        behaviorContent.gravityScale = parseFloat(newValue);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.gravityScale = newValue;
         return true;
       }
       if (propertyName === 'layers') {
-        // The given binary string is reverse, fix it
-        newValue = newValue
-          .split('')
-          .reverse()
-          .join('');
-        // Convert it into a decimal
-        newValue = parseInt(newValue, 2);
-        // If it can't be converted, cancel the edit
-        if (isNaN(newValue)) return false;
-        // Layers minimum and maximum values
-        if (newValue < 0) newValue = 0;
-        if (newValue > 65535) newValue = 65535; // 65535 is the decimal form of 1111111111111111 (16 layer bits flagged)
-        // Save the valid decimal
-        behaviorContent.layers = newValue;
+        behaviorContent.layers = parseInt(newValue);
         return true;
       }
       if (propertyName === 'masks') {
-        // Same than layers
-        newValue = newValue
-          .split('')
-          .reverse()
-          .join('');
-        newValue = parseInt(newValue, 2);
-        if (isNaN(newValue)) return false;
-        if (newValue < 0) newValue = 0;
-        if (newValue > 65535) newValue = 65535;
-        behaviorContent.masks = newValue;
+        behaviorContent.masks = parseInt(newValue);
         return true;
       }
-
-      return false;
     };
     physics2Behavior.getProperties = function(behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
@@ -169,8 +161,8 @@ module.exports = {
           .setLabel('Shape')
           .addExtraInfo('Box')
           .addExtraInfo('Circle')
-          // .addExtraInfo("Polygon") Needs an editor to be useful
           .addExtraInfo('Edge')
+          .addExtraInfo('Polygon')
       );
       behaviorProperties.set(
         'shapeDimensionA',
@@ -195,6 +187,21 @@ module.exports = {
         new gd.PropertyDescriptor(behaviorContent.shapeOffsetY.toString(10))
           .setType('Number')
           .setLabel('Shape Offset Y')
+      );
+      behaviorProperties.set(
+        'polygonOrigin',
+        new gd.PropertyDescriptor(behaviorContent.polygonOrigin || 'Center')
+          .setType('Choice')
+          .setLabel('Polygon Origin')
+          .addExtraInfo('Center')
+          .addExtraInfo('Origin')
+          .addExtraInfo('TopLeft')
+      );
+      behaviorProperties.set(
+        'vertices',
+        new gd.PropertyDescriptor(
+          JSON.stringify(behaviorContent.vertices || [])
+        ).setLabel('Vertices')
       );
       behaviorProperties.set(
         'density',
@@ -232,38 +239,22 @@ module.exports = {
           .setType('Number')
           .setLabel('Gravity Scale')
       );
-
-      // Waiting for a layers/masks editor
-      /*
-      // Transform the layers number into a binary string
-      var layers = behaviorContent.layers.toString(2);
-      // Reverse the string (so the first layer bit is shown at the left)
-      layers = layers
-        .split('')
-        .reverse()
-        .join('');
-      // Add zeros until the total size is 16
-      if (layers.length < 16) layers = layers + '0'.repeat(16 - layers.length);
-      // Expose the converted string
       behaviorProperties.set(
         'layers',
-        new gd.PropertyDescriptor(layers).setLabel('Layers')
+        new gd.PropertyDescriptor(behaviorContent.layers.toString(10))
+          .setType('Number')
+          .setLabel('Layers')
       );
-      // Same than layers
-      var masks = behaviorContent.masks.toString(2);
-      masks = masks
-        .split('')
-        .reverse()
-        .join('');
-      if (masks.length < 16) masks = masks + '0'.repeat(16 - masks.length);
       behaviorProperties.set(
         'masks',
-        new gd.PropertyDescriptor(masks).setLabel('Masks')
+        new gd.PropertyDescriptor(behaviorContent.masks.toString(10))
+          .setType('Number')
+          .setLabel('Masks')
       );
-      */
 
       return behaviorProperties;
     };
+
     physics2Behavior.setRawJSONContent(
       JSON.stringify({
         type: 'Dynamic',
@@ -275,6 +266,8 @@ module.exports = {
         shapeDimensionB: 0,
         shapeOffsetX: 0,
         shapeOffsetY: 0,
+        polygonOrigin: 'Center',
+        vertices: [],
         density: 1.0,
         friction: 0.3,
         restitution: 0.1,
@@ -293,23 +286,27 @@ module.exports = {
       newValue
     ) {
       if (propertyName === 'gravityX') {
-        sharedContent.gravityX = parseInt(newValue, 10);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.gravityX = newValue;
         return true;
       }
       if (propertyName === 'gravityY') {
-        sharedContent.gravityY = parseInt(newValue, 10);
+        newValue = parseFloat(newValue);
+        if (newValue !== newValue) return false;
+        behaviorContent.gravityY = newValue;
         return true;
       }
       if (propertyName === 'scaleX') {
         newValue = parseInt(newValue, 10);
-        if (newValue <= 0) newValue = 1;
-        sharedContent.scaleX = newValue;
+        if (newValue !== newValue) return false;
+        behaviorContent.scaleX = newValue;
         return true;
       }
       if (propertyName === 'scaleY') {
         newValue = parseInt(newValue, 10);
-        if (newValue <= 0) newValue = 1;
-        sharedContent.scaleY = newValue;
+        if (newValue !== newValue) return false;
+        behaviorContent.scaleY = newValue;
         return true;
       }
 
@@ -721,7 +718,7 @@ module.exports = {
         t(
           'Modify an object shape scale. It affects custom shape dimensions and shape offset, if custom dimensions are not set the body will be scaled automatically to the object size.'
         ),
-        t('Do to _PARAM2__PARAM3_ to the shape scale of _PARAM0_'),
+        t('Do _PARAM2__PARAM3_ to the shape scale of _PARAM0_'),
         t('Body settings'),
         'res/physics24.png',
         'res/physics16.png'

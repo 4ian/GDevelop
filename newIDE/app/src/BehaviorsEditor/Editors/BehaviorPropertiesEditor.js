@@ -22,10 +22,7 @@ export default class BehaviorPropertiesEditor extends React.Component<Props> {
     return (
       <Column>
         {propertiesSchema.length ? (
-          <PropertiesEditor
-            schema={propertiesSchema}
-            instances={[behavior]}
-          />
+          <PropertiesEditor schema={propertiesSchema} instances={[behavior]} />
         ) : (
           <EmptyMessage>
             There is nothing to configure for this behavior. You can still use

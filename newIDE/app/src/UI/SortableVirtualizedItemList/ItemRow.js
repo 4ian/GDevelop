@@ -110,7 +110,9 @@ class ThemableItemRow extends React.Component<Props, *> {
         style={{ ...itemStyle, ...style }}
         onContextMenu={this._onContextMenu}
         primaryText={label}
-        leftIcon={getThumbnail && <ListIcon src={getThumbnail()} />}
+        leftIcon={
+          getThumbnail && <ListIcon iconSize={32} src={getThumbnail()} />
+        }
         rightIconButton={this._renderItemMenu(item)}
         onClick={() => {
           if (!this.props.onItemSelected) return;

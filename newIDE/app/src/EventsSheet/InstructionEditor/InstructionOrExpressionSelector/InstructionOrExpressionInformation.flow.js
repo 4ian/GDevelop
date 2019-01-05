@@ -5,6 +5,7 @@ export type InstructionOrExpressionInformation = {|
   name?: string, //For expressions
   displayedName: string,
   fullGroupName: string,
+  iconFilename: string,
   metadata: Object,
   parameters?: Array<any>,
   objectMetadata?: Object, //For expressions

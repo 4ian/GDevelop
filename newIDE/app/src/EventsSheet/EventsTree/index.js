@@ -79,7 +79,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
     this.forceUpdate();
   };
 
-  _onEventContextMenu = domEvent => {
+  _onEventContextMenu = (domEvent: any) => {
     domEvent.preventDefault();
     this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
   };

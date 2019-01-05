@@ -9,7 +9,7 @@ const enumerateExtensionExpressions = (
   expressions,
   objectMetadata,
   behaviorMetadata
-) => {
+): Array<InstructionOrExpressionInformation> => {
   const allExpressions = [];
 
   //Get the map containing the metadata of the expression provided by the extension...
@@ -34,6 +34,7 @@ const enumerateExtensionExpressions = (
 
     const displayedName = exprMetadata.getFullName();
     const groupName = exprMetadata.getGroup();
+    const iconFilename = exprMetadata.getSmallIconFilename();
     const fullGroupName = prefix + groupName;
 
     allExpressions.push({
@@ -41,6 +42,7 @@ const enumerateExtensionExpressions = (
       name: expressionsTypes.get(j),
       displayedName,
       fullGroupName,
+      iconFilename,
       metadata: exprMetadata,
       parameters: parameters,
       objectMetadata: objectMetadata,

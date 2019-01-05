@@ -25,6 +25,7 @@ export default class InstructionSelector extends Component<Props, *> {
       <InstructionOrExpressionSelector
         instructionsInfo={this.instructionsInfo}
         instructionsInfoTree={this.instructionsInfoTree}
+        iconSize={24}
         {...this.props}
       />
     );

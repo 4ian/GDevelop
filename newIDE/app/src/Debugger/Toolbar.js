@@ -11,11 +11,11 @@ type Props = {|
   onPause: () => void,
   canPause: boolean,
   onOpenProfiler: () => void,
-|} & TranslatorProps;
+|};
 
 type State = {||};
 
-export class Toolbar extends PureComponent<Props, State> {
+export class Toolbar extends PureComponent<Props & TranslatorProps, State> {
   render() {
     const {
       t,

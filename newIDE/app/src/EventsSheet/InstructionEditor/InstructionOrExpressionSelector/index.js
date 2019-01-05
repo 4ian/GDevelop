@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
 import ListIcon from '../../../UI/ListIcon';
 import SearchBar from 'material-ui-search-bar';
-import keys from 'lodash/keys';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
 import { type InstructionOrExpressionTreeNode } from './CreateTree';
@@ -27,6 +26,7 @@ type Props = {|
   instructionsInfoTree: InstructionOrExpressionTreeNode,
   selectedType: string,
   onChoose: (type: string, InstructionOrExpressionInformation) => void,
+  iconSize: number,
   style?: Object,
 |};
 type State = {|
@@ -80,23 +80,38 @@ class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
     const { muiTheme } = this.props;
 
     return Object.keys(instructionInfoTree).map(key => {
-      // $FlowFixMe
+      // $FlowFixMe - in theory, we should have a way to distinguish
+      // between instruction (leaf nodes) and group (nodes). We use
+      // the "type" properties, but this will fail if a group is called "type"
+      // (hence the flow errors, which are valid warnings)
       const instructionOrGroup = instructionInfoTree[key];
       if (!instructionOrGroup) return null;
 
       if (typeof instructionOrGroup.type === 'string') {
+        // $FlowFixMe - see above
+        const instructionInformation: InstructionOrExpressionInformation = instructionOrGroup;
         return (
           <ListItem
             key={key}
             primaryText={key}
             value={instructionOrGroup.type}
+            leftIcon={
+              <ListIcon
+                iconSize={this.props.iconSize}
+                src={instructionInformation.iconFilename}
+              />
+            }
             onClick={() => {
-              // $FlowFixMe
-              this.props.onChoose(instructionOrGroup.type, instructionOrGroup);
+              this.props.onChoose(
+                instructionInformation.type,
+                instructionInformation
+              );
             }}
           />
         );
       } else {
+        // $FlowFixMe - see above
+        const groupOfInstructionInformation = (instructionOrGroup: InstructionOrExpressionTreeNode);
         return (
           <ListItem
             key={key}
@@ -111,10 +126,7 @@ class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
             }
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
-            nestedItems={
-              // $FlowFixMe
-              this._renderTree(instructionOrGroup)
-            }
+            nestedItems={this._renderTree(groupOfInstructionInformation)}
           />
         );
       }

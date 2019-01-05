@@ -43,6 +43,25 @@ describe('EnumerateObjects', () => {
     };
 
     const { objectsExpressions } = enumerateExpressions('number');
-    expect(stripMetadata(createTree(objectsExpressions))).toMatchSnapshot();
+    expect(stripMetadata(createTree(objectsExpressions))).toMatchObject({
+      'Common expressions for all objects': {
+        Angle: {
+          Angle: {
+            displayedName: 'Angle',
+            fullGroupName: 'Common expressions for all objects/Angle',
+            name: 'Angle',
+            type: 'Angle',
+          },
+        },
+        Movement: {
+          'Average X coordinates of forces': {
+            displayedName: 'Average X coordinates of forces',
+            fullGroupName: 'Common expressions for all objects/Movement',
+            name: 'ForceX',
+            type: 'ForceX',
+          },
+        },
+      },
+    });
   });
 });

@@ -204,7 +204,10 @@ gdjs.Physics2RuntimeBehavior = function(runtimeScene, behaviorData, owner) {
   this.shapeOffsetX = behaviorData.content.shapeOffsetX;
   this.shapeOffsetY = behaviorData.content.shapeOffsetY;
   this.polygonOrigin = behaviorData.content.polygonOrigin;
-  this.polygon = this.getPolygon(behaviorData.content.vertices);
+  this.polygon =
+    this.shape === 'Polygon'
+      ? gdjs.Physics2RuntimeBehavior.getPolygon(behaviorData.content.vertices)
+      : null;
   this.density = behaviorData.content.density;
   this.friction = behaviorData.content.friction;
   this.restitution = behaviorData.content.restitution;
@@ -269,10 +272,16 @@ gdjs.Physics2RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
   this.onDeActivate();
 };
 
-gdjs.Physics2RuntimeBehavior.prototype.getPolygon = function(verticesData) {
+gdjs.Physics2RuntimeBehavior.getPolygon = function(verticesData) {
+  if (!verticesData) return null;
+
   var polygon = new gdjs.Polygon();
   var maxVertices = 8;
-  for (var i = 0, len = verticesData.length; i < Math.min(len, maxVertices); i++) {
+  for (
+    var i = 0, len = verticesData.length;
+    i < Math.min(len, maxVertices);
+    i++
+  ) {
     polygon.vertices.push([verticesData[i].x, verticesData[i].y]);
   }
   return polygon;
@@ -309,7 +318,7 @@ gdjs.Physics2RuntimeBehavior.prototype.createShape = function() {
   } else if (this.shape === 'Polygon') {
     shape = new Box2D.b2PolygonShape();
     // Not convex, fall back to a box
-    if (!this.polygon.isConvex()) {
+    if (!this.polygon || !this.polygon.isConvex()) {
       var width =
         (this.owner.getWidth() > 0 ? this.owner.getWidth() : 1) *
         this._sharedData.invScaleX;
@@ -321,15 +330,18 @@ gdjs.Physics2RuntimeBehavior.prototype.createShape = function() {
     } else {
       var originOffsetX = 0;
       var originOffsetY = 0;
-      if(this.polygonOrigin === "Origin"){
-        originOffsetX = (this.owner.getWidth() > 0 ? -this.owner.getWidth()/2 : 0)
-                        + (this.owner.getX() - this.owner.getDrawableX());
-        originOffsetY = (this.owner.getHeight() > 0 ? -this.owner.getHeight()/2 : 0)
-                        + (this.owner.getY() - this.owner.getDrawableY());
-      }
-      else if(this.polygonOrigin === "TopLeft"){
-        originOffsetX = this.owner.getWidth() > 0 ? -this.owner.getWidth()/2 : 0;
-        originOffsetY = this.owner.getHeight() > 0 ? -this.owner.getHeight()/2 : 0;
+      if (this.polygonOrigin === 'Origin') {
+        originOffsetX =
+          (this.owner.getWidth() > 0 ? -this.owner.getWidth() / 2 : 0) +
+          (this.owner.getX() - this.owner.getDrawableX());
+        originOffsetY =
+          (this.owner.getHeight() > 0 ? -this.owner.getHeight() / 2 : 0) +
+          (this.owner.getY() - this.owner.getDrawableY());
+      } else if (this.polygonOrigin === 'TopLeft') {
+        originOffsetX =
+          this.owner.getWidth() > 0 ? -this.owner.getWidth() / 2 : 0;
+        originOffsetY =
+          this.owner.getHeight() > 0 ? -this.owner.getHeight() / 2 : 0;
       }
       // Generate vertices if not done already
       if (!this._verticesBuffer) {
@@ -345,10 +357,12 @@ gdjs.Physics2RuntimeBehavior.prototype.createShape = function() {
       var offset = 0;
       for (var i = 0, len = this.polygon.vertices.length; i < len; i++) {
         Box2D.HEAPF32[(this._verticesBuffer + offset) >> 2] =
-          (this.polygon.vertices[i][0] * this.shapeScale + originOffsetX) * this._sharedData.invScaleX +
+          (this.polygon.vertices[i][0] * this.shapeScale + originOffsetX) *
+            this._sharedData.invScaleX +
           offsetX;
         Box2D.HEAPF32[(this._verticesBuffer + (offset + 4)) >> 2] =
-          (this.polygon.vertices[i][1] * this.shapeScale + originOffsetY) * this._sharedData.invScaleY +
+          (this.polygon.vertices[i][1] * this.shapeScale + originOffsetY) *
+            this._sharedData.invScaleY +
           offsetY;
         offset += 8;
       }

@@ -6,7 +6,7 @@ const t = _ => _; //TODO: Implement support for i18n for extensions.
 
 /*flow-include 
 export type JsExtensionModule = {
-  createExtension(t, gd: any): gdPlatformExtension,
+  createExtension(t: (string) => string, gd: any): gdPlatformExtension,
   runExtensionSanityTests(gd: any, extension: gdPlatformExtension): Array<string>,
 };
 

@@ -42,7 +42,7 @@ export default class BuildsWatcher {
 
     this.runningWatchers[watcherId] = true;
 
-    let build;
+    let build = null;
     do {
       if (!this.userProfile) return;
       const { getAuthorizationHeader, profile } = this.userProfile;

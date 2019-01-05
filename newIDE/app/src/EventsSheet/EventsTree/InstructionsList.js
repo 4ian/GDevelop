@@ -137,7 +137,7 @@ class InstructionsList extends React.Component<Props, *> {
     const addButtonDefaultLabel = areConditions
       ? 'Add condition'
       : 'Add action';
-    return connectDropTarget(
+    const instructionsList = connectDropTarget(
       <div
         className={`${
           areConditions ? conditionsContainer : actionsContainer
@@ -163,6 +163,8 @@ class InstructionsList extends React.Component<Props, *> {
         </a>
       </div>
     );
+
+    return instructionsList || null;
   }
 }
 

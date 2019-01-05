@@ -19,6 +19,7 @@ import {
   type DragSourceMonitor,
   type DragSourceConnector,
   type ConnectDragSource,
+  type DragSourceSpec,
   DropTarget,
   type DropTargetMonitor,
   type DropTargetConnector,
@@ -232,7 +233,7 @@ class Instruction extends React.Component<Props, *> {
         {instructionDiv}
       </React.Fragment>
     ) : (
-      instructionDiv
+      instructionDiv || null
     );
   }
 }
@@ -241,8 +242,13 @@ class Instruction extends React.Component<Props, *> {
 
 export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
 
+type InstructionSourceProps = {
+  onClick: () => void,
+  isCondition: boolean,
+}
+
 const instructionSource = {
-  beginDrag(props) {
+  beginDrag(props: InstructionSourceProps) {
     props.onClick(); // Select the dragged instruction
     return {
       // No need to save here what is being dragged,

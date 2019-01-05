@@ -1,5 +1,5 @@
 // @flow
-import React, { PureComponent } from 'react';
+import * as React from 'react';
 import { translate, type TranslatorProps } from 'react-i18next';
 import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
@@ -13,9 +13,7 @@ type Props = {|
   onOpenProfiler: () => void,
 |};
 
-type State = {||};
-
-export class Toolbar extends PureComponent<Props & TranslatorProps, State> {
+export class Toolbar extends React.PureComponent<Props & TranslatorProps> {
   render() {
     const {
       t,

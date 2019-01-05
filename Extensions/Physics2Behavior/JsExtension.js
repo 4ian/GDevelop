@@ -718,7 +718,7 @@ module.exports = {
         t(
           'Modify an object shape scale. It affects custom shape dimensions and shape offset, if custom dimensions are not set the body will be scaled automatically to the object size.'
         ),
-        t('Do to _PARAM2__PARAM3_ to the shape scale of _PARAM0_'),
+        t('Do _PARAM2__PARAM3_ to the shape scale of _PARAM0_'),
         t('Body settings'),
         'res/physics24.png',
         'res/physics16.png'

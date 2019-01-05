@@ -204,7 +204,7 @@ gdjs.Physics2RuntimeBehavior = function(runtimeScene, behaviorData, owner) {
   this.shapeOffsetX = behaviorData.content.shapeOffsetX;
   this.shapeOffsetY = behaviorData.content.shapeOffsetY;
   this.polygonOrigin = behaviorData.content.polygonOrigin;
-  this.polygon = this.getPolygon(behaviorData.content.vertices);
+  this.polygon = this.shape === 'Polygon' ? gdjs.Physics2RuntimeBehavior.getPolygon(behaviorData.content.vertices) : null;
   this.density = behaviorData.content.density;
   this.friction = behaviorData.content.friction;
   this.restitution = behaviorData.content.restitution;
@@ -269,8 +269,11 @@ gdjs.Physics2RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
   this.onDeActivate();
 };
 
-gdjs.Physics2RuntimeBehavior.prototype.getPolygon = function(verticesData) {
+gdjs.Physics2RuntimeBehavior.getPolygon = function(verticesData) {
   var polygon = new gdjs.Polygon();
+
+  if(!verticesData) return polygon;
+
   var maxVertices = 8;
   for (var i = 0, len = verticesData.length; i < Math.min(len, maxVertices); i++) {
     polygon.vertices.push([verticesData[i].x, verticesData[i].y]);
@@ -309,7 +312,7 @@ gdjs.Physics2RuntimeBehavior.prototype.createShape = function() {
   } else if (this.shape === 'Polygon') {
     shape = new Box2D.b2PolygonShape();
     // Not convex, fall back to a box
-    if (!this.polygon.isConvex()) {
+    if (!this.polygon ||!this.polygon.isConvex()) {
       var width =
         (this.owner.getWidth() > 0 ? this.owner.getWidth() : 1) *
         this._sharedData.invScaleX;

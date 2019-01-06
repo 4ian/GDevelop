@@ -287,6 +287,28 @@ gdjs.Physics2RuntimeBehavior.getPolygon = function(verticesData) {
   return polygon;
 };
 
+gdjs.Physics2RuntimeBehavior.isPolygonConvex = function(polygon) {
+  if (!polygon.isConvex()) return false;
+
+  // Repeated vertices or all vertices aligned
+  var alignedX = true;
+  var alignedY = true;
+  for (i = 0; i < polygon.vertices.length - 1; ++i) {
+    for (var j = i + 1; j < polygon.vertices.length; ++j) {
+      if (
+        polygon.vertices[i][0] === polygon.vertices[j][0] &&
+        polygon.vertices[i][1] === polygon.vertices[j][1]
+      )
+        return false;
+    }
+    if (polygon.vertices[i][0] !== polygon.vertices[i + 1][0]) alignedX = false;
+    if (polygon.vertices[i][1] !== polygon.vertices[i + 1][1]) alignedY = false;
+  }
+  if (alignedX || alignedY) return false;
+
+  return true;
+};
+
 gdjs.Physics2RuntimeBehavior.prototype.createShape = function() {
   // Get the scaled offset
   var offsetX = this.shapeOffsetX
@@ -318,7 +340,10 @@ gdjs.Physics2RuntimeBehavior.prototype.createShape = function() {
   } else if (this.shape === 'Polygon') {
     shape = new Box2D.b2PolygonShape();
     // Not convex, fall back to a box
-    if (!this.polygon || !this.polygon.isConvex()) {
+    if (
+      !this.polygon ||
+      !gdjs.Physics2RuntimeBehavior.isPolygonConvex(this.polygon)
+    ) {
       var width =
         (this.owner.getWidth() > 0 ? this.owner.getWidth() : 1) *
         this._sharedData.invScaleX;

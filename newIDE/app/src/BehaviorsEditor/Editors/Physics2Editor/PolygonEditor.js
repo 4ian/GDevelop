@@ -39,6 +39,7 @@ export default class PolygonEditor extends React.Component<Props> {
       else v2 = vertices[i + 1];
       edges.push({ x: v2.x - v1.x, y: v2.y - v1.y });
     }
+
     // Check convexity
     if (edges.length < 3) return false;
 
@@ -57,6 +58,23 @@ export default class PolygonEditor extends React.Component<Props> {
       edges[edges.length - 1].y * edges[0].x;
     var lastZCrossProductIsPositive = lastZCrossProduct > 0;
     if (lastZCrossProductIsPositive !== zProductIsPositive) return false;
+
+    // Repeated vertices
+    for (i = 0; i < vertices.length - 1; ++i) {
+      for (var j = i + 1; j < vertices.length; ++j) {
+        if (vertices[i].x === vertices[j].x && vertices[i].y === vertices[j].y)
+          return false;
+      }
+    }
+
+    // All vertices aligned
+    var alignedX = true;
+    var alignedY = true;
+    for (i = 0; i < vertices.length - 1; ++i) {
+      if (vertices[i].x !== vertices[i + 1].x) alignedX = false;
+      if (vertices[i].y !== vertices[i + 1].y) alignedY = false;
+    }
+    if (alignedX || alignedY) return false;
 
     return true;
   }

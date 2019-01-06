@@ -245,7 +245,7 @@ export const reactDndInstructionType = 'GD_DRAGGED_INSTRUCTION';
 type InstructionSourceProps = {
   onClick: () => void,
   isCondition: boolean,
-}
+};
 
 const instructionSource = {
   beginDrag(props: InstructionSourceProps) {

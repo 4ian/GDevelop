@@ -290,7 +290,7 @@ gdjs.Physics2RuntimeBehavior.getPolygon = function(verticesData) {
 gdjs.Physics2RuntimeBehavior.isPolygonConvex = function(polygon) {
   if (!polygon.isConvex()) return false;
 
-  // Repeated vertices or all vertices aligned
+  // Check for repeated vertices or check if all vertices are aligned (would crash Box2D)
   var alignedX = true;
   var alignedY = true;
   for (i = 0; i < polygon.vertices.length - 1; ++i) {

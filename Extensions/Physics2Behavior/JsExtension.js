@@ -1160,7 +1160,7 @@ module.exports = {
 
 	  aut
       .addExpression(
-        'LinearVelocityLength',
+        'LinearVelocity',
         t('Linear velocity'),
         t('Get the linear velocity of an object.'),
         t('Velocity'),

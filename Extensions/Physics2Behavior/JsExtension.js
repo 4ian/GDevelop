@@ -1081,7 +1081,7 @@ module.exports = {
       .addExpression(
         'LinearVelocityX',
         t('Linear velocity on X axis'),
-        t('Get an objects linear velocity on X axis.'),
+        t('Get the linear velocity of an object on X axis.'),
         t('Velocity'),
         'res/physics16.png'
       )
@@ -1131,7 +1131,7 @@ module.exports = {
       .addExpression(
         'LinearVelocityY',
         t('Linear velocity on Y axis'),
-        t('Get an objects linear velocity on Y axis.'),
+        t('Get the linear velocity of an object on Y axis.'),
         t('Velocity'),
         'res/physics16.png'
       )

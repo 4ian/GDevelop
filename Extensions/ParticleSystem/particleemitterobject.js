@@ -9,7 +9,7 @@ This project is released under the MIT License.
 gdjs.ParticleEmitterObject = function(runtimeScene, objectData){
     gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-    this.renderer = new gdjs.ParticleEmitterObjectRenderer(runtimeScene, this, objectData);
+    this._renderer = new gdjs.ParticleEmitterObjectRenderer(runtimeScene, this, objectData);
 
     this.singleAngle = objectData.emissionEditionSimpleMode;
     this.angleA = objectData.emitterAngleA;
@@ -71,64 +71,64 @@ gdjs.ParticleEmitterObject.prototype.setAngle = function(angle){
 };
 
 gdjs.ParticleEmitterObject.prototype.getRendererObject = function(){
-    return this.renderer.getRendererObject();
+    return this._renderer.getRendererObject();
 };
 
 gdjs.ParticleEmitterObject.prototype.update = function(runtimeScene){
     if(this._posDirty){
-        this.renderer.setPosition(this.getX(), this.getY());
+        this._renderer.setPosition(this.getX(), this.getY());
     }
     if(this._angleDirty){
         var angle = this.getAngle();
-        if(this.singleAngle) this.renderer.setAngle(this.angle - this.angleB/2.0, this.angle + this.angleB/2.0);
-        else this.renderer.setAngle(this.angle + this.angleA, this.angle + this.angleB);
+        if(this.singleAngle) this._renderer.setAngle(this.angle - this.angleB/2.0, this.angle + this.angleB/2.0);
+        else this._renderer.setAngle(this.angle + this.angleA, this.angle + this.angleB);
     }
     if(this._forceDirty){
-        this.renderer.setForce(this.forceMin, this.forceMax);
+        this._renderer.setForce(this.forceMin, this.forceMax);
     }
     if(this._zoneRadiusDirty){
-        this.renderer.setZoneRadius(this.zoneRadius);
+        this._renderer.setZoneRadius(this.zoneRadius);
     }
     if(this._lifeTimeDirty){
-        this.renderer.setLifeTime(this.lifeTimeMin, this.lifeTimeMax);
+        this._renderer.setLifeTime(this.lifeTimeMin, this.lifeTimeMax);
     }
     if(this._gravityDirty){
-        this.renderer.setGravity(this.gravityX, this.gravityY);
+        this._renderer.setGravity(this.gravityX, this.gravityY);
     }
     if(this._colorDirty){
-        this.renderer.setColor(this.colorR1, this.colorG1, this.colorB1,
+        this._renderer.setColor(this.colorR1, this.colorG1, this.colorB1,
                                this.colorR2, this.colorG2, this.colorB2);
     }
     if(this._sizeDirty && this.sizeParam === "Mutable"){
-        this.renderer.setSize(this.size1, this.size2);
+        this._renderer.setSize(this.size1, this.size2);
     }
     if(this._alphaDirty){
-        this.renderer.setAlpha(this.alpha1, this.alpha2);
+        this._renderer.setAlpha(this.alpha1, this.alpha2);
     }
     if(this._flowDirty){
-        this.renderer.setFlow(this.flow, this.tank);
+        this._renderer.setFlow(this.flow, this.tank);
     }
     if(this._textureDirty){
-        this.renderer.setTexture(this.texture, runtimeScene);
+        this._renderer.setTexture(this.texture, runtimeScene);
     }
 
     this._posDirty = this._angleDirty = this._forceDirty = this._zoneRadiusDirty = false;
     this._lifeTimeDirty = this._gravityDirty = this._colorDirty = this._sizeDirty = false;
     this._alphaDirty = this._flowDirty = this._textureDirty = false;
 
-    this.renderer.update(this.getElapsedTime(runtimeScene)/1000.0);
+    this._renderer.update(this.getElapsedTime(runtimeScene)/1000.0);
 
-    if(this.tank > 0 && this.renderer.getTotalParticleCount() > this.tank){
-        this.renderer.stop();
+    if(this.tank > 0 && this._renderer.getTotalParticleCount() > this.tank){
+        this._renderer.stop();
     }
 
-    if(this.renderer.hasStarted() && this.renderer.getParticleCount() === 0 && this.destroyWhenNoParticles){
+    if(this._renderer.hasStarted() && this._renderer.getParticleCount() === 0 && this.destroyWhenNoParticles){
         this.deleteFromScene(runtimeScene);
     }
 };
 
 gdjs.ParticleEmitterObject.prototype.onDeletedFromScene = function(runtimeScene){
-    this.renderer.destroy();
+    this._renderer.destroy();
     gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
 };
 
@@ -446,11 +446,11 @@ gdjs.ParticleEmitterObject.prototype.setParticleAlpha2 = function(alpha){
 };
 
 gdjs.ParticleEmitterObject.prototype.noMoreParticles = function(){
-    this.renderer.stop();
+    this._renderer.stop();
 };
 
 gdjs.ParticleEmitterObject.prototype.recreateParticleSystem = function(){
-    this.renderer.recreate();
+    this._renderer.recreate();
 };
 
 gdjs.ParticleEmitterObject.prototype.getFlow = function(){
@@ -478,7 +478,7 @@ gdjs.ParticleEmitterObject.prototype.getTexture = function(){
 
 gdjs.ParticleEmitterObject.prototype.setTexture = function(texture, runtimeScene){
     if(this.texture !== texture){
-        if(this.renderer.isTextureValid(texture, runtimeScene)){
+        if(this._renderer.isTextureValid(texture, runtimeScene)){
             this.texture = texture;
             this._textureDirty = true;
         }

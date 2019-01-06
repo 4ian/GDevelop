@@ -1077,11 +1077,11 @@ module.exports = {
       .setManipulatedType('number')
       .setGetter('getLinearVelocityX');
 	
-	aut
+	  aut
       .addExpression(
         'LinearVelocityX',
-        t('Linear velocity X'),
-        t('Get an objects linear velocity on X.'),
+        t('Linear velocity on X axis'),
+        t('Get an objects linear velocity on X axis.'),
         t('Velocity'),
         'res/physics16.png'
       )
@@ -1090,7 +1090,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName('getLinearVelocityX');
     
-	aut
+	  aut
       .addCondition(
         'LinearVelocityY',
         t('Linear velocity Y'),
@@ -1127,11 +1127,11 @@ module.exports = {
       .setManipulatedType('number')
       .setGetter('getLinearVelocityY');
 	
-	aut
+	  aut
       .addExpression(
         'LinearVelocityY',
-        t('Linear velocity Y'),
-        t('Get an objects linear velocity on Y.'),
+        t('Linear velocity on Y axis'),
+        t('Get an objects linear velocity on Y axis.'),
         t('Velocity'),
         'res/physics16.png'
       )
@@ -1158,11 +1158,11 @@ module.exports = {
       .setFunctionName('getLinearVelocityLength')
       .setManipulatedType('number');
 
-	aut
+	  aut
       .addExpression(
         'LinearVelocityLength',
-        t('Linear velocity Length'),
-        t('Get an objects linear velocity length.'),
+        t('Linear velocity'),
+        t('Get the linear velocity of an object.'),
         t('Velocity'),
         'res/physics16.png'
       )
@@ -1208,11 +1208,11 @@ module.exports = {
       .setManipulatedType('number')
       .setGetter('getAngularVelocity');
 
-	aut
+	  aut
       .addExpression(
         'AngularVelocity',
         t('Angular velocity'),
-        t('Get an objects Angular velocity.'),
+        t('Get the angular velocity of an object.'),
         t('Velocity'),
         'res/physics16.png'
       )

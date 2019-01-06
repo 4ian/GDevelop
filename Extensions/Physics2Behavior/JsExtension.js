@@ -1076,8 +1076,8 @@ module.exports = {
       .setFunctionName('setLinearVelocityX')
       .setManipulatedType('number')
       .setGetter('getLinearVelocityX');
-	
-	  aut
+
+    aut
       .addExpression(
         'LinearVelocityX',
         t('Linear velocity on X axis'),
@@ -1089,8 +1089,8 @@ module.exports = {
       .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
       .getCodeExtraInformation()
       .setFunctionName('getLinearVelocityX');
-    
-	  aut
+
+    aut
       .addCondition(
         'LinearVelocityY',
         t('Linear velocity Y'),
@@ -1126,8 +1126,8 @@ module.exports = {
       .setFunctionName('setLinearVelocityY')
       .setManipulatedType('number')
       .setGetter('getLinearVelocityY');
-	
-	  aut
+
+    aut
       .addExpression(
         'LinearVelocityY',
         t('Linear velocity on Y axis'),
@@ -1138,8 +1138,8 @@ module.exports = {
       .addParameter('object', t('Object'), '', false)
       .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
       .getCodeExtraInformation()
-      .setFunctionName('getLinearVelocityY');  
-	  
+      .setFunctionName('getLinearVelocityY');
+
     aut
       .addCondition(
         'LinearVelocityLength',
@@ -1158,7 +1158,7 @@ module.exports = {
       .setFunctionName('getLinearVelocityLength')
       .setManipulatedType('number');
 
-	  aut
+    aut
       .addExpression(
         'LinearVelocity',
         t('Linear velocity'),
@@ -1169,8 +1169,8 @@ module.exports = {
       .addParameter('object', t('Object'), '', false)
       .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
       .getCodeExtraInformation()
-      .setFunctionName('getLinearVelocityLength');  
-	  
+      .setFunctionName('getLinearVelocityLength');
+
     aut
       .addCondition(
         'AngularVelocity',
@@ -1208,7 +1208,7 @@ module.exports = {
       .setManipulatedType('number')
       .setGetter('getAngularVelocity');
 
-	  aut
+    aut
       .addExpression(
         'AngularVelocity',
         t('Angular velocity'),
@@ -1219,8 +1219,8 @@ module.exports = {
       .addParameter('object', t('Object'), '', false)
       .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
       .getCodeExtraInformation()
-      .setFunctionName('getAngularVelocity');  
-	  
+      .setFunctionName('getAngularVelocity');
+
     // Forces and impulses
     aut
       .addAction(

@@ -1341,10 +1341,13 @@ gdjs.RuntimeObject.prototype.raycastTest = function(x, y, endX, endY, closest) {
  *
  */
 gdjs.RuntimeObject.prototype.insideObject = function(x, y) {
-    return this.getDrawableX() <= x
-        && this.getDrawableX() + this.getWidth() >= x
-        && this.getDrawableY() <= y
-        && this.getDrawableY() + this.getHeight() >= y;
+    if ( this.hitBoxesDirty ) {
+        this.updateHitBoxes();
+        this.updateAABB();
+        this.hitBoxesDirty = false;
+    }
+    return this.aabb.min[0] <= x && this.aabb.max[0] >= x
+        && this.aabb.min[1] <= y && this.aabb.max[1] >= y;
 }
 
 /**

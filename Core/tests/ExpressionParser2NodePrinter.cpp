@@ -65,8 +65,17 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
   SECTION("Valid numbers") {
     testPrinter("number", "123");
     testPrinter("number", "3.14159");
-    testPrinter("number", ".14159");
+    testPrinter("number", ".14159", "0.14159");
+    testPrinter("number", "0.14159");
     testPrinter("number", "3.");
+    testPrinter("number", "0");
+    testPrinter("number", "00", "0");
+    testPrinter("number", "000", "0");
+    testPrinter("number", "0000", "0");
+    testPrinter("number", "0001234", "1234");
+    testPrinter("number", "0000.", "0.");
+    testPrinter("number", "0000.1", "0.1");
+    testPrinter("number", "0001.2", "1.2");
   }
 
   SECTION("Valid unary operators") {
@@ -76,6 +85,9 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
     testPrinter("number", "+-+123.34567");
     testPrinter("number", "-123.2");
     testPrinter("number", "- + - 123.2", "-+-123.2");
+    testPrinter("number", "- + - .", "-+-0.");
+    testPrinter("number", "- + - 000123.", "-+-123.");
+    testPrinter("number", "- + - 000123.4", "-+-123.4");
   }
 
   SECTION("Valid unary operators with parenthesis") {
@@ -91,7 +103,11 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
     testPrinter("number", "abcd");
     testPrinter("number", "\"hello world\"");
     testPrinter("number", "123 456");
-    testPrinter("number", "3..14", "3. .14");
+    testPrinter("number", "3..14", "3. 0.14");
+    testPrinter("number", "0..", "0. 0.");
+    testPrinter("number", "0...3", "0. 0. 0.3");
+    testPrinter("number", "0...3.", "0. 0. 0.3 0.");
+    testPrinter("number", "./.", "0. / 0.");
   }
 
   SECTION("Invalid number operators") {

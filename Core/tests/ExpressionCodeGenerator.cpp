@@ -94,7 +94,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
                                                           context);
 
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "12.5 + -(2.) / (.3)");
+      REQUIRE(expressionCodeGenerator.GetOutput() == "12.5 + -(2.) / (0.3)");
     }
   }
 

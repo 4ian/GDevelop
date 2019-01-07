@@ -174,20 +174,39 @@ std::unique_ptr<NumberNode> ExpressionParser2::ReadNumber() {
   bool digitFound = false;
   bool dotFound = false;
   while (!IsEndReached()) {
-    if (IsAnyChar("0123456789")) {
+    if (IsAnyChar("0")) {
+      numberHasStarted = true;
+      digitFound = true;
+      if (!parsedNumber.empty()) { // Ignore leading 0s.
+        parsedNumber += GetCurrentChar();
+      }
+    } else if (IsAnyChar("123456789")) {
       numberHasStarted = true;
       digitFound = true;
       parsedNumber += GetCurrentChar();
     } else if (IsAnyChar(".") && !dotFound) {
       numberHasStarted = true;
       dotFound = true;
-      parsedNumber += ".";
+      if (parsedNumber == "") {
+        parsedNumber += "0."; //Normalize by adding a leading 0, only in this case.
+      } else {
+        parsedNumber += ".";
+      }
     } else {
       break;
     }
 
     currentPosition++;
   }
+
+  // parsedNumber can be empty in the only case where we have only seen
+  // 0s (one or more), so normalize it to a single 0.
+  if (parsedNumber.empty()) {
+    parsedNumber = "0";
+  }
+
+  // Note that parsedNumber can finish by a dot (1., 2., 0.). This is
+  // valid in most languages so we allow this.
 
   auto number = gd::make_unique<NumberNode>(parsedNumber);
   if (!numberHasStarted || !digitFound) {

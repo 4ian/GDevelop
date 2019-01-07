@@ -224,6 +224,12 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(numberNode.number == "123");
     }
     {
+      auto node = parser.ParseExpression("number", "0");
+      REQUIRE(node != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+      REQUIRE(numberNode.number == "0");
+    }
+    {
       auto node = parser.ParseExpression("number", "3.14159");
       REQUIRE(node != nullptr);
       auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
@@ -233,13 +239,19 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto node = parser.ParseExpression("number", ".14159");
       REQUIRE(node != nullptr);
       auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
-      REQUIRE(numberNode.number == ".14159");
+      REQUIRE(numberNode.number == "0.14159");
     }
     {
       auto node = parser.ParseExpression("number", "3.");
       REQUIRE(node != nullptr);
       auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
       REQUIRE(numberNode.number == "3.");
+    }
+    {
+      auto node = parser.ParseExpression("number", "0.");
+      REQUIRE(node != nullptr);
+      auto &numberNode = dynamic_cast<gd::NumberNode &>(*node);
+      REQUIRE(numberNode.number == "0.");
     }
   }
 

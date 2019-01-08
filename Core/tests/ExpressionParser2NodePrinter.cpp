@@ -169,7 +169,9 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
   }
   SECTION("Unterminated function calls") {
     testPrinter("number", "Idontexist(12", "Idontexist(12)");
-    testPrinter("number", "Idontexist(12, 34,   \"56\" + 2    ", "Idontexist(12, 34, \"56\" + 2)");
+    testPrinter("number",
+                "Idontexist(12, 34,   \"56\" + 2    ",
+                "Idontexist(12, 34, \"56\" + 2)");
   }
 
   SECTION("Valid variables") {
@@ -188,8 +190,18 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
                 "+MyExtension::GetNumberWith2Params(12, \"hello world\")");
     testPrinter("number",
                 "+-MyExtension::GetNumberWith3Params(12, \"hello world\")");
-    testPrinter("number",
-                "+--+MyExtension::GetNumberWith3Params(12, \"hello world\", 34)");
+    testPrinter(
+        "number",
+        "+--+MyExtension::GetNumberWith3Params(12, \"hello world\", 34)");
     testPrinter("number", "--MySpriteObject.GetObjectNumber()");
+  }
+  SECTION("Other/complex cases") {
+    testPrinter("scenevar",
+                "myVariable[ \"My children\" + "
+                "ToString(+-MyExtension::GetNumberWith3Params(12, \"hello "
+                "world\"))  ].grandChild",
+                "myVariable[\"My children\" + "
+                "ToString(+-MyExtension::GetNumberWith3Params(12, \"hello "
+                "world\"))].grandChild");
   }
 }

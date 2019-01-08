@@ -32,6 +32,11 @@ void SetupProjectWithDummyPlatform(gd::Project &project,
       .AddParameter("scenevar", "Scene variable")
       .SetFunctionName("returnVariable");
   extension
+      ->AddStrExpression(
+          "ToString", "ToString", "", "", "")
+      .AddParameter("expression", "Number to convert to string")
+      .SetFunctionName("toString");
+  extension
       ->AddExpression("MouseX",
                       _("Cursor X position"),
                       _("Cursor X position"),

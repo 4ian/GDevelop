@@ -362,7 +362,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       }
     }
   }
-  SECTION("Mixed/fuzzy tests") {
+  SECTION("Mixed test (1)") {
     {
       auto node = parser.ParseExpression("number", "-+-MyExtension::MouseX(,)");
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
@@ -374,7 +374,7 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       // (first argument is the currentScene)
     }
   }
-  SECTION("Helper for code generation") {
+  SECTION("Mixed test (2)") {
     gd::String output = gd::ExpressionCodeGenerator::GenerateExpressionCode(
         codeGenerator,
         context,
@@ -388,5 +388,18 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
             "returnVariable"
             "(getVariableForObject(MyOtherSpriteObject, mySecondVariable)) ?? "
             "0) ?? \"\").getChild(\"child2\"))");
+  }
+  SECTION("Mixed test (3)") {
+    gd::String output = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+        codeGenerator,
+        context,
+        "globalvar",
+        "myVariable[ \"My children\" + "
+        "MyExtension::ToString(+-MyExtension::GetNumberWith3Params(12, \"hello "
+        "world\"))  ].grandChild");
+    REQUIRE(output ==
+            "getProjectVariable(myVariable).getChild(\"My children\" + "
+            "toString(+(-(getNumberWith3Params(12, \"hello world\", "
+            "0))))).getChild(\"grandChild\")");
   }
 }

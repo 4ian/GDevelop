@@ -510,7 +510,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     "res/actions/position.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("identifier", _("Name of the point"));
+      .AddParameter("string", _("Name of the point"));
 
   obj.AddExpression("PointY",
                     _("Y position of a point"),
@@ -519,7 +519,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsSpriteExtension(
                     "res/actions/position.png")
 
       .AddParameter("object", _("Object"), "Sprite")
-      .AddParameter("identifier", _("Name of the point"));
+      .AddParameter("string", _("Name of the point"));
 
   obj.AddExpression("Direc",
                     _("Direction"),

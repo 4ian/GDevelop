@@ -879,7 +879,7 @@ module.exports = {
       .addExpression(
         'Restitution',
         t('Restitution of the object'),
-        t('Get the Restitution of an object.'),
+        t('Get the restitution of an object.'),
         t('Body settings'),
         'res/physics16.png'
       )
@@ -930,8 +930,8 @@ module.exports = {
     aut
       .addExpression(
         'LinearDamping',
-        t('Linear Damping of the object'),
-        t('Get the Linear Damping of an object.'),
+        t('Linear damping of the object'),
+        t('Get the linear damping of an object.'),
         t('Body settings'),
         'res/physics16.png'
       )
@@ -982,8 +982,8 @@ module.exports = {
     aut
       .addExpression(
         'AngularDamping',
-        t('Angular Damping of the object'),
-        t('Get the Angular Damping of an object.'),
+        t('Angular damping of the object'),
+        t('Get the angular damping of an object.'),
         t('Body settings'),
         'res/physics16.png'
       )
@@ -1034,8 +1034,8 @@ module.exports = {
       aut
       .addExpression(
         'GravityScale',
-        t('Gravity Scale of the object'),
-        t('Get the Gravity Scale of an object.'),
+        t('Gravity scale of the object'),
+        t('Get the gravity scale of an object.'),
         t('Body settings'),
         'res/physics16.png'
       )
@@ -1221,7 +1221,7 @@ module.exports = {
     aut
       .addCondition(
         'LinearVelocityLength',
-        t('Linear velocity length'),
+        t('Linear velocity'),
         t('Test an object linear velocity length.'),
         t('Linear velocity length of _PARAM0_ is _PARAM2__PARAM3_'),
         t('Velocity'),
@@ -2147,7 +2147,7 @@ module.exports = {
       .addExpression(
         'RevoluteJointMaxMotorTorque',
         t('Revolute joint max motor torque'),
-        t('Revolute joint Maximum motor torque'),
+        t('Revolute joint maximum motor torque'),
         t('Joints/Revolute'),
         'JsPlatform/Extensions/revolute_joint16.png'
       )

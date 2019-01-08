@@ -772,6 +772,19 @@ module.exports = {
       .setGetter('getDensity');
 
     aut
+      .addExpression(
+        'Density',
+        t('Density of the object'),
+        t('Get the density of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getDensity');
+
+    aut
       .addCondition(
         'Friction',
         t('Friction'),
@@ -809,6 +822,19 @@ module.exports = {
       .setFunctionName('setFriction')
       .setManipulatedType('number')
       .setGetter('getFriction');
+
+    aut
+      .addExpression(
+        'Friction',
+        t('Friction of the object'),
+        t('Get the friction of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getFriction');
 
     aut
       .addCondition(
@@ -850,6 +876,19 @@ module.exports = {
       .setGetter('getRestitution');
 
     aut
+      .addExpression(
+        'Restitution',
+        t('Restitution of the object'),
+        t('Get the Restitution of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getRestitution');
+
+    aut
       .addCondition(
         'LinearDamping',
         t('Linear damping'),
@@ -887,6 +926,19 @@ module.exports = {
       .setFunctionName('setLinearDamping')
       .setManipulatedType('number')
       .setGetter('getLinearDamping');
+
+    aut
+      .addExpression(
+        'LinearDamping',
+        t('Linear Damping of the object'),
+        t('Get the Linear Damping of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getLinearDamping');
 
     aut
       .addCondition(
@@ -928,6 +980,19 @@ module.exports = {
       .setGetter('getAngularDamping');
 
     aut
+      .addExpression(
+        'AngularDamping',
+        t('Angular Damping of the object'),
+        t('Get the Angular Damping of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getAngularDamping');
+
+    aut
       .addCondition(
         'GravityScale',
         t('Gravity scale'),
@@ -965,6 +1030,19 @@ module.exports = {
       .setFunctionName('setGravityScale')
       .setManipulatedType('number')
       .setGetter('getGravityScale');
+
+      aut
+      .addExpression(
+        'GravityScale',
+        t('Gravity Scale of the object'),
+        t('Get the Gravity Scale of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getGravityScale');
 
     // Filtering
     aut

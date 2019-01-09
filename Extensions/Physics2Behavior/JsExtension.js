@@ -772,6 +772,19 @@ module.exports = {
       .setGetter('getDensity');
 
     aut
+      .addExpression(
+        'Density',
+        t('Density of the object'),
+        t('Get the density of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getDensity');
+
+    aut
       .addCondition(
         'Friction',
         t('Friction'),
@@ -809,6 +822,19 @@ module.exports = {
       .setFunctionName('setFriction')
       .setManipulatedType('number')
       .setGetter('getFriction');
+
+    aut
+      .addExpression(
+        'Friction',
+        t('Friction of the object'),
+        t('Get the friction of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getFriction');
 
     aut
       .addCondition(
@@ -850,6 +876,19 @@ module.exports = {
       .setGetter('getRestitution');
 
     aut
+      .addExpression(
+        'Restitution',
+        t('Restitution of the object'),
+        t('Get the restitution of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getRestitution');
+
+    aut
       .addCondition(
         'LinearDamping',
         t('Linear damping'),
@@ -887,6 +926,19 @@ module.exports = {
       .setFunctionName('setLinearDamping')
       .setManipulatedType('number')
       .setGetter('getLinearDamping');
+
+    aut
+      .addExpression(
+        'LinearDamping',
+        t('Linear damping of the object'),
+        t('Get the linear damping of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getLinearDamping');
 
     aut
       .addCondition(
@@ -928,6 +980,19 @@ module.exports = {
       .setGetter('getAngularDamping');
 
     aut
+      .addExpression(
+        'AngularDamping',
+        t('Angular damping of the object'),
+        t('Get the angular damping of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getAngularDamping');
+
+    aut
       .addCondition(
         'GravityScale',
         t('Gravity scale'),
@@ -965,6 +1030,19 @@ module.exports = {
       .setFunctionName('setGravityScale')
       .setManipulatedType('number')
       .setGetter('getGravityScale');
+
+      aut
+      .addExpression(
+        'GravityScale',
+        t('Gravity scale of the object'),
+        t('Get the gravity scale of an object.'),
+        t('Body settings'),
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .addParameter('behavior', t('Behavior'), 'Physics2Behavior')
+      .getCodeExtraInformation()
+      .setFunctionName('getGravityScale');
 
     // Filtering
     aut
@@ -1143,7 +1221,7 @@ module.exports = {
     aut
       .addCondition(
         'LinearVelocityLength',
-        t('Linear velocity length'),
+        t('Linear velocity'),
         t('Test an object linear velocity length.'),
         t('Linear velocity length of _PARAM0_ is _PARAM2__PARAM3_'),
         t('Velocity'),
@@ -2069,7 +2147,7 @@ module.exports = {
       .addExpression(
         'RevoluteJointMaxMotorTorque',
         t('Revolute joint max motor torque'),
-        t('Revolute joint Maximum motor torque'),
+        t('Revolute joint maximum motor torque'),
         t('Joints/Revolute'),
         'JsPlatform/Extensions/revolute_joint16.png'
       )

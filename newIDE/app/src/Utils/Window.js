@@ -1,3 +1,5 @@
+// @flow
+
 import optionalRequire from './OptionalRequire.js';
 import URLSearchParams from 'url-search-params';
 import { isWindows } from './Platform';
@@ -6,7 +8,7 @@ const shell = electron ? electron.shell : null;
 const dialog = electron ? electron.remote.dialog : null;
 
 export default class Window {
-  static setTitle(title) {
+  static setTitle(title: string) {
     if (electron) {
       const browserWindow = electron.remote.getCurrentWindow();
       browserWindow.setTitle(title);
@@ -15,7 +17,7 @@ export default class Window {
     }
   }
 
-  static setBounds(x, y, width, height) {
+  static setBounds(x: number, y: number, width: number, height: number) {
     if (!electron) return;
 
     let scaleFactor = 1;
@@ -49,7 +51,7 @@ export default class Window {
     browserWindow.setAlwaysOnTop(true);
   }
 
-  static hide(forceHide = false) {
+  static hide(forceHide: boolean = false) {
     if (!electron) return;
 
     const browserWindow = electron.remote.getCurrentWindow();
@@ -59,19 +61,19 @@ export default class Window {
     }
   }
 
-  static onFocus(cb) {
+  static onFocus(cb: () => void) {
     if (!electron) return;
 
     return electron.remote.getCurrentWindow().on('focus', cb);
   }
 
-  static onBlur(cb) {
+  static onBlur(cb: () => void) {
     if (!electron) return;
 
     return electron.remote.getCurrentWindow().on('blur', cb);
   }
 
-  static onClose(cb) {
+  static onClose(cb: () => void) {
     if (!electron) return;
 
     return electron.remote.getCurrentWindow().on('close', cb);
@@ -84,7 +86,7 @@ export default class Window {
    * didn't have an option associated with them (see https://github.com/substack/minimist).
    * (On the web-app, this is emulated using the "project" argument).
    */
-  static getArguments() {
+  static getArguments(): { [string]: any } {
     if (electron) {
       return electron.remote.getGlobal('args');
     }
@@ -102,7 +104,10 @@ export default class Window {
     return argumentsObject;
   }
 
-  static showMessageBox(message, type) {
+  static showMessageBox(
+    message: string,
+    type?: 'none' | 'info' | 'error' | 'question' | 'warning'
+  ) {
     if (!dialog || !electron) {
       alert(message);
       return;
@@ -112,6 +117,7 @@ export default class Window {
     dialog.showMessageBox(browserWindow, {
       message,
       type,
+      buttons: ['OK'],
     });
   }
 
@@ -138,7 +144,7 @@ export default class Window {
         }, 30);
       });
     } else if (document) {
-      document.addEventListener('contextmenu', function(e) {
+      document.addEventListener('contextmenu', function(e: any) {
         // Only show the context menu in text editors.
         if (!e.target.closest(textEditorSelectors)) {
           e.preventDefault();
@@ -150,9 +156,9 @@ export default class Window {
     }
   }
 
-  static openExternalURL(url) {
+  static openExternalURL(url: string) {
     if (electron) {
-      shell.openExternal(url);
+      if (shell) shell.openExternal(url);
       return;
     }
 

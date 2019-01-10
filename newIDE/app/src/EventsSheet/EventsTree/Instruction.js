@@ -19,7 +19,6 @@ import {
   type DragSourceMonitor,
   type DragSourceConnector,
   type ConnectDragSource,
-  type DragSourceSpec,
   DropTarget,
   type DropTargetMonitor,
   type DropTargetConnector,

@@ -46,7 +46,7 @@ export default class ExamplesSearchbar extends Component<Props> {
         text: extension.getFullName(),
         value: extension.getName(),
       };
-    }).filter(extension => !!extension);
+    }).filter(Boolean);
   }
 
   componentDidMount() {

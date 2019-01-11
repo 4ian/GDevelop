@@ -11,6 +11,9 @@ import {
   type ChooseResourceFunction,
 } from '../../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
+import { Line } from '../../UI/Grid';
+import AlertMessage from '../../UI/AlertMessage';
+import { getDeprecatedInstructionInformation } from '../../Hints';
 const gd = global.gd;
 
 const styles = {
@@ -136,6 +139,11 @@ export default class InstructionParametersEditor extends React.Component<
 
     const helpPage = instructionMetadata.getHelpPath();
 
+    const deprecatedInstructionInformation = getDeprecatedInstructionInformation(
+      _ => _,
+      type
+    );
+
     //TODO?
     instruction.setParametersCount(instructionMetadata.getParametersCount());
 
@@ -150,6 +158,13 @@ export default class InstructionParametersEditor extends React.Component<
           />
           <p>{instructionMetadata.getDescription()}</p>
         </div>
+        {deprecatedInstructionInformation && (
+          <Line>
+            <AlertMessage kind="warning">
+              {deprecatedInstructionInformation.warning}
+            </AlertMessage>
+          </Line>
+        )}
         <Divider />
         <div key={type} style={styles.parametersContainer}>
           {mapFor(0, instructionMetadata.getParametersCount(), i => {
@@ -215,7 +230,7 @@ export default class InstructionParametersEditor extends React.Component<
             />
           )}
         </div>
-        <div>
+        <Line>
           {helpPage && (
             <HelpButton
               helpPagePath={instructionMetadata.getHelpPath()}
@@ -226,7 +241,7 @@ export default class InstructionParametersEditor extends React.Component<
               }
             />
           )}
-        </div>
+        </Line>
       </div>
     );
   }

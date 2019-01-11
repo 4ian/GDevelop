@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import * as React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import {
@@ -14,14 +14,14 @@ type State = {|
   text: ?string,
 |};
 
-export default class ExternalEventsField extends Component<
+export default class ExternalEventsField extends React.Component<
   ParameterFieldProps,
   State
 > {
   state = { focused: false, text: null };
 
   _description: ?string = undefined;
-  _fullList: Array<{ text: string, value: string }> = [];
+  _fullList: Array<{ text: string, value: React.Node }> = [];
   _field: ?any;
 
   constructor(props: ParameterFieldProps) {

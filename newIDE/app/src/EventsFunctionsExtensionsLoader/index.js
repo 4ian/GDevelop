@@ -19,7 +19,7 @@ const mangleName = (name: string) => {
 export const loadProjectEventsFunctionsExtensions = (
   project: gdProject,
   eventsFunctionWriter: EventsFunctionWriter
-): Promise<void> => {
+): Promise<Array<void>> => {
   return Promise.all(
     // First pass: generate extensions from the events functions extensions,
     // without writing code for the functions. This is useful as events in functions
@@ -147,7 +147,7 @@ const generateEventsFunctionExtension = (
  */
 export const unloadProjectEventsFunctionsExtensions = (
   project: gdProject
-): Promise<void> => {
+): Promise<Array<void>> => {
   return Promise.all(
     mapFor(0, project.getEventsFunctionsExtensionsCount(), i => {
       gd.JsPlatform.get().removeExtension(

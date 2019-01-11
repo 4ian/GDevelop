@@ -32,6 +32,7 @@ declare type gdParameterMetadata = EmscriptenObject;
 declare type gdExpression = EmscriptenObject;
 declare type gdExpressionMetadata = EmscriptenObject;
 declare type gdObjectMetadata = EmscriptenObject;
+declare type gdBehaviorMetadata = EmscriptenObject;
 
 declare type gdVariable = EmscriptenObject;
 declare type gdVariablesContainer = EmscriptenObject;

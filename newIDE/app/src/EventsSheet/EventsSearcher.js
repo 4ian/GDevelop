@@ -159,7 +159,7 @@ export default class EventsSearcher extends React.Component<Props, State> {
           ? eventsSearchResult.getEvent()
           : null;
       }
-    ).filter(result => !!result);
+    ).filter(Boolean);
 
     // Store a list of unique events, because browsing for results in the events
     // tree is made event by event.

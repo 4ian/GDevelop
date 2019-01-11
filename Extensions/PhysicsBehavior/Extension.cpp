@@ -14,21 +14,23 @@ This project is released under the MIT License.
 #include "ScenePhysicsDatas.h"
 
 void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
-  extension.SetExtensionInformation(
-      "PhysicsBehavior",
-      _("Physics behavior"),
-      _("This extension enables the movement of objects as if they are subject "
-        "to the laws of physics."),
-      "Florian Rival",
-      "Open source (MIT License)")
+  extension
+      .SetExtensionInformation("PhysicsBehavior",
+                               _("Physics engine"),
+                               _("This extension enables the movement of "
+                                 "objects as if they are subject "
+                                 "to the laws of physics."),
+                               "Florian Rival",
+                               "Open source (MIT License)")
       .SetExtensionHelpPath("/behaviors/physics");
 
   {
     gd::BehaviorMetadata& aut = extension.AddBehavior(
         "PhysicsBehavior",
-        _("Physics engine"),
+        _("Physics Engine"),
         _("Physics"),
-        _("Make objects move as if they are subject to the laws of physics."),
+        _("Make objects move as if they are subject to the laws of physics. If "
+          "you're creating a new game, prefer Physics Engine 2.0"),
         "",
         "res/physics32.png",
         "PhysicsBehavior",

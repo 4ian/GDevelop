@@ -355,9 +355,9 @@ module.exports = {
       // extension
       .addBehavior(
         'Physics2Behavior',
-        t('Physics Engine 2.0 (beta)'),
-        'Physics2Behavior',
-        t('Simulate physics, the successor of the old physics behavior'),
+        t('Physics Engine 2.0'),
+        'Physics2',
+        t('Simulate realistic object physics, with gravity, forces, joints, etc.'),
         '',
         'res/physics32.png',
         'Physics2Behavior',

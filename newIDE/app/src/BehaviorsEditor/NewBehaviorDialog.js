@@ -18,7 +18,6 @@ const styles = {
   icon: { borderRadius: 0 },
 };
 
-
 type EnumeratedBehaviorMetadata = {|
   extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,

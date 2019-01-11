@@ -1,7 +1,7 @@
 // @flow
 
 export const getDeprecatedBehaviorsInformation = (
-  t: string => string,
+  t: string => string
 ): { [string]: {| warning: string |} } => ({
   'PhysicsBehavior::PhysicsBehavior': {
     warning: t(

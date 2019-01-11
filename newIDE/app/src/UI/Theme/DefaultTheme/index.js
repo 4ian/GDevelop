@@ -75,6 +75,7 @@ const theme = {
   listItem: {
     groupBackgroundColor: backgroundColor,
     groupTextColor: 'rgba(0,0,0,0.54)',
+    deprecatedGroupTextColor: 'rgba(0,0,0,0.30)',
     separatorColor: '#e0e0e0',
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: '#ffffff',

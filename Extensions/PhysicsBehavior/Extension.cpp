@@ -16,7 +16,7 @@ This project is released under the MIT License.
 void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
   extension
       .SetExtensionInformation("PhysicsBehavior",
-                               _("Physics engine"),
+                               _("Physics Engine (deprecated)"),
                                _("This extension enables the movement of "
                                  "objects as if they are subject "
                                  "to the laws of physics."),

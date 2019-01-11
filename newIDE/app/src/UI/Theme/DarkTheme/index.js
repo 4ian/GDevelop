@@ -90,6 +90,7 @@ const theme: Theme = {
   listItem: {
     groupBackgroundColor: backgroundColor,
     groupTextColor: '#AAA',
+    deprecatedGroupTextColor: '#888',
     separatorColor: '#303030',
     selectedBackgroundColor: systemSelectionColor,
     selectedTextColor: almostWhite,

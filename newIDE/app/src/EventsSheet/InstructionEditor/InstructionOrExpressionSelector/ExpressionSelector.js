@@ -5,7 +5,7 @@ import InstructionOrExpressionSelector from './index';
 import { createTree, type InstructionOrExpressionTreeNode } from './CreateTree';
 import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
 
-export default class ExpressionSelector extends Component<*, *> {
+export default class ExpressionSelector extends Component<*, {||}> {
   instructionsInfo: Array<InstructionOrExpressionInformation> = [];
   instructionsInfoTree: ?InstructionOrExpressionTreeNode = null;
 

@@ -112,6 +112,7 @@ class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
       } else {
         // $FlowFixMe - see above
         const groupOfInstructionInformation = (instructionOrGroup: InstructionOrExpressionTreeNode);
+        const isDeprecated = key.indexOf('(deprecated)') !== -1;
         return (
           <ListItem
             key={key}
@@ -120,7 +121,13 @@ class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
             }}
             nestedListStyle={styles.groupListItemNestedList}
             primaryText={
-              <div style={{ color: muiTheme.listItem.groupTextColor }}>
+              <div
+                style={{
+                  color: isDeprecated
+                    ? muiTheme.listItem.deprecatedGroupTextColor
+                    : muiTheme.listItem.groupTextColor,
+                }}
+              >
                 {key}
               </div>
             }

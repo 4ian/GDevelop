@@ -10,7 +10,7 @@ type Props = {
   // And props from InstructionOrExpressionSelector
 };
 
-export default class InstructionSelector extends Component<Props, *> {
+export default class InstructionSelector extends Component<Props, {||}> {
   instructionsInfo: Array<InstructionOrExpressionInformation> = [];
   instructionsInfoTree: ?InstructionOrExpressionTreeNode = null;
 

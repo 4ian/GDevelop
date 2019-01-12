@@ -349,12 +349,20 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Mouse features",
-        "name": "BuiltinMouse"
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
       },
       {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
       },
       {
         "fullName": "Primitive drawing",
@@ -365,12 +373,8 @@ module.exports = {
         "name": "PanelSpriteObject"
       },
       {
-        "fullName": "Tiled Sprite Object",
-        "name": "TiledSpriteObject"
-      },
-      {
-        "fullName": "Physics engine (deprecated)",
-        "name": "PhysicsBehavior"
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
       },
       {
         "fullName": "Advanced control features",
@@ -385,8 +389,8 @@ module.exports = {
         "name": "BuiltinObject"
       },
       {
-        "fullName": "Cameras and layers features",
-        "name": "BuiltinCamera"
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       },
       {
         "fullName": "Linked objects",

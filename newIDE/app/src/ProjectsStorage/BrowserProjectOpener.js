@@ -71,6 +71,7 @@ import playMusicOnMobile from '../fixtures/play-music-on-mobile/play-music-on-mo
 import playStopSpriteAnimation from '../fixtures/play-stop-sprite-animation/play-stop-sprite-animation.json';
 import racingGame from '../fixtures/racing-game/racing-game.json';
 import rain from '../fixtures/rain/rain.json';
+import ragdoll from '../fixtures/ragdoll/ragdoll.json';
 import randomColorPicker from '../fixtures/random-color-picker/random-color-picker.json';
 import rotateTowardMouse from '../fixtures/rotate-toward-mouse/rotate-toward-mouse.json';
 import rotateTowardPosition from '../fixtures/rotate-toward-position/rotate-toward-position.json';
@@ -240,6 +241,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(racingGame);
     } else if (url === 'example://rain') {
       return Promise.resolve(rain);
+    } else if (url === 'example://ragdoll') {
+      return Promise.resolve(ragdoll);
     } else if (url === 'example://random-color-picker') {
       return Promise.resolve(randomColorPicker);
     } else if (url === 'example://rotate-toward-mouse') {

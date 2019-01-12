@@ -82,6 +82,7 @@ const exampleNames = [
   'play-stop-sprite-animation',
   'racing-game',
   'rain',
+  'ragdoll',
   'random-color-picker',
   'rotate-toward-mouse',
   'rotate-toward-position',

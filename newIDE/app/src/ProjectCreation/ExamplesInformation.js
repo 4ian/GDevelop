@@ -369,7 +369,7 @@ module.exports = {
         "name": "TiledSpriteObject"
       },
       {
-        "fullName": "Physics behavior",
+        "fullName": "Physics engine (deprecated)",
         "name": "PhysicsBehavior"
       },
       {
@@ -464,7 +464,7 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Physics behavior",
+        "fullName": "Physics engine (deprecated)",
         "name": "PhysicsBehavior"
       },
       {
@@ -1182,7 +1182,7 @@ module.exports = {
         "name": "LinkedObjects"
       },
       {
-        "fullName": "Storage and files",
+        "fullName": "Storage",
         "name": "BuiltinFile"
       }
     ]
@@ -1195,16 +1195,24 @@ module.exports = {
         "name": "Sprite"
       },
       {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
         "fullName": "Top-down movement",
         "name": "TopDownMovementBehavior"
       },
       {
-        "fullName": "Keyboard features",
-        "name": "BuiltinKeyboard"
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
       },
       {
         "fullName": "Base object",
         "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
       },
       {
         "fullName": "Cameras and layers features",
@@ -1366,7 +1374,7 @@ module.exports = {
         "name": "BuiltinCamera"
       },
       {
-        "fullName": "Storage and files",
+        "fullName": "Storage",
         "name": "BuiltinFile"
       },
       {
@@ -1586,7 +1594,7 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Physics behavior",
+        "fullName": "Physics engine (deprecated)",
         "name": "PhysicsBehavior"
       },
       {
@@ -1669,7 +1677,7 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Physics behavior",
+        "fullName": "Physics engine (deprecated)",
         "name": "PhysicsBehavior"
       },
       {
@@ -1760,7 +1768,7 @@ module.exports = {
         "name": "BuiltinCommonInstructions"
       },
       {
-        "fullName": "Storage and files",
+        "fullName": "Storage",
         "name": "BuiltinFile"
       }
     ]
@@ -1985,7 +1993,7 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Physics behavior",
+        "fullName": "Physics engine (deprecated)",
         "name": "PhysicsBehavior"
       },
       {
@@ -2396,7 +2404,7 @@ module.exports = {
         "name": "TiledSpriteObject"
       },
       {
-        "fullName": "Physics behavior",
+        "fullName": "Physics engine (deprecated)",
         "name": "PhysicsBehavior"
       },
       {
@@ -2422,6 +2430,63 @@ module.exports = {
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
+      }
+    ]
+  },
+  "ragdoll": {
+    "description": "Example of creating a ragdoll with physics joints.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Particle system",
+        "name": "ParticleSystem"
+      },
+      {
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Advanced control features",
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
       }
     ]
   },
@@ -2574,7 +2639,7 @@ module.exports = {
         "name": "DraggableBehavior"
       },
       {
-        "fullName": "Storage and files",
+        "fullName": "Storage",
         "name": "BuiltinFile"
       },
       {
@@ -2880,6 +2945,39 @@ module.exports = {
       {
         "fullName": "Variable features",
         "name": "BuiltinVariables"
+      }
+    ]
+  },
+  "take-screenshot": {
+    "description": "Show how to save a screenshot of the game on the disk (on Windows/macOS/Linux only).",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Screenshot",
+        "name": "Screenshot"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
       }
     ]
   },

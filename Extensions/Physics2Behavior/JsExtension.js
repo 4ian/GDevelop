@@ -2985,7 +2985,7 @@ module.exports = {
       .setDefaultValue('0')
       .addParameter(
         'expression',
-        t('Motor maximum force (default: 0)'),
+        t('Motor maximum torque (default: 0)'),
         '',
         true
       )

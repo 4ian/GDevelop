@@ -76,3 +76,4 @@ Binaries/Packaging/logs
 **/.DS_Store
 **/node_modules/
 .idea
+newIDE/app/package-lock.json

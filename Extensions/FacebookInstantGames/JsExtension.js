@@ -33,7 +33,7 @@ module.exports = {
           "Save the content of the given variable in the player data, stored on Facebook Instant Games servers"
         ),
         t(
-          "Save the content of _PARAM1_ in key _PARAM1_ of player data (store success message in _PARAM2_ or error in _PARAM3_)"
+          "Save the content of _PARAM1_ in key _PARAM0_ of player data (store success message in _PARAM2_ or error in _PARAM3_)"
         ),
         t("Facebook Instant Games/Player data"),
         "JsPlatform/Extensions/facebookicon24.png",

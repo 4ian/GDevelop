@@ -468,8 +468,8 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Physics engine (deprecated)",
-        "name": "PhysicsBehavior"
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
       },
       {
         "fullName": "Scene management features",
@@ -1598,20 +1598,16 @@ module.exports = {
         "name": "Sprite"
       },
       {
-        "fullName": "Physics engine (deprecated)",
-        "name": "PhysicsBehavior"
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
       },
       {
-        "fullName": "Scene management features",
-        "name": "BuiltinScene"
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
       },
       {
         "fullName": "Mouse features",
         "name": "BuiltinMouse"
-      },
-      {
-        "fullName": "Standard events",
-        "name": "BuiltinCommonInstructions"
       },
       {
         "fullName": "Variable features",
@@ -1681,8 +1677,8 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Physics engine (deprecated)",
-        "name": "PhysicsBehavior"
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
       },
       {
         "fullName": "Standard events",
@@ -1997,8 +1993,8 @@ module.exports = {
         "name": "TextObject"
       },
       {
-        "fullName": "Physics engine (deprecated)",
-        "name": "PhysicsBehavior"
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
       },
       {
         "fullName": "Scene management features",
@@ -2408,8 +2404,8 @@ module.exports = {
         "name": "TiledSpriteObject"
       },
       {
-        "fullName": "Physics engine (deprecated)",
-        "name": "PhysicsBehavior"
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
       },
       {
         "fullName": "Scene management features",

@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/racing-game/racing-game.json",
+    "projectFile": "/Users/florianrival/GDevelop projects/My project1339/racing-game.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -329,8 +329,8 @@
           "locked": false,
           "name": "PlayerCar",
           "width": 0,
-          "x": 341,
-          "y": 838,
+          "x": 333,
+          "y": 802,
           "zOrder": 10,
           "numberProperties": [
             {
@@ -1534,13 +1534,13 @@
         {
           "angle": -130.179,
           "customSize": true,
-          "height": 73.5,
+          "height": 231,
           "layer": "",
           "locked": false,
           "name": "AIDirectionIndicator",
-          "width": 134,
-          "x": -408,
-          "y": 2.25,
+          "width": 285,
+          "x": -474,
+          "y": 18,
           "zOrder": 11,
           "numberProperties": [
             {
@@ -1581,26 +1581,6 @@
           "width": 134,
           "x": -1258,
           "y": -248.75,
-          "zOrder": 11,
-          "numberProperties": [
-            {
-              "name": "animation",
-              "value": 0
-            }
-          ],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 89.0372,
-          "customSize": true,
-          "height": 73.5,
-          "layer": "",
-          "locked": false,
-          "name": "AIDirectionIndicator",
-          "width": 134,
-          "x": -1051,
-          "y": -263.75,
           "zOrder": 11,
           "numberProperties": [
             {
@@ -1814,13 +1794,13 @@
         {
           "angle": -116.003,
           "customSize": true,
-          "height": 73.5,
+          "height": 139,
           "layer": "",
           "locked": false,
           "name": "AIDirectionIndicator",
-          "width": 134,
-          "x": 600,
-          "y": 1047.25,
+          "width": 454,
+          "x": 499,
+          "y": 1069,
           "zOrder": 11,
           "numberProperties": [
             {
@@ -1880,7 +1860,7 @@
           "name": "AICar",
           "width": 0,
           "x": 461,
-          "y": 517,
+          "y": 515,
           "zOrder": 11,
           "numberProperties": [
             {
@@ -2054,13 +2034,13 @@
         {
           "angle": -130.179,
           "customSize": true,
-          "height": 73.5,
+          "height": 127,
           "layer": "",
           "locked": false,
           "name": "AIDirectionIndicator",
-          "width": 134,
-          "x": -375,
-          "y": -191.75,
+          "width": 316,
+          "x": -450,
+          "y": -230,
           "zOrder": 11,
           "numberProperties": [
             {
@@ -2141,7 +2121,7 @@
           "width": 75,
           "x": 340.5,
           "y": 656,
-          "zOrder": 11,
+          "zOrder": 12,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -2174,8 +2154,8 @@
           "locked": false,
           "name": "AIDirectionIndicator",
           "width": 471.87,
-          "x": -1303.94,
-          "y": -550.75,
+          "x": -1439,
+          "y": -548,
           "zOrder": 11,
           "numberProperties": [
             {
@@ -2335,6 +2315,26 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 92.3737,
+          "customSize": true,
+          "height": 73.5,
+          "layer": "",
+          "locked": false,
+          "name": "AIDirectionIndicator",
+          "width": 471.87,
+          "x": -1174,
+          "y": -543,
+          "zOrder": 11,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -2345,22 +2345,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 8,
-              "autoResizing": true,
-              "averageFriction": 0,
-              "averageRestitution": 0.1,
-              "coordsList": "0;-30/51;-7/51;7/0;30/-51;0",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 6,
-              "massDensity": 20,
-              "name": "Physics",
-              "polygonHeight": 65,
-              "polygonWidth": 104,
-              "positioning": "OnCenter",
-              "shapeType": "CustomPolygon",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 8,
+                "friction": 1.4,
+                "restitution": 0.1,
+                "linearDamping": 1.8,
+                "angularDamping": 1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -3417,22 +3424,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": false,
-              "averageFriction": 0,
-              "averageRestitution": 0.4,
-              "coordsList": "",
-              "dynamic": false,
-              "fixedRotation": true,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 1,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnCenter",
-              "shapeType": "Circle",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Static",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Circle",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -4471,22 +4485,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 3,
-              "autoResizing": false,
-              "averageFriction": 0,
-              "averageRestitution": 0.8,
-              "coordsList": "",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 2,
-              "massDensity": 40,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnCenter",
-              "shapeType": "Box",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 0.6,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -5885,22 +5906,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 8,
-              "autoResizing": true,
-              "averageFriction": 0,
-              "averageRestitution": 0.6,
-              "coordsList": "0;-30/51;0/0;30/-51;0",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 6,
-              "massDensity": 20,
-              "name": "Physics",
-              "polygonHeight": 65,
-              "polygonWidth": 104,
-              "positioning": "OnCenter",
-              "shapeType": "CustomPolygon",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 8,
+                "friction": 1.4,
+                "restitution": 0.1,
+                "linearDamping": 1.8,
+                "angularDamping": 1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -7380,8 +7408,22 @@
               "parameters": [
                 "Camera",
                 "PlayerCar",
-                "200",
+                "130",
                 "PlayerCar.Direction()",
+                ""
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "RotateCamera"
+              },
+              "parameters": [
+                "",
+                "=",
+                "PlayerCar.Angle()+90",
+                "",
                 ""
               ],
               "subInstructions": []
@@ -7464,12 +7506,14 @@
       ],
       "behaviorsSharedData": [
         {
-          "gravityX": 0,
-          "gravityY": 0,
-          "name": "Physics",
-          "scaleX": 100,
-          "scaleY": 100,
-          "type": "PhysicsBehavior::PhysicsBehavior"
+          "name": "Physics2",
+          "type": "Physics2::Physics2Behavior",
+          "content": {
+            "gravityX": 0,
+            "gravityY": 0,
+            "scaleX": 100,
+            "scaleY": 100
+          }
         }
       ]
     }
@@ -7531,7 +7575,7 @@
                 "AICar",
                 "Acceleration",
                 ">",
-                "40"
+                "10"
               ],
               "subInstructions": []
             }
@@ -7546,7 +7590,7 @@
                 "AICar",
                 "Acceleration",
                 "=",
-                "40"
+                "10"
               ],
               "subInstructions": []
             }
@@ -7661,7 +7705,7 @@
                 "AICar",
                 "Breaking",
                 ">",
-                "35"
+                "5"
               ],
               "subInstructions": []
             }
@@ -7676,7 +7720,7 @@
                 "AICar",
                 "Breaking",
                 "=",
-                "35"
+                "5"
               ],
               "subInstructions": []
             }
@@ -7766,13 +7810,12 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::CollisionWith"
+                    "value": "Physics2::Collision"
                   },
                   "parameters": [
                     "AICar",
-                    "Physics",
-                    "AIPlayer",
-                    "",
+                    "Physics2",
+                    "AICar",
                     ""
                   ],
                   "subInstructions": []
@@ -7803,50 +7846,12 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::CollisionWith"
+                    "value": "Physics2::Collision"
                   },
                   "parameters": [
                     "AICar",
-                    "Physics",
-                    "AICar",
-                    "",
-                    ""
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "actions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "ModVarObjet"
-                  },
-                  "parameters": [
-                    "AICar",
-                    "Acceleration",
-                    "-",
-                    "100*TimeDelta()"
-                  ],
-                  "subInstructions": []
-                }
-              ],
-              "events": []
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [
-                {
-                  "type": {
-                    "inverted": false,
-                    "value": "PhysicsBehavior::CollisionWith"
-                  },
-                  "parameters": [
-                    "AICar",
-                    "Physics",
+                    "Physics2",
                     "Obstacle",
-                    "",
                     ""
                   ],
                   "subInstructions": []
@@ -7875,7 +7880,7 @@
                     "AICar",
                     "Breaking",
                     "=",
-                    "25"
+                    "5"
                   ],
                   "subInstructions": []
                 }
@@ -7929,13 +7934,12 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::ApplyTorque"
+                    "value": "Physics2::ApplyTorque"
                   },
                   "parameters": [
                     "AICar",
-                    "Physics",
-                    "-(7+1*abs(AngleDifference(AICar.Direction(),AICar.Variable(Direction))))",
-                    ""
+                    "Physics2",
+                    "(3+1*abs(AngleDifference(AICar.Direction(),AICar.Variable(Direction)))/7)"
                   ],
                   "subInstructions": []
                 }
@@ -7964,13 +7968,12 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::ApplyTorque"
+                    "value": "Physics2::ApplyTorque"
                   },
                   "parameters": [
                     "AICar",
-                    "Physics",
-                    "(7+1*abs(AngleDifference(AICar.Direction(),AICar.Variable(Direction))))",
-                    "1"
+                    "Physics2",
+                    "-(3+1*abs(AngleDifference(AICar.Direction(),AICar.Variable(Direction)))/7)"
                   ],
                   "subInstructions": []
                 }
@@ -7986,14 +7989,15 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::ApplyImpulseUsingPolarCoordinates"
+                    "value": "Physics2::ApplyPolarImpulse"
                   },
                   "parameters": [
                     "AICar",
-                    "Physics",
+                    "Physics2",
                     "AICar.Direction()",
                     "AICar.Variable(Acceleration)/10",
-                    ""
+                    "AICar.PointX(Centre)",
+                    "AICar.PointY(Centre)"
                   ],
                   "subInstructions": []
                 }
@@ -8051,7 +8055,7 @@
                 "PlayerCar",
                 "Acceleration",
                 "+",
-                "44*TimeDelta()"
+                "40*TimeDelta()"
               ],
               "subInstructions": []
             }
@@ -8073,7 +8077,7 @@
                 "PlayerCar",
                 "Acceleration",
                 "-",
-                "15*TimeDelta()"
+                "10*TimeDelta()"
               ],
               "subInstructions": []
             }
@@ -8094,7 +8098,7 @@
                 "PlayerCar",
                 "Acceleration",
                 ">",
-                "70"
+                "10"
               ],
               "subInstructions": []
             }
@@ -8109,7 +8113,7 @@
                 "PlayerCar",
                 "Acceleration",
                 "=",
-                "70"
+                "10"
               ],
               "subInstructions": []
             }
@@ -8236,7 +8240,7 @@
                 "PlayerCar",
                 "Breaking",
                 ">",
-                "35"
+                "5"
               ],
               "subInstructions": []
             }
@@ -8251,7 +8255,7 @@
                 "PlayerCar",
                 "Breaking",
                 "=",
-                "35"
+                "5"
               ],
               "subInstructions": []
             }
@@ -8289,14 +8293,15 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::ApplyImpulseUsingPolarCoordinates"
+                "value": "Physics2::ApplyPolarImpulse"
               },
               "parameters": [
                 "PlayerCar",
-                "Physics",
-                "PlayerCar.Direction()",
+                "Physics2",
+                "PlayerCar.Angle()",
                 "PlayerCar.Variable(Acceleration)/10",
-                ""
+                "PlayerCar.PointX(Centre)",
+                "PlayerCar.PointY(Centre)"
               ],
               "subInstructions": []
             }
@@ -8312,14 +8317,15 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::ApplyImpulseUsingPolarCoordinates"
+                "value": "Physics2::ApplyPolarImpulse"
               },
               "parameters": [
                 "PlayerCar",
-                "Physics",
-                "PlayerCar.Direction()+180",
+                "Physics2",
+                "PlayerCar.Angle()+180",
                 "PlayerCar.Variable(Breaking)/10",
-                ""
+                "PlayerCar.PointX(Centre)",
+                "PlayerCar.PointY(Centre)"
               ],
               "subInstructions": []
             }
@@ -8362,13 +8368,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::ApplyTorque"
+                "value": "Physics2::ApplyTorque"
               },
               "parameters": [
                 "PlayerCar",
-                "Physics",
-                "25",
-                "1"
+                "Physics2",
+                "-7.5"
               ],
               "subInstructions": []
             }
@@ -8396,50 +8401,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::ApplyTorque"
+                "value": "Physics2::ApplyTorque"
               },
               "parameters": [
                 "PlayerCar",
-                "Physics",
-                "-25",
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "PhysicsBehavior::CollisionWith"
-              },
-              "parameters": [
-                "PlayerCar",
-                "Physics",
-                "Obstacle",
-                "",
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarObjet"
-              },
-              "parameters": [
-                "PlayerCar",
-                "Acceleration",
-                "=",
-                "0"
+                "Physics2",
+                "7.5"
               ],
               "subInstructions": []
             }
@@ -8519,7 +8486,7 @@
                 "",
                 "1",
                 "=",
-                "0.1 + (PlayerCar.Variable(Acceleration) / 100)"
+                "0.1 + (PlayerCar.Variable(Acceleration) / 10)"
               ],
               "subInstructions": []
             }
@@ -8691,7 +8658,7 @@
                 "",
                 "AICar.Variable(channel)",
                 "=",
-                "0.1 + (AICar.Variable(Acceleration) / 50)"
+                "0.1 + (AICar.Variable(Acceleration) / 10)"
               ],
               "subInstructions": []
             }
@@ -8726,7 +8693,7 @@
                     "",
                     "AICar.Variable(channel)",
                     ">",
-                    "40"
+                    "60"
                   ],
                   "subInstructions": []
                 }
@@ -8741,7 +8708,7 @@
                     "",
                     "AICar.Variable(channel)",
                     "=",
-                    "40"
+                    "60"
                   ],
                   "subInstructions": []
                 }

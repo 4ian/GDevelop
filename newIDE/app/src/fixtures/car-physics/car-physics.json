@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\car-physics\\car-physics.json",
+    "projectFile": "/Users/florianrival/GDevelop projects/My project1347/car-physics.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
@@ -272,7 +272,7 @@
           "width": 321.667,
           "x": 543.776,
           "y": 487.83,
-          "zOrder": 1,
+          "zOrder": 0,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -661,22 +661,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": false,
-              "averageFriction": 0.8,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 1,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnCenter",
-              "shapeType": "Box",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -737,22 +744,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.01,
-              "autoResizing": false,
-              "averageFriction": 0.9,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 1,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnCenter",
-              "shapeType": "Circle",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Circle",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.9,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.01,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -813,22 +827,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": false,
-              "averageFriction": 0.8,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": false,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 1,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnCenter",
-              "shapeType": "Box",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Static",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -1061,15 +1082,25 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::AddRevoluteJointBetweenObjects"
+                "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
               },
               "parameters": [
                 "Tire",
-                "Physics",
+                "Physics2",
+                "Tire.PointX(Centre)",
+                "Tire.PointY(Centre)",
                 "Car",
+                "Tire.PointX(Centre)",
+                "Tire.PointY(Centre)",
                 "",
-                "0",
-                "0"
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
               ],
               "subInstructions": []
             }
@@ -1134,13 +1165,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::ApplyTorque"
+                "value": "Physics2::ApplyTorque"
               },
               "parameters": [
                 "Tire",
-                "Physics",
-                "-30*TimeDelta()",
-                ""
+                "Physics2",
+                "-30*TimeDelta()"
               ],
               "subInstructions": []
             }
@@ -1154,14 +1184,13 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::AngularVelocity"
+                    "value": "Physics2::AngularVelocity"
                   },
                   "parameters": [
                     "Tire",
-                    "Physics",
+                    "Physics2",
                     "=",
-                    "0",
-                    ""
+                    "0"
                   ],
                   "subInstructions": []
                 }
@@ -1170,13 +1199,13 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::SetAngularVelocity"
+                    "value": "Physics2::AngularVelocity"
                   },
                   "parameters": [
                     "Tire",
-                    "Physics",
-                    "-0.0001",
-                    ""
+                    "Physics2",
+                    "=",
+                    "-0.0001"
                   ],
                   "subInstructions": []
                 }
@@ -1191,14 +1220,13 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::AngularVelocity"
+                    "value": "Physics2::AngularVelocity"
                   },
                   "parameters": [
                     "Tire",
-                    "Physics",
+                    "Physics2",
                     "<",
-                    "-160",
-                    ""
+                    "-160"
                   ],
                   "subInstructions": []
                 }
@@ -1207,13 +1235,13 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::SetAngularVelocity"
+                    "value": "Physics2::AngularVelocity"
                   },
                   "parameters": [
                     "Tire",
-                    "Physics",
-                    "-160",
-                    ""
+                    "Physics2",
+                    "=",
+                    "-160"
                   ],
                   "subInstructions": []
                 }
@@ -1280,13 +1308,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::ApplyTorque"
+                "value": "Physics2::ApplyTorque"
               },
               "parameters": [
                 "Tire",
-                "Physics",
-                "20*TimeDelta()",
-                ""
+                "Physics2",
+                "35*TimeDelta()"
               ],
               "subInstructions": []
             }
@@ -1300,14 +1327,13 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::AngularVelocity"
+                    "value": "Physics2::AngularVelocity"
                   },
                   "parameters": [
                     "Tire",
-                    "Physics",
+                    "Physics2",
                     ">",
-                    "20",
-                    ""
+                    "5500"
                   ],
                   "subInstructions": []
                 }
@@ -1316,13 +1342,13 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::SetAngularVelocity"
+                    "value": "Physics2::AngularVelocity"
                   },
                   "parameters": [
                     "Tire",
-                    "Physics",
-                    "20",
-                    ""
+                    "Physics2",
+                    "=",
+                    "5500"
                   ],
                   "subInstructions": []
                 }
@@ -1337,14 +1363,13 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::AngularVelocity"
+                    "value": "Physics2::AngularVelocity"
                   },
                   "parameters": [
                     "Tire",
-                    "Physics",
+                    "Physics2",
                     "=",
-                    "0",
-                    ""
+                    "0"
                   ],
                   "subInstructions": []
                 }
@@ -1353,13 +1378,13 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "PhysicsBehavior::SetAngularVelocity"
+                    "value": "Physics2::AngularVelocity"
                   },
                   "parameters": [
                     "Tire",
-                    "Physics",
-                    "0.0001",
-                    ""
+                    "Physics2",
+                    "=",
+                    "0.0001"
                   ],
                   "subInstructions": []
                 }
@@ -1411,7 +1436,7 @@
               "parameters": [
                 "Debug",
                 "=",
-                "ToString(Tire.Physics::AngularVelocity())"
+                "ToString(round(Tire.Physics2::AngularVelocity()))"
               ],
               "subInstructions": []
             }
@@ -1512,12 +1537,14 @@
       ],
       "behaviorsSharedData": [
         {
-          "gravityX": 0,
-          "gravityY": 9.8,
-          "name": "Physics",
-          "scaleX": 100,
-          "scaleY": 100,
-          "type": "PhysicsBehavior::PhysicsBehavior"
+          "name": "Physics2",
+          "type": "Physics2::Physics2Behavior",
+          "content": {
+            "gravityX": 0,
+            "gravityY": 9.8,
+            "scaleX": 100,
+            "scaleY": 100
+          }
         }
       ]
     }

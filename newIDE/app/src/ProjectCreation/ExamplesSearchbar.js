@@ -40,7 +40,11 @@ export default class ExamplesSearchbar extends Component<Props> {
 
     const extensions = gd.JsPlatform.get().getAllPlatformExtensions();
     this._chips = mapVector(extensions, extension => {
-      if (extension.isBuiltin()) return null;
+      if (
+        extension.isBuiltin() ||
+        extension.getFullName().indexOf('(deprecated)') !== -1
+      )
+        return null;
 
       return {
         text: extension.getFullName(),

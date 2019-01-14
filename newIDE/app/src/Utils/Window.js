@@ -16,7 +16,10 @@ export default class Window {
       } catch (err) {
         // This rarely, but sometimes happen that setTitle throw.
         // Catch the error in the hope that things will continue to work.
-        console.error("Caught an error while calling browserWindow.setTitle", err);
+        console.error(
+          'Caught an error while calling browserWindow.setTitle',
+          err
+        );
       }
     } else {
       document.title = title;

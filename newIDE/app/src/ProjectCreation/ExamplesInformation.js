@@ -919,6 +919,55 @@ module.exports = {
       }
     ]
   },
+  "downhill-bike-physics-demo": {
+    "description": "A fun demo, using the Physics Engine to build an advanced simulation of a bike, with a person pedaling on it. Try to cross the finish line without falling and as fast as possible!",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Physics Engine 2.0",
+        "name": "Physics2"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Advanced control features",
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      }
+    ]
+  },
   "drag-camera-with-mouse": {
     "description": "This shows how to allow the user to move on a map with the mouse.",
     "usedExtensions": [

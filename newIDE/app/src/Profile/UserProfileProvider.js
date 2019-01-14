@@ -219,19 +219,21 @@ export default class UserProfileProvider extends React.Component<Props, State> {
         <UserProfileContext.Provider value={this.state.userProfile}>
           {this.props.children}
         </UserProfileContext.Provider>
-        <LoginDialog
-          open={this.state.loginDialogOpen}
-          onClose={() => this.openLogin(false)}
-          onLogin={this._doLogin}
-          onCreateAccount={this._doCreateAccount}
-          loginInProgress={this.state.loginInProgress}
-          createAccountInProgress={this.state.createAccountInProgress}
-          error={this.state.loginError}
-          onForgotPassword={this._doForgotPassword}
-          resetPasswordDialogOpen={this.state.resetPasswordDialogOpen}
-          onCloseResetPasswordDialog={() => this.openResetPassword(false)}
-          forgotPasswordInProgress={this.state.forgotPasswordInProgress}
-        />
+        {this.state.loginDialogOpen && (
+          <LoginDialog
+            open={this.state.loginDialogOpen}
+            onClose={() => this.openLogin(false)}
+            onLogin={this._doLogin}
+            onCreateAccount={this._doCreateAccount}
+            loginInProgress={this.state.loginInProgress}
+            createAccountInProgress={this.state.createAccountInProgress}
+            error={this.state.loginError}
+            onForgotPassword={this._doForgotPassword}
+            resetPasswordDialogOpen={this.state.resetPasswordDialogOpen}
+            onCloseResetPasswordDialog={() => this.openResetPassword(false)}
+            forgotPasswordInProgress={this.state.forgotPasswordInProgress}
+          />
+        )}
       </React.Fragment>
     );
   }

@@ -24,23 +24,23 @@ module.exports = {
     ).setExtensionHelpPath("/all-features/filesystem");
 
     extension
-    .addCondition(
-      "PathExists",
-      t("File or directory exists"),
-      t(
-        "Check if the file or directory exists."
-      ),
-      t("The path _PARAM0_ exists"),
-      t("Filesystem/Windows, Linux, MacOS"),
-      "JsPlatform/Extensions/filesystem_path_exists24.png",
-      "JsPlatform/Extensions/filesystem_path_exists32.png"
-    )
-    .addParameter("string", t("Path to file or directory"), "", false)
-    .getCodeExtraInformation()
-    .setIncludeFile(
-      "Extensions/FileSystem/filesystemtools.js"
-    )
-    .setFunctionName("gdjs.fileSystem.pathExists");
+      .addCondition(
+        "PathExists",
+        t("File or directory exists"),
+        t(
+          "Check if the file or directory exists."
+        ),
+        t("The path _PARAM0_ exists"),
+        t("Filesystem/Windows, Linux, MacOS"),
+        "JsPlatform/Extensions/filesystem_path_exists24.png",
+        "JsPlatform/Extensions/filesystem_path_exists32.png"
+      )
+      .addParameter("string", t("Path to file or directory"), "", false)
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/FileSystem/filesystemtools.js"
+      )
+      .setFunctionName("gdjs.fileSystem.pathExists");
 
     extension
       .addAction(
@@ -58,6 +58,24 @@ module.exports = {
         "Extensions/FileSystem/filesystemtools.js"
       )
       .setFunctionName("gdjs.fileSystem.makeDirectory");
+
+    extension
+      .addAction(
+        "SaveTextToFile",
+        t("Save a text into a file"),
+        t("Save a text into a file."),
+        t("Save _PARAM0_ into file _PARAM1_"),
+        t("Filesystem/Windows, Linux, MacOS"),
+        "JsPlatform/Extensions/filesystem_save_file24.png",
+        "JsPlatform/Extensions/filesystem_save_file32.png"
+      )
+      .addParameter("string", t("Text"), "", false)
+      .addParameter("string", t("Save path"), "", false)
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/FileSystem/filesystemtools.js"
+      )
+      .setFunctionName("gdjs.fileSystem.saveTextToFile");
 
     extension
       .addStrExpression(
@@ -155,7 +173,7 @@ module.exports = {
       )
       .setFunctionName("gdjs.fileSystem.getTempPath");
 
-      extension
+    extension
       .addStrExpression(
         "PathDelimiter",
         t("Path delimiter"),

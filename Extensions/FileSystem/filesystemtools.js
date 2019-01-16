@@ -125,6 +125,23 @@ gdjs.fileSystem.makeDirectory = function (directory) {
 }
 
 /**
+ * Save a string into a file.
+ * @param {string} text The text string to be saved
+ * @param {string} savePath The absolute path on the filesystem
+ */
+gdjs.fileSystem.saveTextToFile = function (text, savePath) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+
+  if (fileSystem) {
+    fileSystem.writeFile(savePath, text, (err) => {
+      if (err) {
+        console.error("Unable to save the text to path: '" + savePath + "' " + err);
+      }
+    });
+  }
+}
+
+/**
  * Check if the file or directory exists.
  * @param {string} path The path to the file or directory
  * @return {boolean} True if fhe file or directory exists

@@ -1,4 +1,5 @@
-// @flow weak
+// @flow
+import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
 const gd = global.gd;
 
 const GROUP_DELIMITER = '/';
@@ -8,7 +9,7 @@ const enumerateExtensionExpressions = (
   expressions,
   objectMetadata,
   behaviorMetadata
-) => {
+): Array<InstructionOrExpressionInformation> => {
   const allExpressions = [];
 
   //Get the map containing the metadata of the expression provided by the extension...
@@ -33,6 +34,7 @@ const enumerateExtensionExpressions = (
 
     const displayedName = exprMetadata.getFullName();
     const groupName = exprMetadata.getGroup();
+    const iconFilename = exprMetadata.getSmallIconFilename();
     const fullGroupName = prefix + groupName;
 
     allExpressions.push({
@@ -40,6 +42,7 @@ const enumerateExtensionExpressions = (
       name: expressionsTypes.get(j),
       displayedName,
       fullGroupName,
+      iconFilename,
       metadata: exprMetadata,
       parameters: parameters,
       objectMetadata: objectMetadata,
@@ -50,7 +53,7 @@ const enumerateExtensionExpressions = (
   return allExpressions;
 };
 
-export const enumerateExpressions = type => {
+export const enumerateExpressions = (type: string) => {
   const freeExpressions = [];
   const objectsExpressions = [];
   const behaviorsExpressions = [];
@@ -136,7 +139,10 @@ export const enumerateExpressions = type => {
   };
 };
 
-export const filterExpressions = (list, searchText) => {
+export const filterExpressions = (
+  list: Array<InstructionOrExpressionInformation>,
+  searchText: string
+): Array<InstructionOrExpressionInformation> => {
   if (!searchText) return list;
   const lowercaseSearchText = searchText.toLowerCase();
 

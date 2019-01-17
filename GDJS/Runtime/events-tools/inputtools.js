@@ -122,7 +122,7 @@ gdjs.evtTools.input.keysNameToCode = {
     "RShift": 16,
     "RAlt": 18,
     "LControl": 17,
-    "LShift": 1,
+    "LShift": 16,
     "LAlt": 18,
     "LSystem": 91,
     "RSystem": 91,
@@ -183,12 +183,14 @@ gdjs.evtTools.input.anyKeyPressed = function(runtimeScene) {
 gdjs.evtTools.input.isMouseButtonPressed = function(runtimeScene, button) {
     if ( button === "Left" ) return runtimeScene.getGame().getInputManager().isMouseButtonPressed(0);
     if ( button === "Right" ) return runtimeScene.getGame().getInputManager().isMouseButtonPressed(1);
+    if ( button === "Middle" ) return runtimeScene.getGame().getInputManager().isMouseButtonPressed(2);
     return false;
 };
 
 gdjs.evtTools.input.isMouseButtonReleased = function(runtimeScene, button) {
     if ( button === "Left" ) return runtimeScene.getGame().getInputManager().isMouseButtonReleased(0);
     if ( button === "Right" ) return runtimeScene.getGame().getInputManager().isMouseButtonReleased(1);
+    if ( button === "Middle" ) return runtimeScene.getGame().getInputManager().isMouseButtonReleased(2);
     return false;
 };
 

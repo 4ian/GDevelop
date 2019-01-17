@@ -11,6 +11,7 @@ import {
   createOrUpdateResource,
   getLocalResourceFullPath,
   resourceHasValidPath,
+  RESOURCE_EXTENSIONS,
 } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
 
@@ -18,10 +19,6 @@ const path = optionalRequire('path');
 const glob = optionalRequire('glob');
 const electron = optionalRequire('electron');
 const hasElectron = electron ? true : false;
-
-const IMAGE_EXTENSIONS = 'png,jpg,jpeg,PNG,JPG,JPEG';
-const AUDIO_EXTENSIONS = 'wav,mp3,ogg,WAV,MP3,OGG';
-const FONT_EXTENSIONS = 'ttf,ttc,TTF,TTC';
 
 const gd = global.gd;
 
@@ -243,7 +240,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         label: 'Scan for Images',
         click: () => {
           this._scanForNewResources(
-            IMAGE_EXTENSIONS,
+            RESOURCE_EXTENSIONS.image,
             () => new gd.ImageResource()
           );
         },
@@ -253,7 +250,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         label: 'Scan for Audio',
         click: () => {
           this._scanForNewResources(
-            AUDIO_EXTENSIONS,
+            RESOURCE_EXTENSIONS.audio,
             () => new gd.AudioResource()
           );
         },
@@ -263,7 +260,7 @@ export default class ResourcesList extends React.Component<Props, State> {
         label: 'Scan for Fonts',
         click: () => {
           this._scanForNewResources(
-            FONT_EXTENSIONS,
+            RESOURCE_EXTENSIONS.font,
             () => new gd.FontResource()
           );
         },
@@ -298,7 +295,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     ];
   };
 
-  componentDidMount() {
+  checkMissingPaths = () => {
     const { project } = this.props;
     const resourcesManager = project.getResourcesManager();
     const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
@@ -310,6 +307,11 @@ export default class ResourcesList extends React.Component<Props, State> {
       );
     });
     this.setState({ resourcesWithMissingPath });
+    this.forceUpdateList();
+  };
+
+  componentDidMount() {
+    this.checkMissingPaths();
   }
 
   render() {

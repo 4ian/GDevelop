@@ -112,6 +112,7 @@ import EventsFunctionsList from '../EventsFunctionsList';
 import EventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor';
 import OptionsEditorDialog from '../EventsFunctionsExtensionEditor/OptionsEditorDialog';
 import ProjectManager from '../ProjectManager';
+import AlertMessage from '../UI/AlertMessage';
 
 const gd = global.gd;
 const {
@@ -192,6 +193,43 @@ storiesOf('UI Building Blocks/BackgroundText', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <BackgroundText>Hello World, this is a background text</BackgroundText>
+  ));
+
+storiesOf('UI Building Blocks/AlertMessage', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('default', () => (
+    <AlertMessage kind="info">Hello World, this is an alert text</AlertMessage>
+  ))
+  .add('default with button', () => (
+    <AlertMessage kind="info" onHide={() => {}}>
+      Hello World, this is an alert text
+    </AlertMessage>
+  ))
+  .add('long text', () => (
+    <AlertMessage kind="info">
+      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
+      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
+      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
+      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
+      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
+      inimicus.
+    </AlertMessage>
+  ))
+  .add('long text with button', () => (
+    <AlertMessage kind="info" onHide={() => {}}>
+      Hello World, this is a long alert text. Lorem ipsum dolor sit amet, at
+      cibo erroribus sed, sea in meis laoreet. Has modus epicuri ne, dicat
+      nostrum eos ne, elit virtute appetere cu sea. Ut nec erat maluisset
+      argumentum, duo integre propriae ut. Sed cu eius sonet verear, ne sit
+      legendos senserit. Ne mel mundi perpetua dissentiunt. Nec ei nusquam
+      inimicus.
+    </AlertMessage>
+  ))
+  .add('warning', () => (
+    <AlertMessage kind="warning">
+      Hello World, this is an alert text
+    </AlertMessage>
   ));
 
 storiesOf('UI Building Blocks/ColorField', module)

@@ -19,17 +19,21 @@ export default class RelationalOperatorField extends Component {
         ref={field => (this._field = field)}
         onChange={(e, i, value) => this.props.onChange(value)}
       >
-        <MenuItem value="Left" primaryText="Left" />
-        <MenuItem value="Right" primaryText="Right" />
-        <MenuItem value="Middle" primaryText="Middle (native games only)" />
+        <MenuItem value="Left" primaryText="Left (primary)" />
+        <MenuItem value="Right" primaryText="Right (secondary)" />
         <MenuItem
+          value="Middle"
+          primaryText="Middle (Auxiliary button, usually the wheel button)"
+        />
+        {/* TODO: Add support for these buttons in the game engine
+         <MenuItem
           value="XButton1"
-          primaryText="Special button #1 (native games only)"
+          primaryText="Special button #1"
         />
         <MenuItem
           value="XButton2"
-          primaryText="Special button #2 (native games only)"
-        />
+          primaryText="Special button #2"
+        /> */}
       </SelectField>
     );
   }

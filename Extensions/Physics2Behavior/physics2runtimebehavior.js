@@ -203,6 +203,11 @@ gdjs.Physics2RuntimeBehavior = function(runtimeScene, behaviorData, owner) {
   this.shapeDimensionB = behaviorData.content.shapeDimensionB;
   this.shapeOffsetX = behaviorData.content.shapeOffsetX;
   this.shapeOffsetY = behaviorData.content.shapeOffsetY;
+  this.polygonOrigin = behaviorData.content.polygonOrigin;
+  this.polygon =
+    this.shape === 'Polygon'
+      ? gdjs.Physics2RuntimeBehavior.getPolygon(behaviorData.content.vertices)
+      : null;
   this.density = behaviorData.content.density;
   this.friction = behaviorData.content.friction;
   this.restitution = behaviorData.content.restitution;
@@ -227,6 +232,7 @@ gdjs.Physics2RuntimeBehavior = function(runtimeScene, behaviorData, owner) {
   this._objectOldAngle = 0;
   this._objectOldWidth = 0;
   this._objectOldHeight = 0;
+  this._verticesBuffer = 0; // Stores a Box2D pointer of created vertices
 };
 
 gdjs.Physics2RuntimeBehavior.prototype = Object.create(
@@ -251,6 +257,11 @@ gdjs.Physics2RuntimeBehavior.prototype.onDeActivate = function() {
   if (this._body !== null) {
     // When a body is deleted, Box2D removes automatically its joints, leaving an invalid pointer in our joints list
     this._sharedData.clearBodyJoints(this._body);
+    // Delete the vertices
+    if (this._verticesBuffer) {
+      Box2D._free(this._verticesBuffer);
+      this._verticesBuffer = 0;
+    }
     // Delete the body
     this._sharedData.world.DestroyBody(this._body);
     this._body = null;
@@ -259,6 +270,43 @@ gdjs.Physics2RuntimeBehavior.prototype.onDeActivate = function() {
 
 gdjs.Physics2RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
   this.onDeActivate();
+};
+
+gdjs.Physics2RuntimeBehavior.getPolygon = function(verticesData) {
+  if (!verticesData) return null;
+
+  var polygon = new gdjs.Polygon();
+  var maxVertices = 8;
+  for (
+    var i = 0, len = verticesData.length;
+    i < Math.min(len, maxVertices);
+    i++
+  ) {
+    polygon.vertices.push([verticesData[i].x, verticesData[i].y]);
+  }
+  return polygon;
+};
+
+gdjs.Physics2RuntimeBehavior.isPolygonConvex = function(polygon) {
+  if (!polygon.isConvex()) return false;
+
+  // Check for repeated vertices or check if all vertices are aligned (would crash Box2D)
+  var alignedX = true;
+  var alignedY = true;
+  for (i = 0; i < polygon.vertices.length - 1; ++i) {
+    for (var j = i + 1; j < polygon.vertices.length; ++j) {
+      if (
+        polygon.vertices[i][0] === polygon.vertices[j][0] &&
+        polygon.vertices[i][1] === polygon.vertices[j][1]
+      )
+        return false;
+    }
+    if (polygon.vertices[i][0] !== polygon.vertices[i + 1][0]) alignedX = false;
+    if (polygon.vertices[i][1] !== polygon.vertices[i + 1][1]) alignedY = false;
+  }
+  if (alignedX || alignedY) return false;
+
+  return true;
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.createShape = function() {
@@ -290,7 +338,63 @@ gdjs.Physics2RuntimeBehavior.prototype.createShape = function() {
     // Set the offset
     shape.set_m_p(this.b2Vec2(offsetX, offsetY));
   } else if (this.shape === 'Polygon') {
-    // Needs a vertices editor
+    shape = new Box2D.b2PolygonShape();
+    // Not convex, fall back to a box
+    if (
+      !this.polygon ||
+      !gdjs.Physics2RuntimeBehavior.isPolygonConvex(this.polygon)
+    ) {
+      var width =
+        (this.owner.getWidth() > 0 ? this.owner.getWidth() : 1) *
+        this._sharedData.invScaleX;
+      var height =
+        (this.owner.getHeight() > 0 ? this.owner.getHeight() : 1) *
+        this._sharedData.invScaleY;
+      // Set the shape box
+      shape.SetAsBox(width / 2, height / 2, this.b2Vec2(offsetX, offsetY), 0);
+    } else {
+      var originOffsetX = 0;
+      var originOffsetY = 0;
+      if (this.polygonOrigin === 'Origin') {
+        originOffsetX =
+          (this.owner.getWidth() > 0 ? -this.owner.getWidth() / 2 : 0) +
+          (this.owner.getX() - this.owner.getDrawableX());
+        originOffsetY =
+          (this.owner.getHeight() > 0 ? -this.owner.getHeight() / 2 : 0) +
+          (this.owner.getY() - this.owner.getDrawableY());
+      } else if (this.polygonOrigin === 'TopLeft') {
+        originOffsetX =
+          this.owner.getWidth() > 0 ? -this.owner.getWidth() / 2 : 0;
+        originOffsetY =
+          this.owner.getHeight() > 0 ? -this.owner.getHeight() / 2 : 0;
+      }
+      // Generate vertices if not done already
+      if (!this._verticesBuffer) {
+        // Store the vertices using a memory allocation function
+        var buffer = Box2D._malloc(
+          this.polygon.vertices.length * 8,
+          'float',
+          Box2D.ALLOC_STACK
+        );
+        this._verticesBuffer = buffer;
+      }
+      // Overwrite the vertices stored in the buffer
+      var offset = 0;
+      for (var i = 0, len = this.polygon.vertices.length; i < len; i++) {
+        Box2D.HEAPF32[(this._verticesBuffer + offset) >> 2] =
+          (this.polygon.vertices[i][0] * this.shapeScale + originOffsetX) *
+            this._sharedData.invScaleX +
+          offsetX;
+        Box2D.HEAPF32[(this._verticesBuffer + (offset + 4)) >> 2] =
+          (this.polygon.vertices[i][1] * this.shapeScale + originOffsetY) *
+            this._sharedData.invScaleY +
+          offsetY;
+        offset += 8;
+      }
+      // Set the shape vertices
+      var b2Vertices = Box2D.wrapPointer(this._verticesBuffer, Box2D.b2Vec2);
+      shape.Set(b2Vertices, this.polygon.vertices.length);
+    }
   } else if (this.shape === 'Edge') {
     shape = new Box2D.b2EdgeShape();
     // Length from the custom dimension or from the object width
@@ -1404,7 +1508,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addRevoluteJoint = function(
   jointDef.set_lowerAngle(gdjs.toRad(lowerAngle));
   jointDef.set_upperAngle(gdjs.toRad(upperAngle));
   jointDef.set_enableMotor(enableMotor);
-  jointDef.set_motorSpeed(motorSpeed);
+  jointDef.set_motorSpeed(gdjs.toRad(motorSpeed));
   jointDef.set_maxMotorTorque(maxMotorTorque >= 0 ? maxMotorTorque : 0);
   jointDef.set_collideConnected(false);
   // Create the joint and get the id
@@ -1473,7 +1577,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addRevoluteJointBetweenTwoBodies = functi
   jointDef.set_lowerAngle(gdjs.toRad(lowerAngle));
   jointDef.set_upperAngle(gdjs.toRad(upperAngle));
   jointDef.set_enableMotor(enableMotor);
-  jointDef.set_motorSpeed(motorSpeed);
+  jointDef.set_motorSpeed(gdjs.toRad(motorSpeed));
   jointDef.set_maxMotorTorque(maxMotorTorque >= 0 ? maxMotorTorque : 0);
   jointDef.set_collideConnected(collideConnected);
   // Create the joint and get the id
@@ -1732,7 +1836,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addPrismaticJoint = function(
     upperTranslation > 0 ? upperTranslation * this._sharedData.invScaleX : 0
   );
   jointDef.set_enableMotor(enableMotor);
-  jointDef.set_motorSpeed(motorSpeed);
+  jointDef.set_motorSpeed(motorSpeed * this._sharedData.invScaleX);
   jointDef.set_maxMotorForce(maxMotorForce);
   jointDef.set_collideConnected(collideConnected);
   // Create the joint and get the id
@@ -2398,7 +2502,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addWheelJoint = function(
   jointDef.set_frequencyHz(frequency > 0 ? frequency : 1);
   jointDef.set_dampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
   jointDef.set_enableMotor(enableMotor);
-  jointDef.set_motorSpeed(motorSpeed);
+  jointDef.set_motorSpeed(gdjs.toRad(motorSpeed));
   jointDef.set_maxMotorTorque(maxMotorTorque);
   jointDef.set_collideConnected(collideConnected);
   // Create the joint and get the id
@@ -2443,7 +2547,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getWheelJointSpeed = function(jointId) {
   // Joint not found or has wrong type
   if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) return 0;
   // Get the joint speed
-  return joint.GetJointSpeed() * this._sharedData.scaleX;
+  return gdjs.toDegrees(joint.GetJointSpeed());
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.isWheelJointMotorEnabled = function(

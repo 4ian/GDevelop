@@ -36,13 +36,14 @@ TopDownMovementBehavior::TopDownMovementBehavior()
       xVelocity(0),
       yVelocity(0),
       angularSpeed(0),
+      angle(0),
       ignoreDefaultControls(false),
       leftKey(false),
       rightKey(false),
       upKey(false),
       downKey(false) {}
 
-float TopDownMovementBehavior::GetSpeed() {
+float TopDownMovementBehavior::GetSpeed() const {
   return sqrt(xVelocity * xVelocity + yVelocity * yVelocity);
 }
 
@@ -127,24 +128,29 @@ void TopDownMovementBehavior::DoStepPreEvents(RuntimeScene& scene) {
   object->SetY(object->GetY() + yVelocity * timeDelta);
 
   // Also update angle if needed
-  if ((xVelocity != 0 || yVelocity != 0) && rotateObject) {
-    float angularDiff = GDpriv::MathematicalTools::angleDifference(
-        object->GetAngle(), directionInDeg + angleOffset);
-    bool diffWasPositive = angularDiff >= 0;
+  if ((xVelocity != 0 || yVelocity != 0)) {
+    angle = directionInDeg;
 
-    float newAngle = object->GetAngle() +
-                     (diffWasPositive ? -1.0 : 1.0) * angularSpeed * timeDelta;
-    if ((GDpriv::MathematicalTools::angleDifference(
-             newAngle, directionInDeg + angleOffset) > 0) ^
-        diffWasPositive)
-      newAngle = directionInDeg + angleOffset;
-    object->SetAngle(newAngle);
+    if (rotateObject) {
+      float angularDiff = GDpriv::MathematicalTools::angleDifference(
+          object->GetAngle(), directionInDeg + angleOffset);
+      bool diffWasPositive = angularDiff >= 0;
 
-    if (object->GetAngle() != newAngle)  // Objects like sprite in 8 directions
-                                         // does not handle small increments...
-      object->SetAngle(
-          directionInDeg +
-          angleOffset);  //...so force them to be in the path angle anyway.
+      float newAngle = object->GetAngle() + (diffWasPositive ? -1.0 : 1.0) *
+                                                angularSpeed * timeDelta;
+      if ((GDpriv::MathematicalTools::angleDifference(
+               newAngle, directionInDeg + angleOffset) > 0) ^
+          diffWasPositive)
+        newAngle = directionInDeg + angleOffset;
+      object->SetAngle(newAngle);
+
+      if (object->GetAngle() !=
+          newAngle)  // Objects like sprite in 8 directions
+                     // does not handle small increments...
+        object->SetAngle(
+            directionInDeg +
+            angleOffset);  //...so force them to be in the path angle anyway.
+    }
   }
 
   leftKey = false;

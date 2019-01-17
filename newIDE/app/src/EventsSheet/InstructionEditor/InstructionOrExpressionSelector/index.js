@@ -1,8 +1,12 @@
+// @flow
 import React, { Component } from 'react';
 import { List, ListItem, makeSelectable } from 'material-ui/List';
+import ListIcon from '../../../UI/ListIcon';
 import SearchBar from 'material-ui-search-bar';
-import keys from 'lodash/keys';
 import muiThemeable from 'material-ui/styles/muiThemeable';
+import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+import { type InstructionOrExpressionTreeNode } from './CreateTree';
+
 const SelectableList = makeSelectable(List);
 
 const styles = {
@@ -15,14 +19,30 @@ const styles = {
   },
 };
 
-class ThemableInstructionOrExpressionSelector extends Component {
+type Props = {|
+  muiTheme: any,
+  focusOnMount?: boolean,
+  instructionsInfo: Array<InstructionOrExpressionInformation>,
+  instructionsInfoTree: InstructionOrExpressionTreeNode,
+  selectedType: string,
+  onChoose: (type: string, InstructionOrExpressionInformation) => void,
+  iconSize: number,
+  style?: Object,
+|};
+type State = {|
+  search: string,
+  searchResults: Array<InstructionOrExpressionInformation>,
+|};
+
+class ThemableInstructionOrExpressionSelector extends Component<Props, State> {
   state = {
     search: '',
     searchResults: [],
   };
+  _searchBar: ?SearchBar;
 
   componentDidMount() {
-    if (this.props.focusOnMount) {
+    if (this.props.focusOnMount && this._searchBar) {
       this._searchBar.focus();
     }
   }
@@ -31,7 +51,10 @@ class ThemableInstructionOrExpressionSelector extends Component {
     if (this._searchBar) this._searchBar.focus();
   };
 
-  _matchCritera(instructionInfo, lowercaseSearch) {
+  _matchCritera(
+    instructionInfo: InstructionOrExpressionInformation,
+    lowercaseSearch: string
+  ) {
     const { displayedName, fullGroupName } = instructionInfo;
     return (
       displayedName.toLowerCase().indexOf(lowercaseSearch) !== -1 ||
@@ -39,15 +62,11 @@ class ThemableInstructionOrExpressionSelector extends Component {
     );
   }
 
-  _computeSearchResults = search => {
+  _computeSearchResults = (search: string) => {
     const lowercaseSearch = this.state.search.toLowerCase();
-    return keys(this.props.instructionsInfo)
-      .map(key => {
-        return this.props.instructionsInfo[key];
-      })
-      .filter(instructionInfo =>
-        this._matchCritera(instructionInfo, lowercaseSearch)
-      );
+    return this.props.instructionsInfo.filter(instructionInfo =>
+      this._matchCritera(instructionInfo, lowercaseSearch)
+    );
   };
 
   _onSubmitSearch = () => {
@@ -57,24 +76,43 @@ class ThemableInstructionOrExpressionSelector extends Component {
     this.props.onChoose(searchResults[0].type, searchResults[0]);
   };
 
-  _renderTree(instructionInfoTree) {
+  _renderTree(instructionInfoTree: InstructionOrExpressionTreeNode) {
     const { muiTheme } = this.props;
 
     return Object.keys(instructionInfoTree).map(key => {
+      // $FlowFixMe - in theory, we should have a way to distinguish
+      // between instruction (leaf nodes) and group (nodes). We use
+      // the "type" properties, but this will fail if a group is called "type"
+      // (hence the flow errors, which are valid warnings)
       const instructionOrGroup = instructionInfoTree[key];
+      if (!instructionOrGroup) return null;
 
-      if (instructionOrGroup.hasOwnProperty('type')) {
+      if (typeof instructionOrGroup.type === 'string') {
+        // $FlowFixMe - see above
+        const instructionInformation: InstructionOrExpressionInformation = instructionOrGroup;
         return (
           <ListItem
             key={key}
             primaryText={key}
             value={instructionOrGroup.type}
+            leftIcon={
+              <ListIcon
+                iconSize={this.props.iconSize}
+                src={instructionInformation.iconFilename}
+              />
+            }
             onClick={() => {
-              this.props.onChoose(instructionOrGroup.type, instructionOrGroup);
+              this.props.onChoose(
+                instructionInformation.type,
+                instructionInformation
+              );
             }}
           />
         );
       } else {
+        // $FlowFixMe - see above
+        const groupOfInstructionInformation = (instructionOrGroup: InstructionOrExpressionTreeNode);
+        const isDeprecated = key.indexOf('(deprecated)') !== -1;
         return (
           <ListItem
             key={key}
@@ -83,13 +121,19 @@ class ThemableInstructionOrExpressionSelector extends Component {
             }}
             nestedListStyle={styles.groupListItemNestedList}
             primaryText={
-              <div style={{ color: muiTheme.listItem.groupTextColor }}>
+              <div
+                style={{
+                  color: isDeprecated
+                    ? muiTheme.listItem.deprecatedGroupTextColor
+                    : muiTheme.listItem.groupTextColor,
+                }}
+              >
                 {key}
               </div>
             }
             primaryTogglesNestedList={true}
             autoGenerateNestedIndicator={true}
-            nestedItems={this._renderTree(instructionOrGroup)}
+            nestedItems={this._renderTree(groupOfInstructionInformation)}
           />
         );
       }
@@ -101,7 +145,6 @@ class ThemableInstructionOrExpressionSelector extends Component {
       return (
         <ListItem
           key={instructionInfo.type}
-          style={styles.listItem}
           primaryText={instructionInfo.displayedName}
           secondaryText={instructionInfo.fullGroupName}
           value={instructionInfo.type}

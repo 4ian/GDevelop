@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import Popover, { PopoverAnimationVertical } from 'material-ui/Popover';
+import Popover from 'material-ui/Popover';
 import Functions from 'material-ui/svg-icons/editor/functions';
 import RaisedButton from 'material-ui/RaisedButton';
 import SemiControlledTextField from '../../../UI/SemiControlledTextField';
@@ -232,7 +232,6 @@ export default class ExpressionField extends React.Component<Props, State> {
               anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
               targetOrigin={{ horizontal: 'left', vertical: 'top' }}
               onRequestClose={this._handleRequestClose}
-              animation={PopoverAnimationVertical}
             >
               <ExpressionSelector
                 style={styles.expressionSelector}

@@ -120,7 +120,9 @@ class GenericResourcesChooser extends Component {
           value={url}
           key={url}
           primaryText={nameFromUrl(url)}
-          leftAvatar={props.urlsAreImages && <ListIcon src={url} />}
+          leftAvatar={
+            props.urlsAreImages && <ListIcon iconSize={32} src={url} />
+          }
         />
       );
     });

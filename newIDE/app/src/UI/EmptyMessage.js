@@ -1,3 +1,4 @@
+// @flow
 import * as React from 'react';
 import ThemeConsumer from './Theme/ThemeConsumer';
 import BackgroundText from './BackgroundText';
@@ -15,7 +16,7 @@ const styles = {
 type Props = {|
   style?: Object,
   messageStyle?: Object,
-  children: React.Node,
+  children: ?React.Node,
 |};
 
 const EmptyMessage = (props: Props) => (

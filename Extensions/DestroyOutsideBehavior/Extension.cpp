@@ -24,7 +24,7 @@ void DeclareDestroyOutsideBehaviorExtension(gd::PlatformExtension& extension) {
                             _("Destroy when outside of the screen"),
                             _("DestroyOutside"),
                             _("Automatically destroy the object when it goes "
-                              "outside of the screen's borders"),
+                              "outside of the screen's borders."),
                             "",
                             "CppPlatform/Extensions/destroyoutsideicon.png",
                             "DestroyOutsideBehavior",

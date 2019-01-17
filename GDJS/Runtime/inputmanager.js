@@ -33,6 +33,15 @@ gdjs.InputManager = function()
     this._touchSimulateMouse = true;
 };
 
+/** @constant {number} */
+gdjs.InputManager.MOUSE_LEFT_BUTTON = 0;
+
+/** @constant {number} */
+gdjs.InputManager.MOUSE_RIGHT_BUTTON = 1;
+
+/** @constant {number} */
+gdjs.InputManager.MOUSE_MIDDLE_BUTTON = 2;
+
 /**
  * Should be called whenever a key is pressed
  * @param {number} keyCode The key code associated to the key press.
@@ -122,7 +131,8 @@ gdjs.InputManager.prototype.getMouseY = function() {
 
 /**
  * Should be called whenever a mouse button is pressed
- * @param {number} buttonCode The mouse button code associated to the event.<br>0: Left button<br>1: Right button
+ * @param {number} buttonCode The mouse button code associated to the event. 
+ * See gdjs.InputManager.MOUSE_LEFT_BUTTON, gdjs.InputManager.MOUSE_RIGHT_BUTTON, gdjs.InputManager.MOUSE_MIDDLE_BUTTON
  */
 gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
     this._pressedMouseButtons[buttonCode] = true;
@@ -131,7 +141,7 @@ gdjs.InputManager.prototype.onMouseButtonPressed = function(buttonCode) {
 
 /**
  * Should be called whenever a mouse button is released
- * @param {number} buttonCode The mouse button code associated to the event. ( See onMouseButtonPressed )
+ * @param {number} buttonCode The mouse button code associated to the event. (see onMouseButtonPressed)
  */
 gdjs.InputManager.prototype.onMouseButtonReleased = function(buttonCode) {
     this._pressedMouseButtons[buttonCode] = false;
@@ -216,7 +226,7 @@ gdjs.InputManager.prototype.onTouchStart = function(identifier, x, y) {
 
     if (this._touchSimulateMouse) {
         this.onMouseMove(x, y);
-        this.onMouseButtonPressed(0);
+        this.onMouseButtonPressed(gdjs.InputManager.MOUSE_LEFT_BUTTON);
     }
 };
 
@@ -239,7 +249,7 @@ gdjs.InputManager.prototype.onTouchEnd = function(identifier) {
     }
 
     if (this._touchSimulateMouse) {
-        this.onMouseButtonReleased(0);
+        this.onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
     }
 };
 

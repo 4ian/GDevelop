@@ -180,13 +180,29 @@ class GD_EXTENSION_API PlatformerObjectBehavior : public Behavior {
    */
   void ReleaseGrabbedPlatform();
 
-  double gravity;              ///< In pixels.seconds^-2
-  double maxFallingSpeed;      ///< In pixels.seconds^-1
-  double acceleration;         ///< In pixels.seconds^-2
-  double deceleration;         ///< In pixels.seconds^-2
-  double maxSpeed;             ///< In pixels.seconds^-1
-  double jumpSpeed;            ///< In pixels.seconds^-1
-  double slopeMaxAngle;        ///< In degrees
+  bool ignoreTouchingEdges;  // To achieve pixel-perfect precision when
+                             // positioning object on platform or handling
+                             // collision with "walls", edges of the hitboxes
+                             // must be ignored during collision checks, so that
+                             // two overlapping edges are not considered as
+                             // colliding. For example, if a character is 10px
+                             // width and is at position (0, 0), it must not be
+                             // considered as colliding with a platform which is
+                             // at position (10, 0). Edges will still be
+                             // overlapping (because character hitbox right edge
+                             // is at X position 10 and platform hitbox left
+                             // edge is also at X position 10). This parameter
+                             // "ignoreTouchingEdges" will be passed to all
+                             // collision handling functions.
+  bool roundCoordinates;   ///< true to round coordinates when trying to move on
+                           ///< X and Y axis.
+  double gravity;          ///< In pixels.seconds^-2
+  double maxFallingSpeed;  ///< In pixels.seconds^-1
+  double acceleration;     ///< In pixels.seconds^-2
+  double deceleration;     ///< In pixels.seconds^-2
+  double maxSpeed;         ///< In pixels.seconds^-1
+  double jumpSpeed;        ///< In pixels.seconds^-1
+  double slopeMaxAngle;    ///< In degrees
   double slopeClimbingFactor;  ///< Equals to tan(slopeMaxAngle).
   bool canGrabPlatforms;  ///< True to allow the object to grab platform ledges.
   double yGrabOffset;

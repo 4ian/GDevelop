@@ -52,7 +52,7 @@ const buildMainMenuFor = window => {
       { type: 'separator' },
       {
         label: 'Close Project',
-        accelerator: 'CommandOrControl+W',
+        accelerator: 'CommandOrControl+Shift+W',
         click() {
           window.webContents.send('main-menu-close');
         },
@@ -95,6 +95,13 @@ const buildMainMenuFor = window => {
   const viewTemplate = {
     label: 'View',
     submenu: [
+      {
+        label: 'Show Project Manager',
+        accelerator: 'CommandOrControl+Alt+P',
+        click() {
+          window.webContents.send('main-menu-open-project-manager');
+        },
+      },
       {
         label: 'Show Start Page',
         click() {

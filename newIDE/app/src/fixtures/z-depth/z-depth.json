@@ -14,6 +14,7 @@
     "orientation": "default",
     "packageName": "gametemplates.itch.io",
     "projectFile": "C:\\Users\\szoszo\\Desktop\\Projects\\gametemplates\\gdevelop5\\z-depth\\game.json",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": false,
     "version": "1.0.0",

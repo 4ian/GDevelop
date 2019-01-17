@@ -1,34 +1,37 @@
-// Note: this file does not use export/imports nor Flow to allow its usage from Node.js
+// @flow
+// Note: this file does not use export/imports and use Flow comments to allow its usage from Node.js
 
 const some = require('lodash/some');
 const t = _ => _; //TODO: Implement support for i18n for extensions.
 
-// export type JsExtensionModule = {
-//   createExtension(t, gd): gdPlatformExtension,
-//   runExtensionSanityTests(extension: gdPlatformExtension): Array<string>,
-// };
+/*flow-include 
+export type JsExtensionModule = {
+  createExtension(t: (string) => string, gd: any): gdPlatformExtension,
+  runExtensionSanityTests(gd: any, extension: gdPlatformExtension): Array<string>,
+};
 
-// export type ExtensionLoadingResult = {
-//   error: boolean,
-//   message: string,
-//   dangerous?: boolean,
-//   rawError?: any,
-// };
+export type ExtensionLoadingResult = {
+  error: boolean,
+  message: string,
+  dangerous?: boolean,
+  rawError?: any,
+};
 
-// export interface JsExtensionsLoader {
-//   loadAllExtensions(): Promise<
-//     Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
-//   >,
-// }
+export interface JsExtensionsLoader {
+  loadAllExtensions(): Promise<
+    Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
+  >,
+}
+*/
 
 /**
  * Run extensions tests and check for any non-empty results.
  */
 const runExtensionSanityTests = (
-  gd,
+  gd /*: any */,
   extension /*: gdPlatformExtension*/,
   jsExtensionModule /*: JsExtensionModule*/
-) => /*: ExtensionLoadingResult*/ {
+) /*: ExtensionLoadingResult*/ => {
   if (!jsExtensionModule.runExtensionSanityTests) {
     return {
       error: true,
@@ -57,10 +60,10 @@ const runExtensionSanityTests = (
  * to contain a "createExtension" function returning a gd.PlatformExtension.
  */
 const loadExtension = (
-  gd,
+  gd /*: any */,
   platform /*: gdPlatform*/,
   jsExtensionModule /*: JsExtensionModule*/
-) => /*: ExtensionLoadingResult*/ {
+) /*: ExtensionLoadingResult*/ => {
   if (!jsExtensionModule.createExtension) {
     return {
       message:

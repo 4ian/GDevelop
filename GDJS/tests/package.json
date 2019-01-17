@@ -5,7 +5,8 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "test": "./node_modules/karma/bin/karma start --browsers ChromeHeadless --single-run"
+    "test": "./node_modules/karma/bin/karma start --browsers ChromeHeadless --single-run",
+    "test:firefox": "./node_modules/karma/bin/karma start --browsers Firefox --single-run"
   },
   "keywords": [
     "HTML5",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "karma": "^1.7.1",
     "karma-chrome-launcher": "^2.2.0",
+    "karma-firefox-launcher": "^1.1.0",
     "karma-mocha": "^1.3.0"
   }
 }

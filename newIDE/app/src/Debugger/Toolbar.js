@@ -1,21 +1,24 @@
 // @flow
-import React, { PureComponent } from 'react';
-import { translate, type TranslatorProps } from 'react-i18next';
+import * as React from 'react';
+import { translate, type TFunction, type Translator } from 'react-i18next';
 import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 
-type Props = {|
+type OwnProps = {|
   onPlay: () => void,
   canPlay: boolean,
   onPause: () => void,
   canPause: boolean,
   onOpenProfiler: () => void,
-|} & TranslatorProps;
+|};
 
-type State = {||};
+type Props = {|
+  t: TFunction,
+  ...OwnProps,
+|};
 
-export class Toolbar extends PureComponent<Props, State> {
+export class Toolbar extends React.PureComponent<Props> {
   render() {
     const {
       t,
@@ -51,4 +54,5 @@ export class Toolbar extends PureComponent<Props, State> {
   }
 }
 
-export default translate()(Toolbar);
+const translator: Translator<OwnProps, Props> = translate();
+export default translator(Toolbar);

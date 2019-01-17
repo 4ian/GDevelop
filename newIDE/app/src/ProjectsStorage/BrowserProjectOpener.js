@@ -24,6 +24,7 @@ import customMousePointer from '../fixtures/custom-mouse-pointer/custom-mouse-po
 import deviceOrientationBallgame from '../fixtures/device-orientation-ballgame/device-orientation-ballgame.json';
 import deviceOrientationCompass from '../fixtures/device-orientation-compass/device-orientation-compass.json';
 import deviceVibration from '../fixtures/device-vibration/device-vibration.json';
+import downhillBikePhysicsDemo from '../fixtures/downhill-bike-physics-demo/downhill-bike-physics-demo.json';
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
 import dropCollectItemsFromStorage from '../fixtures/drop-collect-items-from-storage/drop-collect-items-from-storage.json';
 import exitApp from '../fixtures/exit-app/exit-app.json';
@@ -59,8 +60,11 @@ import particlesVariousEffects from '../fixtures/particles-various-effects/parti
 import pathfinding from '../fixtures/pathfinding/pathfinding.json';
 import pathfindingBasics from '../fixtures/pathfinding-basics/pathfinding-basics.json';
 import physics from '../fixtures/physics/physics.json';
+import physicsJointsDemo from '../fixtures/physics-joints-demo/physics-joints-demo.json';
+import physicsJointsSettingsDemo from '../fixtures/physics-joints-settings-demo/physics-joints-settings-demo.json';
 import pinObjectToAnother from '../fixtures/pin-object-to-another/pin-object-to-another.json';
 import pinObjectToAnotherMultipleParents from '../fixtures/pin-object-to-another-multiple-parents/pin-object-to-another-multiple-parents.json';
+import pixelPerfectPlatformGame from '../fixtures/pixel-perfect-platform-game/pixel-perfect-platform-game.json';
 import planeAndClouds from '../fixtures/plane-and-clouds/plane-and-clouds.json';
 import platformer from '../fixtures/platformer/platformer.json';
 import platformerDoubleJump from '../fixtures/platformer-double-jump/platformer-double-jump.json';
@@ -68,6 +72,7 @@ import playMusicOnMobile from '../fixtures/play-music-on-mobile/play-music-on-mo
 import playStopSpriteAnimation from '../fixtures/play-stop-sprite-animation/play-stop-sprite-animation.json';
 import racingGame from '../fixtures/racing-game/racing-game.json';
 import rain from '../fixtures/rain/rain.json';
+import ragdoll from '../fixtures/ragdoll/ragdoll.json';
 import randomColorPicker from '../fixtures/random-color-picker/random-color-picker.json';
 import rotateTowardMouse from '../fixtures/rotate-toward-mouse/rotate-toward-mouse.json';
 import rotateTowardPosition from '../fixtures/rotate-toward-position/rotate-toward-position.json';
@@ -119,6 +124,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(pinObjectToAnother);
     } else if (url === 'example://pin-object-to-another-multiple-parents') {
       return Promise.resolve(pinObjectToAnotherMultipleParents);
+    } else if (url === 'example://pixel-perfect-platform-game') {
+      return Promise.resolve(pixelPerfectPlatformGame);
     } else if (url === 'example://plane-and-clouds') {
       return Promise.resolve(planeAndClouds);
     } else if (url === 'example://center-object-within-another') {
@@ -141,6 +148,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(deviceOrientationCompass);
     } else if (url === 'example://device-vibration') {
       return Promise.resolve(deviceVibration);
+    } else if (url === 'example://downhill-bike-physics-demo') {
+      return Promise.resolve(downhillBikePhysicsDemo);
     } else if (url === 'example://create-object-with-mouseclick') {
       return Promise.resolve(createObjectWithMouseclick);
     } else if (url === 'example://custom-font') {
@@ -219,6 +228,10 @@ export default class BrowserProjectOpener {
       return Promise.resolve(pathfindingBasics);
     } else if (url === 'example://physics') {
       return Promise.resolve(physics);
+    } else if (url === 'example://physics-joints-demo') {
+      return Promise.resolve(physicsJointsDemo);
+    } else if (url === 'example://physics-joints-settings-demo') {
+      return Promise.resolve(physicsJointsSettingsDemo);
     } else if (url === 'example://platformer') {
       return Promise.resolve(platformer);
     } else if (url === 'example://platformer-double-jump') {
@@ -231,6 +244,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(racingGame);
     } else if (url === 'example://rain') {
       return Promise.resolve(rain);
+    } else if (url === 'example://ragdoll') {
+      return Promise.resolve(ragdoll);
     } else if (url === 'example://random-color-picker') {
       return Promise.resolve(randomColorPicker);
     } else if (url === 'example://rotate-toward-mouse') {

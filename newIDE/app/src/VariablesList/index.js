@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import * as React from 'react';
 import {
   Table,
   TableHeader,
@@ -35,7 +35,7 @@ const gd = global.gd;
 const SortableVariableRow = SortableElement(VariableRow);
 const SortableAddVariableRow = SortableElement(AddVariableRow);
 
-class VariablesListBody extends Component<*, *> {
+class VariablesListBody extends React.Component<*, *> {
   render() {
     return <div>{this.props.children}</div>;
   }
@@ -58,7 +58,7 @@ type State = {|
   mode: 'select' | 'move',
 |};
 
-export default class VariablesList extends Component<Props, State> {
+export default class VariablesList extends React.Component<Props, State> {
   state = {
     nameErrors: {},
     selectedVariables: getInitialSelection(),
@@ -138,7 +138,7 @@ export default class VariablesList extends Component<Props, State> {
     name: string,
     parentVariable: gdVariable,
     depth: number
-  ) {
+  ): Array<React.Node> {
     const names = parentVariable.getAllChildrenNames().toJSArray();
 
     return flatten(
@@ -242,7 +242,7 @@ export default class VariablesList extends Component<Props, State> {
           style={styles.emptyExplanation}
           messageStyle={styles.emptyExplanationMessage}
         >
-          {this.props.emptyExplanationMessage}
+          {this.props.emptyExplanationMessage || ''}
         </EmptyMessage>
         <EmptyMessage
           style={styles.emptyExplanation}

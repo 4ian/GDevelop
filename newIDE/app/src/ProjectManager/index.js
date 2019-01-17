@@ -265,6 +265,8 @@ type State = {|
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
+  _searchBar: ?SearchBar;
+
   state = {
     renamedItemKind: null,
     renamedItemName: '',
@@ -279,6 +281,13 @@ export default class ProjectManager extends React.Component<Props, State> {
     // so the prop freezeUpdate allow to ask the component to stop
     // updating, for example when hidden.
     return !nextProps.freezeUpdate;
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    // Typical usage (don't forget to compare props):
+    if (!this.props.freezeUpdate && prevProps.freezeUpdate) {
+      if (this._searchBar) this._searchBar.focus();
+    }
   }
 
   _onEditName = (kind: ?string, name: string) => {
@@ -509,7 +518,11 @@ export default class ProjectManager extends React.Component<Props, State> {
       <ProjectStructureItem
         primaryText="Menu"
         leftIcon={
-          <ListIcon isGDevelopIcon src="res/ribbon_default/new32.png" />
+          <ListIcon
+            iconSize={32}
+            isGDevelopIcon
+            src="res/ribbon_default/new32.png"
+          />
         }
         initiallyOpen={true}
         primaryTogglesNestedList={true}
@@ -519,7 +532,11 @@ export default class ProjectManager extends React.Component<Props, State> {
             key="save"
             primaryText="Save"
             leftIcon={
-              <ListIcon isGDevelopIcon src="res/ribbon_default/save32.png" />
+              <ListIcon
+                iconSize={32}
+                isGDevelopIcon
+                src="res/ribbon_default/save32.png"
+              />
             }
             onClick={() => this.props.onSaveProject()}
           />,
@@ -527,7 +544,11 @@ export default class ProjectManager extends React.Component<Props, State> {
             key="close"
             primaryText="Close"
             leftIcon={
-              <ListIcon isGDevelopIcon src="res/ribbon_default/close32.png" />
+              <ListIcon
+                iconSize={32}
+                isGDevelopIcon
+                src="res/ribbon_default/close32.png"
+              />
             }
             onClick={() => this.props.onCloseProject()}
           />,
@@ -535,7 +556,11 @@ export default class ProjectManager extends React.Component<Props, State> {
             key="export"
             primaryText="Export"
             leftIcon={
-              <ListIcon isGDevelopIcon src="res/ribbon_default/export32.png" />
+              <ListIcon
+                iconSize={32}
+                isGDevelopIcon
+                src="res/ribbon_default/export32.png"
+              />
             }
             onClick={() => this.props.onExportProject()}
           />,
@@ -543,7 +568,11 @@ export default class ProjectManager extends React.Component<Props, State> {
             key="preferences"
             primaryText="Preferences"
             leftIcon={
-              <ListIcon isGDevelopIcon src="res/ribbon_default/pref32.png" />
+              <ListIcon
+                iconSize={32}
+                isGDevelopIcon
+                src="res/ribbon_default/pref32.png"
+              />
             }
             onClick={() => this.props.onOpenPreferences()}
           />,
@@ -570,6 +599,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText="Game settings"
             leftIcon={
               <ListIcon
+                iconSize={32}
                 isGDevelopIcon
                 src="res/ribbon_default/projectManager32.png"
               />
@@ -583,6 +613,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText="Properties"
                 leftIcon={
                   <ListIcon
+                    iconSize={32}
                     isGDevelopIcon
                     src="res/ribbon_default/editprop32.png"
                   />
@@ -596,6 +627,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText="Global variables"
                 leftIcon={
                   <ListIcon
+                    iconSize={32}
                     isGDevelopIcon
                     src="res/ribbon_default/editname32.png"
                   />
@@ -607,6 +639,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText="Icons"
                 leftIcon={
                   <ListIcon
+                    iconSize={32}
                     isGDevelopIcon
                     src="res/ribbon_default/image32.png"
                   />
@@ -618,11 +651,14 @@ export default class ProjectManager extends React.Component<Props, State> {
                 primaryText="Resources"
                 leftIcon={
                   <ListIcon
+                    iconSize={32}
                     isGDevelopIcon
                     src="res/ribbon_default/image32.png"
                   />
                 }
-                onClick={() => this.props.onOpenResources()}
+                onClick={() => {
+                  this.props.onOpenResources();
+                }}
               />,
             ]}
           />
@@ -630,6 +666,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText="Scenes"
             leftIcon={
               <ListIcon
+                iconSize={32}
                 isGDevelopIcon
                 src="res/ribbon_default/sceneadd32.png"
               />
@@ -681,6 +718,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText="External events"
             leftIcon={
               <ListIcon
+                iconSize={32}
                 isGDevelopIcon
                 src="res/ribbon_default/externalevents32.png"
               />
@@ -737,6 +775,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             primaryText="External layouts"
             leftIcon={
               <ListIcon
+                iconSize={32}
                 isGDevelopIcon
                 src="res/ribbon_default/externallayout32.png"
               />
@@ -795,6 +834,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             onRefresh={onReloadEventsFunctionsExtensions}
             leftIcon={
               <ListIcon
+                iconSize={32}
                 isGDevelopIcon
                 src="res/ribbon_default/function32.png"
               />
@@ -870,6 +910,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           />
         </List>
         <SearchBar
+          ref={searchBar => (this._searchBar = searchBar)}
           value={searchText}
           onRequestSearch={() => {}}
           onChange={text =>

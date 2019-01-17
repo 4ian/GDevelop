@@ -14,6 +14,7 @@
     "orientation": "landscape",
     "packageName": "com.example.gamename",
     "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/objects-timers/objects-timers.json",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "version": "1.0.0",

@@ -8,6 +8,9 @@ import RenderedTextEntryInstance from './Renderers/RenderedTextEntryInstance';
 import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitterInstance';
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
+import RenderedInstance from './Renderers/RenderedInstance';
+import PIXI from 'pixi.js';
+const gd = global.gd;
 
 /**
  * A service containing functions that are called to render instances
@@ -78,13 +81,17 @@ export default {
       return;
     }
 
-    if (!this.renderers.hasOwnProperty(objectType)) {
+    if (this.renderers.hasOwnProperty(objectType)) {
       console.warn(
         `Tried to register renderer for object "${objectType}", but a renderer already exists.`
       );
       return;
     }
 
+    console.info(`Properly registered renderer for object "${objectType}".`);
     this.renderers[objectType] = renderer;
   },
+  gd, // Expose gd so that it can be used by renderers
+  PIXI, // Expose PIXI so that it can be used by renderers
+  RenderedInstance, // Expose the base class for renderers so that it can be used by renderers
 };

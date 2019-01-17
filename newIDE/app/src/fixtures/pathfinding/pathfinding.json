@@ -14,6 +14,7 @@
     "orientation": "landscape",
     "packageName": "",
     "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/pathfinding/pathfinding.json",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
     "version": "1.0.0",

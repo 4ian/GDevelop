@@ -4,15 +4,16 @@ These are the tests for the GDevelop JavaScript game engine.
 
 Make sure you have [Node.js](https://nodejs.org/) installed. Update dependencies:
 
-```
+```bash
 cd GDJS/tests
 npm install
 ```
 
 Then launch tests:
 
-```
-npm test
+```bash
+npm test #This will use Chrome Headless
+npm test:firefox #To run tests using Firefox
 ```
 
 ## About the tests

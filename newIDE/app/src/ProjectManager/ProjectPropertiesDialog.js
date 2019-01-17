@@ -9,6 +9,7 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SubscriptionChecker from '../Profile/SubscriptionChecker';
 import { translate, type TranslatorProps } from 'react-i18next';
 import { getErrors, displayProjectErrorsBox } from './ProjectErrorsChecker';
+import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 
 type Props = TranslatorProps & {|
   project: gdProject,
@@ -27,6 +28,7 @@ type State = {|
   packageName: string,
   orientation: string,
   adMobAppId: string,
+  scaleMode: 'linear' | 'nearest',
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
 |};
@@ -49,6 +51,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName: project.getPackageName(),
       orientation: project.getOrientation(),
       adMobAppId: project.getAdMobAppId(),
+      scaleMode: project.getScaleMode(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
     };
@@ -74,6 +77,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName,
       orientation,
       adMobAppId,
+      scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
     } = this.state;
@@ -85,6 +89,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setPackageName(packageName);
     project.setOrientation(orientation);
     project.setAdMobAppId(adMobAppId);
+    project.setScaleMode(scaleMode);
     project.setSizeOnStartupMode(sizeOnStartupMode);
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
 
@@ -116,6 +121,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       packageName,
       orientation,
       adMobAppId,
+      scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
     } = this.state;
@@ -191,6 +197,32 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             <MenuItem value="landscape" primaryText="Landscape" />
             <MenuItem value="portrait" primaryText="Portrait" />
           </SelectField>
+          <SelectField
+            fullWidth
+            floatingLabelText={'Scale mode (also called "Sampling")'}
+            floatingLabelFixed
+            value={scaleMode}
+            onChange={(e, i, value) => this.setState({ scaleMode: value })}
+          >
+            <MenuItem
+              value="linear"
+              primaryText="Linear (antialiased rendering, good for most games)"
+            />
+            <MenuItem
+              value="nearest"
+              primaryText="Nearest (no antialiasing, good for pixel perfect games)"
+            />
+          </SelectField>
+          {scaleMode === 'nearest' && (
+            <DismissableAlertMessage
+              identifier="use-non-smoothed-textures"
+              kind="info"
+            >
+              To obtain the best pixel-perfect effect possible, go in the
+              resources editor and disable the Smoothing for all images of your
+              game.
+            </DismissableAlertMessage>
+          )}
           <SelectField
             fullWidth
             floatingLabelText="Fullscreen/game size mode"

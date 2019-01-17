@@ -5,6 +5,7 @@ import SpriteEditor from './Editors/SpriteEditor';
 import EmptyEditor from './Editors/EmptyEditor';
 import ShapePainterEditor from './Editors/ShapePainterEditor';
 import ParticleEmitterEditor from './Editors/ParticleEmitterEditor';
+import ObjectPropertiesEditor from './Editors/ObjectPropertiesEditor';
 const gd = global.gd;
 
 /**
@@ -27,9 +28,9 @@ export default {
       );
       return;
     }
-    if (!editorConfiguration.newObjectCreator) {
+    if (!editorConfiguration.createNewObject) {
       console.warn(
-        `Tried to register editor configuration for object "${objectType}", but "newObjectCreator" property is not defined.`
+        `Tried to register editor configuration for object "${objectType}", but "createNewObject" property is not defined.`
       );
       return;
     }
@@ -40,54 +41,69 @@ export default {
       return;
     }
 
-    if (!this.editorConfigurations.hasOwnProperty(objectType)) {
+    if (this.editorConfigurations.hasOwnProperty(objectType)) {
       console.warn(
-        `Tried to register renderer for object "${objectType}", but an editor configuration already exists.`
+        `Tried to register editor configuration for object "${objectType}", but an editor configuration already exists.`
       );
       return;
     }
 
+    console.info(
+      `Properly registered editor configuration for object "${objectType}".`
+    );
     this.editorConfigurations[objectType] = editorConfiguration;
+  },
+  getDefaultObjectJsImplementationPropertiesEditor() {
+    return {
+      component: ObjectPropertiesEditor,
+      createNewObject: object =>
+        gd
+          .asObjectJsImplementation(object)
+          .clone()
+          .release(),
+      castToObjectType: object => gd.asObjectJsImplementation(object),
+    };
   },
   editorConfigurations: {
     Sprite: {
       component: SpriteEditor,
-      newObjectCreator: () => new gd.SpriteObject(''),
+      createNewObject: () => new gd.SpriteObject(''),
       castToObjectType: object => gd.asSpriteObject(object),
       helpPagePath: '/objects/sprite',
     },
     'TiledSpriteObject::TiledSprite': {
       component: TiledSpriteEditor,
-      newObjectCreator: () => new gd.TiledSpriteObject(''),
+      createNewObject: () => new gd.TiledSpriteObject(''),
       castToObjectType: object => gd.asTiledSpriteObject(object),
       helpPagePath: '/objects/tiled_sprite',
     },
     'PanelSpriteObject::PanelSprite': {
       component: PanelSpriteEditor,
-      newObjectCreator: () => new gd.PanelSpriteObject(''),
+      createNewObject: () => new gd.PanelSpriteObject(''),
       castToObjectType: object => gd.asPanelSpriteObject(object),
+      helpPagePath: '/objects/panel_sprite',
     },
     'TextObject::Text': {
       component: TextEditor,
-      newObjectCreator: () => new gd.TextObject(''),
+      createNewObject: () => new gd.TextObject(''),
       castToObjectType: object => gd.asTextObject(object),
       helpPagePath: '/objects/text',
     },
     'PrimitiveDrawing::Drawer': {
       component: ShapePainterEditor,
-      newObjectCreator: () => new gd.ShapePainterObject(''),
+      createNewObject: () => new gd.ShapePainterObject(''),
       castToObjectType: object => gd.asShapePainterObject(object),
       helpPagePath: '/objects/shape_painter',
     },
     'TextEntryObject::TextEntry': {
       component: EmptyEditor,
-      newObjectCreator: () => new gd.TextEntryObject(''),
+      createNewObject: () => new gd.TextEntryObject(''),
       castToObjectType: object => gd.asTextEntryObject(object),
       helpPagePath: '/objects/text_entry',
     },
     'ParticleSystem::ParticleEmitter': {
       component: ParticleEmitterEditor,
-      newObjectCreator: () => new gd.ParticleEmitterObject(''),
+      createNewObject: () => new gd.ParticleEmitterObject(''),
       castToObjectType: object => gd.asParticleEmitterObject(object),
       helpPagePath: '/objects/particles_emitter',
     },

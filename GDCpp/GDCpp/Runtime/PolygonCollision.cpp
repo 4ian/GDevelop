@@ -61,7 +61,9 @@ float distance(float minA, float maxA, float minB, float maxB) {
 
 }  // namespace
 
-CollisionResult GD_API PolygonCollisionTest(Polygon2d& p1, Polygon2d& p2) {
+CollisionResult GD_API PolygonCollisionTest(Polygon2d& p1,
+                                            Polygon2d& p2,
+                                            bool ignoreTouchingEdges) {
   if (p1.vertices.size() < 3 || p2.vertices.size() < 3) {
     CollisionResult result;
     result.collision = false;
@@ -102,10 +104,10 @@ CollisionResult GD_API PolygonCollisionTest(Polygon2d& p1, Polygon2d& p2) {
     project(axis, p1, minA, maxA);
     project(axis, p2, minB, maxB);
 
-    if (distance(minA, maxA, minB, maxB) >
-        0.0f)  // If the projections on the axis do not overlap, then their is
-               // no collision
-    {
+    float dist = distance(minA, maxA, minB, maxB);
+    if (dist > 0.0f || (dist == 0.0 && ignoreTouchingEdges)) {
+      // If the projections on the axis do not overlap, then
+      // there is no collision
       result.collision = false;
       result.move_axis.x = 0.0f;
       result.move_axis.y = 0.0f;
@@ -113,11 +115,10 @@ CollisionResult GD_API PolygonCollisionTest(Polygon2d& p1, Polygon2d& p2) {
       return result;
     }
 
-    float dist = distance(minA, maxA, minB, maxB);
-    dist = std::abs(dist);
+    float absDist = std::abs(dist);
 
-    if (dist < min_dist) {
-      min_dist = dist;
+    if (absDist < min_dist) {
+      min_dist = absDist;
       move_axis = axis;
     }
   }

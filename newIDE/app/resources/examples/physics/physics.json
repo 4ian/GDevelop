@@ -7,14 +7,17 @@
     "revision": 0
   },
   "properties": {
+    "adMobAppId": "",
     "folderProject": false,
     "linuxExecutableFilename": "",
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.physics",
-    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/physics/physics.json",
+    "projectFile": "/Users/florianrival/GDevelop projects/My project1335/physics.json",
+    "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
+    "version": "1.0.0",
     "winExecutableFilename": "",
     "winExecutableIconFile": "",
     "name": "Physics Example",
@@ -107,6 +110,7 @@
         "alwaysLoaded": false,
         "file": "2DWoodBox.jpg",
         "kind": "image",
+        "metadata": "",
         "name": "2DWoodBox.jpg",
         "smoothed": true,
         "userAdded": true
@@ -115,6 +119,7 @@
         "alwaysLoaded": false,
         "file": "2DSmallWoodBox.jpg",
         "kind": "image",
+        "metadata": "",
         "name": "2DSmallWoodBox.jpg",
         "smoothed": true,
         "userAdded": true
@@ -123,6 +128,7 @@
         "alwaysLoaded": false,
         "file": "BlackSphere.png",
         "kind": "image",
+        "metadata": "",
         "name": "BlackSphere.png",
         "smoothed": true,
         "userAdded": true
@@ -131,6 +137,7 @@
         "alwaysLoaded": false,
         "file": "ConcreteWall.png",
         "kind": "image",
+        "metadata": "",
         "name": "ConcreteWall.png",
         "smoothed": true,
         "userAdded": true
@@ -139,6 +146,7 @@
         "alwaysLoaded": false,
         "file": "FullskiesBlueClear0007_1_M.jpg",
         "kind": "image",
+        "metadata": "",
         "name": "FullskiesBlueClear0007_1_M.jpg",
         "smoothed": true,
         "userAdded": true
@@ -322,7 +330,7 @@
           "locked": false,
           "name": "SmallBox",
           "width": 0,
-          "x": 37,
+          "x": 100,
           "y": 236,
           "zOrder": 0,
           "numberProperties": [],
@@ -337,7 +345,7 @@
           "locked": false,
           "name": "SmallBox",
           "width": 0,
-          "x": 31,
+          "x": 94,
           "y": 201,
           "zOrder": 0,
           "numberProperties": [],
@@ -352,7 +360,7 @@
           "locked": false,
           "name": "SmallBox",
           "width": 0,
-          "x": 21,
+          "x": 84,
           "y": 164,
           "zOrder": 0,
           "numberProperties": [],
@@ -367,7 +375,7 @@
           "locked": false,
           "name": "SmallBox",
           "width": 0,
-          "x": 42,
+          "x": 105,
           "y": 271,
           "zOrder": 0,
           "numberProperties": [],
@@ -381,9 +389,9 @@
           "layer": "",
           "locked": false,
           "name": "BigBox",
-          "width": 6,
-          "x": 155,
-          "y": 128.5,
+          "width": 4,
+          "x": 181,
+          "y": 129,
           "zOrder": 0,
           "numberProperties": [
             {
@@ -568,22 +576,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": true,
-              "averageFriction": 0.8,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 0.5,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnOrigin",
-              "shapeType": "Box",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -938,22 +953,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": true,
-              "averageFriction": 0.8,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 0.2,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnOrigin",
-              "shapeType": "Box",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -1308,22 +1330,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": true,
-              "averageFriction": 0.8,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": true,
-              "linearDamping": 0.1,
-              "massDensity": 1,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnOrigin",
-              "shapeType": "Circle",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": true,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Circle",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -1678,22 +1707,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": true,
-              "averageFriction": 0.8,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": false,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 1,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnOrigin",
-              "shapeType": "Box",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Static",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.7,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -2140,22 +2176,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": true,
-              "averageFriction": 0.8,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 5,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnOrigin",
-              "shapeType": "Box",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -2510,22 +2553,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": true,
-              "averageFriction": 0,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": true,
-              "linearDamping": 0.1,
-              "massDensity": 300,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnOrigin",
-              "shapeType": "Circle",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": true,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Circle",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -2883,22 +2933,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": true,
-              "averageFriction": 0.8,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": false,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 1,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnOrigin",
-              "shapeType": "Box",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Static",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "string": "Physics engine example",
@@ -2945,13 +3002,21 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::AddRevoluteJoint"
+                "value": "Physics2::AddRevoluteJoint"
               },
               "parameters": [
                 "Lever",
-                "Physics",
-                "309",
-                "243"
+                "Physics2",
+                "Lever.PointX(Centre)",
+                "Lever.PointY(Centre)",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
               ],
               "subInstructions": []
             }
@@ -3052,13 +3117,15 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::ApplyForce"
+                "value": "Physics2::ApplyForce"
               },
               "parameters": [
                 "BlackSphere",
-                "Physics",
+                "Physics2",
                 "15",
-                "-5"
+                "-5",
+                "BlackSphere.PointX(Centre)",
+                "BlackSphere.PointY(Centre)"
               ],
               "subInstructions": []
             }
@@ -3088,12 +3155,13 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::CollisionWith"
+                "value": "Physics2::Collision"
               },
               "parameters": [
                 "Text",
-                "Physics",
-                "BigBox"
+                "Physics2",
+                "BigBox",
+                ""
               ],
               "subInstructions": []
             }
@@ -3102,11 +3170,11 @@
             {
               "type": {
                 "inverted": false,
-                "value": "PhysicsBehavior::SetDynamic"
+                "value": "Physics2::SetDynamic"
               },
               "parameters": [
                 "Text",
-                "Physics"
+                "Physics2"
               ],
               "subInstructions": []
             }
@@ -3135,17 +3203,20 @@
       ],
       "behaviorsSharedData": [
         {
-          "gravityX": 0,
-          "gravityY": 9,
-          "name": "Physics",
-          "scaleX": 100,
-          "scaleY": 100,
-          "type": "PhysicsBehavior::PhysicsBehavior"
+          "name": "Physics2",
+          "type": "Physics2::Physics2Behavior",
+          "content": {
+            "gravityX": 0,
+            "gravityY": 9.8,
+            "scaleX": 100,
+            "scaleY": 100
+          }
         }
       ]
     }
   ],
   "externalEvents": [],
+  "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []
 }

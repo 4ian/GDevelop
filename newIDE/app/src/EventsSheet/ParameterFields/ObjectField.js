@@ -67,7 +67,10 @@ export default class ObjectField extends React.Component<
         fullWidth
         errorText={this.state.errorText}
         onBlur={this._doValidation}
-        openOnFocus={!this.props.isInline}
+        openOnFocus={
+          !this.props
+            .value /* Only force showing the list if no object is entered, see https://github.com/4ian/GDevelop/issues/859 */
+        }
         ref={field => (this._field = field)}
       />
     );

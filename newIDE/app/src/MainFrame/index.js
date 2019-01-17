@@ -517,7 +517,10 @@ export default class MainFrame extends React.Component<Props, State> {
     const { currentProject } = this.state;
     if (!currentProject) return;
 
-    if (!currentProject.hasLayoutNamed(oldName)) return;
+    if (currentProject.hasLayoutNamed(oldName)) {
+	  showWarningBox('Another scene with this name already exists.');
+	  return;	
+	};
 
     const layout = currentProject.getLayout(oldName);
     this.setState(
@@ -535,7 +538,10 @@ export default class MainFrame extends React.Component<Props, State> {
     const { currentProject } = this.state;
     if (!currentProject) return;
 
-    if (!currentProject.hasExternalLayoutNamed(oldName)) return;
+    if (currentProject.hasExternalLayoutNamed(oldName)) {
+	  showWarningBox('Another external layout with this name already exists.');
+	  return;	
+	};
 
     const externalLayout = currentProject.getExternalLayout(oldName);
     this.setState(
@@ -556,7 +562,10 @@ export default class MainFrame extends React.Component<Props, State> {
     const { currentProject } = this.state;
     if (!currentProject) return;
 
-    if (!currentProject.hasExternalEventsNamed(oldName)) return;
+    if (currentProject.hasExternalEventsNamed(oldName)) {
+	  showWarningBox('Another external event with this name already exists.');
+	  return;	
+	};
 
     const externalEvents = currentProject.getExternalEvents(oldName);
     this.setState(
@@ -578,7 +587,11 @@ export default class MainFrame extends React.Component<Props, State> {
     const { eventsFunctionWriter } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasEventsFunctionsExtensionNamed(oldName)) return;
+    if (currentProject.hasEventsFunctionsExtensionNamed(oldName)) {
+	  showWarningBox('Another extension with this name already exists.');
+	  return;	
+	};
+	
     if (!gd.Project.validateObjectName(newName)) {
       showWarningBox(
         'This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your extension name.'

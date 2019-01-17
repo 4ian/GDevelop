@@ -35,6 +35,7 @@ const exampleNames = [
   'device-orientation-ballgame',
   'device-orientation-compass',
   'device-vibration',
+  'downhill-bike-physics-demo',
   'drag-camera-with-mouse',
   'drop-collect-items-from-storage',
   'exit-app',

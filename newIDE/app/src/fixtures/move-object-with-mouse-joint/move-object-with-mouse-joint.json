@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "default",
     "packageName": "com.example.gamename",
-    "projectFile": "",
+    "projectFile": "/Users/florianrival/GDevelop projects/My project1343/move-object-with-mouse-joint.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "",
     "useExternalSourceFiles": true,
@@ -155,7 +155,12 @@
         "zoomFactor": 1
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "name": "MouseJointId",
+          "value": ""
+        }
+      ],
       "instances": [
         {
           "angle": 0,
@@ -366,6 +371,66 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 576,
+          "layer": "",
+          "locked": false,
+          "name": "Border",
+          "width": 70,
+          "x": 700,
+          "y": 0,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 72,
+          "layer": "",
+          "locked": false,
+          "name": "Border",
+          "width": 840,
+          "x": -70,
+          "y": -72,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 72,
+          "layer": "",
+          "locked": false,
+          "name": "Border",
+          "width": 840,
+          "x": -70,
+          "y": 576,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 576,
+          "layer": "",
+          "locked": false,
+          "name": "Border",
+          "width": 70,
+          "x": -70,
+          "y": 0,
+          "zOrder": 3,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -376,22 +441,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": false,
-              "averageFriction": 0.8,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": true,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 1,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnCenter",
-              "shapeType": "Circle",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Circle",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -452,22 +524,29 @@
           "variables": [],
           "behaviors": [
             {
-              "angularDamping": 0.1,
-              "autoResizing": false,
-              "averageFriction": 0.8,
-              "averageRestitution": 0,
-              "coordsList": "",
-              "dynamic": false,
-              "fixedRotation": false,
-              "isBullet": false,
-              "linearDamping": 0.1,
-              "massDensity": 1,
-              "name": "Physics",
-              "polygonHeight": 200,
-              "polygonWidth": 200,
-              "positioning": "OnCenter",
-              "shapeType": "Box",
-              "type": "PhysicsBehavior::PhysicsBehavior"
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Static",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
             }
           ],
           "animations": [
@@ -520,41 +599,44 @@
               ]
             }
           ]
+        },
+        {
+          "height": 32,
+          "name": "Border",
+          "texture": "Grass.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 32,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Static",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 1,
+                "masks": 1
+              }
+            }
+          ]
         }
       ],
       "events": [
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "DepartScene"
-              },
-              "parameters": [
-                ""
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "drag_factor",
-                "=",
-                "0.2"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
         {
           "disabled": false,
           "folded": false,
@@ -570,14 +652,6 @@
                 "Left"
               ],
               "subInstructions": []
-            },
-            {
-              "type": {
-                "inverted": false,
-                "value": "BuiltinCommonInstructions::Once"
-              },
-              "parameters": [],
-              "subInstructions": []
             }
           ],
           "actions": [],
@@ -585,8 +659,35 @@
             {
               "disabled": false,
               "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "It's important to ONLY create ONE mouse joint. That's why we're checking that the variable MouseJointId is equal to 0, before creating another joint. If it contains a number, this will be the identifier of the existing joint.",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
               "type": "BuiltinCommonInstructions::Standard",
               "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "MouseJointId",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                },
                 {
                   "type": {
                     "inverted": false,
@@ -605,12 +706,40 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "ModVarScene"
+                    "value": "Physics2::AddMouseJoint"
                   },
                   "parameters": [
-                    "drag",
-                    "=",
-                    "1"
+                    "Player",
+                    "Physics2",
+                    "MouseX(\"\",0)",
+                    "MouseY(\"\",0)",
+                    "10",
+                    "",
+                    "",
+                    "MouseJointId"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Physics2::MouseJointTarget"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Physics2",
+                    "Variable(MouseJointId)",
+                    "MouseX(\"\",0)",
+                    "MouseY(\"\",0)"
                   ],
                   "subInstructions": []
                 }
@@ -640,48 +769,24 @@
             {
               "type": {
                 "inverted": false,
-                "value": "ModVarScene"
-              },
-              "parameters": [
-                "drag",
-                "=",
-                "0"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "events": []
-        },
-        {
-          "disabled": false,
-          "folded": false,
-          "type": "BuiltinCommonInstructions::Standard",
-          "conditions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "VarScene"
-              },
-              "parameters": [
-                "drag",
-                "=",
-                "1"
-              ],
-              "subInstructions": []
-            }
-          ],
-          "actions": [
-            {
-              "type": {
-                "inverted": false,
-                "value": "PhysicsBehavior::SetLinearVelocity"
+                "value": "Physics2::Remove joint"
               },
               "parameters": [
                 "Player",
-                "Physics",
-                "(MouseX() - Player.PointX(Centre)) * Variable(drag_factor)",
-                "(MouseY() - Player.PointY(Centre)) * Variable(drag_factor)",
-                ""
+                "Physics2",
+                "Variable(MouseJointId)"
+              ],
+              "subInstructions": []
+            },
+            {
+              "type": {
+                "inverted": false,
+                "value": "ModVarScene"
+              },
+              "parameters": [
+                "MouseJointId",
+                "=",
+                "0"
               ],
               "subInstructions": []
             }
@@ -710,12 +815,14 @@
       ],
       "behaviorsSharedData": [
         {
-          "gravityX": 0,
-          "gravityY": 9.8,
-          "name": "Physics",
-          "scaleX": 100,
-          "scaleY": 100,
-          "type": "PhysicsBehavior::PhysicsBehavior"
+          "name": "Physics2",
+          "type": "Physics2::Physics2Behavior",
+          "content": {
+            "gravityX": 0,
+            "gravityY": 9.8,
+            "scaleX": 100,
+            "scaleY": 100
+          }
         }
       ]
     }

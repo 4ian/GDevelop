@@ -1,0 +1,5167 @@
+{
+  "firstLayout": "",
+  "gdVersion": {
+    "build": 97,
+    "major": 4,
+    "minor": 0,
+    "revision": 0
+  },
+  "properties": {
+    "adMobAppId": "",
+    "folderProject": false,
+    "linuxExecutableFilename": "",
+    "macExecutableFilename": "",
+    "orientation": "landscape",
+    "packageName": "com.example.zatgamename",
+    "projectFile": "G:\\Games\\New Bike Demo\\game.json",
+    "scaleMode": "linear",
+    "sizeOnStartupMode": "adaptWidth",
+    "useExternalSourceFiles": false,
+    "version": "0.0.1",
+    "winExecutableFilename": "",
+    "winExecutableIconFile": "",
+    "name": "Downhill Bike Demo",
+    "author": "Zat",
+    "windowWidth": 800,
+    "windowHeight": 600,
+    "latestCompilationDirectory": "",
+    "maxFPS": 60,
+    "minFPS": 10,
+    "verticalSync": false,
+    "platformSpecificAssets": {},
+    "loadingScreen": {
+      "showGDevelopSplash": true
+    },
+    "extensions": [
+      {
+        "name": "BuiltinObject"
+      },
+      {
+        "name": "BuiltinAudio"
+      },
+      {
+        "name": "BuiltinVariables"
+      },
+      {
+        "name": "BuiltinTime"
+      },
+      {
+        "name": "BuiltinMouse"
+      },
+      {
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "name": "BuiltinJoystick"
+      },
+      {
+        "name": "BuiltinCamera"
+      },
+      {
+        "name": "BuiltinWindow"
+      },
+      {
+        "name": "BuiltinFile"
+      },
+      {
+        "name": "BuiltinNetwork"
+      },
+      {
+        "name": "BuiltinScene"
+      },
+      {
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "name": "Sprite"
+      },
+      {
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "name": "BuiltinCommonConversions"
+      },
+      {
+        "name": "BuiltinStringInstructions"
+      },
+      {
+        "name": "BuiltinMathematicalTools"
+      },
+      {
+        "name": "BuiltinExternalLayouts"
+      }
+    ],
+    "platforms": [
+      {
+        "name": "GDevelop JS platform"
+      }
+    ],
+    "currentPlatform": "GDevelop JS platform"
+  },
+  "resources": {
+    "resources": [
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Head.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Head.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Torso.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Torso.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Thigh.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Thigh.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Leg.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Leg.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Upper Arm.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Upper Arm.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Arm.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Arm.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/FrontWheel.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\FrontWheel.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/BackWheel.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\BackWheel.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Ground.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Ground.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Pedal.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Pedal.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Crank.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Crank.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Saddle.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Saddle.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/FrontSuspensionBottom.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\FrontSuspensionBottom.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/RearSuspension.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\RearSuspension.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Frame.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Frame.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Win.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Win.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "https://df5lqcdudryde.cloudfront.net/examples/downhill-bike-physics-demo/GFX/Start.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Start.png",
+        "smoothed": true,
+        "userAdded": false
+      }
+    ],
+    "resourceFolders": []
+  },
+  "objects": [],
+  "objectsGroups": [],
+  "variables": [],
+  "layouts": [
+    {
+      "b": 245,
+      "disableInputWhenNotFocused": true,
+      "mangledName": "Downhill_32Bike_32Demo",
+      "name": "Downhill Bike Demo",
+      "oglFOV": 90,
+      "oglZFar": 500,
+      "oglZNear": 1,
+      "r": 196,
+      "standardSortMethod": true,
+      "stopSoundsOnStartup": true,
+      "title": "",
+      "v": 235,
+      "uiSettings": {
+        "grid": false,
+        "gridB": 255,
+        "gridG": 180,
+        "gridHeight": 32,
+        "gridOffsetX": 0,
+        "gridOffsetY": 0,
+        "gridR": 158,
+        "gridWidth": 32,
+        "snap": true,
+        "windowMask": false,
+        "zoomFactor": 1
+      },
+      "objectsGroups": [
+        {
+          "name": "ground",
+          "objects": [
+            {
+              "name": "floor"
+            },
+            {
+              "name": "NewFloor"
+            }
+          ]
+        },
+        {
+          "name": "Bike",
+          "objects": [
+            {
+              "name": "MainFrame"
+            },
+            {
+              "name": "FrontWheel"
+            },
+            {
+              "name": "BackWheel"
+            },
+            {
+              "name": "RearSuspension"
+            },
+            {
+              "name": "FrontSuspensionBottom"
+            },
+            {
+              "name": "Seat"
+            }
+          ]
+        },
+        {
+          "name": "RagdollColl",
+          "objects": [
+            {
+              "name": "Head"
+            },
+            {
+              "name": "Torso"
+            },
+            {
+              "name": "RArm"
+            },
+            {
+              "name": "LArm"
+            },
+            {
+              "name": "RUpperArm"
+            },
+            {
+              "name": "LUpperArm"
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "name": "maxSpeed",
+          "value": ""
+        },
+        {
+          "name": "bikeSpeed",
+          "value": ""
+        },
+        {
+          "name": "Accel",
+          "value": ""
+        },
+        {
+          "name": "mouseJoint",
+          "value": ""
+        },
+        {
+          "name": "height",
+          "value": ""
+        },
+        {
+          "name": "clearance",
+          "value": ""
+        },
+        {
+          "name": "dummy",
+          "value": ""
+        },
+        {
+          "name": "speedLerp",
+          "value": ""
+        },
+        {
+          "name": "followX",
+          "value": ""
+        },
+        {
+          "name": "followY",
+          "value": ""
+        },
+        {
+          "name": "started",
+          "value": ""
+        },
+        {
+          "name": "finished",
+          "value": ""
+        },
+        {
+          "name": "myElapsed",
+          "value": "0"
+        },
+        {
+          "name": "seatForce",
+          "value": ""
+        },
+        {
+          "name": "maxForce",
+          "value": ""
+        }
+      ],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "MainFrame",
+          "width": 0,
+          "x": -198,
+          "y": 404,
+          "zOrder": 2,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "FrontWheel",
+          "width": 0,
+          "x": 268,
+          "y": 799,
+          "zOrder": 1,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "BackWheel",
+          "width": 0,
+          "x": -347,
+          "y": 799,
+          "zOrder": 104,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 40,
+          "layer": "GUI",
+          "locked": false,
+          "name": "Elapsed",
+          "width": 101,
+          "x": 695,
+          "y": 4,
+          "zOrder": 4,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 364.178,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 14356,
+          "x": 75144,
+          "y": 42204,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 359.883,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 36910,
+          "x": 89407,
+          "y": 43017,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "RearSuspension",
+          "width": 0,
+          "x": -350,
+          "y": 799,
+          "zOrder": 105,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "FrontSuspensionBottom",
+          "width": 0,
+          "x": 268,
+          "y": 797,
+          "zOrder": 9,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Seat",
+          "width": 0,
+          "x": -288,
+          "y": 438,
+          "zOrder": 11,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 5189,
+          "x": 24704,
+          "y": 14246,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 350.893,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 1499,
+          "x": 29763,
+          "y": 14847,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 399.353,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 6240,
+          "x": 30532,
+          "y": 16722,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 382.439,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 6105,
+          "x": 48835,
+          "y": 28047,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 399.353,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 6105,
+          "x": 53915,
+          "y": 31110,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 380.699,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 6105,
+          "x": 59097,
+          "y": 34108,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 399.353,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 6105,
+          "x": 64296,
+          "y": 37120,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 385.592,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 6105,
+          "x": 69376,
+          "y": 40361,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 3340,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 323,
+          "x": 125483,
+          "y": 39683,
+          "zOrder": 101,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Crank",
+          "width": 0,
+          "x": -107,
+          "y": 800,
+          "zOrder": 102,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "LPedal",
+          "width": 0,
+          "x": -201,
+          "y": 802,
+          "zOrder": -104,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "RPedal",
+          "width": 0,
+          "x": -18,
+          "y": 799,
+          "zOrder": 105,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 4534,
+          "x": 20473,
+          "y": 11507,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 3972,
+          "x": 16772,
+          "y": 9305,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 4022,
+          "x": 12978,
+          "y": 6737,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 30.1098,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 5189,
+          "x": 8280,
+          "y": 4050,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 5020,
+          "x": 3535,
+          "y": 2108,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 1,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 6020,
+          "x": -2352,
+          "y": 1366,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 387.633,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 6105,
+          "x": 43318,
+          "y": 25463,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 393.749,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 6105,
+          "x": 35511,
+          "y": 20369,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 358.053,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 2860,
+          "x": 41084,
+          "y": 22014,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 298,
+          "layer": "",
+          "locked": false,
+          "name": "RightLeg",
+          "width": 162,
+          "x": -24,
+          "y": 658,
+          "zOrder": 400,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 298,
+          "layer": "",
+          "locked": false,
+          "name": "LeftLeg",
+          "width": 162,
+          "x": -23,
+          "y": 657,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -68.1986,
+          "customSize": true,
+          "height": 307,
+          "layer": "",
+          "locked": false,
+          "name": "RightThigh",
+          "width": 116,
+          "x": -125,
+          "y": 508,
+          "zOrder": 390,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -69,
+          "customSize": true,
+          "height": 307,
+          "layer": "",
+          "locked": false,
+          "name": "LeftThigh",
+          "width": 116,
+          "x": -118,
+          "y": 515,
+          "zOrder": -120,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 8.88818,
+          "customSize": true,
+          "height": 317,
+          "layer": "",
+          "locked": false,
+          "name": "Torso",
+          "width": 162,
+          "x": -189,
+          "y": 306,
+          "zOrder": 300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 194,
+          "layer": "",
+          "locked": false,
+          "name": "Head",
+          "width": 155,
+          "x": -150,
+          "y": 80,
+          "zOrder": 100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -124.055,
+          "customSize": true,
+          "height": 105,
+          "layer": "",
+          "locked": false,
+          "name": "RUpperArm",
+          "width": 200,
+          "x": -140,
+          "y": 290,
+          "zOrder": 420,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -77,
+          "customSize": true,
+          "height": 248,
+          "layer": "",
+          "locked": false,
+          "name": "RArm",
+          "width": 92,
+          "x": 10,
+          "y": 266,
+          "zOrder": 402,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -124,
+          "customSize": true,
+          "height": 105,
+          "layer": "",
+          "locked": false,
+          "name": "LUpperArm",
+          "width": 200,
+          "x": -130,
+          "y": 278,
+          "zOrder": 80,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -77,
+          "customSize": true,
+          "height": 248,
+          "layer": "",
+          "locked": false,
+          "name": "LArm",
+          "width": 92,
+          "x": 20,
+          "y": 277,
+          "zOrder": 60,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Follow",
+          "width": 0,
+          "x": 173,
+          "y": 224,
+          "zOrder": 421,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 2133,
+          "layer": "",
+          "locked": false,
+          "name": "Win",
+          "width": 197,
+          "x": 122122,
+          "y": 40871,
+          "zOrder": 423,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 49.9392,
+          "customSize": true,
+          "height": 574,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 64,
+          "x": 125267,
+          "y": 42534,
+          "zOrder": 424,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 60.0639,
+          "customSize": true,
+          "height": 574,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 64,
+          "x": 93149,
+          "y": 42642,
+          "zOrder": 424,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 79.2429,
+          "customSize": true,
+          "height": 574,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 64,
+          "x": 54893,
+          "y": 28905,
+          "zOrder": 424,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 72.1587,
+          "customSize": true,
+          "height": 574,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 64,
+          "x": 8677,
+          "y": 2470,
+          "zOrder": 424,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1639,
+          "layer": "",
+          "locked": false,
+          "name": "Start",
+          "width": 524,
+          "x": 3658,
+          "y": -158,
+          "zOrder": 425,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "GUI",
+          "locked": false,
+          "name": "Timing",
+          "width": 0,
+          "x": 578,
+          "y": 4,
+          "zOrder": 426,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 2019,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 64,
+          "x": -2217,
+          "y": -669,
+          "zOrder": 427,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "GUI",
+          "locked": false,
+          "name": "Force",
+          "width": 0,
+          "x": 12,
+          "y": 4,
+          "zOrder": 428,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "GUI",
+          "locked": false,
+          "name": "ForceStrength",
+          "width": 0,
+          "x": 120,
+          "y": 4,
+          "zOrder": 429,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1332,
+          "layer": "",
+          "locked": false,
+          "name": "Instructions",
+          "width": 4501,
+          "x": -2079,
+          "y": -647,
+          "zOrder": 430,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
+      "objects": [
+        {
+          "name": "MainFrame",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": false,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 8,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 16384,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "Frame",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Frame.png",
+                      "points": [
+                        {
+                          "name": "Seat",
+                          "x": 27.5,
+                          "y": 172.5
+                        },
+                        {
+                          "name": "Handlebar",
+                          "x": 298.5,
+                          "y": 82
+                        },
+                        {
+                          "name": "BackSuspension",
+                          "x": 62,
+                          "y": 298
+                        },
+                        {
+                          "name": "FrontSuspension",
+                          "x": 380.5,
+                          "y": 244
+                        },
+                        {
+                          "name": "RearWheelAxis",
+                          "x": -150,
+                          "y": 399
+                        },
+                        {
+                          "name": "FrontWheelAxis",
+                          "x": 470,
+                          "y": 399
+                        },
+                        {
+                          "name": "Crank",
+                          "x": 90,
+                          "y": 394
+                        },
+                        {
+                          "name": "Hands",
+                          "x": 280,
+                          "y": 7
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "FrontWheel",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": false,
+                "shape": "Circle",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 3,
+                "friction": 1,
+                "restitution": 0.1,
+                "linearDamping": 0,
+                "angularDamping": 0,
+                "gravityScale": 1,
+                "layers": 16384,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "FrontWheel",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\FrontWheel.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 187,
+                        "y": 187
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "BackWheel",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": false,
+                "shape": "Circle",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 3,
+                "friction": 1,
+                "restitution": 0.1,
+                "linearDamping": 0,
+                "angularDamping": 0,
+                "gravityScale": 1,
+                "layers": 16384,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "BackWheel",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\BackWheel.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 187,
+                        "y": 187
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 64,
+                        "y": 64
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "floor",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Static",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": false,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 1,
+                "friction": 1,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 32768,
+                "masks": 16384
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "NewObject",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Ground.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "Timing",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Timing : ",
+          "font": "",
+          "characterSize": 30,
+          "color": {
+            "b": 226,
+            "g": 144,
+            "r": 74
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "Elapsed",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Text",
+          "font": "",
+          "characterSize": 30,
+          "color": {
+            "b": 226,
+            "g": 144,
+            "r": 74
+          }
+        },
+        {
+          "name": "RearSuspension",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 16384,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "RearSuspension",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\RearSuspension.png",
+                      "points": [
+                        {
+                          "name": "WheelAxis",
+                          "x": 13,
+                          "y": 123.5
+                        },
+                        {
+                          "name": "TopConnect",
+                          "x": 224,
+                          "y": 35
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 13,
+                        "y": 123.5
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "FrontSuspensionBottom",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "FrontSuspensionBottom",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\FrontSuspensionBottom.png",
+                      "points": [
+                        {
+                          "name": "TopConnect",
+                          "x": 10.5,
+                          "y": 8
+                        },
+                        {
+                          "name": "WheelAxis",
+                          "x": 98.5,
+                          "y": 159
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 98.5,
+                        "y": 159
+                      },
+                      "centerPoint": {
+                        "automatic": false,
+                        "name": "centre",
+                        "x": 98.5,
+                        "y": 159
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Seat",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0.1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 16384,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "Saddle",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Saddle.png",
+                      "points": [
+                        {
+                          "name": "Connect",
+                          "x": 113.5,
+                          "y": 139.5
+                        },
+                        {
+                          "name": "UConnect",
+                          "x": 71.5,
+                          "y": 16
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Crank",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 1,
+                "friction": 0,
+                "restitution": 0,
+                "linearDamping": 0,
+                "angularDamping": 0,
+                "gravityScale": 1,
+                "layers": 16384,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "LPedal",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Crank.png",
+                      "points": [
+                        {
+                          "name": "RPedal",
+                          "x": 185,
+                          "y": 9
+                        },
+                        {
+                          "name": "LPedal",
+                          "x": 6,
+                          "y": 9
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 96,
+                        "y": 9
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "RPedal",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 16384,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "NewObject",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Pedal.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 33,
+                        "y": 6
+                      },
+                      "centerPoint": {
+                        "automatic": false,
+                        "name": "centre",
+                        "x": 33,
+                        "y": 6
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "LPedal",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 16384,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "NewObject",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Pedal.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 33,
+                        "y": 6
+                      },
+                      "centerPoint": {
+                        "automatic": false,
+                        "name": "centre",
+                        "x": 33,
+                        "y": 6
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Torso",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 3,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 24576,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Torso.png",
+                      "points": [
+                        {
+                          "name": "UConnect",
+                          "x": 28.5,
+                          "y": 8
+                        },
+                        {
+                          "name": "LConnect",
+                          "x": 29.5,
+                          "y": 100
+                        },
+                        {
+                          "name": "ArmConnect",
+                          "x": 28.5,
+                          "y": 20.5
+                        },
+                        {
+                          "name": "SeatConnect",
+                          "x": 29.5,
+                          "y": 109
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 27.5,
+                        "y": 55
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "RightThigh",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0.1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 24576,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Thigh.png",
+                      "points": [
+                        {
+                          "name": "UConnect",
+                          "x": 19,
+                          "y": 7
+                        },
+                        {
+                          "name": "LConnect",
+                          "x": 21,
+                          "y": 100
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 20,
+                        "y": 53
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "LeftThigh",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0.1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 24576,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Thigh.png",
+                      "points": [
+                        {
+                          "name": "UConnect",
+                          "x": 19,
+                          "y": 7
+                        },
+                        {
+                          "name": "LConnect",
+                          "x": 21,
+                          "y": 100
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 20,
+                        "y": 53
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "RightLeg",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0.1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 24576,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Leg.png",
+                      "points": [
+                        {
+                          "name": "Connect",
+                          "x": 32.5,
+                          "y": 6.5
+                        },
+                        {
+                          "name": "Pedal",
+                          "x": 32.5,
+                          "y": 94
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 27.5,
+                        "y": 50.5
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "LeftLeg",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0.1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 24576,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Leg.png",
+                      "points": [
+                        {
+                          "name": "Connect",
+                          "x": 32.5,
+                          "y": 6.5
+                        },
+                        {
+                          "name": "Pedal",
+                          "x": 31.5,
+                          "y": 94
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 27.5,
+                        "y": 50.5
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "RUpperArm",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0.1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 24576,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Upper Arm.png",
+                      "points": [
+                        {
+                          "name": "UConnect",
+                          "x": 58,
+                          "y": 16
+                        },
+                        {
+                          "name": "LConnect",
+                          "x": 10,
+                          "y": 18
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 32,
+                        "y": 17
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "LUpperArm",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0.1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 24576,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Upper Arm.png",
+                      "points": [
+                        {
+                          "name": "UConnect",
+                          "x": 58,
+                          "y": 16
+                        },
+                        {
+                          "name": "LConnect",
+                          "x": 10,
+                          "y": 18
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 32,
+                        "y": 17
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "RArm",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0.1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 24576,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Arm.png",
+                      "points": [
+                        {
+                          "name": "Connect",
+                          "x": 23,
+                          "y": 6.5
+                        },
+                        {
+                          "name": "Handlebar",
+                          "x": 12,
+                          "y": 86
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 23,
+                        "y": 4
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "LArm",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0.1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 24576,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Arm.png",
+                      "points": [
+                        {
+                          "name": "Connect",
+                          "x": 23,
+                          "y": 6.5
+                        },
+                        {
+                          "name": "Handlebar",
+                          "x": 12,
+                          "y": 85
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 23,
+                        "y": 4
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Head",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2Behavior",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Dynamic",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "density": 0.1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 24576,
+                "masks": 32768
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Head.png",
+                      "points": [
+                        {
+                          "name": "Connect",
+                          "x": 29,
+                          "y": 83.5
+                        }
+                      ],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 34,
+                        "y": 44.5
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Follow",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Follow",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "height": 1185,
+          "name": "Win",
+          "texture": "GFX\\Win.png",
+          "type": "TiledSpriteObject::TiledSprite",
+          "width": 100,
+          "variables": [],
+          "behaviors": []
+        },
+        {
+          "name": "Start",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "Start",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Start.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "Force",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Force : ",
+          "font": "",
+          "characterSize": 30,
+          "color": {
+            "b": 226,
+            "g": 144,
+            "r": 74
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "ForceStrength",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "",
+          "font": "",
+          "characterSize": 30,
+          "color": {
+            "b": 226,
+            "g": 144,
+            "r": 74
+          }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "Instructions",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Ride the bike to the finish and see if you can beat 35 seconds!\n\nForce must not exceed 9,000 and you must not land on your head or you will crash!\n\nUp to pedal forward, Down to pedal back, Space to brake, Left/Right to rotate\n\nEsc to reset scene.  Try to avoid big jumps as you will fall off the bike!",
+          "font": "",
+          "characterSize": 120,
+          "color": {
+            "b": 226,
+            "g": 144,
+            "r": 74
+          }
+        }
+      ],
+      "events": [
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": false,
+          "name": "Start and setup physics",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "maxSpeed",
+                    "=",
+                    "10000"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "bikeSpeed",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "speedLerp",
+                    "=",
+                    "0.18"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Bike Physics",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddWeldJoint"
+                      },
+                      "parameters": [
+                        "MainFrame",
+                        "Physics2Behavior",
+                        "MainFrame.X(Seat)",
+                        "MainFrame.Y(Seat)",
+                        "Seat",
+                        "Seat.X(Connect)",
+                        "Seat.Y(Connect)",
+                        "0",
+                        "30",
+                        "1",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "MainFrame",
+                        "Physics2Behavior",
+                        "MainFrame.X(Crank)",
+                        "MainFrame.Y(Crank)",
+                        "Crank",
+                        "Crank.X(Centre)",
+                        "Crank.Y(Centre)",
+                        "no",
+                        "0",
+                        "0",
+                        "0",
+                        "yes",
+                        "10",
+                        "20",
+                        "no",
+                        "crank"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddWheelJoint"
+                      },
+                      "parameters": [
+                        "MainFrame",
+                        "Physics2Behavior",
+                        "MainFrame.X(FrontWheelAxis)",
+                        "MainFrame.Y(FrontWheelAxis)",
+                        "FrontWheel",
+                        "FrontWheel.X(Centre)",
+                        "FrontWheel.Y(Centre)",
+                        "335",
+                        "14",
+                        "0.7",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddWheelJoint"
+                      },
+                      "parameters": [
+                        "MainFrame",
+                        "Physics2Behavior",
+                        "MainFrame.X(RearWheelAxis)",
+                        "MainFrame.Y(RearWheelAxis)",
+                        "BackWheel",
+                        "BackWheel.X(Centre)",
+                        "BackWheel.Y(Centre)",
+                        "90",
+                        "14",
+                        "0.7",
+                        "yes",
+                        "1",
+                        "400",
+                        "no",
+                        "rearJoint"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "RearSuspension",
+                        "Physics2Behavior",
+                        "RearSuspension.X(WheelAxis)",
+                        "RearSuspension.Y(WheelAxis)",
+                        "BackWheel",
+                        "BackWheel.X(Centre)",
+                        "BackWheel.Y(Centre)",
+                        "120",
+                        "12",
+                        "0.7",
+                        "yes",
+                        "1",
+                        "150",
+                        "no",
+                        "rearJoint",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "Crank",
+                        "Physics2Behavior",
+                        "Crank.X(RPedal)",
+                        "Crank.Y(RPedal)",
+                        "RPedal",
+                        "RPedal.X(Centre)",
+                        "RPedal.Y(Centre)",
+                        "120",
+                        "0",
+                        "0",
+                        "0",
+                        "1",
+                        "0",
+                        "0",
+                        "rearJoint",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "Crank",
+                        "Physics2Behavior",
+                        "Crank.X(LPedal)",
+                        "Crank.Y(LPedal)",
+                        "LPedal",
+                        "LPedal.X(Centre)",
+                        "LPedal.Y(Centre)",
+                        "120",
+                        "0",
+                        "0",
+                        "0",
+                        "1",
+                        "0",
+                        "0",
+                        "rearJoint",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "RagDoll",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "Torso",
+                        "Physics2Behavior",
+                        "Torso.X(SeatConnect)",
+                        "Torso.Y(SeatConnect)",
+                        "Seat",
+                        "Seat.X(UConnect)",
+                        "Seat.Y(UConnect)",
+                        "yes",
+                        "0",
+                        "-10",
+                        "10",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        "torsoForce"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "Torso",
+                        "Physics2Behavior",
+                        "Torso.X(UConnect)",
+                        "Torso.Y(UConnect)",
+                        "Head",
+                        "Head.X(Connect)",
+                        "Head.Y(Connect)",
+                        "yes",
+                        "0",
+                        "-20",
+                        "20",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        "headConn"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "Torso",
+                        "Physics2Behavior",
+                        "Torso.X(LConnect)",
+                        "Torso.Y(LConnect)",
+                        "RightThigh",
+                        "RightThigh.X(UConnect)",
+                        "RightThigh.Y(UConnect)",
+                        "no",
+                        "0",
+                        "100",
+                        "-45",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        "rightThigh"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "Torso",
+                        "Physics2Behavior",
+                        "Torso.X(LConnect)",
+                        "Torso.Y(LConnect)",
+                        "LeftThigh",
+                        "LeftThigh.X(UConnect)",
+                        "LeftThigh.Y(UConnect)",
+                        "no",
+                        "0",
+                        "100",
+                        "-45",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        "leftThigh"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "RightLeg",
+                        "Physics2Behavior",
+                        "RightLeg.X(Connect)",
+                        "RightLeg.Y(Connect)",
+                        "RightThigh",
+                        "RightThigh.X(LConnect)",
+                        "RightThigh.Y(LConnect)",
+                        "yes",
+                        "0",
+                        "-130",
+                        "0",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        "rightLeg"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "LeftLeg",
+                        "Physics2Behavior",
+                        "LeftLeg.X(Connect)",
+                        "LeftLeg.Y(Connect)",
+                        "LeftThigh",
+                        "LeftThigh.X(LConnect)",
+                        "LeftThigh.Y(LConnect)",
+                        "yes",
+                        "0",
+                        "-130",
+                        "0",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        "leftLeg"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "LeftLeg",
+                        "Physics2Behavior",
+                        "LeftLeg.X(Pedal)",
+                        "LeftLeg.Y(Pedal)",
+                        "LPedal",
+                        "LPedal.X(Center)",
+                        "LPedal.Y(Center)",
+                        "no",
+                        "0",
+                        "-10",
+                        "10",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        "ragdollLpedal"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "RightLeg",
+                        "Physics2Behavior",
+                        "RightLeg.X(Pedal)",
+                        "RightLeg.Y(Pedal)",
+                        "RPedal",
+                        "RPedal.X(Center)",
+                        "RPedal.Y(Center)",
+                        "no",
+                        "0",
+                        "-10",
+                        "10",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        "ragdollRpedal"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "Torso",
+                        "Physics2Behavior",
+                        "Torso.X(ArmConnect)",
+                        "Torso.Y(ArmConnect)",
+                        "LUpperArm",
+                        "LUpperArm.X(UConnect)",
+                        "LUpperArm.Y(UConnect)",
+                        "no",
+                        "",
+                        "",
+                        "",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "Torso",
+                        "Physics2Behavior",
+                        "Torso.X(ArmConnect)",
+                        "Torso.Y(ArmConnect)",
+                        "RUpperArm",
+                        "RUpperArm.X(UConnect)",
+                        "RUpperArm.Y(UConnect)",
+                        "no",
+                        "",
+                        "",
+                        "",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "RArm",
+                        "Physics2Behavior",
+                        "RArm.X(Connect)",
+                        "RArm.Y(Connect)",
+                        "RUpperArm",
+                        "RUpperArm.X(LConnect)",
+                        "RUpperArm.Y(LConnect)",
+                        "yes",
+                        "0",
+                        "-40",
+                        "85",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "LArm",
+                        "Physics2Behavior",
+                        "LArm.X(Connect)",
+                        "LArm.Y(Connect)",
+                        "LUpperArm",
+                        "LUpperArm.X(LConnect)",
+                        "LUpperArm.Y(LConnect)",
+                        "yes",
+                        "0",
+                        "-40",
+                        "85",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "LArm",
+                        "Physics2Behavior",
+                        "LArm.X(Handlebar)",
+                        "LArm.Y(Handlebar)",
+                        "MainFrame",
+                        "MainFrame.X(Hands)",
+                        "MainFrame.Y(Hands)",
+                        "no",
+                        "",
+                        "",
+                        "",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        "ragdollLhand"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::AddRevoluteJointBetweenTwoBodies"
+                      },
+                      "parameters": [
+                        "RArm",
+                        "Physics2Behavior",
+                        "RArm.X(Handlebar)",
+                        "RArm.Y(Handlebar)",
+                        "MainFrame",
+                        "MainFrame.X(Hands)",
+                        "MainFrame.Y(Hands)",
+                        "no",
+                        "",
+                        "",
+                        "",
+                        "no",
+                        "",
+                        "",
+                        "no",
+                        "ragdollRhand"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [],
+                  "events": []
+                }
+              ]
+            }
+          ],
+          "parameters": []
+        },
+        {
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "disabled": false,
+          "folded": false,
+          "name": "Main Game",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Move Front suspension and crank to match physics.",
+              "comment2": ""
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreXY"
+                  },
+                  "parameters": [
+                    "FrontSuspensionBottom",
+                    "=",
+                    "FrontWheel.X()",
+                    "=",
+                    "FrontWheel.Y()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "FrontSuspensionBottom",
+                    "=",
+                    "MainFrame.Angle()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetAngle"
+                  },
+                  "parameters": [
+                    "RearSuspension",
+                    "=",
+                    "MainFrame.Angle()"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Physics2::RevoluteJointMotorSpeed"
+                  },
+                  "parameters": [
+                    "Crank",
+                    "Physics2Behavior",
+                    "Variable(crank)",
+                    "=",
+                    "Variable(bikeSpeed)/8"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": false,
+              "name": "Calculate and Display Forces",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Toujours"
+                      },
+                      "parameters": [
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "seatForce",
+                        "=",
+                        "Torso.Physics2Behavior::JointReactionForce(Variable(torsoForce))"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "seatForce",
+                        ">",
+                        "Variable(maxForce)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "maxForce",
+                        "=",
+                        "Variable(seatForce)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "ForceStrength",
+                        "=",
+                        "ToString(floor(Variable(maxForce)))"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": false,
+              "name": "Force too great - Break joints",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [],
+              "parameters": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "seatForce",
+                    ">",
+                    "9000"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Unattach RagDoll from Bike",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "Seat",
+                        "Physics2Behavior",
+                        "Variable(torsoForce)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "RightLeg",
+                        "Physics2Behavior",
+                        "Variable(ragdollRpedal)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "LeftLeg",
+                        "Physics2Behavior",
+                        "Variable(ragdollLpedal)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "RArm",
+                        "Physics2Behavior",
+                        "Variable(ragdollRhand)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "LArm",
+                        "Physics2Behavior",
+                        "Variable(ragdollLhand)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Restrain Ragdoll joints",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::EnableRevoluteJointLimits"
+                      },
+                      "parameters": [
+                        "RightThigh",
+                        "Physics2Behavior",
+                        "Variable(rightThigh)",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::EnableRevoluteJointLimits"
+                      },
+                      "parameters": [
+                        "LeftThigh",
+                        "Physics2Behavior",
+                        "Variable(leftThigh)",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::EnableRevoluteJointLimits"
+                      },
+                      "parameters": [
+                        "LeftLeg",
+                        "Physics2Behavior",
+                        "Variable(leftLeg)",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::EnableRevoluteJointLimits"
+                      },
+                      "parameters": [
+                        "RightLeg",
+                        "Physics2Behavior",
+                        "Variable(rightLeg)",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": false,
+              "name": "We crashed",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [],
+              "parameters": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CollisionNP"
+                  },
+                  "parameters": [
+                    "Head",
+                    "floor",
+                    "floor",
+                    "",
+                    "yes"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Unattach RagDoll from Bike",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "Seat",
+                        "Physics2Behavior",
+                        "Variable(torsoForce)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "RightLeg",
+                        "Physics2Behavior",
+                        "Variable(ragdollRpedal)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "LeftLeg",
+                        "Physics2Behavior",
+                        "Variable(ragdollLpedal)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "RArm",
+                        "Physics2Behavior",
+                        "Variable(ragdollRhand)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "LArm",
+                        "Physics2Behavior",
+                        "Variable(ragdollLhand)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::Remove joint"
+                      },
+                      "parameters": [
+                        "Torso",
+                        "Physics2Behavior",
+                        "Variable(headcoll)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Restrain Ragdoll joints",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::EnableRevoluteJointLimits"
+                      },
+                      "parameters": [
+                        "RightThigh",
+                        "Physics2Behavior",
+                        "Variable(rightThigh)",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::EnableRevoluteJointLimits"
+                      },
+                      "parameters": [
+                        "LeftThigh",
+                        "Physics2Behavior",
+                        "Variable(leftThigh)",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::EnableRevoluteJointLimits"
+                      },
+                      "parameters": [
+                        "LeftLeg",
+                        "Physics2Behavior",
+                        "Variable(leftLeg)",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::EnableRevoluteJointLimits"
+                      },
+                      "parameters": [
+                        "RightLeg",
+                        "Physics2Behavior",
+                        "Variable(rightLeg)",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [],
+              "events": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": false,
+              "name": "Handle Input",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Set Accel variable to 0 to detect if we get any pedal input",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Toujours"
+                      },
+                      "parameters": [
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "Accel",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Pedalling Forward?",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "bikeSpeed",
+                        "<",
+                        "Variable(maxSpeed)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Up"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "bikeSpeed",
+                            "+",
+                            "300"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Physics2::EnableWheelJointMotor"
+                          },
+                          "parameters": [
+                            "BackWheel",
+                            "Physics2Behavior",
+                            "Variable(rearJoint)",
+                            "yes"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Physics2::WheelJointMaxMotorTorque"
+                          },
+                          "parameters": [
+                            "BackWheel",
+                            "Physics2Behavior",
+                            "Variable(rearJoint)",
+                            "=",
+                            "3500"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "Accel",
+                            "=",
+                            "1"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Pedalling Backward?",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "bikeSpeed",
+                        ">",
+                        "-500"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Down"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "bikeSpeed",
+                            "-",
+                            "100"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Physics2::EnableWheelJointMotor"
+                          },
+                          "parameters": [
+                            "BackWheel",
+                            "Physics2Behavior",
+                            "Variable(rearJoint)",
+                            "yes"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "Physics2::WheelJointMaxMotorTorque"
+                          },
+                          "parameters": [
+                            "BackWheel",
+                            "Physics2Behavior",
+                            "Variable(rearJoint)",
+                            "=",
+                            "800"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "Accel",
+                            "=",
+                            "1"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "This fires if you're not accelerating - Sets the speed to 0 and disables motor (Freewheel)",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "Accel",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "bikeSpeed",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::EnableWheelJointMotor"
+                      },
+                      "parameters": [
+                        "BackWheel",
+                        "Physics2Behavior",
+                        "Variable(rearJoint)",
+                        "no"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Brake",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Space"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::EnableWheelJointMotor"
+                      },
+                      "parameters": [
+                        "BackWheel",
+                        "Physics2Behavior",
+                        "Variable(rearJoint)",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "bikeSpeed",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::WheelJointMaxMotorTorque"
+                      },
+                      "parameters": [
+                        "BackWheel",
+                        "Physics2Behavior",
+                        "Variable(rearJoint)",
+                        "=",
+                        "10000"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::WheelJointMotorSpeed"
+                      },
+                      "parameters": [
+                        "BackWheel",
+                        "Physics2Behavior",
+                        "Variable(rearJoint)",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Handle Bike Rotation",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Right"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::ApplyTorque"
+                      },
+                      "parameters": [
+                        "MainFrame",
+                        "Physics2Behavior",
+                        "3000"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::ApplyTorque"
+                      },
+                      "parameters": [
+                        "MainFrame",
+                        "Physics2Behavior",
+                        "-3000"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Physics2::WheelJointMotorSpeed"
+                      },
+                      "parameters": [
+                        "BackWheel",
+                        "Physics2Behavior",
+                        "Variable(rearJoint)",
+                        "=",
+                        "Variable(bikeSpeed)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "KeyPressed"
+                      },
+                      "parameters": [
+                        "",
+                        "Escape"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Scene"
+                      },
+                      "parameters": [
+                        "Elapsed",
+                        "\"Downhill Bike Demo\"",
+                        "VariableString(bikeSpeed)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": false,
+              "name": "Handle Camera",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Find how high above the ground we are?  and zoom camera in/out depending on height.",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "Raycast"
+                      },
+                      "parameters": [
+                        "ground",
+                        "Torso.X(Center)",
+                        "Torso.Y(Center)",
+                        "90",
+                        "5000",
+                        "dummy",
+                        "height",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "clearance",
+                        "=",
+                        "(Variable(height)-(Torso.Y()-400))"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ZoomCamera"
+                      },
+                      "parameters": [
+                        "",
+                        "(200/Variable(clearance))\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Smooth follow camera",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Toujours"
+                      },
+                      "parameters": [
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "followX",
+                        "=",
+                        "lerp(Follow.X(), Torso.X(), Variable(speedLerp))"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "followY",
+                        "=",
+                        "lerp(Follow.Y(), Torso.Y(), Variable(speedLerp))"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "MettreXY"
+                          },
+                          "parameters": [
+                            "Follow",
+                            "=",
+                            "Variable(followX)",
+                            "=",
+                            "Variable(followY)"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "CentreCamera"
+                          },
+                          "parameters": [
+                            "",
+                            "Follow",
+                            "yes",
+                            "",
+                            ""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                }
+              ],
+              "parameters": []
+            },
+            {
+              "colorB": 228,
+              "colorG": 176,
+              "colorR": 74,
+              "creationTime": 0,
+              "disabled": false,
+              "folded": false,
+              "name": "Timing",
+              "source": "",
+              "type": "BuiltinCommonInstructions::Group",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "FrontWheel",
+                        "Start",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ResetTimer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"elapsedTimer\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "finished",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "myElapsed",
+                        "=",
+                        "TimerElapsedTime(\"elapsedTimer\")"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarSceneTxt"
+                      },
+                      "parameters": [
+                        "myElapsed",
+                        "=",
+                        "SubStr(ToString(Variable(myElapsed)), 0, 5)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "Elapsed",
+                        "=",
+                        "VariableString(myElapsed)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CollisionNP"
+                      },
+                      "parameters": [
+                        "FrontWheel",
+                        "Win",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "finished",
+                        "=",
+                        "TimerElapsedTime(\"elapsedTimer\")"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarSceneTxt"
+                      },
+                      "parameters": [
+                        "finished",
+                        "=",
+                        "SubStr(ToString(Variable(myElapsed)), 0, 5)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "TextObject::String"
+                      },
+                      "parameters": [
+                        "Elapsed",
+                        "=",
+                        "VariableString(finished)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [],
+                  "events": []
+                }
+              ],
+              "parameters": []
+            }
+          ],
+          "parameters": []
+        }
+      ],
+      "layers": [
+        {
+          "name": "",
+          "visibility": true,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        },
+        {
+          "name": "GUI",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        }
+      ],
+      "behaviorsSharedData": [
+        {
+          "name": "Physics2Behavior",
+          "type": "Physics2::Physics2Behavior",
+          "content": {
+            "gravityX": 0,
+            "gravityY": 9.8,
+            "scaleX": 100,
+            "scaleY": 100
+          }
+        }
+      ]
+    }
+  ],
+  "externalEvents": [],
+  "eventsFunctionsExtensions": [],
+  "externalLayouts": [],
+  "externalSourceFiles": []
+}

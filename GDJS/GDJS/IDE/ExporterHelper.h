@@ -11,16 +11,10 @@
 #include "GDCore/IDE/ProjectExporter.h"
 namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class ExternalLayout;
-}
-namespace gd {
 class AbstractFileSystem;
-}
+}  // namespace gd
 class wxProgressDialog;
 
 namespace gdjs {
@@ -209,6 +203,16 @@ class ExporterHelper {
    * \param exportDir The directory where the files must be created.
    */
   bool ExportElectronFiles(const gd::Project &project, gd::String exportDir);
+
+  /**
+   * \brief Generate the Facebook Instant Games files for packaging and save it
+   * to the export directory.
+   *
+   * \param project The project to be used to generate the files.
+   * \param exportDir The directory where the files must be created.
+   */
+  bool ExportFacebookInstantGamesFiles(const gd::Project &project,
+                                       gd::String exportDir);
 
   /**
    * \brief Launch all export methods to generate a complete, stand-alone game

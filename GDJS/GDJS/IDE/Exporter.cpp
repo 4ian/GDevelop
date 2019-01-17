@@ -195,6 +195,11 @@ bool Exporter::ExportWholePixiProject(
     if (!exportProject(exportDir + "/app")) return false;
 
     if (!helper.ExportElectronFiles(exportedProject, exportDir)) return false;
+  } else if (exportOptions["exportForFacebookInstantGames"]) {
+    if (!exportProject(exportDir)) return false;
+
+    if (!helper.ExportFacebookInstantGamesFiles(exportedProject, exportDir))
+      return false;
   } else {
     if (!exportProject(exportDir)) return false;
   }

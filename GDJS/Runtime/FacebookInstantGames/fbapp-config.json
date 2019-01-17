@@ -1,0 +1,17 @@
+{
+    "instant_games": {
+      "custom_update_templates": {
+      },
+      "bot": {
+        "subscription_type": "OPT_IN_DEV"
+      },
+      "surfaceable_stats": {
+      },
+      "orientation": "GDJS_ORIENTATION",
+      "navigation_menu_version": "NAV_BAR",
+      "match_player_config": {
+        "min_context_size": 2,
+        "max_context_size": 20
+      }
+    }
+  }

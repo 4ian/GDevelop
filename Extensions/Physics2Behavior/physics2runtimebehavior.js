@@ -1508,7 +1508,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addRevoluteJoint = function(
   jointDef.set_lowerAngle(gdjs.toRad(lowerAngle));
   jointDef.set_upperAngle(gdjs.toRad(upperAngle));
   jointDef.set_enableMotor(enableMotor);
-  jointDef.set_motorSpeed(motorSpeed);
+  jointDef.set_motorSpeed(gdjs.toRad(motorSpeed));
   jointDef.set_maxMotorTorque(maxMotorTorque >= 0 ? maxMotorTorque : 0);
   jointDef.set_collideConnected(false);
   // Create the joint and get the id
@@ -1577,7 +1577,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addRevoluteJointBetweenTwoBodies = functi
   jointDef.set_lowerAngle(gdjs.toRad(lowerAngle));
   jointDef.set_upperAngle(gdjs.toRad(upperAngle));
   jointDef.set_enableMotor(enableMotor);
-  jointDef.set_motorSpeed(motorSpeed);
+  jointDef.set_motorSpeed(gdjs.toRad(motorSpeed));
   jointDef.set_maxMotorTorque(maxMotorTorque >= 0 ? maxMotorTorque : 0);
   jointDef.set_collideConnected(collideConnected);
   // Create the joint and get the id
@@ -1836,7 +1836,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addPrismaticJoint = function(
     upperTranslation > 0 ? upperTranslation * this._sharedData.invScaleX : 0
   );
   jointDef.set_enableMotor(enableMotor);
-  jointDef.set_motorSpeed(motorSpeed);
+  jointDef.set_motorSpeed(motorSpeed * this._sharedData.invScaleX);
   jointDef.set_maxMotorForce(maxMotorForce);
   jointDef.set_collideConnected(collideConnected);
   // Create the joint and get the id
@@ -2502,7 +2502,7 @@ gdjs.Physics2RuntimeBehavior.prototype.addWheelJoint = function(
   jointDef.set_frequencyHz(frequency > 0 ? frequency : 1);
   jointDef.set_dampingRatio(dampingRatio >= 0 ? dampingRatio : 0);
   jointDef.set_enableMotor(enableMotor);
-  jointDef.set_motorSpeed(motorSpeed);
+  jointDef.set_motorSpeed(gdjs.toRad(motorSpeed));
   jointDef.set_maxMotorTorque(maxMotorTorque);
   jointDef.set_collideConnected(collideConnected);
   // Create the joint and get the id
@@ -2547,7 +2547,7 @@ gdjs.Physics2RuntimeBehavior.prototype.getWheelJointSpeed = function(jointId) {
   // Joint not found or has wrong type
   if (joint === null || joint.GetType() !== Box2D.e_wheelJoint) return 0;
   // Get the joint speed
-  return joint.GetJointSpeed() * this._sharedData.scaleX;
+  return gdjs.toDegrees(joint.GetJointSpeed());
 };
 
 gdjs.Physics2RuntimeBehavior.prototype.isWheelJointMotorEnabled = function(

@@ -372,6 +372,25 @@ bool ExporterHelper::ExportCocos2dFiles(
   return true;
 }
 
+bool ExporterHelper::ExportFacebookInstantGamesFiles(const gd::Project &project,
+                                                     gd::String exportDir) {
+  {
+    gd::String str =
+        fs.ReadFile(gdjsRoot +
+                    "/Runtime/FacebookInstantGames/fbapp-config.json")
+            .FindAndReplace("\"GDJS_ORIENTATION\"",
+                            project.GetOrientation() == "portrait"
+                                ? "\"PORTRAIT\""
+                                : "\"LANDSCAPE\"");
+
+    if (!fs.WriteToFile(exportDir + "/fbapp-config.json", str)) {
+      lastError =
+          "Unable to write Facebook Instant Games fbapp-config.json file.";
+      return false;
+    }
+  }
+}
+
 bool ExporterHelper::ExportElectronFiles(const gd::Project &project,
                                          gd::String exportDir) {
   gd::String jsonName =

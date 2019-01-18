@@ -88,7 +88,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           hiddenAlertMessages: {
-            ...state.hiddenAlertMessages,
+            ...state.values.hiddenAlertMessages,
             [identifier]: !show,
           },
         },

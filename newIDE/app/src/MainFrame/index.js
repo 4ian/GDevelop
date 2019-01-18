@@ -516,8 +516,10 @@ export default class MainFrame extends React.Component<Props, State> {
   renameLayout = (oldName: string, newName: string) => {
     const { currentProject } = this.state;
     if (!currentProject) return;
-
-    if (currentProject.hasLayoutNamed(oldName)) {
+    
+    if (!currentProject.hasLayoutNamed(oldName)) return;
+    
+    if (currentProject.hasLayoutNamed(newName)) {
       showWarningBox('Another scene with this name already exists.');
       return;
     };
@@ -538,7 +540,9 @@ export default class MainFrame extends React.Component<Props, State> {
     const { currentProject } = this.state;
     if (!currentProject) return;
 
-    if (currentProject.hasExternalLayoutNamed(oldName)) {
+    if (!currentProject.hasExternalLayoutNamed(oldName)) return;
+    
+    if (currentProject.hasExternalLayoutNamed(newName)) {
       showWarningBox('Another external layout with this name already exists.');
       return;
     };
@@ -562,8 +566,10 @@ export default class MainFrame extends React.Component<Props, State> {
     const { currentProject } = this.state;
     if (!currentProject) return;
 
-    if (currentProject.hasExternalEventsNamed(oldName)) {
-      showWarningBox('Another external event with this name already exists.');
+    if (!currentProject.hasExternalEventsNamed(oldName)) return;
+    
+    if (currentProject.hasExternalEventsNamed(newName)) {
+      showWarningBox('Other external events with this name already exist.');
       return;
     };
 

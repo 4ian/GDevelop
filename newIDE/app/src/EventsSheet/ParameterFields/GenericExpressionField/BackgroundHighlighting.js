@@ -5,7 +5,7 @@ export type Highlight = {|
   begin: number,
   end: number,
   type?: 'error',
-  message?: string,
+  message: string,
 |};
 
 type Props = {|

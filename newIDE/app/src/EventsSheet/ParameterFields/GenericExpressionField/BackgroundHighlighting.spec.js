@@ -15,6 +15,7 @@ describe('BackgroundHighlighting', () => {
               begin: 0,
               end: 5,
               type: 'error',
+              message: 'test highlight 1',
             },
           ]}
         />
@@ -33,6 +34,7 @@ describe('BackgroundHighlighting', () => {
               begin: 5,
               end: 20,
               type: 'error',
+              message: 'test highlight 1',
             },
           ]}
         />
@@ -51,11 +53,13 @@ describe('BackgroundHighlighting', () => {
               begin: 2,
               end: 7,
               type: 'error',
+              message: 'test highlight 1',
             },
             {
               begin: 1,
               end: 4,
               type: 'error',
+              message: 'test highlight 2',
             },
           ]}
         />
@@ -74,26 +78,31 @@ describe('BackgroundHighlighting', () => {
               begin: 2,
               end: 7,
               type: 'error',
+              message: 'test highlight 1',
             },
             {
               begin: 1,
               end: 4,
               type: 'error',
+              message: 'test highlight 2',
             },
             {
               begin: 1,
               end: 9,
               type: 'error',
+              message: 'test highlight 3',
             },
             {
               begin: 7,
               end: 15,
               type: 'error',
+              message: 'test highlight 4',
             },
             {
               begin: 9,
               end: 12,
               type: 'error',
+              message: 'test highlight 5',
             },
           ]}
         />

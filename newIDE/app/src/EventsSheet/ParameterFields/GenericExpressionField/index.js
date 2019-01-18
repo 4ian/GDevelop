@@ -209,7 +209,7 @@ export default class ExpressionField extends React.Component<Props, State> {
     expressionNode.visit(expressionValidator);
     const errors = expressionValidator.getErrors();
 
-    const errorHighlights = mapVector(errors, error => ({
+    const errorHighlights: Array<Highlight> = mapVector(errors, error => ({
       begin: error.getStartPosition(),
       end: error.getEndPosition() + 1,
       message: error.getMessage(),

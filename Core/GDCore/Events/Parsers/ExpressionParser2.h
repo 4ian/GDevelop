@@ -708,7 +708,7 @@ class GD_CORE_API ExpressionParser2 {
     if (type == "number") {
       message = _("You must enter a number or a valid expression call.");
     } else if (type == "string") {
-      message = _("You must enter a text or a valid expression call.");
+      message = _("You must enter a text (between quotes) or a valid expression call.");
     } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
       message = _("You must enter a variable name.");
     } else if (type == "identifier") {

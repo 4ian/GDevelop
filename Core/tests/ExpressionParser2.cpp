@@ -52,8 +52,9 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       gd::ExpressionValidator validator;
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 1);
-      REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "You must enter a text or a valid expression call.");
+      REQUIRE(
+          validator.GetErrors()[0]->GetMessage() ==
+          "You must enter a text (between quotes) or a valid expression call.");
     }
     {
       auto node = parser.ParseExpression("string", "abcd");
@@ -181,6 +182,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors()[1]->GetMessage() ==
               "This parameter was not expected by this expression. Remove it "
               "or verify that you've entered the proper expression name.");
+    }
+    {
+      auto node = parser.ParseExpression("string", "=\"test\"");
+      REQUIRE(node != nullptr);
+
+      gd::ExpressionValidator validator;
+      node->Visit(validator);
+      REQUIRE(validator.GetErrors().size() == 1);
+      REQUIRE(
+          validator.GetErrors()[0]->GetMessage() ==
+          "You must enter a text (between quotes) or a valid expression call.");
     }
   }
 

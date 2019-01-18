@@ -22,9 +22,10 @@ type Props = {|
  */
 export default class Providers extends React.Component<Props, *> {
   render() {
+    const { cmdArguments } = this.props;
     return (
       <DragDropContextProvider>
-        <PreferencesProvider>
+        <PreferencesProvider cmdArguments={cmdArguments}>
           <PreferencesContext.Consumer>
             {({ values }) => (
               <MuiThemeProvider muiTheme={getTheme(values.themeName)}>

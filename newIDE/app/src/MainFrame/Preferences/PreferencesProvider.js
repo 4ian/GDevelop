@@ -73,7 +73,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     // Checking for updates is only done on Electron.
     // Note: This could be abstracted away later if other updates mechanisms
     // should be supported.
-    if (!ipcRenderer) return;
+    const { cmdArguments } = this.props;
+    if (!ipcRenderer || cmdArguments['disable-update-check']) return;
 
     if (!!forceDownload || this.state.values.autoDownloadUpdates) {
       ipcRenderer.send('updates-check-and-download');

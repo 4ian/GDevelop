@@ -1145,6 +1145,7 @@ export default class MainFrame extends React.Component<Props, State> {
       authentification,
       previewLauncher,
       resourceExternalEditors,
+      cmdArguments,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1152,7 +1153,10 @@ export default class MainFrame extends React.Component<Props, State> {
       this.props.loading;
 
     return (
-      <Providers authentification={authentification}>
+      <Providers
+        authentification={authentification}
+        cmdArguments={cmdArguments}
+      >
         <div className="main-frame">
           <ProjectTitlebar project={currentProject} />
           <Drawer

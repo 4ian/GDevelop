@@ -72,6 +72,7 @@ export const create = (authentification: Authentification) => {
             filterExamples: !Window.isDev(),
           })}
           initialPathsOrURLsToOpen={appArguments['_']}
+          cmdArguments={appArguments}
           eventsFunctionWriter={makeLocalEventsFunctionWriter()}
         />
       </ElectronEventsBridge>

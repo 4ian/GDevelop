@@ -1,3 +1,4 @@
+// @flow
 import createReactContext, { type Context } from 'create-react-context';
 
 export type AlertMessageIdentifier =

@@ -520,6 +520,11 @@ export default class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasLayoutNamed(oldName)) return;
 
+    if (currentProject.hasLayoutNamed(newName)) {
+      showWarningBox('Another scene with this name already exists.');
+      return;
+    }
+
     const layout = currentProject.getLayout(oldName);
     this.setState(
       {
@@ -537,6 +542,11 @@ export default class MainFrame extends React.Component<Props, State> {
     if (!currentProject) return;
 
     if (!currentProject.hasExternalLayoutNamed(oldName)) return;
+
+    if (currentProject.hasExternalLayoutNamed(newName)) {
+      showWarningBox('Another external layout with this name already exists.');
+      return;
+    }
 
     const externalLayout = currentProject.getExternalLayout(oldName);
     this.setState(
@@ -559,6 +569,11 @@ export default class MainFrame extends React.Component<Props, State> {
 
     if (!currentProject.hasExternalEventsNamed(oldName)) return;
 
+    if (currentProject.hasExternalEventsNamed(newName)) {
+      showWarningBox('Other external events with this name already exist.');
+      return;
+    }
+
     const externalEvents = currentProject.getExternalEvents(oldName);
     this.setState(
       {
@@ -580,6 +595,12 @@ export default class MainFrame extends React.Component<Props, State> {
     if (!currentProject) return;
 
     if (!currentProject.hasEventsFunctionsExtensionNamed(oldName)) return;
+
+    if (currentProject.hasEventsFunctionsExtensionNamed(newName)) {
+      showWarningBox('Another extension with this name already exists.');
+      return;
+    }
+
     if (!gd.Project.validateObjectName(newName)) {
       showWarningBox(
         'This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your extension name.'

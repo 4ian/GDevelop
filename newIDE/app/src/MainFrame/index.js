@@ -130,6 +130,7 @@ type Props = {
   extensionsLoader?: JsExtensionsLoader,
   initialPathsOrURLsToOpen: ?Array<string>,
   eventsFunctionWriter?: EventsFunctionWriter,
+  disableCheckForUpdates: boolean,
 };
 
 export default class MainFrame extends React.Component<Props, State> {
@@ -1145,6 +1146,7 @@ export default class MainFrame extends React.Component<Props, State> {
       authentification,
       previewLauncher,
       resourceExternalEditors,
+      disableCheckForUpdates,
     } = this.props;
     const showLoader =
       this.state.loadingProject ||
@@ -1152,7 +1154,10 @@ export default class MainFrame extends React.Component<Props, State> {
       this.props.loading;
 
     return (
-      <Providers authentification={authentification}>
+      <Providers
+        authentification={authentification}
+        disableCheckForUpdates={disableCheckForUpdates}
+      >
         <div className="main-frame">
           <ProjectTitlebar project={currentProject} />
           <Drawer

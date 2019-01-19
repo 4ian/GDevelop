@@ -76,6 +76,7 @@ import {
 } from './UpdaterTools';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import EmptyMessage from '../UI/EmptyMessage';
+import { unserializeFromJSObject } from '../Utils/Serializer';
 
 const gd = global.gd;
 
@@ -934,6 +935,15 @@ export default class MainFrame extends React.Component<Props, State> {
 
   save = () => {
     if (!this.state.currentProject) return;
+
+    /// Iterate through each opened scene tab and store its settings
+    this.state.editorTabs.editors.forEach(editor => {
+      if (editor.editorRef.constructor.name === 'SceneEditorContainer') {
+        const uiSettings = editor.editorRef.getSerializedElements().uiSettings;
+        const layout = editor.editorRef.getLayout();
+        unserializeFromJSObject(layout.getAssociatedSettings(), uiSettings);
+      }
+    });
 
     if (this.props.saveDialog) {
       this._openSaveDialog();

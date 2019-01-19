@@ -61,7 +61,7 @@ module.exports = {
 
     extension
       .addAction(
-        "SaveTextToFile",
+        "SaveStringToFile",
         t("Save a text into a file"),
         t("Save a text into a file."),
         t("Save _PARAM0_ into file _PARAM1_"),
@@ -69,13 +69,30 @@ module.exports = {
         "JsPlatform/Extensions/filesystem_save_file24.png",
         "JsPlatform/Extensions/filesystem_save_file32.png"
       )
-      .addParameter("string", t("Text"), "", false)
+      .addParameter("string", t("String (text)"), "", false)
       .addParameter("string", t("Save path"), "", false)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
       )
-      .setFunctionName("gdjs.fileSystem.saveTextToFile");
+      .setFunctionName("gdjs.fileSystem.saveStringToFile");
+
+    extension
+      .addAction(
+        "DeleteFile",
+        t("Delete a file"),
+        t("Delete a file from the filesystem."),
+        t("Delete the file _PARAM0_"),
+        t("Filesystem/Windows, Linux, MacOS"),
+        "JsPlatform/Extensions/filesystem_delete_file24.png",
+        "JsPlatform/Extensions/filesystem_delete_file32.png"
+      )
+      .addParameter("string", t("File path"), "", false)
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/FileSystem/filesystemtools.js"
+      )
+      .setFunctionName("gdjs.fileSystem.deleteFile");
 
     extension
       .addStrExpression(

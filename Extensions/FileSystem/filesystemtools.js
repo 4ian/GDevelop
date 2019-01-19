@@ -126,18 +126,36 @@ gdjs.fileSystem.makeDirectory = function (directory) {
 
 /**
  * Save a string into a file.
- * @param {string} text The text string to be saved
+ * @param {string} text The string to be saved
  * @param {string} savePath The absolute path on the filesystem
  */
-gdjs.fileSystem.saveTextToFile = function (text, savePath) {
+gdjs.fileSystem.saveStringToFile = function (text, savePath) {
   const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
 
   if (fileSystem) {
     fileSystem.writeFile(savePath, text, (err) => {
       if (err) {
-        console.error("Unable to save the text to path: '" + savePath + "' " + err);
+        console.error("Unable to save the text to path: '" + savePath + "': ", err);
       }
     });
+  }
+}
+
+/**
+ * Delete a file from the filesystem.
+ * @param {string} filePath The absolute path on the filesystem
+ */
+gdjs.fileSystem.deleteFile = function (filePath) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+
+  if (fileSystem) {
+    if (fileSystem.existsSync(filePath)) {
+      fileSystem.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Unable to delete the file: '" + filePath + "': ", err);
+        }
+      });
+    }
   }
 }
 

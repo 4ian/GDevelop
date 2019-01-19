@@ -13,6 +13,7 @@ const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 type Props = {|
   children: React.Node,
+  disableCheckForUpdates: boolean,
 |};
 
 type State = Preferences;
@@ -73,8 +74,8 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     // Checking for updates is only done on Electron.
     // Note: This could be abstracted away later if other updates mechanisms
     // should be supported.
-    const { cmdArguments } = this.props;
-    if (!ipcRenderer || cmdArguments['disable-update-check']) return;
+    const { disableCheckForUpdates } = this.props;
+    if (!ipcRenderer || disableCheckForUpdates) return;
 
     if (!!forceDownload || this.state.values.autoDownloadUpdates) {
       ipcRenderer.send('updates-check-and-download');

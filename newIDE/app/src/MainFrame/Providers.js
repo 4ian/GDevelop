@@ -14,6 +14,7 @@ import PreferencesContext from './Preferences/PreferencesContext';
 type Props = {|
   authentification: Authentification,
   children: React$Element<*>,
+  disableCheckForUpdates: boolean,
 |};
 
 /**
@@ -22,18 +23,16 @@ type Props = {|
  */
 export default class Providers extends React.Component<Props, *> {
   render() {
-    const { cmdArguments } = this.props;
+    const { disableCheckForUpdates, authentification, children } = this.props;
     return (
       <DragDropContextProvider>
-        <PreferencesProvider cmdArguments={cmdArguments}>
+        <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
           <PreferencesContext.Consumer>
             {({ values }) => (
               <MuiThemeProvider muiTheme={getTheme(values.themeName)}>
                 <I18nextProvider i18n={i18n}>
-                  <UserProfileProvider
-                    authentification={this.props.authentification}
-                  >
-                    {this.props.children}
+                  <UserProfileProvider authentification={authentification}>
+                    {children}
                   </UserProfileProvider>
                 </I18nextProvider>
               </MuiThemeProvider>

@@ -44,6 +44,7 @@ export const create = (authentification: Authentification) => {
           onReadFromPathOrURL={() => Promise.reject('Should never be called')}
           resourceExternalEditors={localResourceExternalEditors}
           initialPathsOrURLsToOpen={[]}
+          disableCheckForUpdates={!!appArguments['disable-update-check']}
         />
       </ExternalEditor>
     );
@@ -72,7 +73,7 @@ export const create = (authentification: Authentification) => {
             filterExamples: !Window.isDev(),
           })}
           initialPathsOrURLsToOpen={appArguments['_']}
-          cmdArguments={appArguments}
+          disableCheckForUpdates={!!appArguments['disable-update-check']}
           eventsFunctionWriter={makeLocalEventsFunctionWriter()}
         />
       </ElectronEventsBridge>

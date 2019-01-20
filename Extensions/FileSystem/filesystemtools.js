@@ -142,6 +142,52 @@ gdjs.fileSystem.saveStringToFile = function (text, savePath) {
 }
 
 /**
+ * Load a string from a file into a scene variable.
+ * @param {scenevar} scenevar The scene variable to store the string
+ * @param {string} loadPath The absolute path on the filesystem
+ */
+gdjs.fileSystem.loadStringFromFileSync = function (scenevar, loadPath) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+
+  if (fileSystem) {
+    if (fileSystem.existsSync(loadPath)) {
+      try {
+        const data = fileSystem.readFileSync(loadPath, 'utf8');
+
+        if (data) {
+          scenevar.setString(data);
+        }
+      }
+      catch (err) {
+        console.error("Unable to load the file at path: '" + loadPath + "': ", err);
+      }
+    }
+  }
+}
+
+/**
+ * Load a string from a file into a scene variable asyncrounousely.
+ * @param {scenevar} scenevar The scene variable to store the string
+ * @param {string} loadPath The absolute path on the filesystem
+ */
+gdjs.fileSystem.loadStringFromFileAsync = function (scenevar, loadPath) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+
+  if (fileSystem) {
+    if (fileSystem.existsSync(loadPath)) {
+      fileSystem.readFile(loadPath, 'utf8', (err, data) => {
+        if (err) {
+          console.error("Unable to load the file at path: '" + loadPath + "': ", err);
+        }
+        if (data) {
+          scenevar.setString(data);
+        }
+      });
+    }
+  }
+}
+
+/**
  * Delete a file from the filesystem.
  * @param {string} filePath The absolute path on the filesystem
  */

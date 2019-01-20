@@ -79,6 +79,42 @@ module.exports = {
 
     extension
       .addAction(
+        "LoadStringFromFileAsync",
+        t("Load a text from a file (Async)"),
+        t("Load a text from a file asynchronously. Use this for large files to not delay game execution. (The content of the file will not be available immediately)"),
+        t("Load text from _PARAM1_ into scene variable _PARAM0_ (Async)"),
+        t("Filesystem/Windows, Linux, MacOS"),
+        "JsPlatform/Extensions/filesystem_load_file24.png",
+        "JsPlatform/Extensions/filesystem_load_file32.png"
+      )
+      .addParameter("scenevar", t("Scene variable"), "", false)
+      .addParameter("string", t("Load path"), "", false)
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/FileSystem/filesystemtools.js"
+      )
+      .setFunctionName("gdjs.fileSystem.loadStringFromFileAsync");
+
+    extension
+      .addAction(
+        "LoadStringFromFileSync",
+        t("Load a text from a file"),
+        t("Load a text from a file. Only use this on small files to not delay the game execution."),
+        t("Load text from _PARAM1_ into scene variable _PARAM0_"),
+        t("Filesystem/Windows, Linux, MacOS"),
+        "JsPlatform/Extensions/filesystem_load_file24.png",
+        "JsPlatform/Extensions/filesystem_load_file32.png"
+      )
+      .addParameter("scenevar", t("Scene variable"), "", false)
+      .addParameter("string", t("Load path"), "", false)
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/FileSystem/filesystemtools.js"
+      )
+      .setFunctionName("gdjs.fileSystem.loadStringFromFileSync");
+
+    extension
+      .addAction(
         "DeleteFile",
         t("Delete a file"),
         t("Delete a file from the filesystem."),

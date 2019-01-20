@@ -8,6 +8,7 @@ import PreferencesContext, {
   type AlertMessageIdentifier,
 } from './PreferencesContext';
 import optionalRequire from '../../Utils/OptionalRequire';
+import { getIDEVersion } from '../../Version';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
@@ -26,7 +27,9 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
     setAutoDownloadUpdates: this._setAutoDownloadUpdates.bind(this),
     checkUpdates: this._checkUpdates.bind(this),
+    setAutoDisplayChangelog: this._setAutoDisplayChangelog.bind(this),
     showAlertMessage: this._showAlertMessage.bind(this),
+    verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
   };
 
   componentDidMount() {
@@ -69,6 +72,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     );
   }
 
+  _setAutoDisplayChangelog(autoDisplayChangelog: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          autoDisplayChangelog,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
   _checkUpdates(forceDownload?: boolean) {
     // Checking for updates is only done on Electron.
     // Note: This could be abstracted away later if other updates mechanisms
@@ -80,6 +95,34 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     } else {
       ipcRenderer.send('updates-check');
     }
+  }
+
+  _verifyIfIsNewVersion() {
+    const currentVersion = getIDEVersion();
+    const { lastLaunchedVersion } = this.state.values;
+    if (lastLaunchedVersion === currentVersion) {
+      // This is not a new version
+      return false;
+    }
+
+    // This is a new version: store the version number
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          lastLaunchedVersion: currentVersion,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+
+    if (lastLaunchedVersion === undefined) {
+      // This is the first time GDevelop is launched, don't
+      // warn about this version being new.
+      return false;
+    }
+
+    return true;
   }
 
   _showAlertMessage(identifier: AlertMessageIdentifier, show: boolean) {

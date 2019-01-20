@@ -59,6 +59,7 @@ export default class PreferencesDialog extends Component<Props, State> {
             setCodeEditorThemeName,
             setAutoDownloadUpdates,
             showAlertMessage,
+            setAutoDisplayChangelog,
           }) => {
             const dismissedAlertMessages = getDismissedAlertMessages(
               values.hiddenAlertMessages
@@ -106,6 +107,14 @@ export default class PreferencesDialog extends Component<Props, State> {
                     toggled={values.autoDownloadUpdates}
                     labelPosition="right"
                     label="Auto download and install updates (recommended)"
+                  />
+                </Line>
+                <Line>
+                  <Toggle
+                    onToggle={(e, check) => setAutoDisplayChangelog(check)}
+                    toggled={values.autoDisplayChangelog}
+                    labelPosition="right"
+                    label="Display What's New when a new version is launched (recommended)"
                   />
                 </Line>
                 <Line>

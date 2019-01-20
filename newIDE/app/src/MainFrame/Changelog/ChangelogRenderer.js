@@ -12,6 +12,7 @@ import { FlatButton, RaisedButton } from 'material-ui';
 import Window from '../../Utils/Window';
 import { hasBreakingChange } from '../../Utils/GDevelopServices/Release';
 import AlertMessage from '../../UI/AlertMessage';
+import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
 
 type Props = {|
   releases: ?Array<Release>,
@@ -61,28 +62,35 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
     !!currentRelease && hasBreakingChange(currentRelease);
 
   return (
-    <Column>
-      {currentVersionHasBreakingChange && (
-        <AlertMessage kind="warning">
-          This version of GDevelop has a breaking change. Please make sure to
-          read the changes below to understand if any change or adaptation must
-          be made to your project.
-        </AlertMessage>
+    <ThemeConsumer>
+      {muiTheme => (
+        <Column>
+          {currentVersionHasBreakingChange && (
+            <AlertMessage kind="warning">
+              This version of GDevelop has a breaking change. Please make sure
+              to read the changes below to understand if any change or
+              adaptation must be made to your project.
+            </AlertMessage>
+          )}
+          {releases.map(release => (
+            <ReactMarkdown
+              key={release.name}
+              escapeHtml
+              source={
+                '# Version ' + release.name + '\n---\n' + release.description
+              }
+              className={muiTheme.markdownRootClassName}
+            />
+          ))}
+          <Line justifyContent="center">
+            <FlatButton
+              label="See all the releases notes"
+              onClick={openReleaseNote}
+            />
+          </Line>
+        </Column>
       )}
-      {releases.map(release => (
-        <ReactMarkdown
-          key={release.name}
-          escapeHtml
-          source={'# Version ' + release.name + '\n---\n' + release.description}
-        />
-      ))}
-      <Line justifyContent="center">
-        <FlatButton
-          label="See all the releases notes"
-          onClick={openReleaseNote}
-        />
-      </Line>
-    </Column>
+    </ThemeConsumer>
   );
 };
 

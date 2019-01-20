@@ -76,6 +76,7 @@ import {
 } from './UpdaterTools';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import EmptyMessage from '../UI/EmptyMessage';
+import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 
 const gd = global.gd;
 
@@ -1388,6 +1389,7 @@ export default class MainFrame extends React.Component<Props, State> {
             updateStatus={updateStatus}
           />
           <CloseConfirmDialog shouldPrompt={!!this.state.currentProject} />
+          <ChangelogDialogContainer />
         </div>
       </Providers>
     );

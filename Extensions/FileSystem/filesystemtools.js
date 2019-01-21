@@ -140,17 +140,16 @@ gdjs.fileSystem.makeDirectory = function (directory, resultVar) {
  */
 gdjs.fileSystem.saveStringToFile = function (text, savePath, resultVar) {
   const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
-  let result = 'ok';
 
   if (fileSystem) {
     fileSystem.writeFile(savePath, text, (err) => {
+      resultVar.setString('ok');
       if (err) {
         console.error("Unable to save the text to path: '" + savePath + "': ", err);
-        result = 'error';
+        resultVar.setString('error');
       }
     });
   }
-  resultVar.setString(result);
 }
 
 /**
@@ -187,20 +186,19 @@ gdjs.fileSystem.loadStringFromFileSync = function (stringVar, loadPath, resultVa
  */
 gdjs.fileSystem.loadStringFromFileAsync = function (stringVar, loadPath, resultVar) {
   const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
-  let result = 'ok';
 
   if (fileSystem) {
     fileSystem.readFile(loadPath, 'utf8', (err, data) => {
       if (data) {
         stringVar.setString(data);
+        resultVar.setString('ok');
       }
       if (err) {
         console.error("Unable to load the file at path: '" + loadPath + "': ", err);
-        result = 'error';
+        resultVar.setString('error');
       }
     });
   }
-  resultVar.setString(result);
 }
 
 /**
@@ -210,17 +208,16 @@ gdjs.fileSystem.loadStringFromFileAsync = function (stringVar, loadPath, resultV
  */
 gdjs.fileSystem.deleteFile = function (filePath, resultVar) {
   const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
-  let result = 'ok';
 
   if (fileSystem) {
     fileSystem.unlink(filePath, (err) => {
+      resultVar.setString('ok');
       if (err) {
         console.error("Unable to delete the file: '" + filePath + "': ", err);
-        result = 'error';
+        resultVar.setString('error');
       }
     });
   }
-  resultVar.setString(result);
 }
 
 /**

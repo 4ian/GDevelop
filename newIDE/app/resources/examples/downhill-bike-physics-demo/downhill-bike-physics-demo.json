@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.zatgamename",
-    "projectFile": "G:\\Games\\New Bike Demo\\game.json",
+    "projectFile": "G:\\Games\\Downhill Bike Race\\Downhill Bike Race.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -252,6 +252,148 @@
         "name": "GFX\\Start.png",
         "smoothed": true,
         "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/Forward.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Forward.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/Backward.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Backward.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/Brake.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Brake.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/Esc.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Esc.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/Left.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Left.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/Right.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Right.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/snow.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\snow.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/cliff.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX/cliff.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/tree10.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\tree10.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/bush.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\bush.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/grass.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\grass.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/signRight.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\signRight.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/Shelf.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Shelf.png",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/Stone.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\Stone.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "alwaysLoaded": false,
+        "file": "GFX/cliff.png",
+        "kind": "image",
+        "metadata": "",
+        "name": "GFX\\cliff.png",
+        "smoothed": true,
+        "userAdded": false
+      },
+      {
+        "file": "GFX/SF Atarian System.ttf",
+        "kind": "font",
+        "metadata": "",
+        "name": "GFX\\SF Atarian System.ttf",
+        "userAdded": true
       }
     ],
     "resourceFolders": []
@@ -295,6 +437,9 @@
             },
             {
               "name": "NewFloor"
+            },
+            {
+              "name": "Jump"
             }
           ]
         },
@@ -341,6 +486,40 @@
             },
             {
               "name": "LUpperArm"
+            }
+          ]
+        },
+        {
+          "name": "Controls",
+          "objects": [
+            {
+              "name": "Right"
+            },
+            {
+              "name": "Left"
+            },
+            {
+              "name": "Forward"
+            },
+            {
+              "name": "Backward"
+            },
+            {
+              "name": "Brake"
+            },
+            {
+              "name": "Retry"
+            }
+          ]
+        },
+        {
+          "name": "Instructions",
+          "objects": [
+            {
+              "name": "DesktopControls"
+            },
+            {
+              "name": "GameInstructions"
             }
           ]
         }
@@ -405,6 +584,10 @@
         {
           "name": "maxForce",
           "value": ""
+        },
+        {
+          "name": "indicatorForce",
+          "value": ""
         }
       ],
       "instances": [
@@ -416,8 +599,8 @@
           "locked": false,
           "name": "MainFrame",
           "width": 0,
-          "x": -198,
-          "y": 404,
+          "x": -366,
+          "y": 880,
           "zOrder": 2,
           "numberProperties": [],
           "stringProperties": [],
@@ -431,8 +614,8 @@
           "locked": false,
           "name": "FrontWheel",
           "width": 0,
-          "x": 268,
-          "y": 799,
+          "x": -135,
+          "y": 1074,
           "zOrder": 1,
           "numberProperties": [],
           "stringProperties": [],
@@ -446,8 +629,8 @@
           "locked": false,
           "name": "BackWheel",
           "width": 0,
-          "x": -347,
-          "y": 799,
+          "x": -437,
+          "y": 1079,
           "zOrder": 104,
           "numberProperties": [],
           "stringProperties": [],
@@ -469,30 +652,30 @@
           "initialVariables": []
         },
         {
-          "angle": 364.178,
+          "angle": 363.98,
           "customSize": true,
           "height": 49,
           "layer": "",
           "locked": false,
           "name": "floor",
           "width": 14356,
-          "x": 75144,
-          "y": 42204,
+          "x": 74894,
+          "y": 42068,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 359.883,
+          "angle": 360.063,
           "customSize": true,
           "height": 49,
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 36910,
-          "x": 89407,
-          "y": 43017,
+          "width": 32759,
+          "x": 92967,
+          "y": 42868,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -506,8 +689,8 @@
           "locked": false,
           "name": "RearSuspension",
           "width": 0,
-          "x": -350,
-          "y": 799,
+          "x": -438,
+          "y": 1076,
           "zOrder": 105,
           "numberProperties": [],
           "stringProperties": [],
@@ -521,8 +704,8 @@
           "locked": false,
           "name": "FrontSuspensionBottom",
           "width": 0,
-          "x": 268,
-          "y": 797,
+          "x": -136,
+          "y": 1072,
           "zOrder": 9,
           "numberProperties": [],
           "stringProperties": [],
@@ -536,8 +719,8 @@
           "locked": false,
           "name": "Seat",
           "width": 0,
-          "x": -288,
-          "y": 438,
+          "x": -410,
+          "y": 896,
           "zOrder": 11,
           "numberProperties": [],
           "stringProperties": [],
@@ -550,39 +733,39 @@
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 5189,
-          "x": 24704,
-          "y": 14246,
+          "width": 4705,
+          "x": 24880,
+          "y": 14242,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 350.893,
+          "angle": 354.77,
           "customSize": true,
           "height": 49,
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 1499,
-          "x": 29763,
-          "y": 14847,
+          "width": 1755,
+          "x": 29475,
+          "y": 14807,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 399.353,
+          "angle": 399.574,
           "customSize": true,
           "height": 49,
           "layer": "",
           "locked": false,
           "name": "floor",
           "width": 6240,
-          "x": 30532,
-          "y": 16722,
+          "x": 30493,
+          "y": 16713,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -596,8 +779,38 @@
           "locked": false,
           "name": "floor",
           "width": 6105,
-          "x": 48835,
-          "y": 28047,
+          "x": 48750,
+          "y": 27970,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 400.071,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 5975,
+          "x": 53876,
+          "y": 31065,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 380.328,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 6105,
+          "x": 58884,
+          "y": 33984,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -611,38 +824,8 @@
           "locked": false,
           "name": "floor",
           "width": 6105,
-          "x": 53915,
-          "y": 31110,
-          "zOrder": 5,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 380.699,
-          "customSize": true,
-          "height": 49,
-          "layer": "",
-          "locked": false,
-          "name": "floor",
-          "width": 6105,
-          "x": 59097,
-          "y": 34108,
-          "zOrder": 5,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 399.353,
-          "customSize": true,
-          "height": 49,
-          "layer": "",
-          "locked": false,
-          "name": "floor",
-          "width": 6105,
-          "x": 64296,
-          "y": 37120,
+          "x": 64050,
+          "y": 36977,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -656,8 +839,8 @@
           "locked": false,
           "name": "floor",
           "width": 6105,
-          "x": 69376,
-          "y": 40361,
+          "x": 69149,
+          "y": 40225,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -670,9 +853,9 @@
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 323,
-          "x": 125483,
-          "y": 39683,
+          "width": 317,
+          "x": 125479,
+          "y": 39581,
           "zOrder": 101,
           "numberProperties": [],
           "stringProperties": [],
@@ -686,8 +869,8 @@
           "locked": false,
           "name": "Crank",
           "width": 0,
-          "x": -107,
-          "y": 800,
+          "x": -320,
+          "y": 1080,
           "zOrder": 102,
           "numberProperties": [],
           "stringProperties": [],
@@ -701,8 +884,8 @@
           "locked": false,
           "name": "LPedal",
           "width": 0,
-          "x": -201,
-          "y": 802,
+          "x": -359,
+          "y": 1081,
           "zOrder": -104,
           "numberProperties": [],
           "stringProperties": [],
@@ -716,8 +899,8 @@
           "locked": false,
           "name": "RPedal",
           "width": 0,
-          "x": -18,
-          "y": 799,
+          "x": -276,
+          "y": 1080,
           "zOrder": 105,
           "numberProperties": [],
           "stringProperties": [],
@@ -730,9 +913,9 @@
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 4534,
+          "width": 4382,
           "x": 20473,
-          "y": 11507,
+          "y": 11511,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -745,39 +928,39 @@
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 3972,
-          "x": 16772,
-          "y": 9305,
+          "width": 3698,
+          "x": 16830,
+          "y": 9320,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 16.0736,
+          "angle": 17.5057,
           "customSize": true,
           "height": 49,
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 4022,
-          "x": 12978,
-          "y": 6737,
+          "width": 3690,
+          "x": 13000,
+          "y": 6686,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 30.1098,
+          "angle": 29.039,
           "customSize": true,
           "height": 49,
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 5189,
-          "x": 8280,
-          "y": 4050,
+          "width": 4880,
+          "x": 8325,
+          "y": 4005,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -805,54 +988,54 @@
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 6020,
-          "x": -2352,
-          "y": 1366,
+          "width": 5911,
+          "x": -2261,
+          "y": 1369,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 387.633,
+          "angle": 387.072,
           "customSize": true,
           "height": 49,
           "layer": "",
           "locked": false,
           "name": "floor",
           "width": 6105,
-          "x": 43318,
-          "y": 25463,
+          "x": 43219,
+          "y": 25418,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 393.749,
+          "angle": 393.277,
           "customSize": true,
           "height": 49,
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 6105,
-          "x": 35511,
-          "y": 20369,
+          "width": 5987,
+          "x": 35480,
+          "y": 20305,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
         },
         {
-          "angle": 358.053,
+          "angle": 360.393,
           "customSize": true,
           "height": 49,
           "layer": "",
           "locked": false,
           "name": "floor",
-          "width": 2860,
-          "x": 41084,
-          "y": 22014,
+          "width": 2457,
+          "x": 40977,
+          "y": 21950,
           "zOrder": 5,
           "numberProperties": [],
           "stringProperties": [],
@@ -860,14 +1043,14 @@
         },
         {
           "angle": 0,
-          "customSize": true,
+          "customSize": false,
           "height": 298,
           "layer": "",
           "locked": false,
           "name": "RightLeg",
           "width": 162,
-          "x": -24,
-          "y": 658,
+          "x": -277,
+          "y": 1001,
           "zOrder": 400,
           "numberProperties": [],
           "stringProperties": [],
@@ -875,14 +1058,14 @@
         },
         {
           "angle": 0,
-          "customSize": true,
+          "customSize": false,
           "height": 298,
           "layer": "",
           "locked": false,
           "name": "LeftLeg",
           "width": 162,
-          "x": -23,
-          "y": 657,
+          "x": -272,
+          "y": 1022,
           "zOrder": -100,
           "numberProperties": [],
           "stringProperties": [],
@@ -890,14 +1073,14 @@
         },
         {
           "angle": -68.1986,
-          "customSize": true,
-          "height": 307,
+          "customSize": false,
+          "height": 130,
           "layer": "",
           "locked": false,
           "name": "RightThigh",
-          "width": 116,
-          "x": -125,
-          "y": 508,
+          "width": 41,
+          "x": -328,
+          "y": 919,
           "zOrder": 390,
           "numberProperties": [],
           "stringProperties": [],
@@ -905,14 +1088,14 @@
         },
         {
           "angle": -69,
-          "customSize": true,
+          "customSize": false,
           "height": 307,
           "layer": "",
           "locked": false,
           "name": "LeftThigh",
           "width": 116,
-          "x": -118,
-          "y": 515,
+          "x": -311,
+          "y": 941,
           "zOrder": -120,
           "numberProperties": [],
           "stringProperties": [],
@@ -920,14 +1103,14 @@
         },
         {
           "angle": 8.88818,
-          "customSize": true,
+          "customSize": false,
           "height": 317,
           "layer": "",
           "locked": false,
           "name": "Torso",
           "width": 162,
-          "x": -189,
-          "y": 306,
+          "x": -375,
+          "y": 816,
           "zOrder": 300,
           "numberProperties": [],
           "stringProperties": [],
@@ -935,14 +1118,14 @@
         },
         {
           "angle": 0,
-          "customSize": true,
+          "customSize": false,
           "height": 194,
           "layer": "",
           "locked": false,
           "name": "Head",
           "width": 155,
-          "x": -150,
-          "y": 80,
+          "x": -367,
+          "y": 684,
           "zOrder": 100,
           "numberProperties": [],
           "stringProperties": [],
@@ -950,14 +1133,14 @@
         },
         {
           "angle": -124.055,
-          "customSize": true,
+          "customSize": false,
           "height": 105,
           "layer": "",
           "locked": false,
           "name": "RUpperArm",
           "width": 200,
-          "x": -140,
-          "y": 290,
+          "x": -354,
+          "y": 839,
           "zOrder": 420,
           "numberProperties": [],
           "stringProperties": [],
@@ -965,14 +1148,14 @@
         },
         {
           "angle": -77,
-          "customSize": true,
+          "customSize": false,
           "height": 248,
           "layer": "",
           "locked": false,
           "name": "RArm",
           "width": 92,
-          "x": 10,
-          "y": 266,
+          "x": -265,
+          "y": 801,
           "zOrder": 402,
           "numberProperties": [],
           "stringProperties": [],
@@ -980,14 +1163,14 @@
         },
         {
           "angle": -124,
-          "customSize": true,
+          "customSize": false,
           "height": 105,
           "layer": "",
           "locked": false,
           "name": "LUpperArm",
           "width": 200,
-          "x": -130,
-          "y": 278,
+          "x": -332,
+          "y": 812,
           "zOrder": 80,
           "numberProperties": [],
           "stringProperties": [],
@@ -995,14 +1178,14 @@
         },
         {
           "angle": -77,
-          "customSize": true,
+          "customSize": false,
           "height": 248,
           "layer": "",
           "locked": false,
           "name": "LArm",
           "width": 92,
-          "x": 20,
-          "y": 277,
+          "x": -285,
+          "y": 832,
           "zOrder": 60,
           "numberProperties": [],
           "stringProperties": [],
@@ -1016,8 +1199,8 @@
           "locked": false,
           "name": "Follow",
           "width": 0,
-          "x": 173,
-          "y": 224,
+          "x": -384,
+          "y": 556,
           "zOrder": 421,
           "numberProperties": [],
           "stringProperties": [],
@@ -1031,8 +1214,8 @@
           "locked": false,
           "name": "Win",
           "width": 197,
-          "x": 122122,
-          "y": 40871,
+          "x": 122118,
+          "y": 40765,
           "zOrder": 423,
           "numberProperties": [],
           "stringProperties": [],
@@ -1047,52 +1230,7 @@
           "name": "floor",
           "width": 64,
           "x": 125267,
-          "y": 42534,
-          "zOrder": 424,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 60.0639,
-          "customSize": true,
-          "height": 574,
-          "layer": "",
-          "locked": false,
-          "name": "floor",
-          "width": 64,
-          "x": 93149,
-          "y": 42642,
-          "zOrder": 424,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 79.2429,
-          "customSize": true,
-          "height": 574,
-          "layer": "",
-          "locked": false,
-          "name": "floor",
-          "width": 64,
-          "x": 54893,
-          "y": 28905,
-          "zOrder": 424,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 72.1587,
-          "customSize": true,
-          "height": 574,
-          "layer": "",
-          "locked": false,
-          "name": "floor",
-          "width": 64,
-          "x": 8677,
-          "y": 2470,
+          "y": 42437,
           "zOrder": 424,
           "numberProperties": [],
           "stringProperties": [],
@@ -1101,13 +1239,13 @@
         {
           "angle": 0,
           "customSize": true,
-          "height": 1639,
+          "height": 865,
           "layer": "",
           "locked": false,
           "name": "Start",
-          "width": 524,
-          "x": 3658,
-          "y": -158,
+          "width": 277,
+          "x": 3638,
+          "y": 585,
           "zOrder": 425,
           "numberProperties": [],
           "stringProperties": [],
@@ -1131,13 +1269,13 @@
         {
           "angle": 0,
           "customSize": true,
-          "height": 2019,
+          "height": 774,
           "layer": "",
           "locked": false,
           "name": "floor",
           "width": 64,
-          "x": -2217,
-          "y": -669,
+          "x": -2255,
+          "y": 562,
           "zOrder": 427,
           "numberProperties": [],
           "stringProperties": [],
@@ -1176,14 +1314,1904 @@
         {
           "angle": 0,
           "customSize": true,
-          "height": 1332,
+          "height": 73,
+          "layer": "GUI",
+          "locked": false,
+          "name": "GameInstructions",
+          "width": 692,
+          "x": 148,
+          "y": 52,
+          "zOrder": 430,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -17.7856,
+          "customSize": true,
+          "height": 152,
           "layer": "",
           "locked": false,
-          "name": "Instructions",
-          "width": 4501,
-          "x": -2079,
-          "y": -647,
-          "zOrder": 430,
+          "name": "Jump",
+          "width": 613,
+          "x": 8429,
+          "y": 2703,
+          "zOrder": 433,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 78.1679,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 994,
+          "x": 12491,
+          "y": 5663,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 78.758,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 1624,
+          "x": 15931,
+          "y": 8032,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 83.553,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 1082,
+          "x": 19963,
+          "y": 10353,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 81.1554,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 1525,
+          "x": 24103,
+          "y": 12850,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 86.0175,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 2087,
+          "x": 42448,
+          "y": 22984,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 94.3914,
+          "customSize": true,
+          "height": 3748,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 49,
+          "x": 91059,
+          "y": 40867,
+          "zOrder": 424,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -30.3987,
+          "customSize": true,
+          "height": 68,
+          "layer": "",
+          "locked": false,
+          "name": "Jump",
+          "width": 605,
+          "x": 92849,
+          "y": 42705,
+          "zOrder": 434,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 68,
+          "layer": "",
+          "locked": false,
+          "name": "Jump",
+          "width": 224,
+          "x": 64750,
+          "y": 35050,
+          "zOrder": 435,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -10.2651,
+          "customSize": true,
+          "height": 68,
+          "layer": "",
+          "locked": false,
+          "name": "Jump",
+          "width": 610,
+          "x": 54572,
+          "y": 29100,
+          "zOrder": 436,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -100.772,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Jump",
+          "width": 0,
+          "x": 8770,
+          "y": 2850,
+          "zOrder": 400,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -72.3499,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Jump",
+          "width": 0,
+          "x": 54716,
+          "y": 29232,
+          "zOrder": 400,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -73.3008,
+          "customSize": true,
+          "height": 43,
+          "layer": "",
+          "locked": false,
+          "name": "Jump",
+          "width": 132,
+          "x": 64855,
+          "y": 35118,
+          "zOrder": 400,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -70.6652,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Jump",
+          "width": 0,
+          "x": 93147,
+          "y": 42736,
+          "zOrder": 400,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 67,
+          "layer": "Mobile",
+          "locked": false,
+          "name": "Forward",
+          "width": 134,
+          "x": 779,
+          "y": 490,
+          "zOrder": 437,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 60,
+          "layer": "Mobile",
+          "locked": false,
+          "name": "Backward",
+          "width": 134,
+          "x": 40,
+          "y": 490,
+          "zOrder": 438,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Mobile",
+          "locked": false,
+          "name": "Brake",
+          "width": 0,
+          "x": 416,
+          "y": 490,
+          "zOrder": 440,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Mobile",
+          "locked": false,
+          "name": "Retry",
+          "width": 0,
+          "x": 40,
+          "y": 44,
+          "zOrder": 441,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Mobile",
+          "locked": false,
+          "name": "Left",
+          "width": 0,
+          "x": 40,
+          "y": 380,
+          "zOrder": 443,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "Mobile",
+          "locked": false,
+          "name": "Right",
+          "width": 0,
+          "x": 778,
+          "y": 380,
+          "zOrder": 444,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 1,
+          "customSize": true,
+          "height": 372,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 3001,
+          "x": -2261,
+          "y": 1361,
+          "zOrder": -90,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 372,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2992,
+          "x": 3571,
+          "y": 1860,
+          "zOrder": -200,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 29.039,
+          "customSize": true,
+          "height": 417,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2986,
+          "x": 8374,
+          "y": 3552,
+          "zOrder": -200,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 488,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2525,
+          "x": 20114,
+          "y": 11163,
+          "zOrder": -200,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 17.5057,
+          "customSize": true,
+          "height": 534,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2491,
+          "x": 12512,
+          "y": 6365,
+          "zOrder": -200,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 83.553,
+          "customSize": true,
+          "height": 437,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 1385,
+          "x": 19535,
+          "y": 10362,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 78.758,
+          "customSize": true,
+          "height": 521,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 1882,
+          "x": 15437,
+          "y": 7972,
+          "zOrder": -200,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 1,
+          "customSize": true,
+          "height": 372,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2985,
+          "x": 739,
+          "y": 1413,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 372,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2235,
+          "x": 6459,
+          "y": 2585,
+          "zOrder": -150,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 540,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2328,
+          "x": 16332,
+          "y": 9003,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 29.039,
+          "customSize": true,
+          "height": 417,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 3000,
+          "x": 9951,
+          "y": 4432,
+          "zOrder": -202,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 539,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2306,
+          "x": 18147,
+          "y": 9523,
+          "zOrder": -200,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 78.758,
+          "customSize": true,
+          "height": 539,
+          "layer": "",
+          "locked": false,
+          "name": "Cliff",
+          "width": 1665,
+          "x": 15660,
+          "y": 7869,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 78.758,
+          "customSize": true,
+          "height": 454,
+          "layer": "",
+          "locked": false,
+          "name": "Cliff",
+          "width": 952,
+          "x": 12270,
+          "y": 5489,
+          "zOrder": -60,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 17.5057,
+          "customSize": true,
+          "height": 534,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2491,
+          "x": 14105,
+          "y": 6865,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 78.758,
+          "customSize": true,
+          "height": 521,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 1205,
+          "x": 12029,
+          "y": 5605,
+          "zOrder": 80,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 83.553,
+          "customSize": true,
+          "height": 405,
+          "layer": "",
+          "locked": false,
+          "name": "Cliff",
+          "width": 1110,
+          "x": 19765,
+          "y": 10237,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 488,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2525,
+          "x": 22213,
+          "y": 11767,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 628,
+          "layer": "Background",
+          "locked": false,
+          "name": "Background",
+          "width": 2600,
+          "x": -700,
+          "y": -19,
+          "zOrder": 446,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 813,
+          "layer": "",
+          "locked": false,
+          "name": "Bush",
+          "width": 878,
+          "x": 1425,
+          "y": 665,
+          "zOrder": -150,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 778,
+          "layer": "",
+          "locked": false,
+          "name": "Bush",
+          "width": 878,
+          "x": 2014,
+          "y": 763,
+          "zOrder": -200,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 283,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 50,
+          "y": 1088,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 283,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 104,
+          "y": 1123,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1612,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 6883,
+          "y": 900,
+          "zOrder": -180,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1612,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 14780,
+          "y": 5187,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1612,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 22832,
+          "y": 10091,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1612,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 30008,
+          "y": 13290,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1612,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 42662,
+          "y": 20437,
+          "zOrder": -280,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 39.8056,
+          "customSize": true,
+          "height": 474,
+          "layer": "",
+          "locked": false,
+          "name": "Sign",
+          "width": 415,
+          "x": 39001,
+          "y": 20363,
+          "zOrder": -280,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 10.751,
+          "customSize": true,
+          "height": 474,
+          "layer": "",
+          "locked": false,
+          "name": "Sign",
+          "width": 415,
+          "x": 18642,
+          "y": 8941,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 813,
+          "layer": "",
+          "locked": false,
+          "name": "Bush",
+          "width": 878,
+          "x": 18909,
+          "y": 8853,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 39.8056,
+          "customSize": true,
+          "height": 474,
+          "layer": "",
+          "locked": false,
+          "name": "Sign",
+          "width": 415,
+          "x": 67126,
+          "y": 36663,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0.245931,
+          "customSize": true,
+          "height": 474,
+          "layer": "",
+          "locked": false,
+          "name": "Sign",
+          "width": 415,
+          "x": 88848,
+          "y": 42154,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1612,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 78834,
+          "y": 40328,
+          "zOrder": -350,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 2206,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 901,
+          "x": 79568,
+          "y": 39812,
+          "zOrder": -400,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1612,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 113662,
+          "y": 41437,
+          "zOrder": -320,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 2206,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 901,
+          "x": 112709,
+          "y": 40781,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1612,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 100958,
+          "y": 41386,
+          "zOrder": -250,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 813,
+          "layer": "",
+          "locked": false,
+          "name": "Bush",
+          "width": 878,
+          "x": 79226,
+          "y": 41231,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 813,
+          "layer": "",
+          "locked": false,
+          "name": "Bush",
+          "width": 878,
+          "x": 93611,
+          "y": 42158,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 813,
+          "layer": "",
+          "locked": false,
+          "name": "Bush",
+          "width": 878,
+          "x": 101312,
+          "y": 42255,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 813,
+          "layer": "",
+          "locked": false,
+          "name": "Bush",
+          "width": 878,
+          "x": 119319,
+          "y": 42170,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 813,
+          "layer": "",
+          "locked": false,
+          "name": "Bush",
+          "width": 878,
+          "x": 118880,
+          "y": 42243,
+          "zOrder": -302,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1612,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 59367,
+          "y": 31612,
+          "zOrder": -310,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1974,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 58662,
+          "y": 31006,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 1789,
+          "layer": "",
+          "locked": false,
+          "name": "Tree",
+          "width": 709,
+          "x": 68077,
+          "y": 36338,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 283,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 17867,
+          "y": 8843,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 283,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 17778,
+          "y": 8846,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 283,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 24163,
+          "y": 11720,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 283,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 24463,
+          "y": 11801,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 303,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 31045,
+          "y": 14469,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 283,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 30965,
+          "y": 14465,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 283,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 43100,
+          "y": 21696,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 306,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 42450,
+          "y": 21661,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 283,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 84364,
+          "y": 41966,
+          "zOrder": -100,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 326,
+          "layer": "",
+          "locked": false,
+          "name": "Grass",
+          "width": 132,
+          "x": 84406,
+          "y": 41917,
+          "zOrder": -102,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 81.1554,
+          "customSize": true,
+          "height": 539,
+          "layer": "",
+          "locked": false,
+          "name": "Cliff",
+          "width": 1452,
+          "x": 23860,
+          "y": 12663,
+          "zOrder": -300,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 488,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2609,
+          "x": 24380,
+          "y": 13814,
+          "zOrder": -230,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 488,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2609,
+          "x": 26878,
+          "y": 14534,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 354.77,
+          "customSize": true,
+          "height": 444,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 1908,
+          "x": 29337,
+          "y": 14847,
+          "zOrder": -200,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 399.574,
+          "customSize": true,
+          "height": 488,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2340,
+          "x": 30807,
+          "y": 15467,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 399.574,
+          "customSize": true,
+          "height": 488,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 1330,
+          "x": 34683,
+          "y": 18260,
+          "zOrder": -205,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 399.574,
+          "customSize": true,
+          "height": 488,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2662,
+          "x": 32522,
+          "y": 17022,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 16.0736,
+          "customSize": true,
+          "height": 49,
+          "layer": "",
+          "locked": false,
+          "name": "floor",
+          "width": 5020,
+          "x": 3535,
+          "y": 2108,
+          "zOrder": 5,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 81.1554,
+          "customSize": true,
+          "height": 488,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 1602,
+          "x": 23685,
+          "y": 12859,
+          "zOrder": 99,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 393.277,
+          "customSize": true,
+          "height": 488,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2980,
+          "x": 35589,
+          "y": 19480,
+          "zOrder": -205,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 393.277,
+          "customSize": true,
+          "height": 488,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2980,
+          "x": 38081,
+          "y": 21114,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 392,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2760,
+          "x": 40677,
+          "y": 21980,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 86.0175,
+          "customSize": true,
+          "height": 392,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 1988,
+          "x": 42310,
+          "y": 23058,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 387.072,
+          "customSize": true,
+          "height": 392,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2980,
+          "x": 43105,
+          "y": 24580,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 387.072,
+          "customSize": true,
+          "height": 392,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2980,
+          "x": 45756,
+          "y": 25936,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 382.439,
+          "customSize": true,
+          "height": 382,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2980,
+          "x": 48791,
+          "y": 27367,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 400.071,
+          "customSize": true,
+          "height": 392,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2980,
+          "x": 54029,
+          "y": 29999,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 382.439,
+          "customSize": true,
+          "height": 392,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2992,
+          "x": 51538,
+          "y": 28494,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 387.072,
+          "customSize": true,
+          "height": 392,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 525,
+          "x": 48469,
+          "y": 26696,
+          "zOrder": -250,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 400.071,
+          "customSize": true,
+          "height": 358,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2980,
+          "x": 56296,
+          "y": 31946,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 380.328,
+          "customSize": true,
+          "height": 358,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 58779,
+          "y": 33392,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 380.328,
+          "customSize": true,
+          "height": 358,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2575,
+          "x": 61581,
+          "y": 34352,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 380.328,
+          "customSize": true,
+          "height": 358,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 773,
+          "x": 64046,
+          "y": 34931,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 399.353,
+          "customSize": true,
+          "height": 358,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 64306,
+          "y": 35979,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 399.353,
+          "customSize": true,
+          "height": 358,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 66598,
+          "y": 37861,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 385.592,
+          "customSize": true,
+          "height": 318,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 69054,
+          "y": 39470,
+          "zOrder": -230,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 385.592,
+          "customSize": true,
+          "height": 318,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 71753,
+          "y": 40762,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -11.1292,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "Jump",
+          "width": 0,
+          "x": 74929,
+          "y": 41518,
+          "zOrder": 447,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": -112.751,
+          "customSize": true,
+          "height": 32,
+          "layer": "",
+          "locked": false,
+          "name": "Jump",
+          "width": 82,
+          "x": 75122,
+          "y": 41550,
+          "zOrder": -10,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 385.592,
+          "customSize": true,
+          "height": 318,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 383,
+          "x": 74581,
+          "y": 41492,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 363.98,
+          "customSize": true,
+          "height": 299,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 74884,
+          "y": 41689,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 363.98,
+          "customSize": true,
+          "height": 299,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 77860,
+          "y": 41894,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 363.98,
+          "customSize": true,
+          "height": 299,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 80840,
+          "y": 42104,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 363.98,
+          "customSize": true,
+          "height": 299,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 83827,
+          "y": 42312,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 363.98,
+          "customSize": true,
+          "height": 299,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 86814,
+          "y": 42521,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 364.496,
+          "customSize": true,
+          "height": 299,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 89794,
+          "y": 42747,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 299,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 92775,
+          "y": 42864,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 299,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 95769,
+          "y": 42864,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 299,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 98750,
+          "y": 42864,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 287,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 101744,
+          "y": 42876,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 287,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 104736,
+          "y": 42877,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 360.063,
+          "customSize": true,
+          "height": 287,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 107724,
+          "y": 42877,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 360.063,
+          "customSize": true,
+          "height": 287,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 110718,
+          "y": 42877,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 360.063,
+          "customSize": true,
+          "height": 280,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 113701,
+          "y": 42886,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 360.063,
+          "customSize": true,
+          "height": 284,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 116690,
+          "y": 42886,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 360.063,
+          "customSize": true,
+          "height": 287,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 2996,
+          "x": 119687,
+          "y": 42886,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 360.063,
+          "customSize": true,
+          "height": 278,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 1664,
+          "x": 122662,
+          "y": 42898,
+          "zOrder": -220,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 360.063,
+          "customSize": true,
+          "height": 279,
+          "layer": "",
+          "locked": false,
+          "name": "Track",
+          "width": 1481,
+          "x": 124315,
+          "y": 42898,
+          "zOrder": -210,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 108,
+          "layer": "GUI",
+          "locked": false,
+          "name": "DesktopControls",
+          "width": 466,
+          "x": 148,
+          "y": 166,
+          "zOrder": 448,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 43,
+          "layer": "GUI",
+          "locked": false,
+          "name": "ForceIndicator",
+          "width": 47,
+          "x": 167,
+          "y": -103,
+          "zOrder": 449,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -1197,7 +3225,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -1235,43 +3263,48 @@
                       "points": [
                         {
                           "name": "Seat",
-                          "x": 27.5,
-                          "y": 172.5
+                          "x": 13.5,
+                          "y": 86
                         },
                         {
                           "name": "Handlebar",
-                          "x": 298.5,
-                          "y": 82
+                          "x": 143.5,
+                          "y": 34
                         },
                         {
                           "name": "BackSuspension",
-                          "x": 62,
-                          "y": 298
+                          "x": 30.5,
+                          "y": 153
                         },
                         {
                           "name": "FrontSuspension",
-                          "x": 380.5,
-                          "y": 244
+                          "x": 187.5,
+                          "y": 119
                         },
                         {
                           "name": "RearWheelAxis",
-                          "x": -150,
-                          "y": 399
+                          "x": -80,
+                          "y": 197
                         },
                         {
                           "name": "FrontWheelAxis",
-                          "x": 470,
-                          "y": 399
+                          "x": 230,
+                          "y": 197
                         },
                         {
                           "name": "Crank",
-                          "x": 90,
-                          "y": 394
+                          "x": 45.5,
+                          "y": 197
                         },
                         {
                           "name": "Hands",
-                          "x": 280,
-                          "y": 7
+                          "x": 140.5,
+                          "y": 3
+                        },
+                        {
+                          "name": "Sit",
+                          "x": -7.5,
+                          "y": 44
                         }
                       ],
                       "originPoint": {
@@ -1300,7 +3333,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -1313,7 +3346,7 @@
                 "shapeOffsetX": 0,
                 "shapeOffsetY": 0,
                 "density": 3,
-                "friction": 1,
+                "friction": 0.95,
                 "restitution": 0.1,
                 "linearDamping": 0,
                 "angularDamping": 0,
@@ -1338,8 +3371,8 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 187,
-                        "y": 187
+                        "x": 94,
+                        "y": 94
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -1362,7 +3395,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -1375,7 +3408,7 @@
                 "shapeOffsetX": 0,
                 "shapeOffsetY": 0,
                 "density": 3,
-                "friction": 1,
+                "friction": 0.95,
                 "restitution": 0.1,
                 "linearDamping": 0,
                 "angularDamping": 0,
@@ -1400,8 +3433,8 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 187,
-                        "y": 187
+                        "x": 94,
+                        "y": 94
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -1424,13 +3457,13 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Static",
                 "bullet": false,
                 "fixedRotation": false,
-                "canSleep": false,
+                "canSleep": true,
                 "shape": "Box",
                 "shapeDimensionA": 0,
                 "shapeDimensionB": 0,
@@ -1492,9 +3525,9 @@
           "font": "",
           "characterSize": 30,
           "color": {
-            "b": 226,
-            "g": 144,
-            "r": 74
+            "b": 0,
+            "g": 0,
+            "r": 0
           }
         },
         {
@@ -1510,9 +3543,9 @@
           "font": "",
           "characterSize": 30,
           "color": {
-            "b": 226,
-            "g": 144,
-            "r": 74
+            "b": 0,
+            "g": 0,
+            "r": 0
           }
         },
         {
@@ -1522,7 +3555,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -1560,19 +3593,19 @@
                       "points": [
                         {
                           "name": "WheelAxis",
-                          "x": 13,
-                          "y": 123.5
+                          "x": 8.5,
+                          "y": 60
                         },
                         {
                           "name": "TopConnect",
-                          "x": 224,
-                          "y": 35
+                          "x": 111.5,
+                          "y": 17
                         }
                       ],
                       "originPoint": {
                         "name": "origine",
-                        "x": 13,
-                        "y": 123.5
+                        "x": 8.5,
+                        "y": 60
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -1609,25 +3642,25 @@
                       "points": [
                         {
                           "name": "TopConnect",
-                          "x": 10.5,
-                          "y": 8
+                          "x": 6,
+                          "y": 6
                         },
                         {
                           "name": "WheelAxis",
-                          "x": 98.5,
-                          "y": 159
+                          "x": 48,
+                          "y": 80
                         }
                       ],
                       "originPoint": {
                         "name": "origine",
-                        "x": 98.5,
-                        "y": 159
+                        "x": 48,
+                        "y": 80
                       },
                       "centerPoint": {
                         "automatic": false,
                         "name": "centre",
-                        "x": 98.5,
-                        "y": 159
+                        "x": 48,
+                        "y": 80
                       },
                       "customCollisionMask": []
                     }
@@ -1644,7 +3677,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -1682,13 +3715,13 @@
                       "points": [
                         {
                           "name": "Connect",
-                          "x": 113.5,
-                          "y": 139.5
+                          "x": 55.5,
+                          "y": 67
                         },
                         {
                           "name": "UConnect",
-                          "x": 71.5,
-                          "y": 16
+                          "x": 34.5,
+                          "y": 5
                         }
                       ],
                       "originPoint": {
@@ -1717,7 +3750,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -1755,19 +3788,19 @@
                       "points": [
                         {
                           "name": "RPedal",
-                          "x": 185,
-                          "y": 9
+                          "x": 92,
+                          "y": 5
                         },
                         {
                           "name": "LPedal",
-                          "x": 6,
-                          "y": 9
+                          "x": 5,
+                          "y": 5
                         }
                       ],
                       "originPoint": {
                         "name": "origine",
-                        "x": 96,
-                        "y": 9
+                        "x": 48,
+                        "y": 5
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -1790,7 +3823,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -1828,14 +3861,14 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 33,
-                        "y": 6
+                        "x": 17,
+                        "y": 4
                       },
                       "centerPoint": {
                         "automatic": false,
                         "name": "centre",
-                        "x": 33,
-                        "y": 6
+                        "x": 17,
+                        "y": 4
                       },
                       "customCollisionMask": []
                     }
@@ -1852,7 +3885,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -1890,14 +3923,14 @@
                       "points": [],
                       "originPoint": {
                         "name": "origine",
-                        "x": 33,
-                        "y": 6
+                        "x": 17,
+                        "y": 4
                       },
                       "centerPoint": {
                         "automatic": false,
                         "name": "centre",
-                        "x": 33,
-                        "y": 6
+                        "x": 17,
+                        "y": 4
                       },
                       "customCollisionMask": []
                     }
@@ -1914,7 +3947,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -1952,23 +3985,23 @@
                       "points": [
                         {
                           "name": "UConnect",
-                          "x": 28.5,
-                          "y": 8
+                          "x": 40.5,
+                          "y": 9
                         },
                         {
                           "name": "LConnect",
-                          "x": 29.5,
-                          "y": 100
+                          "x": 39.5,
+                          "y": 134
                         },
                         {
                           "name": "ArmConnect",
-                          "x": 28.5,
-                          "y": 20.5
+                          "x": 39.5,
+                          "y": 19
                         },
                         {
                           "name": "SeatConnect",
-                          "x": 29.5,
-                          "y": 109
+                          "x": 40.5,
+                          "y": 148
                         }
                       ],
                       "originPoint": {
@@ -1997,7 +4030,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -2035,13 +4068,13 @@
                       "points": [
                         {
                           "name": "UConnect",
-                          "x": 19,
-                          "y": 7
+                          "x": 29,
+                          "y": 9
                         },
                         {
                           "name": "LConnect",
-                          "x": 21,
-                          "y": 100
+                          "x": 29,
+                          "y": 149
                         }
                       ],
                       "originPoint": {
@@ -2070,7 +4103,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -2108,13 +4141,13 @@
                       "points": [
                         {
                           "name": "UConnect",
-                          "x": 19,
-                          "y": 7
+                          "x": 26,
+                          "y": 10
                         },
                         {
                           "name": "LConnect",
-                          "x": 21,
-                          "y": 100
+                          "x": 28,
+                          "y": 148
                         }
                       ],
                       "originPoint": {
@@ -2143,7 +4176,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -2181,13 +4214,13 @@
                       "points": [
                         {
                           "name": "Connect",
-                          "x": 32.5,
-                          "y": 6.5
+                          "x": 44.5,
+                          "y": 7
                         },
                         {
                           "name": "Pedal",
                           "x": 32.5,
-                          "y": 94
+                          "y": 137
                         }
                       ],
                       "originPoint": {
@@ -2216,7 +4249,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -2254,13 +4287,13 @@
                       "points": [
                         {
                           "name": "Connect",
-                          "x": 32.5,
-                          "y": 6.5
+                          "x": 45.5,
+                          "y": 6
                         },
                         {
                           "name": "Pedal",
-                          "x": 31.5,
-                          "y": 94
+                          "x": 33.5,
+                          "y": 140
                         }
                       ],
                       "originPoint": {
@@ -2289,7 +4322,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -2327,13 +4360,13 @@
                       "points": [
                         {
                           "name": "UConnect",
-                          "x": 58,
-                          "y": 16
+                          "x": 90.5,
+                          "y": 24
                         },
                         {
                           "name": "LConnect",
-                          "x": 10,
-                          "y": 18
+                          "x": 7.5,
+                          "y": 26
                         }
                       ],
                       "originPoint": {
@@ -2362,7 +4395,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -2400,13 +4433,13 @@
                       "points": [
                         {
                           "name": "UConnect",
-                          "x": 58,
-                          "y": 16
+                          "x": 91.5,
+                          "y": 25
                         },
                         {
                           "name": "LConnect",
-                          "x": 10,
-                          "y": 18
+                          "x": 8.5,
+                          "y": 28
                         }
                       ],
                       "originPoint": {
@@ -2435,7 +4468,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -2473,19 +4506,19 @@
                       "points": [
                         {
                           "name": "Connect",
-                          "x": 23,
-                          "y": 6.5
+                          "x": 34,
+                          "y": 9
                         },
                         {
                           "name": "Handlebar",
-                          "x": 12,
-                          "y": 86
+                          "x": 19,
+                          "y": 126
                         }
                       ],
                       "originPoint": {
                         "name": "origine",
-                        "x": 23,
-                        "y": 4
+                        "x": 33,
+                        "y": 8
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -2508,7 +4541,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -2546,19 +4579,19 @@
                       "points": [
                         {
                           "name": "Connect",
-                          "x": 23,
-                          "y": 6.5
+                          "x": 33,
+                          "y": 8
                         },
                         {
                           "name": "Handlebar",
-                          "x": 12,
-                          "y": 85
+                          "x": 19,
+                          "y": 129
                         }
                       ],
                       "originPoint": {
                         "name": "origine",
-                        "x": 23,
-                        "y": 4
+                        "x": 34,
+                        "y": 8
                       },
                       "centerPoint": {
                         "automatic": true,
@@ -2581,7 +4614,7 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "Physics2Behavior",
+              "name": "Physics2",
               "type": "Physics2::Physics2Behavior",
               "content": {
                 "type": "Dynamic",
@@ -2619,8 +4652,8 @@
                       "points": [
                         {
                           "name": "Connect",
-                          "x": 29,
-                          "y": 83.5
+                          "x": 41.5,
+                          "y": 119.5
                         }
                       ],
                       "originPoint": {
@@ -2722,9 +4755,9 @@
           "font": "",
           "characterSize": 30,
           "color": {
-            "b": 226,
-            "g": 144,
-            "r": 74
+            "b": 0,
+            "g": 0,
+            "r": 0
           }
         },
         {
@@ -2740,28 +4773,600 @@
           "font": "",
           "characterSize": 30,
           "color": {
-            "b": 226,
-            "g": 144,
-            "r": 74
+            "b": 0,
+            "g": 0,
+            "r": 0
           }
         },
         {
           "bold": false,
           "italic": false,
-          "name": "Instructions",
+          "name": "DesktopControls",
           "smoothed": true,
           "type": "TextObject::Text",
           "underlined": false,
           "variables": [],
           "behaviors": [],
-          "string": "Ride the bike to the finish and see if you can beat 35 seconds!\n\nForce must not exceed 9,000 and you must not land on your head or you will crash!\n\nUp to pedal forward, Down to pedal back, Space to brake, Left/Right to rotate\n\nEsc to reset scene.  Try to avoid big jumps as you will fall off the bike!",
-          "font": "",
-          "characterSize": 120,
+          "string": "CONTROLS:\n\nUp to pedal forward, Down to pedal back, Space to brake, Left/Right to rotate\n\nEsc to reset scene.  Try to avoid big jumps as you will fall off the bike!",
+          "font": "GFX\\SF Atarian System.ttf",
+          "characterSize": 18,
           "color": {
-            "b": 226,
-            "g": 144,
-            "r": 74
+            "b": 74,
+            "g": 44,
+            "r": 16
           }
+        },
+        {
+          "bold": false,
+          "italic": false,
+          "name": "GameInstructions",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "Ride the bike to the finish and see if you can beat 30 seconds!\n\nForce must not exceed 1,000 and you must not land on your head or you will crash!",
+          "font": "GFX\\SF Atarian System.ttf",
+          "characterSize": 24,
+          "color": {
+            "b": 74,
+            "g": 44,
+            "r": 16
+          }
+        },
+        {
+          "name": "Jump",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [
+            {
+              "name": "Physics2",
+              "type": "Physics2::Physics2Behavior",
+              "content": {
+                "type": "Static",
+                "bullet": false,
+                "fixedRotation": false,
+                "canSleep": true,
+                "shape": "Box",
+                "shapeDimensionA": 0,
+                "shapeDimensionB": 0,
+                "shapeOffsetX": 0,
+                "shapeOffsetY": 0,
+                "polygonOrigin": "Center",
+                "vertices": [],
+                "density": 1,
+                "friction": 0.3,
+                "restitution": 0.1,
+                "linearDamping": 0.1,
+                "angularDamping": 0.1,
+                "gravityScale": 1,
+                "layers": 32768,
+                "masks": 16384
+              }
+            }
+          ],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Shelf.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Forward",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Forward.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 160,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Backward",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Backward.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Brake",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Brake.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 153,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Retry",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Esc.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Left",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Left.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Right",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\Right.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 118,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "bottomMargin": 0,
+          "height": 205,
+          "leftMargin": 0,
+          "name": "Track",
+          "rightMargin": 0,
+          "texture": "GFX\\Stone.jpg",
+          "tiled": true,
+          "topMargin": 0,
+          "type": "PanelSpriteObject::PanelSprite",
+          "width": 1024,
+          "variables": [],
+          "behaviors": []
+        },
+        {
+          "name": "Cliff",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\cliff.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Background",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\snow.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Tree",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\tree10.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Bush",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\bush.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Grass",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\grass.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Sign",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "GFX\\signRight.png",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "ForceIndicator",
+          "type": "PrimitiveDrawing::Drawer",
+          "variables": [],
+          "behaviors": [],
+          "fillOpacity": 255,
+          "outlineSize": 1,
+          "outlineOpacity": 255,
+          "fillColor": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          },
+          "outlineColor": {
+            "b": 0,
+            "g": 0,
+            "r": 0
+          },
+          "absoluteCoordinates": false
         }
       ],
       "events": [
@@ -2776,6 +5381,21 @@
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
           "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Comment",
+              "color": {
+                "b": 109,
+                "g": 230,
+                "r": 255,
+                "textB": 0,
+                "textG": 0,
+                "textR": 0
+              },
+              "comment": "Setup scene variables and position mobile buttons relative to scene width.",
+              "comment2": ""
+            },
             {
               "disabled": false,
               "folded": false,
@@ -2801,7 +5421,7 @@
                   "parameters": [
                     "maxSpeed",
                     "=",
-                    "10000"
+                    "3000"
                   ],
                   "subInstructions": []
                 },
@@ -2828,9 +5448,177 @@
                     "0.18"
                   ],
                   "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreX"
+                  },
+                  "parameters": [
+                    "Forward",
+                    "=",
+                    "SceneWindowWidth()-40"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreX"
+                  },
+                  "parameters": [
+                    "Right",
+                    "=",
+                    "SceneWindowWidth()-40"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreX"
+                  },
+                  "parameters": [
+                    "Brake",
+                    "=",
+                    "(SceneWindowWidth()/2)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreX"
+                  },
+                  "parameters": [
+                    "Timing",
+                    "=",
+                    "SceneWindowWidth()-260"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MettreX"
+                  },
+                  "parameters": [
+                    "Elapsed",
+                    "=",
+                    "SceneWindowWidth()-140"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ChangeWidth"
+                  },
+                  "parameters": [
+                    "Brake",
+                    "=",
+                    "(SceneWindowWidth()/2)"
+                  ],
+                  "subInstructions": []
                 }
               ],
               "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "If we are not on a mobile device then hide the controls, and if we are then Fullscreen!",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "SystemInfo::IsMobile"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "HideLayer"
+                      },
+                      "parameters": [
+                        "",
+                        "\"Mobile\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SystemInfo::IsMobile"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetFullScreen"
+                      },
+                      "parameters": [
+                        "",
+                        "yes",
+                        "yes"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Opacity"
+                      },
+                      "parameters": [
+                        "Controls",
+                        "=",
+                        "180"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Cache"
+                      },
+                      "parameters": [
+                        "DesktopControls"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
                 {
                   "disabled": false,
                   "folded": false,
@@ -2859,7 +5647,7 @@
                       },
                       "parameters": [
                         "MainFrame",
-                        "Physics2Behavior",
+                        "Physics2",
                         "MainFrame.X(Seat)",
                         "MainFrame.Y(Seat)",
                         "Seat",
@@ -2889,7 +5677,7 @@
                       },
                       "parameters": [
                         "MainFrame",
-                        "Physics2Behavior",
+                        "Physics2",
                         "MainFrame.X(Crank)",
                         "MainFrame.Y(Crank)",
                         "Crank",
@@ -2923,7 +5711,7 @@
                       },
                       "parameters": [
                         "MainFrame",
-                        "Physics2Behavior",
+                        "Physics2",
                         "MainFrame.X(FrontWheelAxis)",
                         "MainFrame.Y(FrontWheelAxis)",
                         "FrontWheel",
@@ -2956,7 +5744,7 @@
                       },
                       "parameters": [
                         "MainFrame",
-                        "Physics2Behavior",
+                        "Physics2",
                         "MainFrame.X(RearWheelAxis)",
                         "MainFrame.Y(RearWheelAxis)",
                         "BackWheel",
@@ -2967,7 +5755,7 @@
                         "0.7",
                         "yes",
                         "1",
-                        "400",
+                        "50",
                         "no",
                         "rearJoint"
                       ],
@@ -2989,7 +5777,7 @@
                       },
                       "parameters": [
                         "RearSuspension",
-                        "Physics2Behavior",
+                        "Physics2",
                         "RearSuspension.X(WheelAxis)",
                         "RearSuspension.Y(WheelAxis)",
                         "BackWheel",
@@ -3023,7 +5811,7 @@
                       },
                       "parameters": [
                         "Crank",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Crank.X(RPedal)",
                         "Crank.Y(RPedal)",
                         "RPedal",
@@ -3057,7 +5845,7 @@
                       },
                       "parameters": [
                         "Crank",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Crank.X(LPedal)",
                         "Crank.Y(LPedal)",
                         "LPedal",
@@ -3076,14 +5864,6 @@
                       "subInstructions": []
                     }
                   ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [],
                   "events": []
                 },
                 {
@@ -3114,12 +5894,12 @@
                       },
                       "parameters": [
                         "Torso",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Torso.X(SeatConnect)",
                         "Torso.Y(SeatConnect)",
-                        "Seat",
-                        "Seat.X(UConnect)",
-                        "Seat.Y(UConnect)",
+                        "MainFrame",
+                        "MainFrame.X(Sit)",
+                        "MainFrame.Y(Sit)",
                         "yes",
                         "0",
                         "-10",
@@ -3148,7 +5928,7 @@
                       },
                       "parameters": [
                         "Torso",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Torso.X(UConnect)",
                         "Torso.Y(UConnect)",
                         "Head",
@@ -3182,7 +5962,7 @@
                       },
                       "parameters": [
                         "Torso",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Torso.X(LConnect)",
                         "Torso.Y(LConnect)",
                         "RightThigh",
@@ -3216,7 +5996,7 @@
                       },
                       "parameters": [
                         "Torso",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Torso.X(LConnect)",
                         "Torso.Y(LConnect)",
                         "LeftThigh",
@@ -3250,7 +6030,7 @@
                       },
                       "parameters": [
                         "RightLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "RightLeg.X(Connect)",
                         "RightLeg.Y(Connect)",
                         "RightThigh",
@@ -3284,7 +6064,7 @@
                       },
                       "parameters": [
                         "LeftLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "LeftLeg.X(Connect)",
                         "LeftLeg.Y(Connect)",
                         "LeftThigh",
@@ -3318,7 +6098,7 @@
                       },
                       "parameters": [
                         "LeftLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "LeftLeg.X(Pedal)",
                         "LeftLeg.Y(Pedal)",
                         "LPedal",
@@ -3352,7 +6132,7 @@
                       },
                       "parameters": [
                         "RightLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "RightLeg.X(Pedal)",
                         "RightLeg.Y(Pedal)",
                         "RPedal",
@@ -3386,7 +6166,7 @@
                       },
                       "parameters": [
                         "Torso",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Torso.X(ArmConnect)",
                         "Torso.Y(ArmConnect)",
                         "LUpperArm",
@@ -3420,7 +6200,7 @@
                       },
                       "parameters": [
                         "Torso",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Torso.X(ArmConnect)",
                         "Torso.Y(ArmConnect)",
                         "RUpperArm",
@@ -3454,7 +6234,7 @@
                       },
                       "parameters": [
                         "RArm",
-                        "Physics2Behavior",
+                        "Physics2",
                         "RArm.X(Connect)",
                         "RArm.Y(Connect)",
                         "RUpperArm",
@@ -3488,7 +6268,7 @@
                       },
                       "parameters": [
                         "LArm",
-                        "Physics2Behavior",
+                        "Physics2",
                         "LArm.X(Connect)",
                         "LArm.Y(Connect)",
                         "LUpperArm",
@@ -3522,7 +6302,7 @@
                       },
                       "parameters": [
                         "LArm",
-                        "Physics2Behavior",
+                        "Physics2",
                         "LArm.X(Handlebar)",
                         "LArm.Y(Handlebar)",
                         "MainFrame",
@@ -3556,7 +6336,7 @@
                       },
                       "parameters": [
                         "RArm",
-                        "Physics2Behavior",
+                        "Physics2",
                         "RArm.X(Handlebar)",
                         "RArm.Y(Handlebar)",
                         "MainFrame",
@@ -3575,14 +6355,6 @@
                       "subInstructions": []
                     }
                   ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [],
                   "events": []
                 }
               ]
@@ -3667,10 +6439,10 @@
                   },
                   "parameters": [
                     "Crank",
-                    "Physics2Behavior",
+                    "Physics2",
                     "Variable(crank)",
                     "=",
-                    "Variable(bikeSpeed)/8"
+                    "Variable(bikeSpeed)/4"
                   ],
                   "subInstructions": []
                 }
@@ -3713,12 +6485,27 @@
                       "parameters": [
                         "seatForce",
                         "=",
-                        "Torso.Physics2Behavior::JointReactionForce(Variable(torsoForce))"
+                        "Torso.Physics2::JointReactionForce(Variable(torsoForce))"
                       ],
                       "subInstructions": []
                     }
                   ],
                   "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Update force text",
+                  "comment2": ""
                 },
                 {
                   "disabled": false,
@@ -3765,6 +6552,347 @@
                     }
                   ],
                   "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "update force indicator, change colour and length based on how much force was applied.",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "seatForce",
+                        ">",
+                        "Variable(indicatorForce)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "indicatorForce",
+                        "=",
+                        "Variable(seatForce)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "indicatorForce",
+                        ">",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [],
+                  "events": [
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "maxForce",
+                            "<=",
+                            "1000"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "ModVarScene"
+                          },
+                          "parameters": [
+                            "indicatorForce",
+                            "-",
+                            "1"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "indicatorForce",
+                            ">",
+                            "0"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "PrimitiveDrawing::FillColor"
+                          },
+                          "parameters": [
+                            "ForceIndicator",
+                            "\"186;255;66\""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "indicatorForce",
+                            ">",
+                            "250"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "PrimitiveDrawing::FillColor"
+                          },
+                          "parameters": [
+                            "ForceIndicator",
+                            "\"250;237;86\""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "indicatorForce",
+                            ">",
+                            "500"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "PrimitiveDrawing::FillColor"
+                          },
+                          "parameters": [
+                            "ForceIndicator",
+                            "\"245;166;35\""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "indicatorForce",
+                            ">",
+                            "750"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "PrimitiveDrawing::FillColor"
+                          },
+                          "parameters": [
+                            "ForceIndicator",
+                            "\"255;105;65\""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "VarScene"
+                          },
+                          "parameters": [
+                            "maxForce",
+                            ">",
+                            "1000"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "PrimitiveDrawing::FillColor"
+                          },
+                          "parameters": [
+                            "ForceIndicator",
+                            "\"255;0;0\""
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    },
+                    {
+                      "disabled": false,
+                      "folded": false,
+                      "type": "BuiltinCommonInstructions::Standard",
+                      "conditions": [],
+                      "actions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "PrimitiveDrawing::Line"
+                          },
+                          "parameters": [
+                            "ForceIndicator",
+                            "Force.X()+20",
+                            "125",
+                            "Force.X()+(Variable(indicatorForce)/3)+20",
+                            "125",
+                            "16"
+                          ],
+                          "subInstructions": []
+                        }
+                      ],
+                      "events": []
+                    }
+                  ]
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "On a mobile device use vibration to give feedback when we feel forces.",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "seatForce",
+                        ">",
+                        "100"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "DeviceVibration::StartVibration"
+                      },
+                      "parameters": [
+                        "50"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
                 }
               ],
               "parameters": []
@@ -3795,12 +6923,23 @@
                   "parameters": [
                     "seatForce",
                     ">",
-                    "9000"
+                    "1000"
                   ],
                   "subInstructions": []
                 }
               ],
-              "actions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DeviceVibration::StartVibration"
+                  },
+                  "parameters": [
+                    "500"
+                  ],
+                  "subInstructions": []
+                }
+              ],
               "events": [
                 {
                   "disabled": false,
@@ -3830,7 +6969,7 @@
                       },
                       "parameters": [
                         "Seat",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(torsoForce)"
                       ],
                       "subInstructions": []
@@ -3842,7 +6981,7 @@
                       },
                       "parameters": [
                         "RightLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(ragdollRpedal)"
                       ],
                       "subInstructions": []
@@ -3854,7 +6993,7 @@
                       },
                       "parameters": [
                         "LeftLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(ragdollLpedal)"
                       ],
                       "subInstructions": []
@@ -3866,7 +7005,7 @@
                       },
                       "parameters": [
                         "RArm",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(ragdollRhand)"
                       ],
                       "subInstructions": []
@@ -3878,7 +7017,7 @@
                       },
                       "parameters": [
                         "LArm",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(ragdollLhand)"
                       ],
                       "subInstructions": []
@@ -3914,7 +7053,7 @@
                       },
                       "parameters": [
                         "RightThigh",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(rightThigh)",
                         "yes"
                       ],
@@ -3927,7 +7066,7 @@
                       },
                       "parameters": [
                         "LeftThigh",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(leftThigh)",
                         "yes"
                       ],
@@ -3940,7 +7079,7 @@
                       },
                       "parameters": [
                         "LeftLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(leftLeg)",
                         "yes"
                       ],
@@ -3953,7 +7092,7 @@
                       },
                       "parameters": [
                         "RightLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(rightLeg)",
                         "yes"
                       ],
@@ -3985,19 +7124,37 @@
                 {
                   "type": {
                     "inverted": false,
-                    "value": "CollisionNP"
+                    "value": "Physics2::Collision"
                   },
                   "parameters": [
-                    "Head",
-                    "floor",
-                    "floor",
-                    "",
-                    "yes"
+                    "RagdollColl",
+                    "Physics2",
+                    "ground",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BuiltinCommonInstructions::Once"
+                  },
+                  "parameters": [],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DeviceVibration::StartVibration"
+                  },
+                  "parameters": [
+                    "500"
                   ],
                   "subInstructions": []
                 }
               ],
-              "actions": [],
               "events": [
                 {
                   "disabled": false,
@@ -4027,7 +7184,7 @@
                       },
                       "parameters": [
                         "Seat",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(torsoForce)"
                       ],
                       "subInstructions": []
@@ -4039,7 +7196,7 @@
                       },
                       "parameters": [
                         "RightLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(ragdollRpedal)"
                       ],
                       "subInstructions": []
@@ -4051,7 +7208,7 @@
                       },
                       "parameters": [
                         "LeftLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(ragdollLpedal)"
                       ],
                       "subInstructions": []
@@ -4063,7 +7220,7 @@
                       },
                       "parameters": [
                         "RArm",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(ragdollRhand)"
                       ],
                       "subInstructions": []
@@ -4075,7 +7232,7 @@
                       },
                       "parameters": [
                         "LArm",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(ragdollLhand)"
                       ],
                       "subInstructions": []
@@ -4087,7 +7244,7 @@
                       },
                       "parameters": [
                         "Torso",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(headcoll)"
                       ],
                       "subInstructions": []
@@ -4123,7 +7280,7 @@
                       },
                       "parameters": [
                         "RightThigh",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(rightThigh)",
                         "yes"
                       ],
@@ -4136,7 +7293,7 @@
                       },
                       "parameters": [
                         "LeftThigh",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(leftThigh)",
                         "yes"
                       ],
@@ -4149,7 +7306,7 @@
                       },
                       "parameters": [
                         "LeftLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(leftLeg)",
                         "yes"
                       ],
@@ -4162,7 +7319,7 @@
                       },
                       "parameters": [
                         "RightLeg",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(rightLeg)",
                         "yes"
                       ],
@@ -4172,14 +7329,6 @@
                   "events": []
                 }
               ]
-            },
-            {
-              "disabled": false,
-              "folded": false,
-              "type": "BuiltinCommonInstructions::Standard",
-              "conditions": [],
-              "actions": [],
-              "events": []
             },
             {
               "colorB": 228,
@@ -4192,14 +7341,6 @@
               "source": "",
               "type": "BuiltinCommonInstructions::Group",
               "events": [
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [],
-                  "events": []
-                },
                 {
                   "disabled": false,
                   "folded": false,
@@ -4290,13 +7431,55 @@
                         {
                           "type": {
                             "inverted": false,
-                            "value": "KeyPressed"
+                            "value": "BuiltinCommonInstructions::Or"
                           },
-                          "parameters": [
-                            "",
-                            "Up"
-                          ],
-                          "subInstructions": []
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Up"
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "BuiltinCommonInstructions::And"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "SourisSurObjet"
+                                  },
+                                  "parameters": [
+                                    "Forward",
+                                    "",
+                                    "",
+                                    ""
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "SourisBouton"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Left"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ]
+                            }
+                          ]
                         }
                       ],
                       "actions": [
@@ -4308,20 +7491,7 @@
                           "parameters": [
                             "bikeSpeed",
                             "+",
-                            "300"
-                          ],
-                          "subInstructions": []
-                        },
-                        {
-                          "type": {
-                            "inverted": false,
-                            "value": "Physics2::EnableWheelJointMotor"
-                          },
-                          "parameters": [
-                            "BackWheel",
-                            "Physics2Behavior",
-                            "Variable(rearJoint)",
-                            "yes"
+                            "100"
                           ],
                           "subInstructions": []
                         },
@@ -4332,10 +7502,10 @@
                           },
                           "parameters": [
                             "BackWheel",
-                            "Physics2Behavior",
+                            "Physics2",
                             "Variable(rearJoint)",
                             "=",
-                            "3500"
+                            "50"
                           ],
                           "subInstructions": []
                         },
@@ -4352,7 +7522,53 @@
                           "subInstructions": []
                         }
                       ],
-                      "events": []
+                      "events": [
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Comment",
+                          "color": {
+                            "b": 109,
+                            "g": 230,
+                            "r": 255,
+                            "textB": 0,
+                            "textG": 0,
+                            "textR": 0
+                          },
+                          "comment": "As soon as we first go forward, hide the instructions.",
+                          "comment2": ""
+                        },
+                        {
+                          "disabled": false,
+                          "folded": false,
+                          "type": "BuiltinCommonInstructions::Standard",
+                          "conditions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Visible"
+                              },
+                              "parameters": [
+                                "GameInstructions"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "actions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "Cache"
+                              },
+                              "parameters": [
+                                "Instructions"
+                              ],
+                              "subInstructions": []
+                            }
+                          ],
+                          "events": []
+                        }
+                      ]
                     }
                   ]
                 },
@@ -4399,13 +7615,55 @@
                         {
                           "type": {
                             "inverted": false,
-                            "value": "KeyPressed"
+                            "value": "BuiltinCommonInstructions::Or"
                           },
-                          "parameters": [
-                            "",
-                            "Down"
-                          ],
-                          "subInstructions": []
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "KeyPressed"
+                              },
+                              "parameters": [
+                                "",
+                                "Down"
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "BuiltinCommonInstructions::And"
+                              },
+                              "parameters": [],
+                              "subInstructions": [
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "SourisSurObjet"
+                                  },
+                                  "parameters": [
+                                    "Backward",
+                                    "",
+                                    "",
+                                    ""
+                                  ],
+                                  "subInstructions": []
+                                },
+                                {
+                                  "type": {
+                                    "inverted": false,
+                                    "value": "SourisBouton"
+                                  },
+                                  "parameters": [
+                                    "",
+                                    "Left"
+                                  ],
+                                  "subInstructions": []
+                                }
+                              ]
+                            }
+                          ]
                         }
                       ],
                       "actions": [
@@ -4424,27 +7682,14 @@
                         {
                           "type": {
                             "inverted": false,
-                            "value": "Physics2::EnableWheelJointMotor"
-                          },
-                          "parameters": [
-                            "BackWheel",
-                            "Physics2Behavior",
-                            "Variable(rearJoint)",
-                            "yes"
-                          ],
-                          "subInstructions": []
-                        },
-                        {
-                          "type": {
-                            "inverted": false,
                             "value": "Physics2::WheelJointMaxMotorTorque"
                           },
                           "parameters": [
                             "BackWheel",
-                            "Physics2Behavior",
+                            "Physics2",
                             "Variable(rearJoint)",
                             "=",
-                            "800"
+                            "50"
                           ],
                           "subInstructions": []
                         },
@@ -4477,7 +7722,7 @@
                     "textG": 0,
                     "textR": 0
                   },
-                  "comment": "This fires if you're not accelerating - Sets the speed to 0 and disables motor (Freewheel)",
+                  "comment": "This fires if you're not accelerating - Slows you down slowly (Freewheel)",
                   "comment2": ""
                 },
                 {
@@ -4506,21 +7751,8 @@
                       },
                       "parameters": [
                         "bikeSpeed",
-                        "=",
-                        "0"
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Physics2::EnableWheelJointMotor"
-                      },
-                      "parameters": [
-                        "BackWheel",
-                        "Physics2Behavior",
-                        "Variable(rearJoint)",
-                        "no"
+                        "*",
+                        "0.99"
                       ],
                       "subInstructions": []
                     }
@@ -4550,29 +7782,58 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "KeyPressed"
+                        "value": "BuiltinCommonInstructions::Or"
                       },
-                      "parameters": [
-                        "",
-                        "Space"
-                      ],
-                      "subInstructions": []
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Space"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "BuiltinCommonInstructions::And"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "Brake",
+                                "",
+                                "",
+                                ""
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisBouton"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ],
+                              "subInstructions": []
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Physics2::EnableWheelJointMotor"
-                      },
-                      "parameters": [
-                        "BackWheel",
-                        "Physics2Behavior",
-                        "Variable(rearJoint)",
-                        "yes"
-                      ],
-                      "subInstructions": []
-                    },
                     {
                       "type": {
                         "inverted": false,
@@ -4592,10 +7853,10 @@
                       },
                       "parameters": [
                         "BackWheel",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(rearJoint)",
                         "=",
-                        "10000"
+                        "1000"
                       ],
                       "subInstructions": []
                     },
@@ -4606,7 +7867,7 @@
                       },
                       "parameters": [
                         "BackWheel",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(rearJoint)",
                         "=",
                         "0"
@@ -4614,14 +7875,6 @@
                       "subInstructions": []
                     }
                   ],
-                  "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [],
                   "events": []
                 },
                 {
@@ -4647,13 +7900,55 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "KeyPressed"
+                        "value": "BuiltinCommonInstructions::Or"
                       },
-                      "parameters": [
-                        "",
-                        "Right"
-                      ],
-                      "subInstructions": []
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Right"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "BuiltinCommonInstructions::And"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "Right",
+                                "",
+                                "",
+                                ""
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisBouton"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ],
+                              "subInstructions": []
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "actions": [
@@ -4664,8 +7959,8 @@
                       },
                       "parameters": [
                         "MainFrame",
-                        "Physics2Behavior",
-                        "3000"
+                        "Physics2",
+                        "38"
                       ],
                       "subInstructions": []
                     }
@@ -4680,13 +7975,55 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "KeyPressed"
+                        "value": "BuiltinCommonInstructions::Or"
                       },
-                      "parameters": [
-                        "",
-                        "Left"
-                      ],
-                      "subInstructions": []
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Left"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "BuiltinCommonInstructions::And"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "Left",
+                                "",
+                                "",
+                                ""
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisBouton"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ],
+                              "subInstructions": []
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "actions": [
@@ -4697,13 +8034,28 @@
                       },
                       "parameters": [
                         "MainFrame",
-                        "Physics2Behavior",
-                        "-3000"
+                        "Physics2",
+                        "-38"
                       ],
                       "subInstructions": []
                     }
                   ],
                   "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Now change the rear wheel motor speed to the value of the scene variable (bikeSpeed) we have modified with our input.",
+                  "comment2": ""
                 },
                 {
                   "disabled": false,
@@ -4718,7 +8070,7 @@
                       },
                       "parameters": [
                         "BackWheel",
-                        "Physics2Behavior",
+                        "Physics2",
                         "Variable(rearJoint)",
                         "=",
                         "Variable(bikeSpeed)"
@@ -4731,18 +8083,75 @@
                 {
                   "disabled": false,
                   "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Reset the scene if we press Esc.",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
                   "type": "BuiltinCommonInstructions::Standard",
                   "conditions": [
                     {
                       "type": {
                         "inverted": false,
-                        "value": "KeyPressed"
+                        "value": "BuiltinCommonInstructions::Or"
                       },
-                      "parameters": [
-                        "",
-                        "Escape"
-                      ],
-                      "subInstructions": []
+                      "parameters": [],
+                      "subInstructions": [
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "KeyPressed"
+                          },
+                          "parameters": [
+                            "",
+                            "Escape"
+                          ],
+                          "subInstructions": []
+                        },
+                        {
+                          "type": {
+                            "inverted": false,
+                            "value": "BuiltinCommonInstructions::And"
+                          },
+                          "parameters": [],
+                          "subInstructions": [
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisSurObjet"
+                              },
+                              "parameters": [
+                                "Retry",
+                                "",
+                                "",
+                                ""
+                              ],
+                              "subInstructions": []
+                            },
+                            {
+                              "type": {
+                                "inverted": false,
+                                "value": "SourisBouton"
+                              },
+                              "parameters": [
+                                "",
+                                "Left"
+                              ],
+                              "subInstructions": []
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ],
                   "actions": [
@@ -4822,7 +8231,7 @@
                       "parameters": [
                         "clearance",
                         "=",
-                        "(Variable(height)-(Torso.Y()-400))"
+                        "(Variable(height)-(Torso.Y()-600))"
                       ],
                       "subInstructions": []
                     },
@@ -4833,7 +8242,7 @@
                       },
                       "parameters": [
                         "",
-                        "(200/Variable(clearance))\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+                        "(300/Variable(clearance))\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
                         "",
                         ""
                       ],
@@ -4938,6 +8347,44 @@
                       "events": []
                     }
                   ]
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Comment",
+                  "color": {
+                    "b": 109,
+                    "g": 230,
+                    "r": 255,
+                    "textB": 0,
+                    "textG": 0,
+                    "textR": 0
+                  },
+                  "comment": "Slowly scroll mountain background layer.",
+                  "comment2": ""
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "CameraX"
+                      },
+                      "parameters": [
+                        "",
+                        "=",
+                        "(Torso.X()+900)/100",
+                        "\"Background\"",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
                 }
               ],
               "parameters": []
@@ -5105,14 +8552,6 @@
                     }
                   ],
                   "events": []
-                },
-                {
-                  "disabled": false,
-                  "folded": false,
-                  "type": "BuiltinCommonInstructions::Standard",
-                  "conditions": [],
-                  "actions": [],
-                  "events": []
                 }
               ],
               "parameters": []
@@ -5122,6 +8561,12 @@
         }
       ],
       "layers": [
+        {
+          "name": "Background",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
+        },
         {
           "name": "",
           "visibility": true,
@@ -5144,17 +8589,23 @@
           "visibility": true,
           "cameras": [],
           "effects": []
+        },
+        {
+          "name": "Mobile",
+          "visibility": true,
+          "cameras": [],
+          "effects": []
         }
       ],
       "behaviorsSharedData": [
         {
-          "name": "Physics2Behavior",
+          "name": "Physics2",
           "type": "Physics2::Physics2Behavior",
           "content": {
             "gravityX": 0,
             "gravityY": 9.8,
-            "scaleX": 100,
-            "scaleY": 100
+            "scaleX": 200,
+            "scaleY": 200
           }
         }
       ]

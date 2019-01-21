@@ -53,6 +53,7 @@ module.exports = {
         "JsPlatform/Extensions/filesystem_create_folder32.png"
       )
       .addParameter("string", t("Directory"), "", false)
+      .addParameter("scenevar", t("(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."), "", true)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
@@ -71,6 +72,7 @@ module.exports = {
       )
       .addParameter("string", t("String (text)"), "", false)
       .addParameter("string", t("Save path"), "", false)
+      .addParameter("scenevar", t("(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."), "", true)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
@@ -81,7 +83,7 @@ module.exports = {
       .addAction(
         "LoadStringFromFileAsync",
         t("Load a text from a file (Async)"),
-        t("Load a text from a file asynchronously. Use this for large files to not delay game execution. (The content of the file will not be available immediately)"),
+        t("Load a text from a file asynchronously. Use this for large files to avoid any lag or freeze during game execution. The content of the file will be available in the scene variable after a small delay (usually a few milliseconds). The 'result' variable gets updated when the operation has finised."),
         t("Load text from _PARAM1_ into scene variable _PARAM0_ (Async)"),
         t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/filesystem_load_file24.png",
@@ -89,6 +91,7 @@ module.exports = {
       )
       .addParameter("scenevar", t("Scene variable"), "", false)
       .addParameter("string", t("Load path"), "", false)
+      .addParameter("scenevar", t("(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."), "", true)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
@@ -99,7 +102,7 @@ module.exports = {
       .addAction(
         "LoadStringFromFileSync",
         t("Load a text from a file"),
-        t("Load a text from a file. Only use this on small files to not delay the game execution."),
+        t("Load a text from a file. Only use this on small files to avoid any lag or freeze during the the game execution."),
         t("Load text from _PARAM1_ into scene variable _PARAM0_"),
         t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/filesystem_load_file24.png",
@@ -107,6 +110,7 @@ module.exports = {
       )
       .addParameter("scenevar", t("Scene variable"), "", false)
       .addParameter("string", t("Load path"), "", false)
+      .addParameter("scenevar", t("(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."), "", true)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"
@@ -124,6 +128,7 @@ module.exports = {
         "JsPlatform/Extensions/filesystem_delete_file32.png"
       )
       .addParameter("string", t("File path"), "", false)
+      .addParameter("scenevar", t("(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."), "", true)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/FileSystem/filesystemtools.js"

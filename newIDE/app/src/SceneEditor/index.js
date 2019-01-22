@@ -282,6 +282,13 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.setState({ scenePropertiesDialogOpen: open });
   };
 
+  saveUiSettings = () => {
+    unserializeFromJSObject(
+      this.props.layout.getAssociatedSettings(),
+      this.state.uiSettings
+    );
+  };
+
   openObjectEditor = () => {
     if (!this.instancesSelection.hasSelectedInstances()) {
       return;

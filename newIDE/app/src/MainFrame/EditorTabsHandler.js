@@ -130,6 +130,23 @@ export const closeProjectTabs = (
   );
 };
 
+/* 
+  If a tab contains an Editor and
+  and that Editor contains a method to 
+  save the settings to the project file, run it...
+*/
+
+export const saveUiSettings = (state: EditorTabsState) => {
+  state.editors.forEach(editorTab => {
+    if (
+      editorTab.editorRef.editor &&
+      editorTab.editorRef.editor.saveUiSettings
+    ) {
+      editorTab.editorRef.editor.saveUiSettings();
+    }
+  });
+};
+
 export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
   return changeCurrentTab(
     {

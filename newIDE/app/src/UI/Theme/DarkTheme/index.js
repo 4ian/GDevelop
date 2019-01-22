@@ -5,6 +5,7 @@ import './Mosaic.css';
 import './EventsSheet.css';
 import 'react-virtualized/styles.css'; // Styles for react-virtualized Table
 import './Table.css';
+import './Markdown.css';
 
 const almostWhite = '#EEE';
 const lightWhite = '#DDD';
@@ -103,9 +104,10 @@ const theme: Theme = {
   logo: {
     src: 'res/GD-logo.png',
   },
-  mosaicRootClassName: 'mosaic-gd-dark-theme',
-  eventsSheetRootClassName: 'gd-events-sheet-dark-theme',
-  tableRootClassName: 'gd-table-dark-theme',
+  mosaicRootClassName: 'mosaic-gd-dark-theme', // See Mosaic.css
+  eventsSheetRootClassName: 'gd-events-sheet-dark-theme', // See EventsSheet.css
+  tableRootClassName: 'gd-table-dark-theme', // See Table.css
+  markdownRootClassName: 'gd-markdown-dark-theme', // See Markdown.css
   gdevelopIconsCSSFilter: '',
 };
 

@@ -936,10 +936,12 @@ export default class MainFrame extends React.Component<Props, State> {
   save = () => {
     if (!this.state.currentProject) return;
 
+    if (this.state.editorTabs) {
+      saveUiSettings(this.state.editorTabs);
+    }
     if (this.props.saveDialog) {
       this._openSaveDialog();
     } else if (this.props.onSaveProject) {
-      saveUiSettings(this.state.editorTabs);
       this.props.onSaveProject(this.state.currentProject).then(
         () => {
           this._showSnackMessage('Project properly saved');

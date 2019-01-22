@@ -191,7 +191,7 @@ export default class ResourcesList extends React.Component<Props, State> {
     }
 
     const answer = window.confirm(
-      "Are you sure you want to rename this resource? Game objects using the old name will no longer be able to find it!"
+      'Are you sure you want to rename this resource? Game objects using the old name will no longer be able to find it!'
     );
     if (!answer) return;
 

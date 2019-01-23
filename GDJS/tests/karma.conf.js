@@ -38,6 +38,7 @@ module.exports = function(config) {
       '../Runtime/events-tools/commontools.js',
       '../Runtime/events-tools/runtimescenetools.js',
       '../Runtime/events-tools/inputtools.js',
+      '../Runtime/events-tools/networktools.js',
       '../Runtime/events-tools/objecttools.js',
       '../Runtime/events-tools/cameratools.js',
       '../Runtime/events-tools/soundtools.js',

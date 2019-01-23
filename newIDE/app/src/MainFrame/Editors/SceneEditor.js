@@ -1,7 +1,10 @@
 // @flow
 import * as React from 'react';
 import SceneEditor from '../../SceneEditor';
-import { serializeToJSObject } from '../../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../../Utils/Serializer';
 import BaseEditor from './BaseEditor';
 import { type PreviewOptions } from '../../Export/PreviewLauncher.flow';
 
@@ -41,6 +44,16 @@ export default class SceneEditorContainer extends BaseEditor {
 
     return project.getLayout(layoutName);
   }
+
+  saveUiSettings = () => {
+    const layout = this.getLayout();
+    if (layout) {
+      unserializeFromJSObject(
+        layout.getAssociatedSettings(),
+        this.editor.getUiSettings()
+      );
+    }
+  };
 
   render() {
     const { project, layoutName, isActive } = this.props;

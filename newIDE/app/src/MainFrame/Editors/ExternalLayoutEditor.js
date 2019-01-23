@@ -2,7 +2,10 @@
 import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import SceneEditor from '../../SceneEditor';
-import { serializeToJSObject } from '../../Utils/Serializer';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../../Utils/Serializer';
 import PlaceholderMessage from '../../UI/PlaceholderMessage';
 import BaseEditor from './BaseEditor';
 import LayoutChooserDialog from './LayoutChooserDialog';
@@ -86,6 +89,16 @@ export default class ExternalLayoutEditor extends BaseEditor {
     this.setState({
       layoutChooserOpen: true,
     });
+  };
+
+  saveUiSettings = () => {
+    const layout = this.getExternalLayout();
+    if (layout) {
+      unserializeFromJSObject(
+        layout.getAssociatedSettings(),
+        this.editor.getUiSettings()
+      );
+    }
   };
 
   render() {

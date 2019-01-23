@@ -136,12 +136,8 @@ export const closeProjectTabs = (
  */
 export const saveUiSettings = (state: EditorTabsState) => {
   state.editors.forEach(editorTab => {
-    if (
-      editorTab.editorRef &&
-      editorTab.editorRef.editor &&
-      editorTab.editorRef.editor.saveUiSettings
-    ) {
-      editorTab.editorRef.editor.saveUiSettings();
+    if (editorTab.editorRef && editorTab.editorRef.saveUiSettings) {
+      editorTab.editorRef.saveUiSettings();
     }
   });
 };

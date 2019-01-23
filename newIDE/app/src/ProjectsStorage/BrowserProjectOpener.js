@@ -78,6 +78,7 @@ import rotateTowardMouse from '../fixtures/rotate-toward-mouse/rotate-toward-mou
 import rotateTowardPosition from '../fixtures/rotate-toward-position/rotate-toward-position.json';
 import rotateWithKeypress from '../fixtures/rotate-with-keypress/rotate-with-keypress.json';
 import saveLoad from '../fixtures/save-load/save-load.json';
+import screenShake from '../fixtures/screen-shake/screen-shake.json';
 import shootBulletInParabola from '../fixtures/shoot-bullet-in-parabola/shoot-bullet-in-parabola.json';
 import shootBullets from '../fixtures/shoot-bullets/shoot-bullets.json';
 import shootingBulletsExplanation from '../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
@@ -256,6 +257,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(rotateWithKeypress);
     } else if (url === 'example://save-load') {
       return Promise.resolve(saveLoad);
+    } else if (url === 'example://screen-shake') {
+      return Promise.resolve(screenShake);
     } else if (url === 'example://shoot-bullet-in-parabola') {
       return Promise.resolve(shootBulletInParabola);
     } else if (url === 'example://shoot-bullets') {

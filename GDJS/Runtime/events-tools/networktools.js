@@ -52,9 +52,9 @@ gdjs.evtTools.network.variableStructureToJSON = function(variable)
 {
     if ( !variable.isStructure() ) {
         if ( variable.isNumber() )
-            return variable.getAsNumber().toString();
+            return JSON.stringify(variable.getAsNumber());
         else
-            return "\""+variable.getAsString()+"\"";
+            return JSON.stringify(variable.getAsString());
     }
 
     var str = "{";
@@ -63,7 +63,7 @@ gdjs.evtTools.network.variableStructureToJSON = function(variable)
     for(var p in children) {
         if (children.hasOwnProperty(p)) {
 	        if ( !firstChild ) str += ",";
-	        str += "\""+p+"\": "+gdjs.evtTools.network.variableStructureToJSON(children[p]);
+	        str += JSON.stringify(p) + ": " + gdjs.evtTools.network.variableStructureToJSON(children[p]);
 
 	        firstChild = false;
 	    }

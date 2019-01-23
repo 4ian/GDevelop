@@ -935,12 +935,24 @@ module.exports = {
         "name": "TiledSpriteObject"
       },
       {
+        "fullName": "Panel Sprite (9-patch) Object",
+        "name": "PanelSpriteObject"
+      },
+      {
+        "fullName": "Primitive drawing",
+        "name": "PrimitiveDrawing"
+      },
+      {
         "fullName": "Physics Engine 2.0",
         "name": "Physics2"
       },
       {
         "fullName": "Scene management features",
         "name": "BuiltinScene"
+      },
+      {
+        "fullName": "System information",
+        "name": "SystemInfo"
       },
       {
         "fullName": "Advanced control features",
@@ -951,16 +963,32 @@ module.exports = {
         "name": "BuiltinVariables"
       },
       {
-        "fullName": "Base object",
-        "name": "BuiltinObject"
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
       },
       {
         "fullName": "Keyboard features",
         "name": "BuiltinKeyboard"
       },
       {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
         "fullName": "Cameras and layers features",
         "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Window features",
+        "name": "BuiltinWindow"
+      },
+      {
+        "fullName": "Device vibration",
+        "name": "DeviceVibration"
       },
       {
         "fullName": "Time",
@@ -2694,6 +2722,51 @@ module.exports = {
       {
         "fullName": "Base object",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "screen-shake": {
+    "description": "Make the screen shake when some event occurs.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Tiled Sprite Object",
+        "name": "TiledSpriteObject"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
       }
     ]
   },

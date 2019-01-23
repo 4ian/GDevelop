@@ -52,7 +52,7 @@ const buildMainMenuFor = window => {
       { type: 'separator' },
       {
         label: 'Close Project',
-        accelerator: 'CommandOrControl+W',
+        accelerator: 'CommandOrControl+Shift+W',
         click() {
           window.webContents.send('main-menu-close');
         },

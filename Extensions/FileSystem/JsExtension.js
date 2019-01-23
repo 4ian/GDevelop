@@ -92,7 +92,7 @@ module.exports = {
         "SaveStringToFileAsync",
         t("Save a text into a file (Async)."),
         t(
-          "Save a text into a file asynchronously. Use this for large files to avoid any lag or freeze during game execution. The 'result' variable gets updated when the operation has finised."
+          "Save a text into a file asynchronously. Use this for large files to avoid any lag or freeze during game execution. The 'result' variable gets updated when the operation has finished."
         ),
         t("Save _PARAM0_ into file _PARAM1_"),
         t("Filesystem/Windows, Linux, MacOS/Asyncrounouse"),
@@ -144,7 +144,7 @@ module.exports = {
         "SaveStructureToJSONFileAsync",
         t("Save a structure into a file (Async)"),
         t(
-          "Save a structure with all its child variables into a file in JSON format asynchronously. Use this for large files to avoid any lag or freeze during game execution. The 'result' variable gets updated when the operation has finised."
+          "Save a structure with all its child variables into a file in JSON format asynchronously. Use this for large files to avoid any lag or freeze during game execution. The 'result' variable gets updated when the operation has finished."
         ),
         t("Save structure _PARAM0_ into file _PARAM1_"),
         t("Filesystem/Windows, Linux, MacOS/Asyncrounouse"),
@@ -170,7 +170,7 @@ module.exports = {
         "LoadStringFromFileAsync",
         t("Load a text from a file (Async)"),
         t(
-          "Load a text from a file asynchronously. Use this for large files to avoid any lag or freeze during game execution. The content of the file will be available in the scene variable after a small delay (usually a few milliseconds). The 'result' variable gets updated when the operation has finised."
+          "Load a text from a file asynchronously. Use this for large files to avoid any lag or freeze during game execution. The content of the file will be available in the scene variable after a small delay (usually a few milliseconds). The 'result' variable gets updated when the operation has finished."
         ),
         t("Load text from _PARAM1_ into scene variable _PARAM0_ (Async)"),
         t("Filesystem/Windows, Linux, MacOS/Asyncrounouse"),
@@ -248,7 +248,7 @@ module.exports = {
         "LoadStructureFromJSONFileAsync",
         t("Load a structure from a file (Async)"),
         t(
-          "Load a JSON formatted text from a file and convert it into a structure. Use this for large files to avoid any lag or freeze during game execution. The content of the file will be available as a scene structure after a small delay (usually a few milliseconds). The 'result' variable gets updated when the operation has finised."
+          "Load a JSON formatted text from a file and convert it into a structure. Use this for large files to avoid any lag or freeze during game execution. The content of the file will be available as a scene structure after a small delay (usually a few milliseconds). The 'result' variable gets updated when the operation has finished."
         ),
         t("Load JSON from _PARAM1_ into structure variable _PARAM0_"),
         t("Filesystem/Windows, Linux, MacOS/Asyncrounouse"),

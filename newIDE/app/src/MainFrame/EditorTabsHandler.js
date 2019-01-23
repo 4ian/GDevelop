@@ -130,10 +130,10 @@ export const closeProjectTabs = (
   );
 };
 
-/* 
-  If a tab contains an Editor with a method to 
-  save its settings to the project file, run it...
-*/
+/*
+ * Ask the editors to persist their UI settings
+ * to the project.
+ */
 export const saveUiSettings = (state: EditorTabsState) => {
   state.editors.forEach(editorTab => {
     if (

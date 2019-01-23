@@ -69,3 +69,9 @@ export const StripeCheckoutConfig = {
   image:
     'https://raw.githubusercontent.com/4ian/GDevelop/gh-pages/res/icon128linux.png',
 };
+
+export const GDevelopReleaseApi = {
+  baseUrl: isDev
+    ? 'https://c8cldf4iqh.execute-api.us-east-1.amazonaws.com/dev'
+    : 'https://api.gdevelop-app.com/release',
+};

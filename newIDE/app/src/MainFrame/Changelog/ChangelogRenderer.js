@@ -1,0 +1,97 @@
+// @flow
+import * as React from 'react';
+import {
+  type Release,
+  findRelease,
+} from '../../Utils/GDevelopServices/Release';
+import EmptyMessage from '../../UI/EmptyMessage';
+import PlaceholderLoader from '../../UI/PlaceholderLoader';
+import ReactMarkdown from 'react-markdown';
+import { Column, Line } from '../../UI/Grid';
+import { FlatButton, RaisedButton } from 'material-ui';
+import Window from '../../Utils/Window';
+import { hasBreakingChange } from '../../Utils/GDevelopServices/Release';
+import AlertMessage from '../../UI/AlertMessage';
+import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
+
+type Props = {|
+  releases: ?Array<Release>,
+  error: ?Error,
+  currentReleaseName: string,
+|};
+
+/**
+ * Display information about latest releases.
+ */
+const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
+  const openReleaseNote = () =>
+    Window.openExternalURL('https://github.com/4ian/GDevelop/releases');
+
+  if (error) {
+    return (
+      <Column>
+        <Line>
+          <AlertMessage kind="warning">
+            Please double check online the changes to make sure that you are
+            aware of anything new in this version that would require you to
+            adapt your project.
+          </AlertMessage>
+        </Line>
+        <Line>
+          <EmptyMessage>
+            Unable to load the information about the latest GDevelop releases.
+            Verify your internet connection or retry later.
+          </EmptyMessage>
+        </Line>
+        <Line justifyContent="center">
+          <RaisedButton
+            label="See the releases notes online"
+            onClick={openReleaseNote}
+          />
+        </Line>
+      </Column>
+    );
+  }
+
+  if (!releases) {
+    return <PlaceholderLoader />;
+  }
+
+  const currentRelease = findRelease(releases, currentReleaseName);
+  const currentVersionHasBreakingChange =
+    !!currentRelease && hasBreakingChange(currentRelease);
+
+  return (
+    <ThemeConsumer>
+      {muiTheme => (
+        <Column>
+          {currentVersionHasBreakingChange && (
+            <AlertMessage kind="warning">
+              This version of GDevelop has a breaking change. Please make sure
+              to read the changes below to understand if any change or
+              adaptation must be made to your project.
+            </AlertMessage>
+          )}
+          {releases.map(release => (
+            <ReactMarkdown
+              key={release.name}
+              escapeHtml
+              source={
+                '# Version ' + release.name + '\n---\n' + release.description
+              }
+              className={muiTheme.markdownRootClassName}
+            />
+          ))}
+          <Line justifyContent="center">
+            <FlatButton
+              label="See all the releases notes"
+              onClick={openReleaseNote}
+            />
+          </Line>
+        </Column>
+      )}
+    </ThemeConsumer>
+  );
+};
+
+export default ChangelogRenderer;

@@ -81,6 +81,8 @@ import {
   fakeIndieUserProfile,
   fakeNotAuthenticatedUserProfile,
   fakeAuthenticatedButLoadingUserProfile,
+  release,
+  releaseWithBreakingChange,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
@@ -113,6 +115,8 @@ import EventsFunctionsExtensionEditor from '../EventsFunctionsExtensionEditor';
 import OptionsEditorDialog from '../EventsFunctionsExtensionEditor/OptionsEditorDialog';
 import ProjectManager from '../ProjectManager';
 import AlertMessage from '../UI/AlertMessage';
+import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
+import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
 
 const gd = global.gd;
 const {
@@ -1402,6 +1406,41 @@ storiesOf('ErrorBoundary', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <ErrorFallbackComponent componentStack="Fake stack" error={fakeError} />
+  ));
+
+storiesOf('Changelog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .add('no breaking changes in this version (but in a previous)', () => (
+    <ChangelogRenderer
+      releases={[release, releaseWithBreakingChange]}
+      error={null}
+      currentReleaseName="5.0.0-beta62"
+    />
+  ))
+  .add('breaking changes in this version', () => (
+    <ChangelogRenderer
+      releases={[releaseWithBreakingChange]}
+      error={null}
+      currentReleaseName="5.0.0-beta60"
+    />
+  ))
+  .add('loading', () => (
+    <ChangelogRenderer
+      releases={null}
+      error={null}
+      currentReleaseName="5.0.0-beta62"
+    />
+  ))
+  .add('with error', () => (
+    <ChangelogRenderer
+      releases={null}
+      error={new Error('Fake error')}
+      currentReleaseName="5.0.0-beta62"
+    />
+  ))
+  .add('complete changelog dialog', () => (
+    <ChangelogDialog open onClose={action('close dialog')} />
   ));
 
 storiesOf('CreateProfile', module)

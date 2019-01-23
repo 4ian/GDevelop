@@ -6,7 +6,6 @@ import FlatButton from 'material-ui/FlatButton';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { Column, Line } from '../UI/Grid';
 import Window from '../Utils/Window';
-import optionalRequire from '../Utils/OptionalRequire';
 import IconButton from 'material-ui/IconButton';
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import PreferencesContext from './Preferences/PreferencesContext';
@@ -16,9 +15,8 @@ import {
   canDownloadUpdate,
   type UpdateStatus,
 } from './UpdaterTools';
-const electron = optionalRequire('electron');
-const app = electron ? electron.remote.app : null;
-const gd = global.gd;
+import Changelog from './Changelog';
+import { getIDEVersion, getGDCoreVersion } from '../Version';
 
 type Props = {
   open: boolean,
@@ -112,15 +110,6 @@ const contributors = [
 ];
 
 export default class AboutDialog extends PureComponent<Props, *> {
-  gdVersionString = '';
-  appVersionString = '';
-
-  constructor() {
-    super();
-    this.gdVersionString = gd ? gd.VersionWrapper.fullString() : 'Unknown';
-    this.appVersionString = app ? app.getVersion() : '5';
-  }
-
   _openContributePage = () => {
     Window.openExternalURL('https://gdevelop-app.com/contribute/');
   };
@@ -169,8 +158,8 @@ export default class AboutDialog extends PureComponent<Props, *> {
                 <Tab label="About GDevelop" value="about">
                   <Column>
                     <Line>
-                      GDevelop {this.appVersionString} based on GDevelop.js{' '}
-                      {this.gdVersionString}
+                      GDevelop {getIDEVersion()} based on GDevelop.js{' '}
+                      {getGDCoreVersion()}
                     </Line>
                     <Line>{updateStatusString}</Line>
                     <Line justifyContent="center">
@@ -183,6 +172,11 @@ export default class AboutDialog extends PureComponent<Props, *> {
                         />
                       )}
                     </Line>
+                  </Column>
+                </Tab>
+                <Tab label="What's new?" value="changelog">
+                  <Column>
+                    <Changelog />
                   </Column>
                 </Tab>
                 <Tab label="Contributors" value="contributors">

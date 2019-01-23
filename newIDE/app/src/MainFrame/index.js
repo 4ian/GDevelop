@@ -936,9 +936,8 @@ export default class MainFrame extends React.Component<Props, State> {
   save = () => {
     if (!this.state.currentProject) return;
 
-    if (this.state.editorTabs) {
-      saveUiSettings(this.state.editorTabs);
-    }
+    saveUiSettings(this.state.editorTabs);
+
     if (this.props.saveDialog) {
       this._openSaveDialog();
     } else if (this.props.onSaveProject) {
@@ -1040,6 +1039,7 @@ export default class MainFrame extends React.Component<Props, State> {
   };
 
   _onCloseEditorTab = (editorTab: EditorTab) => {
+    saveUiSettings(this.state.editorTabs);
     this.setState(
       {
         editorTabs: closeEditorTab(this.state.editorTabs, editorTab),

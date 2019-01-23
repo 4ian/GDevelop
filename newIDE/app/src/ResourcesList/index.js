@@ -190,8 +190,8 @@ export default class ResourcesList extends React.Component<Props, State> {
       return;
     }
 
-    const answer = window.confirm(
-      'Are you sure you want to rename this resource? Game objects using the old name will no longer be able to find it!'
+    const answer = confirm( //eslint-disable-line
+      'Are you sure you want to rename this resource? \nGame objects using the old name will no longer be able to find it!'
     );
     if (!answer) return;
 

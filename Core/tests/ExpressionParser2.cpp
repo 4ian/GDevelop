@@ -42,6 +42,19 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       auto &textNode = dynamic_cast<gd::TextNode &>(*node);
       REQUIRE(textNode.text == "hello \"world\"");
     }
+
+    {
+      auto node = parser.ParseExpression("string", "\"\\\\\"");
+      REQUIRE(node != nullptr);
+      auto &textNode = dynamic_cast<gd::TextNode &>(*node);
+      REQUIRE(textNode.text == "\\");
+    }
+    {
+      auto node = parser.ParseExpression("string", "\"hello \\\\\\\"world\\\"\"");
+      REQUIRE(node != nullptr);
+      auto &textNode = dynamic_cast<gd::TextNode &>(*node);
+      REQUIRE(textNode.text == "hello \\\"world\"");
+    }
   }
 
   SECTION("Invalid texts") {

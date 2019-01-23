@@ -792,23 +792,10 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
 }
 
 gd::String EventsCodeGenerator::ConvertToString(gd::String plainString) {
-  for (size_t i = 0; i < plainString.length(); ++i) {
-    if (plainString[i] == '\\') {
-      if (i + 1 >= plainString.length() || plainString[i + 1] != '\"') {
-        if (i + 1 < plainString.length())
-          plainString.insert(i + 1, "\\");
-        else
-          plainString += ("\\");
-
-        ++i;
-      }
-    } else if (plainString[i] == '"') {
-      plainString.insert(i, "\\");
-      ++i;
-    }
-  }
-
-  plainString = plainString.FindAndReplace("\n", "\\n");
+  plainString = plainString.FindAndReplace("\\", "\\\\")
+                    .FindAndReplace("\r", "\\r")
+                    .FindAndReplace("\n", "\\n")
+                    .FindAndReplace("\"", "\\\"");
 
   return plainString;
 }

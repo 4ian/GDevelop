@@ -46,6 +46,14 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       node->Visit(expressionCodeGenerator);
       REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + \"world\"");
     }
+    {
+      auto node = parser.ParseExpression("string", "\"{\\\"hello\\\": \\\"world \\\\\\\" \\\"}\"");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() == "\"{\\\"hello\\\": \\\"world \\\\\\\" \\\"}\"");
+    }
   }
 
   SECTION("Valid number generation") {

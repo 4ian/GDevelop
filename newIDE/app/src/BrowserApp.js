@@ -50,6 +50,7 @@ export const create = (authentification: Authentification) => {
         filterExamples: !Window.isDev(),
       })}
       initialPathsOrURLsToOpen={appArguments['_']}
+      disableCheckForUpdates={!!appArguments['disable-update-check']}
       eventsFunctionWriter={makeBrowserS3EventsFunctionWriter()}
     />
   );

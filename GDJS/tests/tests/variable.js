@@ -4,53 +4,95 @@
  */
 
 describe('gdjs.variable', function() {
+  it('should parse initial values into strings and numbers', function() {
+    var intVar = new gdjs.Variable({ value: '526' });
+    var floatVar = new gdjs.Variable({ value: '10.568' });
+    var strVar = new gdjs.Variable({ value: 'testing variables' });
+    var numStrVar = new gdjs.Variable({ value: '5Apples' });
 
-	it('should parse initial values into strings and numbers', function(){
+    expect(intVar.getAsNumber()).to.be(526);
+    expect(intVar.getAsString()).to.be('526');
+    expect(floatVar.getAsNumber()).to.be(10.568);
+    expect(floatVar.getAsString()).to.be('10.568');
+    expect(strVar.getAsNumber()).to.be(0);
+    expect(strVar.getAsString()).to.be('testing variables');
+    expect(numStrVar.getAsNumber()).to.be(5);
+    expect(numStrVar.getAsString()).to.be('5Apples');
+  });
 
-		var intVar = new gdjs.Variable( {value : "526"} );
-		var floatVar = new gdjs.Variable( {value : "10.568"} );
-		var strVar = new gdjs.Variable( {value : "testing variables"} );
-		var numStrVar = new gdjs.Variable( {value : "5Apples"} );
+  it('should do some variable arithmetics', function() {
+    var a = new gdjs.Variable({ value: '5' });
 
-		expect(intVar.getAsNumber()).to.be(526);
-		expect(intVar.getAsString()).to.be("526");
-		expect(floatVar.getAsNumber()).to.be(10.568);
-		expect(floatVar.getAsString()).to.be("10.568");
-		expect(strVar.getAsNumber()).to.be(0);
-		expect(strVar.getAsString()).to.be("testing variables");
-		expect(numStrVar.getAsNumber()).to.be(5);
-		expect(numStrVar.getAsString()).to.be("5Apples");
-	});
+    a.add(3);
+    expect(a.getAsNumber()).to.be(8);
+    a.sub(10);
+    expect(a.getAsNumber()).to.be(-2);
+    a.mul(3);
+    expect(a.getAsNumber()).to.be(-6);
+    a.div(-2);
+    expect(a.getAsNumber()).to.be(3);
+    a.concatenate('Apples');
+    expect(a.getAsString()).to.be('3Apples');
+  });
 
-	it('should do some variable arithmetics', function(){
+  it('should clear a structure', function() {
+    var structure = new gdjs.Variable({ value: '0' });
+    structure.getChild('a').setNumber(5);
+    structure
+      .getChild('b')
+      .getChild('alpha')
+      .setString('Apples');
 
-		var a = new gdjs.Variable( {value : "5"} );
+    expect(structure.hasChild('a')).to.be(true);
+    expect(structure.hasChild('b')).to.be(true);
+    expect(structure.getChild('b').hasChild('alpha')).to.be(true);
 
-		a.add(3);
-		expect(a.getAsNumber()).to.be(8);
-		a.sub(10);
-		expect(a.getAsNumber()).to.be(-2);
-		a.mul(3);
-		expect(a.getAsNumber()).to.be(-6);
-		a.div(-2);
-		expect(a.getAsNumber()).to.be(3);
-		a.concatenate("Apples");
-		expect(a.getAsString()).to.be("3Apples");
+    structure.clearChildren();
+    expect(structure.hasChild('a')).to.be(false);
+    expect(structure.hasChild('b')).to.be(false);
+  });
 
-	});
+  it('can be serialized to JSON', function() {
+    var structure = new gdjs.Variable({ value: '0' });
+    structure.getChild('a').setNumber(5);
+    structure
+      .getChild('b')
+      .getChild('alpha')
+      .setString('Apples');
+    structure
+      .getChild('b')
+      .getChild('Child with quotes "" and a backlash \\')
+      .setString(
+        'String with quotes "", and a backslash \\ and new line \\n \\n\\r and brackets {[{}]}!'
+      );
 
-	it('should clear a structure', function(){
-		var structure = new gdjs.Variable( {value : "0"} );
-		structure.getChild("a").setNumber(5);
-		structure.getChild("b").getChild("alpha").setString("Apples");
+    expect(gdjs.evtTools.network.variableStructureToJSON(structure)).to.be(
+      '{"a": 5,"b": {"alpha": "Apples","Child with quotes \\"\\" and a backlash \\\\": "String with quotes \\"\\", and a backslash \\\\ and new line \\\\n \\\\n\\\\r and brackets {[{}]}!"}}'
+    );
+  });
 
-		expect(structure.hasChild("a")).to.be(true);
-		expect(structure.hasChild("b")).to.be(true);
-		expect(structure.getChild("b").hasChild("alpha")).to.be(true);
+  it('can be unserialized from JSON', function() {
+    var structure = new gdjs.Variable({ value: '0' });
 
-		structure.clearChildren();
-		expect(structure.hasChild("a")).to.be(false);
-		expect(structure.hasChild("b")).to.be(false);
-	})
+    gdjs.evtTools.network.jsonToVariableStructure(
+      '{"a": 5,"b": {"alpha": "Apples","Child with quotes \\"\\" and a backlash \\\\": "String with quotes \\"\\", and a backslash \\\\ and new line \\\\n \\\\n\\\\r and brackets {[{}]}!"}}',
+      structure
+    );
 
+    expect(structure.getChild('a').getAsNumber()).to.be(5);
+    expect(
+      structure
+        .getChild('b')
+        .getChild('alpha')
+        .getAsString()
+    ).to.be('Apples');
+    expect(
+      structure
+        .getChild('b')
+        .getChild('Child with quotes "" and a backlash \\')
+        .getAsString()
+    ).to.be(
+      'String with quotes "", and a backslash \\ and new line \\n \\n\\r and brackets {[{}]}!'
+    );
+  });
 });

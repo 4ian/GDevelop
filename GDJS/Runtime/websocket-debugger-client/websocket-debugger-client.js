@@ -153,6 +153,9 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
   // useful for the debugger.
   var excludedValues = [that._runtimegame.getGameData()];
   var excludedKeys = [
+    // Exclude reference to the debugger
+    '_debuggerClient',
+
     // Exclude some RuntimeScene fields:
     '_allInstancesList',
     '_initialObjectsData',
@@ -167,6 +170,9 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
     // Exclude some objects data:
     '_animations',
     '_animationFrame',
+
+    // Exclude linked objects to avoid too much repetitions:
+    'linkedObjectsManager', // Could be improved by using private fields and excluding these (_)
 
     // Exclude some behaviors data:
     '_platformRBush', // PlatformBehavior

@@ -47,10 +47,11 @@ export default class SceneEditorContainer extends BaseEditor {
 
   saveUiSettings = () => {
     const layout = this.getLayout();
+    const uiSettings = this.editor ? this.editor.getUiSettings() : {}
     if (layout) {
       unserializeFromJSObject(
         layout.getAssociatedSettings(),
-        this.editor.getUiSettings()
+        uiSettings
       );
     }
   };

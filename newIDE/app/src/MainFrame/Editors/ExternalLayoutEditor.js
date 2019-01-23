@@ -93,10 +93,11 @@ export default class ExternalLayoutEditor extends BaseEditor {
 
   saveUiSettings = () => {
     const layout = this.getExternalLayout();
+    const uiSettings = this.editor ? this.editor.getUiSettings() : {}
     if (layout) {
       unserializeFromJSObject(
         layout.getAssociatedSettings(),
-        this.editor.getUiSettings()
+        uiSettings
       );
     }
   };

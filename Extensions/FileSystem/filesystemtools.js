@@ -62,7 +62,7 @@ gdjs.fileSystem.getPicturesPath = function (runtimeScene) {
 };
 
 /**
- * Get the path to this applications 'executable' folder.
+ * Get the path to this applications 'Executable' folder.
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to this applications executable folder
  */
@@ -80,7 +80,7 @@ gdjs.fileSystem.getExecutablePath = function (runtimeScene) {
 };
 
 /**
- * Get the path to 'userdata' folder.
+ * Get the path to 'UserData' folder.
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to userdata folder
  */
@@ -98,7 +98,7 @@ gdjs.fileSystem.getUserdataPath = function (runtimeScene) {
 };
 
 /**
- * Get the path to 'temp' folder.
+ * Get the path to 'Temp' folder.
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to temp folder
  */
@@ -191,7 +191,7 @@ gdjs.fileSystem.saveStringToFile = function (text, savePath, resultVar) {
 };
 
 /**
- * Save a structure into a file in JSON format.
+ * Save a variable into a file in JSON format.
  * @param {scenevar} structure The structure to be saved
  * @param {string} savePath The absolute path on the filesystem
  * @param {scenevar} resultVar (optional) The variable to store the result of the operation
@@ -213,7 +213,7 @@ gdjs.fileSystem.saveStructureToJSONFile = function (structure, savePath, resultV
 };
 
 /**
- * Save a structure into a file in JSON format asyncrounousely.
+ * Save a variable into a file in JSON format asyncrounousely.
  * @param {string} text The structure to be saved
  * @param {string} savePath The absolute path on the filesystem
  * @param {scenevar} resultVar (optional) The variable to store the result of the operation

@@ -63,7 +63,7 @@ module.exports = {
 
     extension
       .addAction(
-        "SaveStringToFile",
+        "SaveStringToFileSync",
         t("Save a text into a file"),
         t(
           "Save a text into a file. Only use this on small files to avoid any lag or freeze during the the game execution."
@@ -90,12 +90,12 @@ module.exports = {
     extension
       .addAction(
         "SaveStringToFileAsync",
-        t("Save a text into a file (Async)."),
+        t("Save a text into a file (Async)"),
         t(
           "Save a text into a file asynchronously. Use this for large files to avoid any lag or freeze during game execution. The 'result' variable gets updated when the operation has finished."
         ),
         t("Save _PARAM0_ into file _PARAM1_"),
-        t("Filesystem/Windows, Linux, MacOS/Asyncrounouse"),
+        t("Filesystem/Windows, Linux, MacOS/Asynchronous"),
         "JsPlatform/Extensions/filesystem_save_file24.png",
         "JsPlatform/Extensions/filesystem_save_file32.png"
       )
@@ -116,11 +116,11 @@ module.exports = {
     extension
       .addAction(
         "SaveStructureToJSONFileSync",
-        t("Save a structure into a file"),
+        t("Save a scene variable into a JSON file"),
         t(
           "Save a structure with all its child variables into a file in JSON format. Only use this on small files to avoid any lag or freeze during the the game execution."
         ),
-        t("Save structure _PARAM0_ into file _PARAM1_"),
+        t("Save scene variable _PARAM0_ into file PARAM1 as JSON"),
         t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/filesystem_save_file24.png",
         "JsPlatform/Extensions/filesystem_save_file32.png"
@@ -142,16 +142,16 @@ module.exports = {
     extension
       .addAction(
         "SaveStructureToJSONFileAsync",
-        t("Save a structure into a file (Async)"),
+        t("Save a scene variable into a JSON file (Async)"),
         t(
           "Save a structure with all its child variables into a file in JSON format asynchronously. Use this for large files to avoid any lag or freeze during game execution. The 'result' variable gets updated when the operation has finished."
         ),
-        t("Save structure _PARAM0_ into file _PARAM1_"),
-        t("Filesystem/Windows, Linux, MacOS/Asyncrounouse"),
+        t("Save scene variable _PARAM0_ into file PARAM1 as JSON"),
+        t("Filesystem/Windows, Linux, MacOS/Asynchronous"),
         "JsPlatform/Extensions/filesystem_save_file24.png",
         "JsPlatform/Extensions/filesystem_save_file32.png"
       )
-      .addParameter("scenevar", t("Variable structure"), "", false)
+      .addParameter("scenevar", t("Scene variable"), "", false)
       .addParameter("string", t("Save path"), "", false)
       .addParameter(
         "scenevar",
@@ -168,12 +168,12 @@ module.exports = {
     extension
       .addAction(
         "LoadStringFromFileAsync",
-        t("Load a text from a file (Async)"),
+        t("Load a text from a JSON file (Async)"),
         t(
           "Load a text from a file asynchronously. Use this for large files to avoid any lag or freeze during game execution. The content of the file will be available in the scene variable after a small delay (usually a few milliseconds). The 'result' variable gets updated when the operation has finished."
         ),
         t("Load text from _PARAM1_ into scene variable _PARAM0_ (Async)"),
-        t("Filesystem/Windows, Linux, MacOS/Asyncrounouse"),
+        t("Filesystem/Windows, Linux, MacOS/Asynchronous"),
         "JsPlatform/Extensions/filesystem_load_file24.png",
         "JsPlatform/Extensions/filesystem_load_file32.png"
       )
@@ -224,12 +224,12 @@ module.exports = {
         t(
           "Load a JSON formatted text from a file and convert it into a structure. Only use this on small files to avoid any lag or freeze during the the game execution."
         ),
-        t("Load JSON from _PARAM1_ into structure variable _PARAM0_"),
+        t("Load JSON from _PARAM1_ into scene variable _PARAM0_"),
         t("Filesystem/Windows, Linux, MacOS"),
         "JsPlatform/Extensions/filesystem_save_file24.png",
         "JsPlatform/Extensions/filesystem_save_file32.png"
       )
-      .addParameter("scenevar", t("Variable structure"), "", false)
+      .addParameter("scenevar", t("Scene variable"), "", false)
       .addParameter("string", t("Load path"), "", false)
       .addParameter(
         "scenevar",
@@ -246,12 +246,12 @@ module.exports = {
     extension
       .addAction(
         "LoadStructureFromJSONFileAsync",
-        t("Load a structure from a file (Async)"),
+        t("Load a scene variable from a JSON file (Async)"),
         t(
-          "Load a JSON formatted text from a file and convert it into a structure. Use this for large files to avoid any lag or freeze during game execution. The content of the file will be available as a scene structure after a small delay (usually a few milliseconds). The 'result' variable gets updated when the operation has finished."
+          "Load a JSON formatted text from a file and convert it into a scene variable. Use this for large files to avoid any lag or freeze during game execution. The content of the file will be available as a scene structure after a small delay (usually a few milliseconds). The 'result' variable gets updated when the operation has finished."
         ),
-        t("Load JSON from _PARAM1_ into structure variable _PARAM0_"),
-        t("Filesystem/Windows, Linux, MacOS/Asyncrounouse"),
+        t("Load JSON from _PARAM1_ into scene variable _PARAM0_"),
+        t("Filesystem/Windows, Linux, MacOS/Asynchronous"),
         "JsPlatform/Extensions/filesystem_save_file24.png",
         "JsPlatform/Extensions/filesystem_save_file32.png"
       )
@@ -298,7 +298,7 @@ module.exports = {
         t("Delete a file (Async)"),
         t("Delete a file from the filesystem asyncrounouse."),
         t("Delete the file _PARAM0_"),
-        t("Filesystem/Windows, Linux, MacOS/Asyncrounouse"),
+        t("Filesystem/Windows, Linux, MacOS/Asynchronous"),
         "JsPlatform/Extensions/filesystem_delete_file24.png",
         "JsPlatform/Extensions/filesystem_delete_file32.png"
       )

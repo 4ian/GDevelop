@@ -47,12 +47,14 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() == "\"hello\" + \"world\"");
     }
     {
-      auto node = parser.ParseExpression("string", "\"{\\\"hello\\\": \\\"world \\\\\\\" \\\"}\"");
+      auto node = parser.ParseExpression(
+          "string", "\"{\\\"hello\\\": \\\"world \\\\\\\" \\\"}\"");
       gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
                                                           context);
 
       node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() == "\"{\\\"hello\\\": \\\"world \\\\\\\" \\\"}\"");
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "\"{\\\"hello\\\": \\\"world \\\\\\\" \\\"}\"");
     }
   }
 
@@ -159,23 +161,6 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
       REQUIRE(expressionCodeGenerator.GetOutput() ==
               "MySpriteObject.getObjectStringWith1Param(getNumber()) ?? \"\"");
     }
-    {
-      auto node =
-          parser.ParseExpression("string",
-                                 "MySpriteObject.GetObjectStringWith3Param("
-                                 "MySpriteObject.GetObjectNumber() / 2.3, "
-                                 "MySpriteObject.GetObjectStringWith1Param("
-                                 "MyExtension::GetNumber()), test)");
-      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
-                                                          context);
-
-      node->Visit(expressionCodeGenerator);
-      REQUIRE(expressionCodeGenerator.GetOutput() ==
-              "MySpriteObject.getObjectStringWith3Param(MySpriteObject."
-              "getObjectNumber() ?? 0 / 2.3, "
-              "MySpriteObject.getObjectStringWith1Param(getNumber()) ?? \"\", "
-              "\"test\") ?? \"\"");
-    }
   }
   SECTION("Valid function calls with optional arguments") {
     {
@@ -216,6 +201,24 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
     }
   }
   SECTION("Invalid function calls") {
+    {
+      auto node =
+          parser.ParseExpression("string",
+                                 "MySpriteObject.GetObjectStringWith3Param("
+                                 "MySpriteObject.GetObjectNumber() / 2.3, "
+                                 "MySpriteObject.GetObjectStringWith1Param("
+                                 "MyExtension::GetNumber()), test)");
+      gd::ExpressionCodeGenerator expressionCodeGenerator(codeGenerator,
+                                                          context);
+
+      node->Visit(expressionCodeGenerator);
+      REQUIRE(expressionCodeGenerator.GetOutput() ==
+              "MySpriteObject.getObjectStringWith3Param(MySpriteObject."
+              "getObjectNumber() ?? 0 / 2.3, "
+              "MySpriteObject.getObjectStringWith1Param(getNumber()) ?? \"\", "
+              "/* Error during generation, unrecognized identifier type: "
+              "unknown with value test */ \"test\") ?? \"\"");
+    }
     {
       auto node = parser.ParseExpression(
           "number",
@@ -369,6 +372,16 @@ TEST_CASE("ExpressionCodeGenerator", "[common][events]") {
             "0) ?? \"\").getChild(\"child2\"))");
       }
     }
+  }
+  SECTION("Objects") {
+    gd::String output = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+        codeGenerator,
+        context,
+        "string",
+        "MySpriteObject.GetObjectStringWith2ObjectParam(Object1, Object2)");
+    REQUIRE(output ==
+            "MySpriteObject.getObjectStringWith2ObjectParam(fakeObjectListOf_"
+            "Object1, fakeObjectListOf_Object2) ?? \"\"");
   }
   SECTION("Mixed test (1)") {
     {

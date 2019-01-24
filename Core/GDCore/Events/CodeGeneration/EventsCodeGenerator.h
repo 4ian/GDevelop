@@ -423,6 +423,7 @@ class GD_CORE_API EventsCodeGenerator {
   virtual gd::String GetCodeNamespace() { return ""; };
 
   enum VariableScope { LAYOUT_VARIABLE = 0, PROJECT_VARIABLE, OBJECT_VARIABLE };
+
  protected:
   /**
    * \brief Generate the code for a single parameter.
@@ -482,10 +483,10 @@ class GD_CORE_API EventsCodeGenerator {
    * \brief Generate the code to get a variable.
    */
   virtual gd::String GenerateGetVariable(
-      gd::String variableName,
+      const gd::String& variableName,
       const VariableScope& scope,
       gd::EventsCodeGenerationContext& context,
-      gd::String objectName) {
+      const gd::String& objectName) {
     if (scope == LAYOUT_VARIABLE) {
       return "getLayoutVariable(" + variableName + ")";
 
@@ -513,12 +514,29 @@ class GD_CORE_API EventsCodeGenerator {
   };
 
   /**
-   * \brief Generate the code to reference a variable which is 
+   * \brief Generate the code to reference a variable which is
    * in an empty/null state.
    */
-  virtual gd::String GenerateBadVariable() {
-      return "fakeBadVariable";
+  virtual gd::String GenerateBadVariable() { return "fakeBadVariable"; }
+
+  /**
+   * \brief Generate the code to reference an object.
+   * \param objectName the name of the object.
+   * \param type what is the expected type (object, objectPtr...) in which the
+   * object must be generated.
+   * \param context The context for code generation
+   */
+  virtual gd::String GenerateObject(const gd::String& objectName,
+                                    const gd::String& type,
+                                    gd::EventsCodeGenerationContext& context) {
+    return "fakeObjectListOf_" + objectName;
   }
+
+  /**
+   * \brief Generate the code to reference an object which is
+   * in an empty/null state.
+   */
+  virtual gd::String GenerateBadObject() { return "fakeNullObject"; }
 
   /**
    * \brief Call a function of the current object.

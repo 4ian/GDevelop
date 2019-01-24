@@ -130,10 +130,10 @@ class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::EventsCodeGenerationContext& context);
 
   virtual gd::String GenerateGetVariable(
-      gd::String variableName,
+      const gd::String& variableName,
       const VariableScope& scope,
       gd::EventsCodeGenerationContext& context,
-      gd::String objectName);
+      const gd::String& objectName);
 
   virtual gd::String GenerateVariableAccessor(gd::String childName) {
     return ".GetChild(" + ConvertToStringExplicit(childName) + ")";
@@ -147,6 +147,12 @@ class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateBadVariable() {
     return "runtimeContext->GetGameVariables().GetBadVariable()";
   }
+
+  virtual gd::String GenerateBadObject() { return "NULL"; }
+
+  virtual gd::String GenerateObject(const gd::String& objectName,
+                                    const gd::String& type,
+                                    gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Construct a code generator for the specified project and layout.

@@ -155,7 +155,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
     const vector<gd::ParameterMetadata>& parameters) {
   gd::String declaration = "runtimeScene";
   for (const auto& parameter : parameters) {
-    declaration += ", " + (parameter.GetName().empty() ? "_" : parameter.GetName());
+    declaration +=
+        ", " + (parameter.GetName().empty() ? "_" : parameter.GetName());
   }
   declaration += ", parentEventsFunctionContext";
 
@@ -454,7 +455,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Error: bad behavior \"" << behaviorName
-         << "\" requested for object \'" << objectName 
+         << "\" requested for object \'" << objectName
          << "\" (condition: " << instrInfos.GetFullName() << ")." << endl;
   } else {
     conditionCode +=
@@ -578,7 +579,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Error: bad behavior \"" << behaviorName
-         << "\" requested for object \'" << objectName 
+         << "\" requested for object \'" << objectName
          << "\" (action: " << instrInfos.GetFullName() << ")." << endl;
   } else {
     actionCode +=
@@ -739,6 +740,38 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     const gd::String& previousParameter,
     std::vector<std::pair<gd::String, gd::String> >*
         supplementaryParametersTypes) {
+  gd::String argOutput;
+
+  // Code only parameter type
+  if (metadata.type == "currentScene") {
+    argOutput = "runtimeScene";
+  }
+  // Code only parameter type
+  else if (metadata.type == "objectsContext") {
+    argOutput =
+        "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
+        ": runtimeScene)";
+  }
+  // Code only parameter type
+  else if (metadata.type == "eventsFunctionContext") {
+    argOutput =
+        "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
+        ": undefined)";
+  } else
+    return gd::EventsCodeGenerator::GenerateParameterCodes(
+        parameter,
+        metadata,
+        context,
+        previousParameter,
+        supplementaryParametersTypes);
+
+  return argOutput;
+}
+
+gd::String EventsCodeGenerator::GenerateObject(
+    const gd::String& objectName,
+    const gd::String& type,
+    gd::EventsCodeGenerationContext& context) {
   //*Optimization:* when a function need objects, it receive a map of
   //(references to) objects lists. We statically declare and construct them to
   // avoid re-creating them at runtime. Arrays are passed as reference in JS and
@@ -763,78 +796,52 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         return objectsMapName;
       };
 
-  gd::String argOutput;
-
-  // Code only parameter type
-  if (metadata.type == "currentScene") {
-    argOutput = "runtimeScene";
-  }
-  // Code only parameter type
-  else if (metadata.type == "objectsContext") {
-    argOutput =
-        "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
-        ": runtimeScene)";
-  }
-  // Code only parameter type
-  else if (metadata.type == "eventsFunctionContext") {
-    argOutput =
-        "(typeof eventsFunctionContext !== 'undefined' ? eventsFunctionContext "
-        ": undefined)";
-  }
-  // Code only parameter type
-  else if (metadata.type == "objectList") {
-    std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
+  gd::String output;
+  if (type == "objectList") {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
     for (auto& objectName : realObjects) context.ObjectsListNeeded(objectName);
 
     gd::String objectsMapName = declareMapOfObjects(realObjects, context);
-    argOutput = objectsMapName;
-  }
-  // Code only parameter type
-  else if (metadata.type == "objectListWithoutPicking") {
-    std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
+    output = objectsMapName;
+  } else if (type == "objectListWithoutPicking") {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
     for (auto& objectName : realObjects)
       context.EmptyObjectsListNeeded(objectName);
 
     gd::String objectsMapName = declareMapOfObjects(realObjects, context);
-    argOutput = objectsMapName;
-  }
-  // Code only parameter type
-  else if (metadata.type == "objectPtr") {
-    std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
+    output = objectsMapName;
+  } else if (type == "objectPtr") {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
 
     if (find(realObjects.begin(),
              realObjects.end(),
              context.GetCurrentObject()) != realObjects.end() &&
         !context.GetCurrentObject().empty()) {
       // If object currently used by instruction is available, use it directly.
-      argOutput =
-          GetObjectListName(context.GetCurrentObject(), context) + "[i]";
+      output = GetObjectListName(context.GetCurrentObject(), context) + "[i]";
     } else {
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         context.ObjectsListNeeded(realObjects[i]);
-        argOutput += "(" + GetObjectListName(realObjects[i], context) +
-                     ".length !== 0 ? " +
-                     GetObjectListName(realObjects[i], context) + "[0] : ";
+        output += "(" + GetObjectListName(realObjects[i], context) +
+                  ".length !== 0 ? " +
+                  GetObjectListName(realObjects[i], context) + "[0] : ";
       }
-      argOutput += "null";
-      for (std::size_t i = 0; i < realObjects.size(); ++i) argOutput += ")";
+      output += GenerateBadObject();
+      for (std::size_t i = 0; i < realObjects.size(); ++i) output += ")";
     }
-  } else
-    return gd::EventsCodeGenerator::GenerateParameterCodes(
-        parameter,
-        metadata,
-        context,
-        previousParameter,
-        supplementaryParametersTypes);
+  }
 
-  return argOutput;
+  return output;
 }
 
 gd::String EventsCodeGenerator::GenerateGetVariable(
-    gd::String variableName,
+    const gd::String& variableName,
     const VariableScope& scope,
     gd::EventsCodeGenerationContext& context,
-    gd::String objectName) {
+    const gd::String& objectName) {
   gd::String output;
   const gd::VariablesContainer* variables = NULL;
   if (scope == LAYOUT_VARIABLE) {
@@ -860,11 +867,10 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
       // Generate the call to GetVariables() method.
       if (context.GetCurrentObject() == realObjects[i] &&
           !context.GetCurrentObject().empty())
-        output = GetObjectListName(realObjects[i], context) +
-                 "[i].getVariables()";
+        output =
+            GetObjectListName(realObjects[i], context) + "[i].getVariables()";
       else
-        output = "((" +
-                 GetObjectListName(realObjects[i], context) +
+        output = "((" + GetObjectListName(realObjects[i], context) +
                  ".length === 0 ) ? " + output + " : " +
                  GetObjectListName(realObjects[i], context) +
                  "[0].getVariables())";
@@ -876,8 +882,7 @@ gd::String EventsCodeGenerator::GenerateGetVariable(
         variables = &GetLayout().GetObject(objectName).GetVariables();
       else if (GetProject().HasObjectNamed(
                    objectName))  // Then the global objects list.
-        variables =
-            &GetProject().GetObject(objectName).GetVariables();
+        variables = &GetProject().GetObject(objectName).GetVariables();
     }
   }
 

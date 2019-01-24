@@ -71,7 +71,12 @@ class GD_CORE_API ExpressionObjectRenamer : public ExpressionParser2NodeWorker {
     node.expression->Visit(*this);
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitIdentifierNode(IdentifierNode& node) override {
+    if (gd::ParameterMetadata::IsObject(node.type) && node.identifierName == objectName) {
+      hasDoneRenaming = true;
+      node.identifierName = objectNewName;
+    }
+  }
   void OnVisitFunctionNode(FunctionNode& node) override {
     if (node.objectName == objectName) {
       hasDoneRenaming = true;
@@ -138,7 +143,11 @@ class GD_CORE_API ExpressionObjectFinder : public ExpressionParser2NodeWorker {
     node.expression->Visit(*this);
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitIdentifierNode(IdentifierNode& node) override {
+    if (gd::ParameterMetadata::IsObject(node.type) && node.identifierName == objectName) {
+      hasObject = true;
+    }
+  }
   void OnVisitFunctionNode(FunctionNode& node) override {
     if (node.objectName == objectName) {
       hasObject = true;

@@ -331,7 +331,7 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
     cout << "Error: bad behavior \"" << behaviorName
-         << "\" requested for object \'" << objectName 
+         << "\" requested for object \'" << objectName
          << "\" (action: " << instrInfos.GetFullName() << ")." << endl;
   } else {
     actionCode += "for(std::size_t i = 0;i < " + ManObjListName(objectName) +
@@ -356,50 +356,6 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   // Code only parameter type
   if (metadata.type == "currentScene" || metadata.type == "objectsContext") {
     argOutput += "*runtimeContext->scene";
-  }
-  // Code only parameter type
-  else if (metadata.type == "objectList") {
-    std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
-
-    argOutput += "runtimeContext->ClearObjectListsMap()";
-    for (std::size_t i = 0; i < realObjects.size(); ++i) {
-      context.ObjectsListNeeded(realObjects[i]);
-      argOutput += ".AddObjectListToMap(\"" + ConvertToString(realObjects[i]) +
-                   "\", " + ManObjListName(realObjects[i]) + ")";
-    }
-    argOutput += ".ReturnObjectListsMap()";
-  }
-  // Code only parameter type
-  else if (metadata.type == "objectListWithoutPicking") {
-    std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
-
-    argOutput += "runtimeContext->ClearObjectListsMap()";
-    for (std::size_t i = 0; i < realObjects.size(); ++i) {
-      context.EmptyObjectsListNeeded(realObjects[i]);
-      argOutput += ".AddObjectListToMap(\"" + ConvertToString(realObjects[i]) +
-                   "\", " + ManObjListName(realObjects[i]) + ")";
-    }
-    argOutput += ".ReturnObjectListsMap()";
-  }
-  // Code only parameter type
-  else if (metadata.type == "objectPtr") {
-    std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
-
-    if (find(realObjects.begin(),
-             realObjects.end(),
-             context.GetCurrentObject()) != realObjects.end() &&
-        !context.GetCurrentObject().empty()) {
-      // If object currently used by instruction is available, use it directly.
-      argOutput += ManObjListName(context.GetCurrentObject()) + "[i]";
-    } else {
-      for (std::size_t i = 0; i < realObjects.size(); ++i) {
-        context.ObjectsListNeeded(realObjects[i]);
-        argOutput += "(!" + ManObjListName(realObjects[i]) + ".empty() ? " +
-                     ManObjListName(realObjects[i]) + "[0] : ";
-      }
-      argOutput += "NULL";
-      for (std::size_t i = 0; i < realObjects.size(); ++i) argOutput += ")";
-    }
   } else {
     argOutput += gd::EventsCodeGenerator::GenerateParameterCodes(
         parameter,
@@ -412,11 +368,62 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   return argOutput;
 }
 
+gd::String EventsCodeGenerator::GenerateObject(
+    const gd::String& objectName,
+    const gd::String& type,
+    gd::EventsCodeGenerationContext& context) {
+  gd::String output;
+  if (type == "objectList") {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
+
+    output += "runtimeContext->ClearObjectListsMap()";
+    for (std::size_t i = 0; i < realObjects.size(); ++i) {
+      context.ObjectsListNeeded(realObjects[i]);
+      output += ".AddObjectListToMap(\"" + ConvertToString(realObjects[i]) +
+                "\", " + ManObjListName(realObjects[i]) + ")";
+    }
+    output += ".ReturnObjectListsMap()";
+  } else if (type == "objectListWithoutPicking") {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
+
+    output += "runtimeContext->ClearObjectListsMap()";
+    for (std::size_t i = 0; i < realObjects.size(); ++i) {
+      context.EmptyObjectsListNeeded(realObjects[i]);
+      output += ".AddObjectListToMap(\"" + ConvertToString(realObjects[i]) +
+                "\", " + ManObjListName(realObjects[i]) + ")";
+    }
+    output += ".ReturnObjectListsMap()";
+  } else if (type == "objectPtr") {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
+
+    if (find(realObjects.begin(),
+             realObjects.end(),
+             context.GetCurrentObject()) != realObjects.end() &&
+        !context.GetCurrentObject().empty()) {
+      // If object currently used by instruction is available, use it directly.
+      output += ManObjListName(context.GetCurrentObject()) + "[i]";
+    } else {
+      for (std::size_t i = 0; i < realObjects.size(); ++i) {
+        context.ObjectsListNeeded(realObjects[i]);
+        output += "(!" + ManObjListName(realObjects[i]) + ".empty() ? " +
+                  ManObjListName(realObjects[i]) + "[0] : ";
+      }
+      output += GenerateBadObject();
+      for (std::size_t i = 0; i < realObjects.size(); ++i) output += ")";
+    }
+  }
+
+  return output;
+}
+
 gd::String EventsCodeGenerator::GenerateGetVariable(
-    gd::String variableName,
+    const gd::String& variableName,
     const VariableScope& scope,
     gd::EventsCodeGenerationContext& context,
-    gd::String objectName) {
+    const gd::String& objectName) {
   gd::String output;
   const gd::VariablesContainer* variables = NULL;
   if (scope == LAYOUT_VARIABLE) {

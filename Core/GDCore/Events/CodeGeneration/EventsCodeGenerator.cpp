@@ -605,6 +605,10 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   } else if (ParameterMetadata::IsExpression("variable", metadata.type)) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
         *this, context, metadata.type, parameter, previousParameter);
+  } else if (ParameterMetadata::IsObject(metadata.type)) {
+    // It would be possible to run a gd::ExpressionCodeGenerator if later
+    // objects can have nested objects, or function returning objects.
+    argOutput = GenerateObject(parameter, metadata.type, context);
   } else if (metadata.type == "relationalOperator") {
     argOutput += parameter == "=" ? "==" : parameter;
     if (argOutput != "==" && argOutput != "<" && argOutput != ">" &&
@@ -623,7 +627,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     }
 
     argOutput = "\"" + argOutput + "\"";
-  } else if (metadata.type == "object" || metadata.type == "behavior") {
+  } else if (metadata.type == "behavior") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "key") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";

@@ -57,13 +57,16 @@ class GD_CORE_API ExpressionObjectsAnalyzer
     node.expression->Visit(*this);
     if (node.child) node.child->Visit(*this);
   }
-  void OnVisitIdentifierNode(IdentifierNode& node) override {}
+  void OnVisitIdentifierNode(IdentifierNode& node) override {
+    if (gd::ParameterMetadata::IsObject(node.type)) {
+      context.AddObjectName(node.identifierName);
+    }
+  }
   void OnVisitFunctionNode(FunctionNode& node) override {
     if (!node.objectName.empty()) {
       context.AddObjectName(node.objectName);
     }
-    // TODO: we're potentially missing objects that are asked in parameters
-    // of type "object", "objectPtr", "objectList".
+
     for (auto& parameter : node.parameters) {
       parameter->Visit(*this);
     }

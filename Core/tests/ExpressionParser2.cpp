@@ -510,7 +510,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   SECTION("Valid identifiers") {
     {
-      auto node = parser.ParseExpression("identifier", "HelloWorld1");
+      auto node = parser.ParseExpression("object", "HelloWorld1");
       REQUIRE(node != nullptr);
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
       REQUIRE(identifierNode.identifierName == "HelloWorld1");
@@ -521,7 +521,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
     }
 
     {
-      auto node = parser.ParseExpression("identifier", "Hello World 1  ");
+      auto node = parser.ParseExpression("object", "Hello World 1  ");
       REQUIRE(node != nullptr);
       auto &identifierNode = dynamic_cast<gd::IdentifierNode &>(*node);
       REQUIRE(identifierNode.identifierName == "Hello World 1");
@@ -534,17 +534,17 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
 
   SECTION("Invalid identifiers") {
     {
-      auto node = parser.ParseExpression("identifier", "");
+      auto node = parser.ParseExpression("object", "");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator;
       node->Visit(validator);
       REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(validator.GetErrors()[0]->GetMessage() ==
-              "You must enter a valid name.");
+              "You must enter a valid object name.");
     }
     {
-      auto node = parser.ParseExpression("identifier", "Hello + World1");
+      auto node = parser.ParseExpression("object", "Hello + World1");
       REQUIRE(node != nullptr);
 
       gd::ExpressionValidator validator;
@@ -552,7 +552,7 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
       REQUIRE(validator.GetErrors().size() == 1);
       REQUIRE(
           validator.GetErrors()[0]->GetMessage() ==
-          "Operators (+, -, /, *) can't be used there. Remove the operator.");
+          "Operators (+, -, /, *) can't be used with an object name. Remove the operator.");
     }
   }
 
@@ -826,7 +826,8 @@ TEST_CASE("ExpressionParser2", "[common][events]") {
         testExpressionWithType("scenevar");
         testExpressionWithType("globalvar");
         testExpressionWithType("objectvar");
-        testExpressionWithType("identifier");
+        testExpressionWithType("object");
+        testExpressionWithType("objectPtr");
         testExpressionWithType("unknown");
       };
 

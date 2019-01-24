@@ -219,7 +219,15 @@ void ExpressionCodeGenerator::OnVisitVariableBracketAccessorNode(
 }
 
 void ExpressionCodeGenerator::OnVisitIdentifierNode(IdentifierNode& node) {
-  output += codeGenerator.ConvertToStringExplicit(node.identifierName);
+  if (gd::ParameterMetadata::IsObject(node.type)) {
+    output +=
+        codeGenerator.GenerateObject(node.identifierName, node.type, context);
+  } else {
+    output += "/* Error during generation, unrecognized identifier type: " +
+              codeGenerator.ConvertToString(node.type) + " with value " +
+              codeGenerator.ConvertToString(node.identifierName) + " */ " +
+              codeGenerator.ConvertToStringExplicit(node.identifierName);
+  }
 }
 
 void ExpressionCodeGenerator::OnVisitFunctionNode(FunctionNode& node) {
@@ -443,8 +451,11 @@ gd::String ExpressionCodeGenerator::GenerateDefaultValue(
   if (gd::ParameterMetadata::IsExpression("variable", type)) {
     return codeGenerator.GenerateBadVariable();
   }
+  if (gd::ParameterMetadata::IsObject(type)) {
+    return codeGenerator.GenerateBadObject();
+  }
 
-  return (type == "string" || type == "identifier") ? "\"\"" : "0";
+  return (type == "string") ? "\"\"" : "0";
 }
 
 void ExpressionCodeGenerator::OnVisitEmptyNode(EmptyNode& node) {

@@ -60,7 +60,7 @@ struct ExpressionParserError : public ExpressionParserDiagnostic {
   size_t GetEndPosition() override { return endPosition; }
 
  private:
-  gd::String type;  // TODO: Enumify the error type?
+  gd::String type;
   gd::String message;
   size_t startPosition;
   size_t endPosition;
@@ -99,7 +99,7 @@ struct OperatorNode : public ExpressionNode {
 
   std::unique_ptr<ExpressionNode> leftHandSide;
   std::unique_ptr<ExpressionNode> rightHandSide;
-  gd::String::value_type op;  // TODO: Enumify?
+  gd::String::value_type op;
 };
 
 /**
@@ -113,7 +113,7 @@ struct UnaryOperatorNode : public ExpressionNode {
   };
 
   std::unique_ptr<ExpressionNode> factor;
-  gd::String::value_type op;  // TODO: Enumify?
+  gd::String::value_type op;
 };
 
 /**
@@ -206,17 +206,18 @@ struct VariableBracketAccessorNode
 struct IdentifierOrFunctionOrEmptyNode : public ExpressionNode {};
 
 /**
- * \brief An identifier number node. For example: "layer1".
+ * \brief An identifier node, usually representing an object.
  */
 struct IdentifierNode : public IdentifierOrFunctionOrEmptyNode {
-  IdentifierNode(const gd::String &identifierName_)
-      : identifierName(identifierName_){};
+  IdentifierNode(const gd::String &identifierName_, const gd::String &type_)
+      : identifierName(identifierName_), type(type_){};
   virtual ~IdentifierNode(){};
   virtual void Visit(ExpressionParser2NodeWorker &worker) {
     worker.OnVisitIdentifierNode(*this);
   };
 
   gd::String identifierName;
+  gd::String type;
 };
 
 struct FunctionOrEmptyNode : public IdentifierOrFunctionOrEmptyNode {

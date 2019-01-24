@@ -213,10 +213,10 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::EventsCodeGenerationContext& context);
 
   virtual gd::String GenerateGetVariable(
-      gd::String variableName,
+      const gd::String& variableName,
       const VariableScope& scope,
       gd::EventsCodeGenerationContext& context,
-      gd::String objectName);
+      const gd::String& objectName);
 
   virtual gd::String GenerateVariableAccessor(gd::String childName) {
     return ".getChild(" + ConvertToStringExplicit(childName) + ")";
@@ -226,10 +226,16 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::String expressionCode) {
     return ".getChild(" + expressionCode + ")";
   };
-  
+
   virtual gd::String GenerateBadVariable() {
-      return "gdjs.VariablesContainer.badVariable";
+    return "gdjs.VariablesContainer.badVariable";
   }
+
+  virtual gd::String GenerateBadObject() { return "null"; }
+
+  virtual gd::String GenerateObject(const gd::String& objectName,
+                                    const gd::String& type,
+                                    gd::EventsCodeGenerationContext& context);
 
   virtual gd::String GenerateNegatedPredicat(const gd::String& predicat) const {
     return "!(" + predicat + ")";

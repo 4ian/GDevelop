@@ -106,6 +106,16 @@ void SetupProjectWithDummyPlatform(gd::Project &project,
       .AddParameter("string", _("String parameter"))
       .AddParameter("", _("Identifier parameter"))
       .SetFunctionName("getObjectStringWith3Param");
+  object
+      .AddStrExpression("GetObjectStringWith2ObjectParam",
+                        "Get string from object with a 2 objects param",
+                        "",
+                        "",
+                        "")
+      .AddParameter("object", _("Object"), "Sprite")
+      .AddParameter("object", _("Object parameter"))
+      .AddParameter("objectPtr", _("Object parameter"))
+      .SetFunctionName("getObjectStringWith2ObjectParam");
   // auto behavior = extension->AddBehavior("MyBehavior", "Dummy behavior",
   // "MyBehavior", "", "", "","",
   //   gd::make_unique<gd::Behavior>(),

@@ -47,15 +47,15 @@ class GD_CORE_API ExpressionParser2 {
    * Parse the given expression with the specified type.
    *
    * \param type Type of the expression: "string", "number",
-   * "identifier", "scenevar", "globalvar", "objectvar" or "unknown".
-   * \param expression The expression to parse
-   * \param objectName Specify the object name, only for the case of "objectvar"
-   * type.
+   * type supported by gd::ParameterMetadata::IsObject, types supported by
+   * gd::ParameterMetadata::IsExpression or "unknown". \param expression The
+   * expression to parse \param objectName Specify the object name, only for the
+   * case of "objectvar" type.
    *
    * \return The node representing the expression as a parsed tree.
    */
   std::unique_ptr<ExpressionNode> ParseExpression(
-      const gd::String &type,  // TODO: enumify type?
+      const gd::String &type,
       const gd::String &expression_,
       const gd::String &objectName = "") {
     expression = expression_;
@@ -244,7 +244,7 @@ class GD_CORE_API ExpressionParser2 {
       return ObjectFunctionOrBehaviorFunction(
           type, name, identifierStartPosition);
     } else {
-      auto identifier = gd::make_unique<IdentifierNode>(name);
+      auto identifier = gd::make_unique<IdentifierNode>(name, type);
       if (type == "string") {
         identifier->diagnostic =
             RaiseTypeError(_("You must wrap your text inside double quotes "
@@ -253,10 +253,9 @@ class GD_CORE_API ExpressionParser2 {
       } else if (type == "number") {
         identifier->diagnostic = RaiseTypeError(_("You must enter a number."),
                                                 identifierStartPosition);
-      } else if (type != "identifier") {
+      } else if (!gd::ParameterMetadata::IsObject(type)) {
         identifier->diagnostic = RaiseTypeError(
-            _("You've entered an identifier, but this type was expected:") +
-                type,
+            _("You've entered a name, but this type was expected:") + type,
             identifierStartPosition);
       }
 
@@ -454,8 +453,19 @@ class GD_CORE_API ExpressionParser2 {
             parameters.push_back(Expression("string"));
           } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
             parameters.push_back(Expression(type, objectName));
+          } else if (gd::ParameterMetadata::IsObject(type)) {
+            parameters.push_back(Expression(type));
           } else {
-            parameters.push_back(Expression("identifier"));
+            size_t parameterStartPosition = GetCurrentPosition();
+            parameters.push_back(Expression("unknown"));
+            parameters.back()->diagnostic =
+                gd::make_unique<ExpressionParserError>(
+                    "unknown_parameter_type",
+                    _("This function is improperly set up. Reach out to the "
+                      "extension developer or a GDevelop maintainer to fix "
+                      "this issue"),
+                    parameterStartPosition,
+                    GetCurrentPosition());
           }
         } else {
           size_t parameterStartPosition = GetCurrentPosition();
@@ -512,10 +522,10 @@ class GD_CORE_API ExpressionParser2 {
           _("You've used an operator that is not supported. Only + can be used "
             "to concatenate texts."),
           GetCurrentPosition());
-    } else if (type == "identifier") {
+    } else if (gd::ParameterMetadata::IsObject(type)) {
       return gd::make_unique<ExpressionParserError>(
           "invalid_operator",
-          _("Operators (+, -, /, *) can't be used there. Remove the operator."),
+          _("Operators (+, -, /, *) can't be used with an object name. Remove the operator."),
           GetCurrentPosition());
     } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
       return gd::make_unique<ExpressionParserError>(
@@ -548,10 +558,10 @@ class GD_CORE_API ExpressionParser2 {
             "to concatenate texts, and must be placed between two texts (or "
             "expressions)."),
           GetCurrentPosition());
-    } else if (type == "identifier") {
+    } else if (gd::ParameterMetadata::IsObject(type)) {
       return gd::make_unique<ExpressionParserError>(
           "invalid_operator",
-          _("Operators (+, -) can't be used there. Remove the operator."),
+          _("Operators (+, -) can't be used with an object name. Remove the operator."),
           GetCurrentPosition());
     } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
       return gd::make_unique<ExpressionParserError>(
@@ -708,11 +718,12 @@ class GD_CORE_API ExpressionParser2 {
     if (type == "number") {
       message = _("You must enter a number or a valid expression call.");
     } else if (type == "string") {
-      message = _("You must enter a text (between quotes) or a valid expression call.");
+      message = _(
+          "You must enter a text (between quotes) or a valid expression call.");
     } else if (gd::ParameterMetadata::IsExpression("variable", type)) {
       message = _("You must enter a variable name.");
-    } else if (type == "identifier") {
-      message = _("You must enter a valid name.");
+    } else if (gd::ParameterMetadata::IsObject(type)) {
+      message = _("You must enter a valid object name.");
     } else {
       message = _("You must enter a valid expression.");
     }

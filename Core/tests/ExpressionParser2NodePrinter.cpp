@@ -141,12 +141,14 @@ TEST_CASE("ExpressionParser2NodePrinter", "[common][events]") {
     testPrinter("string", "((\"hello world\") + (123))");
   }
 
-  SECTION("Valid identifiers") {
-    testPrinter("identifier", "HelloWorld1");
-    testPrinter("identifier", "Hello World 1  ", "Hello World 1");
+  SECTION("Valid objects") {
+    testPrinter("object", "HelloWorld1");
+    testPrinter("object", "Hello World 1  ", "Hello World 1");
+    testPrinter("objectPtr", "HelloWorld1");
+    testPrinter("objectPtr", "Hello World 1  ", "Hello World 1");
   }
-  SECTION("Invalid identifiers") {
-    testPrinter("identifier", "Hello + World1");
+  SECTION("Invalid objects") {
+    testPrinter("object", "Hello + World1");
   }
   SECTION("Valid function calls") {
     testPrinter("number", "MyExtension::GetNumber()");

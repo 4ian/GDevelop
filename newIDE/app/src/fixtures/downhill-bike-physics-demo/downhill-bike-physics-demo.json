@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.zatgamename",
-    "projectFile": "G:\\Games\\Downhill Bike Race\\Downhill Bike Race.json",
+    "projectFile": "/Users/florianrival/Projects/F/GD/newIDE/app/resources/examples/downhill-bike-physics-demo/downhill-bike-physics-demo.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -5786,11 +5786,11 @@
                         "120",
                         "12",
                         "0.7",
+                        "0",
                         "yes",
-                        "1",
                         "150",
+                        "0",
                         "no",
-                        "rearJoint",
                         ""
                       ],
                       "subInstructions": []

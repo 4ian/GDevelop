@@ -12,16 +12,16 @@ gdjs.fileSystem = {};
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to the desktop folder
  */
-gdjs.fileSystem.getDesktopPath = function (runtimeScene) {
+gdjs.fileSystem.getDesktopPath = function(runtimeScene) {
   const electron = runtimeScene
     .getGame()
     .getRenderer()
     .getElectron();
 
   if (electron) {
-    return electron.remote.app.getPath("desktop") || "";
+    return electron.remote.app.getPath('desktop') || '';
   } else {
-    return "";
+    return '';
   }
 };
 
@@ -30,16 +30,16 @@ gdjs.fileSystem.getDesktopPath = function (runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to the documents folder
  */
-gdjs.fileSystem.getDocumentsPath = function (runtimeScene) {
+gdjs.fileSystem.getDocumentsPath = function(runtimeScene) {
   const electron = runtimeScene
     .getGame()
     .getRenderer()
     .getElectron();
 
   if (electron) {
-    return electron.remote.app.getPath("documents") || "";
+    return electron.remote.app.getPath('documents') || '';
   } else {
-    return "";
+    return '';
   }
 };
 
@@ -48,34 +48,34 @@ gdjs.fileSystem.getDocumentsPath = function (runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to the pictures folder
  */
-gdjs.fileSystem.getPicturesPath = function (runtimeScene) {
+gdjs.fileSystem.getPicturesPath = function(runtimeScene) {
   const electron = runtimeScene
     .getGame()
     .getRenderer()
     .getElectron();
 
   if (electron) {
-    return electron.remote.app.getPath("pictures") || "";
+    return electron.remote.app.getPath('pictures') || '';
   } else {
-    return "";
+    return '';
   }
 };
 
 /**
- * Get the path to this applications 'Executable' folder.
+ * Get the path to this application 'Executable' folder.
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to this applications executable folder
  */
-gdjs.fileSystem.getExecutablePath = function (runtimeScene) {
+gdjs.fileSystem.getExecutablePath = function(runtimeScene) {
   const electron = runtimeScene
     .getGame()
     .getRenderer()
     .getElectron();
 
   if (electron) {
-    return electron.remote.app.getPath("exe") || "";
+    return electron.remote.app.getPath('exe') || '';
   } else {
-    return "";
+    return '';
   }
 };
 
@@ -84,16 +84,16 @@ gdjs.fileSystem.getExecutablePath = function (runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to userdata folder
  */
-gdjs.fileSystem.getUserdataPath = function (runtimeScene) {
+gdjs.fileSystem.getUserdataPath = function(runtimeScene) {
   const electron = runtimeScene
     .getGame()
     .getRenderer()
     .getElectron();
 
   if (electron) {
-    return electron.remote.app.getPath("userData") || "";
+    return electron.remote.app.getPath('userData') || '';
   } else {
-    return "";
+    return '';
   }
 };
 
@@ -102,16 +102,16 @@ gdjs.fileSystem.getUserdataPath = function (runtimeScene) {
  * @param {gdjs.RuntimeScene} runtimeScene The current scene
  * @return {string} The path to temp folder
  */
-gdjs.fileSystem.getTempPath = function (runtimeScene) {
+gdjs.fileSystem.getTempPath = function(runtimeScene) {
   const electron = runtimeScene
     .getGame()
     .getRenderer()
     .getElectron();
 
   if (electron) {
-    return electron.remote.app.getPath("temp") || "";
+    return electron.remote.app.getPath('temp') || '';
   } else {
-    return "";
+    return '';
   }
 };
 
@@ -119,51 +119,57 @@ gdjs.fileSystem.getTempPath = function (runtimeScene) {
  * Get the path delimiter specific to the operating system.
  * @return {string} The path delimiter
  */
-gdjs.fileSystem.getPathDelimiter = function () {
-  const path = typeof require !== "undefined" ? require("path") : null;
+gdjs.fileSystem.getPathDelimiter = function() {
+  const path = typeof require !== 'undefined' ? require('path') : null;
 
   if (path) {
-    return path.sep || "";
+    return path.sep || '/';
   } else {
-    return "";
+    return '/';
   }
 };
 
 /**
  * Create a new directory at the given path.
  * @param {string} directory The path to create a new directory
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.makeDirectory = function (directory, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
-  let result = "error";
+gdjs.fileSystem.makeDirectory = function(directory, resultVar) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  let result = 'error';
 
   if (fileSystem) {
     try {
       fileSystem.mkdirSync(directory);
-      result = "ok";
+      result = 'ok';
     } catch (err) {
-      console.error("Unable to create directory at: '" + directory + "': ", err);
+      console.error(
+        "Unable to create directory at: '" + directory + "': ",
+        err
+      );
     }
   }
   resultVar.setString(result);
 };
 
 /**
- * Save a string into a file asyncrounousely.
+ * Save a string into a file, asynchronously.
  * @param {string} text The string to be saved
- * @param {string} savePath The absolute path on the filesystem
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * @param {string} savePath Path to the file
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.saveStringToFileAsync = function (text, savePath, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
+gdjs.fileSystem.saveStringToFileAsync = function(text, savePath, resultVar) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
 
   if (fileSystem) {
-    fileSystem.writeFile(savePath, text, "utf8", err => {
-      resultVar.setString("ok");
+    fileSystem.writeFile(savePath, text, 'utf8', err => {
+      resultVar.setString('ok');
       if (err) {
-        console.error("Unable to save the text to path: '" + savePath + "': ", err);
-        resultVar.setString("error");
+        console.error(
+          "Unable to save the text to path: '" + savePath + "': ",
+          err
+        );
+        resultVar.setString('error');
       }
     });
   }
@@ -172,19 +178,22 @@ gdjs.fileSystem.saveStringToFileAsync = function (text, savePath, resultVar) {
 /**
  * Save a string into a file.
  * @param {string} text The string to be saved
- * @param {string} savePath The absolute path on the filesystem
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * @param {string} savePath Path to the file
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.saveStringToFile = function (text, savePath, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
-  let result = "error";
+gdjs.fileSystem.saveStringToFile = function(text, savePath, resultVar) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  let result = 'error';
 
   if (fileSystem) {
     try {
-      fileSystem.writeFileSync(savePath, text, "utf8");
-      result = "ok";
+      fileSystem.writeFileSync(savePath, text, 'utf8');
+      result = 'ok';
     } catch (err) {
-      console.error("Unable to save the text to path: '" + savePath + "': ", err);
+      console.error(
+        "Unable to save the text to path: '" + savePath + "': ",
+        err
+      );
     }
   }
   resultVar.setString(result);
@@ -192,44 +201,64 @@ gdjs.fileSystem.saveStringToFile = function (text, savePath, resultVar) {
 
 /**
  * Save a variable into a file in JSON format.
- * @param {scenevar} structure The structure to be saved
- * @param {string} savePath The absolute path on the filesystem
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * @param {gdjs.Variable} variable The variable to be saved
+ * @param {string} savePath Path to the file
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.saveStructureToJSONFile = function (structure, savePath, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
+gdjs.fileSystem.saveVariableToJSONFile = function(
+  variable,
+  savePath,
+  resultVar
+) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
   const network = gdjs.evtTools.network;
-  let result = "error";
+  let result = 'error';
 
   if (fileSystem && network) {
     try {
-      fileSystem.writeFileSync(savePath, network.variableStructureToJSON(structure), "utf8");
-      result = "ok";
+      fileSystem.writeFileSync(
+        savePath,
+        network.variableStructureToJSON(variable),
+        'utf8'
+      );
+      result = 'ok';
     } catch (err) {
-      console.error("Unable to save the structure to path: '" + savePath + "': ", err);
+      console.error(
+        "Unable to save the variable to path: '" + savePath + "': ",
+        err
+      );
     }
   }
   resultVar.setString(result);
 };
 
 /**
- * Save a variable into a file in JSON format asyncrounousely.
- * @param {string} text The structure to be saved
- * @param {string} savePath The absolute path on the filesystem
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * Save a variable into a file in JSON format, asynchronously.
+ * @param {string} text The variable to be saved
+ * @param {string} savePath Path to the file
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.saveStructureToJSONFileAsync = function (structure, savePath, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
+gdjs.fileSystem.saveVariableToJSONFileAsync = function(
+  variable,
+  savePath,
+  resultVar
+) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
   const network = gdjs.evtTools.network;
 
   if (fileSystem && network) {
     fileSystem.writeFile(
       savePath,
-      network.variableStructureToJSON(structure), "utf8", err => {
-        resultVar.setString("ok");
+      network.variableStructureToJSON(variable),
+      'utf8',
+      err => {
+        resultVar.setString('ok');
         if (err) {
-          console.error("Unable to save the structure to path: '" + savePath + "': ", err);
-          resultVar.setString("error");
+          console.error(
+            "Unable to save the variable to path: '" + savePath + "': ",
+            err
+          );
+          resultVar.setString('error');
         }
       }
     );
@@ -238,96 +267,120 @@ gdjs.fileSystem.saveStructureToJSONFileAsync = function (structure, savePath, re
 
 /**
  * Load a string from a file into a scene variable.
- * @param {scenevar} stringVar The scene variable to store the string
- * @param {string} loadPath The absolute path on the filesystem
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * @param {gdjs.Variable} stringVar Variable where to store the content
+ * @param {string} loadPath Path to the file
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.loadStringFromFile = function (stringVar, loadPath, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
-  let result = "error";
+gdjs.fileSystem.loadStringFromFile = function(stringVar, loadPath, resultVar) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  let result = 'error';
 
   if (fileSystem) {
     try {
-      const data = fileSystem.readFileSync(loadPath, "utf8");
+      const data = fileSystem.readFileSync(loadPath, 'utf8');
 
       if (data) {
         stringVar.setString(data);
-        result = "ok";
+        result = 'ok';
       }
     } catch (err) {
-      console.error("Unable to load the file at path: '" + loadPath + "': ", err);
+      console.error(
+        "Unable to load the file at path: '" + loadPath + "': ",
+        err
+      );
     }
   }
   resultVar.setString(result);
 };
 
 /**
- * Load a JSON file and convert it into a structure.
- * @param {scenevar} structureVar The scene variable to store the structure
- * @param {string} loadPath The absolute path on the filesystem
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * Load a JSON file and convert it into a variable.
+ * @param {gdjs.Variable} variable Variable to store the variable
+ * @param {string} loadPath Path to the file
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.loadStructureFromJSONFile = function (structureVar, loadPath, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
+gdjs.fileSystem.loadVariableFromJSONFile = function(
+  variable,
+  loadPath,
+  resultVar
+) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
   const network = gdjs.evtTools.network;
-  let result = "error";
+  let result = 'error';
 
   if (fileSystem && network) {
     try {
-      const data = fileSystem.readFileSync(loadPath, "utf8");
+      const data = fileSystem.readFileSync(loadPath, 'utf8');
       if (data) {
-        network.jsonToVariableStructure(data, structureVar);
-        result = "ok";
+        network.jsonToVariableStructure(data, variable);
+        result = 'ok';
       }
     } catch (err) {
-      console.error("Unable to load structure from the file at path: '" + loadPath + "': ", err);
+      console.error(
+        "Unable to load variable from the file at path: '" + loadPath + "': ",
+        err
+      );
     }
   }
   resultVar.setString(result);
 };
 
 /**
- * Load a JSON file and convert it into a structure asyncrounousely.
- * @param {scenevar} structureVar The scene variable to store the structure
- * @param {string} loadPath The absolute path on the filesystem
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * Load a JSON file and convert it into a variable, asynchronously.
+ * @param {gdjs.Variable} variable Variable to store the variable
+ * @param {string} loadPath Path to the file
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.loadStructureFromJSONFileAsync = function (structureVar, loadPath, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
+gdjs.fileSystem.loadVariableFromJSONFileAsync = function(
+  variable,
+  loadPath,
+  resultVar
+) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
   const network = gdjs.evtTools.network;
 
   if (fileSystem && network) {
-    fileSystem.readFile(loadPath, "utf8", (err, data) => {
+    fileSystem.readFile(loadPath, 'utf8', (err, data) => {
       if (data) {
-        network.jsonToVariableStructure(data, structureVar);
-        resultVar.setString("ok");
+        network.jsonToVariableStructure(data, variable);
+        resultVar.setString('ok');
       }
       if (err) {
-        console.error("Unable to load structure from the file at path: '" + loadPath + "': ", err);
-        resultVar.setString("error");
+        console.error(
+          "Unable to load variable from the file at path: '" + loadPath + "': ",
+          err
+        );
+        resultVar.setString('error');
       }
     });
   }
 };
 
 /**
- * Load a string from a file into a scene variable asyncrounousely.
- * @param {scenevar} stringVar The scene variable to store the string
- * @param {string} loadPath The absolute path on the filesystem
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * Load a string from a file into a scene variable, asynchronously.
+ * @param {gdjs.Variable} stringVar Variable where to store the content
+ * @param {string} loadPath Path to the file
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.loadStringFromFileAsync = function (stringVar, loadPath, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
+gdjs.fileSystem.loadStringFromFileAsync = function(
+  stringVar,
+  loadPath,
+  resultVar
+) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
 
   if (fileSystem) {
-    fileSystem.readFile(loadPath, "utf8", (err, data) => {
+    fileSystem.readFile(loadPath, 'utf8', (err, data) => {
       if (data) {
         stringVar.setString(data);
-        resultVar.setString("ok");
+        resultVar.setString('ok');
       }
       if (err) {
-        console.error("Unable to load the file at path: '" + loadPath + "': ", err);
-        resultVar.setString("error");
+        console.error(
+          "Unable to load the file at path: '" + loadPath + "': ",
+          err
+        );
+        resultVar.setString('error');
       }
     });
   }
@@ -335,40 +388,39 @@ gdjs.fileSystem.loadStringFromFileAsync = function (stringVar, loadPath, resultV
 
 /**
  * Delete a file from the filesystem.
- * @param {string} filePath The absolute path on the filesystem
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * @param {string} filePath Path to the file
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.deleteFile = function (filePath, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
-  let result = "error";
+gdjs.fileSystem.deleteFile = function(filePath, resultVar) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
+  let result = 'error';
 
   if (fileSystem) {
     try {
-      fileSystem.unlinkSync(filePath)
+      fileSystem.unlinkSync(filePath);
       result = 'ok';
-    }
-    catch (err) {
+    } catch (err) {
       console.error("Unable to delete the file: '" + filePath + "': ", err);
-      result = "error";
+      result = 'error';
     }
   }
   resultVar.setString(result);
 };
 
 /**
- * Delete a file from the filesystem asyncrounousely.
- * @param {string} filePath The absolute path on the filesystem
- * @param {scenevar} resultVar (optional) The variable to store the result of the operation
+ * Delete a file from the filesystem, asynchronously.
+ * @param {string} filePath Path to the file
+ * @param {gdjs.Variable} resultVar The variable where to store the result of the operation
  */
-gdjs.fileSystem.deleteFileAsync = function (filePath, resultVar) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
+gdjs.fileSystem.deleteFileAsync = function(filePath, resultVar) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
 
   if (fileSystem) {
     fileSystem.unlink(filePath, err => {
-      resultVar.setString("ok");
+      resultVar.setString('ok');
       if (err) {
         console.error("Unable to delete the file: '" + filePath + "': ", err);
-        resultVar.setString("error");
+        resultVar.setString('error');
       }
     });
   }
@@ -377,10 +429,10 @@ gdjs.fileSystem.deleteFileAsync = function (filePath, resultVar) {
 /**
  * Check if the file or directory exists.
  * @param {string} filePath The path to the file or directory
- * @return {boolean} True if fhe file or directory exists
+ * @return {boolean} true if fhe file or directory exists
  */
-gdjs.fileSystem.pathExists = function (filePath) {
-  const fileSystem = typeof require !== "undefined" ? require("fs") : null;
+gdjs.fileSystem.pathExists = function(filePath) {
+  const fileSystem = typeof require !== 'undefined' ? require('fs') : null;
 
   if (fileSystem) {
     return fileSystem.existsSync(filePath);

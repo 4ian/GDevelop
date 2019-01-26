@@ -88,17 +88,6 @@ export default class InstancePropertiesEditor extends Component {
         getValue: instance => instance.hasCustomSize(),
         setValue: (instance, newValue) => instance.setHasCustomSize(newValue),
       },
-      {
-        name: 'Instance variables',
-        children: [
-          {
-            name: 'Edit variables',
-            getLabel: instance =>
-              'Edit variables (' + instance.getVariables().count() + ')',
-            onClick: instance => this.props.editInstanceVariables(instance),
-          },
-        ],
-      },
     ];
   }
 
@@ -131,6 +120,7 @@ export default class InstancePropertiesEditor extends Component {
           schema={this.schema.concat(instanceSchema)}
           instances={instances}
         />
+        Instance Variables:
         <VariablesList
           variablesContainer={instances[0].getVariables()}
           emptyExplanationMessage={''}
@@ -139,7 +129,6 @@ export default class InstancePropertiesEditor extends Component {
             () =>
               this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
           }
-          onChange={console.log('apply')}
         />
       </div>
     );

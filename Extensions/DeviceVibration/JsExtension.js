@@ -33,7 +33,7 @@ module.exports = {
         "JsPlatform/Extensions/vibration_start24.png",
         "JsPlatform/Extensions/vibration_start32.png"
       )
-        .addParameter("number", t("Duration"), "", false)
+        .addParameter("expression", t("Duration"), "", false)
         .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/DeviceVibration/devicevibrationtools.js"

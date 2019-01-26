@@ -153,6 +153,9 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
   // useful for the debugger.
   var excludedValues = [that._runtimegame.getGameData()];
   var excludedKeys = [
+    // Exclude reference to the debugger
+    '_debuggerClient',
+
     // Exclude some RuntimeScene fields:
     '_allInstancesList',
     '_initialObjectsData',
@@ -167,6 +170,9 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
     // Exclude some objects data:
     '_animations',
     '_animationFrame',
+
+    // Exclude linked objects to avoid too much repetitions:
+    'linkedObjectsManager', // Could be improved by using private fields and excluding these (_)
 
     // Exclude some behaviors data:
     '_platformRBush', // PlatformBehavior
@@ -194,7 +200,7 @@ gdjs.WebsocketDebuggerClient.prototype.sendRuntimeGameDump = function() {
       return '[Removed from the debugger]';
 
     return value;
-  });
+  }, 18 /* Limit maximum depth to prevent any crashes */);
 
   var serializationDuration = Date.now() - serializationStartTime;
   console.log('RuntimeGame serialization took ' + serializationDuration + 'ms');
@@ -260,12 +266,13 @@ gdjs.WebsocketDebuggerClient.prototype.sendProfilerOutput = function(
 gdjs.WebsocketDebuggerClient.prototype._circularSafeStringify = function(
   obj,
   replacer,
+  maxDepth,
   spaces,
   cycleReplacer
 ) {
   return JSON.stringify(
     obj,
-    this._depthLimitedSerializer(replacer, cycleReplacer, 18),
+    this._depthLimitedSerializer(replacer, cycleReplacer, maxDepth),
     spaces
   );
 };
@@ -293,7 +300,7 @@ gdjs.WebsocketDebuggerClient.prototype._depthLimitedSerializer = function(
       ~thisPos ? stack.splice(thisPos + 1) : stack.push(this);
       ~thisPos ? keys.splice(thisPos, Infinity, key) : keys.push(key);
 
-      if (thisPos > maxDepth) {
+      if (maxDepth != null && thisPos > maxDepth) {
         return '[Max depth reached]';
       } else if (~stack.indexOf(value))
         value = cycleReplacer.call(this, key, value);

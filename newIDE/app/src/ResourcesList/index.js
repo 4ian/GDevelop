@@ -92,7 +92,7 @@ export default class ResourcesList extends React.Component<Props, State> {
 
   _locateResourceFile = (resource: gdResource) => {
     const resourceFolderPath = path.dirname(
-      getLocalResourceFullPath(this.props.project, resource.getFile())
+      getLocalResourceFullPath(this.props.project, resource.getName())
     );
     electron.shell.openItem(resourceFolderPath);
   };
@@ -100,7 +100,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   _openResourceFile = (resource: gdResource) => {
     const resourceFilePath = getLocalResourceFullPath(
       this.props.project,
-      resource.getFile()
+      resource.getName()
     );
     electron.shell.openItem(resourceFilePath);
   };
@@ -108,7 +108,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   _copyResourceFilePath = (resource: gdResource) => {
     const resourceFilePath = getLocalResourceFullPath(
       this.props.project,
-      resource.getFile()
+      resource.getName()
     );
     electron.clipboard.writeText(resourceFilePath);
   };
@@ -189,6 +189,12 @@ export default class ResourcesList extends React.Component<Props, State> {
       showWarningBox('Another resource with this name already exists');
       return;
     }
+
+    // eslint-disable-next-line
+    const answer = confirm(
+      'Are you sure you want to rename this resource? \nGame objects using the old name will no longer be able to find it!'
+    );
+    if (!answer) return;
 
     this.props.onRenameResource(resource, newName, doRename => {
       if (!doRename) return;

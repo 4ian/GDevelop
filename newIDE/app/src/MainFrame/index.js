@@ -36,6 +36,7 @@ import {
   closeExternalLayoutTabs,
   closeExternalEventsTabs,
   closeEventsFunctionsExtensionTabs,
+  saveUiSettings,
   type EditorTabsState,
   type EditorTab,
 } from './EditorTabsHandler';
@@ -956,6 +957,7 @@ export default class MainFrame extends React.Component<Props, State> {
   };
 
   save = () => {
+    saveUiSettings(this.state.editorTabs);
     if (!this.state.currentProject) return;
 
     if (this.props.saveDialog) {
@@ -1059,6 +1061,7 @@ export default class MainFrame extends React.Component<Props, State> {
   };
 
   _onCloseEditorTab = (editorTab: EditorTab) => {
+    saveUiSettings(this.state.editorTabs);
     this.setState(
       {
         editorTabs: closeEditorTab(this.state.editorTabs, editorTab),

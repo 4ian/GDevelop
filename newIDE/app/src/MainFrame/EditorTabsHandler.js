@@ -130,6 +130,18 @@ export const closeProjectTabs = (
   );
 };
 
+/*
+ * Ask the editors to persist their UI settings
+ * to the project.
+ */
+export const saveUiSettings = (state: EditorTabsState) => {
+  state.editors.forEach(editorTab => {
+    if (editorTab.editorRef && editorTab.editorRef.saveUiSettings) {
+      editorTab.editorRef.saveUiSettings();
+    }
+  });
+};
+
 export const closeLayoutTabs = (state: EditorTabsState, layout: gdLayout) => {
   return changeCurrentTab(
     {

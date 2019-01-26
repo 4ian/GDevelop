@@ -4,6 +4,7 @@ import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import VariablesList from '../../VariablesList';
 
 export default class InstancePropertiesEditor extends Component {
   constructor() {
@@ -111,7 +112,7 @@ export default class InstancePropertiesEditor extends Component {
 
   _renderInstancesProperties() {
     const { project, layout, instances } = this.props;
-
+    console.log(instances[0]);
     //TODO: multiple instances support
     const properties = instances[0].getCustomProperties(project, layout);
     const instanceSchema = propertiesMapToSchema(
@@ -129,6 +130,16 @@ export default class InstancePropertiesEditor extends Component {
         <PropertiesEditor
           schema={this.schema.concat(instanceSchema)}
           instances={instances}
+        />
+        <VariablesList
+          variablesContainer={instances[0].getVariables()}
+          emptyExplanationMessage={''}
+          emptyExplanationSecondMessage={''}
+          onSizeUpdated={
+            () =>
+              this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
+          }
+          onChange={console.log('apply')}
         />
       </div>
     );

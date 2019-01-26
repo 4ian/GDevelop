@@ -6,17 +6,13 @@ import {
   TableHeaderColumn,
   TableRow,
 } from 'material-ui/Table';
-import IconButton from 'material-ui/IconButton';
-import ContentCopy from 'material-ui/svg-icons/content/content-copy';
-import ContentPaste from 'material-ui/svg-icons/content/content-paste';
-import Delete from 'material-ui/svg-icons/action/delete';
 import flatten from 'lodash/flatten';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../Utils/MapFor';
 import EmptyMessage from '../UI/EmptyMessage';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import VariableRow from './VariableRow';
-import AddVariableRow from './AddVariableRow';
+import EditVariableRow from './EditVariableRow';
 import styles from './styles';
 import {
   getInitialSelection,
@@ -33,7 +29,7 @@ import {
 const gd = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
-const SortableAddVariableRow = SortableElement(AddVariableRow);
+const SortableAddVariableRow = SortableElement(EditVariableRow);
 
 class VariablesListBody extends React.Component<*, *> {
   render() {
@@ -275,7 +271,7 @@ export default class VariablesList extends React.Component<Props, State> {
       }
     );
 
-    const addRow = (
+    const editRow = (
       <SortableAddVariableRow
         index={0}
         key={'add-variable-row'}
@@ -291,6 +287,11 @@ export default class VariablesList extends React.Component<Props, State> {
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
+        onCopy={this.copySelection}
+        onPaste={this.paste}
+        onDeleteSelection={this.deleteSelection}
+        hasSelection={hasSelection(this.state.selectedVariables)}
+        hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
       />
     );
 
@@ -301,26 +302,7 @@ export default class VariablesList extends React.Component<Props, State> {
             <TableRow>
               <TableHeaderColumn>Name</TableHeaderColumn>
               <TableHeaderColumn>Value</TableHeaderColumn>
-              <TableHeaderColumn style={styles.toolColumnHeader}>
-                <IconButton
-                  onClick={this.copySelection}
-                  disabled={!hasSelection(this.state.selectedVariables)}
-                >
-                  <ContentCopy />
-                </IconButton>
-                <IconButton
-                  onClick={this.paste}
-                  disabled={!Clipboard.has(CLIPBOARD_KIND)}
-                >
-                  <ContentPaste />
-                </IconButton>
-                <IconButton
-                  onClick={this.deleteSelection}
-                  disabled={!hasSelection(this.state.selectedVariables)}
-                >
-                  <Delete />
-                </IconButton>
-              </TableHeaderColumn>
+              <TableHeaderColumn style={styles.toolColumnHeader} />
             </TableRow>
           </TableHeader>
         </Table>
@@ -336,7 +318,7 @@ export default class VariablesList extends React.Component<Props, State> {
         >
           {!containerVariablesTree.length && this._renderEmpty()}
           {!!containerVariablesTree.length && containerVariablesTree}
-          {addRow}
+          {editRow}
         </SortableVariablesListBody>
       </div>
     );

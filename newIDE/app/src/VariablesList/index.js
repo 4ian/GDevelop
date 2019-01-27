@@ -277,7 +277,7 @@ export default class VariablesList extends React.Component<Props, State> {
             console.log('created instance variable ' + name);
           }
           const variable = variablesContainer.get(name);
-          const value = ''; // objectVariables.get(name).getValue() //<--crash
+          const value = objectVariables.get(name).getString()
           return this._renderVariableAndChildrenRows(
             name,
             variable,

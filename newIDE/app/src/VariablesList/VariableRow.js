@@ -53,7 +53,7 @@ const ThemableVariableRow = ({
   showSelectionCheckbox,
   isSelected,
   onSelect,
-  objectVariablesMeta ={default:null,isInObject:true}
+  objectVariablesMeta ={default:'',isInObject:true}
 }: Props) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
@@ -90,7 +90,7 @@ const ThemableVariableRow = ({
           commitOnBlur
           fullWidth
           name={key + 'value'}
-          placeholder={objectVariablesMeta.default?objectVariablesMeta.default:''}
+          placeholder={objectVariablesMeta.default}
           value={variable.getString()}
           onChange={onChangeValue}
           multiLine

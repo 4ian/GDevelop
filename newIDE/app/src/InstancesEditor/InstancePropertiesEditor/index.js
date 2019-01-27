@@ -102,13 +102,8 @@ export default class InstancePropertiesEditor extends Component {
   _renderInstancesProperties() {
     const { project, layout, instances } = this.props;
     const objectVariables = layout.getObject(instances[0].getObjectName()).getVariables();
-    const objectVariablesMeta ={}
-    for (let i = 0; i < objectVariables.count(); i++) { 
-      const name = objectVariables.getNameAt(i);
-      const value = 0 //crashes--> objectVariables.getAt(i).getValue();
-      objectVariablesMeta[name]={value}
-    }
-    console.log(objectVariablesMeta)
+
+    // console.log(objectVariablesMeta)
     //TODO: multiple instances support
     const properties = instances[0].getCustomProperties(project, layout);
     const instanceSchema = propertiesMapToSchema(
@@ -129,7 +124,7 @@ export default class InstancePropertiesEditor extends Component {
         />
         Instance Variables:
         <VariablesList
-          objectVariablesMeta={objectVariablesMeta}
+          objectVariables={objectVariables}
           variablesContainer={instances[0].getVariables()}
           emptyExplanationMessage={''}
           emptyExplanationSecondMessage={''}

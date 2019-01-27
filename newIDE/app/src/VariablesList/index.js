@@ -156,19 +156,12 @@ export default class VariablesList extends React.Component<Props, State> {
     variable: gdVariable,
     depth: number,
     index: number,
-    parentVariable: ?gdVariable
+    parentVariable: ?gdVariable,
+    objectVariablesMeta
   ) {
-    const { variablesContainer,objectVariablesMeta } = this.props;
+    const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
-
-    if (objectVariablesMeta) {
-      objectVariablesMeta.isInObject = false
-      if (name in objectVariablesMeta) {
-        objectVariablesMeta.isInObject = true
-        objectVariablesMeta.default=objectVariablesMeta[name].value
-      }
-    }
-
+    
     return (
       <SortableVariableRow
         name={name}
@@ -260,8 +253,16 @@ export default class VariablesList extends React.Component<Props, State> {
   }
 
   render() {
-    const { variablesContainer, objectVariablesMeta } = this.props;
+    const { variablesContainer, objectVariables } = this.props;
     if (!variablesContainer) return null;
+
+    let objectVariablesInfo = {}
+    if (objectVariables) {
+      for (let i = 0; i < objectVariables.count(); i++) { 
+        const name = objectVariables.getNameAt(i);
+        objectVariablesInfo[name]={}
+      }
+    }
 
     const containerVariablesTree = mapFor(
       0,
@@ -270,12 +271,18 @@ export default class VariablesList extends React.Component<Props, State> {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
 
+        let objectVariablesMeta = {}
+        if (name in objectVariablesInfo) {
+          objectVariablesMeta.isInObject = true
+          objectVariablesMeta.default = objectVariables.get(name).getValue()
+        }
         return this._renderVariableAndChildrenRows(
           name,
           variable,
           0,
           index,
-          undefined
+          undefined,
+          objectVariablesMeta
         );
       }
     );

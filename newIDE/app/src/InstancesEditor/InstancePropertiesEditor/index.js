@@ -101,7 +101,9 @@ export default class InstancePropertiesEditor extends Component {
 
   _renderInstancesProperties() {
     const { project, layout, instances } = this.props;
-    const objectVariables = layout.getObject(instances[0].getObjectName()).getVariables();
+    const objectVariables = layout
+      .getObject(instances[0].getObjectName())
+      .getVariables();
 
     // console.log(objectVariablesMeta)
     //TODO: multiple instances support

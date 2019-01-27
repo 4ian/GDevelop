@@ -161,7 +161,7 @@ export default class VariablesList extends React.Component<Props, State> {
   ) {
     const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
-    
+
     return (
       <SortableVariableRow
         name={name}
@@ -252,38 +252,58 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   }
 
+  onAddVariable = (variableName = false) => {
+    const { variablesContainer } = this.props;
+    const variable = new gd.Variable();
+    variable.setString('');
+
+    const name = variableName
+      ? variableName
+      : newNameGenerator('Variable', name => variablesContainer.has(name));
+    variablesContainer.insert(name, variable, variablesContainer.count());
+    return variable;
+  };
+
   render() {
     const { variablesContainer, objectVariables } = this.props;
     if (!variablesContainer) return null;
 
-    let objectVariablesInfo = {}
-    if (objectVariables) {
-      for (let i = 0; i < objectVariables.count(); i++) { 
-        const name = objectVariables.getNameAt(i);
-        objectVariablesInfo[name]={}
-      }
-    }
+    /// map all instance variables with the same name as object variables
+    const objVariablesTree = objectVariables
+      ? mapFor(0, objectVariables.count(), index => {
+          const name = objectVariables.getNameAt(index);
+          this.onAddVariable(name);
+          const variable = variablesContainer.get(name);
+          console.log('ADD ' + name);
+          const value = ''; // objectVariables.get(name).getValue() //<--crash
+          return this._renderVariableAndChildrenRows(
+            name,
+            variable,
+            0,
+            index,
+            undefined,
+            { isInObject: true, default: value }
+          );
+        })
+      : {};
 
+    /// map all unique instance variables
     const containerVariablesTree = mapFor(
       0,
       variablesContainer.count(),
       index => {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
-
-        let objectVariablesMeta = {}
-        if (name in objectVariablesInfo) {
-          objectVariablesMeta.isInObject = true
-          objectVariablesMeta.default = objectVariables.get(name).getValue()
+        if (!objectVariables || !objectVariables.has(name)) {
+          return this._renderVariableAndChildrenRows(
+            name,
+            variable,
+            0,
+            index,
+            undefined,
+            { isInObject: false }
+          );
         }
-        return this._renderVariableAndChildrenRows(
-          name,
-          variable,
-          0,
-          index,
-          undefined,
-          objectVariablesMeta
-        );
       }
     );
 
@@ -293,13 +313,7 @@ export default class VariablesList extends React.Component<Props, State> {
         key={'add-variable-row'}
         disabled
         onAdd={() => {
-          const variable = new gd.Variable();
-          variable.setString('');
-          const name = newNameGenerator('Variable', name =>
-            variablesContainer.has(name)
-          );
-          variablesContainer.insert(name, variable, variablesContainer.count());
-
+          this.onAddVariable();
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
@@ -332,6 +346,9 @@ export default class VariablesList extends React.Component<Props, State> {
           useDragHandle
           lockToContainerEdges
         >
+          {!objVariablesTree.length && this._renderEmpty()}
+          {!!objVariablesTree.length && objVariablesTree}
+
           {!containerVariablesTree.length && this._renderEmpty()}
           {!!containerVariablesTree.length && containerVariablesTree}
           {editRow}

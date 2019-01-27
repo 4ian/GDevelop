@@ -53,13 +53,12 @@ const ThemableVariableRow = ({
   showSelectionCheckbox,
   isSelected,
   onSelect,
-  objectVariablesMeta ={default:'',isInObject:true}
+  objectVariablesMeta = { default: '', isInObject: true },
 }: Props) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
 
-  
-  const {isInObject} = objectVariablesMeta
+  const { isInObject } = objectVariablesMeta;
 
   const columns = [
     <TreeTableCell key="name">
@@ -74,7 +73,10 @@ const ThemableVariableRow = ({
         />
       )}
       <TextField
-        style={{fontStyle: isInObject?"normal":"italic",fontWeight: isInObject?"bold":"normal"}}
+        style={{
+          fontStyle: isInObject ? 'normal' : 'italic',
+          fontWeight: isInObject ? 'bold' : 'normal',
+        }}
         fullWidth
         name={key + 'name'}
         defaultValue={name}

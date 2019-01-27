@@ -272,9 +272,11 @@ export default class VariablesList extends React.Component<Props, State> {
     const objVariablesTree = objectVariables
       ? mapFor(0, objectVariables.count(), index => {
           const name = objectVariables.getNameAt(index);
-          this.onAddVariable(name);
+          if (!variablesContainer.has(name)) {
+            this.onAddVariable(name);
+            console.log('created instance variable ' + name);
+          }
           const variable = variablesContainer.get(name);
-          console.log('ADD ' + name);
           const value = ''; // objectVariables.get(name).getValue() //<--crash
           return this._renderVariableAndChildrenRows(
             name,

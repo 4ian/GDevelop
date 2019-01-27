@@ -18,6 +18,7 @@ const Indent = ({ width }) => (
   </div>
 );
 
+// const isAnObjectVariable = props => <Checkbox {...props} style={{ width: 32 }} />;
 const InlineCheckbox = props => <Checkbox {...props} style={{ width: 32 }} />;
 
 type Props = {|
@@ -52,9 +53,13 @@ const ThemableVariableRow = ({
   showSelectionCheckbox,
   isSelected,
   onSelect,
+  objectVariablesMeta ={default:null,isInObject:true}
 }: Props) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
+
+  
+  const {isInObject} = objectVariablesMeta
 
   const columns = [
     <TreeTableCell key="name">
@@ -69,6 +74,7 @@ const ThemableVariableRow = ({
         />
       )}
       <TextField
+        style={{fontStyle: isInObject?"normal":"italic",fontWeight: isInObject?"bold":"normal"}}
         fullWidth
         name={key + 'name'}
         defaultValue={name}
@@ -84,6 +90,7 @@ const ThemableVariableRow = ({
           commitOnBlur
           fullWidth
           name={key + 'value'}
+          placeholder={objectVariablesMeta.default?objectVariablesMeta.default:''}
           value={variable.getString()}
           onChange={onChangeValue}
           multiLine

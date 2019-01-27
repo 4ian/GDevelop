@@ -158,8 +158,16 @@ export default class VariablesList extends React.Component<Props, State> {
     index: number,
     parentVariable: ?gdVariable
   ) {
-    const { variablesContainer } = this.props;
+    const { variablesContainer,objectVariablesMeta } = this.props;
     const isStructure = variable.isStructure();
+
+    if (objectVariablesMeta) {
+      objectVariablesMeta.isInObject = false
+      if (name in objectVariablesMeta) {
+        objectVariablesMeta.isInObject = true
+        objectVariablesMeta.default=objectVariablesMeta[name].value
+      }
+    }
 
     return (
       <SortableVariableRow
@@ -169,6 +177,7 @@ export default class VariablesList extends React.Component<Props, State> {
         variable={variable}
         disabled={depth !== 0}
         depth={depth}
+        objectVariablesMeta={objectVariablesMeta}
         errorText={
           this.state.nameErrors[variable.ptr]
             ? 'This name is already taken'
@@ -251,7 +260,7 @@ export default class VariablesList extends React.Component<Props, State> {
   }
 
   render() {
-    const { variablesContainer } = this.props;
+    const { variablesContainer, objectVariablesMeta } = this.props;
     if (!variablesContainer) return null;
 
     const containerVariablesTree = mapFor(

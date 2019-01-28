@@ -9,6 +9,7 @@ import YesNoField from './ParameterFields/YesNoField';
 import TrueFalseField from './ParameterFields/TrueFalseField';
 import ExpressionField from './ParameterFields/ExpressionField';
 import StringField from './ParameterFields/StringField';
+import StringListField from './ParameterFields/StringListField';
 import BehaviorField from './ParameterFields/BehaviorField';
 import SceneVariableField from './ParameterFields/SceneVariableField';
 import GlobalVariableField from './ParameterFields/GlobalVariableField';
@@ -31,6 +32,7 @@ const components = {
   trueorfalse: TrueFalseField,
   expression: ExpressionField,
   string: StringField,
+  stringlist: StringListField,
   behavior: BehaviorField,
   scenevar: SceneVariableField,
   globalvar: GlobalVariableField,

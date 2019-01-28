@@ -266,44 +266,42 @@ export default class VariablesList extends React.Component<Props, State> {
   componentDidMount() {
     const { variablesContainer, objectVariables } = this.props;
     if (objectVariables){
-      const objectVariablesTree = mapFor(0, objectVariables.count(), index => {
+      mapFor(0, objectVariables.count(), index => {
         const name = objectVariables.getNameAt(index);
         if (!variablesContainer.has(name)) {
           console.log("add " + name)
           const serializedVariable = serializeToJSObject(objectVariables.getAt(index))
           const newVariable = new gd.Variable();
           unserializeFromJSObject(newVariable, serializedVariable);
-          return this._renderVariableAndChildrenRows(
-            name,
-            newVariable,
-            0,
-            index,
-            undefined,
-            { isInObject: true }
-          );
+          variablesContainer.insert(name, newVariable, variablesContainer.count());
         }
       })
-      this.setState({objectVariablesTree})
+      this.forceUpdate()
     }
   }
 
   render() {
-    const { variablesContainer } = this.props;
+    const { variablesContainer, objectVariables } = this.props;
     if (!variablesContainer) return null;
     /// map all unique instance variables
+
+    
     const containerVariablesTree = mapFor(
       0,
       variablesContainer.count(),
       index => {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
+
+        const isInObject = objectVariables? objectVariables.has(name) : true
+
           return this._renderVariableAndChildrenRows(
             name,
             variable,
             0,
             index,
             undefined,
-            { isInObject: false }
+            { isInObject }
           );
         }
     );
@@ -347,8 +345,6 @@ export default class VariablesList extends React.Component<Props, State> {
           useDragHandle
           lockToContainerEdges
         >
-          {!!this.state.objectVariablesTree && !!this.state.objectVariablesTree.length && this.state.objectVariablesTree}
-
           {!containerVariablesTree.length && this._renderEmpty()}
           {!!containerVariablesTree.length && containerVariablesTree}
           {editRow}

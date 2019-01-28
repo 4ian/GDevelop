@@ -88,6 +88,17 @@ export default class InstancePropertiesEditor extends Component {
         getValue: instance => instance.hasCustomSize(),
         setValue: (instance, newValue) => instance.setHasCustomSize(newValue),
       },
+      {
+        name: 'Instance variables',
+        children: [
+          {
+            name: 'Edit variables',
+            getLabel: instance =>
+              'Edit variables (' + instance.getVariables().count() + ')',
+            onClick: instance => this.props.editInstanceVariables(instance),
+          },
+        ],
+      },
     ];
   }
 

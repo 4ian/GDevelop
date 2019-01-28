@@ -93,7 +93,7 @@ const ThemableVariableRow = ({
           fullWidth
           name={key + 'value'}
           placeholder={objectVariablesMeta.default}
-          value={variable.getString()}
+          value={variable.getString()?variable.getString():objectVariablesMeta.default}
           onChange={onChangeValue}
           multiLine
         />

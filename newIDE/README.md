@@ -121,6 +121,7 @@ To build artifacts for all platforms and publish to a draft GitHub release:
 GH_TOKEN=xxx yarn build --mac --win --linux tar.gz --publish always
 ```
 
+> To build beta versions, you can create archives: `yarn build --mac zip --win zip --linux tar.gz`.
 
 ### Webapp version
 

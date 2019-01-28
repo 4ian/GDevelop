@@ -16,7 +16,7 @@
 #include "GDCore/Events/Builtin/WhileEvent.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
@@ -410,17 +410,9 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
         gd::String repeatNumberExpression = event.GetRepeatExpression();
 
         // Prepare expression containing how many times event must be repeated
-        gd::String repeatCountCode;
-        gd::CallbacksForGeneratingExpressionCode callbacks(
-            repeatCountCode, codeGenerator, parentContext);
-        gd::ExpressionParser parser(repeatNumberExpression);
-        if (!parser.ParseMathExpression(
-                codeGenerator.GetPlatform(),
-                codeGenerator.GetGlobalObjectsAndGroups(),
-                codeGenerator.GetObjectsAndGroups(),
-                callbacks) ||
-            repeatCountCode.empty())
-          repeatCountCode = "0";
+        gd::String repeatCountCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator, parentContext, "number", repeatNumberExpression);
 
         // Context is "reset" each time the event is repeated ( i.e. objects are
         // picked again )

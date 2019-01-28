@@ -134,7 +134,7 @@ gd::String VariableParser::SkipStringExpression() {
     ++currentPositionIt;
   }
 
-  // End of the expression reached ( So expression is invalid by the way )
+  // End of the expression reached (so expression is invalid by the way)
   return stringExpression;
 }
 

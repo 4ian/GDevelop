@@ -15,7 +15,7 @@ class Platform;
 class Object;
 class Project;
 class Layout;
-}
+}  // namespace gd
 
 namespace gd {
 
@@ -23,7 +23,7 @@ namespace gd {
  * \brief Perform a search over a project or a layout, searching for layout,
  * global or object variables.
  *
- * \todo Refactor this class using ArbitraryEventsWorker!
+ * \todo Refactor this class using ArbitraryEventsWorker
  *
  * \ingroup IDE
  */
@@ -31,16 +31,21 @@ class EventsVariablesFinder {
  public:
   /**
    * Construct a list containing the name of all global variables used in the
-   * project. \param project The project to be scanned \return A std::set
-   * containing the names of all global variables used
+   * project.
+   *
+   * \param project The project to be scanned
+   * \return A std::set containing the names of all global variables used
    */
   static std::set<gd::String> FindAllGlobalVariables(
       const gd::Platform& platform, const gd::Project& project);
 
   /**
    * Construct a list containing the name of all layout variables used in the
-   * layout. \param project The project \param layout The layout to be scanned
-   * \return A std::set containing the names of all layout variables used
+   * layout.
+   *
+   * \param project The project
+   * \param layout The layout to be scanned
+   * \return A std::set containing the names of all layout variables used.
    */
   static std::set<gd::String> FindAllLayoutVariables(
       const gd::Platform& platform,
@@ -49,9 +54,12 @@ class EventsVariablesFinder {
 
   /**
    * Construct a list containing the name of all object variables used in the
-   * layout. \param project The project \param layout The layout to use. \param
-   * object The object to be scanned \return A std::set containing the names of
-   * all object variables used
+   * layout.
+   *
+   * \param project The project
+   * \param layout The layout to use.
+   * \param  object The object to be scanned
+   * \return A std::set containing the names of all object variables used.
    */
   static std::set<gd::String> FindAllObjectVariables(
       const gd::Platform& platform,
@@ -62,12 +70,15 @@ class EventsVariablesFinder {
  private:
   /**
    * Construct a list of the value of the arguments for parameters of type @
-   * parameterType \param project The project used \param project The layout
-   * used \param instructions The instructions to be analyzed \param
-   * instructionsAreConditions True if the instructions are conditions. \param
-   * parameterType The parameters type to be analyzed \param objectName If not
-   * empty, parameters will be taken into account only if the last object
-   * parameter is filled with this value.
+   * parameterType
+   *
+   * \param project The project used
+   * \param project The layout used
+   * \param instructions The instructions to be analyzed
+   * \param instructionsAreConditions True if the instructions are conditions.
+   * \param parameterType The parameters type to be analyzed
+   * \param objectName If not empty, parameters will be taken into account only
+   * if the last object parameter is filled with this value.
    *
    * \return A std::set filled with the values used for all parameters of the
    * specified type
@@ -83,10 +94,14 @@ class EventsVariablesFinder {
 
   /**
    * Construct a list of the value of the arguments for parameters of type @
-   * parameterType \param project The project used \param project The layout
-   * used \param events The events to be analyzed \param parameterType The
-   * parameters type to be analyzed \param objectName If not empty, parameters
-   * will be taken into account only if the last object parameter is filled with
+   * parameterType
+   *
+   * \param project The project used
+   * \param project The layout used
+   * \param events The events to be analyzed
+   * \param parameterType The parameters type to be analyzed
+   * \param objectName If not empty, parameters will be taken into account
+   * only if the last object parameter is filled with
    * this value.
    *
    * \return A std::set filled with the values used for all parameters of the

@@ -14,6 +14,7 @@ import Window from '../../Utils/Window';
 import PreferencesContext, {
   type AlertMessageIdentifier,
 } from './PreferencesContext';
+const gd = global.gd;
 
 type Props = {|
   open: boolean,
@@ -115,6 +116,19 @@ export default class PreferencesDialog extends Component<Props, State> {
                     toggled={values.autoDisplayChangelog}
                     labelPosition="right"
                     label="Display What's New when a new version is launched (recommended)"
+                  />
+                </Line>
+                <Line>
+                  <Toggle
+                    onToggle={(e, check) => {
+                      gd.ExpressionCodeGenerator.useOldExpressionParser(!check);
+                      this.forceUpdate();
+                    }}
+                    toggled={
+                      !gd.ExpressionCodeGenerator.isUsingOldExpressionParser()
+                    }
+                    labelPosition="right"
+                    label="Use the new expression parser (alpha, please report any bugs)"
                   />
                 </Line>
                 <Line>

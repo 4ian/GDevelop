@@ -146,7 +146,9 @@ class GD_CORE_API ParameterMetadata {
 
   /**
    * \brief Return true if the type of the parameter is "object", "objectPtr" or
-   * "objectList". \see gd::ParameterMetadata::GetType
+   * "objectList".
+   *
+   * \see gd::ParameterMetadata::GetType
    */
   static bool IsObject(const gd::String &parameterType) {
     return parameterType == "object" || parameterType == "objectPtr" ||
@@ -155,8 +157,8 @@ class GD_CORE_API ParameterMetadata {
   }
 
   /**
-   * \brief Return true if the type of the parameter is "object", "objectPtr" or
-   * "objectList". \see gd::ParameterMetadata::GetType
+   * \brief Return true if the type of the parameter is an expression of the
+   * given type.
    */
   static bool IsExpression(const gd::String &type,
                            const gd::String &parameterType) {
@@ -167,6 +169,9 @@ class GD_CORE_API ParameterMetadata {
       return parameterType == "string" || parameterType == "layer" ||
              parameterType == "color" || parameterType == "file" ||
              parameterType == "joyaxis";
+    } else if (type == "variable") {
+      return parameterType == "objectvar" || parameterType == "globalvar" ||
+             parameterType == "scenevar";
     }
     return false;
   }

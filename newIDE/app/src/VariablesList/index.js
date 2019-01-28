@@ -266,19 +266,31 @@ export default class VariablesList extends React.Component<Props, State> {
   componentDidMount() {
     const { variablesContainer, objectVariables } = this.props;
     if (objectVariables){
-      mapFor(0, objectVariables.count(), index => {
+      const objectVariablesTree = mapFor(0, objectVariables.count(), index => {
         const name = objectVariables.getNameAt(index);
-        const value = objectVariables.get(name).getString();//getString causes crash
         if (!variablesContainer.has(name)) {
-          this.onAddVariable(name,value);
+          console.log("add " + name)
+          const value = objectVariables.get(name).getString();//getString causes crash
+          console.log(value)
+
+          const variable = new gd.Variable();
+          variable.setString(value);
+          return this._renderVariableAndChildrenRows(
+            name,
+            variable,
+            0,
+            index,
+            undefined,
+            { isInObject: true }
+          );
         }
       })
-      this.forceUpdate()
+      this.setState({objectVariablesTree})
     }
   }
 
   render() {
-    const { variablesContainer, objectVariables } = this.props;
+    const { variablesContainer } = this.props;
     if (!variablesContainer) return null;
     /// map all unique instance variables
     const containerVariablesTree = mapFor(
@@ -287,14 +299,13 @@ export default class VariablesList extends React.Component<Props, State> {
       index => {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
-        const isInObject = objectVariables? objectVariables.has(name) : false
           return this._renderVariableAndChildrenRows(
             name,
             variable,
             0,
             index,
             undefined,
-            { isInObject }
+            { isInObject: false }
           );
         }
     );
@@ -338,6 +349,8 @@ export default class VariablesList extends React.Component<Props, State> {
           useDragHandle
           lockToContainerEdges
         >
+          {!!this.state.objectVariablesTree && !!this.state.objectVariablesTree.length && this.state.objectVariablesTree}
+
           {!containerVariablesTree.length && this._renderEmpty()}
           {!!containerVariablesTree.length && containerVariablesTree}
           {editRow}

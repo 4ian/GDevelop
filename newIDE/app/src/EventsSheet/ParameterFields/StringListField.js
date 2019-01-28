@@ -23,6 +23,7 @@ export default class StringListField extends Component<ParameterFieldProps, Stat
     this._choices = [];
     try {
       this._description = parameterMetadata ? parameterMetadata.getDescription() : undefined;
+      // TODO: Change libGD.js to only add the extension name for objects
       this._choices = JSON.parse(parameterMetadata.getExtraInfo().replace('StringListTest::',''));
     } catch(exception) {
       console.error("The parameter seems misconfigured, as an array of choices could not be extracted - verify that your properly wrote a list of choices in JSON format. Full exception is:", exception);

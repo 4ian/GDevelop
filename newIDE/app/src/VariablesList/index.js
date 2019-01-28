@@ -270,14 +270,12 @@ export default class VariablesList extends React.Component<Props, State> {
         const name = objectVariables.getNameAt(index);
         if (!variablesContainer.has(name)) {
           console.log("add " + name)
-          const value = objectVariables.get(name).getString();//getString causes crash
-          console.log(value)
-
-          const variable = new gd.Variable();
-          variable.setString(value);
+          const serializedVariable = serializeToJSObject(objectVariables.getAt(index))
+          const newVariable = new gd.Variable();
+          unserializeFromJSObject(newVariable, serializedVariable);
           return this._renderVariableAndChildrenRows(
             name,
-            variable,
+            newVariable,
             0,
             index,
             undefined,

@@ -182,14 +182,14 @@ BaseStartHerePage::BaseStartHerePage(wxWindow* parent, wxWindowID id, const wxPo
     
     flexGridSizer214->Add(m_hyperLink175, 0, wxALL, 3);
     
-    m_hyperLink2316 = new wxHyperlinkCtrl(this, wxID_ANY, _("Facebook page"), wxT("https://www.facebook.com/GameDevelop"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink2316 = new wxHyperlinkCtrl(this, wxID_ANY, _("Facebook page"), wxT("https://www.facebook.com/GDevelopApp"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
     m_hyperLink2316->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink2316->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink2316->SetVisitedColour(wxColour(wxT("#FF0000")));
     
     flexGridSizer214->Add(m_hyperLink2316, 0, wxALL, 3);
     
-    m_hyperLink237 = new wxHyperlinkCtrl(this, wxID_ANY, _("Follow GDevelop on Twitter"), wxT("https://twitter.com/Game_Develop"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
+    m_hyperLink237 = new wxHyperlinkCtrl(this, wxID_ANY, _("Follow GDevelop on Twitter"), wxT("https://twitter.com/GDevelopApp"), wxDefaultPosition, wxSize(-1,-1), wxHL_DEFAULT_STYLE);
     m_hyperLink237->SetNormalColour(wxColour(wxT("#0000FF")));
     m_hyperLink237->SetHoverColour(wxColour(wxT("#0000FF")));
     m_hyperLink237->SetVisitedColour(wxColour(wxT("#FF0000")));

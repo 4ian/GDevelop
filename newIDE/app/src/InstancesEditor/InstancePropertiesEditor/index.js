@@ -116,7 +116,6 @@ export default class InstancePropertiesEditor extends Component {
       .getObject(instances[0].getObjectName())
       .getVariables();
 
-    // console.log(objectVariablesMeta)
     //TODO: multiple instances support
     const properties = instances[0].getCustomProperties(project, layout);
     const instanceSchema = propertiesMapToSchema(
@@ -137,7 +136,7 @@ export default class InstancePropertiesEditor extends Component {
         />
         Instance Variables:
         <VariablesList
-          objectVariables={objectVariables}
+          inheritedVariablesContainer={objectVariables}
           variablesContainer={instances[0].getVariables()}
           emptyExplanationMessage={''}
           emptyExplanationSecondMessage={''}

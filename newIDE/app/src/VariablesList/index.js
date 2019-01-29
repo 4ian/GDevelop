@@ -150,14 +150,14 @@ export default class VariablesList extends React.Component<Props, State> {
       })
     );
   }
-
+  
   _renderVariableAndChildrenRows(
     name: string,
     variable: gdVariable,
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
-    objectVariablesMeta
+    variableMetadata
   ) {
     const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
@@ -170,14 +170,19 @@ export default class VariablesList extends React.Component<Props, State> {
         variable={variable}
         disabled={depth !== 0}
         depth={depth}
-        objectVariablesMeta={objectVariablesMeta}
+        variableMetadata={variableMetadata}
         errorText={
           this.state.nameErrors[variable.ptr]
             ? 'This name is already taken'
             : undefined
         }
         onChangeValue={text => {
-          variable.setString(text);
+          if (variableMetadata.isInObject && text.length === 0) {
+            variable.setString(variableMetadata.defaultValue);
+          } else {
+            variable.setString(text);
+          }
+
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
@@ -264,28 +269,34 @@ export default class VariablesList extends React.Component<Props, State> {
   };
 
   componentDidMount() {
-    const { variablesContainer, objectVariables } = this.props;
-    if (objectVariables){
-      mapFor(0, objectVariables.count(), index => {
-        const name = objectVariables.getNameAt(index);
+    this._updateInheritedVariables()
+    this.forceUpdate()
+  }
+
+  _updateInheritedVariables = (text='',variable=false) =>{
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
+    if (inheritedVariablesContainer){
+      mapFor(0, inheritedVariablesContainer.count(), index => {
+        const name = inheritedVariablesContainer.getNameAt(index);
         if (!variablesContainer.has(name)) {
           console.log("add " + name)
-          const serializedVariable = serializeToJSObject(objectVariables.getAt(index))
+          const serializedVariable = serializeToJSObject(inheritedVariablesContainer.getAt(index))
           const newVariable = new gd.Variable();
           unserializeFromJSObject(newVariable, serializedVariable);
           variablesContainer.insert(name, newVariable, variablesContainer.count());
         }
       })
-      this.forceUpdate()
     }
+    
+    console.log("try to do it")
+    ///if 
   }
 
   render() {
-    const { variablesContainer, objectVariables } = this.props;
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!variablesContainer) return null;
-    /// map all unique instance variables
 
-    
+    /// map all unique instance variables
     const containerVariablesTree = mapFor(
       0,
       variablesContainer.count(),
@@ -293,15 +304,16 @@ export default class VariablesList extends React.Component<Props, State> {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
 
-        const isInObject = objectVariables? objectVariables.has(name) : true
-
-          return this._renderVariableAndChildrenRows(
+        
+        const isInObject = inheritedVariablesContainer? inheritedVariablesContainer.has(name) : false
+        const defaultValue =  isInObject? inheritedVariablesContainer.get(name).getString() : ''
+        return this._renderVariableAndChildrenRows(
             name,
             variable,
             0,
             index,
             undefined,
-            { isInObject }
+            { isInObject, defaultValue }
           );
         }
     );

@@ -53,12 +53,12 @@ const ThemableVariableRow = ({
   showSelectionCheckbox,
   isSelected,
   onSelect,
-  objectVariablesMeta = { default: '', isInObject: true },
+  variableMetadata = { default: '', isInObject: true },
 }: Props) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
 
-  const { isInObject } = objectVariablesMeta;
+  const { isInObject } = variableMetadata;
 
   const columns = [
     <TreeTableCell key="name">
@@ -92,8 +92,8 @@ const ThemableVariableRow = ({
           commitOnBlur
           fullWidth
           name={key + 'value'}
-          placeholder={objectVariablesMeta.default}
-          value={variable.getString()?variable.getString():objectVariablesMeta.default}
+          placeholder={variableMetadata.default}
+          value={variable.getString()?variable.getString():variableMetadata.default}
           onChange={onChangeValue}
           multiLine
         />

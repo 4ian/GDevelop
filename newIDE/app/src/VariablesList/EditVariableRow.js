@@ -9,7 +9,7 @@ import Delete from 'material-ui/svg-icons/action/delete';
 
 import styles from './styles';
 
-const VariableRow = ({
+const EditVariableRow = ({
   onAdd,
   onCopy,
   hasSelection,
@@ -43,4 +43,4 @@ const VariableRow = ({
   </TreeTableRow>
 );
 
-export default VariableRow;
+export default EditVariableRow;

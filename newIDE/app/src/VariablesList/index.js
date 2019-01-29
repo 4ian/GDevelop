@@ -177,12 +177,12 @@ export default class VariablesList extends React.Component<Props, State> {
             : undefined
         }
         onChangeValue={text => {
-          if (variableMetadata.isInObject && text.length === 0) {
-            variable.setString(variableMetadata.defaultValue);
-          } else {
-            variable.setString(text);
-          }
-
+          variable.setString(text);
+          this.forceUpdate();
+          if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+        }}
+        onResetToDefaultValue={ () =>{
+          variable.setString(variableMetadata.defaultValue);
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
@@ -279,7 +279,6 @@ export default class VariablesList extends React.Component<Props, State> {
       mapFor(0, inheritedVariablesContainer.count(), index => {
         const name = inheritedVariablesContainer.getNameAt(index);
         if (!variablesContainer.has(name)) {
-          console.log("add " + name)
           const serializedVariable = serializeToJSObject(inheritedVariablesContainer.getAt(index))
           const newVariable = new gd.Variable();
           unserializeFromJSObject(newVariable, serializedVariable);
@@ -287,9 +286,6 @@ export default class VariablesList extends React.Component<Props, State> {
         }
       })
     }
-    
-    console.log("try to do it")
-    ///if 
   }
 
   render() {
@@ -304,16 +300,15 @@ export default class VariablesList extends React.Component<Props, State> {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
 
-        
-        const isInObject = inheritedVariablesContainer? inheritedVariablesContainer.has(name) : false
-        const defaultValue =  isInObject? inheritedVariablesContainer.get(name).getString() : ''
+        const isInherited = inheritedVariablesContainer? inheritedVariablesContainer.has(name) : false
+        const defaultValue =  isInherited? inheritedVariablesContainer.get(name).getString() : ''
         return this._renderVariableAndChildrenRows(
             name,
             variable,
             0,
             index,
             undefined,
-            { isInObject, defaultValue }
+            { isInherited, defaultValue }
           );
         }
     );

@@ -8,6 +8,7 @@ import AddCircle from 'material-ui/svg-icons/content/add-circle';
 import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirectory-arrow-right';
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
+import Reset from 'material-ui/svg-icons/av/replay';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';
 
@@ -30,6 +31,7 @@ type Props = {|
   onRemove: () => void,
   onAddChild: () => void,
   onChangeValue: string => void,
+  onResetToDefaultValue: ()=>void,
   children?: React.Node,
   muiTheme: Object,
   showHandle: boolean,
@@ -47,19 +49,21 @@ const ThemableVariableRow = ({
   onRemove,
   onAddChild,
   onChangeValue,
+  onResetToDefaultValue,
   children,
   muiTheme,
   showHandle,
   showSelectionCheckbox,
   isSelected,
   onSelect,
-  variableMetadata = { default: '', isInObject: true },
+  variableMetadata = { default: '', isInherited: false },
 }: Props) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
 
-  const { isInObject } = variableMetadata;
-
+  const { isInherited } = variableMetadata;
+  const valueIsSameAsInherited = variableMetadata.defaultValue === variable.getString()
+  
   const columns = [
     <TreeTableCell key="name">
       {depth > 0 && (
@@ -74,8 +78,8 @@ const ThemableVariableRow = ({
       )}
       <TextField
         style={{
-          fontStyle: isInObject ? 'normal' : 'italic',
-          fontWeight: isInObject ? 'bold' : 'normal',
+          fontStyle: isInherited ? 'normal' : 'italic',
+          fontWeight: isInherited ? 'bold' : 'normal',
         }}
         fullWidth
         name={key + 'name'}
@@ -93,7 +97,7 @@ const ThemableVariableRow = ({
           fullWidth
           name={key + 'value'}
           placeholder={variableMetadata.default}
-          value={variable.getString()?variable.getString():variableMetadata.default}
+          value={variable.getString()}
           onChange={onChangeValue}
           multiLine
         />
@@ -104,6 +108,14 @@ const ThemableVariableRow = ({
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>
+        {variableMetadata.isInherited && !valueIsSameAsInherited &&(
+            <IconButton
+            onClick={onResetToDefaultValue}
+            style={isStructure ? undefined : styles.fadedButton}
+          >
+            <Reset />
+          </IconButton>      
+        )}
       <IconButton
         onClick={onAddChild}
         style={isStructure ? undefined : styles.fadedButton}

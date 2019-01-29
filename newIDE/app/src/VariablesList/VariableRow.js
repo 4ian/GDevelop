@@ -64,6 +64,7 @@ const ThemableVariableRow = ({
 
   const { isInherited } = variableMetadata;
   const valueIsSameAsInherited =
+    variable.isStructure() ||
     variableMetadata.defaultValue === variable.getString();
 
   const columns = [

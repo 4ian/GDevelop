@@ -157,12 +157,22 @@ export default class VariablesList extends React.Component<Props, State> {
     variable: gdVariable,
     depth: number,
     index: number,
-    parentVariable: ?gdVariable,
-    variableMetadata?: ?Object
+    parentVariable: ?gdVariable
   ) {
-    const { variablesContainer } = this.props;
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
     const isStructure = variable.isStructure();
 
+    const isInherited = inheritedVariablesContainer
+      ? inheritedVariablesContainer.has(name)
+      : false;
+    const defaultValue =
+      inheritedVariablesContainer && isInherited && !isStructure
+        ? inheritedVariablesContainer.get(name).getString()
+        : '';
+    const variableMetadata = { isInherited, defaultValue };
+
+    console.log(parentVariable);
+    console.log(isStructure);
     return (
       <SortableVariableRow
         name={name}
@@ -262,7 +272,6 @@ export default class VariablesList extends React.Component<Props, State> {
 
   componentDidMount() {
     this._updateInheritedVariables();
-    this.forceUpdate();
   }
 
   _updateInheritedVariables = () => {
@@ -281,13 +290,15 @@ export default class VariablesList extends React.Component<Props, State> {
             newVariable,
             variablesContainer.count()
           );
+          newVariable.delete();
         }
+        this.forceUpdate();
       });
     }
   };
 
   render() {
-    const { variablesContainer, inheritedVariablesContainer } = this.props;
+    const { variablesContainer } = this.props;
     if (!variablesContainer) return null;
 
     /// map all unique instance variables
@@ -298,20 +309,12 @@ export default class VariablesList extends React.Component<Props, State> {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
 
-        const isInherited = inheritedVariablesContainer
-          ? inheritedVariablesContainer.has(name)
-          : false;
-        const defaultValue =
-          inheritedVariablesContainer && isInherited
-            ? inheritedVariablesContainer.get(name).getString()
-            : '';
         return this._renderVariableAndChildrenRows(
           name,
           variable,
           0,
           index,
-          undefined,
-          { isInherited, defaultValue }
+          undefined
         );
       }
     );

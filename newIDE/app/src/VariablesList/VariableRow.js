@@ -31,7 +31,7 @@ type Props = {|
   onRemove: () => void,
   onAddChild: () => void,
   onChangeValue: string => void,
-  onResetToDefaultValue: string => void,
+  onResetToDefaultValue: () => void,
   children?: React.Node,
   muiTheme: Object,
   showHandle: boolean,
@@ -112,7 +112,7 @@ const ThemableVariableRow = ({
     <TreeTableCell key="tools" style={styles.toolColumn}>
       {variableMetadata.isInherited && !valueIsSameAsInherited && (
         <IconButton
-          onClick={onResetToDefaultValue(variableMetadata.defaultValue)}
+          onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
         >
           <Reset />

@@ -182,10 +182,12 @@ export default class VariablesList extends React.Component<Props, State> {
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
-        onResetToDefaultValue={resetValue => {
-          variable.setString(resetValue);
-          this.forceUpdate();
-          if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+        onResetToDefaultValue={() => {
+          if (variableMetadata) {
+            variable.setString(variableMetadata.defaultValue);
+            this.forceUpdate();
+            if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+          }
         }}
         onBlur={event => {
           const text = event.target.value;

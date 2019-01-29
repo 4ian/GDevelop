@@ -44,6 +44,7 @@ type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
 
 type Props = {|
   variablesContainer: gdVariablesContainer,
+  inheritedVariablesContainer?: gdVariablesContainer,
   emptyExplanationMessage?: string,
   emptyExplanationSecondMessage?: string,
   onSizeUpdated?: () => void,
@@ -150,14 +151,14 @@ export default class VariablesList extends React.Component<Props, State> {
       })
     );
   }
-  
+
   _renderVariableAndChildrenRows(
     name: string,
     variable: gdVariable,
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
-    variableMetadata
+    variableMetadata?: ?Object
   ) {
     const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
@@ -181,8 +182,8 @@ export default class VariablesList extends React.Component<Props, State> {
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
-        onResetToDefaultValue={ () =>{
-          variable.setString(variableMetadata.defaultValue);
+        onResetToDefaultValue={resetValue => {
+          variable.setString(resetValue);
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
@@ -257,36 +258,31 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   }
 
-  onAddVariable = (variableName = false,string='') => {
-    const { variablesContainer } = this.props;
-    const variable = new gd.Variable();
-    variable.setString(string);
-
-    const name = variableName
-      ? variableName
-      : newNameGenerator('Variable', name => variablesContainer.has(name));
-    variablesContainer.insert(name, variable, variablesContainer.count());
-  };
-
   componentDidMount() {
-    this._updateInheritedVariables()
-    this.forceUpdate()
+    this._updateInheritedVariables();
+    this.forceUpdate();
   }
 
-  _updateInheritedVariables = (text='',variable=false) =>{
+  _updateInheritedVariables = () => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
-    if (inheritedVariablesContainer){
+    if (inheritedVariablesContainer) {
       mapFor(0, inheritedVariablesContainer.count(), index => {
         const name = inheritedVariablesContainer.getNameAt(index);
         if (!variablesContainer.has(name)) {
-          const serializedVariable = serializeToJSObject(inheritedVariablesContainer.getAt(index))
+          const serializedVariable = serializeToJSObject(
+            inheritedVariablesContainer.getAt(index)
+          );
           const newVariable = new gd.Variable();
           unserializeFromJSObject(newVariable, serializedVariable);
-          variablesContainer.insert(name, newVariable, variablesContainer.count());
+          variablesContainer.insert(
+            name,
+            newVariable,
+            variablesContainer.count()
+          );
         }
-      })
+      });
     }
-  }
+  };
 
   render() {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
@@ -300,17 +296,22 @@ export default class VariablesList extends React.Component<Props, State> {
         const variable = variablesContainer.getAt(index);
         const name = variablesContainer.getNameAt(index);
 
-        const isInherited = inheritedVariablesContainer? inheritedVariablesContainer.has(name) : false
-        const defaultValue =  isInherited? inheritedVariablesContainer.get(name).getString() : ''
+        const isInherited = inheritedVariablesContainer
+          ? inheritedVariablesContainer.has(name)
+          : false;
+        const defaultValue =
+          inheritedVariablesContainer && isInherited
+            ? inheritedVariablesContainer.get(name).getString()
+            : '';
         return this._renderVariableAndChildrenRows(
-            name,
-            variable,
-            0,
-            index,
-            undefined,
-            { isInherited, defaultValue }
-          );
-        }
+          name,
+          variable,
+          0,
+          index,
+          undefined,
+          { isInherited, defaultValue }
+        );
+      }
     );
 
     const editRow = (
@@ -319,7 +320,12 @@ export default class VariablesList extends React.Component<Props, State> {
         key={'add-variable-row'}
         disabled
         onAdd={() => {
-          this.onAddVariable();
+          const variable = new gd.Variable();
+          variable.setString('');
+          const name = newNameGenerator('Variable', name =>
+            variablesContainer.has(name)
+          );
+          variablesContainer.insert(name, variable, variablesContainer.count());
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}

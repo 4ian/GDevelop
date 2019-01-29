@@ -31,13 +31,14 @@ type Props = {|
   onRemove: () => void,
   onAddChild: () => void,
   onChangeValue: string => void,
-  onResetToDefaultValue: ()=>void,
+  onResetToDefaultValue: string => void,
   children?: React.Node,
   muiTheme: Object,
   showHandle: boolean,
   showSelectionCheckbox: boolean,
   isSelected: boolean,
   onSelect: boolean => void,
+  variableMetadata: Object,
 |};
 
 const ThemableVariableRow = ({
@@ -62,8 +63,9 @@ const ThemableVariableRow = ({
   const key = '' + depth + name;
 
   const { isInherited } = variableMetadata;
-  const valueIsSameAsInherited = variableMetadata.defaultValue === variable.getString()
-  
+  const valueIsSameAsInherited =
+    variableMetadata.defaultValue === variable.getString();
+
   const columns = [
     <TreeTableCell key="name">
       {depth > 0 && (
@@ -108,14 +110,14 @@ const ThemableVariableRow = ({
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>
-        {variableMetadata.isInherited && !valueIsSameAsInherited &&(
-            <IconButton
-            onClick={onResetToDefaultValue}
-            style={isStructure ? undefined : styles.fadedButton}
-          >
-            <Reset />
-          </IconButton>      
-        )}
+      {variableMetadata.isInherited && !valueIsSameAsInherited && (
+        <IconButton
+          onClick={onResetToDefaultValue(variableMetadata.defaultValue)}
+          style={isStructure ? undefined : styles.fadedButton}
+        >
+          <Reset />
+        </IconButton>
+      )}
       <IconButton
         onClick={onAddChild}
         style={isStructure ? undefined : styles.fadedButton}

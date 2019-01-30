@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -803,9 +803,9 @@
               "parameters": [
                 "slider_button",
                 "=",
-                "volume_slider.PointX(button)",
+                "volume_slider.PointX(\"button\")",
                 "=",
-                "volume_slider.PointY(button)"
+                "volume_slider.PointY(\"button\")"
               ],
               "subInstructions": []
             }
@@ -936,7 +936,7 @@
               "parameters": [
                 "slider_button",
                 ">=",
-                "volume_slider.PointX(button)"
+                "volume_slider.PointX(\"button\")"
               ],
               "subInstructions": []
             }
@@ -982,7 +982,7 @@
               "parameters": [
                 "slider_button",
                 "<",
-                "volume_slider.PointX(button)"
+                "volume_slider.PointX(\"button\")"
               ],
               "subInstructions": []
             }

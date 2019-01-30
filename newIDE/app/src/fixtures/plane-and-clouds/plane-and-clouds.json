@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -674,9 +674,9 @@
               "parameters": [
                 "Smoke",
                 "=",
-                "Plane.PointX(Smoke)",
+                "Plane.PointX(\"Smoke\")",
                 "=",
-                "Plane.PointY(Smoke)"
+                "Plane.PointY(\"Smoke\")"
               ],
               "subInstructions": []
             },
@@ -738,7 +738,7 @@
               "parameters": [
                 "",
                 "=",
-                "Plane.PointX(Centre)*1.5",
+                "Plane.PointX(\"Centre\")*1.5",
                 "\"UpperLayer\"",
                 ""
               ],
@@ -752,7 +752,7 @@
               "parameters": [
                 "",
                 "=",
-                "Plane.PointY(Centre)*1.5",
+                "Plane.PointY(\"Centre\")*1.5",
                 "\"UpperLayer\"",
                 ""
               ],
@@ -804,9 +804,9 @@
               "parameters": [
                 "Bullet",
                 "=",
-                "Plane.PointX(GunA)",
+                "Plane.PointX(\"GunA\")",
                 "=",
-                "Plane.PointY(GunA)"
+                "Plane.PointY(\"GunA\")"
               ],
               "subInstructions": []
             },
@@ -853,9 +853,9 @@
               "parameters": [
                 "Bullet",
                 "=",
-                "Plane.PointX(GunB)",
+                "Plane.PointX(\"GunB\")",
                 "=",
-                "Plane.PointY(GunB)"
+                "Plane.PointY(\"GunB\")"
               ],
               "subInstructions": []
             },
@@ -1012,8 +1012,8 @@
                   "parameters": [
                     "",
                     "Cloud",
-                    "Plane.PointX(Centre) + 700*cos(ToRad(Variable(random_angle)))",
-                    "Plane.PointY(Centre) + 700*sin(ToRad(Variable(random_angle)))",
+                    "Plane.PointX(\"Centre\") + 700*cos(ToRad(Variable(random_angle)))",
+                    "Plane.PointY(\"Centre\") + 700*sin(ToRad(Variable(random_angle)))",
                     ""
                   ],
                   "subInstructions": []
@@ -1121,9 +1121,9 @@
                       "parameters": [
                         "Cloud",
                         "=",
-                        "Cloud.X() + (1.5 -1)*Plane.PointX(Centre)",
+                        "Cloud.X() + (1.5 -1)*Plane.PointX(\"Centre\")",
                         "=",
-                        "Cloud.Y() + (1.5 -1)*Plane.PointY(Centre)"
+                        "Cloud.Y() + (1.5 -1)*Plane.PointY(\"Centre\")"
                       ],
                       "subInstructions": []
                     }
@@ -1194,8 +1194,8 @@
                   "parameters": [
                     "",
                     "Bullet",
-                    "Plane.PointX(GunA)",
-                    "Plane.PointY(GunA)",
+                    "Plane.PointX(\"GunA\")",
+                    "Plane.PointY(\"GunA\")",
                     ""
                   ],
                   "subInstructions": []
@@ -1242,8 +1242,8 @@
                   "parameters": [
                     "",
                     "Bullet",
-                    "Plane.PointX(GunB)",
-                    "Plane.PointY(GunB)",
+                    "Plane.PointX(\"GunB\")",
+                    "Plane.PointY(\"GunB\")",
                     ""
                   ],
                   "subInstructions": []

@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -5757,8 +5757,8 @@
                                       "parameters": [
                                         "",
                                         "engine_particle",
-                                        "player.PointX(engine)",
-                                        "player.PointY(engine) + Random(10)",
+                                        "player.PointX(\"engine\")",
+                                        "player.PointY(\"engine\") + Random(10)",
                                         ""
                                       ],
                                       "subInstructions": []
@@ -6281,8 +6281,8 @@
                                           "parameters": [
                                             "",
                                             "engine_particle",
-                                            "player.PointX(engine)",
-                                            "player.PointY(engine) + Random(10)",
+                                            "player.PointX(\"engine\")",
+                                            "player.PointY(\"engine\") + Random(10)",
                                             ""
                                           ],
                                           "subInstructions": []
@@ -6658,8 +6658,8 @@
                           "parameters": [
                             "",
                             "player_bullet",
-                            "player.PointX(firespot)",
-                            "player.PointY(firespot)",
+                            "player.PointX(\"firespot\")",
+                            "player.PointY(\"firespot\")",
                             ""
                           ],
                           "subInstructions": []
@@ -6917,8 +6917,8 @@
                                   "parameters": [
                                     "",
                                     "player_bullet",
-                                    "player.PointX(firespot)",
-                                    "player.PointY(firespot)",
+                                    "player.PointX(\"firespot\")",
+                                    "player.PointY(\"firespot\")",
                                     ""
                                   ],
                                   "subInstructions": []

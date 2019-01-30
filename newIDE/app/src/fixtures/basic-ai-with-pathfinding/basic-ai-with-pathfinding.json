@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -1718,8 +1718,8 @@
               "parameters": [
                 "",
                 "Alert",
-                "IA.PointX(Center)",
-                "IA.PointY(Center)",
+                "IA.PointX(\"Center\")",
+                "IA.PointY(\"Center\")",
                 ""
               ],
               "subInstructions": []

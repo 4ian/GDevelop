@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -885,8 +885,8 @@
                   "parameters": [
                     "",
                     "Mask",
-                    "Box.PointX(Centre)",
-                    "Box.PointY(Centre)",
+                    "Box.PointX(\"Centre\")",
+                    "Box.PointY(\"Centre\")",
                     ""
                   ],
                   "subInstructions": []
@@ -1692,8 +1692,8 @@
                           "parameters": [
                             "",
                             "Mask",
-                            "Box.PointX(Centre) + cos(3.14159/4 + 3.14159*Variable(direction)/2)*Variable(distance)*100*sqrt(2)",
-                            "Box.PointY(Centre) + sin(3.14159/4 + 3.14159*Variable(direction)/2)*Variable(distance)*100*sqrt(2)",
+                            "Box.PointX(\"Centre\") + cos(3.14159/4 + 3.14159*Variable(direction)/2)*Variable(distance)*100*sqrt(2)",
+                            "Box.PointY(\"Centre\") + sin(3.14159/4 + 3.14159*Variable(direction)/2)*Variable(distance)*100*sqrt(2)",
                             ""
                           ],
                           "subInstructions": []
@@ -2425,7 +2425,7 @@
                   "parameters": [
                     "x",
                     "=",
-                    "Box.PointX(Centre)"
+                    "Box.PointX(\"Centre\")"
                   ],
                   "subInstructions": []
                 },
@@ -2437,7 +2437,7 @@
                   "parameters": [
                     "y",
                     "=",
-                    "Box.PointY(Centre)"
+                    "Box.PointY(\"Centre\")"
                   ],
                   "subInstructions": []
                 },
@@ -2544,7 +2544,7 @@
                                 "value": "Egal"
                               },
                               "parameters": [
-                                "Box.PointX(Centre)",
+                                "Box.PointX(\"Centre\")",
                                 ">",
                                 "Variable(dest_x) - 5"
                               ],
@@ -2556,7 +2556,7 @@
                                 "value": "Egal"
                               },
                               "parameters": [
-                                "Box.PointX(Centre)",
+                                "Box.PointX(\"Centre\")",
                                 "<",
                                 "Variable(dest_x) + 5"
                               ],
@@ -2568,7 +2568,7 @@
                                 "value": "Egal"
                               },
                               "parameters": [
-                                "Box.PointY(Centre)",
+                                "Box.PointY(\"Centre\")",
                                 ">",
                                 "Variable(dest_y) - 5"
                               ],
@@ -2580,7 +2580,7 @@
                                 "value": "Egal"
                               },
                               "parameters": [
-                                "Box.PointY(Centre)",
+                                "Box.PointY(\"Centre\")",
                                 "<",
                                 "Variable(dest_y) + 5"
                               ],

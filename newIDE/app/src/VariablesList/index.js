@@ -105,12 +105,12 @@ export default class VariablesList extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
-  deleteSelection = () => {
+  deleteSelection = (deleteVariables=[]) => {
     const { variablesContainer } = this.props;
-    const selection: Array<VariableAndName> = getSelection(
+    const selection: Array<VariableAndName> = deleteVariables.length? deleteVariables :getSelection(
       this.state.selectedVariables
     );
-
+      console.log(selection)
     // Only delete ancestor variables, as selection can be composed of variables
     // that are contained inside others.
     const ancestorOnlyVariables = selection.filter(({ variable }) => {
@@ -174,14 +174,14 @@ export default class VariablesList extends React.Component<Props, State> {
     const isStructure = variable.isStructure();
 
     const isInherited = isParentInherited || (depth === 0 && this._isVariableInherited(name))
-    
-    console.log(name+"-->"+isInherited+'--'+isStructure)
 
   const defaultValue =
     inheritedVariablesContainer && isInherited && !isStructure && depth === 0 ///<- workaround for below
       ? inheritedVariablesContainer.get(name).getString() ///<-- causes GD to crash when child variable
       : '';
 
+      // console.log(name)
+      // console.log(inheritedVariablesContainer.get(name))
     const variableMetadata ={isInherited,defaultValue}
 
     return (
@@ -210,7 +210,7 @@ export default class VariablesList extends React.Component<Props, State> {
         }}
         onResetToDefaultValue={() => {
           if (variableMetadata) {
-            variable.setString(variableMetadata.defaultValue);
+            this.deleteSelection([{variable, name}])
             this.forceUpdate();
             if (this.props.onSizeUpdated) this.props.onSizeUpdated();
           }

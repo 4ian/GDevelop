@@ -168,19 +168,19 @@ export default class VariablesList extends React.Component<Props, State> {
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
-    isParentInherited =false /// workaround for above issue
+    isParentInherited =false
   ) {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     const isStructure = variable.isStructure();
 
-    const isInherited = isParentInherited? true: this._isVariableInherited(name)
+    const isInherited = isParentInherited || (depth === 0 && this._isVariableInherited(name))
     
     console.log(name+"-->"+isInherited+'--'+isStructure)
 
-  const defaultValue = '' 
-    // inheritedVariablesContainer && isInherited && !isStructure
-    //   ? inheritedVariablesContainer.get(name).getString() ///<-- causes GD to crash when child variable
-    //   : '';
+  const defaultValue =
+    inheritedVariablesContainer && isInherited && !isStructure && depth === 0 ///<- workaround for below
+      ? inheritedVariablesContainer.get(name).getString() ///<-- causes GD to crash when child variable
+      : '';
 
     const variableMetadata ={isInherited,defaultValue}
 

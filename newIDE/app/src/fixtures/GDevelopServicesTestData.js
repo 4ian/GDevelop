@@ -130,6 +130,5 @@ export const releaseWithoutDescription: Release = {
   name: '5.0.0-beta60',
   publishedAt: '2019-01-07T23:32:41Z',
   url: 'https://github.com/4ian/GDevelop/releases/tag/v5.0.0-beta60',
-  description:
-    null,
+  description: null,
 };

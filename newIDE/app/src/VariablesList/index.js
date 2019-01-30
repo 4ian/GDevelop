@@ -105,12 +105,11 @@ export default class VariablesList extends React.Component<Props, State> {
     this.forceUpdate();
   };
 
-  deleteSelection = (deleteVariables=[]) => {
+  deleteSelection = () => {
     const { variablesContainer } = this.props;
-    const selection: Array<VariableAndName> = deleteVariables.length? deleteVariables :getSelection(
+    const selection: Array<VariableAndName> = getSelection(
       this.state.selectedVariables
     );
-      console.log(selection)
     // Only delete ancestor variables, as selection can be composed of variables
     // that are contained inside others.
     const ancestorOnlyVariables = selection.filter(({ variable }) => {
@@ -210,7 +209,8 @@ export default class VariablesList extends React.Component<Props, State> {
         }}
         onResetToDefaultValue={() => {
           if (variableMetadata) {
-            this.deleteSelection([{variable, name}])
+            // this.deleteSelection([{variable, name}])
+            variablesContainer.removeRecursively(variable)
             this.forceUpdate();
             if (this.props.onSizeUpdated) this.props.onSizeUpdated();
           }

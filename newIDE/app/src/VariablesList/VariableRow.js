@@ -59,10 +59,13 @@ const ThemableVariableRow = ({
   onSelect,
   variableMetadata = { default: '', isInherited: false },
 }: Props) => {
+
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
 
   const { isInherited } = variableMetadata;
+  // console.log(name+"--"+isInherited)
+
   const valueIsSameAsInherited =
   variable.isStructure() ||
   variableMetadata.defaultValue === variable.getString();

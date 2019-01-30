@@ -135,11 +135,11 @@ export default class VariablesList extends React.Component<Props, State> {
     name: string,
     parentVariable: gdVariable,
     depth: number,
-    variableMetadata:Object ={}
+    isInherited=false
   ): Array<React.Node> {
     const names = parentVariable.getAllChildrenNames().toJSArray();
 
-    return flatten(
+    return  flatten(
       names.map((name, index) => {
         const variable = parentVariable.getChild(name);
         return this._renderVariableAndChildrenRows(
@@ -148,10 +148,18 @@ export default class VariablesList extends React.Component<Props, State> {
           depth + 1,
           index,
           parentVariable,
-          variableMetadata
+          isInherited
         );
       })
     );
+  }
+
+  _isVariableInherited = name =>{
+    const { inheritedVariablesContainer } = this.props;
+
+    return inheritedVariablesContainer
+    ? inheritedVariablesContainer.has(name) ///<-- always false when variable is a child :(
+    : false;
   }
 
   _renderVariableAndChildrenRows(
@@ -160,24 +168,21 @@ export default class VariablesList extends React.Component<Props, State> {
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
-    variableData: Object ={}
+    isParentInherited =false /// workaround for above issue
   ) {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     const isStructure = variable.isStructure();
 
-    const isInherited = inheritedVariablesContainer
-    ? inheritedVariablesContainer.has(name)
-    : false;
-  const defaultValue =
-    inheritedVariablesContainer && isInherited && !isStructure
-      ? inheritedVariablesContainer.get(name).getString()
-      : '';
+    const isInherited = isParentInherited? true: this._isVariableInherited(name)
+    
+    console.log(name+"-->"+isInherited+'--'+isStructure)
 
-    //   const valueIsSameAsInherited =
-    // variable.isStructure() ||
-    // defaultValue === variable.getString();
+  const defaultValue = '' 
+    // inheritedVariablesContainer && isInherited && !isStructure
+    //   ? inheritedVariablesContainer.get(name).getString() ///<-- causes GD to crash when child variable
+    //   : '';
 
-    const variableMetadata =variableData.length?variableData:{isInherited,defaultValue}
+    const variableMetadata ={isInherited,defaultValue}
 
     return (
       <SortableVariableRow
@@ -249,7 +254,7 @@ export default class VariablesList extends React.Component<Props, State> {
         }}
         children={
           isStructure
-            ? this._renderVariableChildren(name, variable, depth, variableMetadata)
+            ? this._renderVariableChildren(name, variable, depth,isInherited)
             : null
         }
         showHandle={this.state.mode === 'move'}
@@ -322,7 +327,7 @@ export default class VariablesList extends React.Component<Props, State> {
           undefined
         );
       }
-    }):{}
+    }):[]
 
     /// map all unique instance variables
     const containerVariablesTree = mapFor(

@@ -83,6 +83,7 @@ import {
   fakeAuthenticatedButLoadingUserProfile,
   release,
   releaseWithBreakingChange,
+  releaseWithoutDescription,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
@@ -1439,6 +1440,13 @@ storiesOf('Changelog', module)
   .add('breaking changes in this version', () => (
     <ChangelogRenderer
       releases={[releaseWithBreakingChange]}
+      error={null}
+      currentReleaseName="5.0.0-beta60"
+    />
+  ))
+  .add('release without a description', () => (
+    <ChangelogRenderer
+      releases={[releaseWithoutDescription]}
       error={null}
       currentReleaseName="5.0.0-beta60"
     />

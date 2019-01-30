@@ -64,8 +64,8 @@ const ThemableVariableRow = ({
 
   const { isInherited } = variableMetadata;
   const valueIsSameAsInherited =
-    variable.isStructure() ||
-    variableMetadata.defaultValue === variable.getString();
+  variable.isStructure() ||
+  variableMetadata.defaultValue === variable.getString();
 
   const columns = [
     <TreeTableCell key="name">
@@ -77,6 +77,7 @@ const ThemableVariableRow = ({
         <InlineCheckbox
           checked={isSelected}
           onCheck={(e, checked) => onSelect(checked)}
+          disabled={isInherited}
         />
       )}
       <TextField
@@ -89,6 +90,7 @@ const ThemableVariableRow = ({
         defaultValue={name}
         errorText={errorText}
         onBlur={onBlur}
+        disabled={isInherited}
       />
     </TreeTableCell>,
   ];
@@ -122,6 +124,7 @@ const ThemableVariableRow = ({
       <IconButton
         onClick={onAddChild}
         style={isStructure ? undefined : styles.fadedButton}
+        disabled={isInherited}
       >
         <AddCircle />
       </IconButton>

@@ -98,12 +98,13 @@ const ThemableVariableRow = ({
           fullWidth
           name={key + 'value'}
           value={variable.getString()}
-          onChange={text=>{
+          onChange={text => {
             if (variable.getString() !== text) {
-              onChangeValue(text)
+              onChangeValue(text);
             }
           }}
           multiLine
+          disabled={depth !== 0 && limitEditing} //disable temporary until it works
         />
       </TreeTableCell>
     );
@@ -116,6 +117,7 @@ const ThemableVariableRow = ({
         <IconButton
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
+          disabled={depth !== 0} //disable temporary until we can fix it
         >
           <Reset />
         </IconButton>

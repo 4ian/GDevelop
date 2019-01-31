@@ -165,3 +165,16 @@
   width: '100%';
   box-sizing: 'border-box';
 }
+
+/**
+* Skinning the "Link" event
+*/
+.gd-events-sheet-dark-theme .large-selectable {
+  background: #505050;
+}
+.gd-events-sheet-dark-theme .large-selectable span {
+  color: rgb(209, 209, 209);
+}
+.gd-events-sheet-dark-theme .large-selectable .selectable {
+  color: #b77cff;
+}

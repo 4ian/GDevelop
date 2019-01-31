@@ -153,7 +153,7 @@ export default class VariablesList extends React.Component<Props, State> {
     );
   }
 
-  _getInstanceVariableType = name => {
+  _getInstanceVariableType = (name: string) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     return inheritedVariablesContainer // We check for 3 types of variable states, when editing instance variables
       ? variablesContainer.has(name) && !inheritedVariablesContainer.has(name)
@@ -199,7 +199,7 @@ export default class VariablesList extends React.Component<Props, State> {
         }
         onChangeValue={text => {
           // if it's an object variable edited, create an instance variable in it's place marked as 'inherited'
-          if (type === 'object') {
+          if (inheritedVariablesContainer && type === 'object') {
             const serializedVariable = serializeToJSObject(
               inheritedVariablesContainer.get(name)
             );

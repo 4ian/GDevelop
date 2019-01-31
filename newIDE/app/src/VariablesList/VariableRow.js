@@ -19,7 +19,6 @@ const Indent = ({ width }) => (
   </div>
 );
 
-// const isAnObjectVariable = props => <Checkbox {...props} style={{ width: 32 }} />;
 const InlineCheckbox = props => <Checkbox {...props} style={{ width: 32 }} />;
 
 type Props = {|
@@ -38,7 +37,7 @@ type Props = {|
   showSelectionCheckbox: boolean,
   isSelected: boolean,
   onSelect: boolean => void,
-  variableMetadata: Object,
+  type: String,
 |};
 
 const ThemableVariableRow = ({
@@ -57,18 +56,12 @@ const ThemableVariableRow = ({
   showSelectionCheckbox,
   isSelected,
   onSelect,
-  variableMetadata = { default: '', isInherited: false },
+  type,
 }: Props) => {
-
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
 
-  const { isInherited } = variableMetadata;
-  // console.log(name+"--"+isInherited)
-
-  const valueIsSameAsInherited =
-  variable.isStructure() ||
-  variableMetadata.defaultValue === variable.getString();
+  const limitEditing = type === 'object' || type === 'inherited';
 
   const columns = [
     <TreeTableCell key="name">
@@ -80,20 +73,20 @@ const ThemableVariableRow = ({
         <InlineCheckbox
           checked={isSelected}
           onCheck={(e, checked) => onSelect(checked)}
-          disabled={isInherited}
+          disabled={limitEditing}
         />
       )}
       <TextField
         style={{
-          fontStyle: isInherited ? 'normal' : 'italic',
-          fontWeight: isInherited ? 'bold' : 'normal',
+          fontStyle: limitEditing ? 'normal' : 'italic',
+          fontWeight: limitEditing ? 'bold' : 'normal',
         }}
         fullWidth
         name={key + 'name'}
         defaultValue={name}
         errorText={errorText}
         onBlur={onBlur}
-        disabled={isInherited}
+        disabled={limitEditing}
       />
     </TreeTableCell>,
   ];
@@ -104,9 +97,12 @@ const ThemableVariableRow = ({
           commitOnBlur
           fullWidth
           name={key + 'value'}
-          placeholder={variableMetadata.default}
           value={variable.getString()}
-          onChange={onChangeValue}
+          onChange={text=>{
+            if (variable.getString() !== text) {
+              onChangeValue(text)
+            }
+          }}
           multiLine
         />
       </TreeTableCell>
@@ -116,7 +112,7 @@ const ThemableVariableRow = ({
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>
-      {variableMetadata.isInherited && !valueIsSameAsInherited && (
+      {type === 'inherited' && !isStructure && (
         <IconButton
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
@@ -127,7 +123,7 @@ const ThemableVariableRow = ({
       <IconButton
         onClick={onAddChild}
         style={isStructure ? undefined : styles.fadedButton}
-        disabled={isInherited}
+        disabled={limitEditing}
       >
         <AddCircle />
       </IconButton>

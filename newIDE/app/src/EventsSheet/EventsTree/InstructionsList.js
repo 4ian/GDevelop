@@ -146,7 +146,7 @@ class InstructionsList extends React.Component<Props, *> {
       >
         {instructions}
         {isOver && <DropIndicator canDrop={canDrop} />}
-        <a
+        <button
           style={styles.addButton}
           className="add-link"
           onClick={this.onAddNewInstruction}
@@ -160,7 +160,7 @@ class InstructionsList extends React.Component<Props, *> {
           }}
         >
           {addButtonLabel || addButtonDefaultLabel}
-        </a>
+        </button>
       </div>
     );
 

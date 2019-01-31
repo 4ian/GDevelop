@@ -11,17 +11,17 @@ export const RESOURCE_EXTENSIONS = {
 
 export const createOrUpdateResource = (
   project: gdProject,
-  gdResource: gdResource,
+  resource: gdResource,
   resourceName: string
 ) => {
   const resourcesManager = project.getResourcesManager();
   if (resourcesManager.hasResource(resourceName)) {
     resourcesManager.removeResource(resourceName);
   }
-  gdResource.setFile(resourceName);
-  gdResource.setName(resourceName);
-  resourcesManager.addResource(gdResource);
-  gdResource.delete();
+  resource.setFile(resourceName);
+  resource.setName(resourceName);
+  resourcesManager.addResource(resource);
+  resource.delete();
 };
 
 export const getLocalResourceFullPath = (

@@ -134,7 +134,7 @@ export default class VariablesList extends React.Component<Props, State> {
     name: string,
     parentVariable: gdVariable,
     depth: number,
-    isInherited = false
+    type: string
   ): Array<React.Node> {
     const names = parentVariable.getAllChildrenNames().toJSArray();
 
@@ -147,7 +147,7 @@ export default class VariablesList extends React.Component<Props, State> {
           depth + 1,
           index,
           parentVariable,
-          isInherited
+          type
         );
       })
     );
@@ -177,9 +177,10 @@ export default class VariablesList extends React.Component<Props, State> {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     const isStructure = variable.isStructure();
 
-    const type = parentType.length
-      ? parentType // a state can come from a parent variable
-      : this._getInstanceVariableType(name);
+    const type =
+      parentType && parentType.length
+        ? parentType // a state can come from a parent variable
+        : this._getInstanceVariableType(name);
     console.log(name + '--type:' + type);
 
     return (
@@ -198,7 +199,7 @@ export default class VariablesList extends React.Component<Props, State> {
         }
         onChangeValue={text => {
           // if it's an object variable edited, create an instance variable in it's place marked as 'inherited'
-          if (type === 'object' && depth === 0) {
+          if (type === 'object') {
             const serializedVariable = serializeToJSObject(
               inheritedVariablesContainer.get(name)
             );
@@ -315,7 +316,7 @@ export default class VariablesList extends React.Component<Props, State> {
               0,
               index,
               undefined,
-              true
+              'object'
             );
           }
         })

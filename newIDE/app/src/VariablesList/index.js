@@ -389,7 +389,7 @@ export default class VariablesList extends React.Component<Props, State> {
             containerObjectVariablesTree}
           {!!containerVariablesTree.length && containerVariablesTree}
           {editRow}
-          {!containerVariablesTree.length && this._renderEmpty()}
+          {/* {!containerVariablesTree.length && this._renderEmpty()} */}
         </SortableVariablesListBody>
       </div>
     );

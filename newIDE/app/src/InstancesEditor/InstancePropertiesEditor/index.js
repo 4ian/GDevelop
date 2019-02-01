@@ -123,11 +123,9 @@ export default class InstancePropertiesEditor extends Component {
           instances={instances}
         />
         <FlatButton
-          label={'Object Variables (' + object.getVariables().count() + ')'}
-          onClick={() => this.props.editInstanceVariables(object)}
-        />
-        <FlatButton
-          label={'Instance Variables (' + instance.getVariables().count() + ')'}
+          label={
+            'Instance Variables (' + instance.getVariables().count() + ') :'
+          }
           onClick={() => this.props.editInstanceVariables(instance)}
         />
         <VariablesList
@@ -137,6 +135,13 @@ export default class InstancePropertiesEditor extends Component {
             () =>
               this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
           }
+        />
+        <FlatButton
+          labelStyle={{ fontSize: 14, textTransform: 'none', opacity: 0.6 }}
+          label={
+            'Edit Object Variables (' + object.getVariables().count() + ')'
+          }
+          onClick={() => this.props.editInstanceVariables(object)}
         />
       </div>
     );

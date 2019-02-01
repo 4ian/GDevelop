@@ -104,7 +104,7 @@ const ThemableVariableRow = ({
             }
           }}
           multiLine
-          disabled={depth !== 0 && limitEditing} //disable temporary until it works
+          // disabled={depth !== 0 && limitEditing} //disable temporary until it works
         />
       </TreeTableCell>
     );
@@ -117,7 +117,7 @@ const ThemableVariableRow = ({
         <IconButton
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
-          disabled={depth !== 0} //disable temporary until we can fix it
+          // disabled={depth !== 0} //disable temporary until we can fix it
         >
           <Reset />
         </IconButton>

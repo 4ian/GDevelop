@@ -83,14 +83,18 @@ export default class VariablesList extends React.Component<Props, State> {
   };
 
   paste = () => {
-    const { variablesContainer } = this.props;
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!Clipboard.has(CLIPBOARD_KIND)) return;
 
     const variables = Clipboard.get(CLIPBOARD_KIND);
     variables.forEach(({ name, serializedVariable }) => {
       const newName = newNameGenerator(
         name,
-        name => variablesContainer.has(name),
+        name =>
+          inheritedVariablesContainer
+            ? inheritedVariablesContainer.has(name) ||
+              variablesContainer.has(name)
+            : variablesContainer.has(name),
         'CopyOf'
       );
       const newVariable = new gd.Variable();
@@ -344,7 +348,10 @@ export default class VariablesList extends React.Component<Props, State> {
           const variable = new gd.Variable();
           variable.setString('');
           const name = newNameGenerator('Variable', name =>
-            variablesContainer.has(name)
+            inheritedVariablesContainer
+              ? inheritedVariablesContainer.has(name) ||
+                variablesContainer.has(name)
+              : variablesContainer.has(name)
           );
           variablesContainer.insert(name, variable, variablesContainer.count());
           this.forceUpdate();

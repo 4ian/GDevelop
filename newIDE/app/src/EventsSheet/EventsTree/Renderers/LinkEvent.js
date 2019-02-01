@@ -8,6 +8,7 @@ import {
   largeSelectableArea,
   selectableArea,
   linkContainer,
+  disabledText,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import ExternalEventsField from '../../ParameterFields/ExternalEventsField';
@@ -83,40 +84,47 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
         })}
         style={styles.container}
       >
-        <span style={styles.title}>
-          Include events from{' '}
-          <i
+        <span
             className={classNames({
               [selectableArea]: true,
-            })}
-            onClick={this.edit}
-          >
-            {target || '< Enter the name of external events >'}
-          </i>
-        </span>
-        <IconButton onClick={this.openTarget} disabled={!target}>
-          <OpenInNew />
-        </IconButton>
-        <InlinePopover
-          open={this.state.editing}
-          anchorEl={this.state.anchorEl}
-          onRequestClose={this.endEditing}
+              [disabledText]: this.props.disabled,
+            })}            
         >
-          <ExternalEventsField
-            project={this.props.project}
-            globalObjectsContainer={this.props.globalObjectsContainer}
-            objectsContainer={this.props.objectsContainer}
-            value={target}
-            onChange={text => {
-              linkEvent.setTarget(text);
-              this.props.onUpdate();
-            }}
-            isInline
-            ref={externalEventsField =>
-              (this._externalEventsField = externalEventsField)
-            }
-          />
-        </InlinePopover>
+          <span style={styles.title}>
+            Include events from{' '}
+            <i
+              className={classNames({
+                [selectableArea]: true,
+              })}
+              onClick={this.edit}
+            >
+              {target || '< Enter the name of external events >'}
+            </i>
+          </span>
+          <IconButton onClick={this.openTarget} disabled={!target}>
+            <OpenInNew />
+          </IconButton>
+          <InlinePopover
+            open={this.state.editing}
+            anchorEl={this.state.anchorEl}
+            onRequestClose={this.endEditing}
+          >
+            <ExternalEventsField
+              project={this.props.project}
+              globalObjectsContainer={this.props.globalObjectsContainer}
+              objectsContainer={this.props.objectsContainer}
+              value={target}
+              onChange={text => {
+                linkEvent.setTarget(text);
+                this.props.onUpdate();
+              }}
+              isInline
+              ref={externalEventsField =>
+                (this._externalEventsField = externalEventsField)
+              }
+            />
+          </InlinePopover>
+        </span>
       </div>
     );
   }

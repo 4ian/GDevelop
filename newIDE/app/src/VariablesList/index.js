@@ -286,7 +286,7 @@ export default class VariablesList extends React.Component<Props, State> {
             style={styles.emptyExplanation}
             messageStyle={styles.emptyExplanationMessage}
           >
-            {this.props.emptyExplanationMessage || ''}
+            {this.props.emptyExplanationMessage}
           </EmptyMessage>
           <EmptyMessage
             style={styles.emptyExplanation}

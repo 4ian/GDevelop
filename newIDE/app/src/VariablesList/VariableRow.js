@@ -103,7 +103,7 @@ const ThemableVariableRow = ({
             }
           }}
           multiLine
-          disabled={depth !== 0 && limitEditing} //GD doesnt support deep merging
+          disabled={depth !== 0 && limitEditing} //GD doesn't support deep merging
         />
       </TreeTableCell>
     );

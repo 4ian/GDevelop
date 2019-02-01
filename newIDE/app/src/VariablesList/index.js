@@ -186,7 +186,6 @@ export default class VariablesList extends React.Component<Props, State> {
         ? parentType // a state can come from a parent variable
         : this._getInstanceVariableType(name);
 
-    console.log(name + '--type:' + type);
     return (
       <SortableVariableRow
         name={name}
@@ -302,7 +301,7 @@ export default class VariablesList extends React.Component<Props, State> {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!variablesContainer) return null;
 
-    /// map all object variables, if they have been passed
+    // map all object variables, if they have been passed
     const containerObjectVariablesTree = inheritedVariablesContainer
       ? mapFor(0, inheritedVariablesContainer.count(), index => {
           const name = inheritedVariablesContainer.getNameAt(index);
@@ -321,7 +320,7 @@ export default class VariablesList extends React.Component<Props, State> {
         })
       : [];
 
-    /// map all unique instance variables
+    // map all unique instance variables
     const containerVariablesTree = mapFor(
       0,
       variablesContainer.count(),

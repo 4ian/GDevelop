@@ -89,7 +89,7 @@ export default class InstancePropertiesEditor extends Component {
         setValue: (instance, newValue) => instance.setHasCustomSize(newValue),
       },
       {
-        name: '',
+        name: 'Instance variables',
         children: [
           {
             name: 'Edit variables',
@@ -134,12 +134,9 @@ export default class InstancePropertiesEditor extends Component {
           schema={this.schema.concat(instanceSchema)}
           instances={instances}
         />
-        Instance Variables:
         <VariablesList
           inheritedVariablesContainer={objectVariables}
           variablesContainer={instances[0].getVariables()}
-          emptyExplanationMessage={''}
-          emptyExplanationSecondMessage={''}
           onSizeUpdated={
             () =>
               this.forceUpdate() /*Force update to ensure dialog is properly positionned*/

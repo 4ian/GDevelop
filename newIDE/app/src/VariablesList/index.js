@@ -134,11 +134,10 @@ export default class VariablesList extends React.Component<Props, State> {
     name: string,
     parentVariable: gdVariable,
     depth: number,
-    type: string,
-    topLevelParentName: string
+    type: string
   ): Array<React.Node> {
     const names = parentVariable.getAllChildrenNames().toJSArray();
-    
+
     return flatten(
       names.map((name, index) => {
         const variable = parentVariable.getChild(name);
@@ -148,8 +147,7 @@ export default class VariablesList extends React.Component<Props, State> {
           depth + 1,
           index,
           parentVariable,
-          type,
-          topLevelParentName
+          type
         );
       })
     );
@@ -174,22 +172,17 @@ export default class VariablesList extends React.Component<Props, State> {
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
-    parentType: ?string = '',
-    topLevelParentName?: ?string = undefined
+    parentType: ?string = ''
   ) {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     const isStructure = variable.isStructure();
 
-    const type = 
+    const type =
       parentType && parentType.length
         ? parentType // a state can come from a parent variable
         : this._getInstanceVariableType(name);
 
     console.log(name + '--type:' + type + ' --depth:' + depth);
-    if (depth === 0 && variable.isStructure()) {
-      topLevelParentName = name;
-      // console.log('top parent:' + topLevelParentName);
-    }
     return (
       <SortableVariableRow
         name={name}
@@ -207,15 +200,12 @@ export default class VariablesList extends React.Component<Props, State> {
         onChangeValue={text => {
           // if it's an object variable edited, create an instance variable in it's place marked as 'inherited'
           if (inheritedVariablesContainer && type === 'object') {
-            // if the variable created is a child (depth>0), create its root instead
-            const variableName = depth === 0 ? name : topLevelParentName;
-
             const serializedVariable = serializeToJSObject(
-              inheritedVariablesContainer.get(variableName)
+              inheritedVariablesContainer.get(name)
             );
             const newVariable = new gd.Variable();
             unserializeFromJSObject(newVariable, serializedVariable);
-            variablesContainer.insert(variableName, newVariable, index);
+            variablesContainer.insert(name, newVariable, index);
             newVariable.delete();
 
             variablesContainer.get(name).setString(text);
@@ -228,11 +218,7 @@ export default class VariablesList extends React.Component<Props, State> {
         }}
         onResetToDefaultValue={() => {
           if (type === 'inherited') {
-            const inheritedVariable =
-              depth === 0
-                ? variable
-                : variablesContainer.get(topLevelParentName);
-            variablesContainer.removeRecursively(inheritedVariable);
+            variablesContainer.removeRecursively(variable);
             this.forceUpdate();
             if (this.props.onSizeUpdated) this.props.onSizeUpdated();
           }
@@ -280,8 +266,7 @@ export default class VariablesList extends React.Component<Props, State> {
                 name,
                 variable,
                 depth,
-                type,
-                topLevelParentName
+                type
               )
             : null
         }

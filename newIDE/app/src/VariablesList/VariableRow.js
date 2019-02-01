@@ -77,10 +77,6 @@ const ThemableVariableRow = ({
         />
       )}
       <TextField
-        style={{
-          fontStyle: limitEditing ? 'normal' : 'italic',
-          fontWeight: limitEditing ? 'bold' : 'normal',
-        }}
         fullWidth
         name={key + 'name'}
         defaultValue={name}
@@ -104,7 +100,7 @@ const ThemableVariableRow = ({
             }
           }}
           multiLine
-          // disabled={depth !== 0 && limitEditing} //disable temporary until it works
+          disabled={depth !== 0 && limitEditing} //GD doesnt support deep merging
         />
       </TreeTableCell>
     );
@@ -117,7 +113,6 @@ const ThemableVariableRow = ({
         <IconButton
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
-          // disabled={depth !== 0} //disable temporary until we can fix it
         >
           <Reset />
         </IconButton>

@@ -262,12 +262,7 @@ export default class VariablesList extends React.Component<Props, State> {
         }}
         children={
           isStructure
-            ? this._renderVariableChildren(
-                name,
-                variable,
-                depth,
-                type
-              )
+            ? this._renderVariableChildren(name, variable, depth, type)
             : null
         }
         showHandle={this.state.mode === 'move'}

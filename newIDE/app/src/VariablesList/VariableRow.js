@@ -77,6 +77,9 @@ const ThemableVariableRow = ({
         />
       )}
       <TextField
+        style={{
+          fontStyle: type !== 'inherited' ? 'normal' : 'italic',
+        }}
         fullWidth
         name={key + 'name'}
         defaultValue={name}

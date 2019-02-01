@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import FlatButton from 'material-ui/FlatButton';
 import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -88,17 +89,6 @@ export default class InstancePropertiesEditor extends Component {
         getValue: instance => instance.hasCustomSize(),
         setValue: (instance, newValue) => instance.setHasCustomSize(newValue),
       },
-      {
-        name: 'Instance variables',
-        children: [
-          {
-            name: 'Edit variables',
-            getLabel: instance =>
-              'Instance Variables (' + instance.getVariables().count() + ')',
-            onClick: instance => this.props.editInstanceVariables(instance),
-          },
-        ],
-      },
     ];
   }
 
@@ -112,12 +102,13 @@ export default class InstancePropertiesEditor extends Component {
 
   _renderInstancesProperties() {
     const { project, layout, instances } = this.props;
+    const instance = instances[0];
     const objectVariables = layout
-      .getObject(instances[0].getObjectName())
+      .getObject(instance.getObjectName())
       .getVariables();
 
     //TODO: multiple instances support
-    const properties = instances[0].getCustomProperties(project, layout);
+    const properties = instance.getCustomProperties(project, layout);
     const instanceSchema = propertiesMapToSchema(
       properties,
       instance => instance.getCustomProperties(project, layout),
@@ -134,9 +125,15 @@ export default class InstancePropertiesEditor extends Component {
           schema={this.schema.concat(instanceSchema)}
           instances={instances}
         />
+        <FlatButton
+          label={
+            'Instance Variables (' + instance.getVariables().count() + ') :'
+          }
+          onClick={() => this.props.editInstanceVariables(instance)}
+        />
         <VariablesList
           inheritedVariablesContainer={objectVariables}
-          variablesContainer={instances[0].getVariables()}
+          variablesContainer={instance.getVariables()}
           onSizeUpdated={
             () =>
               this.forceUpdate() /*Force update to ensure dialog is properly positionned*/

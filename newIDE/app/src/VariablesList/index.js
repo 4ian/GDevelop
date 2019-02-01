@@ -280,20 +280,22 @@ export default class VariablesList extends React.Component<Props, State> {
 
   _renderEmpty() {
     return (
-      <div>
-        <EmptyMessage
-          style={styles.emptyExplanation}
-          messageStyle={styles.emptyExplanationMessage}
-        >
-          {this.props.emptyExplanationMessage || ''}
-        </EmptyMessage>
-        <EmptyMessage
-          style={styles.emptyExplanation}
-          messageStyle={styles.emptyExplanationMessage}
-        >
-          {this.props.emptyExplanationSecondMessage}
-        </EmptyMessage>
-      </div>
+      this.props.emptyExplanationMessage && (
+        <div>
+          <EmptyMessage
+            style={styles.emptyExplanation}
+            messageStyle={styles.emptyExplanationMessage}
+          >
+            {this.props.emptyExplanationMessage || ''}
+          </EmptyMessage>
+          <EmptyMessage
+            style={styles.emptyExplanation}
+            messageStyle={styles.emptyExplanationMessage}
+          >
+            {this.props.emptyExplanationSecondMessage}
+          </EmptyMessage>
+        </div>
+      )
     );
   }
 
@@ -387,9 +389,9 @@ export default class VariablesList extends React.Component<Props, State> {
         >
           {!!containerObjectVariablesTree.length &&
             containerObjectVariablesTree}
+          {!containerVariablesTree.length && this._renderEmpty()}
           {!!containerVariablesTree.length && containerVariablesTree}
           {editRow}
-          {/* {!containerVariablesTree.length && this._renderEmpty()} */}
         </SortableVariablesListBody>
       </div>
     );

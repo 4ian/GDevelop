@@ -103,10 +103,7 @@ export default class InstancePropertiesEditor extends Component {
   _renderInstancesProperties() {
     const { project, layout, instances } = this.props;
     const instance = instances[0];
-    const objectVariables = layout
-      .getObject(instance.getObjectName())
-      .getVariables();
-
+    const object = layout.getObject(instance.getObjectName());
     //TODO: multiple instances support
     const properties = instance.getCustomProperties(project, layout);
     const instanceSchema = propertiesMapToSchema(
@@ -126,13 +123,15 @@ export default class InstancePropertiesEditor extends Component {
           instances={instances}
         />
         <FlatButton
-          label={
-            'Instance Variables (' + instance.getVariables().count() + ') :'
-          }
+          label={'Object Variables (' + object.getVariables().count() + ')'}
+          onClick={() => this.props.editInstanceVariables(object)}
+        />
+        <FlatButton
+          label={'Instance Variables (' + instance.getVariables().count() + ')'}
           onClick={() => this.props.editInstanceVariables(instance)}
         />
         <VariablesList
-          inheritedVariablesContainer={objectVariables}
+          inheritedVariablesContainer={object.getVariables()}
           variablesContainer={instance.getVariables()}
           onSizeUpdated={
             () =>

@@ -123,7 +123,7 @@ const ThemableVariableRow = ({
       <IconButton
         onClick={onAddChild}
         style={isStructure ? undefined : styles.fadedButton}
-        disabled={type === 'object'}
+        disabled={limitEditing}
       >
         <AddCircle />
       </IconButton>

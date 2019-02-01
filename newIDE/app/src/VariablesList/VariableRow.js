@@ -85,7 +85,7 @@ const ThemableVariableRow = ({
         defaultValue={name}
         errorText={errorText}
         onBlur={onBlur}
-        disabled={limitEditing}
+        disabled={type === 'object'}
       />
     </TreeTableCell>,
   ];

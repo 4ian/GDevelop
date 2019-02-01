@@ -186,7 +186,7 @@ export default class VariablesList extends React.Component<Props, State> {
         ? parentType // a state can come from a parent variable
         : this._getInstanceVariableType(name);
 
-    console.log(name + '--type:' + type + ' --depth:' + depth);
+    console.log(name + '--type:' + type);
     return (
       <SortableVariableRow
         name={name}

@@ -936,6 +936,13 @@ export default class MainFrame extends React.Component<Props, State> {
   };
 
   openCreateDialog = (open: boolean = true) => {
+    
+    console.log("openCreateDialog");  
+    if (this.state.currentProject) {
+        console.log("save ?");
+        this.askToSaveProject();
+    }
+    
     this.setState({
       createDialogOpen: open,
     });
@@ -943,6 +950,13 @@ export default class MainFrame extends React.Component<Props, State> {
 
   chooseProject = () => {
     if (!this.props.onChooseProject) return;
+
+    console.log("save ?");
+    if (this.state.currentProject) {
+        console.log("save ?");
+        this.askToSaveProject();
+    }
+    
 
     this.props
       .onChooseProject()
@@ -977,6 +991,18 @@ export default class MainFrame extends React.Component<Props, State> {
     }
   };
 
+  askToSaveProject = (cb: ?Function) => {
+    if (!this.state.currentProject) return;
+
+    //eslint-disable-next-line
+    const answer = confirm(
+      'A project is already open. Are you sure to save it before open another project ?'
+    );
+    if (!answer) return;
+
+    this.save();
+  };
+  
   askToCloseProject = (cb: ?Function) => {
     if (!this.state.currentProject) return;
 

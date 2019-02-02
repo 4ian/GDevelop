@@ -207,7 +207,7 @@ void DeclareInventoryExtension(gd::PlatformExtension& extension) {
                      _("Get the number of an item in the inventory"),
                      _("Inventory"),
                      "CppPlatform/Extensions/Inventoryicon16.png")
-      .AddCodeOnlyParameter("currentScene", _(""))
+      .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Inventory name"))
       .AddParameter("string", _("Item name"))
       .SetFunctionName("InventoryTools::Count")

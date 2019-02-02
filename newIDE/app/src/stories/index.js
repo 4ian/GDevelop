@@ -99,7 +99,7 @@ import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
-import { I18nextProvider } from 'react-i18next';
+import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -107,7 +107,6 @@ import LoaderModal from '../UI/LoaderModal';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
-import i18n from '../UI/i18n';
 import ObjectField from '../EventsSheet/ParameterFields/ObjectField';
 import { getInitialSelection } from '../EventsSheet/SelectionHandler';
 import EventsFunctionConfigurationEditor from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor';
@@ -640,27 +639,27 @@ storiesOf('LocalExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <I18nextProvider i18n={i18n}>
+    <GDI18nProvider language="en">
       <LocalExport open project={project} onClose={action('close')} />
-    </I18nextProvider>
+    </GDI18nProvider>
   ));
 
 storiesOf('LocalS3Export', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <I18nextProvider i18n={i18n}>
+    <GDI18nProvider language="en">
       <LocalS3Export open project={project} onClose={action('close')} />
-    </I18nextProvider>
+    </GDI18nProvider>
   ));
 
 storiesOf('LocalCordovaExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <I18nextProvider i18n={i18n}>
+    <GDI18nProvider language="en">
       <LocalCordovaExport project={project} />
-    </I18nextProvider>
+    </GDI18nProvider>
   ));
 
 storiesOf('BuildStepsProgress', module)

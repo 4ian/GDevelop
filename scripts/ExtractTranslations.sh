@@ -1,19 +1,22 @@
 #Launch this script to generate the .POT file used
 #to update the strings to be translated.
-echo "Listing all sources files..."
+echo "ℹ️ Listing all GDCore, GDCpp, GDJS and Extensions sources files to translate..."
 
-find ../IDE -name '*.cpp' | grep -v '/wxstedit/' > /tmp/listfile.txt
-find ../IDE -name '*.h' -o -name "*.hpp" | grep -v '/wxstedit/' >> /tmp/listfile.txt
-find ../GDCpp/GDCpp/ -name '*.cpp' >> /tmp/listfile.txt
-find ../GDCpp/GDCpp/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
-find ../GDJS/GDJS/ -name '*.cpp' >> /tmp/listfile.txt
-find ../GDJS/GDJS/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
-find ../Extensions/ -name '*.cpp' >> /tmp/listfile.txt
-find ../Extensions/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
-find ../Core/GDCore -name '*.cpp' >> /tmp/listfile.txt
-find ../Core/GDCore -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
+find ../GDCpp/GDCpp/ -name '*.cpp' | grep -v '/Dialogs/' > /tmp/listfile.txt
+find ../GDCpp/GDCpp/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
+find ../GDJS/GDJS/ -name '*.cpp' | grep -v '/Dialogs/' >> /tmp/listfile.txt
+find ../GDJS/GDJS/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
+find ../Extensions/ -name '*.cpp' | grep -v '/Dialogs/' >> /tmp/listfile.txt
+find ../Extensions/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
+find ../Extensions/ -name '*.js' | grep -v 'box2d.js' >> /tmp/listfile.txt
+find ../Core/GDCore -name '*.cpp' | grep -v '/Dialogs/' >> /tmp/listfile.txt
+find ../Core/GDCore -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
+# Don't include old IDE anymore in the translations.
+# newIDE translations are generated separately (see newIDE/app/scripts)
+# find ../IDE -name '*.cpp' | grep -v '/wxstedit/' >> /tmp/listfile.txt
+# find ../IDE -name '*.h' -o -name "*.hpp" | grep -v '/wxstedit/' >> /tmp/listfile.txt
 
-echo "Generating .POT file..."
+echo "ℹ️ Generating .POT file..."
 if type xgettext 2>/dev/null; then
     GETTEXT=xgettext
 else
@@ -21,8 +24,8 @@ else
 fi
 
 if type $GETTEXT 2>/dev/null; then
-	$GETTEXT --from-code utf-8  -o source.pot --c++ --keyword=GD_T --no-wrap -f /tmp/listfile.txt -k_
-	echo "source.pot file generated and ready to be sent to Crowdin or used in a translation software like PoEdit."
+	$GETTEXT --from-code utf-8  -o gdcore-gdcpp-gdjs-extensions-messages.pot --keyword=GD_T --no-wrap -f /tmp/listfile.txt -k_
+	echo "ℹ️ Translation file 'gdcore-gdcpp-gdjs-extensions-messages.pot' generated and ready to be sent to Crowdin or used in a translation software like PoEdit."
 else
-	echo "Unable to find xgettext on your system."
+	echo "❌ Unable to find xgettext on your system."
 fi

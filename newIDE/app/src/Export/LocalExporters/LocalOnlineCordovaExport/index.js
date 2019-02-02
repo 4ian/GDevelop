@@ -25,7 +25,6 @@ import {
   displayProjectErrorsBox,
   getErrors,
 } from '../../../ProjectManager/ProjectErrorsChecker';
-import { translate, type TranslatorProps } from 'react-i18next';
 import { type Limit } from '../../../Utils/GDevelopServices/Usage';
 import BuildsWatcher from '../../Builds/BuildsWatcher';
 import BuildStepsProgress, {
@@ -45,7 +44,7 @@ type State = {
   errored: boolean,
 };
 
-type Props = TranslatorProps & {
+type Props = {
   project: gdProject,
   onChangeSubscription: Function,
 };
@@ -94,7 +93,8 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
   }
 
   launchExport = (): Promise<string> => {
-    const { project, t } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return Promise.reject();
 
     return LocalOnlineCordovaExport.prepareExporter()
@@ -170,7 +170,8 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
   };
 
   launchWholeExport = (userProfile: UserProfile) => {
-    const { t, project } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     sendExportLaunched('local-online-cordova');
 
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
@@ -242,7 +243,8 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
       uploadProgress,
       errored,
     } = this.state;
-    const { project, t } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return null;
 
     const getBuildLimit = (userProfile: UserProfile): ?Limit =>
@@ -307,4 +309,4 @@ class LocalOnlineCordovaExport extends Component<Props, State> {
   }
 }
 
-export default translate()(LocalOnlineCordovaExport);
+export default LocalOnlineCordovaExport;

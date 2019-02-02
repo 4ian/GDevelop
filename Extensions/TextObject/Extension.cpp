@@ -37,7 +37,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 _("Modify the text"),
                 _("Modify the text of a Text object."),
                 _("Do _PARAM1__PARAM2_ to the text of _PARAM0_"),
-                _(""),
+                "",
                 "res/actions/text24.png",
                 "res/actions/text.png")
 
@@ -53,7 +53,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Compare the text"),
                    _("Compare the text of a Text object."),
                    _("Text of _PARAM0_ is _PARAM1__PARAM2_"),
-                   _(""),
+                   "",
                    "res/conditions/text24.png",
                    "res/conditions/text.png")
 
@@ -81,7 +81,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 _("Size"),
                 _("Change the size of the text."),
                 _("Do _PARAM1__PARAM2_ to the size of the text of _PARAM0_"),
-                _(""),
+                "",
                 "res/actions/characterSize24.png",
                 "res/actions/characterSize.png")
 
@@ -97,7 +97,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Size"),
                    _("Compare the size of the text"),
                    _("The size of the text of _PARAM0_ is _PARAM1__PARAM2_"),
-                   _(""),
+                   "",
                    "res/conditions/characterSize24.png",
                    "res/conditions/characterSize.png")
 
@@ -127,7 +127,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                 _("Change the opacity of a Text. 0 is fully transparent, 255 "
                   "is opaque (default)."),
                 _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
-                _(""),
+                "",
                 "res/actions/opacity24.png",
                 "res/actions/opacity.png")
 
@@ -144,7 +144,7 @@ void DeclareTextObjectExtension(gd::PlatformExtension& extension) {
                    _("Compare the opacity of a Text object, between 0 (fully "
                      "transparent) to 255 (opaque)."),
                    _("The opacity of _PARAM0_ is _PARAM1__PARAM2_"),
-                   _(""),
+                   "",
                    "res/conditions/opacity24.png",
                    "res/conditions/opacity.png")
 

@@ -14,7 +14,6 @@ import {
   displayProjectErrorsBox,
   getErrors,
 } from '../../ProjectManager/ProjectErrorsChecker';
-import { translate, type TranslatorProps } from 'react-i18next';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
@@ -22,7 +21,7 @@ const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
 
-type Props = TranslatorProps & {|
+type Props = {|
   project: gdProject,
 |};
 
@@ -67,7 +66,8 @@ class LocalElectronExport extends Component<Props, State> {
   };
 
   launchExport = () => {
-    const { t, project } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return;
 
     sendExportLaunched('local-electron');
@@ -99,7 +99,8 @@ class LocalElectronExport extends Component<Props, State> {
   };
 
   render() {
-    const { t, project } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return null;
 
     return (
@@ -167,4 +168,4 @@ class LocalElectronExport extends Component<Props, State> {
   }
 }
 
-export default translate()(LocalElectronExport);
+export default LocalElectronExport;

@@ -1,0 +1,154 @@
+{
+  "An error has occured during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        290
+      ]
+    ]
+  },
+  "Unable to open this project. Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        323
+      ]
+    ]
+  },
+  "Are you sure you want to remove this scene? This can't be undone.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        449
+      ]
+    ]
+  },
+  "Are you sure you want to remove this external layout? This can't be undone.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        471
+      ]
+    ]
+  },
+  "Are you sure you want to remove these external events? This can't be undone.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        496
+      ]
+    ]
+  },
+  "Are you sure you want to remove this extension? This can't be undone.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        523
+      ]
+    ]
+  },
+  "Another scene with this name already exists.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        549
+      ]
+    ]
+  },
+  "Another external layout with this name already exists.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        573
+      ]
+    ]
+  },
+  "Other external events with this name already exist.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        600
+      ]
+    ]
+  },
+  "Another extension with this name already exists.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        628
+      ]
+    ]
+  },
+  "This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your extension name.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        634
+      ]
+    ]
+  },
+  "Unable to launch the preview!": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        706
+      ]
+    ]
+  },
+  "(Events)": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        744
+      ]
+    ]
+  },
+  "Resources": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        888
+      ]
+    ]
+  },
+  "Start Page": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        923
+      ]
+    ]
+  },
+  "Debugger": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        952
+      ]
+    ]
+  },
+  "Project properly saved": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        1000
+      ]
+    ]
+  },
+  "Unable to save the project! Please try again by choosing another location.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        1005
+      ]
+    ]
+  },
+  "Close the project? Any changes that have not been saved will be lost.": {
+    "origin": [
+      [
+        "src/MainFrame/index.js",
+        1021
+      ]
+    ]
+  }
+}

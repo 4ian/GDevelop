@@ -31,3 +31,5 @@ public/CppPlatform
 public/JsPlatform
 resources/GDJS
 
+# locales build files
+locales/_build

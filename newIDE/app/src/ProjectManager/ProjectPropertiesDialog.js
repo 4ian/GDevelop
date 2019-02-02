@@ -7,11 +7,10 @@ import MenuItem from 'material-ui/MenuItem';
 import Dialog from '../UI/Dialog';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SubscriptionChecker from '../Profile/SubscriptionChecker';
-import { translate, type TranslatorProps } from 'react-i18next';
 import { getErrors, displayProjectErrorsBox } from './ProjectErrorsChecker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
 
-type Props = TranslatorProps & {|
+type Props = {|
   project: gdProject,
   open: boolean,
   onClose: Function,
@@ -67,7 +66,8 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
   }
 
   _onApply = () => {
-    const { project, t } = this.props;
+    const t = str => str; //TODO
+    const { project } = this.props;
     const {
       windowDefaultWidth,
       windowDefaultHeight,
@@ -284,4 +284,4 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
   }
 }
 
-export default translate()(ProjectPropertiesDialog);
+export default ProjectPropertiesDialog;

@@ -22,6 +22,7 @@ import makeExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
 import { makeLocalEventsFunctionWriter } from './EventsFunctionsExtensionsLoader/LocalEventsFunctionWriter';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
+import Providers from './MainFrame/Providers';
 const gd = global.gd;
 
 export const create = (authentification: Authentification) => {
@@ -32,51 +33,59 @@ export const create = (authentification: Authentification) => {
 
   if (appArguments['server-port']) {
     app = (
-      <ExternalEditor
-        serverPort={appArguments['server-port']}
-        isIntegrated={appArguments['mode'] === 'integrated'}
-        editor={appArguments['editor']}
-        editedElementName={appArguments['edited-element-name']}
+      <Providers
+        authentification={authentification}
+        disableCheckForUpdates={!!appArguments['disable-update-check']}
       >
-        <MainFrame
-          resourceSources={localResourceSources}
-          authentification={authentification}
-          onReadFromPathOrURL={() => Promise.reject('Should never be called')}
-          resourceExternalEditors={localResourceExternalEditors}
-          initialPathsOrURLsToOpen={[]}
-          disableCheckForUpdates={!!appArguments['disable-update-check']}
-        />
-      </ExternalEditor>
+        <ExternalEditor
+          serverPort={appArguments['server-port']}
+          isIntegrated={appArguments['mode'] === 'integrated'}
+          editor={appArguments['editor']}
+          editedElementName={appArguments['edited-element-name']}
+        >
+          <MainFrame
+            resourceSources={localResourceSources}
+            authentification={authentification}
+            onReadFromPathOrURL={() => Promise.reject('Should never be called')}
+            resourceExternalEditors={localResourceExternalEditors}
+            initialPathsOrURLsToOpen={[]}
+          />
+        </ExternalEditor>
+      </Providers>
     );
   } else {
     app = (
-      <ElectronEventsBridge>
-        <MainFrame
-          previewLauncher={<LocalPreviewLauncher />}
-          exportDialog={<ExportDialog exporters={getLocalExporters()} />}
-          createDialog={
-            <CreateProjectDialog
-              examplesComponent={LocalExamples}
-              startersComponent={LocalStarters}
-            />
-          }
-          onSaveProject={LocalProjectWriter.saveProject}
-          onChooseProject={LocalProjectOpener.chooseProjectFile}
-          onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
-          resourceSources={localResourceSources}
-          resourceExternalEditors={localResourceExternalEditors}
-          authentification={authentification}
-          extensionsLoader={makeExtensionsLoader({
-            gd,
-            objectsEditorService: ObjectsEditorService,
-            objectsRenderingService: ObjectsRenderingService,
-            filterExamples: !Window.isDev(),
-          })}
-          initialPathsOrURLsToOpen={appArguments['_']}
-          disableCheckForUpdates={!!appArguments['disable-update-check']}
-          eventsFunctionWriter={makeLocalEventsFunctionWriter()}
-        />
-      </ElectronEventsBridge>
+      <Providers
+        authentification={authentification}
+        disableCheckForUpdates={!!appArguments['disable-update-check']}
+      >
+        <ElectronEventsBridge>
+          <MainFrame
+            previewLauncher={<LocalPreviewLauncher />}
+            exportDialog={<ExportDialog exporters={getLocalExporters()} />}
+            createDialog={
+              <CreateProjectDialog
+                examplesComponent={LocalExamples}
+                startersComponent={LocalStarters}
+              />
+            }
+            onSaveProject={LocalProjectWriter.saveProject}
+            onChooseProject={LocalProjectOpener.chooseProjectFile}
+            onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
+            resourceSources={localResourceSources}
+            resourceExternalEditors={localResourceExternalEditors}
+            authentification={authentification}
+            extensionsLoader={makeExtensionsLoader({
+              gd,
+              objectsEditorService: ObjectsEditorService,
+              objectsRenderingService: ObjectsRenderingService,
+              filterExamples: !Window.isDev(),
+            })}
+            initialPathsOrURLsToOpen={appArguments['_']}
+            eventsFunctionWriter={makeLocalEventsFunctionWriter()}
+          />
+        </ElectronEventsBridge>
+      </Providers>
     );
   }
 

@@ -26,7 +26,6 @@ import {
   displayProjectErrorsBox,
   getErrors,
 } from '../../../ProjectManager/ProjectErrorsChecker';
-import { translate, type TranslatorProps } from 'react-i18next';
 import { type Limit } from '../../../Utils/GDevelopServices/Usage';
 import { type TargetName } from '../../../Utils/GDevelopServices/Build';
 import BuildsWatcher from '../../Builds/BuildsWatcher';
@@ -48,7 +47,7 @@ type State = {
   targets: Array<TargetName>,
 };
 
-type Props = TranslatorProps & {
+type Props = {
   project: gdProject,
   onChangeSubscription: Function,
 };
@@ -98,7 +97,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
   }
 
   launchExport = (): Promise<string> => {
-    const { project, t } = this.props;
+    const t = str => str; //TODO
+    const { project } = this.props;
     if (!project) return Promise.reject();
 
     return LocalOnlineElectronExport.prepareExporter()
@@ -175,7 +175,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
   };
 
   launchWholeExport = (userProfile: UserProfile) => {
-    const { t, project } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     sendExportLaunched('local-online-electron');
 
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
@@ -259,7 +260,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
       uploadProgress,
       errored,
     } = this.state;
-    const { project, t } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return null;
 
     const getBuildLimit = (userProfile: UserProfile): ?Limit =>
@@ -349,4 +351,4 @@ class LocalOnlineElectronExport extends Component<Props, State> {
   }
 }
 
-export default translate()(LocalOnlineElectronExport);
+export default LocalOnlineElectronExport;

@@ -451,7 +451,7 @@ void DeclarePhysicsBehaviorExtension(gd::PlatformExtension& extension) {
                        "into account by the next actions and conditions, if "
                        "they are colliding with the other objects."),
                      _("_PARAM0_ is in collision with a _PARAM2_"),
-                     _(""),
+                     "",
                      "res/physics24.png",
                      "res/physics16.png")
         .AddParameter("object", _("Object"))

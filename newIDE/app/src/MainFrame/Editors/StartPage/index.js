@@ -9,6 +9,7 @@ import { Line } from '../../../UI/Grid';
 import GDevelopLogo from './GDevelopLogo';
 import ScrollBackground from './ScrollBackground';
 import RaisedButton from 'material-ui/RaisedButton';
+import { Trans } from '@lingui/macro';
 
 const styles = {
   innerContainer: {
@@ -77,8 +78,10 @@ class StartPage extends BaseEditor {
               >
                 <GDevelopLogo />
                 <p>
-                  GDevelop is an easy-to-use game creator with no programming
-                  language to learn.
+                  <Trans>
+                    GDevelop is an easy-to-use game creator with no programming
+                    language to learn.
+                  </Trans>
                 </p>
               </Paper>
               {!project && canOpen && (

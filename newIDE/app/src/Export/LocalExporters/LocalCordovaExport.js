@@ -14,7 +14,6 @@ import {
   displayProjectErrorsBox,
   getErrors,
 } from '../../ProjectManager/ProjectErrorsChecker';
-import { translate, type TranslatorProps } from 'react-i18next';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 import Window from '../../Utils/Window';
@@ -23,7 +22,7 @@ const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
 
-type Props = TranslatorProps & {|
+type Props = {|
   project: gdProject,
 |};
 
@@ -68,7 +67,8 @@ class LocalCordovaExport extends Component<Props, State> {
   };
 
   launchExport = () => {
-    const { t, project } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return;
 
     sendExportLaunched('local-cordova');
@@ -104,7 +104,8 @@ class LocalCordovaExport extends Component<Props, State> {
   };
 
   render() {
-    const { t, project } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return null;
 
     return (
@@ -186,4 +187,4 @@ class LocalCordovaExport extends Component<Props, State> {
   }
 }
 
-export default translate()(LocalCordovaExport);
+export default LocalCordovaExport;

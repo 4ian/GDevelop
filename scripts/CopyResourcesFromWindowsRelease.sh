@@ -1,5 +1,6 @@
 #!/bin/sh
 #This script copy all (versioned) files from Release_Windows into Release_Linux.
+#This is for GDevelop 4 only.
 
 #Get the destination, or copy by default to Release_Linux directory
 DESTINATION=Release_Linux

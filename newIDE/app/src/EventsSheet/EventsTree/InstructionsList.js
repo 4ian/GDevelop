@@ -198,6 +198,7 @@ function targetCollect(
   };
 }
 
+// $FlowFixMe - Typing of DragSource/DropTarget is a pain to get correctly
 export default DropTarget(
   reactDndInstructionType,
   instructionsListTarget,

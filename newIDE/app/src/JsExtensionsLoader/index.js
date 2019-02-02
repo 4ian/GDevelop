@@ -2,11 +2,11 @@
 // Note: this file does not use export/imports and use Flow comments to allow its usage from Node.js
 
 const some = require('lodash/some');
-const t = _ => _; //TODO: Implement support for i18n for extensions.
-
 /*flow-include 
+export type TranslationFunction = (string) => string;
+
 export type JsExtensionModule = {
-  createExtension(t: (string) => string, gd: any): gdPlatformExtension,
+  createExtension(_: TranslationFunction, gd: any): gdPlatformExtension,
   runExtensionSanityTests(gd: any, extension: gdPlatformExtension): Array<string>,
 };
 
@@ -18,7 +18,7 @@ export type ExtensionLoadingResult = {
 };
 
 export interface JsExtensionsLoader {
-  loadAllExtensions(): Promise<
+  loadAllExtensions(_: TranslationFunction): Promise<
     Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
   >,
 }
@@ -60,6 +60,7 @@ const runExtensionSanityTests = (
  * to contain a "createExtension" function returning a gd.PlatformExtension.
  */
 const loadExtension = (
+  _ /*: TranslationFunction */,
   gd /*: any */,
   platform /*: gdPlatform*/,
   jsExtensionModule /*: JsExtensionModule*/
@@ -74,7 +75,7 @@ const loadExtension = (
 
   let extension = null;
   try {
-    extension = jsExtensionModule.createExtension(t, gd);
+    extension = jsExtensionModule.createExtension(_, gd);
     if (!extension) {
       return {
         message: `createExtension did not return any extension. Did you forget to return the extension created?`,

@@ -15,7 +15,7 @@ const _ = require('lodash');
 var shell = require('shelljs');
 
 shell.exec('node import-GDJS-Runtime.js');
-gd.initializePlatforms();
+gd.initializePlatforms(); //TODO: Useless or not?
 
 const outputFile = '../src/ProjectCreation/ExamplesInformation.js';
 
@@ -162,10 +162,11 @@ const readFileContent = filename => {
   });
 };
 
+const noopTranslationFunction = str => str;
 const examplesInformation = {};
 const extensionsLoader = makeExtensionsLoader({ gd, filterExamples: false });
 extensionsLoader
-  .loadAllExtensions()
+  .loadAllExtensions(noopTranslationFunction)
   .then(loadingResults => {
     console.info('Loaded extensions', loadingResults);
 

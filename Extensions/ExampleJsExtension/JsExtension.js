@@ -11,7 +11,7 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: function(t, gd) {
+  createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       "MyDummyExtension",
@@ -25,17 +25,17 @@ module.exports = {
     extension
       .addCondition(
         "MyNewCondition",
-        t("Dummy condition example"),
-        t(
+        _("Dummy condition example"),
+        _(
           "This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5."
         ),
-        t("Call the example condition with _PARAM0_ and _PARAM1_"),
-        t("Dummy Extension"),
+        _("Call the example condition with _PARAM0_ and _PARAM1_"),
+        _("Dummy Extension"),
         "res/conditions/camera24.png",
         "res/conditions/camera.png"
       )
-      .addParameter("expression", t("Number 1"), "", false)
-      .addParameter("string", t("Text 1"), "", false)
+      .addParameter("expression", _("Number 1"), "", false)
+      .addParameter("string", _("Text 1"), "", false)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/ExampleJsExtension/examplejsextensiontools.js"
@@ -45,21 +45,21 @@ module.exports = {
     extension
       .addExpression(
         "DummyExpression",
-        t("Dummy expression example"),
-        t("This is an example of an expression"),
-        t("Dummy Extension"),
+        _("Dummy expression example"),
+        _("This is an example of an expression"),
+        _("Dummy Extension"),
         "res/actions/camera.png"
       )
-      .addParameter("expression", t("Maximum"), "", false)
+      .addParameter("expression", _("Maximum"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("gdjs.random");
 
     extension
       .addStrExpression(
         "DummyStrExpression",
-        t("Dummy string expression example"),
-        t("This is an example of an expression returning a string"),
-        t("Dummy Extension"),
+        _("Dummy string expression example"),
+        _("This is an example of an expression returning a string"),
+        _("Dummy Extension"),
         "res/actions/camera.png"
       )
       .getCodeExtraInformation()
@@ -115,9 +115,9 @@ module.exports = {
     extension
       .addBehavior(
         "DummyBehavior",
-        t("Dummy behavior for testing"),
+        _("Dummy behavior for testing"),
         "DummyBehavior",
-        t("This dummy behavior does nothing"),
+        _("This dummy behavior does nothing"),
         "",
         "CppPlatform/Extensions/topdownmovementicon.png",
         "DummyBehavior",
@@ -194,9 +194,9 @@ module.exports = {
     extension
       .addBehavior(
         "DummyBehaviorWithSharedData",
-        t("Dummy behavior with shared data for testing"),
+        _("Dummy behavior with shared data for testing"),
         "DummyBehaviorWithSharedData",
-        t("This dummy behavior uses shared data and does nothing"),
+        _("This dummy behavior uses shared data and does nothing"),
         "",
         "CppPlatform/Extensions/topdownmovementicon.png",
         "DummyBehaviorWithSharedData",
@@ -314,8 +314,8 @@ module.exports = {
     const object = extension
       .addObject(
         "DummyObject",
-        t("Dummy object for testing"),
-        t("This dummy object does nothing"),
+        _("Dummy object for testing"),
+        _("This dummy object does nothing"),
         "CppPlatform/Extensions/topdownmovementicon.png",
         dummyObject
       )
@@ -421,7 +421,7 @@ module.exports = {
       );
 
       //Setup the PIXI object:
-      this._pixiObject = new PIXI.Text("This is a dummy object", {
+      this._pixiObject = new PIXI.Tex_("This is a dummy object", {
         align: "left"
       });
       this._pixiObject.anchor.x = 0.5;
@@ -451,7 +451,7 @@ module.exports = {
       // Read a property from the object
       const property1Value = this._associatedObject
         .getProperties(this.project)
-        .get("My first property")
+        .ge_("My first property")
         .getValue();
       this._pixiObject.text = property1Value;
 

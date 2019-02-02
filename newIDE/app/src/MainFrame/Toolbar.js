@@ -1,6 +1,5 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { translate, type TranslatorProps } from 'react-i18next';
 import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
@@ -18,12 +17,12 @@ const styles = {
 type Props = {
   showProjectIcons: boolean,
   hasProject: boolean,
-  toggleProjectManager: boolean,
+  toggleProjectManager: () => void,
   requestUpdate: ?() => void,
   simulateUpdateDownloaded: ?() => void,
   simulateUpdateAvailable: ?() => void,
   exportProject: Function,
-} & TranslatorProps;
+};
 
 type State = {
   editorToolbar: any,
@@ -43,7 +42,7 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
   }
 
   render() {
-    const { t } = this.props;
+    const t = str => str; //TODO
 
     return (
       <Toolbar style={styles.toolbar}>
@@ -101,4 +100,4 @@ export class MainFrameToolbar extends PureComponent<Props, State> {
   }
 }
 
-export default translate('', { withRef: true })(MainFrameToolbar);
+export default MainFrameToolbar;

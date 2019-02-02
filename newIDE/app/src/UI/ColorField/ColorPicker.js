@@ -46,9 +46,9 @@ const styles = {
     cursor: 'pointer',
   },
   popover: {
-    position: 'absolute',
+    position: 'fixed',
     zIndex: '2',
-    right: '113px', 
+    transform: 'translateX(-174px)', 
   },
   cover: {
     position: 'fixed',

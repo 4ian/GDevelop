@@ -280,7 +280,7 @@ export default class VariablesList extends React.Component<Props, State> {
 
   _renderEmpty() {
     return (
-      this.props.emptyExplanationMessage && (
+      !!this.props.emptyExplanationMessage && (
         <div>
           <EmptyMessage
             style={styles.emptyExplanation}

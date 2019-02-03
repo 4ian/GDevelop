@@ -85,46 +85,44 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
         style={styles.container}
       >
         <span
+          style={styles.title}
           className={classNames({
-            [selectableArea]: true,
             [disabledText]: this.props.disabled,
           })}
         >
-          <span style={styles.title}>
-            Include events from{' '}
-            <i
-              className={classNames({
-                [selectableArea]: true,
-              })}
-              onClick={this.edit}
-            >
-              {target || '< Enter the name of external events >'}
-            </i>
-          </span>
-          <IconButton onClick={this.openTarget} disabled={!target}>
-            <OpenInNew />
-          </IconButton>
-          <InlinePopover
-            open={this.state.editing}
-            anchorEl={this.state.anchorEl}
-            onRequestClose={this.endEditing}
+          Include events from{' '}
+          <i
+            className={classNames({
+              [selectableArea]: true,
+            })}
+            onClick={this.edit}
           >
-            <ExternalEventsField
-              project={this.props.project}
-              globalObjectsContainer={this.props.globalObjectsContainer}
-              objectsContainer={this.props.objectsContainer}
-              value={target}
-              onChange={text => {
-                linkEvent.setTarget(text);
-                this.props.onUpdate();
-              }}
-              isInline
-              ref={externalEventsField =>
-                (this._externalEventsField = externalEventsField)
-              }
-            />
-          </InlinePopover>
+            {target || '< Enter the name of external events >'}
+          </i>
         </span>
+        <IconButton onClick={this.openTarget} disabled={!target}>
+          <OpenInNew />
+        </IconButton>
+        <InlinePopover
+          open={this.state.editing}
+          anchorEl={this.state.anchorEl}
+          onRequestClose={this.endEditing}
+        >
+          <ExternalEventsField
+            project={this.props.project}
+            globalObjectsContainer={this.props.globalObjectsContainer}
+            objectsContainer={this.props.objectsContainer}
+            value={target}
+            onChange={text => {
+              linkEvent.setTarget(text);
+              this.props.onUpdate();
+            }}
+            isInline
+            ref={externalEventsField =>
+              (this._externalEventsField = externalEventsField)
+            }
+          />
+        </InlinePopover>
       </div>
     );
   }

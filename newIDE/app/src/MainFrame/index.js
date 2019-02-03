@@ -935,7 +935,7 @@ export default class MainFrame extends React.Component<Props, State> {
     );
   };
 
-  openCreateDialog = (open: boolean = true) => {    
+  openCreateDialog = (open: boolean = true) => {
     this.setState({
       createDialogOpen: open,
     });
@@ -945,9 +945,8 @@ export default class MainFrame extends React.Component<Props, State> {
     if (!this.props.onChooseProject) return;
 
     if (this.state.currentProject) {
-        this.askToSaveProject();
+      this.askToSaveProject();
     }
-    
 
     this.props
       .onChooseProject()
@@ -993,7 +992,7 @@ export default class MainFrame extends React.Component<Props, State> {
 
     this.save();
   };
-  
+
   askToCloseProject = (cb: ?Function) => {
     if (!this.state.currentProject) return;
 

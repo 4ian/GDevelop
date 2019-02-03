@@ -935,14 +935,7 @@ export default class MainFrame extends React.Component<Props, State> {
     );
   };
 
-  openCreateDialog = (open: boolean = true) => {
-    
-    console.log("openCreateDialog");  
-    if (this.state.currentProject) {
-        console.log("save ?");
-        this.askToSaveProject();
-    }
-    
+  openCreateDialog = (open: boolean = true) => {    
     this.setState({
       createDialogOpen: open,
     });
@@ -951,9 +944,7 @@ export default class MainFrame extends React.Component<Props, State> {
   chooseProject = () => {
     if (!this.props.onChooseProject) return;
 
-    console.log("save ?");
     if (this.state.currentProject) {
-        console.log("save ?");
         this.askToSaveProject();
     }
     
@@ -996,7 +987,7 @@ export default class MainFrame extends React.Component<Props, State> {
 
     //eslint-disable-next-line
     const answer = confirm(
-      'A project is already open. Are you sure to save it before open another project ?'
+      'A project is already open. Do you want to save it before opening another one ?'
     );
     if (!answer) return;
 

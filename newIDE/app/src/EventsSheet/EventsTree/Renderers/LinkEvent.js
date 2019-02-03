@@ -85,10 +85,10 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
         style={styles.container}
       >
         <span
-            className={classNames({
-              [selectableArea]: true,
-              [disabledText]: this.props.disabled,
-            })}            
+          className={classNames({
+            [selectableArea]: true,
+            [disabledText]: this.props.disabled,
+          })}
         >
           <span style={styles.title}>
             Include events from{' '}

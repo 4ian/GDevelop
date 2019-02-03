@@ -1329,6 +1329,7 @@ export default class MainFrame extends React.Component<Props, State> {
               onClose: () => this.openCreateDialog(false),
               onOpen: filepath => {
                 this.openCreateDialog(false);
+                this.askToSaveProject();
                 this.openFromPathOrURL(filepath, () =>
                   this.openSceneOrProjectManager()
                 );

@@ -308,9 +308,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(manager, wi
             gdjs.InputManager.MOUSE_LEFT_BUTTON);
         return false;
     };
-    renderer.view.onmouseout = function(e){        
-        return false;
-    };
     window.addEventListener('click', function(e) {
         if (window.focus !== undefined) window.focus();
         e.preventDefault();

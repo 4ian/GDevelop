@@ -32,4 +32,5 @@ public/JsPlatform
 resources/GDJS
 
 # locales build files
-locales/_build
+src/locales/_build
+src/locales/**/*.po

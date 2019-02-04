@@ -164,7 +164,7 @@ const buildMainMenuFor = window => {
     ],
   };
   if (process.platform !== 'darwin') {
-    fileTemplate.submenu.push(
+    helpTemplate.submenu.push(
       { type: 'separator' },
       {
         label: 'About GDevelop',

@@ -7,6 +7,9 @@
 
 gdjs.TweenRuntimeBehavior = function (runtimeScene, behaviorData, owner) {
   gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
+
+  /** @type Object.<string, gdjs.TweenRuntimeBehavior.TweenInstance > */
+  this._tweens = {};
 };
 
 gdjs.TweenRuntimeBehavior.prototype = Object.create(
@@ -15,8 +18,6 @@ gdjs.TweenRuntimeBehavior.prototype = Object.create(
 
 gdjs.TweenRuntimeBehavior.thisIsARuntimeBehaviorConstructor =
   "Tween::TweenBehavior";
-
-gdjs.TweenRuntimeBehavior._tweenList = {};
 
 gdjs.TweenRuntimeBehavior.TweenInstance = function (instance, hasFinished, progress, currentValue) {
   this.instance = instance;
@@ -40,65 +41,60 @@ gdjs.TweenRuntimeBehavior.ObjectPositionTweenInstance = function (instance, hasF
   this.y = y;
 }
 
-gdjs.TweenRuntimeBehavior._addObjectVariableTween = (owner, identifier, instance, variable, currentValue) => {
-  gdjs.TweenRuntimeBehavior._tweenList[owner][identifier] = new gdjs.TweenRuntimeBehavior.ObjectVariableTweenInstance(instance, false, 0, variable, currentValue);
+gdjs.TweenRuntimeBehavior.prototype._addObjectVariableTween = (identifier, instance, variable, currentValue) => {
+  this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.ObjectVariableTweenInstance(instance, false, 0, variable, currentValue);
 };
 
-gdjs.TweenRuntimeBehavior._addObjectPositionTween = (owner, identifier, instance, x, y) => {
-  gdjs.TweenRuntimeBehavior._tweenList[owner] = { identifier };
-  gdjs.TweenRuntimeBehavior._tweenList[owner][identifier] = new gdjs.TweenRuntimeBehavior.ObjectPositionTweenInstance(instance, false, 0, x, y);
+gdjs.TweenRuntimeBehavior.prototype._addObjectPositionTween = (identifier, instance, x, y) => {
+  this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.ObjectPositionTweenInstance(instance, false, 0, x, y);
 };
 
-gdjs.TweenRuntimeBehavior._getTween = (owner, identifier) => {
-  return gdjs.TweenRuntimeBehavior._tweenList[owner][identifier];
+gdjs.TweenRuntimeBehavior.prototype._getTween = (identifier) => {
+  return this._tweens[identifier];
 };
 
-gdjs.TweenRuntimeBehavior._tweenExists = (owner, identifier) => {
-  if (owner in gdjs.TweenRuntimeBehavior._tweenList) {
-    if (identifier in gdjs.TweenRuntimeBehavior._tweenList[owner]) {
-      return true
-    }
+gdjs.TweenRuntimeBehavior.prototype._tweenExists = (identifier) => {
+  if (identifier in this._tweens) {
+    return true
   }
   return false;
 };
 
-gdjs.TweenRuntimeBehavior._tweenIsPlaying = (owner, identifier) => {
-  return gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].instance.isPlaying();
+gdjs.TweenRuntimeBehavior.prototype._tweenIsPlaying = (identifier) => {
+  return this._tweens[identifier].instance.isPlaying();
 };
 
-gdjs.TweenRuntimeBehavior._pauseTween = (owner, identifier) => {
-  return gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].instance.pause();
+gdjs.TweenRuntimeBehavior.prototype._pauseTween = (identifier) => {
+  return this._tweens[identifier].instance.pause();
 };
 
-gdjs.TweenRuntimeBehavior._resumeTween = (owner, identifier) => {
-  return gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].instance.resume();
+gdjs.TweenRuntimeBehavior.prototype._resumeTween = (identifier) => {
+  return this._tweens[identifier].instance.resume();
 };
 
-gdjs.TweenRuntimeBehavior._stopTween = (owner, identifier, JumpToDest) => {
-  return gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].instance.stop(JumpToDest);
+gdjs.TweenRuntimeBehavior.prototype._stopTween = (identifier, JumpToDest) => {
+  return this._tweens[identifier].instance.stop(JumpToDest);
 };
 
-gdjs.TweenRuntimeBehavior._setTweenFinished = (owner, identifier, hasFinished) => {
-  gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].hasFinished = hasFinished;
+gdjs.TweenRuntimeBehavior.prototype._setTweenFinished = (identifier, hasFinished) => {
+  this._tweens[identifier].hasFinished = hasFinished;
 };
 
-gdjs.TweenRuntimeBehavior._tweenHasFinished = (owner, identifier) => {
-  return gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].hasFinished;
+gdjs.TweenRuntimeBehavior.prototype._tweenHasFinished = (identifier) => {
+  return this._tweens[identifier].hasFinished;
 };
 
-gdjs.TweenRuntimeBehavior._setRemoveObjectFromScene = (owner, identifier, removeObjectFromScene) => {
-  return gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].removeObjectFromScene = removeObjectFromScene;
+gdjs.TweenRuntimeBehavior.prototype._setRemoveObjectFromScene = (identifier, removeObjectFromScene) => {
+  return this._tweens[identifier].removeObjectFromScene = removeObjectFromScene;
 };
 
-gdjs.TweenRuntimeBehavior._removeTween = (owner, identifier) => {
-  gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].instance.dispose();
-  delete gdjs.TweenRuntimeBehavior._tweenList[owner][identifier];
+gdjs.TweenRuntimeBehavior.prototype._removeTween = (identifier) => {
+  this._tweens[identifier].instance.dispose();
+  delete this._tweens[identifier];
 };
 
 /**
  * Add an object variable tween.
- * @param {object} owner The runtime object
- * @param {behavior} tweenBehavior The tween behavior
  * @param {string} identifier Unique id to idenfify the tween
  * @param {objectvar} variable The object variable to store the tweened value
  * @param {number} fromValue Start value
@@ -107,9 +103,7 @@ gdjs.TweenRuntimeBehavior._removeTween = (owner, identifier) => {
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-gdjs.TweenRuntimeBehavior.addObjectVariableTween = function (
-  owner,
-  tweenBehavior,
+gdjs.TweenRuntimeBehavior.prototype.addObjectVariableTween = function (
   identifier,
   variable,
   fromValue,
@@ -119,7 +113,7 @@ gdjs.TweenRuntimeBehavior.addObjectVariableTween = function (
   destroyObjectWhenFinished
 ) {
 
-  if (gdjs.TweenRuntimeBehavior._tweenExists(owner, identifier)) {
+  if (this._tweenExists(identifier)) {
     return;
   }
 
@@ -132,32 +126,30 @@ gdjs.TweenRuntimeBehavior.addObjectVariableTween = function (
     easing: easingValue,
     step: state => {
       //variable.setNumber(state.value);
-      gdjs.TweenRuntimeBehavior._getTween(owner, identifier).progress = state.progress;
-      gdjs.TweenRuntimeBehavior._getTween(owner, identifier).currentValue = state.value;
+      this._getTween(identifier).progress = state.progress;
+      this._getTween(identifier).currentValue = state.value;
       console.log(state);
     }
   });
 
-  gdjs.TweenRuntimeBehavior._addObjectVariableTween(owner, identifier, newTweenable, variable, fromValue);
+  this._addObjectVariableTween(identifier, newTweenable, variable, fromValue);
 
   if (destroyObjectWhenFinished) {
-    gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].instance.tween().then(() => {
+    this._tweens[identifier].instance.tween().then(() => {
 
-      gdjs.TweenRuntimeBehavior._removeTween(owner, identifier);
-      gdjs.TweenRuntimeBehavior._setRemoveObjectFromScene(owner, identifier, true);
+      this._removeTween(identifier);
+      this._setRemoveObjectFromScene(identifier, true);
 
     });
   } else {
-    gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].instance.tween().then(() => {
-      gdjs.TweenRuntimeBehavior._setTweenFinished(owner, identifier, true);
+    this._tweens[identifier].instance.tween().then(() => {
+      this._setTweenFinished(identifier, true);
     });
   }
 };
 
 /**
  * Add an object position tween.
- * @param {object} owner The runtime object
- * @param {behavior} tweenBehavior The tween behavior
  * @param {string} identifier Unique id to idenfify the tween
  * @param {number} toX The object variable to store the tweened value
  * @param {number} toY Start value
@@ -165,9 +157,7 @@ gdjs.TweenRuntimeBehavior.addObjectVariableTween = function (
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
  */
-gdjs.TweenRuntimeBehavior.addObjectPositionTween = function (
-  owner,
-  tweenBehavior,
+gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function (
   identifier,
   toX,
   toY,
@@ -176,37 +166,37 @@ gdjs.TweenRuntimeBehavior.addObjectPositionTween = function (
   destroyObjectWhenFinished
 ) {
 
-  if (gdjs.TweenRuntimeBehavior._tweenExists(owner, identifier)) {
-    gdjs.TweenRuntimeBehavior.removeTween(owner, tweenBehavior, identifier);
+  if (this._tweenExists(identifier)) {
+    this.removeTween(tweenBehavior, identifier);
   }
 
   let newTweenable = new shifty.Tweenable();
   newTweenable.setConfig({
-    from: { x: owner.getX(), y: owner.getY(), progress: 0.0 },
+    from: { x: this.owner.getX(), y: this.owner.getY(), progress: 0.0 },
     to: { x: toX, y: toY, progress: 1.0 },
     duration: durationValue,
     easing: easingValue,
     step: state => {
 
-      gdjs.TweenRuntimeBehavior._getTween(owner, identifier).progress = state.progress;
-      gdjs.TweenRuntimeBehavior._getTween(owner, identifier).x = state.x;
-      gdjs.TweenRuntimeBehavior._getTween(owner, identifier).y = state.y;
-      owner.setX(state.x);
-      owner.setY(state.y);
+      this._getTween(identifier).progress = state.progress;
+      this._getTween(identifier).x = state.x;
+      this._getTween(identifier).y = state.y;
+      this.owner.setX(state.x);
+      this.owner.setY(state.y);
       console.log(state);
     }
   });
 
-  gdjs.TweenRuntimeBehavior._addObjectPositionTween(owner, identifier, newTweenable, owner.getX(), owner.getY());
+  this._addObjectPositionTween(identifier, newTweenable, this.owner.getX(), this.owner.getY());
 
   if (destroyObjectWhenFinished) {
-    gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].instance.tween().then(() => {
-      gdjs.TweenRuntimeBehavior._removeTween(owner, identifier);
-      gdjs.TweenRuntimeBehavior._setRemoveObjectFromScene(owner, identifier, true);
+    this._tweens[identifier].instance.tween().then(() => {
+      this._removeTween(identifier);
+      this._setRemoveObjectFromScene(identifier, true);
     });
   } else {
-    gdjs.TweenRuntimeBehavior._tweenList[owner][identifier].instance.tween().then(() => {
-      gdjs.TweenRuntimeBehavior._setTweenFinished(owner, identifier, true);
+    this._tweens[identifier].instance.tween().then(() => {
+      this._setTweenFinished(identifier, true);
     });
   }
 };
@@ -215,8 +205,8 @@ gdjs.TweenRuntimeBehavior.addObjectPositionTween = function (
  * Tween is playing.
  * @param {string} identifier Unique id to idenfify the tween
  */
-gdjs.TweenRuntimeBehavior.isPlaying = function (owner, behavior, identifier) {
-  if (gdjs.TweenRuntimeBehavior._tweenExists(owner, identifier) && this._tweenIsPlaying(owner, identifier)) {
+gdjs.TweenRuntimeBehavior.prototype.isPlaying = function (identifier) {
+  if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
     return true;
   } else {
     return false;
@@ -227,9 +217,9 @@ gdjs.TweenRuntimeBehavior.isPlaying = function (owner, behavior, identifier) {
  * Tween has finished.
  * @param {string} identifier Unique id to idenfify the tween
  */
-gdjs.TweenRuntimeBehavior.hasFinished = function (owner, tweenBehavior, identifier) {
-  if (gdjs.TweenRuntimeBehavior._tweenExists(owner, identifier)) {
-    return gdjs.TweenRuntimeBehavior._tweenHasFinished(owner, identifier);
+gdjs.TweenRuntimeBehavior.prototype.hasFinished = function (identifier) {
+  if (this._tweenExists(identifier)) {
+    return this._tweenHasFinished(identifier);
   } else {
     return false;
   }
@@ -239,9 +229,9 @@ gdjs.TweenRuntimeBehavior.hasFinished = function (owner, tweenBehavior, identifi
  * Pause a tween.
  * @param {string} identifier Unique id to idenfify the tween
  */
-gdjs.TweenRuntimeBehavior.pauseTween = function (owner, behavior, identifier) {
-  if (gdjs.TweenRuntimeBehavior._tweenExists(owner, identifier) && gdjs.TweenRuntimeBehavior._tweenIsPlaying(owner, identifier)) {
-    gdjs.TweenRuntimeBehavior._pauseTween(owner, identifier);
+gdjs.TweenRuntimeBehavior.prototype.pauseTween = function (identifier) {
+  if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
+    this._pauseTween(identifier);
   }
 };
 
@@ -250,12 +240,9 @@ gdjs.TweenRuntimeBehavior.pauseTween = function (owner, behavior, identifier) {
  * @param {string} identifier Unique id to idenfify the tween
  * @param {boolean} JumpToDest Move to destination
  */
-gdjs.TweenRuntimeBehavior.stopTween = function (owner, behavior,
-  identifier,
-  JumpToDest
-) {
-  if (gdjs.TweenRuntimeBehavior._tweenExists(owner, identifier) && gdjs.TweenRuntimeBehavior._tweenIsPlaying(owner, identifier)) {
-    gdjs.TweenRuntimeBehavior._stopTween(owner, identifier, JumpToDest);
+gdjs.TweenRuntimeBehavior.prototype.stopTween = function (identifier, JumpToDest) {
+  if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
+    this._stopTween(identifier, JumpToDest);
   }
 };
 
@@ -263,9 +250,9 @@ gdjs.TweenRuntimeBehavior.stopTween = function (owner, behavior,
  * Resume a tween.
  * @param {string} identifier Unique id to idenfify the tween
  */
-gdjs.TweenRuntimeBehavior.resumeTween = function (owner, behavior, identifier) {
-  if (gdjs.TweenRuntimeBehavior._tweenExists(owner, identifier) && !gdjs.TweenRuntimeBehavior._tweenIsPlaying(owner, identifier)) {
-    gdjs.TweenRuntimeBehavior._resumeTween(owner, identifier);
+gdjs.TweenRuntimeBehavior.prototype.resumeTween = function (identifier) {
+  if (this._tweenExists(identifier) && !this._tweenIsPlaying(identifier)) {
+    this._resumeTween(identifier);
   }
 };
 
@@ -273,9 +260,9 @@ gdjs.TweenRuntimeBehavior.resumeTween = function (owner, behavior, identifier) {
  * Remove a tween.
  * @param {string} identifierFirst Unique id to idenfify the tween
  */
-gdjs.TweenRuntimeBehavior.removeTween = function (owner, behavior, identifier) {
-  if (gdjs.TweenRuntimeBehavior._tweenExists(owner, identifier)) {
-    gdjs.TweenRuntimeBehavior._removeTween(owner, identifier);
+gdjs.TweenRuntimeBehavior.prototype.removeTween = function (identifier) {
+  if (this._tweenExists(identifier)) {
+    this._removeTween(identifier);
   }
 };
 
@@ -284,9 +271,9 @@ gdjs.TweenRuntimeBehavior.removeTween = function (owner, behavior, identifier) {
  * @param {string} identifier Unique id to idenfify the tween
  * @returns {boolean} Progress of playing tween animation (between 0.0 and 1.0)
  */
-gdjs.TweenRuntimeBehavior.getProgress = function (owner, behavior, identifier) {
-  if (gdjs.TweenRuntimeBehavior._tweenExists(owner, identifier)) {
-    return gdjs.TweenRuntimeBehavior._getTween(owner, identifier).progress;
+gdjs.TweenRuntimeBehavior.prototype.getProgress = function (identifier) {
+  if (this._tweenExists(identifier)) {
+    return this._getTween(identifier).progress;
   } else {
     return 0.0;
   }

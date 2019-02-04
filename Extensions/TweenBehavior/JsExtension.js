@@ -66,7 +66,7 @@ module.exports = {
       })
     );
 
-    extension
+   const tb = extension
       .addBehavior(
         "TweenBehavior",
         t("Tween animation"),
@@ -83,8 +83,7 @@ module.exports = {
     //.addIncludeFile("Extensions/TweenBehavior/LICENSE-MIT.txt");
 
     // Behavior related
-    extension
-      .addAction(
+    tb.addAction(
         "AddObjectVariableTween",
         t("Add object variable tween"),
         t("Add a tween animation for an object variable."),
@@ -95,8 +94,8 @@ module.exports = {
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("objectPtr", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
       .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
       .addParameter("objectvar", t("Object variable"), "", false)
       .addParameter("expression", t("From value"), "", false)
@@ -105,12 +104,11 @@ module.exports = {
       .setDefaultValue("linear")
       .addParameter("expression", t("Duration"), "", false)
       .addParameter("yesorno", t("Destroy this object when tween finishes"), "", false)
-      .setDefaultValue("false")
+      .setDefaultValue("no")
       .getCodeExtraInformation()
-      .setFunctionName("gdjs.TweenRuntimeBehavior.addObjectVariableTween");
+      .setFunctionName("addObjectVariableTween");
 
-    extension
-      .addAction(
+      tb.addAction(
         "AddObjectPositionTween",
         t("Add object position tween"),
         t("Add a tween animation for an object position."),
@@ -121,8 +119,8 @@ module.exports = {
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("objectPtr", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
       .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
       .addParameter("expression", t("To X"), "", false)
       .addParameter("expression", t("To Y"), "", false)
@@ -130,12 +128,11 @@ module.exports = {
       .setDefaultValue("linear")
       .addParameter("expression", t("Duration"), "", false)
       .addParameter("yesorno", t("Destroy this object when tween finishes"), "", false)
-      .setDefaultValue("false")
+      .setDefaultValue("no")
       .getCodeExtraInformation()
-      .setFunctionName("gdjs.TweenRuntimeBehavior.addObjectPositionTween");
+      .setFunctionName("addObjectPositionTween");
 
-    extension
-      .addCondition(
+      tb.addCondition(
         "IsPlaying",
         t("Tween is playing"),
         t("Check if the tween animation is currently playing."),
@@ -147,13 +144,12 @@ module.exports = {
         "JsPlatform/Extensions/take_screenshot32.png"
       )
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior")
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
       .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
       .getCodeExtraInformation()
-      .setFunctionName("gdjs.TweenRuntimeBehavior.isPlaying");
+      .setFunctionName("isPlaying");
 
-    extension
-      .addCondition(
+      tb.addCondition(
         "HasFinished",
         t("Tween finished playing"),
         t("Check if the tween animation has finished playing."),
@@ -164,14 +160,13 @@ module.exports = {
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("objectPtr", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior")
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
       .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
       .getCodeExtraInformation()
-      .setFunctionName("gdjs.TweenRuntimeBehavior.hasFinished");
+      .setFunctionName("hasFinished");
 
-    extension
-      .addAction(
+      tb.addAction(
         "PauseTween",
         t("Pause a tween"),
         t("Pause the running tween animation."),
@@ -183,13 +178,12 @@ module.exports = {
         "JsPlatform/Extensions/take_screenshot32.png"
       )
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior")
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
       .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
       .getCodeExtraInformation()
-      .setFunctionName("gdjs.TweenRuntimeBehavior.pauseTween");
+      .setFunctionName("pauseTween");
 
-    extension
-      .addAction(
+      tb.addAction(
         "StopTween",
         t("Stop a tween"),
         t("Stop the running tween animation."),
@@ -201,14 +195,13 @@ module.exports = {
         "JsPlatform/Extensions/take_screenshot32.png"
       )
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior")
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
       .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
       .addParameter("yesorno", t("Jump to end"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName("gdjs.TweenRuntimeBehavior.stopTween");
+      .setFunctionName("stopTween");
 
-    extension
-      .addAction(
+      tb.addAction(
         "ResumeTween",
         t("Resume a tween"),
         t("Resume the tween animation."),
@@ -220,13 +213,12 @@ module.exports = {
         "JsPlatform/Extensions/take_screenshot32.png"
       )
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior")
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
       .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
       .getCodeExtraInformation()
-      .setFunctionName("gdjs.TweenRuntimeBehavior.resumeTween");
+      .setFunctionName("resumeTween");
 
-    extension
-      .addAction(
+      tb.addAction(
         "RemoveTween",
         t("Remove a tween"),
         t("Remove the tween animation from the object."),
@@ -238,13 +230,12 @@ module.exports = {
         "JsPlatform/Extensions/take_screenshot32.png"
       )
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior")
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
       .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
       .getCodeExtraInformation()
-      .setFunctionName("gdjs.TweenRuntimeBehavior.removeTween");
+      .setFunctionName("removeTween");
 
-    extension
-      .addExpression(
+      tb.addExpression(
         "GetProgress",
         t("Progress of a tween"),
         t("Progress of a tween (between 0.0 and 1.0)"),
@@ -253,10 +244,10 @@ module.exports = {
         "JsPlatform/Extensions/take_screenshot32.png"
       )
       .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior")
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
       .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
       .getCodeExtraInformation()
-      .setFunctionName("gdjs.TweenRuntimeBehavior.getProgress");
+      .setFunctionName("getProgress");
 
     return extension;
   },

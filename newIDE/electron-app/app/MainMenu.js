@@ -123,7 +123,7 @@ const buildMainMenuFor = window => {
 
   const windowTemplate = {
     role: 'window',
-    submenu: [{ role: 'minimize' }, { role: 'close' }],
+    submenu: [{ role: 'minimize' }],
   };
 
   const helpTemplate = {

@@ -45,9 +45,6 @@ const analyzeFile = filePath =>
       ) {
         results.requiresTrans = true;
         results.reason = 'React with string properties';
-        //TODO: Automatic updater with support for <EmptyMessage>, <p>, <Line> with text only (potentially . and /, \,!,?)
-        // <BackgroundText>
-        //label="text", floatingLabelText="text", hintText="text", title="text", primaryText="text", message="text", Label="text"
       }
 
       if (content.includes('label: ')) {

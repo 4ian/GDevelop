@@ -86,7 +86,7 @@ class StartPage extends BaseEditor {
               </Paper>
               {!project && canOpen && (
                 <RaisedButton
-                  label="Open a project"
+                  label={<Trans>Open a project</Trans>}
                   fullWidth
                   onClick={onOpen}
                   primary
@@ -94,7 +94,7 @@ class StartPage extends BaseEditor {
               )}
               {!project && (
                 <RaisedButton
-                  label="Create a new project"
+                  label={<Trans>Create a new project</Trans>}
                   fullWidth
                   onClick={onCreate}
                   primary
@@ -102,7 +102,7 @@ class StartPage extends BaseEditor {
               )}
               {!!project && (
                 <RaisedButton
-                  label="Open Project Manager"
+                  label={<Trans>Open Project Manager</Trans>}
                   fullWidth
                   onClick={onOpenProjectManager}
                   primary
@@ -110,14 +110,14 @@ class StartPage extends BaseEditor {
               )}
               {!!project && (
                 <FlatButton
-                  label="Close project"
+                  label={<Trans>Close project</Trans>}
                   fullWidth
                   onClick={onCloseProject}
                 />
               )}
               {
                 <FlatButton
-                  label="Search the documentation"
+                  label={<Trans>Search the documentation</Trans>}
                   fullWidth
                   onClick={onOpenHelpFinder}
                 />
@@ -126,15 +126,18 @@ class StartPage extends BaseEditor {
           </Line>
           <Line alignItems="center" justifyContent="space-between">
             <div>
-              <FlatButton label="About GDevelop" onClick={onOpenAboutDialog} />
               <FlatButton
-                label="Gdevelop Forums"
+                label={<Trans>About GDevelop</Trans>}
+                onClick={onOpenAboutDialog}
+              />
+              <FlatButton
+                label={<Trans>Gdevelop Forums</Trans>}
                 onClick={() =>
                   Window.openExternalURL('http://forum.compilgames.net')
                 }
               />
               <FlatButton
-                label="Help and tutorials"
+                label={<Trans>Help and tutorials</Trans>}
                 onClick={() =>
                   Window.openExternalURL(
                     'http://wiki.compilgames.net/doku.php/gdevelop5/start'

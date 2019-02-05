@@ -12,6 +12,7 @@ import {
   sendSubscriptionCheckDialogShown,
   sendSubscriptionCheckDismiss,
 } from '../Utils/Analytics/EventSender';
+import { Trans } from '@lingui/macro';
 
 type Props = {|
   title: string,
@@ -75,7 +76,7 @@ export class SubscriptionCheckDialog extends Component<
         actions={[
           onChangeSubscription && (
             <RaisedButton
-              label="Get a subscription or login"
+              label={<Trans>Get a subscription or login</Trans>}
               key="subscribe"
               primary
               onClick={() => {
@@ -87,7 +88,13 @@ export class SubscriptionCheckDialog extends Component<
         ]}
         secondaryActions={[
           <FlatButton
-            label={mode === 'try' ? 'Continue anyway' : 'Not now, thanks!'}
+            label={
+              mode === 'try' ? (
+                <Trans>Continue anyway</Trans>
+              ) : (
+                <Trans>Not now, thanks!</Trans>
+              )
+            }
             key="close"
             primary={false}
             onClick={this._closeDialog}
@@ -102,34 +109,44 @@ export class SubscriptionCheckDialog extends Component<
           <Line noMargin alignItems="center">
             {mode === 'try' ? (
               <p>
-                You can try this feature, but if you're using it regularly, we
-                ask you to get a subscription to GDevelop.
+                <Trans>
+                  You can try this feature, but if you're using it regularly, we
+                  ask you to get a subscription to GDevelop.
+                </Trans>
               </p>
             ) : (
               <p>
-                To use this feature, we ask you to get a subscription to
-                GDevelop.
+                <Trans>
+                  To use this feature, we ask you to get a subscription to
+                  GDevelop.
+                </Trans>
               </p>
             )}
           </Line>
           <Line noMargin alignItems="center">
             <Star style={styles.icon} />
             <p style={styles.iconText}>
-              Having a subscription allows you to use the one-click export for
-              Android, Windows, macOS and Linux, launch live previews over wifi,
-              disable the GDevelop splashscreen during loading and more!
+              <Trans>
+                Having a subscription allows you to use the one-click export for
+                Android, Windows, macOS and Linux, launch live previews over
+                wifi, disable the GDevelop splashscreen during loading and more!
+              </Trans>
             </p>
           </Line>
           <Line noMargin alignItems="center">
             <Favorite style={styles.icon} />
             <p style={styles.iconText}>
-              You're also supporting the development of GDevelop, an open-source
-              software! In the future, more online services will be available
-              for users with a subscription.
+              <Trans>
+                You're also supporting the development of GDevelop, an
+                open-source software! In the future, more online services will
+                be available for users with a subscription.
+              </Trans>
             </p>
           </Line>
           <p style={styles.thanksText}>
-            <b>Thanks!</b>
+            <b>
+              <Trans>Thanks!</Trans>
+            </b>
           </p>
         </Column>
       </Dialog>

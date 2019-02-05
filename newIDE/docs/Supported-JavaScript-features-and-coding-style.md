@@ -28,13 +28,13 @@ It's a good idea to start using it now on your new extensions (install the exten
 
 The editor sources are processed by Babel, which *transpiles* the JavaScript latest features so that they run on older browsers. Thus, it's fine to use **all the latest and greatest** syntax and features 🎉
 
-All source files should use arrow function (`=>`), `class`, `let`/`const` and anything that make the codebase more readable, concise and less error prone.
+All source files should use the arrow function (`=>`), `class`, `let`/`const` and anything that makes the codebase more readable, concise and less error prone.
 
 ### What about typing?
 
 The codebase is typed using **[Flow](https://flow.org/)**. It's a powerful typechecker that does not require any recompilation.
 
-Annotations can be added directly in the code (not in JSDoc annotations, contrary to the game engine) as they are understand and removed by Babel, and analyzed by Flow.
+Annotations can be added directly in the code (not in JSDoc annotations, contrary to the game engine) as they are understood and removed by Babel, and analyzed by Flow.
 
 While properly typing can be seen as cumbersome, it's something that is rather quick to learn and force developers to think about what they are using. It's also an invaluable tool to do refactoring, and ensure that any addition/removal is not breaking anything  🎉. It also provides autocompletion (like in VSCode, with the Flow Language Support plugin).
 

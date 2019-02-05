@@ -96,7 +96,7 @@ Make sure to have the standalone app running with Electron.
 
 ### Recommended tools for development
 
-Any text editor is fine, but it's a good idea to have one with *Prettier* (code formatting), *ESLint* (code linting) and *Flow* (type checking) integration.
+Any text editor is fine, but it's a good idea to have one with *Prettier* (code formatting), *ESLint* (code linting) and *Flow* (type checking) integration. [Modern JavaScript is used for the editor](https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md).
 
 👉 You can use [Visual Studio Code](https://code.visualstudio.com) with these extensions: [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [Flow Language Support](https://github.com/flowtype/flow-for-vscode).
 

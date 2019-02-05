@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -134,7 +136,7 @@ class LocalCordovaExport extends Component<Props, State> {
         <Line>
           <Spacer expand />
           <RaisedButton
-            label="Export"
+            label={<Trans>Export</Trans>}
             primary={true}
             onClick={this.launchExport}
             disabled={!this.state.outputDir}
@@ -145,13 +147,13 @@ class LocalCordovaExport extends Component<Props, State> {
           actions={[
             <FlatButton
               key="open"
-              label="Open folder"
+              label={<Trans>Open folder</Trans>}
               primary={true}
               onClick={this.openExportFolder}
             />,
             <FlatButton
               key="close"
-              label="Close"
+              label={<Trans>Close</Trans>}
               primary={false}
               onClick={() =>
                 this.setState({
@@ -171,9 +173,11 @@ class LocalCordovaExport extends Component<Props, State> {
             which will compile it for you to an iOS and Android app.
           </p>
           <p>
-            You can also compile the game by yourself using Cordova command-line
-            tool to iOS (XCode is required) or Android (Android SDK is
-            required).
+            <Trans>
+              You can also compile the game by yourself using Cordova
+              command-line tool to iOS (XCode is required) or Android (Android
+              SDK is required).
+            </Trans>
           </p>
           <RaisedButton
             fullWidth

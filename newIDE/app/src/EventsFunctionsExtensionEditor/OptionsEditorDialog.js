@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';
@@ -17,7 +19,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
   render() {
     const actions = [
       <FlatButton
-        label="Close"
+        label={<Trans>Close</Trans>}
         primary={true}
         keyboardFocused={true}
         onClick={() => this.props.onClose()}
@@ -31,19 +33,19 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
         secondaryActions={<HelpButton helpPagePath="/events/functions" />}
         actions={actions}
         open={this.props.open}
-        title="Edit Extension Options"
+        title={<Trans>Edit Extension Options</Trans>}
         onRequestClose={this.props.onClose}
         autoScrollBodyContent={true}
       >
         <Column>
           <TextField
-            floatingLabelText="Name"
+            floatingLabelText={<Trans>Name</Trans>}
             value={eventsFunctionsExtension.getName()}
             disabled
             fullWidth
           />
           <TextField
-            floatingLabelText="Name displayed in editor"
+            floatingLabelText={<Trans>Name displayed in editor</Trans>}
             value={eventsFunctionsExtension.getFullName()}
             onChange={(e, text) => {
               eventsFunctionsExtension.setFullName(text);
@@ -52,7 +54,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
             fullWidth
           />
           <TextField
-            floatingLabelText="Description"
+            floatingLabelText={<Trans>Description</Trans>}
             value={eventsFunctionsExtension.getDescription()}
             onChange={(e, text) => {
               eventsFunctionsExtension.setDescription(text);
@@ -62,7 +64,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
             fullWidth
           />
           <TextField
-            floatingLabelText="Version"
+            floatingLabelText={<Trans>Version</Trans>}
             value={eventsFunctionsExtension.getVersion()}
             onChange={(e, text) => {
               eventsFunctionsExtension.setVersion(text);

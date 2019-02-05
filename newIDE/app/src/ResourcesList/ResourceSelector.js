@@ -26,8 +26,8 @@ type Props = {|
   fullWidth?: boolean,
   initialResourceName: string,
   onChange: string => void,
-  floatingLabelText?: string,
-  hintText?: string,
+  floatingLabelText?: React.Node,
+  hintText?: React.Node,
 |};
 
 type State = {|

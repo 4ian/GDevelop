@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
@@ -81,12 +82,12 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       // (either by enhancing a function like propertiesMapToSchema or using copies)
       // and then re-enable cancel button.
       // <FlatButton
-      //   label="Cancel"
+      //   label={<Trans>Cancel</Trans>}
       //   primary={false}
       //   onClick={this.props.onClose}
       // />,
       <FlatButton
-        label="Ok"
+        label={<Trans>Ok</Trans>}
         key="ok"
         primary={true}
         keyboardFocused={true}
@@ -129,14 +130,14 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         contentStyle={{ width: '350px' }}
       >
         <TextField
-          floatingLabelText="Window title"
+          floatingLabelText={<Trans>Window title</Trans>}
           fullWidth
           type="text"
           value={this.state.windowTitle}
           onChange={(e, value) => this.setState({ windowTitle: value })}
         />
         <ColorField
-          floatingLabelText="Scene background color"
+          floatingLabelText={<Trans>Scene background color</Trans>}
           fullWidth
           disableAlpha
           color={this.state.backgroundColor}
@@ -146,7 +147,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         />
         <Checkbox
           checked={this.state.shouldStopSoundsOnStartup}
-          label="Stop musics and sounds on startup"
+          label={<Trans>Stop musics and sounds on startup</Trans>}
           onCheck={(e, check) =>
             this.setState({
               shouldStopSoundsOnStartup: check,
@@ -154,7 +155,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
           }
         />
         <RaisedButton
-          label="Edit scene variables"
+          label={<Trans>Edit scene variables</Trans>}
           fullWidth
           onClick={() => {
             this.props.onEditVariables();
@@ -163,14 +164,16 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         />
         {!some(propertiesEditors) && (
           <EmptyMessage>
-            Any additional properties will appear here if you add behaviors to
-            objects, like Physics behavior.
+            <Trans>
+              Any additional properties will appear here if you add behaviors to
+              objects, like Physics behavior.
+            </Trans>
           </EmptyMessage>
         )}
         {propertiesEditors}
         {this.props.onOpenMoreSettings && (
           <RaisedButton
-            label="Open advanced settings"
+            label={<Trans>Open advanced settings</Trans>}
             fullWidth
             onClick={() => {
               this.props.onOpenMoreSettings();

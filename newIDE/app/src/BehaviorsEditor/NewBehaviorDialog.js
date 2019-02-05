@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
@@ -120,7 +122,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
     const actions = [
       <FlatButton
         key="close"
-        label="Close"
+        label={<Trans>Close</Trans>}
         primary={false}
         onClick={onClose}
       />,
@@ -150,7 +152,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title="Add a new behavior to the object"
+        title={<Trans>Add a new behavior to the object</Trans>}
         actions={actions}
         secondaryActions={<HelpButton helpPagePath="/behaviors" />}
         open={open}
@@ -184,7 +186,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
               icon={<Visibility />}
               primary={false}
               onClick={() => this._showDeprecated(true)}
-              label="Show deprecated (old) behaviors"
+              label={<Trans>Show deprecated (old) behaviors</Trans>}
             />
           ) : (
             <FlatButton
@@ -192,7 +194,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
               icon={<VisibilityOff />}
               primary={false}
               onClick={() => this._showDeprecated(false)}
-              label="Show deprecated (old) behaviors"
+              label={<Trans>Show deprecated (old) behaviors</Trans>}
             />
           )}
         </Line>

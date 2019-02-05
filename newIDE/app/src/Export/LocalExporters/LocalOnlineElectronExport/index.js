@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import assignIn from 'lodash/assignIn';
@@ -287,22 +288,22 @@ class LocalOnlineElectronExport extends Component<Props, State> {
               )}
             </Line>
             <Checkbox
-              label="Windows (zip file)"
+              label={<Trans>Windows (zip file)</Trans>}
               checked={this.state.targets.indexOf('winZip') !== -1}
               onCheck={(e, checked) => this._setTarget('winZip', checked)}
             />
             <Checkbox
-              label="Windows (auto-installer file)"
+              label={<Trans>Windows (auto-installer file)</Trans>}
               checked={this.state.targets.indexOf('winExe') !== -1}
               onCheck={(e, checked) => this._setTarget('winExe', checked)}
             />
             <Checkbox
-              label="macOS (zip file)"
+              label={<Trans>macOS (zip file)</Trans>}
               checked={this.state.targets.indexOf('macZip') !== -1}
               onCheck={(e, checked) => this._setTarget('macZip', checked)}
             />
             <Checkbox
-              label="Linux (AppImage)"
+              label={<Trans>Linux (AppImage)</Trans>}
               checked={this.state.targets.indexOf('linuxAppImage') !== -1}
               onCheck={(e, checked) =>
                 this._setTarget('linuxAppImage', checked)

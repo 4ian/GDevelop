@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import axios from 'axios';
 import { sleep } from 'wait-promise';
@@ -126,7 +127,11 @@ export default class LocalS3Export extends Component {
         <Spacer />
         <TextField value={this.state.url} style={{ flex: 1 }} />
         <Spacer />
-        <RaisedButton label="Open" primary={true} onClick={this.openURL} />
+        <RaisedButton
+          label={<Trans>Open</Trans>}
+          primary={true}
+          onClick={this.openURL}
+        />
       </Line>
     );
   };
@@ -148,8 +153,10 @@ export default class LocalS3Export extends Component {
     return (
       <Column noMargin>
         <Line>
-          This will export your game and upload it on GDevelop games hosting.
-          The game will be free and available for a few days.
+          <Trans>
+            This will export your game and upload it on GDevelop games hosting.
+            The game will be free and available for a few days.
+          </Trans>
         </Line>
         <Line alignItems="center">
           <LinearProgress
@@ -164,7 +171,7 @@ export default class LocalS3Export extends Component {
           />
           <Spacer />
           <RaisedButton
-            label="Export and upload my game"
+            label={<Trans>Export and upload my game</Trans>}
             primary={true}
             onClick={this.launchExport}
             disabled={exportStarted}

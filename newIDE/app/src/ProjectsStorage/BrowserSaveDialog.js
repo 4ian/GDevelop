@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -33,24 +34,30 @@ export default class BrowserSaveDialog extends Component {
 
     const actions = [
       <FlatButton
-        label="Download GDevelop desktop version"
+        label={<Trans>Download GDevelop desktop version</Trans>}
         primary={false}
         onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
       />,
-      <FlatButton label="Close" primary={false} onClick={onClose} />,
+      <FlatButton
+        label={<Trans>Close</Trans>}
+        primary={false}
+        onClick={onClose}
+      />,
     ];
 
     return (
       <Dialog actions={actions} open={open} onRequestClose={onClose}>
         <Column noMargin>
           <Line>
-            You can download the file of your game to continue working on it
-            using the full GDevelop version:
+            <Trans>
+              You can download the file of your game to continue working on it
+              using the full GDevelop version:
+            </Trans>
           </Line>
           <Line>
             <Column expand>
               <RaisedButton
-                label="Download game file"
+                label={<Trans>Download game file</Trans>}
                 fullWidth
                 primary
                 onClick={this._download}

@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Checkbox from 'material-ui/Checkbox';
@@ -101,12 +103,12 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
   render() {
     const actions = [
       <FlatButton
-        label="Cancel"
+        label={<Trans>Cancel</Trans>}
         primary={false}
         onClick={this.props.onClose}
       />,
       <FlatButton
-        label="Apply"
+        label={<Trans>Apply</Trans>}
         primary={true}
         keyboardFocused={true}
         onClick={this._onApply}
@@ -135,14 +137,14 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           autoScrollBodyContent={true}
         >
           <SemiControlledTextField
-            floatingLabelText="Game name"
+            floatingLabelText={<Trans>Game name</Trans>}
             fullWidth
             type="text"
             value={name}
             onChange={value => this.setState({ name: value })}
           />
           <SemiControlledTextField
-            floatingLabelText="Game's window width"
+            floatingLabelText={<Trans>Game's window width</Trans>}
             fullWidth
             type="number"
             value={'' + windowDefaultWidth}
@@ -153,7 +155,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             }
           />
           <SemiControlledTextField
-            floatingLabelText="Game's window height"
+            floatingLabelText={<Trans>Game's window height</Trans>}
             fullWidth
             type="number"
             value={'' + windowDefaultHeight}
@@ -164,53 +166,73 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             }
           />
           <SemiControlledTextField
-            floatingLabelText="Author name"
+            floatingLabelText={<Trans>Author name</Trans>}
             fullWidth
-            hintText="Your name"
+            hintText={<Trans>Your name</Trans>}
             type="text"
             value={author}
             onChange={value => this.setState({ author: value })}
           />
           <SemiControlledTextField
-            floatingLabelText="Version number (X.Y.Z)"
+            floatingLabelText={<Trans>Version number (X.Y.Z)</Trans>}
             fullWidth
-            hintText="1.0.0"
+            hintText={<Trans>1.0.0</Trans>}
             type="text"
             value={version}
             onChange={value => this.setState({ version: value })}
           />
           <SemiControlledTextField
-            floatingLabelText="Package name (for iOS and Android)"
+            floatingLabelText={
+              <Trans>Package name (for iOS and Android)</Trans>
+            }
             fullWidth
-            hintText="com.example.mygame"
+            hintText={<Trans>com.example.mygame</Trans>}
             type="text"
             value={packageName}
             onChange={value => this.setState({ packageName: value })}
           />
           <SelectField
             fullWidth
-            floatingLabelText="Device orientation (for iOS and Android)"
+            floatingLabelText={
+              <Trans>Device orientation (for iOS and Android)</Trans>
+            }
             value={orientation}
             onChange={(e, i, value) => this.setState({ orientation: value })}
           >
-            <MenuItem value="default" primaryText="Platform default" />
-            <MenuItem value="landscape" primaryText="Landscape" />
-            <MenuItem value="portrait" primaryText="Portrait" />
+            <MenuItem
+              value="default"
+              primaryText={<Trans>Platform default</Trans>}
+            />
+            <MenuItem
+              value="landscape"
+              primaryText={<Trans>Landscape</Trans>}
+            />
+            <MenuItem value="portrait" primaryText={<Trans>Portrait</Trans>} />
           </SelectField>
           <SelectField
             fullWidth
-            floatingLabelText={'Scale mode (also called "Sampling")'}
+            floatingLabelText={
+              <Trans>Scale mode (also called "Sampling")</Trans>
+            }
             floatingLabelFixed
             value={scaleMode}
             onChange={(e, i, value) => this.setState({ scaleMode: value })}
           >
             <MenuItem
               value="linear"
-              primaryText="Linear (antialiased rendering, good for most games)"
+              primaryText={
+                <Trans>
+                  Linear (antialiased rendering, good for most games)
+                </Trans>
+              }
             />
             <MenuItem
               value="nearest"
-              primaryText="Nearest (no antialiasing, good for pixel perfect games)"
+              primaryText={
+                <Trans>
+                  Nearest (no antialiasing, good for pixel perfect games)
+                </Trans>
+              }
             />
           </SelectField>
           {scaleMode === 'nearest' && (
@@ -225,33 +247,42 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           )}
           <SelectField
             fullWidth
-            floatingLabelText="Fullscreen/game size mode"
+            floatingLabelText={<Trans>Fullscreen/game size mode</Trans>}
             floatingLabelFixed
             value={sizeOnStartupMode}
             onChange={(e, i, value) =>
               this.setState({ sizeOnStartupMode: value })
             }
           >
-            <MenuItem value="" primaryText="No changes to the game size" />
+            <MenuItem
+              value=""
+              primaryText={<Trans>No changes to the game size</Trans>}
+            />
             <MenuItem
               value="adaptWidth"
-              primaryText="Change width to fit the screen"
+              primaryText={<Trans>Change width to fit the screen</Trans>}
             />
             <MenuItem
               value="adaptHeight"
-              primaryText="Change height to fit the screen"
+              primaryText={<Trans>Change height to fit the screen</Trans>}
             />
           </SelectField>
           <SemiControlledTextField
-            floatingLabelText="AdMob application ID (for iOS and Android)"
+            floatingLabelText={
+              <Trans>AdMob application ID (for iOS and Android)</Trans>
+            }
             fullWidth
-            hintText="ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY"
+            hintText={<Trans>ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY</Trans>}
             type="text"
             value={adMobAppId}
             onChange={value => this.setState({ adMobAppId: value })}
           />
           <Checkbox
-            label="Display GDevelop splash at startup (in exported game)"
+            label={
+              <Trans>
+                Display GDevelop splash at startup (in exported game)
+              </Trans>
+            }
             checked={showGDevelopSplash}
             onCheck={(e, checked) => {
               if (!checked) {
@@ -277,7 +308,8 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             this.props.onChangeSubscription();
           }}
           mode="mandatory"
-          title="Disable GDevelop splash at startup"
+          id="Disable GDevelop splash at startup"
+          title={<Trans>Disable GDevelop splash at startup</Trans>}
         />
       </React.Fragment>
     );

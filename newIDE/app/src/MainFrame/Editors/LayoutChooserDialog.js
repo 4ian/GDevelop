@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import { RadioButton, RadioButtonGroup } from 'material-ui/RadioButton';
@@ -29,12 +30,12 @@ export default class LayoutChooserDialog extends Component {
   render() {
     const actions = [
       <FlatButton
-        label="Cancel"
+        label={<Trans>Cancel</Trans>}
         primary={false}
         onClick={this.props.onClose}
       />,
       <FlatButton
-        label="Choose"
+        label={<Trans>Choose</Trans>}
         primary={true}
         keyboardFocused={true}
         onClick={() => this.props.onChoose(this.state.selectedLayoutName)}

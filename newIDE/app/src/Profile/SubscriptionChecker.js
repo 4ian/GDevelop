@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
@@ -15,7 +15,8 @@ import {
 import { Trans } from '@lingui/macro';
 
 type Props = {|
-  title: string,
+  title: React.Node,
+  id: string,
   onChangeSubscription?: () => void,
   mode: 'try' | 'mandatory',
 |};
@@ -35,14 +36,14 @@ const styles = {
   thanksText: { textAlign: 'right', marginRight: 20, marginBottom: 0 },
 };
 
-export class SubscriptionCheckDialog extends Component<
+export class SubscriptionCheckDialog extends React.Component<
   DialogProps,
   DialogState
 > {
   state = { open: false };
 
   checkHasSubscription() {
-    const { userProfile, mode, title } = this.props;
+    const { userProfile, mode, id } = this.props;
     if (userProfile.subscription) {
       const hasPlan = !!userProfile.subscription.planId;
       if (hasPlan) {
@@ -56,7 +57,7 @@ export class SubscriptionCheckDialog extends Component<
     this.setState({
       open: true,
     });
-    sendSubscriptionCheckDialogShown({ mode, title });
+    sendSubscriptionCheckDialogShown({ mode, id });
 
     return false;
   }
@@ -154,7 +155,7 @@ export class SubscriptionCheckDialog extends Component<
   }
 }
 
-class SubscriptionChecker extends Component<Props, {}> {
+class SubscriptionChecker extends React.Component<Props, {}> {
   _dialog: ?SubscriptionCheckDialog = null;
 
   checkHasSubscription() {
@@ -173,6 +174,7 @@ class SubscriptionChecker extends Component<Props, {}> {
             userProfile={userProfile}
             ref={dialog => (this._dialog = dialog)}
             onChangeSubscription={this.props.onChangeSubscription}
+            id={this.props.id}
             title={this.props.title}
             mode={this.props.mode}
           />

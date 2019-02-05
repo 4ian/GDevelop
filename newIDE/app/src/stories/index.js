@@ -1687,6 +1687,7 @@ storiesOf('SubscriptionCheckDialog', module)
     <RefGetter onRef={ref => ref.checkHasSubscription()}>
       <SubscriptionCheckDialog
         title="Preview over wifi"
+        id="Preview over wifi"
         userProfile={fakeNoSubscriptionUserProfile}
         onChangeSubscription={action('change subscription')}
         mode="try"
@@ -1697,6 +1698,7 @@ storiesOf('SubscriptionCheckDialog', module)
     <RefGetter onRef={ref => ref.checkHasSubscription()}>
       <SubscriptionCheckDialog
         title="Preview over wifi"
+        id="Preview over wifi"
         userProfile={fakeNoSubscriptionUserProfile}
         onChangeSubscription={action('change subscription')}
         mode="mandatory"

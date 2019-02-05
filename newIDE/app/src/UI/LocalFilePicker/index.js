@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import React, { PureComponent } from 'react';
 import TextField from 'material-ui/TextField';
@@ -67,12 +68,12 @@ export default class LocalFilePicker extends PureComponent<Props, *> {
           floatingLabelText={this.props.floatingLabelText}
           floatingLabelFixed
           type="text"
-          hintText="Click to choose"
+          hintText={<Trans>Click to choose</Trans>}
           value={this.props.value}
           onChange={(event, value) => this.props.onChange(value)}
         />
         <FlatButton
-          label="..."
+          label={<Trans>...</Trans>}
           style={styles.button}
           onClick={this.onChooseFolder}
         />

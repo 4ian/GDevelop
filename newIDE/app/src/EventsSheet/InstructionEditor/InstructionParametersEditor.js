@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Divider from 'material-ui/Divider';
 import Toggle from 'material-ui/Toggle';
@@ -215,11 +217,13 @@ export default class InstructionParametersEditor extends React.Component<
             );
           })}
           {this._getNonCodeOnlyParametersCount(instructionMetadata) === 0 && (
-            <EmptyMessage>There is nothing to configure.</EmptyMessage>
+            <EmptyMessage>
+              <Trans>There is nothing to configure.</Trans>
+            </EmptyMessage>
           )}
           {this.props.isCondition && (
             <Toggle
-              label="Invert condition"
+              label={<Trans>Invert condition</Trans>}
               labelPosition="right"
               toggled={instruction.isInverted()}
               style={styles.invertToggle}

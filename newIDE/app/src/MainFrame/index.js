@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import * as React from 'react';
 import './MainFrame.css';
@@ -1291,7 +1292,9 @@ class MainFrame extends React.Component<Props, State> {
             />
           )}
           {!currentProject && (
-            <EmptyMessage>To begin, open or create a new project.</EmptyMessage>
+            <EmptyMessage>
+              <Trans>To begin, open or create a new project.</Trans>
+            </EmptyMessage>
           )}
         </Drawer>
         <Toolbar

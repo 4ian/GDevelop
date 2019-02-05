@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Divider from 'material-ui/Divider';
 import LocalFolderPicker from '../UI/LocalFolderPicker';
@@ -59,7 +60,9 @@ export default class LocalExamples extends Component {
     return (
       <Column noMargin>
         <Column>
-          <p>Choose or search for an example to open:</p>
+          <p>
+            <Trans>Choose or search for an example to open:</Trans>
+          </p>
         </Column>
         <Line>
           <ExamplesList
@@ -74,8 +77,8 @@ export default class LocalExamples extends Component {
               fullWidth
               value={this.state.outputPath}
               onChange={this._handleChangePath}
-              title="Folder where to create the game"
-              message="Choose where to create the game"
+              title={<Trans>Folder where to create the game</Trans>}
+              message={<Trans>Choose where to create the game</Trans>}
             />
           </Column>
         </Line>

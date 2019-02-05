@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { PureComponent } from 'react';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
@@ -102,7 +104,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
               ref={_searchTextField =>
                 (this.searchTextField = _searchTextField)
               }
-              hintText="Text to search"
+              hintText={<Trans>Text to search</Trans>}
               onChange={(e, searchText) =>
                 this.setState({ searchText, searchDirty: true })
               }
@@ -112,13 +114,13 @@ export default class SearchPanel extends PureComponent<Props, State> {
             <FlatButton
               disabled={!searchText}
               primary
-              label="Search"
+              label={<Trans>Search</Trans>}
               onClick={this.launchSearch}
             />
           </Line>
           <Line alignItems="baseline">
             <TextField
-              hintText="Text to replace"
+              hintText={<Trans>Text to replace</Trans>}
               onChange={(e, replaceText) => this.setState({ replaceText })}
               value={replaceText}
               fullWidth
@@ -129,19 +131,19 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 !searchText ||
                 (!hasEventSelected && searchInSelection)
               }
-              label="Replace"
+              label={<Trans>Replace</Trans>}
               onClick={this.launchReplace}
             />
           </Line>
           <Line noMargin alignItems="center" justifyContent="space-between">
             <Line noMargin alignItems="center">
               <InlineCheckbox
-                label="Case insensitive"
+                label={<Trans>Case insensitive</Trans>}
                 checked={!this.state.matchCase}
                 onCheck={(e, checked) => this.setState({ matchCase: !checked })}
               />
               {/* <InlineCheckbox //TODO: Implement search/replace in selection
-                label="Replace in selection"
+                label={<Trans>Replace in selection</Trans>}
                 checked={this.state.searchInSelection}
                 onCheck={(e, checked) =>
                   this.setState({ searchInSelection: checked })}

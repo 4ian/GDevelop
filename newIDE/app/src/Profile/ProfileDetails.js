@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Avatar from 'material-ui/Avatar';
 import { Column, Line } from '../UI/Grid';
@@ -26,7 +28,11 @@ export default ({ profile }: Props) =>
         <span style={styles.title}>You are connected as {profile.email}</span>
       </Line>
       <Line>
-        <p>An account allows you to access GDevelop services online.</p>
+        <p>
+          <Trans>
+            An account allows you to access GDevelop services online.
+          </Trans>
+        </p>
       </Line>
     </Column>
   ) : (

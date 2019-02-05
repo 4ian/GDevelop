@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
@@ -174,9 +175,13 @@ class GenericResourcesChooser extends Component {
     if (!this.state.open) return null;
 
     const actions = [
-      <FlatButton label="Close" primary={false} onClick={this._onClose} />,
       <FlatButton
-        label="Choose"
+        label={<Trans>Close</Trans>}
+        primary={false}
+        onClick={this._onClose}
+      />,
+      <FlatButton
+        label={<Trans>Choose</Trans>}
         primary={false}
         disabled={!this.state.chosenResourceUrl}
         onClick={this._onChoose}
@@ -193,8 +198,10 @@ class GenericResourcesChooser extends Component {
       >
         <div style={styles.explanations}>
           <p>
-            Adding resources from Dropbox, Google Drive... is coming soon!
-            Download GDevelop desktop version to use your own assets.
+            <Trans>
+              Adding resources from Dropbox, Google Drive... is coming soon!
+              Download GDevelop desktop version to use your own assets.
+            </Trans>
           </p>
         </div>
         <SelectableList
@@ -224,7 +231,7 @@ export default [
             urls={publicAudioUrls}
             urlsAreImages={false}
             createNewResource={() => new gd.AudioResource()}
-            title="Choose an audio file from the library"
+            title={<Trans>Choose an audio file from the library</Trans>}
             ref={chooser => (this._chooser = chooser)}
           />
         );
@@ -246,7 +253,7 @@ export default [
             urls={publicImageUrls}
             urlsAreImages
             createNewResource={() => new gd.ImageResource()}
-            title="Choose an image from the library"
+            title={<Trans>Choose an image from the library</Trans>}
             ref={chooser => (this._chooser = chooser)}
           />
         );
@@ -268,7 +275,7 @@ export default [
             urls={publicFontUrls}
             urlsAreImages={false}
             createNewResource={() => new gd.FontResource()}
-            title="Choose a font from the library"
+            title={<Trans>Choose a font from the library</Trans>}
             ref={chooser => (this._chooser = chooser)}
           />
         );

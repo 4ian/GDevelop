@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -107,7 +109,7 @@ export default class VariableField extends Component<Props, State> {
         />
         {this.props.onOpenDialog && !this.props.isInline && (
           <RaisedButton
-            label="..."
+            label={<Trans>...</Trans>}
             disabled={!this.props.variablesContainer}
             primary
             style={styles.moreButton}

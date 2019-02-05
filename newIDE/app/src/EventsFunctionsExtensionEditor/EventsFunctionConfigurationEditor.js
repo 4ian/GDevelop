@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import TextField from 'material-ui/TextField';
 import { Column, Line } from '../UI/Grid';
@@ -111,23 +113,23 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               >
                 <MenuItem
                   value={gd.EventsFunction.Action}
-                  primaryText="Action"
+                  primaryText={<Trans>Action</Trans>}
                 />
                 <MenuItem
                   value={gd.EventsFunction.Condition}
-                  primaryText="Condition"
+                  primaryText={<Trans>Condition</Trans>}
                 />
                 <MenuItem
                   value={gd.EventsFunction.Expression}
-                  primaryText="Expression"
+                  primaryText={<Trans>Expression</Trans>}
                 />
                 <MenuItem
                   value={gd.EventsFunction.StringExpression}
-                  primaryText="String Expression"
+                  primaryText={<Trans>String Expression</Trans>}
                 />
               </SelectField>
               <TextField
-                hintText="Full name displayed in editor"
+                hintText={<Trans>Full name displayed in editor</Trans>}
                 value={eventsFunction.getFullName()}
                 onChange={(e, text) => {
                   eventsFunction.setFullName(text);
@@ -137,7 +139,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             </Line>
             <Line noMargin>
               <TextField
-                hintText="Description, displayed in editor"
+                hintText={<Trans>Description, displayed in editor</Trans>}
                 fullWidth
                 multiLine
                 value={eventsFunction.getDescription()}
@@ -151,7 +153,12 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               {type === gd.EventsFunction.Action ||
               type === gd.EventsFunction.Condition ? (
                 <TextField
-                  hintText="Sentence in Events Sheet (write _PARAMx_ for parameters, e.g: _PARAM1_)"
+                  hintText={
+                    <Trans>
+                      Sentence in Events Sheet (write _PARAMx_ for parameters,
+                      e.g: _PARAM1_)
+                    </Trans>
+                  }
                   fullWidth
                   value={eventsFunction.getSentence()}
                   onChange={(e, text) => {
@@ -172,7 +179,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                       <MiniToolbarText>Parameter #{i + 1}:</MiniToolbarText>
                       <Column expand noMargin>
                         <SemiControlledTextField
-                          hintText="Enter the parameter name"
+                          hintText={<Trans>Enter the parameter name</Trans>}
                           value={parameter.getName()}
                           onChange={text => {
                             if (!validateParameterName(text)) return;
@@ -201,7 +208,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                     <Line expand noMargin>
                       <Column expand>
                         <SelectField
-                          floatingLabelText="Type"
+                          floatingLabelText={<Trans>Type</Trans>}
                           value={parameter.getType()}
                           onChange={(e, i, value) => {
                             parameter.setType(value);
@@ -210,26 +217,32 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                           }}
                           fullWidth
                         >
-                          <MenuItem value="objectList" primaryText="Objects" />
-                          <MenuItem value="expression" primaryText="Number" />
+                          <MenuItem
+                            value="objectList"
+                            primaryText={<Trans>Objects</Trans>}
+                          />
+                          <MenuItem
+                            value="expression"
+                            primaryText={<Trans>Number</Trans>}
+                          />
                           <MenuItem
                             value="string"
-                            primaryText="String (text)"
+                            primaryText={<Trans>String (text)</Trans>}
                           />
                           <MenuItem
                             value="key"
-                            primaryText="Keyboard Key (text)"
+                            primaryText={<Trans>Keyboard Key (text)</Trans>}
                           />
                           <MenuItem
                             value="mouse"
-                            primaryText="Mouse button (text)"
+                            primaryText={<Trans>Mouse button (text)</Trans>}
                           />
                         </SelectField>
                       </Column>
                       {parameter.getType() === 'objectList' && (
                         <Column expand>
                           <SelectField
-                            floatingLabelText="Object type"
+                            floatingLabelText={<Trans>Object type</Trans>}
                             floatingLabelFixed
                             value={parameter.getExtraInfo()}
                             onChange={(e, i, value) => {
@@ -239,7 +252,10 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                             }}
                             fullWidth
                           >
-                            <MenuItem value="" primaryText="Any object" />
+                            <MenuItem
+                              value=""
+                              primaryText={<Trans>Any object</Trans>}
+                            />
                             {objectMetadata.map(
                               (metadata: EnumeratedObjectMetadata) => {
                                 if (metadata.name === '') {
@@ -263,7 +279,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                     <Line expand noMargin>
                       <Column expand>
                         <TextField
-                          floatingLabelText="Description"
+                          floatingLabelText={<Trans>Description</Trans>}
                           value={parameter.getDescription()}
                           onChange={(e, text) => {
                             parameter.setDescription(text);
@@ -277,7 +293,9 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 )
               )}
               {parameters.size() === 0 ? (
-                <EmptyMessage>No parameters for this function.</EmptyMessage>
+                <EmptyMessage>
+                  <Trans>No parameters for this function.</Trans>
+                </EmptyMessage>
               ) : null}
               <Line justifyContent="space-between">
                 <Column>
@@ -285,7 +303,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                 </Column>
                 <Column>
                   <FlatButton
-                    label="Add a parameter"
+                    label={<Trans>Add a parameter</Trans>}
                     onClick={this._addParameter}
                   />
                 </Column>

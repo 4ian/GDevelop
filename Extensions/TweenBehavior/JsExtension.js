@@ -66,7 +66,7 @@ module.exports = {
       })
     );
 
-   const tb = extension
+   const behavior = extension
       .addBehavior(
         "TweenBehavior",
         t("Tween animation"),
@@ -83,14 +83,14 @@ module.exports = {
     //.addIncludeFile("Extensions/TweenBehavior/LICENSE-MIT.txt");
 
     // Behavior related
-    tb.addAction(
+    behavior.addAction(
         "AddObjectVariableTween",
         t("Add object variable tween"),
         t("Add a tween animation for an object variable."),
         t(
-          "Tween variable _PARAM3_ of _PARAM0_ from _PARAM4_ to _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_"
+          "Tween the variable _PARAM3_ of _PARAM0_ from _PARAM4_ to _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_"
         ),
-        t("Tween animation"),
+        t("Tween animation/Object variables"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -108,14 +108,14 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("addObjectVariableTween");
 
-      tb.addAction(
+      behavior.addAction(
         "AddObjectPositionTween",
         t("Add object position tween"),
-        t("Add a tween animation for an object position."),
+        t("Add a tween animation for the object position."),
         t(
-          "Tween position of _PARAM0_ to x: _PARAM3_, y: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_"
+          "Tween the position of _PARAM0_ to x: _PARAM3_, y: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_"
         ),
-        t("Tween animation"),
+        t("Tween animation/Position"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -132,7 +132,146 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("addObjectPositionTween");
 
-      tb.addCondition(
+      behavior.addAction(
+        "AddObjectPositionXTween",
+        t("Add object position X tween"),
+        t("Add a tween animation for the object X position."),
+        t(
+          "Tween the X position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
+        ),
+        t("Tween animation/Position"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
+      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("expression", t("To X"), "", false)
+      .addParameter("string", t("Easing"), "", false)
+      .setDefaultValue("linear")
+      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("yesorno", t("Destroy this object when tween finishes"), "", false)
+      .setDefaultValue("no")
+      .getCodeExtraInformation()
+      .setFunctionName("addObjectPositionXTween");
+
+      behavior.addAction(
+        "AddObjectPositionYTween",
+        t("Add object position Y tween"),
+        t("Add a tween animation for the object Y position."),
+        t(
+          "Tween the Y position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
+        ),
+        t("Tween animation/Position"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
+      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("expression", t("To Y"), "", false)
+      .addParameter("string", t("Easing"), "", false)
+      .setDefaultValue("linear")
+      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("yesorno", t("Destroy this object when tween finishes"), "", false)
+      .setDefaultValue("no")
+      .getCodeExtraInformation()
+      .setFunctionName("addObjectPositionYTween");
+
+      behavior.addAction(
+        "AddObjectAngleTween",
+        t("Add object angle tween"),
+        t("Add a tween animation for the object angle."),
+        t(
+          "Tween the angle of _PARAM0_ to _PARAM3_° with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
+        ),
+        t("Tween animation"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
+      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("expression", t("To angle (in degrees)"), "", false)
+      .addParameter("string", t("Easing"), "", false)
+      .setDefaultValue("linear")
+      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("yesorno", t("Destroy this object when tween finishes"), "", false)
+      .setDefaultValue("no")
+      .getCodeExtraInformation()
+      .setFunctionName("addObjectAngleTween");
+
+      behavior.addAction(
+        "AddObjectSizeTween",
+        t("Add object size tween"),
+        t("Add a tween animation for the object size. (Note: the size can never be less than 0)"),
+        t(
+          "Tween the size of _PARAM0_ to width: _PARAM3_, height: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_"
+        ),
+        t("Tween animation/Size"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
+      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("expression", t("To width"), "", false)
+      .addParameter("expression", t("To height"), "", false)
+      .addParameter("string", t("Easing"), "", false)
+      .setDefaultValue("linear")
+      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("yesorno", t("Destroy this object when tween finishes"), "", false)
+      .setDefaultValue("no")
+      .getCodeExtraInformation()
+      .setFunctionName("addObjectSizeTween");
+
+      behavior.addAction(
+        "AddObjectWidthTween",
+        t("Add object with tween"),
+        t("Add a tween animation for the object width. (Note: the width can never be less than 0)"),
+        t(
+          "Tween the width of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
+        ),
+        t("Tween animation/Size"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
+      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("expression", t("To width"), "", false)
+      .addParameter("string", t("Easing"), "", false)
+      .setDefaultValue("linear")
+      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("yesorno", t("Destroy this object when tween finishes"), "", false)
+      .setDefaultValue("no")
+      .getCodeExtraInformation()
+      .setFunctionName("addObjectWidthTween");
+
+      behavior.addAction(
+        "AddObjectHeightTween",
+        t("Add object height tween"),
+        t("Add a tween animation for the object height. (Note: the height can never be less than 0)"),
+        t(
+          "Tween the height of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
+        ),
+        t("Tween animation/Size"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
+      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("expression", t("To height"), "", false)
+      .addParameter("string", t("Easing"), "", false)
+      .setDefaultValue("linear")
+      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("yesorno", t("Destroy this object when tween finishes"), "", false)
+      .setDefaultValue("no")
+      .getCodeExtraInformation()
+      .setFunctionName("addObjectHeightTween");
+
+      behavior.addCondition(
         "IsPlaying",
         t("Tween is playing"),
         t("Check if the tween animation is currently playing."),
@@ -149,7 +288,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("isPlaying");
 
-      tb.addCondition(
+      behavior.addCondition(
         "HasFinished",
         t("Tween finished playing"),
         t("Check if the tween animation has finished playing."),
@@ -166,7 +305,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("hasFinished");
 
-      tb.addAction(
+      behavior.addAction(
         "PauseTween",
         t("Pause a tween"),
         t("Pause the running tween animation."),
@@ -183,7 +322,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("pauseTween");
 
-      tb.addAction(
+      behavior.addAction(
         "StopTween",
         t("Stop a tween"),
         t("Stop the running tween animation."),
@@ -201,7 +340,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("stopTween");
 
-      tb.addAction(
+      behavior.addAction(
         "ResumeTween",
         t("Resume a tween"),
         t("Resume the tween animation."),
@@ -218,7 +357,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("resumeTween");
 
-      tb.addAction(
+      behavior.addAction(
         "RemoveTween",
         t("Remove a tween"),
         t("Remove the tween animation from the object."),
@@ -235,7 +374,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("removeTween");
 
-      tb.addExpression(
+      behavior.addExpression(
         "GetProgress",
         t("Progress of a tween"),
         t("Progress of a tween (between 0.0 and 1.0)"),

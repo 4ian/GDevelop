@@ -24,7 +24,6 @@ gdjs.TweenRuntimeBehavior.TweenInstance = function (instance, hasFinished, progr
   this.hasFinished = hasFinished;
   this.progress = progress;
   this.currentValue = currentValue;
-  this.removeObjectFromScene = false;
 };
 
 gdjs.TweenRuntimeBehavior.ObjectVariableTweenInstance = function (instance, hasFinished, progress, variable, currentValue) {
@@ -41,54 +40,115 @@ gdjs.TweenRuntimeBehavior.ObjectPositionTweenInstance = function (instance, hasF
   this.y = y;
 }
 
-gdjs.TweenRuntimeBehavior.prototype._addObjectVariableTween = (identifier, instance, variable, currentValue) => {
+gdjs.TweenRuntimeBehavior.ObjectPositionXTweenInstance = function (instance, hasFinished, progress, x) {
+  gdjs.TweenRuntimeBehavior.TweenInstance.call(this, instance, hasFinished, progress);
+
+  this.x = x;
+}
+
+gdjs.TweenRuntimeBehavior.ObjectPositionYTweenInstance = function (instance, hasFinished, progress, y) {
+  gdjs.TweenRuntimeBehavior.TweenInstance.call(this, instance, hasFinished, progress);
+
+  this.y = y;
+}
+
+gdjs.TweenRuntimeBehavior.ObjectSizeTweenInstance = function (instance, hasFinished, progress, widht, height) {
+  gdjs.TweenRuntimeBehavior.TweenInstance.call(this, instance, hasFinished, progress);
+
+  this.widht = widht;
+  this.height = height;
+}
+
+gdjs.TweenRuntimeBehavior.ObjectWidthTweenInstance = function (instance, hasFinished, progress, width) {
+  gdjs.TweenRuntimeBehavior.TweenInstance.call(this, instance, hasFinished, progress);
+
+  this.width = width;
+}
+
+gdjs.TweenRuntimeBehavior.ObjectHeightTweenInstance = function (instance, hasFinished, progress, height) {
+  gdjs.TweenRuntimeBehavior.TweenInstance.call(this, instance, hasFinished, progress);
+
+  this.height = height;
+}
+
+gdjs.TweenRuntimeBehavior.ObjectAngleTweenInstance = function (instance, hasFinished, progress, angle) {
+  gdjs.TweenRuntimeBehavior.TweenInstance.call(this, instance, hasFinished, progress);
+
+  this.angle = angle;
+}
+
+gdjs.TweenRuntimeBehavior.prototype._addObjectVariableTween = function(identifier, instance, variable, currentValue){
   this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.ObjectVariableTweenInstance(instance, false, 0, variable, currentValue);
 };
 
-gdjs.TweenRuntimeBehavior.prototype._addObjectPositionTween = (identifier, instance, x, y) => {
+gdjs.TweenRuntimeBehavior.prototype._addObjectPositionTween = function(identifier, instance, x, y) {
   this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.ObjectPositionTweenInstance(instance, false, 0, x, y);
 };
 
-gdjs.TweenRuntimeBehavior.prototype._getTween = (identifier) => {
+gdjs.TweenRuntimeBehavior.prototype._addObjectPositionXTween = function(identifier, instance, x) {
+  this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.ObjectPositionXTweenInstance(instance, false, 0, x);
+};
+
+gdjs.TweenRuntimeBehavior.prototype._addObjectPositionYTween = function(identifier, instance, y) {
+  this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.ObjectPositionYTweenInstance(instance, false, 0, y);
+};
+
+gdjs.TweenRuntimeBehavior.prototype._addObjectSizeTween = function(identifier, instance, widht, height) {
+  this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.ObjectSizeTweenInstance(instance, false, 0, widht, height);
+};
+
+gdjs.TweenRuntimeBehavior.prototype._addObjectWidthTween = function(identifier, instance, width) {
+  this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.ObjectWidthTweenInstance(instance, false, 0, width);
+};
+
+gdjs.TweenRuntimeBehavior.prototype._addObjectHeightTween = function(identifier, instance, height) {
+  this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.ObjectHeightTweenInstance(instance, false, 0, height);
+};
+
+gdjs.TweenRuntimeBehavior.prototype._addObjectAngleTween = function(identifier, instance, angle) {
+  this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.ObjectAngleTweenInstance(instance, false, 0, angle);
+};
+
+gdjs.TweenRuntimeBehavior.prototype._getTween = function(identifier) {
   return this._tweens[identifier];
 };
 
-gdjs.TweenRuntimeBehavior.prototype._tweenExists = (identifier) => {
-  if (identifier in this._tweens) {
-    return true
-  }
-  return false;
-};
+gdjs.TweenRuntimeBehavior.prototype._tweenExists = function(identifier){ 
+  return !!this._tweens[identifier]; 
+}
 
-gdjs.TweenRuntimeBehavior.prototype._tweenIsPlaying = (identifier) => {
+gdjs.TweenRuntimeBehavior.prototype._tweenIsPlaying = function(identifier) {
   return this._tweens[identifier].instance.isPlaying();
 };
 
-gdjs.TweenRuntimeBehavior.prototype._pauseTween = (identifier) => {
+gdjs.TweenRuntimeBehavior.prototype._pauseTween = function(identifier) {
   return this._tweens[identifier].instance.pause();
 };
 
-gdjs.TweenRuntimeBehavior.prototype._resumeTween = (identifier) => {
+gdjs.TweenRuntimeBehavior.prototype._resumeTween = function(identifier) {
   return this._tweens[identifier].instance.resume();
 };
 
-gdjs.TweenRuntimeBehavior.prototype._stopTween = (identifier, JumpToDest) => {
+gdjs.TweenRuntimeBehavior.prototype._stopTween = function(identifier, JumpToDest) {
   return this._tweens[identifier].instance.stop(JumpToDest);
 };
 
-gdjs.TweenRuntimeBehavior.prototype._setTweenFinished = (identifier, hasFinished) => {
+gdjs.TweenRuntimeBehavior.prototype._setTweenFinished = function(identifier, hasFinished) {
   this._tweens[identifier].hasFinished = hasFinished;
 };
 
-gdjs.TweenRuntimeBehavior.prototype._tweenHasFinished = (identifier) => {
+gdjs.TweenRuntimeBehavior.prototype._tweenHasFinished = function(identifier) {
   return this._tweens[identifier].hasFinished;
 };
 
-gdjs.TweenRuntimeBehavior.prototype._setRemoveObjectFromScene = (identifier, removeObjectFromScene) => {
-  return this._tweens[identifier].removeObjectFromScene = removeObjectFromScene;
+gdjs.TweenRuntimeBehavior.prototype._removeObjectFromScene = function(identifier) {
+  if (this._tweenExists(identifier)){
+    this._removeTween(identifier)
+  }
+  return this.owner.deleteFromScene(this.runtimeScene);
 };
 
-gdjs.TweenRuntimeBehavior.prototype._removeTween = (identifier) => {
+gdjs.TweenRuntimeBehavior.prototype._removeTween = function(identifier) {
   this._tweens[identifier].instance.dispose();
   delete this._tweens[identifier];
 };
@@ -114,10 +174,10 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectVariableTween = function (
 ) {
 
   if (this._tweenExists(identifier)) {
-    return;
+    this.removeTween(identifier);
   }
 
-  let newTweenable = new shifty.Tweenable();
+  var newTweenable = new shifty.Tweenable();
 
   newTweenable.setConfig({
     from: { value: fromValue, progress: 0.0 },
@@ -125,9 +185,11 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectVariableTween = function (
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      //variable.setNumber(state.value);
+      //var instanceVariable = this.owner.getVariables().get(variable);
       this._getTween(identifier).progress = state.progress;
       this._getTween(identifier).currentValue = state.value;
+      //this.owner.setVariableNumber(instanceVariable, state.value) 
+      this.owner.setVariableNumber(variable, state.value);
       console.log(state);
     }
   });
@@ -137,8 +199,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectVariableTween = function (
   if (destroyObjectWhenFinished) {
     this._tweens[identifier].instance.tween().then(() => {
 
-      this._removeTween(identifier);
-      this._setRemoveObjectFromScene(identifier, true);
+      this._removeObjectFromScene(identifier);
 
     });
   } else {
@@ -151,8 +212,8 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectVariableTween = function (
 /**
  * Add an object position tween.
  * @param {string} identifier Unique id to idenfify the tween
- * @param {number} toX The object variable to store the tweened value
- * @param {number} toY Start value
+ * @param {number} toX The target X position
+ * @param {number} toY The target Y position
  * @param {string} easingValue Type of easing
  * @param {number} durationValue Duration in milliseconds
  * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
@@ -167,17 +228,16 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function (
 ) {
 
   if (this._tweenExists(identifier)) {
-    this.removeTween(tweenBehavior, identifier);
+    this.removeTween(identifier);
   }
 
-  let newTweenable = new shifty.Tweenable();
+  var newTweenable = new shifty.Tweenable();
   newTweenable.setConfig({
     from: { x: this.owner.getX(), y: this.owner.getY(), progress: 0.0 },
     to: { x: toX, y: toY, progress: 1.0 },
     duration: durationValue,
     easing: easingValue,
     step: state => {
-
       this._getTween(identifier).progress = state.progress;
       this._getTween(identifier).x = state.x;
       this._getTween(identifier).y = state.y;
@@ -191,14 +251,306 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function (
 
   if (destroyObjectWhenFinished) {
     this._tweens[identifier].instance.tween().then(() => {
-      this._removeTween(identifier);
-      this._setRemoveObjectFromScene(identifier, true);
+      this._removeObjectFromScene(identifier);
     });
   } else {
     this._tweens[identifier].instance.tween().then(() => {
       this._setTweenFinished(identifier, true);
     });
   }
+};
+
+/**
+ * Add an object X position tween.
+ * @param {string} identifier Unique id to idenfify the tween
+ * @param {number} toX The target X position
+ * @param {string} easingValue Type of easing
+ * @param {number} durationValue Duration in milliseconds
+ * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
+ */
+gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function (
+  identifier,
+  toX,
+  easingValue,
+  durationValue,
+  destroyObjectWhenFinished
+) {
+
+  if (this._tweenExists(identifier)) {
+    this.removeTween(identifier);
+  }
+
+  var newTweenable = new shifty.Tweenable();
+  newTweenable.setConfig({
+    from: { x: this.owner.getX(), progress: 0.0 },
+    to: { x: toX, progress: 1.0 },
+    duration: durationValue,
+    easing: easingValue,
+    step: state => {
+      this._getTween(identifier).progress = state.progress;
+      this._getTween(identifier).x = state.x;
+      this.owner.setX(state.x);
+      console.log(state);
+    }
+});
+
+this._addObjectPositionXTween(identifier, newTweenable, this.owner.getX());
+
+if (destroyObjectWhenFinished) {
+  this._tweens[identifier].instance.tween().then(() => {
+    this._removeObjectFromScene(identifier);
+  });
+} else {
+  this._tweens[identifier].instance.tween().then(() => {
+    this._setTweenFinished(identifier, true);
+  });
+}
+};
+
+/**
+ * Add an object Y position tween.
+ * @param {string} identifier Unique id to idenfify the tween
+ * @param {number} toY The target Y position
+ * @param {string} easingValue Type of easing
+ * @param {number} durationValue Duration in milliseconds
+ * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
+ */
+gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function (
+  identifier,
+  toY,
+  easingValue,
+  durationValue,
+  destroyObjectWhenFinished
+) {
+
+  if (this._tweenExists(identifier)) {
+    this.removeTween(identifier);
+  }
+
+  var newTweenable = new shifty.Tweenable();
+  newTweenable.setConfig({
+    from: { y: this.owner.getY(), progress: 0.0 },
+    to: { y: toY, progress: 1.0 },
+    duration: durationValue,
+    easing: easingValue,
+    step: state => {
+      this._getTween(identifier).progress = state.progress;
+      this._getTween(identifier).y = state.y;
+      this.owner.setY(state.y);
+      console.log(state);
+    }
+});
+
+this._addObjectPositionYTween(identifier, newTweenable, this.owner.getY());
+
+if (destroyObjectWhenFinished) {
+  this._tweens[identifier].instance.tween().then(() => {
+    this._removeObjectFromScene(identifier);
+  });
+} else {
+  this._tweens[identifier].instance.tween().then(() => {
+    this._setTweenFinished(identifier, true);
+  });
+}
+};
+
+/**
+ * Add an object angle tween.
+ * @param {string} identifier Unique id to idenfify the tween
+ * @param {number} toAngle The target angle
+ * @param {string} easingValue Type of easing
+ * @param {number} durationValue Duration in milliseconds
+ * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
+ */
+gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function (
+  identifier,
+  toAngle,
+  easingValue,
+  durationValue,
+  destroyObjectWhenFinished
+) {
+
+  if (this._tweenExists(identifier)) {
+    this.removeTween(identifier);
+  }
+
+  if (toAngle < 0) toAngle = 0;
+  if (toAngle > 360) toAngle = 360;
+
+  var newTweenable = new shifty.Tweenable();
+  newTweenable.setConfig({
+    from: { angle: this.owner.getAngle(), progress: 0.0 },
+    to: { angle: toAngle, progress: 1.0 },
+    duration: durationValue,
+    easing: easingValue,
+    step: state => {
+      this._getTween(identifier).progress = state.progress;
+      this._getTween(identifier).angle = state.angle;
+      this.owner.setAngle(state.angle);
+      console.log(state);
+    }
+});
+
+this._addObjectAngleTween(identifier, newTweenable, this.owner.getAngle());
+
+if (destroyObjectWhenFinished) {
+  this._tweens[identifier].instance.tween().then(() => {
+    this._removeObjectFromScene(identifier);
+  });
+} else {
+  this._tweens[identifier].instance.tween().then(() => {
+    this._setTweenFinished(identifier, true);
+  });
+}
+};
+
+/**
+ * Add an object size tween.
+ * @param {string} identifier Unique id to idenfify the tween
+ * @param {number} toWidth The target width
+ * @param {number} toHeight The target height
+ * @param {string} easingValue Type of easing
+ * @param {number} durationValue Duration in milliseconds
+ * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
+ */
+gdjs.TweenRuntimeBehavior.prototype.addObjectSizeTween = function (
+  identifier,
+  toWidth,
+  toHeight,
+  easingValue,
+  durationValue,
+  destroyObjectWhenFinished
+) {
+
+  if (this._tweenExists(identifier)) {
+    this.removeTween(identifier);
+  }
+
+  if (toWidth < 0) toWidth = 0;
+  if (toHeight < 0) toHeight = 0;
+
+  var newTweenable = new shifty.Tweenable();
+  newTweenable.setConfig({
+    from: { width: this.owner.getWidth(), height: this.owner.getHeight(), progress: 0.0 },
+    to: { width: toWidth, height: toHeight, progress: 1.0 },
+    duration: durationValue,
+    easing: easingValue,
+    step: state => {
+
+      this._getTween(identifier).progress = state.progress;
+      this._getTween(identifier).width = state.widht;
+      this._getTween(identifier).height = state.height;
+      this.owner.setWidth(state.widht);
+      this.owner.setHeight(state.height);
+      console.log(state);
+    }
+  });
+
+  this._addObjectSizeTween(identifier, newTweenable, this.owner.getWidth(), this.owner.getHeight());
+
+  if (destroyObjectWhenFinished) {
+    this._tweens[identifier].instance.tween().then(() => {
+      this._removeObjectFromScene(identifier);
+    });
+  } else {
+    this._tweens[identifier].instance.tween().then(() => {
+      this._setTweenFinished(identifier, true);
+    });
+  }
+}
+
+/**
+ * Add an object width tween.
+ * @param {string} identifier Unique id to idenfify the tween
+ * @param {number} toWidth The target width
+ * @param {string} easingValue Type of easing
+ * @param {number} durationValue Duration in milliseconds
+ * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
+ */
+gdjs.TweenRuntimeBehavior.prototype.addObjectWidthTween = function (
+  identifier,
+  toWidth,
+  easingValue,
+  durationValue,
+  destroyObjectWhenFinished
+) {
+
+  if (this._tweenExists(identifier)) {
+    this.removeTween(identifier);
+  }
+
+  var newTweenable = new shifty.Tweenable();
+  newTweenable.setConfig({
+    from: { width: this.owner.getWidth(), progress: 0.0 },
+    to: { width: toWidth, progress: 1.0 },
+    duration: durationValue,
+    easing: easingValue,
+    step: state => {
+      this._getTween(identifier).progress = state.progress;
+      this._getTween(identifier).width = state.width;
+      this.owner.setY(state.width);
+      console.log(state);
+    }
+});
+
+this._addObjectWidthTween(identifier, newTweenable, this.owner.getWidth());
+
+if (destroyObjectWhenFinished) {
+  this._tweens[identifier].instance.tween().then(() => {
+    this._removeObjectFromScene(identifier);
+  });
+} else {
+  this._tweens[identifier].instance.tween().then(() => {
+    this._setTweenFinished(identifier, true);
+  });
+}
+};
+
+/**
+ * Add an object height tween.
+ * @param {string} identifier Unique id to idenfify the tween
+ * @param {number} toHeight The target height
+ * @param {string} easingValue Type of easing
+ * @param {number} durationValue Duration in milliseconds
+ * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
+ */
+gdjs.TweenRuntimeBehavior.prototype.addObjectHeightTween = function (
+  identifier,
+  toHeight,
+  easingValue,
+  durationValue,
+  destroyObjectWhenFinished
+) {
+
+  if (this._tweenExists(identifier)) {
+    this.removeTween(identifier);
+  }
+
+  var newTweenable = new shifty.Tweenable();
+  newTweenable.setConfig({
+    from: { height: this.owner.getHeight(), progress: 0.0 },
+    to: { height: toHeight, progress: 1.0 },
+    duration: durationValue,
+    easing: easingValue,
+    step: state => {
+      this._getTween(identifier).progress = state.progress;
+      this._getTween(identifier).height = state.height;
+      this.owner.setHeight(state.height);
+      console.log(state);
+    }
+});
+
+this._addObjectHeightTween(identifier, newTweenable, this.owner.getHeight());
+
+if (destroyObjectWhenFinished) {
+  this._tweens[identifier].instance.tween().then(() => {
+    this._removeObjectFromScene(identifier);
+  });
+} else {
+  this._tweens[identifier].instance.tween().then(() => {
+    this._setTweenFinished(identifier, true);
+  });
+}
 };
 
 /**

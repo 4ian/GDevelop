@@ -34,29 +34,32 @@ export const create = (authentification: Authentification) => {
       authentification={authentification}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
     >
-      <MainFrame
-        previewLauncher={<BrowserS3PreviewLauncher />}
-        exportDialog={<ExportDialog exporters={getBrowserExporters()} />}
-        createDialog={
-          <CreateProjectDialog
-            examplesComponent={BrowserExamples}
-            startersComponent={BrowserStarters}
-          />
-        }
-        introDialog={<BrowserIntroDialog />}
-        saveDialog={<BrowserSaveDialog />}
-        onReadFromPathOrURL={BrowserProjectOpener.readInternalFile}
-        resourceSources={browserResourceSources}
-        resourceExternalEditors={browserResourceExternalEditors}
-        authentification={authentification}
-        extensionsLoader={makeExtensionsLoader({
-          objectsEditorService: ObjectsEditorService,
-          objectsRenderingService: ObjectsRenderingService,
-          filterExamples: !Window.isDev(),
-        })}
-        initialPathsOrURLsToOpen={appArguments['_']}
-        eventsFunctionWriter={makeBrowserS3EventsFunctionWriter()}
-      />
+      {({ i18n }) => (
+        <MainFrame
+          i18n={i18n}
+          previewLauncher={<BrowserS3PreviewLauncher />}
+          exportDialog={<ExportDialog exporters={getBrowserExporters()} />}
+          createDialog={
+            <CreateProjectDialog
+              examplesComponent={BrowserExamples}
+              startersComponent={BrowserStarters}
+            />
+          }
+          introDialog={<BrowserIntroDialog />}
+          saveDialog={<BrowserSaveDialog />}
+          onReadFromPathOrURL={BrowserProjectOpener.readInternalFile}
+          resourceSources={browserResourceSources}
+          resourceExternalEditors={browserResourceExternalEditors}
+          authentification={authentification}
+          extensionsLoader={makeExtensionsLoader({
+            objectsEditorService: ObjectsEditorService,
+            objectsRenderingService: ObjectsRenderingService,
+            filterExamples: !Window.isDev(),
+          })}
+          initialPathsOrURLsToOpen={appArguments['_']}
+          eventsFunctionWriter={makeBrowserS3EventsFunctionWriter()}
+        />
+      )}
     </Providers>
   );
 

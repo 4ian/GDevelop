@@ -8,10 +8,12 @@ import Authentification from '../Utils/GDevelopServices/Authentification';
 import PreferencesProvider from './Preferences/PreferencesProvider';
 import PreferencesContext from './Preferences/PreferencesContext';
 import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 
 type Props = {|
   authentification: Authentification,
-  children: React$Element<*>,
+  children: ({ i18n: I18nType }) => React.Node,
   disableCheckForUpdates: boolean,
 |};
 
@@ -30,7 +32,7 @@ export default class Providers extends React.Component<Props, {||}> {
               <GDI18nProvider language="fr">
                 <MuiThemeProvider muiTheme={getTheme(values.themeName)}>
                   <UserProfileProvider authentification={authentification}>
-                    {children}
+                    <I18n update>{({ i18n }) => children({ i18n })}</I18n>
                   </UserProfileProvider>
                 </MuiThemeProvider>
               </GDI18nProvider>

@@ -37,20 +37,25 @@ export const create = (authentification: Authentification) => {
         authentification={authentification}
         disableCheckForUpdates={!!appArguments['disable-update-check']}
       >
-        <ExternalEditor
-          serverPort={appArguments['server-port']}
-          isIntegrated={appArguments['mode'] === 'integrated'}
-          editor={appArguments['editor']}
-          editedElementName={appArguments['edited-element-name']}
-        >
-          <MainFrame
-            resourceSources={localResourceSources}
-            authentification={authentification}
-            onReadFromPathOrURL={() => Promise.reject('Should never be called')}
-            resourceExternalEditors={localResourceExternalEditors}
-            initialPathsOrURLsToOpen={[]}
-          />
-        </ExternalEditor>
+        {({ i18n }) => (
+          <ExternalEditor
+            serverPort={appArguments['server-port']}
+            isIntegrated={appArguments['mode'] === 'integrated'}
+            editor={appArguments['editor']}
+            editedElementName={appArguments['edited-element-name']}
+          >
+            <MainFrame
+              i18n={i18n}
+              resourceSources={localResourceSources}
+              authentification={authentification}
+              onReadFromPathOrURL={() =>
+                Promise.reject('Should never be called')
+              }
+              resourceExternalEditors={localResourceExternalEditors}
+              initialPathsOrURLsToOpen={[]}
+            />
+          </ExternalEditor>
+        )}
       </Providers>
     );
   } else {
@@ -59,32 +64,35 @@ export const create = (authentification: Authentification) => {
         authentification={authentification}
         disableCheckForUpdates={!!appArguments['disable-update-check']}
       >
-        <ElectronEventsBridge>
-          <MainFrame
-            previewLauncher={<LocalPreviewLauncher />}
-            exportDialog={<ExportDialog exporters={getLocalExporters()} />}
-            createDialog={
-              <CreateProjectDialog
-                examplesComponent={LocalExamples}
-                startersComponent={LocalStarters}
-              />
-            }
-            onSaveProject={LocalProjectWriter.saveProject}
-            onChooseProject={LocalProjectOpener.chooseProjectFile}
-            onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
-            resourceSources={localResourceSources}
-            resourceExternalEditors={localResourceExternalEditors}
-            authentification={authentification}
-            extensionsLoader={makeExtensionsLoader({
-              gd,
-              objectsEditorService: ObjectsEditorService,
-              objectsRenderingService: ObjectsRenderingService,
-              filterExamples: !Window.isDev(),
-            })}
-            initialPathsOrURLsToOpen={appArguments['_']}
-            eventsFunctionWriter={makeLocalEventsFunctionWriter()}
-          />
-        </ElectronEventsBridge>
+        {({ i18n }) => (
+          <ElectronEventsBridge>
+            <MainFrame
+              i18n={i18n}
+              previewLauncher={<LocalPreviewLauncher />}
+              exportDialog={<ExportDialog exporters={getLocalExporters()} />}
+              createDialog={
+                <CreateProjectDialog
+                  examplesComponent={LocalExamples}
+                  startersComponent={LocalStarters}
+                />
+              }
+              onSaveProject={LocalProjectWriter.saveProject}
+              onChooseProject={LocalProjectOpener.chooseProjectFile}
+              onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
+              resourceSources={localResourceSources}
+              resourceExternalEditors={localResourceExternalEditors}
+              authentification={authentification}
+              extensionsLoader={makeExtensionsLoader({
+                gd,
+                objectsEditorService: ObjectsEditorService,
+                objectsRenderingService: ObjectsRenderingService,
+                filterExamples: !Window.isDev(),
+              })}
+              initialPathsOrURLsToOpen={appArguments['_']}
+              eventsFunctionWriter={makeLocalEventsFunctionWriter()}
+            />
+          </ElectronEventsBridge>
+        )}
       </Providers>
     );
   }

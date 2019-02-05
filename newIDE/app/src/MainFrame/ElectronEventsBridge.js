@@ -1,14 +1,23 @@
-import React, { Component } from 'react';
+// @flow
+import * as React from 'react';
+import MainFrame from '.';
 import optionalRequire from '../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
+
+type Props = {|
+  children: React.Element<typeof MainFrame>,  
+|};
 
 /**
  * Forward events received from Electron main process
  * to the underlying child React component.
  */
-class ElectronEventsBridge extends Component {
+class ElectronEventsBridge extends React.Component<Props, {||}> {
+  editor: ?MainFrame;
   componentDidMount() {
+    if (!ipcRenderer) return;
+    
     ipcRenderer.on(
       'main-menu-open',
       event => this.editor && this.editor.chooseProject()

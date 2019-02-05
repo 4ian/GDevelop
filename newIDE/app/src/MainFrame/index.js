@@ -75,7 +75,6 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import EmptyMessage from '../UI/EmptyMessage';
 import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunction';
-import { withI18n } from '@lingui/react';
 import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
 
@@ -132,8 +131,6 @@ type Props = {
   extensionsLoader?: JsExtensionsLoader,
   initialPathsOrURLsToOpen: ?Array<string>,
   eventsFunctionWriter?: EventsFunctionWriter,
-
-  // Added by withI18n HOC (https://lingui.js.org/ref/react.html#i18n):
   i18n: I18n,
 };
 
@@ -1426,4 +1423,4 @@ class MainFrame extends React.Component<Props, State> {
   }
 }
 
-export default withI18n()(MainFrame);
+export default MainFrame;

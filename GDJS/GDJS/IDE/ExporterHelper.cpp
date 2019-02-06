@@ -389,6 +389,8 @@ bool ExporterHelper::ExportFacebookInstantGamesFiles(const gd::Project &project,
       return false;
     }
   }
+
+  return true;
 }
 
 bool ExporterHelper::ExportElectronFiles(const gd::Project &project,

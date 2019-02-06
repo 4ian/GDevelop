@@ -157,6 +157,15 @@ class GD_CORE_API ParameterMetadata {
   }
 
   /**
+   * \brief Return true if the type of the parameter is "behavior".
+   *
+   * \see gd::ParameterMetadata::GetType
+   */
+  static bool IsBehavior(const gd::String &parameterType) {
+    return parameterType == "behavior";
+  }
+
+  /**
    * \brief Return true if the type of the parameter is an expression of the
    * given type.
    */

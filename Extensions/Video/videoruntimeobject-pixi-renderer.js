@@ -19,6 +19,10 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene)
 
       //Setup the PIXI object:
       this._pixiObject = new PIXI.Sprite(this._textureVideo);
+
+      this._pixiObject._texture.baseTexture.source.pause();
+
+
     }
     
       //this._pixiObject.anchor.x = 0.5;
@@ -42,6 +46,12 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
     this._pixiObject.position.x = this._object.x
     this._pixiObject.position.y = this._object.y;
+
+     
+    
+
+    
+
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
@@ -86,12 +96,26 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.setLoop = function(looped) {
     this._pixiObject.texture.baseTexture.source.loop = looped;
 };
 
-/*
 
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.play = function() {
+
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.play = function(object) {
     //this._pixiObject.texture.baseTexture.source.loop = isLooped;
     console.log("#2bouh-renderer");
-    this._pixiObject.texture.baseTexture.source.play();
+
+    var promise = this._pixiObject._texture.baseTexture.source.play();
+
+    if (promise !== undefined) {
+      promise.then(_ => {
+        // Autoplay started!
+        console.log("play !");
+        //this._pixiObject._texture.baseTexture.source.pause();
+      }).catch(error => {
+        // Autoplay was prevented.
+         console.log("bah !");
+         //this._pixiObject._texture.baseTexture.source.play();
+        // Show a "Play" button so that user can start playback.
+      });
+    }
 };
 
- */
+ 

@@ -20,7 +20,7 @@ gdjs.VideoRuntimeObject = function(runtimeScene, objectData) {
 
 gdjs.VideoRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
 gdjs.VideoRuntimeObject.thisIsARuntimeObjectConstructor =
-  "VideoExtension::VideoObject"; //Replace by your extension + object name.
+  "Video::VideoObject"; //Replace by your extension + object name.
 
 gdjs.VideoRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
@@ -134,7 +134,8 @@ gdjs.VideoRuntimeObject.prototype.setHeight = function(height) {
 TODO
 play, voir JsExtention.js dans l'action (mais l'action marche pas)
 */
-gdjs.VideoRuntimeObject.prototype.play = function() {
+gdjs.VideoRuntimeObject.prototype.play = function(object) {
+  gdjs.VideoRuntimeObject.prototype.play.call(this, object);
   console.log("#2bouh-object");
-  this._renderer.play();
+  this._renderer.play(object);
 }

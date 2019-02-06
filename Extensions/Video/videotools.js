@@ -6,17 +6,23 @@
  * Functions are being passed the arguments that were declared in the extension.
  *
  * @memberof gdjs.evtTools
- * @class videoExtension
+ * @class video
  * @static
  * @private
  */
-gdjs.evtTools.videoExtension = {};
+gdjs.evtTools.video = {};
 
-gdjs.evtTools.videoExtension.myConditionFunction = function(number, text) {
+gdjs.evtTools.video.myConditionFunction = function(number, text) {
   return number <= 10 && text.length < 5;
 };
 
-gdjs.evtTools.videoExtension.getString = function() {
+gdjs.evtTools.video.play = function(runtimeObject, playAtBegeningOrNot, LoopOrNot) {
+  console.log("#2bouh-tools");
+  gdjs.VideoRuntimeObjectPixiRenderer.prototype.play();
+  //runtimeObject.play();
+};
+
+gdjs.evtTools.video.getString = function() {
   return "Hello World";
 };
 
@@ -26,7 +32,7 @@ gdjs.evtTools.videoExtension.getString = function() {
  * to debug. Most of the time you can have all the logic in your functions, your gdjs.RuntimeBehavior
  * or your gdjs.RuntimeObject.
  */
-gdjs.videoExtension = {
+gdjs.video = {
   myGlobalString: "Hello World"
 };
 
@@ -35,7 +41,7 @@ gdjs.videoExtension = {
  * that will be called at this moment. Name you callback gdjsCallbackRuntimeSceneLoaded.
  * GDJS will scan anything declared inside gdjs for these names.
  */
-gdjs.videoExtension.gdjsCallbackRuntimeSceneLoaded = function(
+gdjs.video.gdjsCallbackRuntimeSceneLoaded = function(
   runtimeScene
 ) {
   console.log("A gdjs.RuntimeScene was loaded:", runtimeScene);
@@ -46,7 +52,7 @@ gdjs.videoExtension.gdjsCallbackRuntimeSceneLoaded = function(
  * that will be called at this moment. Name you callback gdjsCallbackRuntimeSceneLoaded.
  * GDJS will scan anything declared inside gdjs for these names.
  */
-gdjs.videoExtension.callbacksRuntimeSceneUnloaded = function(runtimeScene) {
+gdjs.video.callbacksRuntimeSceneUnloaded = function(runtimeScene) {
   console.log("A gdjs.RuntimeScene was unloaded:", runtimeScene);
 };
 
@@ -55,7 +61,7 @@ gdjs.videoExtension.callbacksRuntimeSceneUnloaded = function(runtimeScene) {
  * You can create a callback named "callbacksObjectDeletedFromScene" on your extension object.
  * GDJS will scan anything declared inside gdjs for this name.
  */
-gdjs.videoExtension.callbacksObjectDeletedFromScene = function(
+gdjs.video.callbacksObjectDeletedFromScene = function(
   runtimeScene,
   runtimeObject
 ) {
@@ -68,13 +74,7 @@ gdjs.videoExtension.callbacksObjectDeletedFromScene = function(
 
 // Finally, note that you can also simply run code here. Most of the time you shouldn't need it though.
 console.log(
-  "gdjs.videoExtension was created, with myGlobalString containing:" +
-    gdjs.videoExtension.myGlobalString
+  "gdjs.video was created, with myGlobalString containing:" +
+    gdjs.video.myGlobalString
 );
 
-
-gdjs.evtTools.videoExtension.play = function(runtimeObject) {
-  console.log("#2bouh-tools");
-  gdjs.VideoRuntimeObjectPixiRenderer.play();
-  runtimeObject.play();
-};

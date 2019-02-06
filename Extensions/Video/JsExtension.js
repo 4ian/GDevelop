@@ -20,13 +20,33 @@ module.exports = {
   createExtension: function(t, gd) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
-      "VideoExtension",
-      "Video Extension",
+      "Video",
+      "Video",
       "Display a video in your scene",
       "Aurélien vivet",
       "Open source (MIT License)"
     )
     .setExtensionHelpPath("/all-features/video");
+
+    extension
+      .addCondition(
+        "MyNewCondition",
+        t("video condition example"),
+        t(
+          "This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5."
+        ),
+        t("Call the example condition with _PARAM0_ and _PARAM1_"),
+        t("Dummy Extension"),
+        "res/conditions/camera24.png",
+        "res/conditions/camera.png"
+      )
+      .addParameter("expression", t("Number 1"), "", false)
+      .addParameter("string", t("Text 1"), "", false)
+      .getCodeExtraInformation()
+      .setIncludeFile(
+        "Extensions/Video/videotools.js"
+     )
+     .setFunctionName("gdjs.evtTools.video.myConditionFunction");
 
     extension
       .addAction(
@@ -43,12 +63,13 @@ module.exports = {
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", "Choose an object video", "", false)
+      .addParameter("yesorno", t("Auto play or not"), "", false)
       .addParameter("yesorno", t("Loop or not"), "", false)
       .getCodeExtraInformation()
       .setIncludeFile(
-         "Extensions/VideoObject/videoextentiontools.js"
+         "Extensions/Video/videotools.js"
       )
-      .setFunctionName("gdjs.evtTools.videoExtension.play");
+      .setFunctionName("gdjs.evtTools.video.play");
 
     // Declare an object.
     // Create a new gd.ObjectJsImplementation object and implement the methods
@@ -158,10 +179,8 @@ module.exports = {
         "JsPlatform/Extensions/videoicon32.png",
         videoObject
       )
-      .setIncludeFile("Extensions/VideoObject/videoruntimeobject.js")
-      .addIncludeFile(
-        "Extensions/VideoObject/videoruntimeobject-pixi-renderer.js"
-      );
+      .setIncludeFile("Extensions/Video/videoruntimeobject.js")
+      .addIncludeFile("Extensions/Video/videoruntimeobject-pixi-renderer.js");
 
     return extension;
   },
@@ -184,7 +203,7 @@ module.exports = {
    */
   registerEditorConfigurations: function(objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
-      "VideoExtension::VideoObject",
+      "Video::VideoObject",
       objectsEditorService.getDefaultObjectJsImplementationPropertiesEditor()
     );
   },
@@ -317,7 +336,7 @@ module.exports = {
     };
 
     objectsRenderingService.registerInstanceRenderer(
-      "VideoExtension::VideoObject",
+      "Video::VideoObject",
       RenderedVideoObjectInstance
     );
   }

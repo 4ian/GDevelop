@@ -128,6 +128,9 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       showGDevelopSplash,
     } = this.state;
 
+    const defaultPackageName = "com.example.mygame";
+    const admobHint = "ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY";
+
     return (
       <React.Fragment>
         <Dialog
@@ -186,7 +189,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               <Trans>Package name (for iOS and Android)</Trans>
             }
             fullWidth
-            hintText={<Trans>com.example.mygame</Trans>}
+            hintText={defaultPackageName}
             type="text"
             value={packageName}
             onChange={value => this.setState({ packageName: value })}
@@ -272,7 +275,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               <Trans>AdMob application ID (for iOS and Android)</Trans>
             }
             fullWidth
-            hintText={<Trans>ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY</Trans>}
+            hintText={admobHint}
             type="text"
             value={adMobAppId}
             onChange={value => this.setState({ adMobAppId: value })}

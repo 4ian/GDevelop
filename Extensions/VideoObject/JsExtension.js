@@ -1,4 +1,10 @@
 /**
+ * TODO
+ * support draggable behavior
+ * and other behavior
+ */
+
+/**
  * This is a declaration of an extension for GDevelop 5.
  *
  * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
@@ -18,8 +24,31 @@ module.exports = {
       "Video Extension",
       "Display a video in your scene",
       "Aurélien vivet",
-      "MIT"
-    );
+      "Open source (MIT License)"
+    )
+    .setExtensionHelpPath("/all-features/video");
+
+    extension
+      .addAction(
+        "Play",
+        t("Play a video"),
+        t(
+          "Play a video"
+        ),
+        t(
+          "Play the video : _PARAM0_"
+        ),
+        t("Le titre peut etre ?"),
+        "JsPlatform/Extensions/videoicon24.png",
+        "JsPlatform/Extensions/videoicon16.png"
+      )
+      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("yesorno", t("Loop or not"), "", false)
+      .getCodeExtraInformation()
+      .setIncludeFile(
+         "Extensions/VideoObject/videoextentiontools.js"
+      )
+      .setFunctionName("gdjs.evtTools.videoExtension.play");
 
     // Declare an object.
     // Create a new gd.ObjectJsImplementation object and implement the methods
@@ -37,11 +66,11 @@ module.exports = {
         objectContent.property1 = newValue;
         return true;
       }
-      if (propertyName === "My other property") {
+      if (propertyName === "Video Looped or no") {
         objectContent.property2 = newValue === "1";
         return true;
       }
-      if (propertyName === "My third property") {
+      if (propertyName === "Volume") {
         objectContent.property3 = newValue;
         return true;
       }
@@ -56,13 +85,13 @@ module.exports = {
         new gd.PropertyDescriptor(objectContent.property1)
       );
       objectProperties.set(
-        "My other property",
+        "Video Looped or no",
         new gd.PropertyDescriptor(
           objectContent.property2 ? "true" : "false"
         ).setType("boolean")
       );
       objectProperties.set(
-        "My third property",
+        "Volume",
         new gd.PropertyDescriptor(
             objectContent.property3.toString()
         ).setType("number")
@@ -73,8 +102,8 @@ module.exports = {
     videoObject.setRawJSONContent(
       JSON.stringify({
         property1: "Hello world",
-        property2: true,
-        property3: 123
+        property2: false,
+        property3: 100
       })
     );
 
@@ -126,7 +155,7 @@ module.exports = {
         "VideoObject",
         t("Video object for testing"),
         t("This video object does nothing"),
-        "CppPlatform/Extensions/videoicon.png",
+        "JsPlatform/Extensions/videoicon32.png",
         videoObject
       )
       .setIncludeFile("Extensions/VideoObject/videoruntimeobject.js")
@@ -201,14 +230,18 @@ module.exports = {
        
        
       // create a video texture from a path
-      var texture = new PIXI.Texture.fromVideo('C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4');
+      var textureVideo = new PIXI.Texture.fromVideo('C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4');
       
-        if(!texture){
-          var texture = new PIXI.Texture.fromImage('C:/Users/RTX-Bouh/Desktop/video.svg');
+      //TODO fonctionne pas
+      /*
+      Souhaite un check de textureVideo si elle est chargé on continue sinon on charge un placeholder error
+      */
+        if(!textureVideo){
+          var textureVideo = new PIXI.Texture.fromImage('C:/Users/RTX-Bouh/Desktop/video.svg');
         }
       
       //Setup the PIXI object:
-      this._pixiObject = new PIXI.Sprite(texture);
+      this._pixiObject = new PIXI.Sprite(textureVideo);
       this._pixiObject.anchor.x = 0.5;
       this._pixiObject.anchor.y = 0.5;
       this._pixiContainer.addChild(this._pixiObject);
@@ -226,7 +259,7 @@ module.exports = {
       resourcesLoader,
       object
     ) {
-      return "CppPlatform/Extensions/videoicon24.png";
+      return "JsPlatform/Extensions/videoicon24.png";
     };
 
     /**

@@ -129,3 +129,12 @@ gdjs.VideoRuntimeObject.prototype.setHeight = function(height) {
   this._height = height;
   this._renderer.updateHeight();
 };
+
+/*
+TODO
+play, voir JsExtention.js dans l'action (mais l'action marche pas)
+*/
+gdjs.VideoRuntimeObject.prototype.play = function() {
+  console.log("#2bouh-object");
+  this._renderer.play();
+}

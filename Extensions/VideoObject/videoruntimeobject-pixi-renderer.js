@@ -15,14 +15,14 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene)
 
     // Here we're going to create a video text as an example.
     if ( this._pixiObject === undefined ) {     
-        this._video = new PIXI.Texture.fromVideo('C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4');
+        this._textureVideo = new PIXI.Texture.fromVideo('C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4');
 
       //Setup the PIXI object:
-      this._pixiObject = new PIXI.Sprite(this._video);
+      this._pixiObject = new PIXI.Sprite(this._textureVideo);
     }
     
-      this._pixiObject.anchor.x = 0.5;
-      this._pixiObject.anchor.y = 0.5;
+      //this._pixiObject.anchor.x = 0.5;
+      //this._pixiObject.anchor.y = 0.5;
     runtimeScene.getLayer("").getRenderer().addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
     //this.updatePosition();
@@ -40,8 +40,8 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
-    this._pixiObject.position.x = this._object.x+this._pixiObject.width/2;
-    this._pixiObject.position.y = this._object.y+this._pixiObject.height/2;
+    this._pixiObject.position.x = this._object.x
+    this._pixiObject.position.y = this._object.y;
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
@@ -65,15 +65,33 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateWidth = function() {
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateWidth = function() {
-    this._pixiObject.width = this._object._width / 2;
+    this._pixiObject.width = this._object._width;
     //this._updateSpritesAndTexturesSize();
    // this._updateLocalPositions();
     this.updatePosition();
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateHeight = function() {
-    this._pixiObject.height = this._object._height / 2;
+    this._pixiObject.height = this._object._height;
     //this._updateSpritesAndTexturesSize();
     //this._updateLocalPositions();
     this.updatePosition();
 };
+
+/*
+TODO
+setloop
+*/
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.setLoop = function(looped) {
+    this._pixiObject.texture.baseTexture.source.loop = looped;
+};
+
+/*
+
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.play = function() {
+    //this._pixiObject.texture.baseTexture.source.loop = isLooped;
+    console.log("#2bouh-renderer");
+    this._pixiObject.texture.baseTexture.source.play();
+};
+
+ */

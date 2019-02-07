@@ -1050,6 +1050,59 @@ module.exports = {
       }
     ]
   },
+  "endless-up-runner": {
+    "description": "A game where the player have to jump on platforms and avoid falling down as the screen goes up. With special objects (spring, rocks), score and Game Over handling!",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Platform Behavior",
+        "name": "PlatformBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "System information",
+        "name": "SystemInfo"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      }
+    ]
+  },
   "exit-app": {
     "description": "Simple example showing how to close your game.",
     "usedExtensions": [
@@ -2907,6 +2960,67 @@ module.exports = {
       {
         "fullName": "Base object",
         "name": "BuiltinObject"
+      }
+    ]
+  },
+  "space-invaders": {
+    "description": "A Space Invaders-like game, where you have a turret and shoot on enemies coming from the sky.",
+    "usedExtensions": [
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Destroy Outside Screen Behavior",
+        "name": "DestroyOutsideBehavior"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "System information",
+        "name": "SystemInfo"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Cameras and layers features",
+        "name": "BuiltinCamera"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Audio",
+        "name": "BuiltinAudio"
+      },
+      {
+        "fullName": "Window features",
+        "name": "BuiltinWindow"
       }
     ]
   },

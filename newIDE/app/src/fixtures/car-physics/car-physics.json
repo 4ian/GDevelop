@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -1087,11 +1087,11 @@
               "parameters": [
                 "Tire",
                 "Physics2",
-                "Tire.PointX(Centre)",
-                "Tire.PointY(Centre)",
+                "Tire.PointX(\"Centre\")",
+                "Tire.PointY(\"Centre\")",
                 "Car",
-                "Tire.PointX(Centre)",
-                "Tire.PointY(Centre)",
+                "Tire.PointX(\"Centre\")",
+                "Tire.PointY(\"Centre\")",
                 "",
                 "",
                 "",

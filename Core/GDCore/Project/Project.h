@@ -532,12 +532,17 @@ class GD_CORE_API Project : public ObjectsContainer {
   /**
    * Get the major version of GDevelop used to save the project.
    */
-  unsigned int GetLastSaveGDMajorVersion() { return GDMajorVersion; };
+  unsigned int GetLastSaveGDMajorVersion() { return gdMajorVersion; };
 
   /**
    * Get the minor version of GDevelop used to save the project.
    */
-  unsigned int GetLastSaveGDMinorVersion() { return GDMinorVersion; };
+  unsigned int GetLastSaveGDMinorVersion() { return gdMinorVersion; };
+  
+  /**
+   * Get the minor version of GDevelop used to save the project.
+   */
+  unsigned int GetLastSaveGDBuildVersion() { return gdBuildVersion; };
 #endif
 
 /** \name External events management
@@ -998,9 +1003,11 @@ class GD_CORE_API Project : public ObjectsContainer {
   gd::LoadingScreen loadingScreen;
   std::vector<std::unique_ptr<gd::ExternalEvents> >
       externalEvents;                   ///< List of all externals events
-  mutable unsigned int GDMajorVersion;  ///< The GD major version used the last
+  mutable unsigned int gdMajorVersion;  ///< The GD major version used the last
                                         ///< time the project was saved.
-  mutable unsigned int GDMinorVersion;  ///< The GD minor version used the last
+  mutable unsigned int gdMinorVersion;  ///< The GD minor version used the last
+                                        ///< time the project was saved.
+  mutable unsigned int gdBuildVersion;  ///< The GD build version used the last
                                         ///< time the project was saved.
   mutable bool dirty;  ///< True to flag the project as being modified.
 #endif

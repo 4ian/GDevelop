@@ -150,7 +150,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& parameter,
       const gd::ParameterMetadata& metadata,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& previousParameter,
+      const gd::String& lastObjectName,
       std::vector<std::pair<gd::String, gd::String> >*
           supplementaryParametersTypes);
 
@@ -212,6 +212,31 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context);
 
+  virtual gd::String GenerateGetVariable(
+      const gd::String& variableName,
+      const VariableScope& scope,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& objectName);
+
+  virtual gd::String GenerateVariableAccessor(gd::String childName) {
+    return ".getChild(" + ConvertToStringExplicit(childName) + ")";
+  };
+
+  virtual gd::String GenerateVariableBracketAccessor(
+      gd::String expressionCode) {
+    return ".getChild(" + expressionCode + ")";
+  };
+
+  virtual gd::String GenerateBadVariable() {
+    return "gdjs.VariablesContainer.badVariable";
+  }
+
+  virtual gd::String GenerateBadObject() { return "null"; }
+
+  virtual gd::String GenerateObject(const gd::String& objectName,
+                                    const gd::String& type,
+                                    gd::EventsCodeGenerationContext& context);
+
   virtual gd::String GenerateNegatedPredicat(const gd::String& predicat) const {
     return "!(" + predicat + ")";
   };
@@ -256,13 +281,13 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
 
   /**
    * \brief Generate the list of parameters of a function.
-   * 
+   *
    * \note runtimeScene is always added as the first parameter, and
    * parentEventsFunctionContext as the last parameter.
    */
   gd::String GenerateEventsFunctionParameterDeclarationsList(
       const std::vector<gd::ParameterMetadata>& parameters);
-  
+
   /**
    * \brief Generate the "eventsFunctionContext" object that allow a function
    * to provides access objects, object creation and access to arguments from
@@ -272,7 +297,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const std::vector<gd::ParameterMetadata>& parameters);
 
   gd::String GenerateEventsFunctionReturn(
-      const gd::EventsFunction & eventFunction);
+      const gd::EventsFunction& eventFunction);
 
   /**
    * \brief Construct a code generator for the specified project and layout.

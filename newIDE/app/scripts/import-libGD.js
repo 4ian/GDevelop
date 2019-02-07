@@ -38,7 +38,7 @@ if (shell.test('-f', sourceFile)) {
 
   var file = fs.createWriteStream('../public/libGD.js');
   https.get(
-    'https://github.com/4ian/GDevelop.js/releases/download/5.0.0-beta57/libGD.js',
+    'https://github.com/4ian/GDevelop.js/releases/download/5.0.0-beta64/libGD.js',
     function(response) {
       if (response.statusCode !== 200) {
         shell.echo(

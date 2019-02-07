@@ -25,5 +25,10 @@ TEST_CASE("EventsCodeGenerator", "[common][events]") {
     REQUIRE(codeGenerator.ConvertToString(
                 "Hello \"world\"!\nThis is a backslash \\") ==
             "Hello \\\"world\\\"!\\nThis is a backslash \\\\");
+
+    REQUIRE(codeGenerator.ConvertToString("{\"hello\": \"world \\\" \"}") ==
+            "{\\\"hello\\\": \\\"world \\\\\\\" \\\"}");
+    REQUIRE(codeGenerator.ConvertToString("{\"hello\":\r\n\"world \\\" \"}") ==
+            "{\\\"hello\\\":\\r\\n\\\"world \\\\\\\" \\\"}");
   }
 }

@@ -83,6 +83,7 @@ import {
   fakeAuthenticatedButLoadingUserProfile,
   release,
   releaseWithBreakingChange,
+  releaseWithoutDescription,
 } from '../fixtures/GDevelopServicesTestData';
 import debuggerGameDataDump from '../fixtures/DebuggerGameDataDump.json';
 import profilerOutput from '../fixtures/ProfilerOutputsTestData.json';
@@ -367,6 +368,24 @@ storiesOf('ParameterFields', module)
   .add('ExpressionField', () => (
     <ValueStateHolder
       initialValue={'MySpriteObject.X() + MouseX("", 0)'}
+      render={(value, onChange) => (
+        <ExpressionField
+          project={project}
+          layout={testLayout}
+          globalObjectsContainer={project}
+          objectsContainer={testLayout}
+          value={value}
+          onChange={onChange}
+          parameterRenderingService={ParameterRenderingService}
+        />
+      )}
+    />
+  ))
+  .add('ExpressionField (with errors)', () => (
+    <ValueStateHolder
+      initialValue={
+        'Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3-Test()+3\n-Test2()+3-/2//2 \n+ 3()'
+      }
       render={(value, onChange) => (
         <ExpressionField
           project={project}
@@ -1421,6 +1440,13 @@ storiesOf('Changelog', module)
   .add('breaking changes in this version', () => (
     <ChangelogRenderer
       releases={[releaseWithBreakingChange]}
+      error={null}
+      currentReleaseName="5.0.0-beta60"
+    />
+  ))
+  .add('release without a description', () => (
+    <ChangelogRenderer
+      releases={[releaseWithoutDescription]}
       error={null}
       currentReleaseName="5.0.0-beta60"
     />

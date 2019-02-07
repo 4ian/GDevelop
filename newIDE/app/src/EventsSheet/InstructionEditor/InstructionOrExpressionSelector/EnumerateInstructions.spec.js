@@ -40,7 +40,7 @@ describe('EnumerateInstructions', () => {
         }),
         expect.objectContaining({
           displayedName: 'Rotate',
-          fullGroupName: 'Common action for all objects/Angle',
+          fullGroupName: 'Common actions for all objects/Angle',
           type: 'Rotate',
         }),
       ])

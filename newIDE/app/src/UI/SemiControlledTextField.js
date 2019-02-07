@@ -11,8 +11,17 @@ type Props = {
   onChange: string => void,
   value: string,
   commitOnBlur?: boolean,
-  onFocus?: (event: any) => void,
-  onBlur?: (event: any) => void,
+  onFocus?: ({
+    currentTarget: {
+      value: string,
+    },
+    preventDefault: () => void,
+  }) => void,
+  onBlur?: ({
+    currentTarget: {
+      value: string,
+    },
+  }) => void,
 };
 
 /**
@@ -71,7 +80,7 @@ export default class SemiControlledTextField extends React.Component<
           if (!commitOnBlur) onChange(newValue);
         }}
         onBlur={event => {
-          onChange(event.target.value);
+          onChange(event.currentTarget.value);
           this.setState({
             focused: false,
             text: null,

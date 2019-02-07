@@ -80,8 +80,9 @@ Project::Project()
       ,
       useExternalSourceFiles(false),
       currentPlatform(NULL),
-      GDMajorVersion(gd::VersionWrapper::Major()),
-      GDMinorVersion(gd::VersionWrapper::Minor()),
+      gdMajorVersion(gd::VersionWrapper::Major()),
+      gdMinorVersion(gd::VersionWrapper::Minor()),
+      gdBuildVersion(gd::VersionWrapper::Build()),
       dirty(false)
 #endif
 {
@@ -581,28 +582,28 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
   const SerializerElement& gdVersionElement =
       element.GetChild("gdVersion", 0, "GDVersion");
-  GDMajorVersion =
-      gdVersionElement.GetIntAttribute("major", GDMajorVersion, "Major");
-  GDMinorVersion =
-      gdVersionElement.GetIntAttribute("minor", GDMinorVersion, "Minor");
-  int build = gdVersionElement.GetIntAttribute("build", 0, "Build");
+  gdMajorVersion =
+      gdVersionElement.GetIntAttribute("major", gdMajorVersion, "Major");
+  gdMinorVersion =
+      gdVersionElement.GetIntAttribute("minor", gdMinorVersion, "Minor");
+  gdBuildVersion = gdVersionElement.GetIntAttribute("build", 0, "Build");
   int revision = gdVersionElement.GetIntAttribute("revision", 0, "Revision");
 
-  if (GDMajorVersion > gd::VersionWrapper::Major())
+  if (gdMajorVersion > gd::VersionWrapper::Major())
     gd::LogWarning(
         _("The version of GDevelop used to create this game seems to be a new "
           "version.\nGDevelop may fail to open the game, or data may be "
           "missing.\nYou should check if a new version of GDevelop is "
           "available."));
   else {
-    if ((GDMajorVersion == gd::VersionWrapper::Major() &&
-         GDMinorVersion > gd::VersionWrapper::Minor()) ||
-        (GDMajorVersion == gd::VersionWrapper::Major() &&
-         GDMinorVersion == gd::VersionWrapper::Minor() &&
-         build > gd::VersionWrapper::Build()) ||
-        (GDMajorVersion == gd::VersionWrapper::Major() &&
-         GDMinorVersion == gd::VersionWrapper::Minor() &&
-         build == gd::VersionWrapper::Build() &&
+    if ((gdMajorVersion == gd::VersionWrapper::Major() &&
+         gdMinorVersion > gd::VersionWrapper::Minor()) ||
+        (gdMajorVersion == gd::VersionWrapper::Major() &&
+         gdMinorVersion == gd::VersionWrapper::Minor() &&
+         gdBuildVersion > gd::VersionWrapper::Build()) ||
+        (gdMajorVersion == gd::VersionWrapper::Major() &&
+         gdMinorVersion == gd::VersionWrapper::Minor() &&
+         gdBuildVersion == gd::VersionWrapper::Build() &&
          revision > gd::VersionWrapper::Revision())) {
       gd::LogWarning(
           _("The version of GDevelop used to create this game seems to be "
@@ -613,7 +614,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
   }
 
   // Compatibility code
-  if (GDMajorVersion <= 1) {
+  if (gdMajorVersion <= 1) {
     gd::LogError(_(
         "The game was saved with version of GDevelop which is too old. Please "
         "open and save the game with one of the first version of GDevelop 2. "
@@ -685,7 +686,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
       propElement.GetChild("currentPlatform").GetValue().GetString();
   // Compatibility code
   if (VersionWrapper::IsOlderOrEqual(
-          GDMajorVersion, GDMajorVersion, GDMinorVersion, 0, 3, 4, 73, 0)) {
+          gdMajorVersion, gdMajorVersion, gdMinorVersion, 0, 3, 4, 73, 0)) {
     if (currentPlatformName == "Game Develop C++ platform")
       currentPlatformName = "GDevelop C++ platform";
     if (currentPlatformName == "Game Develop JS platform")
@@ -700,7 +701,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     gd::String name = platformsElement.GetChild(i).GetStringAttribute("name");
     // Compatibility code
     if (VersionWrapper::IsOlderOrEqual(
-            GDMajorVersion, GDMajorVersion, GDMinorVersion, 0, 3, 4, 73, 0)) {
+            gdMajorVersion, gdMajorVersion, gdMinorVersion, 0, 3, 4, 73, 0)) {
       if (name == "Game Develop C++ platform") name = "GDevelop C++ platform";
       if (name == "Game Develop JS platform") name = "GDevelop JS platform";
     }
@@ -733,7 +734,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
 // Compatibility code
 #if defined(GD_IDE_ONLY)
-  if (VersionWrapper::IsOlder(GDMajorVersion, 0, 0, 0, 3, 0, 0, 0)) {
+  if (VersionWrapper::IsOlder(gdMajorVersion, 0, 0, 0, 3, 0, 0, 0)) {
     updateText +=
         _("Sprite scaling has changed since GD 2: The resizing is made so that "
           "the origin point of the object won't move whatever the scale of the "
@@ -748,8 +749,14 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
 // Compatibility code
 #if defined(GD_IDE_ONLY)
-  if (VersionWrapper::IsOlderOrEqual(
-          GDMajorVersion, GDMinorVersion, revision, build, 2, 2, 1, 10822)) {
+  if (VersionWrapper::IsOlderOrEqual(gdMajorVersion,
+                                     gdMinorVersion,
+                                     revision,
+                                     gdBuildVersion,
+                                     2,
+                                     2,
+                                     1,
+                                     10822)) {
     if (std::find(GetUsedExtensions().begin(),
                   GetUsedExtensions().end(),
                   "BuiltinExternalLayouts") == GetUsedExtensions().end())
@@ -759,8 +766,14 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
 // Compatibility code
 #if defined(GD_IDE_ONLY)
-  if (VersionWrapper::IsOlderOrEqual(
-          GDMajorVersion, GDMinorVersion, revision, build, 3, 3, 3, 0)) {
+  if (VersionWrapper::IsOlderOrEqual(gdMajorVersion,
+                                     gdMinorVersion,
+                                     revision,
+                                     gdBuildVersion,
+                                     3,
+                                     3,
+                                     3,
+                                     0)) {
     if (std::find(GetUsedExtensions().begin(),
                   GetUsedExtensions().end(),
                   "AStarBehavior") != GetUsedExtensions().end()) {
@@ -782,8 +795,14 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
 // Compatibility code
 #if defined(GD_IDE_ONLY)
-  if (VersionWrapper::IsOlderOrEqual(
-          GDMajorVersion, GDMinorVersion, revision, build, 4, 0, 85, 0)) {
+  if (VersionWrapper::IsOlderOrEqual(gdMajorVersion,
+                                     gdMinorVersion,
+                                     revision,
+                                     gdBuildVersion,
+                                     4,
+                                     0,
+                                     85,
+                                     0)) {
     for (unsigned int i = 0; i < extensionsUsed.size(); ++i)
       extensionsUsed[i] =
           extensionsUsed[i].FindAndReplace("Automatism", "Behavior");
@@ -812,7 +831,7 @@ void Project::UnserializeFrom(const SerializerElement& element) {
 
 // Compatibility code with GD 2.x
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    if (GDMajorVersion <= 2) {
+    if (gdMajorVersion <= 2) {
       SpriteObjectsPositionUpdater updater(*this, layout);
       gd::InitialInstancesContainer& instances = layout.GetInitialInstances();
       instances.IterateOverInstances(updater);
@@ -1266,8 +1285,9 @@ void Project::Init(const gd::Project& game) {
   loadingScreen = game.loadingScreen;
   objectGroups = game.objectGroups;
 
-  GDMajorVersion = game.GDMajorVersion;
-  GDMinorVersion = game.GDMinorVersion;
+  gdMajorVersion = game.gdMajorVersion;
+  gdMinorVersion = game.gdMinorVersion;
+  gdBuildVersion = game.gdBuildVersion;
 
   currentPlatform = game.currentPlatform;
 #endif

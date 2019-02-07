@@ -143,13 +143,13 @@ class StartPage extends BaseEditor {
               <IconButton
                 iconClassName="icon-facebook"
                 onClick={() =>
-                  Window.openExternalURL('https://www.facebook.com/GameDevelop')
+                  Window.openExternalURL('https://www.facebook.com/GDevelopApp')
                 }
               />
               <IconButton
                 iconClassName="icon-twitter"
                 onClick={() =>
-                  Window.openExternalURL('https://twitter.com/game_develop')
+                  Window.openExternalURL('https://twitter.com/GDevelopApp')
                 }
               />
             </div>

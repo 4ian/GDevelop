@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -7996,8 +7996,8 @@
                     "Physics2",
                     "AICar.Direction()",
                     "AICar.Variable(Acceleration)/10",
-                    "AICar.PointX(Centre)",
-                    "AICar.PointY(Centre)"
+                    "AICar.PointX(\"Centre\")",
+                    "AICar.PointY(\"Centre\")"
                   ],
                   "subInstructions": []
                 }
@@ -8300,8 +8300,8 @@
                 "Physics2",
                 "PlayerCar.Angle()",
                 "PlayerCar.Variable(Acceleration)/10",
-                "PlayerCar.PointX(Centre)",
-                "PlayerCar.PointY(Centre)"
+                "PlayerCar.PointX(\"Centre\")",
+                "PlayerCar.PointY(\"Centre\")"
               ],
               "subInstructions": []
             }
@@ -8324,8 +8324,8 @@
                 "Physics2",
                 "PlayerCar.Angle()+180",
                 "PlayerCar.Variable(Breaking)/10",
-                "PlayerCar.PointX(Centre)",
-                "PlayerCar.PointY(Centre)"
+                "PlayerCar.PointX(\"Centre\")",
+                "PlayerCar.PointY(\"Centre\")"
               ],
               "subInstructions": []
             }

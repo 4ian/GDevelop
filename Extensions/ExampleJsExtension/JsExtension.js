@@ -311,7 +311,7 @@ module.exports = {
       return instanceProperties;
     };
 
-    extension
+    const object = extension
       .addObject(
         "DummyObject",
         t("Dummy object for testing"),
@@ -323,6 +323,24 @@ module.exports = {
       .addIncludeFile(
         "Extensions/ExampleJsExtension/dummyruntimeobject-pixi-renderer.js"
       );
+
+    object
+      .addAction(
+        "MyMethod",
+        t("Display a dummy text in Developer console"),
+        t(
+          "Display a dummy text in Developer console. Open it with CTRL-SHIFT-J (Cmd-Alt-J on macOS)."
+        ),
+        t("Display a dummy text for _PARAM0_, with params: _PARAM1_, _PARAM2_"),
+        "",
+        "res/conditions/camera24.png",
+        "res/conditions/camera.png"
+      )
+      .addParameter("object", t("Object"), "DummyObject", false) // This parameter is mandatory for any object action/condition
+      .addParameter("expression", t("Number 1"), "", false)
+      .addParameter("string", t("Text 1"), "", false)
+      .getCodeExtraInformation()
+      .setFunctionName("myMethod");
 
     return extension;
   },

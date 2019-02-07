@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -3176,8 +3176,8 @@
               "parameters": [
                 "",
                 "etincelle",
-                "Voiture.PointX(Centre)",
-                "Voiture.PointY(Centre)",
+                "Voiture.PointX(\"Centre\")",
+                "Voiture.PointY(\"Centre\")",
                 ""
               ],
               "subInstructions": []
@@ -3190,8 +3190,8 @@
               "parameters": [
                 "",
                 "etincelle",
-                "Voiture.PointX(Centre)",
-                "Voiture.PointY(Centre)",
+                "Voiture.PointX(\"Centre\")",
+                "Voiture.PointY(\"Centre\")",
                 ""
               ],
               "subInstructions": []
@@ -3204,8 +3204,8 @@
               "parameters": [
                 "",
                 "etincelle",
-                "Voiture.PointX(Centre)",
-                "Voiture.PointY(Centre)",
+                "Voiture.PointX(\"Centre\")",
+                "Voiture.PointY(\"Centre\")",
                 ""
               ],
               "subInstructions": []

@@ -7,6 +7,8 @@ import {
   largeSelectedArea,
   largeSelectableArea,
   selectableArea,
+  linkContainer,
+  disabledText,
 } from '../ClassNames';
 import InlinePopover from '../../InlinePopover';
 import ExternalEventsField from '../../ParameterFields/ExternalEventsField';
@@ -78,10 +80,16 @@ export default class LinkEvent extends React.Component<EventRendererProps, *> {
         className={classNames({
           [largeSelectableArea]: true,
           [largeSelectedArea]: this.props.selected,
+          [linkContainer]: true,
         })}
         style={styles.container}
       >
-        <span style={styles.title}>
+        <span
+          style={styles.title}
+          className={classNames({
+            [disabledText]: this.props.disabled,
+          })}
+        >
           Include events from{' '}
           <i
             className={classNames({

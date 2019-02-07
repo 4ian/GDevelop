@@ -9,7 +9,7 @@ This project is released under the MIT License.
 
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCpp/Runtime/CommonTools.h"
@@ -64,7 +64,8 @@ class Extension : public ExtensionBase {
               instruction.GetParameter(0).GetPlainString();
 
           if (!codeGenerator.HasProjectAndLayout()) {
-              return gd::String("/*Function generation not supported without layout*/");
+            return gd::String(
+                "/*Function generation not supported without layout*/");
           }
 
           const gd::Project& project = codeGenerator.GetProject();
@@ -106,14 +107,12 @@ class Extension : public ExtensionBase {
           // Generate code for evaluating parameters
           code += "std::vector<gd::String> functionParameters;\n";
           for (std::size_t i = 1; i < 8; ++i) {
-            gd::String parameterCode;
-            gd::CallbacksForGeneratingExpressionCode callbacks(
-                parameterCode, codeGenerator, context);
-            gd::ExpressionParser parser(
-                instruction.GetParameter(i).GetPlainString());
-            parser.ParseStringExpression(
-                CppPlatform::Get(), project, layout, callbacks);
-            if (parameterCode.empty()) parameterCode = "\"\"";
+            gd::String parameterCode =
+                gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                    codeGenerator,
+                    context,
+                    "string",
+                    instruction.GetParameter(i).GetPlainString());
 
             code += "functionParameters.push_back(" + parameterCode + ");\n";
           }
@@ -135,7 +134,8 @@ class Extension : public ExtensionBase {
             [](gd::BaseEvent& event_, gd::EventsCodeGenerator& codeGenerator, gd::EventsCodeGenerationContext& /* The function has nothing to do with the current context */) {
               FunctionEvent& event = dynamic_cast<FunctionEvent&>(event_);
 
-              if (!codeGenerator.HasProjectAndLayout()) return "/*Function generation not supported without layout*/";
+              if (!codeGenerator.HasProjectAndLayout())
+                return "/*Function generation not supported without layout*/";
               const gd::Layout& layout = codeGenerator.GetLayout();
 
               // Declaring function prototype.
@@ -229,17 +229,12 @@ class Extension : public ExtensionBase {
                 codeGenerator.AddCustomCodeInMain(mainFakeParameters);
 
               // Generate code for evaluating index
-              gd::String expression;
-              gd::CallbacksForGeneratingExpressionCode callbacks(
-                  expression, codeGenerator, context);
-              gd::ExpressionParser parser(parameters[0].GetPlainString());
-              if (!parser.ParseMathExpression(
-                      codeGenerator.GetPlatform(), 
-                      codeGenerator.GetGlobalObjectsAndGroups(), 
-                      codeGenerator.GetObjectsAndGroups(),
-                      callbacks) ||
-                  expression.empty())
-                expression = "0";
+              gd::String expression =
+                  gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                      codeGenerator,
+                      context,
+                      "number",
+                      parameters[0].GetPlainString());
 
               gd::String code;
 

@@ -40,13 +40,14 @@ gd::VariableParserCallbacks VariableCodeGenerationCallbacks callbacks(output,
     gd::VariableParser parser(parameter);
     if ( !parser.Parse(callbacks) )
         cout << "Error :" << parser.GetFirstError() << " in: "<< parameter <<
-endl; \endcode
+endl;
+\endcode
  *
  * Here is the parsed grammar:   <br>
  * S -> VarName X  <br>
  * X -> e | . S | [StringExpression] X   <br>
  *
- * where e = nothing ( end of expression ), StringExpression = A valid string
+ * where e = nothing (end of expression), StringExpression = A valid string
 expression and
  * S is the start.
  *

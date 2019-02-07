@@ -46,12 +46,6 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
     this._pixiObject.position.x = this._object.x
     this._pixiObject.position.y = this._object.y;
-
-     
-    
-
-    
-
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
@@ -100,22 +94,56 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.setLoop = function(looped) {
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.play = function(object) {
     //this._pixiObject.texture.baseTexture.source.loop = isLooped;
-    console.log("#2bouh-renderer");
-
     var promise = this._pixiObject._texture.baseTexture.source.play();
 
     if (promise !== undefined) {
       promise.then(_ => {
         // Autoplay started!
-        console.log("play !");
+        console.log("action play > play !");
         //this._pixiObject._texture.baseTexture.source.pause();
       }).catch(error => {
         // Autoplay was prevented.
-         console.log("bah !");
+         console.log("action play > pause !");
          //this._pixiObject._texture.baseTexture.source.play();
         // Show a "Play" button so that user can start playback.
       });
     }
 };
 
- 
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.pause = function() {
+
+    var promise = this._pixiObject._texture.baseTexture.source.pause();
+
+    if (promise !== undefined) {
+      promise.then(_ => {
+          // Autoplay started!
+          console.log("action pause > play !");
+        //this._pixiObject._texture.baseTexture.source.pause();
+      }).catch(error => {
+        // Autoplay was prevented.
+         console.log("action pause > pause !");
+         //this._pixiObject._texture.baseTexture.source.play();
+        // Show a "Play" button so that user can start playback.
+      });
+    }
+};
+
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.loop = function(number1) {
+
+
+    this._pixiObject._texture.baseTexture.source.loop = number1;
+    /* var promise = 
+
+    if (promise !== undefined) {
+      promise.then(_ => {
+        // Autoplay started!
+        console.log("action pause > play !");
+        //this._pixiObject._texture.baseTexture.source.pause();
+      }).catch(error => {
+        // Autoplay was prevented.
+         console.log("action pause > pause !");
+         //this._pixiObject._texture.baseTexture.source.play();
+        // Show a "Play" button so that user can start playback.
+      });
+    } */
+};

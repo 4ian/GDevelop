@@ -48,29 +48,6 @@ module.exports = {
      )
      .setFunctionName("gdjs.evtTools.video.myConditionFunction");
 
-    extension
-      .addAction(
-        "Play",
-        t("Play a video"),
-        t(
-          "Play a video"
-        ),
-        t(
-          "Play the video : _PARAM0_"
-        ),
-        t("Le titre peut etre ?"),
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
-      )
-      .addParameter("object", "Choose an object video", "", false)
-      .addParameter("yesorno", t("Auto play or not"), "", false)
-      .addParameter("yesorno", t("Loop or not"), "", false)
-      .getCodeExtraInformation()
-      .setIncludeFile(
-         "Extensions/Video/videotools.js"
-      )
-      .setFunctionName("gdjs.evtTools.video.play");
-
     // Declare an object.
     // Create a new gd.ObjectJsImplementation object and implement the methods
     // that are called to get and set the properties of the object, as well
@@ -171,7 +148,7 @@ module.exports = {
       return instanceProperties;
     };
 
-    extension
+    const object = extension
       .addObject(
         "VideoObject",
         t("Video object for testing"),
@@ -182,6 +159,59 @@ module.exports = {
       .setIncludeFile("Extensions/Video/videoruntimeobject.js")
       .addIncludeFile("Extensions/Video/videoruntimeobject-pixi-renderer.js");
 
+    object
+      .addAction(
+        "Play",
+        t("Play an video"),
+        t("Play an video"),
+        t("Play the video on my object : _PARAM0_"),
+        "",
+        "JsPlatform/Extensions/videoicon24.png",
+        "JsPlatform/Extensions/videoicon16.png"
+      )
+      .addParameter("object", "Choose an object video", "", false)
+      .getCodeExtraInformation()
+      .setIncludeFile("Extensions/Video/videotools.js")
+      .setFunctionName("play");
+
+      object
+      .addAction(
+        "Pause",
+        t("Pause an video"),
+        t("Pause an video"),
+        t("Pause the video on my object : _PARAM0_"),
+        "",
+        "JsPlatform/Extensions/videoicon24.png",
+        "JsPlatform/Extensions/videoicon16.png"
+      )
+      .addParameter("object", "Choose an object video", "", false)
+      .getCodeExtraInformation()
+      .setIncludeFile("Extensions/Video/videotools.js")
+      .setFunctionName("pause");
+
+      object
+      .addAction(
+        "Loop",
+        t("Loop an video"),
+        t("Loop an video"),
+        t("Loop the video on my object : _PARAM0_ is on _PARAM1_"),
+        "",
+        "JsPlatform/Extensions/videoicon24.png",
+        "JsPlatform/Extensions/videoicon16.png"
+      )
+      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("yesorno", t("Loop or not"), "", false)
+      .getCodeExtraInformation()
+      .setFunctionName("loop");
+
+      /*
+      t("Le titre peut etre ?")
+
+      .addParameter("object", t("Object"), "VideoObject", false) // This parameter is mandatory for any object action/condition
+      .addParameter("expression", t("Number 1"), "", false)
+      .addParameter("string", t("Text 1"), "", false)
+      
+      */
     return extension;
   },
   /**
@@ -195,12 +225,18 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-    runExtensionSanityTests: function (gd, extension) { return []; },
+  runExtensionSanityTests: function(gd, extension) { return []; },
   /**
    * Register editors for objects.
    * 
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
+
+   
+     
+
+
+
   registerEditorConfigurations: function(objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
       "Video::VideoObject",
@@ -288,7 +324,26 @@ module.exports = {
        
        //Stop video in IDE
        if(!this._pixiObject._texture.baseTexture.source.paused){
-        this._pixiObject._texture.baseTexture.source.pause();   
+         //TODO
+         //Add promise HERE for avoid error in IDE
+        
+        
+        var promise = this._pixiObject._texture.baseTexture.source.pause();
+
+        if (promise !== undefined) {
+          promise.then(_ => {
+            // Autoplay started!
+            console.log("action pause > play !");
+            //this._pixiObject._texture.baseTexture.source.pause();
+          }).catch(error => {
+            // Autoplay was prevented.
+            console.log("action pause > pause !");
+            //this._pixiObject._texture.baseTexture.source.play();
+            // Show a "Play" button so that user can start playback.
+          });
+        }
+
+
        }
         
       // Read a property from the object

@@ -111,7 +111,6 @@ gdjs.VideoRuntimeObject.prototype.getText = function() {
   return this._property1;
 };
 
-
 /**
  * Set the width of the panel sprite.
  * @param {number} width The new width in pixels.
@@ -130,12 +129,44 @@ gdjs.VideoRuntimeObject.prototype.setHeight = function(height) {
   this._renderer.updateHeight();
 };
 
-/*
-TODO
-play, voir JsExtention.js dans l'action (mais l'action marche pas)
-*/
-gdjs.VideoRuntimeObject.prototype.play = function(object) {
-  gdjs.VideoRuntimeObject.prototype.play.call(this, object);
-  console.log("#2bouh-object");
-  this._renderer.play(object);
-}
+/**
+ * A dummy method that can be called from events
+ */
+gdjs.VideoRuntimeObject.prototype.play = function(number1, text1) {
+  console.log("Here is the object:", this);
+  console.log("Here are the arguments passed from events:", number1, text1);
+  console.log("#2bouh-play");
+  this._renderer.play();
+}; 
+
+/**
+ * A dummy method that can be called from events
+ */
+gdjs.VideoRuntimeObject.prototype.pause = function(number1, text1) {
+  console.log("Here is the object:", this);
+  console.log("Here are the arguments passed from events:", number1, text1);
+  console.log("#2bouh-pause");
+  this._renderer.pause();
+}; 
+
+/**
+ * A dummy method that can be called from events
+ */
+gdjs.VideoRuntimeObject.prototype.loop = function(number1) {
+  console.log("Here is the object:", this);
+  console.log("Here are the arguments passed from events:", number1);
+  console.log("#2bouh-loop");
+  this._renderer.loop(number1);
+}; 
+
+
+
+/**
+ * currentTime 6.873379
+ * duration 60.789841
+ * ended false/true
+ * loop false/true
+ * muted false/true
+ * volume 0-1
+ * controls ? false-true
+ */

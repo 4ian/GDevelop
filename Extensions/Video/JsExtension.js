@@ -1,7 +1,36 @@
 /**
  * TODO
- * support draggable behavior
- * and other behavior
+ * Le clique sur la video ne fait rien via les events
+ * Le support du draggable behavior  n'est pas là
+ * Comment passer les propriétés de l'instance a mon objet video sur la scene ?
+ * 
+ * Volume | Condition, si le volume de l'object est = à 100, The volume of MONOBJECTVIDEO is = 100
+ * Volume | Action, mettre le volume de l'object à 100, Do = 100 to the volume of MONOBJECTVIDEO
+ * getVolume | Expression, getVolume sur un objet video, MONOBJECTVIDEO.Video::Volume()
+ * 
+ * Play | Condition si la video de l'object MONOBJECTVIDEO est en lecture
+ * Play | Fait | Action, Lancer la video de l'object , Play the video of MONOBJECTVIDEO
+ * isPlayed | Expression, isPlayed sur un objet, MONOBJECTVIDEO.Video::IsPlayed()
+ * 
+ * Pause | Condition, si la video de l'object MONOBJECTVIDEO est en pause
+ * Pause | Fait | Action, Lancer la video de l'object , Pause the video of MONOBJECTVIDEO
+ * isPaused | Expression, isPaused sur un objet, MONOBJECTVIDEO.Video::IsPaused()
+ * 
+ * isLoaded | Condition, si la video de l'object MONOBJECTVIDEO est bien charger, The video of my MONOBJECTVIDEO is loaded
+ * isLoaded | Expression, isLoaded sur un object video, MONOBJECTVIDEO.Video::IsLoaded()
+ * 
+ * Loop | Condition, si le volume de l'object est = à 100, The volume of MONOBJECTVIDEO is = 100
+ * Loop | Action, mettre le volume de l'object à 100, Do = 100 to the volume of MONOBJECTVIDEO
+ * isLooped | Expression, isLooped sur un objet video, MONOBJECTVIDEO.Video::IsLooped()
+ * 
+ * Mute | Condition, si le volume de l'object est = à 100, The volume of MONOBJECTVIDEO is = 100
+ * Mute | Action, mettre le volume de l'object en Mute ou à 0, Mute the volume of MONOBJECTVIDEO
+ * isMuted | Expression, isMuted sur un objet video, MONOBJECTVIDEO.Video::IsMuted()
+ * 
+ * getDuration | Expression, getDuration sur un objet video retourne le temps en MS depuis le lancement de la vidéo, MONOBJECTVIDEO.Video::GetDuration()
+ * 
+ * isFinish  | Expression, isMuted sur un objet video, MONOBJECTVIDEO.Video::IsMuted()
+ * gettime | Expression, isMuted sur un objet video, MONOBJECTVIDEO.Video::IsMuted()
  */
 
 /**
@@ -28,6 +57,14 @@ module.exports = {
     )
     .setExtensionHelpPath("/all-features/video");
 
+
+    /**
+     * 
+     * Utile ?
+     * 
+     */
+
+    /*  
     extension
       .addCondition(
         "MyNewCondition",
@@ -46,7 +83,7 @@ module.exports = {
       .setIncludeFile(
         "Extensions/Video/videotools.js"
      )
-     .setFunctionName("gdjs.evtTools.video.myConditionFunction");
+     .setFunctionName("gdjs.evtTools.video.myConditionFunction"); */
 
     // Declare an object.
     // Create a new gd.ObjectJsImplementation object and implement the methods
@@ -174,7 +211,7 @@ module.exports = {
       .setIncludeFile("Extensions/Video/videotools.js")
       .setFunctionName("play");
 
-      object
+    object
       .addAction(
         "Pause",
         t("Pause an video"),
@@ -189,7 +226,7 @@ module.exports = {
       .setIncludeFile("Extensions/Video/videotools.js")
       .setFunctionName("pause");
 
-      object
+    object
       .addAction(
         "Loop",
         t("Loop an video"),
@@ -231,11 +268,6 @@ module.exports = {
    * 
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
-
-   
-     
-
-
 
   registerEditorConfigurations: function(objectsEditorService) {
     objectsEditorService.registerEditorConfiguration(
@@ -289,11 +321,12 @@ module.exports = {
       
       //TODO fonctionne pas
       /*
-      Souhaite un check de textureVideo si elle est chargé on continue sinon on charge un placeholder error
+      * Souhaite un check de textureVideo si elle est chargé on continue sinon on charge un placeholder error
+      * Verif avec un isloaded ?
       */
-        if(!textureVideo){
-          var textureVideo = new PIXI.Texture.fromImage('C:/Users/RTX-Bouh/Desktop/video.svg');
-        }
+      if(!textureVideo){
+        var textureVideo = new PIXI.Texture.fromImage('C:/Users/RTX-Bouh/Desktop/video.svg');
+      }
       
       //Setup the PIXI object:
       this._pixiObject = new PIXI.Sprite(textureVideo);

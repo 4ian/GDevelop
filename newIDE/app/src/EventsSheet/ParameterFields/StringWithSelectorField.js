@@ -31,8 +31,7 @@ export default class StringWithSelector extends Component<
 
     try {
       this._description = parameterMetadata.getDescription();
-      this._choices = JSON.parse(parameterMetadata.getExtraInfo())
-      );
+      this._choices = JSON.parse(parameterMetadata.getExtraInfo());
     } catch (exception) {
       console.error(
         'The parameter seems misconfigured, as an array of choices could not be extracted - verify that your properly wrote a list of choices in JSON format. Full exception is:',

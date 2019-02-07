@@ -27,6 +27,7 @@ import deviceVibration from '../fixtures/device-vibration/device-vibration.json'
 import downhillBikePhysicsDemo from '../fixtures/downhill-bike-physics-demo/downhill-bike-physics-demo.json';
 import dragCameraWithMouse from '../fixtures/drag-camera-with-mouse/drag-camera-with-mouse.json';
 import dropCollectItemsFromStorage from '../fixtures/drop-collect-items-from-storage/drop-collect-items-from-storage.json';
+import endlessUpRunner from '../fixtures/endless-up-runner/endless-up-runner.json';
 import exitApp from '../fixtures/exit-app/exit-app.json';
 import facebookInstantGame from '../fixtures/facebook-instant-game/facebook-instant-game.json';
 import findDiagonals from '../fixtures/find-diagonals/find-diagonals.json';
@@ -83,6 +84,7 @@ import shootBulletInParabola from '../fixtures/shoot-bullet-in-parabola/shoot-bu
 import shootBullets from '../fixtures/shoot-bullets/shoot-bullets.json';
 import shootingBulletsExplanation from '../fixtures/shooting-bullets-explanation/shooting-bullets-explanation.json';
 import snapObjectToGrid from '../fixtures/snap-object-to-grid/snap-object-to-grid.json';
+import spaceInvaders from '../fixtures/space-invaders/space-invaders.json';
 import spaceShooter from '../fixtures/space-shooter/space-shooter.json';
 import spaceShooterWithFunctions from '../fixtures/space-shooter-with-functions/space-shooter-with-functions.json';
 import splashScreen from '../fixtures/splash-screen/splash-screen.json';
@@ -163,6 +165,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(dragCameraWithMouse);
     } else if (url === 'example://drop-collect-items-from-storage') {
       return Promise.resolve(dropCollectItemsFromStorage);
+    } else if (url === 'example://endless-up-runner') {
+      return Promise.resolve(endlessUpRunner);
     } else if (url === 'example://exit-app') {
       return Promise.resolve(exitApp);
     } else if (url === 'example://facebook-instant-game') {
@@ -267,6 +271,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(shootingBulletsExplanation);
     } else if (url === 'example://snap-object-to-grid') {
       return Promise.resolve(snapObjectToGrid);
+    } else if (url === 'example://space-invaders') {
+      return Promise.resolve(spaceInvaders);
     } else if (url === 'example://space-shooter') {
       return Promise.resolve(spaceShooter);
     } else if (url === 'example://space-shooter-with-functions') {

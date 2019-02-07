@@ -7,7 +7,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
 #include "GDCore/Extensions/Builtin/AllBuiltinExtensions.h"
 #include "GDCore/Tools/Localization.h"
 
@@ -24,20 +24,12 @@ AdvancedExtension::AdvancedExtension() {
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
-        gd::String expressionCode;
-        {
-          gd::CallbacksForGeneratingExpressionCode callbacks(
-              expressionCode, codeGenerator, context);
-          gd::ExpressionParser parser(
-              instruction.GetParameter(0).GetPlainString());
-          if (!parser.ParseMathExpression(
-                  codeGenerator.GetPlatform(),
-                  codeGenerator.GetGlobalObjectsAndGroups(),
-                  codeGenerator.GetObjectsAndGroups(),
-                  callbacks) ||
-              expressionCode.empty())
-            expressionCode = "0";
-        }
+        gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "number",
+                instruction.GetParameter(0).GetPlainString());
 
         return "if (typeof eventsFunctionContext !== 'undefined') { "
                "eventsFunctionContext.returnValue = " +
@@ -49,20 +41,12 @@ AdvancedExtension::AdvancedExtension() {
       .SetCustomCodeGenerator([](gd::Instruction& instruction,
                                  gd::EventsCodeGenerator& codeGenerator,
                                  gd::EventsCodeGenerationContext& context) {
-        gd::String expressionCode;
-        {
-          gd::CallbacksForGeneratingExpressionCode callbacks(
-              expressionCode, codeGenerator, context);
-          gd::ExpressionParser parser(
-              instruction.GetParameter(0).GetPlainString());
-          if (!parser.ParseStringExpression(
-                  codeGenerator.GetPlatform(),
-                  codeGenerator.GetGlobalObjectsAndGroups(),
-                  codeGenerator.GetObjectsAndGroups(),
-                  callbacks) ||
-              expressionCode.empty())
-            expressionCode = "\"\"";
-        }
+        gd::String expressionCode =
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                instruction.GetParameter(0).GetPlainString());
 
         return "if (typeof eventsFunctionContext !== 'undefined') { "
                "eventsFunctionContext.returnValue = " +
@@ -84,36 +68,17 @@ AdvancedExtension::AdvancedExtension() {
                booleanCode + "; }";
       });
 
-  auto generateParameterNameCode =
-      [](const std::vector<gd::Expression>& parameters,
-         gd::EventsCodeGenerator& codeGenerator,
-         gd::EventsCodeGenerationContext& context) {
-        gd::String parameterNameCode;
-        {
-          gd::CallbacksForGeneratingExpressionCode callbacks(
-              parameterNameCode, codeGenerator, context);
-          gd::ExpressionParser parser(
-              !parameters.empty() ? parameters[0].GetPlainString() : "");
-          if (!parser.ParseStringExpression(
-                  codeGenerator.GetPlatform(),
-                  codeGenerator.GetGlobalObjectsAndGroups(),
-                  codeGenerator.GetObjectsAndGroups(),
-                  callbacks) ||
-              parameterNameCode.empty())
-            parameterNameCode = "\"\"";
-        }
-
-        return parameterNameCode;
-      };
-
   GetAllExpressions()["GetArgumentAsNumber"]
       .GetCodeExtraInformation()
-      .SetCustomCodeGenerator([&generateParameterNameCode](
-                                  const std::vector<gd::Expression>& parameters,
-                                  gd::EventsCodeGenerator& codeGenerator,
-                                  gd::EventsCodeGenerationContext& context) {
+      .SetCustomCodeGenerator([](const std::vector<gd::Expression>& parameters,
+                                 gd::EventsCodeGenerator& codeGenerator,
+                                 gd::EventsCodeGenerationContext& context) {
         gd::String parameterNameCode =
-            generateParameterNameCode(parameters, codeGenerator, context);
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                !parameters.empty() ? parameters[0].GetPlainString() : "");
 
         return "(typeof eventsFunctionContext !== 'undefined' ? "
                "Number(eventsFunctionContext.getArgument(" +
@@ -122,12 +87,15 @@ AdvancedExtension::AdvancedExtension() {
 
   GetAllStrExpressions()["GetArgumentAsString"]
       .GetCodeExtraInformation()
-      .SetCustomCodeGenerator([&generateParameterNameCode](
-                                  const std::vector<gd::Expression>& parameters,
-                                  gd::EventsCodeGenerator& codeGenerator,
-                                  gd::EventsCodeGenerationContext& context) {
+      .SetCustomCodeGenerator([](const std::vector<gd::Expression>& parameters,
+                                 gd::EventsCodeGenerator& codeGenerator,
+                                 gd::EventsCodeGenerationContext& context) {
         gd::String parameterNameCode =
-            generateParameterNameCode(parameters, codeGenerator, context);
+            gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                codeGenerator,
+                context,
+                "string",
+                !parameters.empty() ? parameters[0].GetPlainString() : "");
 
         return "(typeof eventsFunctionContext !== 'undefined' ? \"\" + "
                "eventsFunctionContext.getArgument(" +

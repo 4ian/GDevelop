@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -3116,8 +3116,8 @@
                       "parameters": [
                         "",
                         "slot_text",
-                        "inventory_slot.PointX(slot_text)",
-                        "inventory_slot.PointY(slot_text)",
+                        "inventory_slot.PointX(\"slot_text\")",
+                        "inventory_slot.PointY(\"slot_text\")",
                         "\"inventory\""
                       ],
                       "subInstructions": []

@@ -3,6 +3,7 @@
 #include <utility>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
+#include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/Parsers/ExpressionParser.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
@@ -13,8 +14,8 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Project/Layout.h"
-#include "GDCore/Project/Project.h"
 #include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Project/Project.h"
 
 using namespace std;
 
@@ -295,11 +296,14 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
       if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
-          !GetGlobalObjectsAndGroups().GetObjectGroups().Has(objectInParameter)) {
+          !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
+              objectInParameter)) {
         condition.SetParameter(pNb, gd::Expression(""));
         condition.SetType("");
       } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
-                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectInParameter) !=
+                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
+                                     GetObjectsAndGroups(),
+                                     objectInParameter) !=
                      instrInfos.parameters[pNb].supplementaryInformation) {
         condition.SetParameter(pNb, gd::Expression(""));
         condition.SetType("");
@@ -328,7 +332,8 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
   gd::String objectName = condition.GetParameters().empty()
                               ? ""
                               : condition.GetParameter(0).GetPlainString();
-  gd::String objectType = gd::GetTypeOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
+  gd::String objectType = gd::GetTypeOfObject(
+      GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (!objectName.empty() &&
       MetadataProvider::HasObjectCondition(
           platform, objectType, condition.GetType()) &&
@@ -473,11 +478,14 @@ gd::String EventsCodeGenerator::GenerateActionCode(
       if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetObjectsAndGroups().GetObjectGroups().Has(objectInParameter) &&
-          !GetGlobalObjectsAndGroups().GetObjectGroups().Has(objectInParameter)) {
+          !GetGlobalObjectsAndGroups().GetObjectGroups().Has(
+              objectInParameter)) {
         action.SetParameter(pNb, gd::Expression(""));
         action.SetType("");
       } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
-                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectInParameter) !=
+                 gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
+                                     GetObjectsAndGroups(),
+                                     objectInParameter) !=
                      instrInfos.parameters[pNb].supplementaryInformation) {
         action.SetParameter(pNb, gd::Expression(""));
         action.SetType("");
@@ -496,7 +504,8 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   gd::String objectName = action.GetParameters().empty()
                               ? ""
                               : action.GetParameter(0).GetPlainString();
-  gd::String objectType = gd::GetTypeOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
+  gd::String objectType = gd::GetTypeOfObject(
+      GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (MetadataProvider::HasObjectAction(
           platform, objectType, action.GetType()) &&
       !instrInfos.parameters.empty()) {
@@ -582,34 +591,24 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     const gd::String& parameter,
     const gd::ParameterMetadata& metadata,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& previousParameter,
+    const gd::String& lastObjectName,
     std::vector<std::pair<gd::String, gd::String> >*
         supplementaryParametersTypes) {
   gd::String argOutput;
 
   if (ParameterMetadata::IsExpression("number", metadata.type)) {
-    CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
-
-    gd::ExpressionParser parser(parameter);
-    if (!parser.ParseMathExpression(platform, GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-
-      argOutput = "0";
-    }
-
-    if (argOutput.empty()) argOutput = "0";
+    argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+        *this, context, "number", parameter);
   } else if (ParameterMetadata::IsExpression("string", metadata.type)) {
-    CallbacksForGeneratingExpressionCode callbacks(argOutput, *this, context);
-
-    gd::ExpressionParser parser(parameter);
-    if (!parser.ParseStringExpression(platform, GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), callbacks)) {
-      cout << "Error in text expression" << parser.GetFirstError() << endl;
-
-      argOutput = "\"\"";
-    }
-
-    if (argOutput.empty()) argOutput = "\"\"";
+    argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+        *this, context, "string", parameter);
+  } else if (ParameterMetadata::IsExpression("variable", metadata.type)) {
+    argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
+        *this, context, metadata.type, parameter, lastObjectName);
+  } else if (ParameterMetadata::IsObject(metadata.type)) {
+    // It would be possible to run a gd::ExpressionCodeGenerator if later
+    // objects can have nested objects, or function returning objects.
+    argOutput = GenerateObject(parameter, metadata.type, context);
   } else if (metadata.type == "relationalOperator") {
     argOutput += parameter == "=" ? "==" : parameter;
     if (argOutput != "==" && argOutput != "<" && argOutput != ">" &&
@@ -628,14 +627,12 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     }
 
     argOutput = "\"" + argOutput + "\"";
-  } else if (metadata.type == "object" || metadata.type == "behavior") {
+  } else if (metadata.type == "behavior") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "key") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
-  } else if (metadata.type == "objectvar" || metadata.type == "scenevar" ||
-             metadata.type == "globalvar" || metadata.type == "password" ||
-             metadata.type == "musicfile" || metadata.type == "soundfile" ||
-             metadata.type == "police") {
+  } else if (metadata.type == "password" || metadata.type == "musicfile" ||
+             metadata.type == "soundfile" || metadata.type == "police") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
   } else if (metadata.type == "mouse") {
     argOutput = "\"" + ConvertToString(parameter) + "\"";
@@ -682,6 +679,7 @@ vector<gd::String> EventsCodeGenerator::GenerateParametersCodes(
   while (parameters.size() < parametersInfo.size())
     parameters.push_back(gd::Expression(""));
 
+  gd::String lastObjectName = "";
   for (std::size_t pNb = 0;
        pNb < parametersInfo.size() && pNb < parameters.size();
        ++pNb) {
@@ -689,12 +687,18 @@ vector<gd::String> EventsCodeGenerator::GenerateParametersCodes(
         parametersInfo[pNb].optional)
       parameters[pNb] = gd::Expression(parametersInfo[pNb].defaultValue);
 
-    gd::String argOutput = GenerateParameterCodes(
-        parameters[pNb].GetPlainString(),
-        parametersInfo[pNb],
-        context,
-        pNb == 0 ? "" : parameters[pNb - 1].GetPlainString(),
-        supplementaryParametersTypes);
+    gd::String argOutput =
+        GenerateParameterCodes(parameters[pNb].GetPlainString(),
+                               parametersInfo[pNb],
+                               context,
+                               lastObjectName,
+                               supplementaryParametersTypes);
+
+    // Memorize the last object name. By convention, parameters that require
+    // an object (mainly, "objectvar") should be placed after the object
+    // in the list of parameters (if possible, just after).
+    if (gd::ParameterMetadata::IsObject(parametersInfo[pNb].GetType()))
+      lastObjectName = parameters[pNb].GetPlainString();
 
     arguments.push_back(argOutput);
   }
@@ -799,23 +803,10 @@ gd::String EventsCodeGenerator::GenerateEventsListCode(
 }
 
 gd::String EventsCodeGenerator::ConvertToString(gd::String plainString) {
-  for (size_t i = 0; i < plainString.length(); ++i) {
-    if (plainString[i] == '\\') {
-      if (i + 1 >= plainString.length() || plainString[i + 1] != '\"') {
-        if (i + 1 < plainString.length())
-          plainString.insert(i + 1, "\\");
-        else
-          plainString += ("\\");
-
-        ++i;
-      }
-    } else if (plainString[i] == '"') {
-      plainString.insert(i, "\\");
-      ++i;
-    }
-  }
-
-  plainString = plainString.FindAndReplace("\n", "\\n");
+  plainString = plainString.FindAndReplace("\\", "\\\\")
+                    .FindAndReplace("\r", "\\r")
+                    .FindAndReplace("\n", "\\n")
+                    .FindAndReplace("\"", "\\\"");
 
   return plainString;
 }
@@ -831,10 +822,12 @@ std::vector<gd::String> EventsCodeGenerator::ExpandObjectsName(
   // Note: this logic is duplicated in EventsContextAnalyzer::ExpandObjectsName
   std::vector<gd::String> realObjects;
   if (globalObjectsAndGroups.GetObjectGroups().Has(objectName))
-    realObjects =
-        globalObjectsAndGroups.GetObjectGroups().Get(objectName).GetAllObjectsNames();
+    realObjects = globalObjectsAndGroups.GetObjectGroups()
+                      .Get(objectName)
+                      .GetAllObjectsNames();
   else if (objectsAndGroups.GetObjectGroups().Has(objectName))
-    realObjects = objectsAndGroups.GetObjectGroups().Get(objectName).GetAllObjectsNames();
+    realObjects =
+        objectsAndGroups.GetObjectGroups().Get(objectName).GetAllObjectsNames();
   else
     realObjects.push_back(objectName);
 
@@ -893,7 +886,9 @@ gd::String EventsCodeGenerator::GenerateObjectFunctionCall(
     gd::String parametersStr,
     gd::String defaultOutput,
     gd::EventsCodeGenerationContext& context) {
-  return "TODO (GenerateObjectFunctionCall)";
+  // To be used for testing only.
+  return objectListName + "." + codeInfo.functionCallName + "(" +
+         parametersStr + ") ?? " + defaultOutput;
 }
 
 gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(
@@ -904,7 +899,10 @@ gd::String EventsCodeGenerator::GenerateObjectBehaviorFunctionCall(
     gd::String parametersStr,
     gd::String defaultOutput,
     gd::EventsCodeGenerationContext& context) {
-  return "TODO (GenerateObjectBehaviorFunctionCall)";
+  // To be used for testing only.
+  return objectListName + "::" + behaviorName + "." +
+         codeInfo.functionCallName + "(" + parametersStr + ") ?? " +
+         defaultOutput;
 }
 
 gd::String EventsCodeGenerator::GenerateFreeCondition(
@@ -1135,9 +1133,10 @@ EventsCodeGenerator::EventsCodeGenerator(gd::Project& project_,
       maxCustomConditionsDepth(0),
       maxConditionsListsSize(0){};
 
-EventsCodeGenerator::EventsCodeGenerator(const gd::Platform& platform_,
-  gd::ObjectsContainer & globalObjectsAndGroups_,
-  const gd::ObjectsContainer & objectsAndGroups_)
+EventsCodeGenerator::EventsCodeGenerator(
+    const gd::Platform& platform_,
+    gd::ObjectsContainer& globalObjectsAndGroups_,
+    const gd::ObjectsContainer& objectsAndGroups_)
     : platform(platform_),
       globalObjectsAndGroups(globalObjectsAndGroups_),
       objectsAndGroups(objectsAndGroups_),

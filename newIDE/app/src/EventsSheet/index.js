@@ -521,14 +521,20 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
 
     eventsRemover.launch(events);
-    this.setState({
-      selection: clearSelection(),
-      inlineEditing: false,
-      inlineEditingAnchorEl: null,
-    });
-    this._saveChangesToHistory(() => {
-      if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-    });
+
+    // /!\ Events were changed, so any reference to an existing event can now
+    // be invalid. Make sure to immediately trigger a forced update before
+    // any re-render that could use a deleted/invalid event.
+    if (this._eventsTree) this._eventsTree.forceEventsUpdate();
+
+    this.setState(
+      {
+        selection: clearSelection(),
+        inlineEditing: false,
+        inlineEditingAnchorEl: null,
+      },
+      () => this._saveChangesToHistory()
+    );
   };
 
   copySelection = () => {

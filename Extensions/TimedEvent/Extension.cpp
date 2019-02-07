@@ -9,7 +9,7 @@ This project is released under the MIT License.
 
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/CodeGeneration/ExpressionCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
@@ -61,16 +61,12 @@ class Extension : public ExtensionBase {
           event.codeGenerationChildren.clear();
 
           // Prepare code for computing timeout
-          gd::String timeOutCode;
-          gd::CallbacksForGeneratingExpressionCode callbacks(
-              timeOutCode, codeGenerator, context);
-          gd::ExpressionParser parser(event.GetTimeoutExpression());
-          if (!parser.ParseMathExpression(codeGenerator.GetPlatform(),
-                                          codeGenerator.GetGlobalObjectsAndGroups(),
-                                          codeGenerator.GetObjectsAndGroups(),
-                                          callbacks) ||
-              timeOutCode.empty())
-            timeOutCode = "0";
+          gd::String timeOutCode =
+              gd::ExpressionCodeGenerator::GenerateExpressionCode(
+                  codeGenerator,
+                  context,
+                  "number",
+                  event.GetTimeoutExpression());
 
           // Prepare name
           gd::String codeName =

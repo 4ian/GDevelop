@@ -18,7 +18,6 @@
 #include "GDCore/Project/Project.h"
 #include "GDCpp/Events/Builtin/ProfileEvent.h"
 #include "GDCpp/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDCpp/Events/CodeGeneration/VariableParserCallbacks.h"
 #include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCpp/IDE/BaseProfiler.h"
 #include "GDCpp/Runtime/SceneNameMangler.h"
@@ -193,11 +192,13 @@ gd::String EventsCodeGenerator::GenerateBehaviorCondition(
   if (conditionInverted) predicat = GenerateNegatedPredicat(predicat);
 
   // Verify that object has behavior.
-  vector<gd::String> behaviors =
-      gd::GetBehaviorsOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
+  vector<gd::String> behaviors = gd::GetBehaviorsOfObject(
+      GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
-    cout << "Bad behavior requested" << endl;
+    cout << "Error: bad behavior \"" << behaviorName
+         << "\" requested for object \'" << objectName
+         << "\" (condition: " << instrInfos.GetFullName() << ")." << endl;
   } else {
     conditionCode += "for(std::size_t i = 0;i < " + ManObjListName(objectName) +
                      ".size();)\n";
@@ -325,11 +326,13 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
   }
 
   // Verify that object has behavior.
-  vector<gd::String> behaviors =
-      gd::GetBehaviorsOfObject(GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
+  vector<gd::String> behaviors = gd::GetBehaviorsOfObject(
+      GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (find(behaviors.begin(), behaviors.end(), behaviorName) ==
       behaviors.end()) {
-    cout << "Bad behavior requested for an action" << endl;
+    cout << "Error: bad behavior \"" << behaviorName
+         << "\" requested for object \'" << objectName
+         << "\" (action: " << instrInfos.GetFullName() << ")." << endl;
   } else {
     actionCode += "for(std::size_t i = 0;i < " + ManObjListName(objectName) +
                   ".size();++i)\n";
@@ -345,7 +348,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     const gd::String& parameter,
     const gd::ParameterMetadata& metadata,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& previousParameter,
+    const gd::String& lastObjectName,
     std::vector<std::pair<gd::String, gd::String> >*
         supplementaryParametersTypes) {
   gd::String argOutput;
@@ -353,101 +356,131 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
   // Code only parameter type
   if (metadata.type == "currentScene" || metadata.type == "objectsContext") {
     argOutput += "*runtimeContext->scene";
+  } else {
+    argOutput += gd::EventsCodeGenerator::GenerateParameterCodes(
+        parameter,
+        metadata,
+        context,
+        lastObjectName,
+        supplementaryParametersTypes);
   }
-  // Code only parameter type
-  else if (metadata.type == "objectList") {
-    std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
 
-    argOutput += "runtimeContext->ClearObjectListsMap()";
+  return argOutput;
+}
+
+gd::String EventsCodeGenerator::GenerateObject(
+    const gd::String& objectName,
+    const gd::String& type,
+    gd::EventsCodeGenerationContext& context) {
+  gd::String output;
+  if (type == "objectList") {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
+
+    output += "runtimeContext->ClearObjectListsMap()";
     for (std::size_t i = 0; i < realObjects.size(); ++i) {
       context.ObjectsListNeeded(realObjects[i]);
-      argOutput += ".AddObjectListToMap(\"" + ConvertToString(realObjects[i]) +
-                   "\", " + ManObjListName(realObjects[i]) + ")";
+      output += ".AddObjectListToMap(\"" + ConvertToString(realObjects[i]) +
+                "\", " + ManObjListName(realObjects[i]) + ")";
     }
-    argOutput += ".ReturnObjectListsMap()";
-  }
-  // Code only parameter type
-  else if (metadata.type == "objectListWithoutPicking") {
-    std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
+    output += ".ReturnObjectListsMap()";
+  } else if (type == "objectListWithoutPicking") {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
 
-    argOutput += "runtimeContext->ClearObjectListsMap()";
+    output += "runtimeContext->ClearObjectListsMap()";
     for (std::size_t i = 0; i < realObjects.size(); ++i) {
       context.EmptyObjectsListNeeded(realObjects[i]);
-      argOutput += ".AddObjectListToMap(\"" + ConvertToString(realObjects[i]) +
-                   "\", " + ManObjListName(realObjects[i]) + ")";
+      output += ".AddObjectListToMap(\"" + ConvertToString(realObjects[i]) +
+                "\", " + ManObjListName(realObjects[i]) + ")";
     }
-    argOutput += ".ReturnObjectListsMap()";
-  }
-  // Code only parameter type
-  else if (metadata.type == "objectPtr") {
-    std::vector<gd::String> realObjects = ExpandObjectsName(parameter, context);
+    output += ".ReturnObjectListsMap()";
+  } else if (type == "objectPtr") {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
 
     if (find(realObjects.begin(),
              realObjects.end(),
              context.GetCurrentObject()) != realObjects.end() &&
         !context.GetCurrentObject().empty()) {
       // If object currently used by instruction is available, use it directly.
-      argOutput += ManObjListName(context.GetCurrentObject()) + "[i]";
+      output += ManObjListName(context.GetCurrentObject()) + "[i]";
     } else {
       for (std::size_t i = 0; i < realObjects.size(); ++i) {
         context.ObjectsListNeeded(realObjects[i]);
-        argOutput += "(!" + ManObjListName(realObjects[i]) + ".empty() ? " +
-                     ManObjListName(realObjects[i]) + "[0] : ";
+        output += "(!" + ManObjListName(realObjects[i]) + ".empty() ? " +
+                  ManObjListName(realObjects[i]) + "[0] : ";
       }
-      argOutput += "NULL";
-      for (std::size_t i = 0; i < realObjects.size(); ++i) argOutput += ")";
+      output += GenerateBadObject();
+      for (std::size_t i = 0; i < realObjects.size(); ++i) output += ")";
     }
-  } else if (metadata.type == "scenevar") {
-    VariableCodeGenerationCallbacks callbacks(
-        argOutput,
-        *this,
-        context,
-        VariableCodeGenerationCallbacks::LAYOUT_VARIABLE);
-
-    gd::VariableParser parser(parameter);
-    if (!parser.Parse(callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-      argOutput = "runtimeContext->GetSceneVariables().GetBadVariable()";
-    }
-  } else if (metadata.type == "globalvar") {
-    VariableCodeGenerationCallbacks callbacks(
-        argOutput,
-        *this,
-        context,
-        VariableCodeGenerationCallbacks::PROJECT_VARIABLE);
-
-    gd::VariableParser parser(parameter);
-    if (!parser.Parse(callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-      argOutput = "runtimeContext->GetGameVariables().GetBadVariable()";
-    }
-  } else if (metadata.type == "objectvar") {
-    // Object is either the object of the previous parameter or, if it is empty,
-    // the object being picked by the instruction.
-    gd::String object = previousParameter;
-    if (object.empty()) object = context.GetCurrentObject();
-
-    VariableCodeGenerationCallbacks callbacks(
-        argOutput, *this, context, object);
-
-    gd::VariableParser parser(parameter);
-    if (!parser.Parse(callbacks)) {
-      cout << "Error :" << parser.GetFirstError() << " in: " << parameter
-           << endl;
-      argOutput = "runtimeContext->GetGameVariables().GetBadVariable()";
-    }
-  } else {
-    argOutput += gd::EventsCodeGenerator::GenerateParameterCodes(
-        parameter,
-        metadata,
-        context,
-        previousParameter,
-        supplementaryParametersTypes);
   }
 
-  return argOutput;
+  return output;
+}
+
+gd::String EventsCodeGenerator::GenerateGetVariable(
+    const gd::String& variableName,
+    const VariableScope& scope,
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& objectName) {
+  gd::String output;
+  const gd::VariablesContainer* variables = NULL;
+  if (scope == LAYOUT_VARIABLE) {
+    output = "runtimeContext->GetSceneVariables()";
+
+    if (HasProjectAndLayout()) {
+      variables = &GetLayout().GetVariables();
+    }
+  } else if (scope == PROJECT_VARIABLE) {
+    output = "runtimeContext->GetGameVariables()";
+
+    if (HasProjectAndLayout()) {
+      variables = &GetProject().GetVariables();
+    }
+  } else {
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(objectName, context);
+
+    output = "RuntimeVariablesContainer::GetBadVariablesContainer()";
+    for (std::size_t i = 0; i < realObjects.size(); ++i) {
+      context.ObjectsListNeeded(realObjects[i]);
+
+      // Generate the call to GetVariables() method.
+      if (context.GetCurrentObject() == realObjects[i] &&
+          !context.GetCurrentObject().empty())
+        output =
+            GetObjectListName(realObjects[i], context) + "[i]->GetVariables()";
+      else
+        output = "((" + GetObjectListName(realObjects[i], context) +
+                 ".empty() ) ? " + output + " : " +
+                 GetObjectListName(realObjects[i], context) +
+                 "[0]->GetVariables())";
+    }
+
+    if (HasProjectAndLayout()) {
+      if (GetLayout().HasObjectNamed(
+              objectName))  // We check first layout's objects' list.
+        variables = &GetLayout().GetObject(objectName).GetVariables();
+      else if (GetProject().HasObjectNamed(
+                   objectName))  // Then the global objects list.
+        variables = &GetProject().GetObject(objectName).GetVariables();
+    }
+  }
+
+  // Optimize the lookup of the variable when the variable is declared.
+  //(In this case, it is stored in an array at runtime and we know its
+  // position.)
+  if (variables && variables->Has(variableName)) {
+    std::size_t index = variables->GetPosition(variableName);
+    if (index < variables->Count()) {
+      output += ".Get(" + gd::String::From(index) + ")";
+      return output;
+    }
+  }
+
+  output += ".Get(" + ConvertToStringExplicit(variableName) + ")";
+  return output;
 }
 
 gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
@@ -593,7 +626,8 @@ void EventsCodeGenerator::PreprocessEventList(gd::EventsList& eventsList) {
 
 #if !defined( \
     GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
-      if (GetLayout().GetProfiler() && GetLayout().GetProfiler()->profilingActivated &&
+      if (GetLayout().GetProfiler() &&
+          GetLayout().GetProfiler()->profilingActivated &&
           eventsList[i].IsExecutable()) {
         // Define a new profile event
         std::shared_ptr<ProfileEvent> profileEvent =

@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -1230,9 +1230,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "LoadAtTop.PointX(Centre) - ButtonText.Width()/2",
+                    "LoadAtTop.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "LoadAtTop.PointY(Centre) - ButtonText.Height()/2"
+                    "LoadAtTop.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1279,9 +1279,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "LoadAtBottom.PointX(Centre) - ButtonText.Width()/2",
+                    "LoadAtBottom.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "LoadAtBottom.PointY(Centre) - ButtonText.Height()/2"
+                    "LoadAtBottom.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1328,9 +1328,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Show.PointX(Centre) - ButtonText.Width()/2",
+                    "Show.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Show.PointY(Centre) - ButtonText.Height()/2"
+                    "Show.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1377,9 +1377,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Hide.PointX(Centre) - ButtonText.Width()/2",
+                    "Hide.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Hide.PointY(Centre) - ButtonText.Height()/2"
+                    "Hide.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1426,9 +1426,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "LoadAtTopAndDisplay.PointX(Centre) - ButtonText.Width()/2",
+                    "LoadAtTopAndDisplay.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "LoadAtTopAndDisplay.PointY(Centre) - ButtonText.Height()/2"
+                    "LoadAtTopAndDisplay.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1475,9 +1475,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "LoadAtBottomAndDisplay.PointX(Centre) - ButtonText.Width()/2",
+                    "LoadAtBottomAndDisplay.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "LoadAtBottomAndDisplay.PointY(Centre) - ButtonText.Height()/2"
+                    "LoadAtBottomAndDisplay.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1524,9 +1524,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Remove.PointX(Centre) - ButtonText.Width()/2",
+                    "Remove.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Remove.PointY(Centre) - ButtonText.Height()/2"
+                    "Remove.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1573,9 +1573,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToInterstitials.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToInterstitials.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToInterstitials.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToInterstitials.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -1622,9 +1622,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToRewardVideos.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToRewardVideos.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToRewardVideos.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToRewardVideos.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -2845,9 +2845,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Load.PointX(Centre) - ButtonText.Width()/2",
+                    "Load.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Load.PointY(Centre) - ButtonText.Height()/2"
+                    "Load.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -2894,9 +2894,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Display.PointX(Centre) - ButtonText.Width()/2",
+                    "Display.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Display.PointY(Centre) - ButtonText.Height()/2"
+                    "Display.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -2943,9 +2943,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "LoadAndDisplay.PointX(Centre) - ButtonText.Width()/2",
+                    "LoadAndDisplay.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "LoadAndDisplay.PointY(Centre) - ButtonText.Height()/2"
+                    "LoadAndDisplay.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -2992,9 +2992,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToRewardVideos.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToRewardVideos.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToRewardVideos.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToRewardVideos.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -3041,9 +3041,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToBanners.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToBanners.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToBanners.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToBanners.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4148,9 +4148,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Load.PointX(Centre) - ButtonText.Width()/2",
+                    "Load.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Load.PointY(Centre) - ButtonText.Height()/2"
+                    "Load.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4197,9 +4197,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "Display.PointX(Centre) - ButtonText.Width()/2",
+                    "Display.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "Display.PointY(Centre) - ButtonText.Height()/2"
+                    "Display.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4246,9 +4246,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "LoadAndDisplay.PointX(Centre) - ButtonText.Width()/2",
+                    "LoadAndDisplay.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "LoadAndDisplay.PointY(Centre) - ButtonText.Height()/2"
+                    "LoadAndDisplay.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4295,9 +4295,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "ClaimReward.PointX(Centre) - ButtonText.Width()/2",
+                    "ClaimReward.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "ClaimReward.PointY(Centre) - ButtonText.Height()/2"
+                    "ClaimReward.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4344,9 +4344,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToBanners.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToBanners.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToBanners.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToBanners.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }
@@ -4393,9 +4393,9 @@
                   "parameters": [
                     "ButtonText",
                     "=",
-                    "GoToInterstitials.PointX(Centre) - ButtonText.Width()/2",
+                    "GoToInterstitials.PointX(\"Centre\") - ButtonText.Width()/2",
                     "=",
-                    "GoToInterstitials.PointY(Centre) - ButtonText.Height()/2"
+                    "GoToInterstitials.PointY(\"Centre\") - ButtonText.Height()/2"
                   ],
                   "subInstructions": []
                 }

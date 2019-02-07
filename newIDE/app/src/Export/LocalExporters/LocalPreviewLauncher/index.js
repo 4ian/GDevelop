@@ -29,6 +29,7 @@ type State = {
   previewBrowserWindowConfig: ?{
     width: number,
     height: number,
+    useContentSize: boolean,
     title: string,
     backgroundColor: string,
   },
@@ -72,6 +73,7 @@ export default class LocalPreviewLauncher extends React.Component<
         previewBrowserWindowConfig: {
           width: project.getMainWindowDefaultWidth(),
           height: project.getMainWindowDefaultHeight(),
+          useContentSize: true,
           title: `Preview of ${project.getName()}`,
           backgroundColor: '#000000',
         },

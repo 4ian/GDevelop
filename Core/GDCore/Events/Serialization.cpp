@@ -16,10 +16,74 @@
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/Log.h"
+#include "GDCore/Tools/VersionWrapper.h"
 
 using namespace std;
 
+namespace {
+bool AddQuotesToFunctionCall(gd::String& expressionStr,
+                             const gd::String& functionName) {
+  bool changedSomething = false;
+  size_t functionCallPos = expressionStr.find(functionName + "(");
+  while (functionCallPos != gd::String::npos) {
+    size_t pos = functionCallPos + functionName.size() + 1;
+
+    // Skip whitespace
+    while (pos < expressionStr.size() && expressionStr[pos] == ' ') pos++;
+
+    if (pos < expressionStr.size()) {
+      changedSomething = true;
+
+      // Insert the first quote
+      expressionStr.insert(pos, "\"");
+      pos++;
+
+      // Escape the argument
+      while (pos < expressionStr.size() && expressionStr[pos] != ')') {
+        if (expressionStr[pos] == '"') {
+          expressionStr.insert(pos,
+                               "\\");  // Insert a backslash to escape the quote
+          pos++;
+        }
+        pos++;
+      }
+
+      // Insert the last quote
+      if (pos < expressionStr.size() && expressionStr[pos] == ')') {
+        expressionStr.insert(pos, "\"");
+        pos++;
+      }
+    }
+
+    functionCallPos = expressionStr.find(functionName + "(", pos + 1);
+  }
+
+  return changedSomething;
+}
+}  // namespace
+
 namespace gd {
+
+void EventsListSerialization::UpdateInstructionsFromGD4097(
+    gd::Project& project, gd::InstructionsList& list) {
+  for (std::size_t i = 0; i < list.size(); ++i) {
+    gd::Instruction& instr = list[i];
+
+    for (std::size_t j = 0; j < instr.GetParametersCount(); ++j) {
+      gd::String expressionStr = instr.GetParameter(j).GetPlainString();
+      bool changedSomething = false;
+      changedSomething |= AddQuotesToFunctionCall(expressionStr, "PointX");
+      changedSomething |= AddQuotesToFunctionCall(expressionStr, "PointY");
+
+      if (changedSomething) {
+        std::cout << "(Debug) Converted \""
+                  << instr.GetParameter(j).GetPlainString() << "\" to \""
+                  << expressionStr << "\"" << std::endl;
+        instr.SetParameter(j, gd::Expression(expressionStr));
+      }
+    }
+  }
+}
 
 void EventsListSerialization::UpdateInstructionsFromGD31x(
     gd::Project& project, gd::InstructionsList& list) {
@@ -256,6 +320,18 @@ void gd::EventsListSerialization::UnserializeInstructionsFrom(
   if (project.GetLastSaveGDMajorVersion() < 3)
     UpdateInstructionsFromGD2x(
         project, instructions, elem.HasChild("action", "Action"));
+
+  // Compatibility with GD <= 4.0.97
+  if (VersionWrapper::IsOlderOrEqual(project.GetLastSaveGDMajorVersion(),
+                                     project.GetLastSaveGDMinorVersion(),
+                                     project.GetLastSaveGDBuildVersion(),
+                                     0,
+                                     4,
+                                     0,
+                                     97,
+                                     0)) {
+    UpdateInstructionsFromGD4097(project, instructions);
+  }
   // end of compatibility code
 }
 

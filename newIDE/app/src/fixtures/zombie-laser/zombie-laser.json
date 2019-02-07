@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -2664,8 +2664,8 @@
                   },
                   "parameters": [
                     "LaserObstacle",
-                    "Hero.PointX(Barrel)",
-                    "Hero.PointY(Barrel)",
+                    "Hero.PointX(\"Barrel\")",
+                    "Hero.PointY(\"Barrel\")",
                     "Hero.Direction()",
                     "800",
                     "ContactX",
@@ -2796,7 +2796,7 @@
                   "parameters": [
                     "ContactX",
                     "=",
-                    "Hero.PointX(Barrel) + 800*cos(ToRad(Hero.Angle()))"
+                    "Hero.PointX(\"Barrel\") + 800*cos(ToRad(Hero.Angle()))"
                   ],
                   "subInstructions": []
                 },
@@ -2808,7 +2808,7 @@
                   "parameters": [
                     "ContactY",
                     "=",
-                    "Hero.PointY(Barrel) + 800*sin(ToRad(Hero.Angle()))"
+                    "Hero.PointY(\"Barrel\") + 800*sin(ToRad(Hero.Angle()))"
                   ],
                   "subInstructions": []
                 }
@@ -2843,8 +2843,8 @@
                   },
                   "parameters": [
                     "LaserDrawer",
-                    "Hero.PointX(Barrel)",
-                    "Hero.PointY(Barrel)",
+                    "Hero.PointX(\"Barrel\")",
+                    "Hero.PointY(\"Barrel\")",
                     "Variable(ContactX)",
                     "Variable(ContactY)",
                     "3"

@@ -3,9 +3,9 @@ import axios from 'axios';
 import { GDevelopReleaseApi } from './ApiConfigs';
 
 export type Release = {
-  name: string,
-  publishedAt: string,
-  description: string,
+  name: ?string,
+  publishedAt: ?string,
+  description: ?string,
 };
 
 export const getReleases = (): Promise<Array<Release>> => {
@@ -19,7 +19,9 @@ export const getReleases = (): Promise<Array<Release>> => {
 };
 
 export const hasBreakingChange = (release: Release): boolean => {
-  return release.description.toLowerCase().indexOf('breaking change') !== -1;
+  return (
+    (release.description || '').toLowerCase().indexOf('breaking change') !== -1
+  );
 };
 
 export const findRelease = (

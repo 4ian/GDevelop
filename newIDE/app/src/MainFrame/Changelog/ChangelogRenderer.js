@@ -72,16 +72,22 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
               adaptation must be made to your project.
             </AlertMessage>
           )}
-          {releases.map(release => (
-            <ReactMarkdown
-              key={release.name}
-              escapeHtml
-              source={
-                '# Version ' + release.name + '\n---\n' + release.description
-              }
-              className={muiTheme.markdownRootClassName}
-            />
-          ))}
+          {releases.map(release =>
+            release.name ? (
+              <ReactMarkdown
+                key={release.name}
+                escapeHtml
+                source={
+                  '# Version ' +
+                  release.name +
+                  '\n---\n' +
+                  (release.description ||
+                    'Changes and new features description will be available soon.')
+                }
+                className={muiTheme.markdownRootClassName}
+              />
+            ) : null
+          )}
           <Line justifyContent="center">
             <FlatButton
               label="See all the releases notes"

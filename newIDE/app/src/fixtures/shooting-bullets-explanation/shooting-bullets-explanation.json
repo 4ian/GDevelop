@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -444,8 +444,8 @@
               "parameters": [
                 "",
                 "Bullet",
-                "Tank.PointX(Canon)",
-                "Tank.PointY(Canon)",
+                "Tank.PointX(\"Canon\")",
+                "Tank.PointY(\"Canon\")",
                 ""
               ],
               "subInstructions": []
@@ -899,8 +899,8 @@
                   "parameters": [
                     "",
                     "Bullet",
-                    "Tank.PointX(Canon)",
-                    "Tank.PointY(Canon)",
+                    "Tank.PointX(\"Canon\")",
+                    "Tank.PointY(\"Canon\")",
                     ""
                   ],
                   "subInstructions": []

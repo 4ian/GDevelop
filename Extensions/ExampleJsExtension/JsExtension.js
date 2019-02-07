@@ -327,18 +327,18 @@ module.exports = {
     object
       .addAction(
         "MyMethod",
-        t("Display a dummy text in Developer console"),
-        t(
+        _("Display a dummy text in Developer console"),
+        _(
           "Display a dummy text in Developer console. Open it with CTRL-SHIFT-J (Cmd-Alt-J on macOS)."
         ),
-        t("Display a dummy text for _PARAM0_, with params: _PARAM1_, _PARAM2_"),
+        _("Display a dummy text for _PARAM0_, with params: _PARAM1_, _PARAM2_"),
         "",
         "res/conditions/camera24.png",
         "res/conditions/camera.png"
       )
-      .addParameter("object", t("Object"), "DummyObject", false) // This parameter is mandatory for any object action/condition
-      .addParameter("expression", t("Number 1"), "", false)
-      .addParameter("string", t("Text 1"), "", false)
+      .addParameter("object", _("Object"), "DummyObject", false) // This parameter is mandatory for any object action/condition
+      .addParameter("expression", _("Number 1"), "", false)
+      .addParameter("string", _("Text 1"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("myMethod");
 
@@ -421,7 +421,7 @@ module.exports = {
       );
 
       //Setup the PIXI object:
-      this._pixiObject = new PIXI.Tex_("This is a dummy object", {
+      this._pixiObject = new PIXI.Text("This is a dummy object", {
         align: "left"
       });
       this._pixiObject.anchor.x = 0.5;
@@ -451,7 +451,7 @@ module.exports = {
       // Read a property from the object
       const property1Value = this._associatedObject
         .getProperties(this.project)
-        .ge_("My first property")
+        .get("My first property")
         .getValue();
       this._pixiObject.text = property1Value;
 

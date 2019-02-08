@@ -920,9 +920,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension
       .AddAction("AjoutObjConcern",
                  _("Pick all objects"),
-                 _("Pick all objects of this type. When you pick all objects "
-                   "of this type, the next conditions and actions of this "
-                   "event work on all of them."),
+                 _("Pick all the specified objects. When you pick all objects, "
+                   "the next conditions and actions of this event work on all "
+                   "of them."),
                  _("Pick all _PARAM1_ objects"),
                  _("Objects"),
                  "res/actions/add24.png",
@@ -935,7 +935,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddAction(
           "AjoutHasard",
           _("Pick a random object"),
-          _("Pick one object from all the objects of this type. When an object "
+          _("Pick one object from all the specified objects. When an object "
             "is picked, the next conditions and actions of this event work "
             "only on that object."),
           _("Pick a random _PARAM1_"),
@@ -994,9 +994,9 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCondition(
           "AjoutObjConcern",
           _("Pick all objects"),
-          _("Pick all objects of this type. When you pick all objects "
-            "of this type, the next conditions and actions of this "
-            "event work on all of them."),
+          _("Pick all the specified objects. When you pick all objects, "
+            "the next conditions and actions of this event work on all "
+            "of them."),
           _("Pick all _PARAM1_ objects"),
           _("Objects"),
           "res/conditions/add24.png",
@@ -1009,7 +1009,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCondition(
           "AjoutHasard",
           _("Pick a random object"),
-          _("Pick one object from all the objects of this type. When an object "
+          _("Pick one object from all the specified objects. When an object "
             "is picked, the next conditions and actions of this event work "
             "only on that object."),
           _("Pick a random _PARAM1_"),
@@ -1038,14 +1038,17 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   extension
-      .AddCondition("NbObjet",
-                    _("Number of objects"),
-                    _("Count how many objects of this type exist in the "
-                      "current scene, and compare that number to a value."),
-                    _("The number of _PARAM0_ objects is _PARAM1__PARAM2_"),
-                    _("Objects"),
-                    "res/conditions/nbObjet24.png",
-                    "res/conditions/nbObjet.png")
+      .AddCondition(
+          "NbObjet",
+          _("Number of objects"),
+          _("Count how many of the specified objects are currently picked, and "
+            "compare that number to a value. If previous conditions on the "
+            "objects have not been used, this condition counts how many of "
+            "these objects exist in the current scene."),
+          _("The number of _PARAM0_ objects is _PARAM1__PARAM2_"),
+          _("Objects"),
+          "res/conditions/nbObjet24.png",
+          "res/conditions/nbObjet.png")
       .AddParameter("objectList", _("Object"))
       .AddParameter("relationalOperator", _("Sign of the test"))
       .AddParameter("expression", _("Value to test"))
@@ -1148,12 +1151,12 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddExpression(
-          "Count",
-          _("Number of objects"),
-          _("Count the number of the specified objects being currently picked in the event"),
-          _("Objects"),
-          "res/conditions/nbObjet.png")
+      .AddExpression("Count",
+                     _("Number of objects"),
+                     _("Count the number of the specified objects being "
+                       "currently picked in the event"),
+                     _("Objects"),
+                     "res/conditions/nbObjet.png")
       .AddParameter("objectList", _("Object"));
 
   obj.AddStrExpression("ObjectName",

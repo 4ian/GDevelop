@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -1657,8 +1657,8 @@
                       "parameters": [
                         "Group",
                         "Physics2Behavior",
-                        "Group.PointX(Swing)",
-                        "Group.PointY(Swing)",
+                        "Group.PointX(\"Swing\")",
+                        "Group.PointY(\"Swing\")",
                         "MainChar",
                         "MainChar.X()",
                         "MainChar.Y()",
@@ -1714,8 +1714,8 @@
                     "Rope",
                     "MainChar.X()",
                     "MainChar.Y()",
-                    "Group.PointX(Swing)",
-                    "Group.PointY(Swing)",
+                    "Group.PointX(\"Swing\")",
+                    "Group.PointY(\"Swing\")",
                     "3"
                   ],
                   "subInstructions": []

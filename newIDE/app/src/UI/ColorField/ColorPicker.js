@@ -48,6 +48,7 @@ const styles = {
   popover: {
     position: 'fixed',
     zIndex: '2',
+    transform: 'translateX(-174px)',
   },
   cover: {
     position: 'fixed',

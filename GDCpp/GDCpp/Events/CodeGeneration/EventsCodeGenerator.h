@@ -17,7 +17,7 @@ class ObjectMetadata;
 class BehaviorMetadata;
 class InstructionMetadata;
 class ExpressionCodeGenerationInformation;
-}
+}  // namespace gd
 
 class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
   friend class VariableCodeGenerationCallbacks;
@@ -64,8 +64,8 @@ class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GetCodeNamespaceAccessor() { return ""; };
 
   /**
-   * \brief Get the namespace to be used to store code generated objects/values/functions.
-   * \note This is unused for C++ code generation.
+   * \brief Get the namespace to be used to store code generated
+   * objects/values/functions. \note This is unused for C++ code generation.
    */
   virtual gd::String GetCodeNamespace() { return ""; };
 
@@ -74,7 +74,7 @@ class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& parameter,
       const gd::ParameterMetadata& metadata,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& previousParameter,
+      const gd::String& lastObjectName,
       std::vector<std::pair<gd::String, gd::String> >*
           supplementaryParametersTypes);
 
@@ -128,6 +128,31 @@ class GD_API EventsCodeGenerator : public gd::EventsCodeGenerator {
       const std::vector<gd::String>& arguments,
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context);
+
+  virtual gd::String GenerateGetVariable(
+      const gd::String& variableName,
+      const VariableScope& scope,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& objectName);
+
+  virtual gd::String GenerateVariableAccessor(gd::String childName) {
+    return ".GetChild(" + ConvertToStringExplicit(childName) + ")";
+  };
+
+  virtual gd::String GenerateVariableBracketAccessor(
+      gd::String expressionCode) {
+    return ".GetChild(" + expressionCode + ")";
+  };
+
+  virtual gd::String GenerateBadVariable() {
+    return "runtimeContext->GetGameVariables().GetBadVariable()";
+  }
+
+  virtual gd::String GenerateBadObject() { return "NULL"; }
+
+  virtual gd::String GenerateObject(const gd::String& objectName,
+                                    const gd::String& type,
+                                    gd::EventsCodeGenerationContext& context);
 
   /**
    * \brief Construct a code generator for the specified project and layout.

@@ -717,9 +717,6 @@ bool ExpressionParser::ParseStringExpression(const gd::Platform& platform,
           firstErrorPos = functionNameEnd;
           firstErrorStr = _("Incorrect number of parameters");
 
-          for (std::size_t i = 0; i < parameters.size(); ++i)
-            cout << "Param:" << parameters[i].GetPlainString() << endl;
-
           return false;
         }
 

@@ -106,3 +106,13 @@ gdjs.DummyRuntimeObject.prototype.getOpacity = function() {
 gdjs.DummyRuntimeObject.prototype.getText = function() {
   return this._property1;
 };
+
+
+/**
+ * A dummy method that can be called from events
+ */
+gdjs.DummyRuntimeObject.prototype.myMethod = function(number1, text1) {
+  console.log("Congrats, this method was called on a DummyRuntimeObject");
+  console.log("Here is the object:", this);
+  console.log("Here are the arguments passed from events:", number1, text1);
+};

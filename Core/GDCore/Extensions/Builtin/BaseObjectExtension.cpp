@@ -920,8 +920,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
   extension
       .AddAction("AjoutObjConcern",
                  _("Pick all objects"),
-                 _("Pick all objects with this name."),
-                 _("Pick all _PARAM1_"),
+                 _("Pick all objects of this type. When you pick all objects "
+                   "of this type, the next conditions and actions of this "
+                   "event work on all of them."),
+                 _("Pick all _PARAM1_ objects"),
                  _("Objects"),
                  "res/actions/add24.png",
                  "res/actions/add.png")
@@ -930,13 +932,16 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("AjoutHasard",
-                 _("Pick a random object"),
-                 _("Pick only one object with this name, among all"),
-                 _("Pick a random _PARAM1_"),
-                 _("Objects"),
-                 "res/actions/ajouthasard24.png",
-                 "res/actions/ajouthasard.png")
+      .AddAction(
+          "AjoutHasard",
+          _("Pick a random object"),
+          _("Pick one object from all the objects of this type. When an object "
+            "is picked, the next conditions and actions of this event work "
+            "only on that object."),
+          _("Pick a random _PARAM1_"),
+          _("Objects"),
+          "res/actions/ajouthasard24.png",
+          "res/actions/ajouthasard.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsSimple();
@@ -986,25 +991,31 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .MarkAsSimple();
 
   extension
-      .AddCondition("AjoutObjConcern",
-                    _("Pick all objects"),
-                    _("Pick all objects with this name."),
-                    _("Pick all _PARAM1_"),
-                    _("Objects"),
-                    "res/conditions/add24.png",
-                    "res/conditions/add.png")
+      .AddCondition(
+          "AjoutObjConcern",
+          _("Pick all objects"),
+          _("Pick all objects of this type. When you pick all objects "
+            "of this type, the next conditions and actions of this "
+            "event work on all of them."),
+          _("Pick all _PARAM1_ objects"),
+          _("Objects"),
+          "res/conditions/add24.png",
+          "res/conditions/add.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsAdvanced();
 
   extension
-      .AddCondition("AjoutHasard",
-                    _("Pick a random object"),
-                    _("Pick only one object with this name, among all"),
-                    _("Pick a random _PARAM1_"),
-                    _("Objects"),
-                    "res/conditions/ajouthasard24.png",
-                    "res/conditions/ajouthasard.png")
+      .AddCondition(
+          "AjoutHasard",
+          _("Pick a random object"),
+          _("Pick one object from all the objects of this type. When an object "
+            "is picked, the next conditions and actions of this event work "
+            "only on that object."),
+          _("Pick a random _PARAM1_"),
+          _("Objects"),
+          "res/conditions/ajouthasard24.png",
+          "res/conditions/ajouthasard.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("objectList", _("Object"))
       .MarkAsSimple();
@@ -1013,9 +1024,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddCondition(
           "PickNearest",
           _("Pick nearest object"),
-          _("Among the objects, pick the one that is nearest (or furthest if "
-            "condition is inverted) from the specified position."),
-          _("Pick nearest _PARAM0_ to _PARAM1_;_PARAM2_"),
+          _("Pick the object of this type that is nearest to the specified "
+            "position. If the condition is inverted, the object farthest from "
+            "the specified position is picked instead."),
+          _("Pick the _PARAM0_ that is nearest to _PARAM1_;_PARAM2_"),
           _("Objects"),
           "res/conditions/distance24.png",
           "res/conditions/distance.png")
@@ -1027,9 +1039,10 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
 
   extension
       .AddCondition("NbObjet",
-                    _("Objects count"),
-                    _("Compare the number of picked objects"),
-                    _("The number of _PARAM0_ is _PARAM1__PARAM2_"),
+                    _("Number of objects"),
+                    _("Count how many objects of this type exist in the "
+                      "current scene, and compare that number to a value."),
+                    _("The number of _PARAM0_ objects is _PARAM1__PARAM2_"),
                     _("Objects"),
                     "res/conditions/nbObjet24.png",
                     "res/conditions/nbObjet.png")
@@ -1138,7 +1151,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsBaseObjectExtension(
       .AddExpression(
           "Count",
           _("Number of objects"),
-          _("Count the number of the specified objects currently picked"),
+          _("Count the number of the specified objects being currently picked in the event"),
           _("Objects"),
           "res/conditions/nbObjet.png")
       .AddParameter("objectList", _("Object"));

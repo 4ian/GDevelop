@@ -1,0 +1,153 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BackgroundHighlighting can render one highlight at the beginning 1`] = `
+<div
+  style={
+    Object {
+      "color": "transparent",
+      "position": "absolute",
+      "whiteSpace": "pre-wrap",
+      "width": "100%",
+      "wordWrap": "break-word",
+    }
+  }
+>
+  <span
+    style={
+      Object {
+        "backgroundColor": "rgba(244, 67, 54, 0.15)",
+        "borderBottom": "3px solid rgba(244, 67, 54, 0.7)",
+        "borderSizing": "border-box",
+      }
+    }
+  >
+    Hello
+  </span>
+  <span>
+     world
+  </span>
+</div>
+`;
+
+exports[`BackgroundHighlighting can render one highlight past the end 1`] = `
+<div
+  style={
+    Object {
+      "color": "transparent",
+      "position": "absolute",
+      "whiteSpace": "pre-wrap",
+      "width": "100%",
+      "wordWrap": "break-word",
+    }
+  }
+>
+  <span>
+    Hello
+  </span>
+  <span
+    style={
+      Object {
+        "backgroundColor": "rgba(244, 67, 54, 0.15)",
+        "borderBottom": "3px solid rgba(244, 67, 54, 0.7)",
+        "borderSizing": "border-box",
+      }
+    }
+  >
+     world
+  </span>
+</div>
+`;
+
+exports[`BackgroundHighlighting can render overlapping highlights 1`] = `
+<div
+  style={
+    Object {
+      "color": "transparent",
+      "position": "absolute",
+      "whiteSpace": "pre-wrap",
+      "width": "100%",
+      "wordWrap": "break-word",
+    }
+  }
+>
+  <span>
+    H
+  </span>
+  <span
+    style={
+      Object {
+        "backgroundColor": "rgba(244, 67, 54, 0.15)",
+        "borderBottom": "3px solid rgba(244, 67, 54, 0.7)",
+        "borderSizing": "border-box",
+      }
+    }
+  >
+    ell
+  </span>
+  <span
+    style={
+      Object {
+        "backgroundColor": "rgba(244, 67, 54, 0.15)",
+        "borderBottom": "3px solid rgba(244, 67, 54, 0.7)",
+        "borderSizing": "border-box",
+      }
+    }
+  >
+    o w
+  </span>
+  <span>
+    orld
+  </span>
+</div>
+`;
+
+exports[`BackgroundHighlighting can render overlapping highlights on all the text 1`] = `
+<div
+  style={
+    Object {
+      "color": "transparent",
+      "position": "absolute",
+      "whiteSpace": "pre-wrap",
+      "width": "100%",
+      "wordWrap": "break-word",
+    }
+  }
+>
+  <span>
+    H
+  </span>
+  <span
+    style={
+      Object {
+        "backgroundColor": "rgba(244, 67, 54, 0.15)",
+        "borderBottom": "3px solid rgba(244, 67, 54, 0.7)",
+        "borderSizing": "border-box",
+      }
+    }
+  >
+    ell
+  </span>
+  <span
+    style={
+      Object {
+        "backgroundColor": "rgba(244, 67, 54, 0.15)",
+        "borderBottom": "3px solid rgba(244, 67, 54, 0.7)",
+        "borderSizing": "border-box",
+      }
+    }
+  >
+    o wor
+  </span>
+  <span
+    style={
+      Object {
+        "backgroundColor": "rgba(244, 67, 54, 0.15)",
+        "borderBottom": "3px solid rgba(244, 67, 54, 0.7)",
+        "borderSizing": "border-box",
+      }
+    }
+  >
+    ld
+  </span>
+</div>
+`;

@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -1191,8 +1191,8 @@
                   "parameters": [
                     "",
                     "small_magnet",
-                    "Hole.PointX(Centre)",
-                    "Hole.PointY(Centre)",
+                    "Hole.PointX(\"Centre\")",
+                    "Hole.PointY(\"Centre\")",
                     ""
                   ],
                   "subInstructions": []

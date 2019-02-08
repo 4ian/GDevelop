@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -611,7 +611,7 @@
                             "child",
                             "AngleToParent",
                             "=",
-                            "ToDeg(atan2(child.PointY(Centre) - parent.PointY(Centre), child.PointX(Centre) - parent.PointX(Centre)))"
+                            "ToDeg(atan2(child.PointY(\"Centre\") - parent.PointY(\"Centre\"), child.PointX(\"Centre\") - parent.PointX(\"Centre\")))"
                           ],
                           "subInstructions": []
                         }
@@ -901,7 +901,7 @@
                     "child",
                     "distanceX",
                     "=",
-                    "parent.PointX(Centre) - child.PointX(Centre)"
+                    "parent.PointX(\"Centre\") - child.PointX(\"Centre\")"
                   ],
                   "subInstructions": []
                 },
@@ -914,7 +914,7 @@
                     "child",
                     "distanceY",
                     "=",
-                    "parent.PointY(Centre) - child.PointY(Centre)"
+                    "parent.PointY(\"Centre\") - child.PointY(\"Centre\")"
                   ],
                   "subInstructions": []
                 },
@@ -943,9 +943,9 @@
                         "value": "Egal"
                       },
                       "parameters": [
-                        "child.PointX(Centre)",
+                        "child.PointX(\"Centre\")",
                         ">",
-                        "parent.PointX(Centre)"
+                        "parent.PointX(\"Centre\")"
                       ],
                       "subInstructions": []
                     }
@@ -978,9 +978,9 @@
                         "value": "Egal"
                       },
                       "parameters": [
-                        "child.PointX(Centre)",
+                        "child.PointX(\"Centre\")",
                         "<",
-                        "parent.PointX(Centre)"
+                        "parent.PointX(\"Centre\")"
                       ],
                       "subInstructions": []
                     }
@@ -1013,9 +1013,9 @@
                         "value": "Egal"
                       },
                       "parameters": [
-                        "child.PointY(Centre)",
+                        "child.PointY(\"Centre\")",
                         ">",
-                        "parent.PointY(Centre)"
+                        "parent.PointY(\"Centre\")"
                       ],
                       "subInstructions": []
                     }
@@ -1048,9 +1048,9 @@
                         "value": "Egal"
                       },
                       "parameters": [
-                        "child.PointY(Centre)",
+                        "child.PointY(\"Centre\")",
                         "<",
-                        "parent.PointY(Centre)"
+                        "parent.PointY(\"Centre\")"
                       ],
                       "subInstructions": []
                     }

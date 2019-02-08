@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -3608,11 +3608,11 @@
                       "parameters": [
                         "DistanceBox",
                         "Physics2Behavior",
-                        "DistanceBox.PointX(Anchor)",
-                        "DistanceBox.PointY(Anchor)",
+                        "DistanceBox.PointX(\"Anchor\")",
+                        "DistanceBox.PointY(\"Anchor\")",
                         "DistanceCircle",
-                        "DistanceCircle.PointX(Anchor)",
-                        "DistanceCircle.PointY(Anchor)",
+                        "DistanceCircle.PointX(\"Anchor\")",
+                        "DistanceCircle.PointY(\"Anchor\")",
                         "60",
                         "2",
                         "0.05",
@@ -3653,11 +3653,11 @@
                       "parameters": [
                         "RevoluteBox",
                         "Physics2Behavior",
-                        "RevoluteBox.PointX(Anchor)",
-                        "RevoluteBox.PointY(Anchor)",
+                        "RevoluteBox.PointX(\"Anchor\")",
+                        "RevoluteBox.PointY(\"Anchor\")",
                         "RevoluteCircle",
-                        "RevoluteCircle.PointX(Anchor)",
-                        "RevoluteCircle.PointY(Anchor)",
+                        "RevoluteCircle.PointX(\"Anchor\")",
+                        "RevoluteCircle.PointY(\"Anchor\")",
                         "yes",
                         "0",
                         "-15",
@@ -3678,8 +3678,8 @@
                       "parameters": [
                         "RevoluteBox2",
                         "Physics2Behavior",
-                        "RevoluteBox2.PointX(Anchor)",
-                        "RevoluteBox2.PointY(Anchor)",
+                        "RevoluteBox2.PointX(\"Anchor\")",
+                        "RevoluteBox2.PointY(\"Anchor\")",
                         "no",
                         "",
                         "",
@@ -3723,11 +3723,11 @@
                       "parameters": [
                         "PrismaticBox",
                         "Physics2Behavior",
-                        "PrismaticBox.PointX(Anchor)",
-                        "PrismaticBox.PointY(Anchor)",
+                        "PrismaticBox.PointX(\"Anchor\")",
+                        "PrismaticBox.PointY(\"Anchor\")",
                         "PrismaticCircle",
-                        "PrismaticCircle.PointX(Anchor)",
-                        "PrismaticCircle.PointY(Anchor)",
+                        "PrismaticCircle.PointX(\"Anchor\")",
+                        "PrismaticCircle.PointY(\"Anchor\")",
                         "45",
                         "0",
                         "yes",
@@ -3773,7 +3773,7 @@
                       "parameters": [
                         "pulleyAnchorX1",
                         "=",
-                        "PulleyBox.PointX(Centre)"
+                        "PulleyBox.PointX(\"Centre\")"
                       ],
                       "subInstructions": []
                     },
@@ -3785,7 +3785,7 @@
                       "parameters": [
                         "pulleyAnchorY1",
                         "=",
-                        "PulleyBox.PointY(Centre) - 40"
+                        "PulleyBox.PointY(\"Centre\") - 40"
                       ],
                       "subInstructions": []
                     },
@@ -3797,7 +3797,7 @@
                       "parameters": [
                         "pulleyAnchorX2",
                         "=",
-                        "PulleyCircle.PointX(Centre)"
+                        "PulleyCircle.PointX(\"Centre\")"
                       ],
                       "subInstructions": []
                     },
@@ -3809,7 +3809,7 @@
                       "parameters": [
                         "pulleyAnchorY2",
                         "=",
-                        "PulleyCircle.PointY(Centre) - 70"
+                        "PulleyCircle.PointY(\"Centre\") - 70"
                       ],
                       "subInstructions": []
                     },
@@ -3821,11 +3821,11 @@
                       "parameters": [
                         "PulleyBox",
                         "Physics2Behavior",
-                        "PulleyBox.PointX(Anchor)",
-                        "PulleyBox.PointY(Anchor)",
+                        "PulleyBox.PointX(\"Anchor\")",
+                        "PulleyBox.PointY(\"Anchor\")",
                         "PulleyCircle",
-                        "PulleyCircle.PointX(Anchor)",
-                        "PulleyCircle.PointY(Anchor)",
+                        "PulleyCircle.PointX(\"Anchor\")",
+                        "PulleyCircle.PointY(\"Anchor\")",
                         "Variable(pulleyAnchorX1)",
                         "Variable(pulleyAnchorY1)",
                         "Variable(pulleyAnchorX2)",
@@ -3870,11 +3870,11 @@
                       "parameters": [
                         "GearBox2",
                         "Physics2Behavior",
-                        "GearBox2.PointX(Centre)",
-                        "GearBox2.PointY(Centre)",
+                        "GearBox2.PointX(\"Centre\")",
+                        "GearBox2.PointY(\"Centre\")",
                         "GearBox1",
-                        "GearBox1.PointX(Centre)",
-                        "GearBox1.PointY(Centre)",
+                        "GearBox1.PointX(\"Centre\")",
+                        "GearBox1.PointY(\"Centre\")",
                         "-90",
                         "",
                         "no",
@@ -3896,11 +3896,11 @@
                       "parameters": [
                         "GearBox2",
                         "Physics2Behavior",
-                        "GearBox2.PointX(Centre)",
-                        "GearBox2.PointY(Centre)",
+                        "GearBox2.PointX(\"Centre\")",
+                        "GearBox2.PointY(\"Centre\")",
                         "GearCircle1",
-                        "GearCircle1.PointX(Centre)",
-                        "GearCircle1.PointY(Centre)",
+                        "GearCircle1.PointX(\"Centre\")",
+                        "GearCircle1.PointY(\"Centre\")",
                         "no",
                         "",
                         "",
@@ -3921,8 +3921,8 @@
                       "parameters": [
                         "GearCircle2",
                         "Physics2Behavior",
-                        "GearCircle2.PointX(Centre)",
-                        "GearCircle2.PointY(Centre)",
+                        "GearCircle2.PointX(\"Centre\")",
+                        "GearCircle2.PointY(\"Centre\")",
                         "no",
                         "",
                         "",
@@ -3998,11 +3998,11 @@
                       "parameters": [
                         "WheelBox",
                         "Physics2Behavior",
-                        "WheelBox.PointX(Anchor1)",
-                        "WheelBox.PointY(Anchor1)",
+                        "WheelBox.PointX(\"Anchor1\")",
+                        "WheelBox.PointY(\"Anchor1\")",
                         "WheelCircle1",
-                        "WheelCircle1.PointX(Centre)",
-                        "WheelCircle1.PointY(Centre)",
+                        "WheelCircle1.PointX(\"Centre\")",
+                        "WheelCircle1.PointY(\"Centre\")",
                         "100",
                         "5",
                         "0.1",
@@ -4022,11 +4022,11 @@
                       "parameters": [
                         "WheelBox",
                         "Physics2Behavior",
-                        "WheelBox.PointX(Anchor2)",
-                        "WheelBox.PointY(Anchor2)",
+                        "WheelBox.PointX(\"Anchor2\")",
+                        "WheelBox.PointY(\"Anchor2\")",
                         "WheelCircle2",
-                        "WheelCircle2.PointX(Centre)",
-                        "WheelCircle2.PointY(Centre)",
+                        "WheelCircle2.PointX(\"Centre\")",
+                        "WheelCircle2.PointY(\"Centre\")",
                         "80",
                         "6",
                         "0.9",
@@ -4070,11 +4070,11 @@
                       "parameters": [
                         "WeldBox",
                         "Physics2Behavior",
-                        "WeldBox.PointX(Anchor1)",
-                        "WeldBox.PointY(Anchor1)",
+                        "WeldBox.PointX(\"Anchor1\")",
+                        "WeldBox.PointY(\"Anchor1\")",
                         "WeldCircle1",
-                        "WeldCircle1.PointX(Centre)",
-                        "WeldCircle1.PointY(Centre)",
+                        "WeldCircle1.PointX(\"Centre\")",
+                        "WeldCircle1.PointY(\"Centre\")",
                         "",
                         "",
                         "",
@@ -4091,11 +4091,11 @@
                       "parameters": [
                         "WeldBox",
                         "Physics2Behavior",
-                        "WeldBox.PointX(Anchor2)",
-                        "WeldBox.PointY(Anchor2)",
+                        "WeldBox.PointX(\"Anchor2\")",
+                        "WeldBox.PointY(\"Anchor2\")",
                         "WeldCircle2",
-                        "WeldCircle2.PointX(Centre)",
-                        "WeldCircle2.PointY(Centre)",
+                        "WeldCircle2.PointX(\"Centre\")",
+                        "WeldCircle2.PointY(\"Centre\")",
                         "",
                         "",
                         "",
@@ -4159,11 +4159,11 @@
                       "parameters": [
                         "RopeBox",
                         "Physics2Behavior",
-                        "RopeBox.PointX(Anchor)",
-                        "RopeBox.PointY(Anchor)",
+                        "RopeBox.PointX(\"Anchor\")",
+                        "RopeBox.PointY(\"Anchor\")",
                         "RopeCircle",
-                        "RopeCircle.PointX(Anchor)",
-                        "RopeCircle.PointY(Anchor)",
+                        "RopeCircle.PointX(\"Anchor\")",
+                        "RopeCircle.PointY(\"Anchor\")",
                         "100",
                         "yes",
                         ""
@@ -4202,11 +4202,11 @@
                       "parameters": [
                         "FrictionBox",
                         "Physics2Behavior",
-                        "FrictionBox.PointX(Centre)",
-                        "FrictionBox.PointY(Centre)",
+                        "FrictionBox.PointX(\"Centre\")",
+                        "FrictionBox.PointY(\"Centre\")",
                         "FrictionCircle",
-                        "FrictionCircle.PointX(Centre) + 16",
-                        "FrictionCircle.PointY(Centre)",
+                        "FrictionCircle.PointX(\"Centre\") + 16",
+                        "FrictionCircle.PointY(\"Centre\")",
                         "0.5",
                         "0.01",
                         "no",
@@ -4310,8 +4310,8 @@
                       "parameters": [
                         "BreakableBox1",
                         "Physics2Behavior",
-                        "BreakableBox1.PointX(Anchor1)",
-                        "BreakableBox1.PointY(Anchor1)",
+                        "BreakableBox1.PointX(\"Anchor1\")",
+                        "BreakableBox1.PointY(\"Anchor1\")",
                         "yes",
                         "",
                         "0",
@@ -4331,8 +4331,8 @@
                       "parameters": [
                         "BreakableBox2",
                         "Physics2Behavior",
-                        "BreakableBox2.PointX(Anchor1)",
-                        "BreakableBox2.PointY(Anchor1)",
+                        "BreakableBox2.PointX(\"Anchor1\")",
+                        "BreakableBox2.PointY(\"Anchor1\")",
                         "yes",
                         "",
                         "-90",
@@ -4352,11 +4352,11 @@
                       "parameters": [
                         "BreakableBox1",
                         "Physics2Behavior",
-                        "BreakableBox1.PointX(Anchor2)",
-                        "BreakableBox1.PointY(Anchor2)",
+                        "BreakableBox1.PointX(\"Anchor2\")",
+                        "BreakableBox1.PointY(\"Anchor2\")",
                         "BreakableBox2",
-                        "BreakableBox2.PointX(Anchor2)",
-                        "BreakableBox2.PointY(Anchor2)",
+                        "BreakableBox2.PointX(\"Anchor2\")",
+                        "BreakableBox2.PointY(\"Anchor2\")",
                         "no",
                         "",
                         "",
@@ -4828,7 +4828,7 @@
                     "Draggable",
                     "Physics2Behavior",
                     "=",
-                    "10*(MouseX(\"\",0) - Draggable.PointX(Centre))"
+                    "10*(MouseX(\"\",0) - Draggable.PointX(\"Centre\"))"
                   ],
                   "subInstructions": []
                 },
@@ -4841,7 +4841,7 @@
                     "Draggable",
                     "Physics2Behavior",
                     "=",
-                    "10*(MouseY(\"\",0) - Draggable.PointY(Centre))"
+                    "10*(MouseY(\"\",0) - Draggable.PointY(\"Centre\"))"
                   ],
                   "subInstructions": []
                 }
@@ -4941,10 +4941,10 @@
                   },
                   "parameters": [
                     "DistanceDraw",
-                    "DistanceBox.PointX(Anchor)",
-                    "DistanceBox.PointY(Anchor)",
-                    "DistanceCircle.PointX(Anchor)",
-                    "DistanceCircle.PointY(Anchor)",
+                    "DistanceBox.PointX(\"Anchor\")",
+                    "DistanceBox.PointY(\"Anchor\")",
+                    "DistanceCircle.PointX(\"Anchor\")",
+                    "DistanceCircle.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -4976,10 +4976,10 @@
                   },
                   "parameters": [
                     "RevoluteDraw",
-                    "RevoluteBox.PointX(Anchor)",
-                    "RevoluteBox.PointY(Anchor)",
-                    "RevoluteBox.PointX(Anchor) + 30*cos(atan2(RevoluteCircle.PointY(Centre) - RevoluteBox.PointY(Anchor), RevoluteCircle.PointX(Centre) - RevoluteBox.PointX(Anchor)))",
-                    "RevoluteBox.PointY(Anchor) + 30*sin(atan2(RevoluteCircle.PointY(Centre) - RevoluteBox.PointY(Anchor), RevoluteCircle.PointX(Centre) - RevoluteBox.PointX(Anchor)))",
+                    "RevoluteBox.PointX(\"Anchor\")",
+                    "RevoluteBox.PointY(\"Anchor\")",
+                    "RevoluteBox.PointX(\"Anchor\") + 30*cos(atan2(RevoluteCircle.PointY(\"Centre\") - RevoluteBox.PointY(\"Anchor\"), RevoluteCircle.PointX(\"Centre\") - RevoluteBox.PointX(\"Anchor\")))",
+                    "RevoluteBox.PointY(\"Anchor\") + 30*sin(atan2(RevoluteCircle.PointY(\"Centre\") - RevoluteBox.PointY(\"Anchor\"), RevoluteCircle.PointX(\"Centre\") - RevoluteBox.PointX(\"Anchor\")))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5002,10 +5002,10 @@
                   },
                   "parameters": [
                     "RevoluteDraw",
-                    "RevoluteBox.PointX(Anchor)",
-                    "RevoluteBox.PointY(Anchor)",
-                    "RevoluteBox.PointX(Anchor) + 20*cos(ToRad(RevoluteBox.Angle() - 15))",
-                    "RevoluteBox.PointY(Anchor) + 20*sin(ToRad(RevoluteBox.Angle() - 15))",
+                    "RevoluteBox.PointX(\"Anchor\")",
+                    "RevoluteBox.PointY(\"Anchor\")",
+                    "RevoluteBox.PointX(\"Anchor\") + 20*cos(ToRad(RevoluteBox.Angle() - 15))",
+                    "RevoluteBox.PointY(\"Anchor\") + 20*sin(ToRad(RevoluteBox.Angle() - 15))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5028,10 +5028,10 @@
                   },
                   "parameters": [
                     "RevoluteDraw",
-                    "RevoluteBox.PointX(Anchor)",
-                    "RevoluteBox.PointY(Anchor)",
-                    "RevoluteBox.PointX(Anchor) + 20*cos(ToRad(RevoluteBox.Angle() + 45))",
-                    "RevoluteBox.PointY(Anchor) + 20*sin(ToRad(RevoluteBox.Angle() + 45))",
+                    "RevoluteBox.PointX(\"Anchor\")",
+                    "RevoluteBox.PointY(\"Anchor\")",
+                    "RevoluteBox.PointX(\"Anchor\") + 20*cos(ToRad(RevoluteBox.Angle() + 45))",
+                    "RevoluteBox.PointY(\"Anchor\") + 20*sin(ToRad(RevoluteBox.Angle() + 45))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5054,8 +5054,8 @@
                   },
                   "parameters": [
                     "RevoluteDraw",
-                    "RevoluteBox.PointX(Anchor)",
-                    "RevoluteBox.PointY(Anchor)",
+                    "RevoluteBox.PointX(\"Anchor\")",
+                    "RevoluteBox.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5078,8 +5078,8 @@
                   },
                   "parameters": [
                     "RevoluteDraw",
-                    "RevoluteBox2.PointX(Anchor)",
-                    "RevoluteBox2.PointY(Anchor)",
+                    "RevoluteBox2.PointX(\"Anchor\")",
+                    "RevoluteBox2.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5111,10 +5111,10 @@
                   },
                   "parameters": [
                     "PrismaticDraw",
-                    "PrismaticBox.PointX(Anchor) - 40*cos(ToRad(PrismaticBox.Angle() + 45))",
-                    "PrismaticBox.PointY(Anchor) - 40*sin(ToRad(PrismaticBox.Angle() + 45))",
-                    "PrismaticBox.PointX(Anchor) + 80*cos(ToRad(PrismaticBox.Angle() + 45))",
-                    "PrismaticBox.PointY(Anchor) + 80*sin(ToRad(PrismaticBox.Angle() + 45))",
+                    "PrismaticBox.PointX(\"Anchor\") - 40*cos(ToRad(PrismaticBox.Angle() + 45))",
+                    "PrismaticBox.PointY(\"Anchor\") - 40*sin(ToRad(PrismaticBox.Angle() + 45))",
+                    "PrismaticBox.PointX(\"Anchor\") + 80*cos(ToRad(PrismaticBox.Angle() + 45))",
+                    "PrismaticBox.PointY(\"Anchor\") + 80*sin(ToRad(PrismaticBox.Angle() + 45))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5137,10 +5137,10 @@
                   },
                   "parameters": [
                     "PrismaticDraw",
-                    "PrismaticBox.PointX(Anchor)",
-                    "PrismaticBox.PointY(Anchor)",
-                    "PrismaticCircle.PointX(Anchor)",
-                    "PrismaticCircle.PointY(Anchor)",
+                    "PrismaticBox.PointX(\"Anchor\")",
+                    "PrismaticBox.PointY(\"Anchor\")",
+                    "PrismaticCircle.PointX(\"Anchor\")",
+                    "PrismaticCircle.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5163,8 +5163,8 @@
                   },
                   "parameters": [
                     "PrismaticDraw",
-                    "PrismaticBox.PointX(Anchor)",
-                    "PrismaticBox.PointY(Anchor)",
+                    "PrismaticBox.PointX(\"Anchor\")",
+                    "PrismaticBox.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5176,8 +5176,8 @@
                   },
                   "parameters": [
                     "PrismaticDraw",
-                    "PrismaticCircle.PointX(Anchor)",
-                    "PrismaticCircle.PointY(Anchor)",
+                    "PrismaticCircle.PointX(\"Anchor\")",
+                    "PrismaticCircle.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5198,8 +5198,8 @@
                   },
                   "parameters": [
                     "PulleyDraw",
-                    "PulleyBox.PointX(Anchor)",
-                    "PulleyBox.PointY(Anchor)",
+                    "PulleyBox.PointX(\"Anchor\")",
+                    "PulleyBox.PointY(\"Anchor\")",
                     "Variable(pulleyAnchorX1)",
                     "Variable(pulleyAnchorY1)",
                     "2"
@@ -5230,8 +5230,8 @@
                     "PulleyDraw",
                     "Variable(pulleyAnchorX2)",
                     "Variable(pulleyAnchorY2)",
-                    "PulleyCircle.PointX(Anchor)",
-                    "PulleyCircle.PointY(Anchor)",
+                    "PulleyCircle.PointX(\"Anchor\")",
+                    "PulleyCircle.PointY(\"Anchor\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5252,10 +5252,10 @@
                   },
                   "parameters": [
                     "GearDraw",
-                    "GearBox1.PointX(Centre)",
-                    "GearBox1.PointY(Centre)",
-                    "GearBox2.PointX(Centre)",
-                    "GearBox2.PointY(Centre)",
+                    "GearBox1.PointX(\"Centre\")",
+                    "GearBox1.PointY(\"Centre\")",
+                    "GearBox2.PointX(\"Centre\")",
+                    "GearBox2.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5267,10 +5267,10 @@
                   },
                   "parameters": [
                     "GearDraw",
-                    "GearBox2.PointX(Centre)",
-                    "GearBox2.PointY(Centre)",
-                    "GearCircle1.PointX(Centre)",
-                    "GearCircle1.PointY(Centre)",
+                    "GearBox2.PointX(\"Centre\")",
+                    "GearBox2.PointY(\"Centre\")",
+                    "GearCircle1.PointX(\"Centre\")",
+                    "GearCircle1.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5282,10 +5282,10 @@
                   },
                   "parameters": [
                     "GearDraw",
-                    "GearCircle1.PointX(Centre)",
-                    "GearCircle1.PointY(Centre)",
-                    "GearCircle2.PointX(Centre)",
-                    "GearCircle2.PointY(Centre)",
+                    "GearCircle1.PointX(\"Centre\")",
+                    "GearCircle1.PointY(\"Centre\")",
+                    "GearCircle2.PointX(\"Centre\")",
+                    "GearCircle2.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5306,10 +5306,10 @@
                   },
                   "parameters": [
                     "WheelDraw",
-                    "WheelBox.PointX(Anchor1)",
-                    "WheelBox.PointY(Anchor1)",
-                    "WheelCircle1.PointX(Centre)",
-                    "WheelCircle1.PointY(Centre)",
+                    "WheelBox.PointX(\"Anchor1\")",
+                    "WheelBox.PointY(\"Anchor1\")",
+                    "WheelCircle1.PointX(\"Centre\")",
+                    "WheelCircle1.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5321,10 +5321,10 @@
                   },
                   "parameters": [
                     "WheelDraw",
-                    "WheelBox.PointX(Anchor2)",
-                    "WheelBox.PointY(Anchor2)",
-                    "WheelCircle2.PointX(Centre)",
-                    "WheelCircle2.PointY(Centre)",
+                    "WheelBox.PointX(\"Anchor2\")",
+                    "WheelBox.PointY(\"Anchor2\")",
+                    "WheelCircle2.PointX(\"Centre\")",
+                    "WheelCircle2.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5345,8 +5345,8 @@
                   },
                   "parameters": [
                     "WeldDraw",
-                    "WeldBox.PointX(Anchor1)",
-                    "WeldBox.PointY(Anchor1)",
+                    "WeldBox.PointX(\"Anchor1\")",
+                    "WeldBox.PointY(\"Anchor1\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5358,8 +5358,8 @@
                   },
                   "parameters": [
                     "WeldDraw",
-                    "WeldBox.PointX(Anchor2)",
-                    "WeldBox.PointY(Anchor2)",
+                    "WeldBox.PointX(\"Anchor2\")",
+                    "WeldBox.PointY(\"Anchor2\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5380,10 +5380,10 @@
                   },
                   "parameters": [
                     "RopeDraw",
-                    "RopeBox.PointX(Centre)",
-                    "RopeBox.PointY(Centre)",
-                    "RopeCircle.PointX(Centre)",
-                    "RopeCircle.PointY(Centre)",
+                    "RopeBox.PointX(\"Centre\")",
+                    "RopeBox.PointY(\"Centre\")",
+                    "RopeCircle.PointX(\"Centre\")",
+                    "RopeCircle.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5404,10 +5404,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorBox2.PointX(Centre)",
-                    "MotorBox2.PointY(Centre)",
-                    "MotorBox2.PointX(Centre) + 50",
-                    "MotorBox2.PointY(Centre)",
+                    "MotorBox2.PointX(\"Centre\")",
+                    "MotorBox2.PointY(\"Centre\")",
+                    "MotorBox2.PointX(\"Centre\") + 50",
+                    "MotorBox2.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -5419,10 +5419,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorBox2.PointX(Centre) + 50",
-                    "MotorBox2.PointY(Centre)",
-                    "MotorBox1.PointX(Centre)",
-                    "MotorBox1.PointY(Centre)",
+                    "MotorBox2.PointX(\"Centre\") + 50",
+                    "MotorBox2.PointY(\"Centre\")",
+                    "MotorBox1.PointX(\"Centre\")",
+                    "MotorBox1.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -5434,10 +5434,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorBox2.PointX(Centre)",
-                    "MotorBox2.PointY(Centre)",
-                    "MotorBox2.PointX(Centre) + 70",
-                    "MotorBox2.PointY(Centre) + 30",
+                    "MotorBox2.PointX(\"Centre\")",
+                    "MotorBox2.PointY(\"Centre\")",
+                    "MotorBox2.PointX(\"Centre\") + 70",
+                    "MotorBox2.PointY(\"Centre\") + 30",
                     "1"
                   ],
                   "subInstructions": []
@@ -5449,10 +5449,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorBox2.PointX(Centre) + 70",
-                    "MotorBox2.PointY(Centre) + 30",
-                    "MotorCircle.PointX(Centre)",
-                    "MotorCircle.PointY(Centre)",
+                    "MotorBox2.PointX(\"Centre\") + 70",
+                    "MotorBox2.PointY(\"Centre\") + 30",
+                    "MotorCircle.PointX(\"Centre\")",
+                    "MotorCircle.PointY(\"Centre\")",
                     "1"
                   ],
                   "subInstructions": []
@@ -5464,10 +5464,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorCircle.PointX(Centre)",
-                    "MotorCircle.PointY(Centre)",
-                    "MotorCircle.PointX(Centre) + 30*cos(ToRad(MotorCircle.Angle()))",
-                    "MotorCircle.PointY(Centre) + 30*sin(ToRad(MotorCircle.Angle()))",
+                    "MotorCircle.PointX(\"Centre\")",
+                    "MotorCircle.PointY(\"Centre\")",
+                    "MotorCircle.PointX(\"Centre\") + 30*cos(ToRad(MotorCircle.Angle()))",
+                    "MotorCircle.PointY(\"Centre\") + 30*sin(ToRad(MotorCircle.Angle()))",
                     "1"
                   ],
                   "subInstructions": []
@@ -5479,10 +5479,10 @@
                   },
                   "parameters": [
                     "MotorDraw",
-                    "MotorCircle.PointX(Centre)",
-                    "MotorCircle.PointY(Centre)",
-                    "MotorCircle.PointX(Centre) + 30*cos(ToRad(MotorBox2.Angle() + 45))",
-                    "MotorCircle.PointY(Centre) + 30*sin(ToRad(MotorBox2.Angle() + 45))",
+                    "MotorCircle.PointX(\"Centre\")",
+                    "MotorCircle.PointY(\"Centre\")",
+                    "MotorCircle.PointX(\"Centre\") + 30*cos(ToRad(MotorBox2.Angle() + 45))",
+                    "MotorCircle.PointY(\"Centre\") + 30*sin(ToRad(MotorBox2.Angle() + 45))",
                     "1"
                   ],
                   "subInstructions": []
@@ -5503,10 +5503,10 @@
                   },
                   "parameters": [
                     "FrictionDraw",
-                    "FrictionBox.PointX(Centre)",
-                    "FrictionBox.PointY(Centre)",
-                    "FrictionCircle.PointX(Centre) + 16*cos(ToRad(FrictionCircle.Angle()))",
-                    "FrictionCircle.PointY(Centre) + 16*sin(ToRad(FrictionCircle.Angle()))",
+                    "FrictionBox.PointX(\"Centre\")",
+                    "FrictionBox.PointY(\"Centre\")",
+                    "FrictionCircle.PointX(\"Centre\") + 16*cos(ToRad(FrictionCircle.Angle()))",
+                    "FrictionCircle.PointY(\"Centre\") + 16*sin(ToRad(FrictionCircle.Angle()))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5518,10 +5518,10 @@
                   },
                   "parameters": [
                     "FrictionDraw",
-                    "FrictionBox.PointX(Centre)",
-                    "FrictionBox.PointY(Centre)",
-                    "FrictionCircle.PointX(Centre) + 16*cos(ToRad(FrictionCircle.Angle()))",
-                    "FrictionCircle.PointY(Centre) + 16*sin(ToRad(FrictionCircle.Angle()))",
+                    "FrictionBox.PointX(\"Centre\")",
+                    "FrictionBox.PointY(\"Centre\")",
+                    "FrictionCircle.PointX(\"Centre\") + 16*cos(ToRad(FrictionCircle.Angle()))",
+                    "FrictionCircle.PointY(\"Centre\") + 16*sin(ToRad(FrictionCircle.Angle()))",
                     "2"
                   ],
                   "subInstructions": []
@@ -5533,10 +5533,10 @@
                   },
                   "parameters": [
                     "FrictionDraw",
-                    "FrictionCircle.PointX(Centre) + 16*cos(ToRad(FrictionCircle.Angle()))",
-                    "FrictionCircle.PointY(Centre) + 16*sin(ToRad(FrictionCircle.Angle()))",
-                    "FrictionCircle.PointX(Centre)",
-                    "FrictionCircle.PointY(Centre)",
+                    "FrictionCircle.PointX(\"Centre\") + 16*cos(ToRad(FrictionCircle.Angle()))",
+                    "FrictionCircle.PointY(\"Centre\") + 16*sin(ToRad(FrictionCircle.Angle()))",
+                    "FrictionCircle.PointX(\"Centre\")",
+                    "FrictionCircle.PointY(\"Centre\")",
                     "2"
                   ],
                   "subInstructions": []
@@ -5568,10 +5568,10 @@
                   },
                   "parameters": [
                     "BreakableDraw",
-                    "BreakableBox1.PointX(Anchor1) - 15",
-                    "BreakableBox1.PointY(Anchor1)",
-                    "BreakableBox1.PointX(Anchor1) - 15",
-                    "BreakableBox1.PointY(Anchor1) - BreakableBox1.Physics2Behavior::JointReactionForce(Variable(breakableJoint))",
+                    "BreakableBox1.PointX(\"Anchor1\") - 15",
+                    "BreakableBox1.PointY(\"Anchor1\")",
+                    "BreakableBox1.PointX(\"Anchor1\") - 15",
+                    "BreakableBox1.PointY(\"Anchor1\") - BreakableBox1.Physics2Behavior::JointReactionForce(Variable(breakableJoint))",
                     "3"
                   ],
                   "subInstructions": []
@@ -5594,8 +5594,8 @@
                   },
                   "parameters": [
                     "BreakableDraw",
-                    "BreakableBox1.PointX(Anchor1) - 15",
-                    "BreakableBox1.PointY(Anchor1) - 50",
+                    "BreakableBox1.PointX(\"Anchor1\") - 15",
+                    "BreakableBox1.PointY(\"Anchor1\") - 50",
                     "2"
                   ],
                   "subInstructions": []

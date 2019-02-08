@@ -19,6 +19,8 @@ class Layout;
 
 namespace gd {
 
+// TODO: Replace and remove (ExpressionValidator)
+
 /**
  * \brief Parser callbacks used to check expressions correctness
  *

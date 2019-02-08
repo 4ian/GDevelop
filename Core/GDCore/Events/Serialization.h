@@ -72,6 +72,16 @@ class GD_CORE_API EventsListSerialization {
    */
   static void UpdateInstructionsFromGD31x(gd::Project& project,
                                           gd::InstructionsList& list);
+  
+  /**
+   * \brief Internal method called when opening events created with GD <= 4.0.97
+   *
+   * PointX/PointY would previously take a name of a point without quotes.
+   * This is not providing any value and inconsistent with everything else.
+   * Add quotes around them.
+   */
+  static void UpdateInstructionsFromGD4097(gd::Project& project,
+                                          gd::InstructionsList& list);
 };
 
 }  // namespace gd

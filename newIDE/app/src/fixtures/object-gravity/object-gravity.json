@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -679,10 +679,10 @@
                 "SpaceGuy",
                 "Physics2",
                 "5",
-                "Planet.PointX(Centre)",
-                "Planet.PointY(Centre)",
-                "SpaceGuy.PointX(Centre)",
-                "SpaceGuy.PointY(Centre)"
+                "Planet.PointX(\"Centre\")",
+                "Planet.PointY(\"Centre\")",
+                "SpaceGuy.PointX(\"Centre\")",
+                "SpaceGuy.PointY(\"Centre\")"
               ],
               "subInstructions": []
             }
@@ -762,8 +762,8 @@
                 "Physics2",
                 "SpaceGuy.Angle() - 90",
                 "1",
-                "SpaceGuy.PointX(Centre)",
-                "SpaceGuy.PointY(Centre)"
+                "SpaceGuy.PointX(\"Centre\")",
+                "SpaceGuy.PointY(\"Centre\")"
               ],
               "subInstructions": []
             }
@@ -835,8 +835,8 @@
                 "Physics2",
                 "SpaceGuy.Angle()",
                 "0.5",
-                "SpaceGuy.PointX(Centre)",
-                "SpaceGuy.PointY(Centre)"
+                "SpaceGuy.PointX(\"Centre\")",
+                "SpaceGuy.PointY(\"Centre\")"
               ],
               "subInstructions": []
             }
@@ -893,8 +893,8 @@
                 "Physics2",
                 "SpaceGuy.Angle()+180",
                 "0.5",
-                "SpaceGuy.PointX(Centre)",
-                "SpaceGuy.PointY(Centre)"
+                "SpaceGuy.PointX(\"Centre\")",
+                "SpaceGuy.PointY(\"Centre\")"
               ],
               "subInstructions": []
             }
@@ -929,8 +929,8 @@
               },
               "parameters": [
                 "SpaceGuy",
-                "Planet.PointX(Centre)",
-                "Planet.PointY(Centre)",
+                "Planet.PointX(\"Centre\")",
+                "Planet.PointY(\"Centre\")",
                 "0",
                 ""
               ],

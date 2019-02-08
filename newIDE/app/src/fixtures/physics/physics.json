@@ -1,7 +1,7 @@
 {
   "firstLayout": "",
   "gdVersion": {
-    "build": 97,
+    "build": 98,
     "major": 4,
     "minor": 0,
     "revision": 0
@@ -3007,8 +3007,8 @@
               "parameters": [
                 "Lever",
                 "Physics2",
-                "Lever.PointX(Centre)",
-                "Lever.PointY(Centre)",
+                "Lever.PointX(\"Centre\")",
+                "Lever.PointY(\"Centre\")",
                 "",
                 "",
                 "",
@@ -3124,8 +3124,8 @@
                 "Physics2",
                 "15",
                 "-5",
-                "BlackSphere.PointX(Centre)",
-                "BlackSphere.PointY(Centre)"
+                "BlackSphere.PointX(\"Centre\")",
+                "BlackSphere.PointY(\"Centre\")"
               ],
               "subInstructions": []
             }

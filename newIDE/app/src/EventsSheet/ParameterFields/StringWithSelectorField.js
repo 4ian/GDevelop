@@ -9,7 +9,7 @@ type State = {|
   text: ?string,
 |};
 
-export default class StringWithSelector extends Component<
+export default class StringWithSelectorField extends Component<
   ParameterFieldProps,
   State
 > {

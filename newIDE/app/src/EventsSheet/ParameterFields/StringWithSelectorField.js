@@ -80,7 +80,7 @@ export default class StringWithSelectorField extends Component<
         }}
         dataSource={this._choices.map(choice => ({
           text: choice,
-          value: choice,
+          value:  '"' + choice + '"',
         }))}
         openOnFocus={!this.props.isInline}
         ref={field => (this._field = field)}

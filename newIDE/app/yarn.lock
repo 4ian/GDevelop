@@ -1300,10 +1300,9 @@
     "@lingui/babel-plugin-transform-react" "2.7.3"
     babel-plugin-macros "^2.2.0"
 
-"@lingui/react@^2.7.3":
+"@lingui/react@git://github.com/4ian/lingui-react.git#master":
   version "2.7.3"
-  resolved "https://registry.yarnpkg.com/@lingui/react/-/react-2.7.3.tgz#3b377189b04e406b225d3c1d8a196d004d7229fe"
-  integrity sha512-apKhH+QSHX9hF94gpcuPqSypkKzheWHMdiwNCy47HMEdiyBH9b16R3dMOGcAdBpiFRc9R4Gr2lRUBpL59Ey0Fw==
+  resolved "git://github.com/4ian/lingui-react.git#dc6b1e013470d952cf85f96cc4affdd28e29634a"
   dependencies:
     "@lingui/core" "2.7.3"
     babel-runtime "^6.26.0"
@@ -11111,9 +11110,9 @@ react-inspector@^2.3.0:
     prop-types "^15.6.1"
 
 react-is@^16.3.2:
-  version "16.7.0"
-  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.7.0.tgz#c1bd21c64f1f1364c6f70695ec02d69392f41bfa"
-  integrity sha512-Z0VRQdF4NPDoI0tsXVMLkJLiwEBa+RP66g0xDHxgxysxSoCUccSten4RTF/UFvZF1dZvZ9Zu1sx+MDXwcOR34g==
+  version "16.8.1"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.1.tgz#a80141e246eb894824fb4f2901c0c50ef31d4cdb"
+  integrity sha512-ioMCzVDWvCvKD8eeT+iukyWrBGrA3DiFYkXfBsVYIRdaREZuBjENG+KjrikavCLasozqRWTwFUagU/O4vPpRMA==
 
 react-json-view@^1.16.1:
   version "1.16.1"

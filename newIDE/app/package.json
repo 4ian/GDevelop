@@ -23,7 +23,7 @@
     "unzip2": "^0.2.5"
   },
   "dependencies": {
-    "@lingui/react": "^2.7.3",
+    "@lingui/react": "git://github.com/4ian/lingui-react.git#master",
     "algoliasearch": "^3.30.0",
     "aws-sdk": "^2.100.0",
     "axios": "^0.16.1",

@@ -268,7 +268,7 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   _loadProjectEventsFunctionsExtensions = () => {
-    const {i18n} = this.props;
+    const { i18n } = this.props;
     if (this.props.eventsFunctionWriter && this.state.currentProject) {
       loadProjectEventsFunctionsExtensions(
         this.state.currentProject,
@@ -284,7 +284,9 @@ class MainFrame extends React.Component<Props, State> {
             eventsFunctionsExtensionsError,
           });
           showErrorBox(
-            i18n._(t`An error has occured during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`),
+            i18n._(
+              t`An error has occured during functions generation. If GDevelop is installed, verify that nothing is preventing GDevelop from writing on disk. If you're running GDevelop online, verify your internet connection and refresh functions from the Project Manager.`
+            ),
             eventsFunctionsExtensionsError
           );
         });
@@ -292,7 +294,7 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   openFromPathOrURL = (url: string, cb: Function) => {
-    const {i18n} = this.props;
+    const { i18n } = this.props;
     this.props.onReadFromPathOrURL(url).then(
       projectObject => {
         this.setState({ loadingProject: true }, () =>
@@ -317,7 +319,9 @@ class MainFrame extends React.Component<Props, State> {
       },
       err => {
         showErrorBox(
-          i18n._(t`Unable to open this project. Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`),
+          i18n._(
+            t`Unable to open this project. Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`
+          ),
           err
         );
         return;
@@ -438,12 +442,14 @@ class MainFrame extends React.Component<Props, State> {
 
   deleteLayout = (layout: gdLayout) => {
     const { currentProject } = this.state;
-    const {i18n} = this.props;
+    const { i18n } = this.props;
     if (!currentProject) return;
 
     //eslint-disable-next-line
     const answer = confirm(
-      i18n._(t`Are you sure you want to remove this scene? This can't be undone.`)
+      i18n._(
+        t`Are you sure you want to remove this scene? This can't be undone.`
+      )
     );
     if (!answer) return;
 
@@ -460,12 +466,14 @@ class MainFrame extends React.Component<Props, State> {
 
   deleteExternalLayout = (externalLayout: gdExternalLayout) => {
     const { currentProject } = this.state;
-    const {i18n} = this.props;
+    const { i18n } = this.props;
     if (!currentProject) return;
 
     //eslint-disable-next-line
     const answer = confirm(
-      i18n._(t`Are you sure you want to remove this external layout? This can't be undone.`)
+      i18n._(
+        t`Are you sure you want to remove this external layout? This can't be undone.`
+      )
     );
     if (!answer) return;
 
@@ -485,12 +493,14 @@ class MainFrame extends React.Component<Props, State> {
 
   deleteExternalEvents = (externalEvents: gdExternalEvents) => {
     const { currentProject } = this.state;
-    const {i18n} = this.props;
+    const { i18n } = this.props;
     if (!currentProject) return;
 
     //eslint-disable-next-line
     const answer = confirm(
-      i18n._(t`Are you sure you want to remove these external events? This can't be undone.`)
+      i18n._(
+        t`Are you sure you want to remove these external events? This can't be undone.`
+      )
     );
     if (!answer) return;
 
@@ -512,12 +522,14 @@ class MainFrame extends React.Component<Props, State> {
     externalLayout: gdEventsFunctionsExtension
   ) => {
     const { currentProject } = this.state;
-    const {i18n} = this.props;
+    const { i18n } = this.props;
     if (!currentProject) return;
 
     //eslint-disable-next-line
     const answer = confirm(
-      i18n._(t`Are you sure you want to remove this extension? This can't be undone.`)
+      i18n._(
+        t`Are you sure you want to remove this extension? This can't be undone.`
+      )
     );
     if (!answer) return;
 
@@ -537,7 +549,7 @@ class MainFrame extends React.Component<Props, State> {
 
   renameLayout = (oldName: string, newName: string) => {
     const { currentProject } = this.state;
-    const {i18n} = this.props;
+    const { i18n } = this.props;
     if (!currentProject) return;
 
     if (!currentProject.hasLayoutNamed(oldName)) return;
@@ -567,7 +579,9 @@ class MainFrame extends React.Component<Props, State> {
     if (!currentProject.hasExternalLayoutNamed(oldName)) return;
 
     if (currentProject.hasExternalLayoutNamed(newName)) {
-      showWarningBox(i18n._(t`Another external layout with this name already exists.`));
+      showWarningBox(
+        i18n._(t`Another external layout with this name already exists.`)
+      );
       return;
     }
 
@@ -594,7 +608,9 @@ class MainFrame extends React.Component<Props, State> {
     if (!currentProject.hasExternalEventsNamed(oldName)) return;
 
     if (currentProject.hasExternalEventsNamed(newName)) {
-      showWarningBox(i18n._(t`Other external events with this name already exist.`));
+      showWarningBox(
+        i18n._(t`Other external events with this name already exist.`)
+      );
       return;
     }
 
@@ -615,20 +631,24 @@ class MainFrame extends React.Component<Props, State> {
 
   renameEventsFunctionsExtension = (oldName: string, newName: string) => {
     const { currentProject } = this.state;
-    const {i18n} = this.props;
+    const { i18n } = this.props;
     const { eventsFunctionWriter } = this.props;
     if (!currentProject) return;
 
     if (!currentProject.hasEventsFunctionsExtensionNamed(oldName)) return;
 
     if (currentProject.hasEventsFunctionsExtensionNamed(newName)) {
-      showWarningBox(i18n._(t`Another extension with this name already exists.`));
+      showWarningBox(
+        i18n._(t`Another extension with this name already exists.`)
+      );
       return;
     }
 
     if (!gd.Project.validateObjectName(newName)) {
       showWarningBox(
-        i18n._(t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your extension name.`)
+        i18n._(
+          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your extension name.`
+        )
       );
       return;
     }

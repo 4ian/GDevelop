@@ -53,7 +53,9 @@ export default function makeExtensionsLoader({
   filterExamples,
 }: MakeExtensionsLoaderArguments): JsExtensionsLoader {
   return {
-    loadAllExtensions(_: TranslationFunction): Promise<
+    loadAllExtensions(
+      _: TranslationFunction
+    ): Promise<
       Array<{ extensionModulePath: string, result: ExtensionLoadingResult }>
     > {
       return Promise.resolve(
@@ -84,7 +86,12 @@ export default function makeExtensionsLoader({
 
             return {
               extensionModulePath: 'internal-extension://' + name,
-              result: loadExtension(_, gd, gd.JsPlatform.get(), extensionModule),
+              result: loadExtension(
+                _,
+                gd,
+                gd.JsPlatform.get(),
+                extensionModule
+              ),
             };
           })
       );

@@ -6,7 +6,7 @@ const electron = optionalRequire('electron');
 const ipcRenderer = electron ? electron.ipcRenderer : null;
 
 type Props = {|
-  children: React.Element<typeof MainFrame>,  
+  children: React.Element<typeof MainFrame>,
 |};
 
 /**
@@ -17,7 +17,7 @@ class ElectronEventsBridge extends React.Component<Props, {||}> {
   editor: ?MainFrame;
   componentDidMount() {
     if (!ipcRenderer) return;
-    
+
     ipcRenderer.on(
       'main-menu-open',
       event => this.editor && this.editor.chooseProject()

@@ -68,6 +68,7 @@ export default class GDI18nProvider extends React.Component<Props, State> {
         () => {
           const { i18n } = this.state;
           gd.getTranslation = getTranslationFunction(i18n);
+          console.info(`Loaded "${language}" language`);
         }
       );
     });

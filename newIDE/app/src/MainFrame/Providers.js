@@ -29,7 +29,7 @@ export default class Providers extends React.Component<Props, {||}> {
         <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
           <PreferencesContext.Consumer>
             {({ values }) => (
-              <GDI18nProvider language="fr">
+              <GDI18nProvider language={values.language}>
                 <MuiThemeProvider muiTheme={getTheme(values.themeName)}>
                   <UserProfileProvider authentification={authentification}>
                     <I18n update>{({ i18n }) => children({ i18n })}</I18n>

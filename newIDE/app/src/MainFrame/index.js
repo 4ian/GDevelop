@@ -78,6 +78,7 @@ import ChangelogDialogContainer from './Changelog/ChangelogDialogContainer';
 import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunction';
 import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
+import LanguageDialog from './Preferences/LanguageDialog';
 
 const gd = global.gd;
 
@@ -104,6 +105,7 @@ type State = {|
   snackMessage: string,
   snackMessageOpen: boolean,
   preferencesDialogOpen: boolean,
+  languageDialogOpen: boolean,
   profileDialogOpen: boolean,
   subscriptionDialogOpen: boolean,
   updateStatus: UpdateStatus,
@@ -151,6 +153,7 @@ class MainFrame extends React.Component<Props, State> {
     snackMessage: '',
     snackMessageOpen: false,
     preferencesDialogOpen: false,
+    languageDialogOpen: false,
     profileDialogOpen: false,
     subscriptionDialogOpen: false,
     updateStatus: { message: '', status: 'unknown' },
@@ -1090,6 +1093,12 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
+  openLanguage = (open: boolean = true) => {
+    this.setState({
+      languageDialogOpen: open,
+    });
+  };
+
   openProfile = (open: boolean = true) => {
     this.setState({
       profileDialogOpen: open,
@@ -1433,6 +1442,10 @@ class MainFrame extends React.Component<Props, State> {
         <PreferencesDialog
           open={this.state.preferencesDialogOpen}
           onClose={() => this.openPreferences(false)}
+        />
+        <LanguageDialog
+          open={this.state.languageDialogOpen}
+          onClose={() => this.openLanguage(false)}
         />
         <AboutDialog
           open={aboutDialogOpen}

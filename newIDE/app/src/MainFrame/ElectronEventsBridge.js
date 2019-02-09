@@ -59,6 +59,10 @@ class ElectronEventsBridge extends React.Component<Props, {||}> {
       event => this.editor && this.editor.openPreferences()
     );
     ipcRenderer.on(
+      'main-menu-open-language',
+      event => this.editor && this.editor.openLanguage()
+    );
+    ipcRenderer.on(
       'main-menu-open-profile',
       event => this.editor && this.editor.openProfile()
     );

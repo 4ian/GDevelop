@@ -128,8 +128,8 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       showGDevelopSplash,
     } = this.state;
 
-    const defaultPackageName = "com.example.mygame";
-    const admobHint = "ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY";
+    const defaultPackageName = 'com.example.mygame';
+    const admobHint = 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY';
 
     return (
       <React.Fragment>

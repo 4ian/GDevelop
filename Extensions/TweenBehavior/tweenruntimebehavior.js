@@ -371,8 +371,8 @@ gdjs.TweenRuntimeBehavior.prototype._removeObjectFromScene = function (
 };
 
 gdjs.TweenRuntimeBehavior.prototype._removeTween = function (identifier) {
-  this._tweens[identifier].instance.dispose();
-  delete this._tweens[identifier];
+  //this._tweens[identifier].instance.dispose();
+  //delete this._tweens[identifier];
 };
 
 gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function (
@@ -421,7 +421,7 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function (
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      let tween = this._getTween(identifier);
+      var tween = this._getTween(identifier);
       tween.progress = state.progress;
       tween.currentValue = state.value;
 
@@ -463,7 +463,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function (
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      let tween = this._getTween(identifier);
+      var tween = this._getTween(identifier);
       tween.progress = state.progress;
       tween.x = state.x;
       tween.y = state.y;
@@ -509,7 +509,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function (
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      let tween = this._getTween(identifier);
+      var tween = this._getTween(identifier);
       tween.progress = state.progress;
       tween.x = state.x;
       this.owner.setX(state.x);
@@ -548,7 +548,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function (
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      let tween = this._getTween(identifier);
+      var tween = this._getTween(identifier);
       tween.progress = state.progress;
       tween.y = state.y;
       this.owner.setY(state.y);
@@ -587,7 +587,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function (
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      let tween = this._getTween(identifier);
+      var tween = this._getTween(identifier);
       tween.progress = state.progress;
       tween.angle = state.angle;
       this.owner.setAngle(state.angle);
@@ -637,7 +637,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function (
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      let tween = this._getTween(identifier);
+      var tween = this._getTween(identifier);
       tween.progress = state.progress;
       tween.scalex = state.scalex;
       tween.scaley = state.scaley;
@@ -685,7 +685,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function (
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      let tween = this._getTween(identifier);
+      var tween = this._getTween(identifier);
       tween.progress = state.progress;
       tween.scalex = state.scalex;
       this.owner.setScaleX(state.scalex);
@@ -726,7 +726,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function (
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      let tween = this._getTween(identifier);
+      var tween = this._getTween(identifier);
       tween.progress = state.progress;
       tween.scaley = state.scaley;
       this.owner.setScaleY(state.scaley);
@@ -767,7 +767,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function (
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      let tween = this._getTween(identifier);
+      var tween = this._getTween(identifier);
       tween.progress = state.progress;
       tween.opacity = state.opacity;
       this.owner.setOpacity(state.opacity);

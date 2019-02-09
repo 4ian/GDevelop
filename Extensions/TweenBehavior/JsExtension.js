@@ -91,7 +91,7 @@ module.exports = {
         t(
           "Tween the variable _PARAM3_ of _PARAM0_ from _PARAM4_ to _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_"
         ),
-        t("Tween animation/Object variables"),
+        t("Tween animation/Variables"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )

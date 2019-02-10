@@ -372,6 +372,7 @@ export default class VariablesList extends React.Component<Props, State> {
         onDeleteSelection={this.deleteSelection}
         hasSelection={hasSelection(this.state.selectedVariables)}
         hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
+        onEditObjectVariables={this.props.onEditObjectVariables}
       />
     );
 

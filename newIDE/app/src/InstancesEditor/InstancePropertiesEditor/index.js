@@ -125,9 +125,10 @@ export default class InstancePropertiesEditor extends Component {
           schema={this.schema.concat(instanceSchema)}
           instances={instances}
         />
-        Instance Variables ({instance.getVariables().count()} /{' '}
-        {object.getVariables().count()})
+        Instance Variables
         <IconButton
+          tooltip={'Edit instance variables'}
+          style={{ top: 5 }}
           onClick={() => {
             this.props.editInstanceVariables(instance);
           }}
@@ -142,7 +143,7 @@ export default class InstancePropertiesEditor extends Component {
               this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
           }
           onEditObjectVariables={() => {
-            this.props.editInstanceVariables(object);
+            this.props.editObjectVariables(object);
           }}
         />
       </div>

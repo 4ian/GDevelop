@@ -9,7 +9,6 @@ import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirector
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import Reset from 'material-ui/svg-icons/av/replay';
-import ObjectVar from 'material-ui/svg-icons/action/assignment';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';
 
@@ -39,7 +38,6 @@ type Props = {|
   isSelected: boolean,
   onSelect: boolean => void,
   origin: 'parent' | 'inherited' | '',
-  onEditObjectVariables?: () => void,
 |};
 
 const ThemableVariableRow = ({
@@ -59,7 +57,6 @@ const ThemableVariableRow = ({
   isSelected,
   onSelect,
   origin,
-  onEditObjectVariables,
 }: Props) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
@@ -118,23 +115,16 @@ const ThemableVariableRow = ({
         <IconButton
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
+          tooltip={'Reset to default object variable'}
         >
           <Reset />
         </IconButton>
       )}
-      {origin === 'parent' && !isStructure && (
-        <IconButton
-          onClick={onEditObjectVariables}
-          style={isStructure ? undefined : styles.fadedButton}
-        >
-          <ObjectVar />
-        </IconButton>
-      )}
-
       <IconButton
         onClick={onAddChild}
         style={isStructure ? undefined : styles.fadedButton}
         disabled={limitEditing}
+        tooltip={'Add child variable'}
       >
         <AddCircle />
       </IconButton>

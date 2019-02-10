@@ -58,8 +58,8 @@ export default class ExpressionParametersEditorDialog extends Component<
         open={this.props.open}
         actions={
           <FlatButton
-            key="done"
-            label={<Trans>Done</Trans>}
+            key="apply"
+            label={<Trans>Apply</Trans>}
             primary
             onClick={() => this.props.onDone(this.state.parameterValues)}
           />

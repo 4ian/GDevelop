@@ -3,8 +3,8 @@ echo Listing all GDCore, GDCpp, GDJS and Extensions sources files to translate..
 
 dir ..\GDJS\GDJS\*.cpp /L /B /S |find /v /i "\Dialogs\" > %TEMP%\listfile.txt
 dir ..\GDJS\GDJS\*.h /L /B /S |find /v /i "\Dialogs\" >> %TEMP%\listfile.txt
-dir ..\Extensions\*.cpp /L /B /S  |find /v /i "\Dialogs\" >> %TEMP%\listfile.txt
-dir ..\Extensions\*.h /L /B /S  |find /v /i "\Dialogs\" >> %TEMP%\listfile.txt
+dir ..\Extensions\*.cpp /L /B /S  |find /v /i "\Dialogs\" |find /v /i "\AdvancedXML\" >> %TEMP%\listfile.txt
+dir ..\Extensions\*.h /L /B /S  |find /v /i "\Dialogs\" |find /v /i "\AdvancedXML\" >> %TEMP%\listfile.txt
 dir ..\Core\GDCore\*.cpp /L /B /S |find /v /i "\Dialogs\" >> %TEMP%\listfile.txt
 dir ..\Core\GDCore\*.h /L /B /S |find /v /i "\Dialogs\" >> %TEMP%\listfile.txt
 REM Don't include old IDE anymore in the translations.

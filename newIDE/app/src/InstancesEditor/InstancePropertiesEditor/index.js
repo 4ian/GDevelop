@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import FlatButton from 'material-ui/FlatButton';
 import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -7,6 +6,9 @@ import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import VariablesList from '../../VariablesList';
 import getObjectFromInstance from '../../Utils/GetObjectFromInstance';
+import IconButton from 'material-ui/IconButton';
+
+import PopOut from 'material-ui/svg-icons/action/open-in-new';
 
 export default class InstancePropertiesEditor extends Component {
   constructor() {
@@ -123,12 +125,15 @@ export default class InstancePropertiesEditor extends Component {
           schema={this.schema.concat(instanceSchema)}
           instances={instances}
         />
-        <FlatButton
-          label={
-            'Instance Variables (' + instance.getVariables().count() + ') :'
-          }
-          onClick={() => this.props.editInstanceVariables(instance)}
-        />
+        Instance Variables ({instance.getVariables().count()} /{' '}
+        {object.getVariables().count()})
+        <IconButton
+          onClick={() => {
+            this.props.editInstanceVariables(instance);
+          }}
+        >
+          <PopOut />
+        </IconButton>
         <VariablesList
           inheritedVariablesContainer={object ? object.getVariables() : []}
           variablesContainer={instance.getVariables()}
@@ -136,13 +141,9 @@ export default class InstancePropertiesEditor extends Component {
             () =>
               this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
           }
-        />
-        <FlatButton
-          labelStyle={{ fontSize: 14, textTransform: 'none', opacity: 0.6 }}
-          label={
-            'Edit Object Variables (' + object.getVariables().count() + ')'
-          }
-          onClick={() => this.props.editInstanceVariables(object)}
+          onEditObjectVariables={() => {
+            this.props.editInstanceVariables(object);
+          }}
         />
       </div>
     );

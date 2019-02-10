@@ -9,6 +9,7 @@ import SubdirectoryArrowRight from 'material-ui/svg-icons/navigation/subdirector
 import TextField from 'material-ui/TextField';
 import IconButton from 'material-ui/IconButton';
 import Reset from 'material-ui/svg-icons/av/replay';
+import ObjectVar from 'material-ui/svg-icons/action/assignment';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';
 
@@ -38,6 +39,7 @@ type Props = {|
   isSelected: boolean,
   onSelect: boolean => void,
   origin: 'parent' | 'inherited' | '',
+  onEditObjectVariables?: () => void,
 |};
 
 const ThemableVariableRow = ({
@@ -57,6 +59,7 @@ const ThemableVariableRow = ({
   isSelected,
   onSelect,
   origin,
+  onEditObjectVariables,
 }: Props) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
@@ -69,11 +72,10 @@ const ThemableVariableRow = ({
         <Indent width={(depth + 1) * styles.tableChildIndentation} />
       )}
       {depth === 0 && showHandle && <DragHandle />}
-      {showSelectionCheckbox && (
+      {showSelectionCheckbox && !limitEditing && (
         <InlineCheckbox
           checked={isSelected}
           onCheck={(e, checked) => onSelect(checked)}
-          disabled={limitEditing}
         />
       )}
       <TextField
@@ -120,6 +122,15 @@ const ThemableVariableRow = ({
           <Reset />
         </IconButton>
       )}
+      {origin === 'parent' && !isStructure && (
+        <IconButton
+          onClick={onEditObjectVariables}
+          style={isStructure ? undefined : styles.fadedButton}
+        >
+          <ObjectVar />
+        </IconButton>
+      )}
+
       <IconButton
         onClick={onAddChild}
         style={isStructure ? undefined : styles.fadedButton}

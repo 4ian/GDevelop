@@ -2,8 +2,6 @@
 import * as React from 'react';
 import { I18nProvider } from '@lingui/react';
 import { setupI18n } from '@lingui/core';
-import catalogEn from '../../locales/en/messages';
-import catalogFr from '../../locales/fr/messages';
 import { getTranslationFunction } from './getTranslationFunction';
 const gd = global.gd;
 
@@ -24,7 +22,7 @@ type State = {
 
 export default class GDI18nProvider extends React.Component<Props, State> {
   state = {
-    catalogs: { en: catalogEn, fr: catalogFr },
+    catalogs: {},
     i18n: null,
   };
 

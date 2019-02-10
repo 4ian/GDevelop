@@ -137,7 +137,7 @@ getLocales()
             // as it's the source language.
             const files =
               locale === 'en'
-                ? 'ide-messages.po'
+                ? 'ide-messages.pot'
                 : 'ide-messages.po gdcore-gdcpp-gdjs-extensions-messages.po';
 
             // Run msgcat. Use --no-wrap to allow to sanitize the catalog with

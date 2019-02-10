@@ -123,7 +123,7 @@ const buildMainMenuFor = window => {
 
   const windowTemplate = {
     role: 'window',
-    submenu: [{ role: 'minimize' }, { role: 'close' }],
+    submenu: [{ role: 'minimize' }],
   };
 
   const helpTemplate = {
@@ -164,7 +164,7 @@ const buildMainMenuFor = window => {
     ],
   };
   if (process.platform !== 'darwin') {
-    fileTemplate.submenu.push(
+    helpTemplate.submenu.push(
       { type: 'separator' },
       {
         label: 'About GDevelop',

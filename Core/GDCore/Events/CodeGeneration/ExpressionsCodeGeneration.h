@@ -11,27 +11,17 @@
 #include "GDCore/String.h"
 namespace gd {
 class ExpressionMetadata;
-}
-namespace gd {
 class Expression;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class EventsCodeGenerationContext;
-}
-namespace gd {
 class EventsCodeGenerator;
 }
 
 namespace gd {
+
+// TODO: Replace and remove (ExpressionCodeGenerator)
 
 /**
  * \brief Used to generate code from expressions.

@@ -50,7 +50,20 @@ gd::ExpressionMetadata& ExpressionMetadata::AddParameter(
   info.codeOnly = false;
   info.optional = parameterIsOptional;
   info.supplementaryInformation =
-      optionalObjectType.empty() ? "" : extensionNamespace + optionalObjectType;
+      // For objects/behavior, the supplementary information
+      // parameter is an object/behavior type...
+      (gd::ParameterMetadata::IsObject(type) ||
+       gd::ParameterMetadata::IsBehavior(type))
+          ? (optionalObjectType.empty()
+                 ? ""
+                 : extensionNamespace +
+                       optionalObjectType  //... so prefix it with the extension
+                                           // namespace.
+             )
+          : optionalObjectType;  // Otherwise don't change anything
+
+  // TODO: Assert against optionalObjectType === "emsc" (when running with
+  // Emscripten), and warn about a missing argument when calling addParameter.
 
   parameters.push_back(info);
   return *this;

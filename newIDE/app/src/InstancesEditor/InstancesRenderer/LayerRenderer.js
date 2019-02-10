@@ -1,5 +1,7 @@
 import gesture from 'pixi-simple-gesture';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+import getObjectFromInstance from '../../Utils/GetObjectFromInstance';
+
 import PIXI from 'pixi.js';
 const gd = global.gd;
 
@@ -100,13 +102,12 @@ export default class LayerRenderer {
     var renderedInstance = this.renderedInstances[instance.ptr];
     if (renderedInstance === undefined) {
       //No renderer associated yet, the instance must have been just created!...
-      var associatedObjectName = instance.getObjectName();
-      var associatedObject = null;
-      if (this.layout.hasObjectNamed(associatedObjectName))
-        associatedObject = this.layout.getObject(associatedObjectName);
-      else if (this.project.hasObjectNamed(associatedObjectName))
-        associatedObject = this.project.getObject(associatedObjectName);
-      else return;
+      const associatedObject = getObjectFromInstance(
+        instance,
+        this.layout,
+        this.project
+      );
+      if (!associatedObject) return;
 
       //...so let's create a renderer.
       renderedInstance = this.renderedInstances[

@@ -6,6 +6,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import VariablesList from '../../VariablesList';
+import getObjectFromInstance from '../../Utils/GetObjectFromInstance';
 
 export default class InstancePropertiesEditor extends Component {
   constructor() {
@@ -103,7 +104,7 @@ export default class InstancePropertiesEditor extends Component {
   _renderInstancesProperties() {
     const { project, layout, instances } = this.props;
     const instance = instances[0];
-    const object = layout.getObject(instance.getObjectName());
+    const object = getObjectFromInstance(instance, layout, project);
     //TODO: multiple instances support
     const properties = instance.getCustomProperties(project, layout);
     const instanceSchema = propertiesMapToSchema(
@@ -129,7 +130,7 @@ export default class InstancePropertiesEditor extends Component {
           onClick={() => this.props.editInstanceVariables(instance)}
         />
         <VariablesList
-          inheritedVariablesContainer={object.getVariables()}
+          inheritedVariablesContainer={object ? object.getVariables() : []}
           variablesContainer={instance.getVariables()}
           onSizeUpdated={
             () =>

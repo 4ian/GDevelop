@@ -37,7 +37,7 @@ type Props = {|
   showSelectionCheckbox: boolean,
   isSelected: boolean,
   onSelect: boolean => void,
-  type: String,
+  origin: 'parent' | 'inherited' | '',
 |};
 
 const ThemableVariableRow = ({
@@ -56,12 +56,12 @@ const ThemableVariableRow = ({
   showSelectionCheckbox,
   isSelected,
   onSelect,
-  type,
+  origin,
 }: Props) => {
   const isStructure = variable.isStructure();
   const key = '' + depth + name;
 
-  const limitEditing = type === 'object' || type === 'inherited';
+  const limitEditing = origin === 'parent' || origin === 'inherited';
 
   const columns = [
     <TreeTableCell key="name">
@@ -78,14 +78,14 @@ const ThemableVariableRow = ({
       )}
       <TextField
         style={{
-          fontStyle: type !== 'inherited' ? 'normal' : 'italic',
+          fontStyle: origin !== 'inherited' ? 'normal' : 'italic',
         }}
         fullWidth
         name={key + 'name'}
         defaultValue={name}
         errorText={errorText}
         onBlur={onBlur}
-        disabled={type === 'object'}
+        disabled={origin === 'parent'}
       />
     </TreeTableCell>,
   ];
@@ -112,7 +112,7 @@ const ThemableVariableRow = ({
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>
-      {type === 'inherited' && !isStructure && (
+      {origin === 'inherited' && !isStructure && (
         <IconButton
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}

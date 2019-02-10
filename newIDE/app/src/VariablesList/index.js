@@ -134,11 +134,35 @@ export default class VariablesList extends React.Component<Props, State> {
     });
   };
 
+  updateOrDefineVariable = (
+    name: string,
+    variable: gdVariable,
+    newValue: string,
+    index: number,
+    origin: ?string
+  ) => {
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
+
+    if (inheritedVariablesContainer && origin === 'parent') {
+      const serializedVariable = serializeToJSObject(
+        inheritedVariablesContainer.get(name)
+      );
+      const newVariable = new gd.Variable();
+      unserializeFromJSObject(newVariable, serializedVariable);
+      variablesContainer.insert(name, newVariable, index);
+      newVariable.delete();
+
+      variablesContainer.get(name).setString(newValue);
+    } else {
+      variable.setString(newValue);
+    }
+  };
+
   _renderVariableChildren(
     name: string,
     parentVariable: gdVariable,
     depth: number,
-    type: string
+    origin: ?string
   ): Array<React.Node> {
     const names = parentVariable.getAllChildrenNames().toJSArray();
 
@@ -151,22 +175,22 @@ export default class VariablesList extends React.Component<Props, State> {
           depth + 1,
           index,
           parentVariable,
-          type
+          origin
         );
       })
     );
   }
 
-  _getInstanceVariableType = (name: string) => {
+  _getVariableOrigin = (name: string) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     return inheritedVariablesContainer // We check for 3 types of variable states, when editing instance variables
       ? variablesContainer.has(name) && !inheritedVariablesContainer.has(name)
-        ? 'instance' // -variable that is unique to the instance - we can edit its name/structure
+        ? '' // -variable that is unique to the instance - we can edit its name/structure
         : !variablesContainer.has(name) && inheritedVariablesContainer.has(name)
-        ? 'object' // -displaying object variable at its default value, changing it will create an inherited
+        ? 'parent' // -displaying parent variable at its default value, changing it will create an inherited
         : variablesContainer.has(name) && inheritedVariablesContainer.has(name)
-        ? 'inherited' // -instance variable created when editing an object variable's value, deleting it will re-show
-        : '' // object go in inheritedVariablesContainer, the rest stay in variablesContainer
+        ? 'inherited' // -instance variable created when editing a parent variable's value, deleting it will re-show
+        : '' // parent go in inheritedVariablesContainer, the rest stay in variablesContainer
       : '';
   };
 
@@ -176,15 +200,13 @@ export default class VariablesList extends React.Component<Props, State> {
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
-    parentType: ?string = ''
+    parentOrigin: ?string = null
   ) {
-    const { variablesContainer, inheritedVariablesContainer } = this.props;
+    const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
 
-    const type =
-      parentType && parentType.length
-        ? parentType // a state can come from a parent variable
-        : this._getInstanceVariableType(name);
+    const origin =
+      parentOrigin !== null ? parentOrigin : this._getVariableOrigin(name);
 
     return (
       <SortableVariableRow
@@ -194,37 +216,22 @@ export default class VariablesList extends React.Component<Props, State> {
         variable={variable}
         disabled={depth !== 0}
         depth={depth}
-        type={type}
+        origin={origin}
         errorText={
           this.state.nameErrors[variable.ptr]
             ? 'This name is already taken'
             : undefined
         }
         onChangeValue={text => {
-          // if it's an object variable edited, create an instance variable in it's place marked as 'inherited'
-          if (inheritedVariablesContainer && type === 'object') {
-            const serializedVariable = serializeToJSObject(
-              inheritedVariablesContainer.get(name)
-            );
-            const newVariable = new gd.Variable();
-            unserializeFromJSObject(newVariable, serializedVariable);
-            variablesContainer.insert(name, newVariable, index);
-            newVariable.delete();
-
-            variablesContainer.get(name).setString(text);
-          } else {
-            variable.setString(text);
-          }
+          this.updateOrDefineVariable(name, variable, text, index, origin);
 
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
         onResetToDefaultValue={() => {
-          if (type === 'inherited') {
-            variablesContainer.removeRecursively(variable);
-            this.forceUpdate();
-            if (this.props.onSizeUpdated) this.props.onSizeUpdated();
-          }
+          variablesContainer.removeRecursively(variable);
+          this.forceUpdate();
+          if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
         onBlur={event => {
           const text = event.target.value;
@@ -265,7 +272,7 @@ export default class VariablesList extends React.Component<Props, State> {
         }}
         children={
           isStructure
-            ? this._renderVariableChildren(name, variable, depth, type)
+            ? this._renderVariableChildren(name, variable, depth, origin)
             : null
         }
         showHandle={this.state.mode === 'move'}
@@ -307,7 +314,7 @@ export default class VariablesList extends React.Component<Props, State> {
     const containerObjectVariablesTree = inheritedVariablesContainer
       ? mapFor(0, inheritedVariablesContainer.count(), index => {
           const name = inheritedVariablesContainer.getNameAt(index);
-          if (this._getInstanceVariableType(name) === 'object') {
+          if (!variablesContainer.has(name)) {
             // Show only object variables that have no instance variable
             const variable = inheritedVariablesContainer.getAt(index);
             return this._renderVariableAndChildrenRows(
@@ -316,7 +323,7 @@ export default class VariablesList extends React.Component<Props, State> {
               0,
               index,
               undefined,
-              'object'
+              'parent'
             );
           }
         })

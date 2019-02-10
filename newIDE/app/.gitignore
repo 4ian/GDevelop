@@ -34,3 +34,4 @@ resources/GDJS
 # locales build files
 src/locales/_build
 src/locales/**/*.po
+src/locales/**/*.pot

@@ -130,6 +130,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
 
     const defaultPackageName = 'com.example.mygame';
     const admobHint = 'ca-app-pub-XXXXXXXXXXXXXXXX/YYYYYYYYYY';
+    const defaultVersion = '1.0.0';
 
     return (
       <React.Fragment>
@@ -179,7 +180,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
           <SemiControlledTextField
             floatingLabelText={<Trans>Version number (X.Y.Z)</Trans>}
             fullWidth
-            hintText={<Trans>1.0.0</Trans>}
+            hintText={defaultVersion}
             type="text"
             value={version}
             onChange={value => this.setState({ version: value })}

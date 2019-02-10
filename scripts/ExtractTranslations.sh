@@ -2,8 +2,8 @@
 #to update the strings to be translated.
 echo "ℹ️ Listing all GDCore, GDCpp, GDJS and Extensions sources files to translate..."
 
-find ../GDCpp/GDCpp/ -name '*.cpp' | grep -v '/Dialogs/' > /tmp/listfile.txt
-find ../GDCpp/GDCpp/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
+find ../GDCpp/GDCpp/ -name '*.cpp' | grep -v '/Dialogs/' | grep -v '/IDE/' > /tmp/listfile.txt
+find ../GDCpp/GDCpp/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' | grep -v '/IDE/' >> /tmp/listfile.txt
 find ../GDJS/GDJS/ -name '*.cpp' | grep -v '/Dialogs/' >> /tmp/listfile.txt
 find ../GDJS/GDJS/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
 find ../Extensions/ -name '*.cpp' | grep -v '/Dialogs/' >> /tmp/listfile.txt

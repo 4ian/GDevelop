@@ -33,20 +33,53 @@ const getLocalePath = localeName => {
   return path.join(localesBasePath, localeName);
 };
 
+const getLocaleCatalogPath = localeName => {
+  return path.join(getLocalePath(localeName), 'messages.po');
+};
+
 const getLocaleCompiledCatalogPath = localeName => {
   return path.join(getLocalePath(localeName), 'messages.js');
 };
 
 const getLocaleMetadataPath = () => {
   return path.join(localesBasePath, 'LocalesMetadata.js');
-}
+};
 
-const getLocaleName = langCode => ISO6391.getName(getShortestCode(langCode));
-const getLocaleNativeName = langCode => ISO6391.getNativeName(getShortestCode(langCode));
+const getLocaleName = langCode => {
+  if (langCode === 'pt_BR') {
+    return 'Brazilian Portuguese';
+  } else if (langCode === 'zh_CN') {
+    return 'Chinese Simplified';
+  } else if (langCode === 'zh_TW') {
+    return 'Chinese Traditional';
+  } else if (langCode === 'sr_CS') {
+    return 'Serbian (Latin)';
+  } else if (langCode === 'fil_PH') {
+    return 'Filipino';
+  }
+
+  return ISO6391.getName(getShortestCode(langCode));
+};
+const getLocaleNativeName = langCode => {
+  if (langCode === 'pt_BR') {
+    return 'Português brasileiro';
+  } else if (langCode === 'zh_CN') {
+    return '简化字';
+  } else if (langCode === 'zh_TW') {
+    return '正體字';
+  } else if (langCode === 'sr_CS') {
+    return 'srpski';
+  } else if (langCode === 'fil_PH') {
+    return 'Mga Filipino';
+  }
+
+  return ISO6391.getNativeName(getShortestCode(langCode));
+};
 
 module.exports = {
   getLocales,
   getLocalePath,
+  getLocaleCatalogPath,
   getLocaleCompiledCatalogPath,
   getLocaleMetadataPath,
   getLocaleName,

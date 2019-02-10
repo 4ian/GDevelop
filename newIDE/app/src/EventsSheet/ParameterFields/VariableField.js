@@ -1,5 +1,5 @@
 // @flow
-import { Trans } from '@lingui/macro';
+import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 
 import React, { Component } from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
@@ -109,7 +109,7 @@ export default class VariableField extends Component<Props, State> {
         />
         {this.props.onOpenDialog && !this.props.isInline && (
           <RaisedButton
-            label={<Trans>...</Trans>}
+            icon={<OpenInNew />}
             disabled={!this.props.variablesContainer}
             primary
             style={styles.moreButton}

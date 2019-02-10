@@ -4,6 +4,7 @@ const fs = require('fs');
 const {
   getLocales,
   getLocalePath,
+  getLocaleCatalogPath,
   getLocaleCompiledCatalogPath,
   getLocaleMetadataPath,
   getLocaleName,
@@ -68,15 +69,81 @@ const writeLocaleMetadata = object => {
   });
 };
 
+const sanitizeMessagePo = path => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf8', function(err, content) {
+      if (err) {
+        return reject(err);
+      }
+      let forbiddenStringsFound = [];
+      let forbiddenStrings = [
+        {
+          str: 'n \\',
+          regex: /n \\/g,
+        },
+        {
+          str: 'n\\\\',
+          regex: /n\\\\/g,
+        },
+        {
+          str: '\\\\',
+          regex: /\\\\/g,
+        },
+        {
+          str: '\\ n',
+          regex: /\\ n/g,
+        },
+        {
+          str: '\\ t',
+          regex: /\\ t/g,
+        },
+        {
+          str: '\\ ',
+          regex: /\\ /g,
+        },
+      ];
+      let sanitizedContent = content;
+      forbiddenStrings.forEach(forbiddenString => {
+        if (sanitizedContent.search(forbiddenString.regex) !== -1) {
+          forbiddenStringsFound.push(forbiddenString);
+          sanitizedContent = sanitizedContent.replace(
+            forbiddenString.regex,
+            ' '
+          );
+        }
+      });
+
+      fs.writeFile(path, sanitizedContent, 'utf8', function(err) {
+        if (err) {
+          return reject(err);
+        }
+
+        resolve({
+          forbiddenStringsFound,
+        });
+      });
+    });
+  });
+};
+
 getLocales()
   .then(
     locales =>
       Promise.all(
         locales.map(locale => {
           return new Promise(resolve => {
+            // Concatenate all message catalogs into a single one for lingui-js.
+            // For "en", don't concatenate with gdcore-gdcpp-gdjs-extensions-messages.po
+            // as it's the source language.
+            const files =
+              locale === 'en'
+                ? 'ide-messages.po'
+                : 'ide-messages.po gdcore-gdcpp-gdjs-extensions-messages.po';
+
+            // Run msgcat. Use --no-wrap to allow to sanitize the catalog with
+            // regex/string replace.
             shell.exec(
-              msgcat +
-                ' ide-messages.po gdcore-gdcpp-gdjs-extensions-messages.po -o messages.po',
+              msgcat + ` --no-wrap ${files} -o messages.po`,
               {
                 cwd: getLocalePath(locale),
                 silent: true,
@@ -123,15 +190,37 @@ getLocales()
       });
     }
 
+    return successes.map(({ locale }) => locale);
+  })
+  .then(locales => {
+    // "Sanitize" all catalogs by removing and warning about bad characters
+    // in translations that would break js-lingui (incorrect ICU message format).
+    return Promise.all(
+      locales.map(locale =>
+        sanitizeMessagePo(getLocaleCatalogPath(locale)).then(results => {
+          if (results.forbiddenStringsFound.length) {
+            shell.echo(
+              `⚠️ Found forbidden strings for locale ${locale} (replaced by spaces):`
+            );
+            results.forbiddenStringsFound.forEach(({ str }) => {
+              shell.echo(`  * Found ${str}`);
+            });
+          }
+        })
+      )
+    ).then(() => locales);
+  })
+  .then(locales => {
     // Launch "lingui compile" for transforming .PO files into
     // js files ready to be used with @lingui/react newIDE translations
     shell.exec('node node_modules/.bin/lingui compile', {
       cwd: newIdeAppPath,
     });
 
-    return successes.map(({ locale }) => locale);
+    return locales;
   })
   .then(locales => {
+    // Compute some stats about the languages...
     return Promise.all(
       locales.map(locale => {
         const compiledCatalog = require(getLocaleCompiledCatalogPath(locale));
@@ -146,6 +235,8 @@ getLocales()
     );
   })
   .then(
+    // ... and store the stats in LocaleMetadata.js, to be displayed/used
+    // in the editor.
     localesMetadata => writeLocaleMetadata(localesMetadata),
     error => {
       shell.echo(

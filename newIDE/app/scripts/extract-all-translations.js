@@ -23,7 +23,7 @@ getLocales().then(locales =>
     const localePath = getLocalePath(locale);
     shell.mv(
       path.join(localePath, 'messages.po'),
-      path.join(localePath, 'ide-messages.po')
+      path.join(localePath, locale === 'en' ? 'ide-messages.pot' : 'ide-messages.po')
     );
   })
 );

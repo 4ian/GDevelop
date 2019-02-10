@@ -73,7 +73,7 @@ export default class LocalFilePicker extends PureComponent<Props, *> {
           onChange={(event, value) => this.props.onChange(value)}
         />
         <FlatButton
-          label={<Trans>...</Trans>}
+          label={<Trans>Choose</Trans>}
           style={styles.button}
           onClick={this.onChooseFolder}
         />

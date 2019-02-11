@@ -115,19 +115,21 @@ const ThemableVariableRow = ({
         <IconButton
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
-          tooltip={'Reset to default object variable'}
+          tooltip={'Reset'}
         >
           <Reset />
         </IconButton>
       )}
-      <IconButton
-        onClick={onAddChild}
-        style={isStructure ? undefined : styles.fadedButton}
-        disabled={limitEditing}
-        tooltip={'Add child variable'}
-      >
-        <AddCircle />
-      </IconButton>
+      {!limitEditing && (
+        <IconButton
+          onClick={onAddChild}
+          style={isStructure ? undefined : styles.fadedButton}
+          disabled={limitEditing}
+          tooltip={'Add child variable'}
+        >
+          <AddCircle />
+        </IconButton>
+      )}
     </TreeTableCell>
   );
 

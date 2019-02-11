@@ -3,7 +3,6 @@ import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
 import { withSerializableObject } from '../Utils/SerializableObjectEditorContainer';
 import VariablesList from './index';
-import styles from './styles';
 
 const gd = global.gd;
 
@@ -20,9 +19,26 @@ export class VariablesEditorDialog extends Component {
       variablesContainer,
     } = this.props;
     const actions = [
-      <FlatButton label="Cancel" onClick={onCancel} />,
-      <FlatButton label="Apply" primary keyboardFocused onClick={onApply} />,
+      <FlatButton label="Cancel" onClick={onCancel} key={'Cancel'} />,
+      <FlatButton
+        label="Apply"
+        primary
+        keyboardFocused
+        onClick={onApply}
+        key={'Apply'}
+      />,
     ];
+    const secondaryActions =
+      onEditObjectVariables === undefined ? (
+        ''
+      ) : (
+        <FlatButton
+          label="Edit Object Variables"
+          key="InstanceEditObjectVariables"
+          primary={false}
+          onClick={onEditObjectVariables}
+        />
+      );
 
     return (
       <Dialog
@@ -32,8 +48,9 @@ export class VariablesEditorDialog extends Component {
         open={open}
         onRequestClose={onCancel}
         autoScrollBodyContent
+        secondaryActions={secondaryActions}
+        title={titleMessage}
       >
-        {titleMessage && <div style={styles.titleMessage}>{titleMessage}</div>}
         <VariablesList
           variablesContainer={variablesContainer}
           emptyExplanationMessage={emptyExplanationMessage}
@@ -42,7 +59,6 @@ export class VariablesEditorDialog extends Component {
             () =>
               this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
           }
-          onEditObjectVariables={onEditObjectVariables}
         />
       </Dialog>
     );

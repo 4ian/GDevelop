@@ -6,7 +6,6 @@ import EmptyMessage from '../UI/EmptyMessage';
 import ContentCopy from 'material-ui/svg-icons/content/content-copy';
 import ContentPaste from 'material-ui/svg-icons/content/content-paste';
 import Delete from 'material-ui/svg-icons/action/delete';
-import ObjectVar from 'material-ui/svg-icons/action/list';
 
 import styles from './styles';
 
@@ -17,7 +16,6 @@ const EditVariableRow = ({
   onPaste,
   hasClipboard,
   onDeleteSelection,
-  onEditObjectVariables,
 }) => (
   <TreeTableRow key="add-row">
     <TreeTableCell style={styles.toolColumnHeader}>
@@ -41,14 +39,6 @@ const EditVariableRow = ({
     </TreeTableCell>
 
     <TreeTableCell style={styles.toolColumn}>
-      {onEditObjectVariables && (
-        <IconButton
-          onClick={onEditObjectVariables}
-          tooltip={'Edit object variables'}
-        >
-          <ObjectVar />
-        </IconButton>
-      )}
       <IconButton onClick={onAdd} tooltip={'Add new variable'}>
         <Add />
       </IconButton>

@@ -102,6 +102,7 @@ type State = {|
   layerRemoved: ?string,
   editedObjectWithContext: ?ObjectWithContext,
   variablesEditedInstance: ?gdInitialInstance,
+  variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
 
   editedGroup: ?gdObjectGroup,
@@ -149,6 +150,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoved: null,
       editedObjectWithContext: null,
       variablesEditedInstance: null,
+      variablesEditedObject: null,
       selectedObjectNames: [],
 
       editedGroup: null,

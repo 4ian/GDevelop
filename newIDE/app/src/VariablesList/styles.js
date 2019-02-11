@@ -27,9 +27,4 @@ export default {
   fadedButton: {
     opacity: 0.7,
   },
-  titleMessage: {
-    textAlign: 'center',
-    fontSize: 20,
-    paddingTop: 4,
-  },
 };

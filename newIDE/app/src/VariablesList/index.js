@@ -48,7 +48,6 @@ type Props = {|
   emptyExplanationMessage?: string,
   emptyExplanationSecondMessage?: string,
   onSizeUpdated?: () => void,
-  onEditObjectVariables?: () => void,
 |};
 type State = {|
   nameErrors: { [string]: string },
@@ -203,7 +202,7 @@ export default class VariablesList extends React.Component<Props, State> {
     parentVariable: ?gdVariable,
     parentOrigin: ?string = null
   ) {
-    const { variablesContainer, onEditObjectVariables } = this.props;
+    const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
 
     const origin =
@@ -218,7 +217,6 @@ export default class VariablesList extends React.Component<Props, State> {
         disabled={depth !== 0}
         depth={depth}
         origin={origin}
-        onEditObjectVariables={onEditObjectVariables}
         errorText={
           this.state.nameErrors[variable.ptr]
             ? 'This name is already taken'
@@ -372,7 +370,6 @@ export default class VariablesList extends React.Component<Props, State> {
         onDeleteSelection={this.deleteSelection}
         hasSelection={hasSelection(this.state.selectedVariables)}
         hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
-        onEditObjectVariables={this.props.onEditObjectVariables}
       />
     );
 

@@ -7,6 +7,7 @@ import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema'
 import VariablesList from '../../VariablesList';
 import getObjectFromInstance from '../../Utils/GetObjectFromInstance';
 import IconButton from 'material-ui/IconButton';
+import { Line } from '../../UI/Grid';
 
 import PopOut from 'material-ui/svg-icons/action/open-in-new';
 
@@ -125,16 +126,17 @@ export default class InstancePropertiesEditor extends Component {
           schema={this.schema.concat(instanceSchema)}
           instances={instances}
         />
-        Instance Variables
-        <IconButton
-          tooltip={'Edit instance variables'}
-          style={{ top: 5 }}
-          onClick={() => {
-            this.props.editInstanceVariables(instance);
-          }}
-        >
-          <PopOut />
-        </IconButton>
+        <Line alignItems="center">
+          Instance Variables
+          <IconButton
+            tooltip={'Edit instance variables'}
+            onClick={() => {
+              this.props.editInstanceVariables(instance);
+            }}
+          >
+            <PopOut />
+          </IconButton>
+        </Line>
         <VariablesList
           inheritedVariablesContainer={object ? object.getVariables() : []}
           variablesContainer={instance.getVariables()}

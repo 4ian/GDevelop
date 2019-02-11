@@ -107,7 +107,14 @@ const ThemableVariableRow = ({
       </TreeTableCell>
     );
   } else {
-    columns.push(<TreeTableCell key="value">(Structure)</TreeTableCell>);
+    columns.push(
+      <TreeTableCell
+        key="value"
+        style={limitEditing ? styles.fadedButton : undefined}
+      >
+        (Structure)
+      </TreeTableCell>
+    );
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>

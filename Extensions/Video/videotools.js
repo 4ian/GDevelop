@@ -16,19 +16,6 @@ gdjs.evtTools.video.myConditionFunction = function(number, text) {
   return number <= 10 && text.length < 5;
 };
 
-/**
- * Inutile ?
- */
-/*
-gdjs.evtTools.video.play = function(runtimeObject, playAtBegeningOrNot, LoopOrNot) {
-  console.log("#2bouh- Usless code - TODO REMOVE");
-  //gdjs.VideoRuntimeObjectPixiRenderer.prototype.play();
-};
-*/
-/**
- * Fin du truc Inutile 
- */
-
 gdjs.evtTools.video.getString = function() {
   return "Hello World";
 };

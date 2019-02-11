@@ -105,14 +105,14 @@ gdjs.VideoRuntimeObject.prototype.getOpacity = function() {
 };
 
 /**
- * Get the text that must be displayed by the video object.
+ * A supprimer
  */
 gdjs.VideoRuntimeObject.prototype.getText = function() {
   return this._property1;
 };
 
 /**
- * Set the width of the panel sprite.
+ * Set the width of video instance and renderer
  * @param {number} width The new width in pixels.
  */
 gdjs.VideoRuntimeObject.prototype.setWidth = function(width) {
@@ -121,7 +121,7 @@ gdjs.VideoRuntimeObject.prototype.setWidth = function(width) {
 };
 
 /**
-* Set the height of the panel sprite.
+* Set the height of video instance and renderer
 * @param {number} height The new height in pixels.
 */
 gdjs.VideoRuntimeObject.prototype.setHeight = function(height) {
@@ -130,43 +130,107 @@ gdjs.VideoRuntimeObject.prototype.setHeight = function(height) {
 };
 
 /**
- * A dummy method that can be called from events
+ * Action play
  */
-gdjs.VideoRuntimeObject.prototype.play = function(number1, text1) {
-  console.log("Here is the object:", this);
-  console.log("Here are the arguments passed from events:", number1, text1);
-  console.log("#2bouh-play");
+gdjs.VideoRuntimeObject.prototype.play = function() {
   this._renderer.play();
 }; 
 
 /**
- * A dummy method that can be called from events
+ * Action pause
  */
-gdjs.VideoRuntimeObject.prototype.pause = function(number1, text1) {
-  console.log("Here is the object:", this);
-  console.log("Here are the arguments passed from events:", number1, text1);
-  console.log("#2bouh-pause");
+gdjs.VideoRuntimeObject.prototype.pause = function() {
   this._renderer.pause();
 }; 
 
 /**
- * A dummy method that can be called from events
+ * Action loop
  */
-gdjs.VideoRuntimeObject.prototype.loop = function(number1) {
-  console.log("Here is the object:", this);
-  console.log("Here are the arguments passed from events:", number1);
-  console.log("#2bouh-loop");
-  this._renderer.loop(number1);
+gdjs.VideoRuntimeObject.prototype.setLoop = function(bool) {
+  this._renderer.setLoop(bool);
+};
+
+/**
+ * Action mute
+ */
+gdjs.VideoRuntimeObject.prototype.mute = function(bool) {
+  this._renderer.setMute(bool);
+};
+
+gdjs.VideoRuntimeObject.prototype.isMuted = function() {
+  return this._renderer.isMuted();
+};
+
+
+/* Tool normalize for value 
+
+input 0-1, return a number 0-100
+this._normalize(volume, 1, 0)*100;
+
+input 0-100, return output 0-1
+this._normalize(parseFloat(number), 100, 0)
+ */
+ 
+gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
+  return (val - min) / (max - min); 
+};
+
+gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
+  return val <= min ? min : val >= max ? max : val;
+}
+
+/**
+ * WIP
+ * setVolume
+ */
+gdjs.VideoRuntimeObject.prototype.setVolume = function( newVolume ) {
+
+  var getVolumeqsd=  this.getVolume();
+  var _newVolume = this._clamp( this._normalize( newVolume, 0, 100 ) , 0, 1 );
+  //console.log("volume actuel : " + getVolumeqsd + ", volume recalculé : " + newVolume +  ", _newVolume : " + _newVolume );
+  this._renderer.setVolume( _newVolume );
+};
+
+gdjs.VideoRuntimeObject.prototype.getVolume = function() {
+  return this._normalize(this._renderer.getVolume(), 0, 1)*100;
+};
+
+gdjs.VideoRuntimeObject.prototype.isPlayed = function() {
+  return this._renderer.isPlayed();
+}; 
+
+gdjs.VideoRuntimeObject.prototype.isPaused = function() {
+  return !this._renderer.isPlayed();
 }; 
 
 
+gdjs.VideoRuntimeObject.prototype.isLooped = function() {
+  return this._renderer.isLooped();
+}; 
 
-/**
- * currentTime 6.873379
- * duration 60.789841
- * ended false/true
- * loop false/true
- * muted false/true
- * volume 0-1
- * controls ? false-true
- */
+
+/* gdjs.VideoRuntimeObject.prototype.controls = function(bool) {
+  this._renderer.setControls(bool);
+}; */
+
+gdjs.VideoRuntimeObject.prototype.controlsAreShowing = function() {
+  return this._renderer.controlsAreShowing();
+};
+
+
+
+gdjs.VideoRuntimeObject.prototype.getDuration = function() {
+  return this._renderer.getDuration();
+};
+
+gdjs.VideoRuntimeObject.prototype.isEnded = function() {
+  return !this._renderer.isEnded();
+}; 
+
+gdjs.VideoRuntimeObject.prototype.setCurrentTime = function(number) {
+  this._renderer.setCurrentTime(number);
+};
+
+gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
+  return this._renderer.getCurrentTime();
+};

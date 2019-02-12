@@ -51,8 +51,20 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
   this._pixiObject.rotation = gdjs.toRad(this._object.angle);
 };
 
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
-  this._pixiObject.alpha = this._object.opacity / 255;
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateOpacity = function(number) {
+  //this._object.opacity = this.getOpacity()*255
+  //console.log("opacity avant : " + this._pixiObject.alpha + ", "+ this._object.opacity+"/255");
+  
+  //need 0-1
+  //console.log("opacity apres : " + this._pixiObject.alpha + ", "+ this._object.opacity+"/255");
+  this._pixiObject.alpha = number;
+};
+
+/**
+ * Return alpha 0-1
+ */
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.getOpacity = function() {
+  return this._pixiObject.alpha;
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getWidth = function() {

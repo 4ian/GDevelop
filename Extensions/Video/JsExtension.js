@@ -285,7 +285,7 @@ module.exports = {
         "SetVolume",
         t("Set volume (in %)"),
         t("Set volume (in %)"),
-        t("Do _PARAM1_ _PARAM2_ to the volume of _PARAM0_, in percentage"),
+        t("Do _PARAM1_ _PARAM2_ % to the volume of _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
@@ -300,7 +300,7 @@ module.exports = {
 
       object
       .addExpression(
-        'getVolume',
+        'GetVolume',
         t('Get the volume'),
         t('Get the volume of an video object.'),
         t('Volume'),
@@ -312,7 +312,7 @@ module.exports = {
 
       object
       .addExpression(
-        'isMuted',
+        'IsMuted',
         t('Video is muted'),
         t('Return if video is muted'),
         t('Volume'),
@@ -352,7 +352,7 @@ module.exports = {
 
       object
       .addExpression(
-        'isPaused',
+        'IsPaused',
         t('Video is played'),
         t('Return if video is played'),
         t('Time'),
@@ -364,7 +364,7 @@ module.exports = {
 
       object
       .addExpression(
-        'isPlayed',
+        'IsPlayed',
         t('Video is played'),
         t('Return if video is played'),
         t('Time'),
@@ -390,7 +390,7 @@ module.exports = {
 
       object
       .addExpression(
-        'isPaused',
+        'IsPaused',
         t('Video is paused'),
         t('Return if video is paused'),
         t('Time'),
@@ -402,7 +402,7 @@ module.exports = {
 
       object
       .addExpression(
-        'isLooped',
+        'IsLooped',
         t('Video is looped'),
         t('Return if video is looped'),
         t('Time'),
@@ -445,7 +445,7 @@ module.exports = {
 
       object
       .addExpression(
-        'getCurrentTime',
+        'GetCurrentTime',
         t('Get current time'),
         t('Return the current time of an video object (in seconds)'),
         t('Time'),
@@ -457,7 +457,7 @@ module.exports = {
 
       object
       .addExpression(
-        'getDuration',
+        'GetDuration',
         t('Get the duration'),
         t('Return the duration of an video object (in seconds)'),
         t('Time'),
@@ -469,7 +469,7 @@ module.exports = {
 
       object
       .addExpression(
-        'isEnded',
+        'IsEnded',
         t('Get the duration'),
         t('Get the duration of an video object (in seconds)'),
         t('Time'),
@@ -492,6 +492,53 @@ module.exports = {
       .addParameter("object", "Choose an object video", "", false)
       .getCodeExtraInformation()
       .setFunctionName("isEnded");
+
+      object
+      .addAction(
+        "SetOpacity",
+        t("Set opacity (in %)"),
+        t("Set opacity (in %)"),
+        t("Do _PARAM1_ _PARAM2_ % to the opacity of _PARAM0_"),
+        "",
+        "JsPlatform/Extensions/videoicon24.png",
+        "JsPlatform/Extensions/videoicon16.png"
+      )
+      .addParameter("object", t("Choose an object video"), "", false)
+      .addParameter('operator', t("Modification's sign"), "", false)
+      .addParameter("expression", t("Opacity in %"), "", false)
+      .getCodeExtraInformation()
+      .setFunctionName("setOpacity")
+      .setManipulatedType('number')
+      .setGetter('getOpacity');
+
+      object
+      .addCondition(
+        "GetOpacity",
+        t("Opacity"),
+        t("Test the opacity of an video object"),
+        t("Opacity of _PARAM0_ is _PARAM1_ _PARAM2_"),
+        "",
+        "JsPlatform/Extensions/videoicon24.png",
+        "JsPlatform/Extensions/videoicon16.png"
+      )
+      .addParameter('object', t('Choose an object video'), '', false)
+      .addParameter('relationalOperator', t('Sign of the test'))
+      .addParameter('expression', t('Opacity 0-100'))
+      .getCodeExtraInformation()
+      .setFunctionName('getOpacity')
+      .setManipulatedType('number');
+
+      object
+      .addExpression(
+        'GetOpacity',
+        t('Get current opacity'),
+        t('Return the opacity of an video object'),
+        "",
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getOpacity');
 
       /* object
       .addAction(
@@ -601,6 +648,9 @@ module.exports = {
         si la video n'est pas chargé mettre un placeholder fichier non trouver / ou erreur
        */
        
+     
+
+
        
       // create a video texture from a path
       var textureVideo = new PIXI.Texture.fromVideo('C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4');

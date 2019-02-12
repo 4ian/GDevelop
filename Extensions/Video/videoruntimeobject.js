@@ -92,16 +92,17 @@ gdjs.VideoRuntimeObject.prototype.setAngle = function(angle) {
 gdjs.VideoRuntimeObject.prototype.setOpacity = function(opacity) {
   if (opacity < 0) opacity = 0;
   if (opacity > 255) opacity = 255;
-
-  this.opacity = opacity;
-  this._renderer.updateOpacity(); // Tell the renderer to update the rendered object
+  var new_opacity = opacity/255;
+  //this.opacity = opacity || this.getOpacity() ;
+  this._renderer.updateOpacity(new_opacity); // Tell the renderer to update the rendered object
 };
 
 /**
  * Get object opacity.
+ * return 0-1
  */
 gdjs.VideoRuntimeObject.prototype.getOpacity = function() {
-  return this.opacity;
+  return this._renderer.getOpacity()*255;
 };
 
 /**
@@ -129,30 +130,32 @@ gdjs.VideoRuntimeObject.prototype.setHeight = function(height) {
   this._renderer.updateHeight();
 };
 
-/**
- * Action play
- */
+//TODO getWidth
+gdjs.VideoRuntimeObject.prototype.getWidth = function() {
+  return this._width;
+  /* this._width = width;
+  this._renderer.updateWidth(); */
+};
+
+//TODO getHeight
+gdjs.VideoRuntimeObject.prototype.getHeight = function() {
+  return this._height;
+  /* this._height = height;
+  this._renderer.updateHeight(); */
+};
+
 gdjs.VideoRuntimeObject.prototype.play = function() {
   this._renderer.play();
 }; 
 
-/**
- * Action pause
- */
 gdjs.VideoRuntimeObject.prototype.pause = function() {
   this._renderer.pause();
 }; 
 
-/**
- * Action loop
- */
 gdjs.VideoRuntimeObject.prototype.setLoop = function(bool) {
   this._renderer.setLoop(bool);
 };
 
-/**
- * Action mute
- */
 gdjs.VideoRuntimeObject.prototype.mute = function(bool) {
   this._renderer.setMute(bool);
 };
@@ -161,7 +164,6 @@ gdjs.VideoRuntimeObject.prototype.isMuted = function() {
   return this._renderer.isMuted();
 };
 
-
 /* Tool normalize for value 
 
 input 0-1, return a number 0-100
@@ -169,7 +171,7 @@ this._normalize(volume, 1, 0)*100;
 
 input 0-100, return output 0-1
 this._normalize(parseFloat(number), 100, 0)
- */
+*/
  
 gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
   return (val - min) / (max - min); 
@@ -179,15 +181,9 @@ gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
   return val <= min ? min : val >= max ? max : val;
 }
 
-/**
- * WIP
- * setVolume
- */
 gdjs.VideoRuntimeObject.prototype.setVolume = function( newVolume ) {
 
-  var getVolumeqsd=  this.getVolume();
   var _newVolume = this._clamp( this._normalize( newVolume, 0, 100 ) , 0, 1 );
-  //console.log("volume actuel : " + getVolumeqsd + ", volume recalculé : " + newVolume +  ", _newVolume : " + _newVolume );
   this._renderer.setVolume( _newVolume );
 };
 
@@ -203,21 +199,13 @@ gdjs.VideoRuntimeObject.prototype.isPaused = function() {
   return !this._renderer.isPlayed();
 }; 
 
-
 gdjs.VideoRuntimeObject.prototype.isLooped = function() {
   return this._renderer.isLooped();
 }; 
 
-
-/* gdjs.VideoRuntimeObject.prototype.controls = function(bool) {
-  this._renderer.setControls(bool);
-}; */
-
 gdjs.VideoRuntimeObject.prototype.controlsAreShowing = function() {
   return this._renderer.controlsAreShowing();
 };
-
-
 
 gdjs.VideoRuntimeObject.prototype.getDuration = function() {
   return this._renderer.getDuration();
@@ -234,3 +222,7 @@ gdjs.VideoRuntimeObject.prototype.setCurrentTime = function(number) {
 gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
   return this._renderer.getCurrentTime();
 };
+
+/* gdjs.VideoRuntimeObject.prototype.controls = function(bool) {
+  this._renderer.setControls(bool);
+}; */

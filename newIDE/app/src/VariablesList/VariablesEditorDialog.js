@@ -13,7 +13,7 @@ export class VariablesEditorDialog extends Component {
       onApply,
       open,
       onEditObjectVariables,
-      titleMessage,
+      title,
       emptyExplanationMessage,
       emptyExplanationSecondMessage,
       variablesContainer,
@@ -28,17 +28,13 @@ export class VariablesEditorDialog extends Component {
         key={'Apply'}
       />,
     ];
-    const secondaryActions =
-      onEditObjectVariables === undefined ? (
-        ''
-      ) : (
-        <FlatButton
-          label="Edit Object Variables"
-          key="InstanceEditObjectVariables"
-          primary={false}
-          onClick={onEditObjectVariables}
-        />
-      );
+    const secondaryActions = onEditObjectVariables ? (
+      <FlatButton
+        label="Edit Object Variables"
+        primary={false}
+        onClick={onEditObjectVariables}
+      />
+    ) : null;
 
     return (
       <Dialog
@@ -49,7 +45,7 @@ export class VariablesEditorDialog extends Component {
         onRequestClose={onCancel}
         autoScrollBodyContent
         secondaryActions={secondaryActions}
-        title={titleMessage}
+        title={title}
       >
         <VariablesList
           variablesContainer={variablesContainer}

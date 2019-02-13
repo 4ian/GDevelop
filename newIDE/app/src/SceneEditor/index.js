@@ -1072,7 +1072,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           onCancel={() => this.editInstanceVariables(null)}
           onApply={() => this.editInstanceVariables(null)}
           emptyExplanationMessage="Instance variables will override the default values of the variables of the object."
-          titleMessage="Instance Variables:"
+          title="Instance Variables"
           onEditObjectVariables={() => {
             if (!this.instancesSelection.hasSelectedInstances()) {
               return;
@@ -1095,7 +1095,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           onCancel={() => this.editObjectVariables(null)}
           onApply={() => this.editObjectVariables(null)}
           emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
-          titleMessage="Object Variables:"
+          title="Object Variables"
         />
         <LayerRemoveDialog
           open={!!this.state.layerRemoveDialogOpen}
@@ -1117,7 +1117,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           variablesContainer={layout.getVariables()}
           onCancel={() => this.editLayoutVariables(false)}
           onApply={() => this.editLayoutVariables(false)}
-          titleMessage="Scene variables:"
+          title="Scene variables"
           emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
           emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
         />

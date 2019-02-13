@@ -26,6 +26,8 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { type variableOrigin } from './VariablesList.flow';
+
 const gd = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
@@ -139,7 +141,7 @@ export default class VariablesList extends React.Component<Props, State> {
     variable: gdVariable,
     newValue: string,
     index: number,
-    origin: ?string
+    origin: ?variableOrigin
   ) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
@@ -162,7 +164,7 @@ export default class VariablesList extends React.Component<Props, State> {
     name: string,
     parentVariable: gdVariable,
     depth: number,
-    origin: ?string
+    origin: variableOrigin
   ): Array<React.Node> {
     const names = parentVariable.getAllChildrenNames().toJSArray();
 
@@ -183,15 +185,10 @@ export default class VariablesList extends React.Component<Props, State> {
 
   _getVariableOrigin = (name: string) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
-    return inheritedVariablesContainer // We check for 3 types of variable states, when editing instance variables
-      ? variablesContainer.has(name) && !inheritedVariablesContainer.has(name)
-        ? '' // -variable that is unique to the instance - we can edit its name/structure
-        : !variablesContainer.has(name) && inheritedVariablesContainer.has(name)
-        ? 'parent' // -displaying parent variable at its default value, changing it will create an inherited
-        : variablesContainer.has(name) && inheritedVariablesContainer.has(name)
-        ? 'inherited' // -instance variable created when editing a parent variable's value, deleting it will re-show
-        : '' // parent go in inheritedVariablesContainer, the rest stay in variablesContainer
-      : '';
+
+    if (!inheritedVariablesContainer || !inheritedVariablesContainer.has(name))
+      return '';
+    return variablesContainer.has(name) ? 'inherited' : 'parent';
   };
 
   _renderVariableAndChildrenRows(
@@ -200,13 +197,12 @@ export default class VariablesList extends React.Component<Props, State> {
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
-    parentOrigin: ?string = null
+    parentOrigin: ?variableOrigin = null
   ) {
     const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
 
-    const origin =
-      parentOrigin !== null ? parentOrigin : this._getVariableOrigin(name);
+    const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
 
     return (
       <SortableVariableRow
@@ -310,8 +306,8 @@ export default class VariablesList extends React.Component<Props, State> {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!variablesContainer) return null;
 
-    // map all object variables, if they have been passed
-    const containerObjectVariablesTree = inheritedVariablesContainer
+    // Display inherited variables, if any
+    const containerInheritedVariablesTree = inheritedVariablesContainer
       ? mapFor(0, inheritedVariablesContainer.count(), index => {
           const name = inheritedVariablesContainer.getNameAt(index);
           if (!variablesContainer.has(name)) {
@@ -329,7 +325,6 @@ export default class VariablesList extends React.Component<Props, State> {
         })
       : [];
 
-    // map all unique instance variables
     const containerVariablesTree = mapFor(
       0,
       variablesContainer.count(),
@@ -394,8 +389,8 @@ export default class VariablesList extends React.Component<Props, State> {
           useDragHandle
           lockToContainerEdges
         >
-          {!!containerObjectVariablesTree.length &&
-            containerObjectVariablesTree}
+          {!!containerInheritedVariablesTree.length &&
+            containerInheritedVariablesTree}
           {!containerVariablesTree.length && this._renderEmpty()}
           {!!containerVariablesTree.length && containerVariablesTree}
           {editRow}

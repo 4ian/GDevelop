@@ -20,6 +20,15 @@
  * - Souhaite un check de textureVideo si elle est chargé on continue sinon on charge un placeholder error
  *    Verif avec un isloaded ?
  * 
+ * 
+ * après un changement de fichier vidéo : 
+ * https://www.w3schools.com/tags/av_met_load.asp
+ * 
+ * test codec :
+ * https://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_av_met_canplaytype
+ * 
+ * 
+ * 
  * NOTE HELP
  * Le clique sur la video ne fait rien via les events
  * Le support du draggable behavior  n'est pas là
@@ -539,6 +548,56 @@ module.exports = {
       .addParameter('object', t('Object'), '', false)
       .getCodeExtraInformation()
       .setFunctionName('getOpacity');
+
+
+      //TODO SetPlaybackSpeed
+
+      object
+      .addAction(
+        "SetPlaybackSpeed",
+        t("Set playback speed (in %)"),
+        t("Set playback speed (in %)"),
+        t("Do _PARAM1_ _PARAM2_ % to the playback speed of _PARAM0_"),
+        "",
+        "JsPlatform/Extensions/videoicon24.png",
+        "JsPlatform/Extensions/videoicon16.png"
+      )
+      .addParameter("object", t("Choose an object video"), "", false)
+      .addParameter('operator', t("Modification's sign"), "", false)
+      .addParameter("expression", t("Speed in %"), "", false)
+      .getCodeExtraInformation()
+      .setFunctionName("setPlaybackSpeed")
+      .setManipulatedType('number')
+      .setGetter('getPlaybackSpeed');
+
+      object
+      .addCondition(
+        "GetPlaybackSpeed",
+        t("Playback speed "),
+        t("Test the playback speed of an video object"),
+        t("Playback speed of _PARAM0_ is _PARAM1_ _PARAM2_"),
+        "",
+        "JsPlatform/Extensions/videoicon24.png",
+        "JsPlatform/Extensions/videoicon16.png"
+      )
+      .addParameter('object', t('Choose an object video'), '', false)
+      .addParameter('relationalOperator', t('Sign of the test'))
+      .addParameter('expression', t('Speed 0-100'))
+      .getCodeExtraInformation()
+      .setFunctionName('getPlaybackSpeed')
+      .setManipulatedType('number');
+
+      object
+      .addExpression(
+        'GetPlaybackSpeed',
+        t('Get current opacity'),
+        t('Return the playback speed of an video object'),
+        "",
+        'res/physics16.png'
+      )
+      .addParameter('object', t('Object'), '', false)
+      .getCodeExtraInformation()
+      .setFunctionName('getPlaybackSpeed');
 
       /* object
       .addAction(

@@ -177,12 +177,17 @@ gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
   return (val - min) / (max - min); 
 };
 
+/**
+ * Limit value in an interval
+ */
+
 gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
   return val <= min ? min : val >= max ? max : val;
 }
 
 gdjs.VideoRuntimeObject.prototype.setVolume = function( newVolume ) {
 
+  //newVolume = 0-100 , newVolume = normalize(newVolume) = 0-1, clamp = clamp(newVolume) = 0-1
   var _newVolume = this._clamp( this._normalize( newVolume, 0, 100 ) , 0, 1 );
   this._renderer.setVolume( _newVolume );
 };
@@ -221,6 +226,24 @@ gdjs.VideoRuntimeObject.prototype.setCurrentTime = function(number) {
 
 gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
   return this._renderer.getCurrentTime();
+};
+
+gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
+
+  var new_playbackSpeed = this._clamp( this._normalize( playbackSpeed, 0, 100 ) , 0, 1 );
+  /* if (playbackSpeed < 0) playbackSpeed = 0;
+  if (playbackSpeed > 100) playbackSpeed = 100;
+  var new_playbackSpeed = playbackSpeed/100; */
+  //this.opacity = opacity || this.getOpacity() ;
+  this._renderer.setPlaybackSpeed(new_playbackSpeed); // Tell the renderer to update the rendered object
+};
+
+/**
+ * Get playblack speed.
+ * return 0-100
+ */
+gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
+  return this._normalize(this._renderer.getPlaybackSpeed(), 0, 1)*100;
 };
 
 /* gdjs.VideoRuntimeObject.prototype.controls = function(bool) {

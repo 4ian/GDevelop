@@ -218,3 +218,14 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.getDuration = function() {
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.isEnded = function() {
   return this._pixiObject._texture.baseTexture.source.ended;
 };
+
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.setPlaybackSpeed = function(number) {
+  this._pixiObject._texture.baseTexture.source.playbackRate = number;
+};
+
+/**
+ * Return alpha 0-1
+ */
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.getPlaybackSpeed = function() {
+  return this._pixiObject._texture.baseTexture.source.playbackRate;
+};

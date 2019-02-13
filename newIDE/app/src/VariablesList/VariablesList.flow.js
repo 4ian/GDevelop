@@ -1,2 +1,2 @@
 // @flow
-export type variableOrigin = 'parent' | 'inherited' | '' | null;
+export type variableOrigin = 'parent' | 'inherited' | '';

@@ -591,7 +591,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     const gd::String& parameter,
     const gd::ParameterMetadata& metadata,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& previousParameter,
+    const gd::String& lastObjectName,
     std::vector<std::pair<gd::String, gd::String> >*
         supplementaryParametersTypes) {
   gd::String argOutput;
@@ -604,7 +604,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         *this, context, "string", parameter);
   } else if (ParameterMetadata::IsExpression("variable", metadata.type)) {
     argOutput = gd::ExpressionCodeGenerator::GenerateExpressionCode(
-        *this, context, metadata.type, parameter, previousParameter);
+        *this, context, metadata.type, parameter, lastObjectName);
   } else if (ParameterMetadata::IsObject(metadata.type)) {
     // It would be possible to run a gd::ExpressionCodeGenerator if later
     // objects can have nested objects, or function returning objects.
@@ -679,6 +679,7 @@ vector<gd::String> EventsCodeGenerator::GenerateParametersCodes(
   while (parameters.size() < parametersInfo.size())
     parameters.push_back(gd::Expression(""));
 
+  gd::String lastObjectName = "";
   for (std::size_t pNb = 0;
        pNb < parametersInfo.size() && pNb < parameters.size();
        ++pNb) {
@@ -686,12 +687,18 @@ vector<gd::String> EventsCodeGenerator::GenerateParametersCodes(
         parametersInfo[pNb].optional)
       parameters[pNb] = gd::Expression(parametersInfo[pNb].defaultValue);
 
-    gd::String argOutput = GenerateParameterCodes(
-        parameters[pNb].GetPlainString(),
-        parametersInfo[pNb],
-        context,
-        pNb == 0 ? "" : parameters[pNb - 1].GetPlainString(),
-        supplementaryParametersTypes);
+    gd::String argOutput =
+        GenerateParameterCodes(parameters[pNb].GetPlainString(),
+                               parametersInfo[pNb],
+                               context,
+                               lastObjectName,
+                               supplementaryParametersTypes);
+
+    // Memorize the last object name. By convention, parameters that require
+    // an object (mainly, "objectvar") should be placed after the object
+    // in the list of parameters (if possible, just after).
+    if (gd::ParameterMetadata::IsObject(parametersInfo[pNb].GetType()))
+      lastObjectName = parameters[pNb].GetPlainString();
 
     arguments.push_back(argOutput);
   }

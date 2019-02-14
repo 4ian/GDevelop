@@ -348,7 +348,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
     const gd::String& parameter,
     const gd::ParameterMetadata& metadata,
     gd::EventsCodeGenerationContext& context,
-    const gd::String& previousParameter,
+    const gd::String& lastObjectName,
     std::vector<std::pair<gd::String, gd::String> >*
         supplementaryParametersTypes) {
   gd::String argOutput;
@@ -361,7 +361,7 @@ gd::String EventsCodeGenerator::GenerateParameterCodes(
         parameter,
         metadata,
         context,
-        previousParameter,
+        lastObjectName,
         supplementaryParametersTypes);
   }
 

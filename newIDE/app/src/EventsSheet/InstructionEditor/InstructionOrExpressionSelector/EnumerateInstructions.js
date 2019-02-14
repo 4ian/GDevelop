@@ -52,7 +52,7 @@ export const enumerateInstructions = (
       prefix =
         extension.getName() === 'BuiltinObject'
           ? 'Common ' +
-            (isCondition ? 'conditions' : 'action') +
+            (isCondition ? 'conditions' : 'actions') +
             ' for all objects'
           : extension.getFullName();
       prefix += GROUP_DELIMITER;

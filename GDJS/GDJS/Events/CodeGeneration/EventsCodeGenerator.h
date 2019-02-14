@@ -150,7 +150,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       const gd::String& parameter,
       const gd::ParameterMetadata& metadata,
       gd::EventsCodeGenerationContext& context,
-      const gd::String& previousParameter,
+      const gd::String& lastObjectName,
       std::vector<std::pair<gd::String, gd::String> >*
           supplementaryParametersTypes);
 

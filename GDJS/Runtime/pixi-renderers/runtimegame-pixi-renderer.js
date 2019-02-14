@@ -308,13 +308,6 @@ gdjs.RuntimeGamePixiRenderer.prototype.bindStandardEvents = function(manager, wi
             gdjs.InputManager.MOUSE_LEFT_BUTTON);
         return false;
     };
-    renderer.view.onmouseout = function(e){
-        manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_LEFT_BUTTON);
-        manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_RIGHT_BUTTON);
-        manager.onMouseButtonReleased(gdjs.InputManager.MOUSE_MIDDLE_BUTTON);
-        manager.onMouseWheel(0);
-        return false;
-    };
     window.addEventListener('click', function(e) {
         if (window.focus !== undefined) window.focus();
         e.preventDefault();

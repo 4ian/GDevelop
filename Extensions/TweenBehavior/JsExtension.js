@@ -356,6 +356,53 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("addObjectOpacityTween");
 
+      behavior
+      .addAction(
+        "AddObjectColorTween",
+        t("Add object color tween"),
+        t(
+          'Add a tween animation for the object color. Format: "128;200;255" with values between 0 and 255 for red, green and blue'
+        ),
+        t(
+          "Tween the color of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
+        ),
+        t("Tween animation/Color"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
+      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("To color"), "", false)
+      .addParameter("string", t("Easing"), "", false)
+      .setDefaultValue("linear")
+      .addParameter("expression", t("Duration"), "", false)
+      .addParameter(
+        "yesorno",
+        t("Destroy this object when tween finishes"),
+        "",
+        false
+      )
+      .setDefaultValue("no")
+      .getCodeExtraInformation()
+      .setFunctionName("addObjectColorTween");
+
+      behavior
+      .addCondition(
+        "Exists",
+        t("Tween exists"),
+        t("Check if the tween animation exists."),
+        t("Tween _PARAM2_ on _PARAM0_ exists"),
+        t("Tween animation"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addParameter("object", t("Object"), "", false)
+      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
+      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .getCodeExtraInformation()
+      .setFunctionName("exists");
+
     behavior
       .addCondition(
         "IsPlaying",

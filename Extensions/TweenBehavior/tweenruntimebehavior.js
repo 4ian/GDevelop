@@ -489,7 +489,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
   destroyObjectWhenFinished
 ) {
   // TODO: Add a getColor function to the sprite object in PixiJs / RegEx not working correctly
-
+  /*
   if (!this.owner.getColor || !this.owner.setColor) return;
   if (
     !toColor.match(
@@ -497,7 +497,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
     )
   )
     return;
-
+  */
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
@@ -525,7 +525,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
     step: state => {
       var tween = this._getTween(identifier);
       tween.progress = state.progress;
-      this.owner.setColor(state.red + ";" + state.green + ";" + state.blue);
+      this.owner.setColor(Math.floor(state.red) + ";" + Math.floor(state.green) + ";" + Math.floor(state.blue));
       console.log(state);
     }
   });

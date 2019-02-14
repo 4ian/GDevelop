@@ -306,7 +306,7 @@
           "locked": false,
           "name": "Background",
           "width": 160,
-          "x": 208,
+          "x": 384,
           "y": 336,
           "zOrder": 0,
           "numberProperties": [],
@@ -645,21 +645,6 @@
         },
         {
           "angle": 0,
-          "customSize": true,
-          "height": 96,
-          "layer": "",
-          "locked": false,
-          "name": "Background_ToDo",
-          "width": 160,
-          "x": 384,
-          "y": 336,
-          "zOrder": 24,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": []
-        },
-        {
-          "angle": 0,
           "customSize": false,
           "height": 0,
           "layer": "",
@@ -684,6 +669,21 @@
           "x": 464,
           "y": 400,
           "zOrder": 26,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "height": 96,
+          "layer": "",
+          "locked": false,
+          "name": "Background",
+          "width": 160,
+          "x": 208,
+          "y": 336,
+          "zOrder": 0,
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
@@ -3776,10 +3776,188 @@
       ]
     },
     {
-      "associatedLayout": "",
+      "associatedLayout": "NewScene",
       "lastChangeTimeStamp": 0,
       "name": "ColourTweens",
-      "events": []
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": [
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MouseButtonReleased"
+                      },
+                      "parameters": [
+                        "",
+                        "Left"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SourisSurObjet"
+                      },
+                      "parameters": [
+                        "ColourTweenSprite",
+                        "",
+                        "",
+                        ""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::AddObjectColorTween"
+                      },
+                      "parameters": [
+                        "ColourTweenSprite",
+                        "TweenBehavior",
+                        "\"ColorTweenToRed\"",
+                        "\"255;0;0\"",
+                        "\"linear\"",
+                        "1000",
+                        "no"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [],
+              "actions": [],
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::HasFinished"
+                      },
+                      "parameters": [
+                        "ColourTweenSprite",
+                        "TweenBehavior",
+                        "\"ColorTweenToRed\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::AddObjectColorTween"
+                      },
+                      "parameters": [
+                        "ColourTweenSprite",
+                        "TweenBehavior",
+                        "\"ColorTweenToWhite\"",
+                        "\"255;255;255\"",
+                        "\"linear\"",
+                        "1000",
+                        "no"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::HasFinished"
+                      },
+                      "parameters": [
+                        "ColourTweenSprite",
+                        "TweenBehavior",
+                        "\"ColorTweenToWhite\""
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "BuiltinCommonInstructions::Once"
+                      },
+                      "parameters": [],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::AddObjectColorTween"
+                      },
+                      "parameters": [
+                        "ColourTweenSprite",
+                        "TweenBehavior",
+                        "\"ColorTweenToRed\"",
+                        "\"255;0;0\"",
+                        "\"linear\"",
+                        "1000",
+                        "no"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Standard",
+          "conditions": [],
+          "actions": [],
+          "events": []
+        }
+      ]
     }
   ],
   "eventsFunctionsExtensions": [],

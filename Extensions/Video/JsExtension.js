@@ -1,81 +1,14 @@
 /**
- * 
+ *
  * JsExtention.js :  Permet de déclarer les events et fait l'affichage des instances d'object dans l'éditeur de GD grace à RenderedVideoObjectInstance
- * 
+ *
  * videoruntimeobject-pixi-renderer.js  : Gère le rendu des object dans la preview et les exports.
- * 
+ *
  * Les actions : a déclarer dans JsExtention.js, puis ça appel dans videoruntimeobject.js, puis vers videoruntimeobject-pixi-renderer.js
  * Si il y a un operator il faut un .setManipulatedType('number')  et     .setGetter('getVolume');
  * la nouvelle valeur calculé avec l'opérateur est envoyé directement à setFunctionName("setVolume") !
- * 
- * 
- **************************
- * TODOLIST
- ************************** 
  *
- * FIXME 
- * 
- * TODO 
- * - si la video n'est pas chargé mettre un placeholder fichier non trouver / ou erreur
- * - Souhaite un check de textureVideo si elle est chargé on continue sinon on charge un placeholder error
- *    Verif avec un isloaded ?
- * 
- * 
- * après un changement de fichier vidéo : 
- * https://www.w3schools.com/tags/av_met_load.asp
- * 
- * test codec :
- * https://www.w3schools.com/tags/tryit.asp?filename=tryhtml5_av_met_canplaytype
- * 
- * 
- * 
- * NOTE HELP
- * Le clique sur la video ne fait rien via les events
- * Le support du draggable behavior  n'est pas là
- * Pas possible de changer l'opacitée de la vidéo de par ce que GD propose déjà.
- * Doit-je inclure mes actions / contidion pour l'opacitée ?
- * 
- * Est-ce qu'une variable volume global pour géré tout les volume de différentes vidéo en même temps est utile ?
- * 
- **************************
- * List for eventsheet (not updated, see directly the declaration below)
- ************************** 
- * 
- * | Fait | Play | Condition, si la video de l'object MONOBJECTVIDEO est en lecture, MONOBJECTVIDEO is played
- * | Fait | Play | Action, Lancer la video de l'object , Play the video of MONOBJECTVIDEO
- * | WIP | isPlayed | Expression, retourne true/false si la video est en lecture, MONOBJECTVIDEO.Video::IsPlayed()
- * 
- * Pause | Condition, si la video de l'objet MONOBJECTVIDEO est en pause, The object video MONOBJECTVIDEO is paused
- * | Fait | Pause | Action, mettre en pause la video de l'object , Pause the video of MONOBJECTVIDEO
- * isPaused | Expression, retourne true/false si la video est en pause sur un objet, MONOBJECTVIDEO.Video::IsPaused()
- * 
- * Loop | Condition, si la video de l'object MONOBJECTVIDEO est en boucle, The object video MONOBJECTVIDEO is looped
- * | Fait | Loop | Action, mettre la video de l'object MONOBJECTVIDEO en boucle, Looped the video of MONOBJECTVIDEO
- * isLooped | Expression, retourne true/false si la video est en boucle, MONOBJECTVIDEO.Video::IsLooped()
- * 
- * Mute | Condition, si le volume de l'object est mute (ou volume = 0), The volume of MONOBJECTVIDEO is muted
- * | Fait | Mute | Action, mettre le volume de l'object en mute (ou volume = 0), Mute the volume of MONOBJECTVIDEO
- * | Fait | isMuted | Expression, retourne true/false si la video est mute, MONOBJECTVIDEO.Video::IsMuted()
- * 
- * Duration | Condition, si la lecture de la video est au temps 6000 (60 secondes), The duration of MONOBJECTVIDEO is = 6000 ms
- * WIP operator | setTime | Action, met la video a un temps spécifié en ms, Do = 6000 to the timer of MONOBJECTVIDEO
- * getTime | Expression, retourne un number qui est le temps depuis le lancement de la vidéo en ms (6000ms = 60secondes), MONOBJECTVIDEO.Video::GetTime()
- * 
- * Finish | Condition, si la vidéo est fini, If the video of MONOBJECTVIDEO is finish.
- * isFinish  | Expression, retourne true/false , isMuted sur un objet video, MONOBJECTVIDEO.Video::IsFinish()
- * 
- * isLoaded | Condition, si la video de l'object MONOBJECTVIDEO est charger, The video of my MONOBJECTVIDEO is loaded
- * isLoaded | Expression, retourne true/false si la video de MONOBJECTVIDEO est charger, MONOBJECTVIDEO.Video::IsLoaded()
- * 
- * 
- * Volume | Condition, si le volume de l'object est = à 100, The volume of MONOBJECTVIDEO is = 100 %
- * | fait | Volume | Action, mettre le volume de l'object à 100, Do = 100 % to the volume of MONOBJECTVIDEO
- * | fait | getVolume | Expression, getVolume sur un objet video, MONOBJECTVIDEO.Video::GetVolume()
- * 
- * Global Volume | Condition, si le volume global des l'objets est = à 100, The global volume of video objet's is = 100 %
- * Global Volume | Action, mettre le volume global des l'objets à 100, Do = 100 % to the global volume video objet's
- * getGlobalVolume | Expression, getGlobalVolume sur les objets video, Video::GetGlobalVolume()
- * 
+ *
  */
 
 /**
@@ -93,14 +26,15 @@
 module.exports = {
   createExtension: function(t, gd) {
     const extension = new gd.PlatformExtension();
-    extension.setExtensionInformation(
-      "Video",
-      "Video",
-      "Display a video in your scene",
-      "Aurélien vivet",
-      "Open source (MIT License)"
-    )
-    .setExtensionHelpPath("/all-features/video");
+    extension
+      .setExtensionInformation(
+        "Video",
+        "Video",
+        "Display a video in your scene",
+        "Aurélien vivet",
+        "Open source (MIT License)"
+      )
+      .setExtensionHelpPath("/all-features/video");
 
     // Declare an object.
     // Create a new gd.ObjectJsImplementation object and implement the methods
@@ -144,9 +78,9 @@ module.exports = {
       );
       objectProperties.set(
         "Volume",
-        new gd.PropertyDescriptor(
-            objectContent.property3.toString()
-        ).setType("number")
+        new gd.PropertyDescriptor(objectContent.property3.toString()).setType(
+          "number"
+        )
       );
 
       return objectProperties;
@@ -213,7 +147,7 @@ module.exports = {
       .setIncludeFile("Extensions/Video/videoruntimeobject.js")
       .addIncludeFile("Extensions/Video/videoruntimeobject-pixi-renderer.js");
 
-      object
+    object
       .addAction(
         "Play",
         t("Play an video"),
@@ -226,8 +160,8 @@ module.exports = {
       .addParameter("object", "Choose an object video", "", false)
       .getCodeExtraInformation()
       .setFunctionName("play");
-  
-       object
+
+    object
       .addAction(
         "Pause",
         t("Pause an video"),
@@ -241,7 +175,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("pause");
 
-      object
+    object
       .addAction(
         "Loop",
         t("Loop an video"),
@@ -256,7 +190,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("setLoop");
 
-      object
+    object
       .addAction(
         "Mute",
         t("Mute an video"),
@@ -271,7 +205,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("mute");
 
-      object
+    object
       .addAction(
         "SetTime",
         t("Set time (in seconds)"),
@@ -282,14 +216,14 @@ module.exports = {
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", t("Choose an object video"), "", false)
-      .addParameter('operator', t("Modification's sign"), "", false)
+      .addParameter("operator", t("Modification's sign"), "", false)
       .addParameter("expression", t("Time in seconds"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("setCurrentTime")
-      .setManipulatedType('number')
-      .setGetter('getCurrentTime');
+      .setManipulatedType("number")
+      .setGetter("getCurrentTime");
 
-      object
+    object
       .addAction(
         "SetVolume",
         t("Set volume (in %)"),
@@ -300,38 +234,38 @@ module.exports = {
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", t("Choose an object video"), "", false)
-      .addParameter('operator', t("Modification's sign"), "", false)
+      .addParameter("operator", t("Modification's sign"), "", false)
       .addParameter("expression", t("Volume in %"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("setVolume")
-      .setManipulatedType('number')
-      .setGetter('getVolume');
+      .setManipulatedType("number")
+      .setGetter("getVolume");
 
-      object
+    object
       .addExpression(
-        'GetVolume',
-        t('Get the volume'),
-        t('Get the volume of an video object.'),
-        t('Volume'),
-        'res/physics16.png'
+        "GetVolume",
+        t("Get the volume"),
+        t("Get the volume of an video object."),
+        t("Volume"),
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('getVolume');
+      .setFunctionName("getVolume");
 
-      object
+    object
       .addExpression(
-        'IsMuted',
-        t('Video is muted'),
-        t('Return if video is muted'),
-        t('Volume'),
-        'res/physics16.png'
+        "IsMuted",
+        t("Video is muted"),
+        t("Return if video is muted"),
+        t("Volume"),
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('isMuted');
-      
-      object
+      .setFunctionName("isMuted");
+
+    object
       .addCondition(
         "Play",
         t("Is played"),
@@ -345,7 +279,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("isPlayed");
 
-      object
+    object
       .addCondition(
         "Pause",
         t("Is paused"),
@@ -359,31 +293,31 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("isPaused");
 
-      object
+    object
       .addExpression(
-        'IsPaused',
-        t('Video is played'),
-        t('Return if video is played'),
-        t('Time'),
-        'res/physics16.png'
+        "IsPaused",
+        t("Video is played"),
+        t("Return if video is played"),
+        t("Time"),
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('isPaused');
+      .setFunctionName("isPaused");
 
-      object
+    object
       .addExpression(
-        'IsPlayed',
-        t('Video is played'),
-        t('Return if video is played'),
-        t('Time'),
-        'res/physics16.png'
+        "IsPlayed",
+        t("Video is played"),
+        t("Return if video is played"),
+        t("Time"),
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('isPlayed');
+      .setFunctionName("isPlayed");
 
-      object
+    object
       .addCondition(
         "Loop",
         t("Is looped"),
@@ -397,31 +331,31 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("isLooped");
 
-      object
+    object
       .addExpression(
-        'IsPaused',
-        t('Video is paused'),
-        t('Return if video is paused'),
-        t('Time'),
-        'res/physics16.png'
+        "IsPaused",
+        t("Video is paused"),
+        t("Return if video is paused"),
+        t("Time"),
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('isPaused');
+      .setFunctionName("isPaused");
 
-      object
+    object
       .addExpression(
-        'IsLooped',
-        t('Video is looped'),
-        t('Return if video is looped'),
-        t('Time'),
-        'res/physics16.png'
+        "IsLooped",
+        t("Video is looped"),
+        t("Return if video is looped"),
+        t("Time"),
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('isLooped');
+      .setFunctionName("isLooped");
 
-      object
+    object
       .addCondition(
         "Volume",
         t("Volume"),
@@ -431,14 +365,14 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter('object', t('Choose an object video'), '', false)
-      .addParameter('relationalOperator', t('Sign of the test'))
-      .addParameter('expression', t('Value 0-100'))
+      .addParameter("object", t("Choose an object video"), "", false)
+      .addParameter("relationalOperator", t("Sign of the test"))
+      .addParameter("expression", t("Value 0-100"))
       .getCodeExtraInformation()
-      .setFunctionName('getVolume')
-      .setManipulatedType('number');
+      .setFunctionName("getVolume")
+      .setManipulatedType("number");
 
-      object
+    object
       .addCondition(
         "Mute",
         t("Is muted"),
@@ -452,43 +386,43 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("isMuted");
 
-      object
+    object
       .addExpression(
-        'GetCurrentTime',
-        t('Get current time'),
-        t('Return the current time of an video object (in seconds)'),
-        t('Time'),
-        'res/physics16.png'
+        "GetCurrentTime",
+        t("Get current time"),
+        t("Return the current time of an video object (in seconds)"),
+        t("Time"),
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('getCurrentTime');
+      .setFunctionName("getCurrentTime");
 
-      object
+    object
       .addExpression(
-        'GetDuration',
-        t('Get the duration'),
-        t('Return the duration of an video object (in seconds)'),
-        t('Time'),
-        'res/physics16.png'
+        "GetDuration",
+        t("Get the duration"),
+        t("Return the duration of an video object (in seconds)"),
+        t("Time"),
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('getDuration');
+      .setFunctionName("getDuration");
 
-      object
+    object
       .addExpression(
-        'IsEnded',
-        t('Get the duration'),
-        t('Get the duration of an video object (in seconds)'),
-        t('Time'),
-        'res/physics16.png'
+        "IsEnded",
+        t("Get the duration"),
+        t("Get the duration of an video object (in seconds)"),
+        t("Time"),
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('isEnded');
+      .setFunctionName("isEnded");
 
-      object
+    object
       .addCondition(
         "Ended",
         t("Is ended"),
@@ -502,7 +436,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("isEnded");
 
-      object
+    object
       .addAction(
         "SetOpacity",
         t("Set opacity (in %)"),
@@ -513,14 +447,14 @@ module.exports = {
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", t("Choose an object video"), "", false)
-      .addParameter('operator', t("Modification's sign"), "", false)
+      .addParameter("operator", t("Modification's sign"), "", false)
       .addParameter("expression", t("Opacity in %"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("setOpacity")
-      .setManipulatedType('number')
-      .setGetter('getOpacity');
+      .setManipulatedType("number")
+      .setGetter("getOpacity");
 
-      object
+    object
       .addCondition(
         "GetOpacity",
         t("Opacity"),
@@ -530,29 +464,26 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter('object', t('Choose an object video'), '', false)
-      .addParameter('relationalOperator', t('Sign of the test'))
-      .addParameter('expression', t('Opacity 0-100'))
+      .addParameter("object", t("Choose an object video"), "", false)
+      .addParameter("relationalOperator", t("Sign of the test"))
+      .addParameter("expression", t("Opacity 0-100"))
       .getCodeExtraInformation()
-      .setFunctionName('getOpacity')
-      .setManipulatedType('number');
+      .setFunctionName("getOpacity")
+      .setManipulatedType("number");
 
-      object
+    object
       .addExpression(
-        'GetOpacity',
-        t('Get current opacity'),
-        t('Return the opacity of an video object'),
+        "GetOpacity",
+        t("Get current opacity"),
+        t("Return the opacity of an video object"),
         "",
-        'res/physics16.png'
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('getOpacity');
+      .setFunctionName("getOpacity");
 
-
-      //TODO SetPlaybackSpeed
-
-      object
+    object
       .addAction(
         "SetPlaybackSpeed",
         t("Set playback speed (in %)"),
@@ -563,14 +494,14 @@ module.exports = {
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", t("Choose an object video"), "", false)
-      .addParameter('operator', t("Modification's sign"), "", false)
+      .addParameter("operator", t("Modification's sign"), "", false)
       .addParameter("expression", t("Speed in %"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("setPlaybackSpeed")
-      .setManipulatedType('number')
-      .setGetter('getPlaybackSpeed');
+      .setManipulatedType("number")
+      .setGetter("getPlaybackSpeed");
 
-      object
+    object
       .addCondition(
         "GetPlaybackSpeed",
         t("Playback speed "),
@@ -580,26 +511,34 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter('object', t('Choose an object video'), '', false)
-      .addParameter('relationalOperator', t('Sign of the test'))
-      .addParameter('expression', t('Speed 0-100'))
+      .addParameter("object", t("Choose an object video"), "", false)
+      .addParameter("relationalOperator", t("Sign of the test"))
+      .addParameter("expression", t("Speed 0-100"))
       .getCodeExtraInformation()
-      .setFunctionName('getPlaybackSpeed')
-      .setManipulatedType('number');
+      .setFunctionName("getPlaybackSpeed")
+      .setManipulatedType("number");
 
-      object
+    object
       .addExpression(
-        'GetPlaybackSpeed',
-        t('Get current opacity'),
-        t('Return the playback speed of an video object'),
+        "GetPlaybackSpeed",
+        t("Get current playback speed"),
+        t("Return the playback speed of an video object"),
         "",
-        'res/physics16.png'
+        "res/physics16.png"
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter("object", t("Object"), "", false)
       .getCodeExtraInformation()
-      .setFunctionName('getPlaybackSpeed');
+      .setFunctionName("getPlaybackSpeed");
 
-      /* object
+    /**
+     *
+     * TODO Action for change video (with PATH expression fileSystem) of an object video
+     * Condition : if video is ready to play
+     * Expression :  return if video is ready to play
+     */
+
+     //NOTE This don't work, because controls can't be displayed, need comfirmation please.
+    /* object
       .addAction(
         "Controls",
         t("Toggle controls on video"),
@@ -639,7 +578,6 @@ module.exports = {
       .addParameter("object", "Choose an object video", "", false)
       .getCodeExtraInformation()
       .setFunctionName("controlsAreShowing"); */
-      
 
     return extension;
   },
@@ -654,10 +592,12 @@ module.exports = {
    * But it is recommended to create tests for the behaviors/objects properties you created
    * to avoid mistakes.
    */
-  runExtensionSanityTests: function(gd, extension) { return []; },
+  runExtensionSanityTests: function(gd, extension) {
+    return [];
+  },
   /**
    * Register editors for objects.
-   * 
+   *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
 
@@ -669,7 +609,7 @@ module.exports = {
   },
   /**
    * Register renderers for instance of objects on the scene editor.
-   * 
+   *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
   registerInstanceRenderers: function(objectsRenderingService) {
@@ -701,28 +641,16 @@ module.exports = {
         pixiResourcesLoader
       );
 
-    
-       //TODO
-       /*
-        si la video n'est pas chargé mettre un placeholder fichier non trouver / ou erreur
-       */
-       
-     
+      //TODO Need ressource manager and can select only video files
+      //Codec can be played : https://www.w3schools.com/tags/av_met_canplaytype.asp
 
+      var textureVideo = new PIXI.Texture.fromVideo("C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4");
 
-       
-      // create a video texture from a path
-      var textureVideo = new PIXI.Texture.fromVideo('C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4');
-      
-      //TODO fonctionne pas
-      /*
-      * Souhaite un check de textureVideo si elle est chargé on continue sinon on charge un placeholder error
-      * Verif avec un isloaded ?
-      */
-      if(!textureVideo){
-        var textureVideo = new PIXI.Texture.fromImage('C:/Users/RTX-Bouh/Desktop/video.svg');
-      }
-      
+      //FIXME This autoplay don't work
+      textureVideo.baseTexture.source.autoplay = false;
+
+      console.log(textureVideo);
+
       //Setup the PIXI object:
       this._pixiObject = new PIXI.Sprite(textureVideo);
       this._pixiObject.anchor.x = 0.5;
@@ -749,31 +677,47 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedVideoObjectInstance.prototype.update = function() {
-       
-       //Stop video in IDE
-       if(!this._pixiObject._texture.baseTexture.source.paused){
-         
-         
-         
-         //promise added here for avoid error in IDE
-        var promise = this._pixiObject._texture.baseTexture.source.pause();
 
-        if (promise !== undefined) {
-          promise.then(_ => {
-            // Autoplay started!
-            console.log("action pause > play !");
-            //this._pixiObject._texture.baseTexture.source.pause();
-          }).catch(error => {
-            // Autoplay was prevented.
-            console.log("action pause > pause !");
-            //this._pixiObject._texture.baseTexture.source.play();
-            // Show a "Play" button so that user can start playback.
-          });
+      //FIXME need help here i can't catch err_file_not_found like this :
+      video_is_ok = true;
+      this._pixiObject._texture.baseTexture.error = function() {
+        console.log("Starting to load video");
+        console.log("Force pause");
+        //this._pixiObject._texture.baseTexture.source.pause();
+        video_is_ok = false;
+      };
+
+
+      if(video_is_ok == false){
+        video_missing = new PIXI.Texture.fromImage('C:/GDevelop/newIDE/electron-app/app/www/JsPlatform/Extensions/missing_video24.png');
+        this._pixiObject.texture = video_missing;
+      }
+      
+      if (typeof this._pixiObject._texture.baseTexture.source.pause === "function" && video_is_ok == true ) {
+
+        //NOTE This stop the video but is not very clean i guess
+        //Stop video in scene editor
+        if (!this._pixiObject._texture.baseTexture.source.paused) {
+          //promise added here for avoid error in IDE
+          var promise = this._pixiObject._texture.baseTexture.source.pause();
+
+          if (promise !== undefined) {
+            promise
+              .then(_ => {
+                // Autoplay started!
+                console.log("action pause > play !");
+                //this._pixiObject._texture.baseTexture.source.pause();
+              })
+              .catch(error => {
+                // Autoplay was prevented.
+                console.log("action pause > pause !");
+                //this._pixiObject._texture.baseTexture.source.play();
+                // Show a "Play" button so that user can start playback.
+              });
+          }
         }
+      }
 
-
-       }
-        
       // Read a property from the object
       const property1Value = this._associatedObject
         .getProperties(this.project)
@@ -789,8 +733,8 @@ module.exports = {
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
-      
-      if(this._instance.hasCustomSize()){
+
+      if (this._instance.hasCustomSize()) {
         this._pixiObject.width = this._instance.getCustomWidth();
         this._pixiObject.height = this._instance.getCustomHeight();
       }

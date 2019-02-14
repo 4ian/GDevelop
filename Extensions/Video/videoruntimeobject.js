@@ -130,18 +130,12 @@ gdjs.VideoRuntimeObject.prototype.setHeight = function(height) {
   this._renderer.updateHeight();
 };
 
-//TODO getWidth
 gdjs.VideoRuntimeObject.prototype.getWidth = function() {
   return this._width;
-  /* this._width = width;
-  this._renderer.updateWidth(); */
 };
 
-//TODO getHeight
 gdjs.VideoRuntimeObject.prototype.getHeight = function() {
   return this._height;
-  /* this._height = height;
-  this._renderer.updateHeight(); */
 };
 
 gdjs.VideoRuntimeObject.prototype.play = function() {
@@ -231,10 +225,6 @@ gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
 gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
 
   var new_playbackSpeed = this._clamp( this._normalize( playbackSpeed, 0, 100 ) , 0, 1 );
-  /* if (playbackSpeed < 0) playbackSpeed = 0;
-  if (playbackSpeed > 100) playbackSpeed = 100;
-  var new_playbackSpeed = playbackSpeed/100; */
-  //this.opacity = opacity || this.getOpacity() ;
   this._renderer.setPlaybackSpeed(new_playbackSpeed); // Tell the renderer to update the rendered object
 };
 
@@ -246,6 +236,7 @@ gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
   return this._normalize(this._renderer.getPlaybackSpeed(), 0, 1)*100;
 };
 
+//NOTE Controls impossible to display ?
 /* gdjs.VideoRuntimeObject.prototype.controls = function(bool) {
   this._renderer.setControls(bool);
 }; */

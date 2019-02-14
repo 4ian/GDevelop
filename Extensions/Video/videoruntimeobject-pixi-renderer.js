@@ -187,17 +187,6 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.isLooped = function() {
   return this._pixiObject._texture.baseTexture.source.loop;
 };
 
-/*
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.setControls = function(bool) {
-  this._pixiObject._texture.baseTexture.source.controls = bool;
-};
-
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.controlsAreShowing = function() {
-  //console.log("#get muted : runtime-renderer ");
-  return this._pixiObject._texture.baseTexture.source.controls;
-};
-*/
-
 /**
  * get current time on video in renderer
  */
@@ -219,13 +208,29 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.isEnded = function() {
   return this._pixiObject._texture.baseTexture.source.ended;
 };
 
+/**
+ * Set speed, 1 = 100%
+ */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.setPlaybackSpeed = function(number) {
   this._pixiObject._texture.baseTexture.source.playbackRate = number;
 };
 
 /**
- * Return alpha 0-1
+ * Return speed 0-1
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getPlaybackSpeed = function() {
   return this._pixiObject._texture.baseTexture.source.playbackRate;
 };
+
+
+
+/*
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.setControls = function(bool) {
+  this._pixiObject._texture.baseTexture.source.controls = bool;
+};
+
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.controlsAreShowing = function() {
+  //console.log("#get muted : runtime-renderer ");
+  return this._pixiObject._texture.baseTexture.source.controls;
+};
+*/

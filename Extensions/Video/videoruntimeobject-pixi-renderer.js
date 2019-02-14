@@ -54,7 +54,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateOpacity = function(number) {
   //this._object.opacity = this.getOpacity()*255
   //console.log("opacity avant : " + this._pixiObject.alpha + ", "+ this._object.opacity+"/255");
-  
+
   //need 0-1
   //console.log("opacity apres : " + this._pixiObject.alpha + ", "+ this._object.opacity+"/255");
   this._pixiObject.alpha = number;
@@ -111,20 +111,20 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.play = function() {
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.pause = function() {
   var promise = this._pixiObject._texture.baseTexture.source.pause();
-  
+
   if (promise !== undefined) {
     promise
-    .then(_ => {
-      // Autoplay started!
-      //console.log("action pause > play !");
-      //this._pixiObject._texture.baseTexture.source.pause();
-    })
-    .catch(error => {
-      // Autoplay was prevented.
-      //console.log("action pause > pause !");
-      //this._pixiObject._texture.baseTexture.source.play();
-      // Show a "Play" button so that user can start playback.
-    });
+      .then(_ => {
+        // Autoplay started!
+        //console.log("action pause > play !");
+        //this._pixiObject._texture.baseTexture.source.pause();
+      })
+      .catch(error => {
+        // Autoplay was prevented.
+        //console.log("action pause > pause !");
+        //this._pixiObject._texture.baseTexture.source.play();
+        // Show a "Play" button so that user can start playback.
+      });
   }
 };
 
@@ -153,7 +153,9 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.isMuted = function() {
 /**
  * set the time on video in renderer
  */
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.setCurrentTime = function(number) {
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.setCurrentTime = function(
+  number
+) {
   this._pixiObject._texture.baseTexture.source.currentTime = number;
 };
 
@@ -178,7 +180,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.getVolume = function() {
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.isPlayed = function() {
   return !this._pixiObject._texture.baseTexture.source.paused;
-}; 
+};
 
 /**
  * return state of loop on video in renderer
@@ -211,7 +213,9 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.isEnded = function() {
 /**
  * Set speed, 1 = 100%
  */
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.setPlaybackSpeed = function(number) {
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.setPlaybackSpeed = function(
+  number
+) {
   this._pixiObject._texture.baseTexture.source.playbackRate = number;
 };
 
@@ -221,8 +225,6 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.setPlaybackSpeed = function(number
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getPlaybackSpeed = function() {
   return this._pixiObject._texture.baseTexture.source.playbackRate;
 };
-
-
 
 /*
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.setControls = function(bool) {

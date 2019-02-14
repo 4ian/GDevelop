@@ -35,9 +35,7 @@ gdjs.video = {
  * that will be called at this moment. Name you callback gdjsCallbackRuntimeSceneLoaded.
  * GDJS will scan anything declared inside gdjs for these names.
  */
-gdjs.video.gdjsCallbackRuntimeSceneLoaded = function(
-  runtimeScene
-) {
+gdjs.video.gdjsCallbackRuntimeSceneLoaded = function(runtimeScene) {
   console.log("A gdjs.RuntimeScene was loaded:", runtimeScene);
 };
 
@@ -71,4 +69,3 @@ console.log(
   "gdjs.video was created, with myGlobalString containing:" +
     gdjs.video.myGlobalString
 );
-

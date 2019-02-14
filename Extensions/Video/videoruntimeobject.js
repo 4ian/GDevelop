@@ -19,8 +19,7 @@ gdjs.VideoRuntimeObject = function(runtimeScene, objectData) {
 };
 
 gdjs.VideoRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.VideoRuntimeObject.thisIsARuntimeObjectConstructor =
-  "Video::VideoObject"; //Replace by your extension + object name.
+gdjs.VideoRuntimeObject.thisIsARuntimeObjectConstructor = "Video::VideoObject"; //Replace by your extension + object name.
 
 gdjs.VideoRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
@@ -43,12 +42,10 @@ gdjs.VideoRuntimeObject.prototype.update = function(runtimeScene) {
 gdjs.VideoRuntimeObject.prototype.extraInitializationFromInitialInstance = function(
   initialInstanceData
 ) {
-
-  if ( initialInstanceData.customSize ) {
+  if (initialInstanceData.customSize) {
     this.setWidth(initialInstanceData.width);
     this.setHeight(initialInstanceData.height);
   }
-
 };
 
 /**
@@ -92,7 +89,7 @@ gdjs.VideoRuntimeObject.prototype.setAngle = function(angle) {
 gdjs.VideoRuntimeObject.prototype.setOpacity = function(opacity) {
   if (opacity < 0) opacity = 0;
   if (opacity > 255) opacity = 255;
-  var new_opacity = opacity/255;
+  var new_opacity = opacity / 255;
   //this.opacity = opacity || this.getOpacity() ;
   this._renderer.updateOpacity(new_opacity); // Tell the renderer to update the rendered object
 };
@@ -102,7 +99,7 @@ gdjs.VideoRuntimeObject.prototype.setOpacity = function(opacity) {
  * return 0-1
  */
 gdjs.VideoRuntimeObject.prototype.getOpacity = function() {
-  return this._renderer.getOpacity()*255;
+  return this._renderer.getOpacity() * 255;
 };
 
 /**
@@ -122,9 +119,9 @@ gdjs.VideoRuntimeObject.prototype.setWidth = function(width) {
 };
 
 /**
-* Set the height of video instance and renderer
-* @param {number} height The new height in pixels.
-*/
+ * Set the height of video instance and renderer
+ * @param {number} height The new height in pixels.
+ */
 gdjs.VideoRuntimeObject.prototype.setHeight = function(height) {
   this._height = height;
   this._renderer.updateHeight();
@@ -140,11 +137,11 @@ gdjs.VideoRuntimeObject.prototype.getHeight = function() {
 
 gdjs.VideoRuntimeObject.prototype.play = function() {
   this._renderer.play();
-}; 
+};
 
 gdjs.VideoRuntimeObject.prototype.pause = function() {
   this._renderer.pause();
-}; 
+};
 
 gdjs.VideoRuntimeObject.prototype.setLoop = function(bool) {
   this._renderer.setLoop(bool);
@@ -166,9 +163,9 @@ this._normalize(volume, 1, 0)*100;
 input 0-100, return output 0-1
 this._normalize(parseFloat(number), 100, 0)
 */
- 
+
 gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
-  return (val - min) / (max - min); 
+  return (val - min) / (max - min);
 };
 
 /**
@@ -177,30 +174,29 @@ gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
 
 gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
   return val <= min ? min : val >= max ? max : val;
-}
+};
 
-gdjs.VideoRuntimeObject.prototype.setVolume = function( newVolume ) {
-
+gdjs.VideoRuntimeObject.prototype.setVolume = function(newVolume) {
   //newVolume = 0-100 , newVolume = normalize(newVolume) = 0-1, clamp = clamp(newVolume) = 0-1
-  var _newVolume = this._clamp( this._normalize( newVolume, 0, 100 ) , 0, 1 );
-  this._renderer.setVolume( _newVolume );
+  var _newVolume = this._clamp(this._normalize(newVolume, 0, 100), 0, 1);
+  this._renderer.setVolume(_newVolume);
 };
 
 gdjs.VideoRuntimeObject.prototype.getVolume = function() {
-  return this._normalize(this._renderer.getVolume(), 0, 1)*100;
+  return this._normalize(this._renderer.getVolume(), 0, 1) * 100;
 };
 
 gdjs.VideoRuntimeObject.prototype.isPlayed = function() {
   return this._renderer.isPlayed();
-}; 
+};
 
 gdjs.VideoRuntimeObject.prototype.isPaused = function() {
   return !this._renderer.isPlayed();
-}; 
+};
 
 gdjs.VideoRuntimeObject.prototype.isLooped = function() {
   return this._renderer.isLooped();
-}; 
+};
 
 gdjs.VideoRuntimeObject.prototype.controlsAreShowing = function() {
   return this._renderer.controlsAreShowing();
@@ -212,7 +208,7 @@ gdjs.VideoRuntimeObject.prototype.getDuration = function() {
 
 gdjs.VideoRuntimeObject.prototype.isEnded = function() {
   return !this._renderer.isEnded();
-}; 
+};
 
 gdjs.VideoRuntimeObject.prototype.setCurrentTime = function(number) {
   this._renderer.setCurrentTime(number);
@@ -223,8 +219,11 @@ gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
 };
 
 gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
-
-  var new_playbackSpeed = this._clamp( this._normalize( playbackSpeed, 0, 100 ) , 0, 1 );
+  var new_playbackSpeed = this._clamp(
+    this._normalize(playbackSpeed, 0, 100),
+    0,
+    1
+  );
   this._renderer.setPlaybackSpeed(new_playbackSpeed); // Tell the renderer to update the rendered object
 };
 
@@ -233,7 +232,7 @@ gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
  * return 0-100
  */
 gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
-  return this._normalize(this._renderer.getPlaybackSpeed(), 0, 1)*100;
+  return this._normalize(this._renderer.getPlaybackSpeed(), 0, 1) * 100;
 };
 
 //NOTE Controls impossible to display ?

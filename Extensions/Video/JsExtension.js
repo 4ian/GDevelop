@@ -532,12 +532,12 @@ module.exports = {
 
     /**
      *
-     * TODO Action for change video (with PATH expression fileSystem) of an object video
+     * //TODO Action for change video (with PATH expression fileSystem) of an object video
      * Condition : if video is ready to play
      * Expression :  return if video is ready to play
      */
 
-     //NOTE This don't work, because controls can't be displayed, need comfirmation please.
+    //NOTE This don't work, because controls can't be displayed, need comfirmation please.
     /* object
       .addAction(
         "Controls",
@@ -644,7 +644,9 @@ module.exports = {
       //TODO Need ressource manager and can select only video files
       //Codec can be played : https://www.w3schools.com/tags/av_met_canplaytype.asp
 
-      var textureVideo = new PIXI.Texture.fromVideo("C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4");
+      var textureVideo = new PIXI.Texture.fromVideo(
+        "C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4"
+      );
 
       //FIXME This autoplay don't work
       textureVideo.baseTexture.source.autoplay = false;
@@ -677,7 +679,6 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedVideoObjectInstance.prototype.update = function() {
-
       //FIXME need help here i can't catch err_file_not_found like this :
       video_is_ok = true;
       this._pixiObject._texture.baseTexture.error = function() {
@@ -687,14 +688,18 @@ module.exports = {
         video_is_ok = false;
       };
 
-
-      if(video_is_ok == false){
-        video_missing = new PIXI.Texture.fromImage('C:/GDevelop/newIDE/electron-app/app/www/JsPlatform/Extensions/missing_video24.png');
+      if (video_is_ok == false) {
+        video_missing = new PIXI.Texture.fromImage(
+          "C:/GDevelop/newIDE/electron-app/app/www/JsPlatform/Extensions/missing_video24.png"
+        );
         this._pixiObject.texture = video_missing;
       }
-      
-      if (typeof this._pixiObject._texture.baseTexture.source.pause === "function" && video_is_ok == true ) {
 
+      if (
+        typeof this._pixiObject._texture.baseTexture.source.pause ===
+          "function" &&
+        video_is_ok == true
+      ) {
         //NOTE This stop the video but is not very clean i guess
         //Stop video in scene editor
         if (!this._pixiObject._texture.baseTexture.source.paused) {

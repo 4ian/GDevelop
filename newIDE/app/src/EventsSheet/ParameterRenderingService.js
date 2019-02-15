@@ -11,9 +11,17 @@ import ExpressionField from './ParameterFields/ExpressionField';
 import StringField from './ParameterFields/StringField';
 import StringWithSelectorField from './ParameterFields/StringWithSelectorField';
 import BehaviorField from './ParameterFields/BehaviorField';
-import SceneVariableField from './ParameterFields/SceneVariableField';
-import GlobalVariableField from './ParameterFields/GlobalVariableField';
-import ObjectVariableField from './ParameterFields/ObjectVariableField';
+
+import SceneVariableField, {
+  renderForceSceneVariable,
+} from './ParameterFields/SceneVariableField';
+import GlobalVariableField, {
+  renderForceGlobalVariable,
+} from './ParameterFields/GlobalVariableField';
+import ObjectVariableField, {
+  renderForceObjectVariable,
+} from './ParameterFields/ObjectVariableField';
+
 import LayerField from './ParameterFields/LayerField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
 import ColorExpressionField from './ParameterFields/ColorExpressionField';
@@ -50,6 +58,9 @@ const components = {
 
 const stringRenderers = {
   forceMultiplier: renderForceMultiplierString,
+  globalvar: renderForceGlobalVariable,
+  scenevar: renderForceSceneVariable,
+  objectvar: renderForceObjectVariable,
 };
 
 export default {

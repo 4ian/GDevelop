@@ -120,6 +120,7 @@ class Instruction extends React.Component<Props, *> {
             return <span key={i}>{formattedTexts.getString(i)}</span>;
 
           const parameterType = metadata.getParameter(parameterIndex).getType();
+          console.log(parameterType + ':' + formattedTexts.getString(i));
           return (
             <span
               key={i}

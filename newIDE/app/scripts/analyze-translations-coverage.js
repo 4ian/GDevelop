@@ -39,8 +39,10 @@ const analyzeFile = filePath =>
           content.includes('primaryText={') ||
           content.includes('hintText=') ||
           content.includes('hintText={') ||
-          content.includes('<EmptyMessage>') ||
-          content.includes('<BackgroundText>'))
+          content.includes('tooltip=') ||
+          content.includes('tooltip={') ||
+          content.includes('<EmptyMessage') ||
+          content.includes('<BackgroundText'))
         // /(?<!key)=("|\{["'])/.test(content)
       ) {
         results.requiresTrans = true;

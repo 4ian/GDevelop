@@ -11,6 +11,7 @@ gdjs.TweenRuntimeBehavior = function (runtimeScene, behaviorData, owner) {
   /** @type Object.<string, gdjs.TweenRuntimeBehavior.TweenInstance > */
   this._tweens = {};
   this._runtimeScene = runtimeScene;
+  this._easings = ["linear", "easeInQuad", "easeOutQuad", "easeInOutQuad", "easeInCubic", "easeOutCubic", "easeInOutCubic", "easeInQuart", "easeOutQuart", "easeInOutQuart", "easeInQuint", "easeOutQuint", "easeInOutQuint", "easeInSine", "easeOutSine", "easeInOutSine", "easeInExpo", "easeOutExpo", "easeInOutExpo", "easeInCirc", "easeOutCirc", "easeInOutCirc", "easeOutBounce", "easeInBack", "easeOutBack", "easeInOutBack", "elastic", "swingFromTo", "swingFrom", "swingTo", "bounce", "bouncePast", "easeFromTo", "easeFrom", "easeTo"]
 };
 
 gdjs.TweenRuntimeBehavior.prototype = Object.create(
@@ -124,6 +125,9 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function (
   durationValue,
   destroyObjectWhenFinished
 ) {
+
+  if (!!this._easings[easingValue]) return;
+
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
@@ -165,6 +169,9 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function (
   durationValue,
   destroyObjectWhenFinished
 ) {
+
+  if (!!this._easings[easingValue]) return;
+
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
@@ -204,6 +211,9 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function (
   durationValue,
   destroyObjectWhenFinished
 ) {
+
+  if (!!this._easings[easingValue]) return;
+
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
@@ -242,6 +252,9 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function (
   durationValue,
   destroyObjectWhenFinished
 ) {
+
+  if (!!this._easings[easingValue]) return;
+
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
@@ -280,6 +293,9 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function (
   durationValue,
   destroyObjectWhenFinished
 ) {
+
+  if (!!this._easings[easingValue]) return;
+
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
@@ -321,6 +337,8 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function (
   destroyObjectWhenFinished
 ) {
   if (!this.owner.setScaleX || !this.owner.setScaleY) return;
+
+  if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
@@ -370,6 +388,8 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function (
 ) {
   if (!this.owner.setScaleX) return;
 
+  if (!!this._easings[easingValue]) return;
+
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
@@ -410,6 +430,8 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function (
 ) {
   if (!this.owner.setScaleY) return;
 
+  if (!!this._easings[easingValue]) return;
+
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
@@ -449,6 +471,8 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function (
   destroyObjectWhenFinished
 ) {
   if (!this.owner.getOpacity || !this.owner.setOpacity) return;
+
+  if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
@@ -496,6 +520,8 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function (
     )
   )
     return;
+
+  if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);

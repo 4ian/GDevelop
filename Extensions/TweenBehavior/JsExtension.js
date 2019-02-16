@@ -97,7 +97,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("objectvar", t("Object variable"), "", false)
       .addParameter("expression", t("From value"), "", false)
       .addParameter("expression", t("To value"), "", false)
@@ -128,7 +128,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("expression", t("To X"), "", false)
       .addParameter("expression", t("To Y"), "", false)
       .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
@@ -158,7 +158,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("expression", t("To X"), "", false)
       .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
@@ -187,7 +187,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("expression", t("To Y"), "", false)
       .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
@@ -216,7 +216,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("expression", t("To angle (in degrees)"), "", false)
       .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
@@ -247,7 +247,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("expression", t("To scale X"), "", false)
       .addParameter("expression", t("To scale Y"), "", false)
       .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
@@ -279,7 +279,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("expression", t("To scale X"), "", false)
       .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
@@ -310,7 +310,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("expression", t("To scale Y"), "", false)
       .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
@@ -341,7 +341,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("expression", t("To opacity"), "", false)
       .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
@@ -372,9 +372,9 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("string", t("To color"), "", false)
-      .addParameter("string", t("Easing"), "", false)
+      .addParameter("stringWithSelector", t("Items"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
       .addParameter("expression", t("Duration"), "", false)
       .addParameter(
@@ -399,7 +399,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("exists");
 
@@ -415,7 +415,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isPlaying");
 
@@ -431,7 +431,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("hasFinished");
 
@@ -447,7 +447,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("pauseTween");
 
@@ -463,7 +463,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .addParameter("yesorno", t("Jump to end"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("stopTween");
@@ -480,7 +480,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("resumeTween");
 
@@ -496,7 +496,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("removeTween");
 
@@ -511,7 +511,7 @@ module.exports = {
       )
       .addParameter("object", t("Object"), "", false)
       .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false) // TODO: Change into stringlist
+      .addParameter("string", t("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("getProgress");
 

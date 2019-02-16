@@ -19,7 +19,10 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../SelectionHandler';
-import getThumbnail from '../../ObjectsRendering/ObjectsRenderingService';
+import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
+const getThumbnail=ObjectsRenderingService.getThumbnail.bind(
+  ObjectsRenderingService
+)
 
 const gd = global.gd;
 
@@ -88,13 +91,8 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
 
   renderObjectThumbnail = (objectName) =>{
     const { project, layout } = this.props;
-    console.log("YESS!"+objectName)
-    console.log(layout)
-    if (!layout.hasObjectNamed(objectName)) {return}
     const object = layout.getObject(objectName)
-    console.log(object.getType())
-    console.log(getThumbnail(project,object))
-    // return getThumbnail(project,object)
+    return getThumbnail(project,object)
   }
 
   render() {

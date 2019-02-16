@@ -122,7 +122,7 @@ export default class VariableField extends Component<Props, State> {
 export const VariableWithIcon = (value, iconPath, tooltip = '') => {
   return (
     <span title={tooltip}>
-      <img width={16} height={16} src={iconPath} />
+      <img style={{maxWidth:48}} width={'auto'} height={24} src={iconPath} />
       {value}
     </span>
   );

@@ -19,6 +19,8 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../SelectionHandler';
+import getThumbnail from '../../ObjectsRendering/ObjectsRenderingService';
+
 const gd = global.gd;
 
 const indentWidth = 22;
@@ -84,6 +86,17 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
     this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
   };
 
+  renderObjectThumbnail = (objectName) =>{
+    const { project, layout } = this.props;
+    console.log("YESS!"+objectName)
+    console.log(layout)
+    if (!layout.hasObjectNamed(objectName)) {return}
+    const object = layout.getObject(objectName)
+    console.log(object.getType())
+    console.log(getThumbnail(project,object))
+    // return getThumbnail(project,object)
+  }
+
   render() {
     const { event, project, layout, disabled } = this.props;
     const EventComponent = EventsRenderingService.getEventComponent(event);
@@ -120,6 +133,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
             disabled={
               disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
             }
+            renderObjectThumbnail={this.renderObjectThumbnail}
           />
         )}
       </div>

@@ -126,6 +126,7 @@ class InstructionsList extends React.Component<Props, *> {
           onSubInstructionsListContextMenu={onInstructionsListContextMenu}
           onSubParameterClick={onParameterClick}
           disabled={disabled}
+          renderObjectThumbnail={this.props.renderObjectThumbnail}
         />
       );
     });

@@ -135,7 +135,8 @@ class Instruction extends React.Component<Props, *> {
             >
               {ParameterRenderingService.renderParameterString(
                 parameterType,
-                formattedTexts.getString(i)
+                formattedTexts.getString(i),
+                this.props.renderObjectThumbnail
               )}
             </span>
           );

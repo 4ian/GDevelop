@@ -4,7 +4,7 @@ import RelationalOperatorField from './ParameterFields/RelationalOperatorField';
 import OperatorField from './ParameterFields/OperatorField';
 import MouseField from './ParameterFields/MouseField';
 import KeyField from './ParameterFields/KeyField';
-import ObjectField from './ParameterFields/ObjectField';
+import ObjectField, {renderObjectWithThumbnail} from './ParameterFields/ObjectField';
 import YesNoField from './ParameterFields/YesNoField';
 import TrueFalseField from './ParameterFields/TrueFalseField';
 import ExpressionField from './ParameterFields/ExpressionField';
@@ -61,6 +61,7 @@ const stringRenderers = {
   globalvar: renderForceGlobalVariable,
   scenevar: renderForceSceneVariable,
   objectvar: renderForceObjectVariable,
+  object: renderObjectWithThumbnail,
 };
 
 export default {
@@ -71,7 +72,10 @@ export default {
     if (components.hasOwnProperty(fieldType)) return components[fieldType];
     else return components.default;
   },
-  renderParameterString: (type: string, value: string) => {
+  renderParameterString: (type: string, value: string, renderObjectThumnail=null) => {
+    if (renderObjectThumnail) {
+      return stringRenderers[type] ? stringRenderers[type](value,renderObjectThumnail) : value;
+    }
     return stringRenderers[type] ? stringRenderers[type](value) : value;
   },
 };

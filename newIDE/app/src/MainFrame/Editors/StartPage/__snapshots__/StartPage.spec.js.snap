@@ -51,7 +51,7 @@ exports[`StartPage renders the start page with a project 1`] = `
               "backgroundColor": "#f0f0f0",
               "borderRadius": 2,
               "boxShadow": "0 1px 6px rgba(0, 0, 0, 0.12),
-                     0 1px 4px rgba(0, 0, 0, 0.12)",
+         0 1px 4px rgba(0, 0, 0, 0.12)",
               "boxSizing": "border-box",
               "color": "rgba(0, 0, 0, 0.87)",
               "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
@@ -78,14 +78,13 @@ exports[`StartPage renders the start page with a project 1`] = `
           </p>
         </div>
         <div
-          className={undefined}
           style={
             Object {
               "WebkitTapHighlightColor": "rgba(0,0,0,0)",
               "backgroundColor": "#f0f0f0",
               "borderRadius": 2,
               "boxShadow": "0 1px 6px rgba(0, 0, 0, 0.12),
-                     0 1px 4px rgba(0, 0, 0, 0.12)",
+         0 1px 4px rgba(0, 0, 0, 0.12)",
               "boxSizing": "border-box",
               "color": "rgba(0, 0, 0, 0.87)",
               "display": "inline-block",
@@ -723,7 +722,7 @@ exports[`StartPage renders the start page with no project opened 1`] = `
               "backgroundColor": "#f0f0f0",
               "borderRadius": 2,
               "boxShadow": "0 1px 6px rgba(0, 0, 0, 0.12),
-                     0 1px 4px rgba(0, 0, 0, 0.12)",
+         0 1px 4px rgba(0, 0, 0, 0.12)",
               "boxSizing": "border-box",
               "color": "rgba(0, 0, 0, 0.87)",
               "fontFamily": "-apple-system, BlinkMacSystemFont, sans-serif",
@@ -750,14 +749,13 @@ exports[`StartPage renders the start page with no project opened 1`] = `
           </p>
         </div>
         <div
-          className={undefined}
           style={
             Object {
               "WebkitTapHighlightColor": "rgba(0,0,0,0)",
               "backgroundColor": "#f0f0f0",
               "borderRadius": 2,
               "boxShadow": "0 1px 6px rgba(0, 0, 0, 0.12),
-                     0 1px 4px rgba(0, 0, 0, 0.12)",
+         0 1px 4px rgba(0, 0, 0, 0.12)",
               "boxSizing": "border-box",
               "color": "rgba(0, 0, 0, 0.87)",
               "display": "inline-block",

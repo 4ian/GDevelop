@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Paper from 'material-ui/Paper';
 import Info from 'material-ui/svg-icons/action/info';
@@ -27,7 +29,9 @@ const AlertMessage = ({ kind, children, onHide }: Props) => (
       {kind === 'info' && <Info style={styles.icon} />}
       {kind === 'warning' && <Warning style={styles.icon} />}
       <p style={styles.content}>{children}</p>
-      {onHide && <FlatButton label="Hide" onClick={() => onHide()} />}
+      {onHide && (
+        <FlatButton label={<Trans>Hide</Trans>} onClick={() => onHide()} />
+      )}
     </Line>
   </Paper>
 );

@@ -6,7 +6,7 @@ const optionalRequire = require('../Utils/OptionalRequire');
 const { findJsExtensionModules } = require('./LocalJsExtensionsFinder');
 
 /*flow-include
-import type {JsExtensionsLoader} from '.';
+import type {JsExtensionsLoader, TranslationFunction} from '.';
 import ObjectsEditorService from '../ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from '../ObjectsRendering/ObjectsRenderingService';
 
@@ -32,7 +32,7 @@ module.exports = function makeExtensionsLoader(
   } /*: MakeExtensionsLoaderArguments*/
 ) /*: JsExtensionsLoader*/ {
   return {
-    loadAllExtensions: () => {
+    loadAllExtensions: (_ /*: TranslationFunction */) => {
       return findJsExtensionModules({ filterExamples }).then(
         extensionModulePaths => {
           return Promise.all(
@@ -80,6 +80,7 @@ module.exports = function makeExtensionsLoader(
                 return {
                   extensionModulePath,
                   result: loadExtension(
+                    _,
                     gd,
                     gd.JsPlatform.get(),
                     extensionModule

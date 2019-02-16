@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Paper from 'material-ui/Paper';
 import { type Build } from '../../Utils/GDevelopServices/Build';
@@ -26,9 +28,11 @@ export default ({ builds, onDownload }: Props) => {
       <Line>
         <Column>
           <EmptyMessage>
-            This is the list of builds that you've done. Note that you can
-            download games generated during to 7 days, after which they are
-            removed.
+            <Trans>
+              This is the list of builds that you've done. Note that you can
+              download games generated during to 7 days, after which they are
+              removed.
+            </Trans>
           </EmptyMessage>
         </Column>
       </Line>
@@ -37,7 +41,9 @@ export default ({ builds, onDownload }: Props) => {
           <PlaceholderLoader />
         ) : builds.length === 0 ? (
           <EmptyMessage>
-            You don't have any builds on the online services for now
+            <Trans>
+              You don't have any builds on the online services for now
+            </Trans>
           </EmptyMessage>
         ) : (
           <Column noMargin expand>
@@ -60,8 +66,10 @@ export default ({ builds, onDownload }: Props) => {
                   )}
                   {isOld && (
                     <EmptyMessage>
-                      This build is old and the generated games can't be
-                      downloaded anymore.
+                      <Trans>
+                        This build is old and the generated games can't be
+                        downloaded anymore.
+                      </Trans>
                     </EmptyMessage>
                   )}
                 </Paper>

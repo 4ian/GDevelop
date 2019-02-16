@@ -11,13 +11,13 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: function(t, gd) {
+  createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
         'FileSystem',
-        t('Filesystem'),
-        t('Access the filesystem of the operating system.'),
+        _('Filesystem'),
+        _('Access the filesystem of the operating system.'),
         'Matthias Meike',
         'Open source (MIT License)'
       )
@@ -26,14 +26,14 @@ module.exports = {
     extension
       .addCondition(
         'PathExists',
-        t('File or directory exists'),
-        t('Check if the file or directory exists.'),
-        t('The path _PARAM0_ exists'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('File or directory exists'),
+        _('Check if the file or directory exists.'),
+        _('The path _PARAM0_ exists'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_path_exists24.png',
         'JsPlatform/Extensions/filesystem_path_exists32.png'
       )
-      .addParameter('string', t('Path to file or directory'), '', false)
+      .addParameter('string', _('Path to file or directory'), '', false)
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/FileSystem/filesystemtools.js')
       .setFunctionName('gdjs.fileSystem.pathExists');
@@ -41,17 +41,17 @@ module.exports = {
     extension
       .addAction(
         'MakeDirectory',
-        t('Create a directory'),
-        t('Create a new directory at the specified path.'),
-        t('Create directory _PARAM0_'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Create a directory'),
+        _('Create a new directory at the specified path.'),
+        _('Create directory _PARAM0_'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_create_folder24.png',
         'JsPlatform/Extensions/filesystem_create_folder32.png'
       )
-      .addParameter('string', t('Directory'), '', false)
+      .addParameter('string', _('Directory'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -64,20 +64,20 @@ module.exports = {
     extension
       .addAction(
         'SaveStringToFileSync',
-        t('Save a text into a file'),
-        t(
+        _('Save a text into a file'),
+        _(
           'Save a text into a file. Only use this on small files to avoid any lag or freeze during the the game execution.'
         ),
-        t('Save _PARAM0_ into file _PARAM1_'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Save _PARAM0_ into file _PARAM1_'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_save_file24.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
-      .addParameter('string', t('String (text)'), '', false)
-      .addParameter('string', t('Save path'), '', false)
+      .addParameter('string', _('String (text)'), '', false)
+      .addParameter('string', _('Save path'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -90,20 +90,20 @@ module.exports = {
     extension
       .addAction(
         'SaveStringToFileAsync',
-        t('Save a text into a file (Async)'),
-        t(
+        _('Save a text into a file (Async)'),
+        _(
           "Save a text into a file asynchronously. Use this for large files to avoid any lag or freeze during game execution. The 'result' variable gets updated when the operation has finished."
         ),
-        t('Save _PARAM0_ into file _PARAM1_'),
-        t('Filesystem/Windows, Linux, MacOS/Asynchronous'),
+        _('Save _PARAM0_ into file _PARAM1_'),
+        _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
         'JsPlatform/Extensions/filesystem_save_file24.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
-      .addParameter('string', t('String (text)'), '', false)
-      .addParameter('string', t('Save path'), '', false)
+      .addParameter('string', _('String (text)'), '', false)
+      .addParameter('string', _('Save path'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -116,20 +116,20 @@ module.exports = {
     extension
       .addAction(
         'SaveVariableToJSONFileSync',
-        t('Save a scene variable into a JSON file'),
-        t(
+        _('Save a scene variable into a JSON file'),
+        _(
           'Save a scene variable (including, for structure, all the children) into a file in JSON format. Only use this on small files to avoid any lag or freeze during the the game execution.'
         ),
-        t('Save scene variable _PARAM0_ into file PARAM1 as JSON'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Save scene variable _PARAM0_ into file PARAM1 as JSON'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_save_file24.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
-      .addParameter('scenevar', t('Scene variable'), '', false)
-      .addParameter('string', t('Save path'), '', false)
+      .addParameter('scenevar', _('Scene variable'), '', false)
+      .addParameter('string', _('Save path'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -142,20 +142,20 @@ module.exports = {
     extension
       .addAction(
         'SaveVariableToJSONFileAsync',
-        t('Save a scene variable into a JSON file (Async)'),
-        t(
+        _('Save a scene variable into a JSON file (Async)'),
+        _(
           "Save the scene variable (including, for structures, all the children) into a file in JSON format, asynchronously. Use this for large files to avoid any lag or freeze during game execution. The 'result' variable gets updated when the operation has finished."
         ),
-        t('Save scene variable _PARAM0_ into file PARAM1 as JSON'),
-        t('Filesystem/Windows, Linux, MacOS/Asynchronous'),
+        _('Save scene variable _PARAM0_ into file PARAM1 as JSON'),
+        _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
         'JsPlatform/Extensions/filesystem_save_file24.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
-      .addParameter('scenevar', t('Scene variable'), '', false)
-      .addParameter('string', t('Save path'), '', false)
+      .addParameter('scenevar', _('Scene variable'), '', false)
+      .addParameter('string', _('Save path'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -168,20 +168,20 @@ module.exports = {
     extension
       .addAction(
         'LoadStringFromFileAsync',
-        t('Load a text from a file (Async)'),
-        t(
+        _('Load a text from a file (Async)'),
+        _(
           "Load a text from a file, asynchronously. Use this for large files to avoid any lag or freeze during game execution. The content of the file will be available in the scene variable after a small delay (usually a few milliseconds). The 'result' variable gets updated when the operation has finished."
         ),
-        t('Load text from _PARAM1_ into scene variable _PARAM0_ (Async)'),
-        t('Filesystem/Windows, Linux, MacOS/Asynchronous'),
+        _('Load text from _PARAM1_ into scene variable _PARAM0_ (Async)'),
+        _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
         'JsPlatform/Extensions/filesystem_load_file24.png',
         'JsPlatform/Extensions/filesystem_load_file32.png'
       )
-      .addParameter('scenevar', t('Scene variable'), '', false)
-      .addParameter('string', t('Load path'), '', false)
+      .addParameter('scenevar', _('Scene variable'), '', false)
+      .addParameter('string', _('Load path'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -194,20 +194,20 @@ module.exports = {
     extension
       .addAction(
         'LoadStringFromFileSync',
-        t('Load a text from a file'),
-        t(
+        _('Load a text from a file'),
+        _(
           'Load a text from a file. Only use this on small files to avoid any lag or freeze during the the game execution.'
         ),
-        t('Load text from _PARAM1_ into scene variable _PARAM0_'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Load text from _PARAM1_ into scene variable _PARAM0_'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_load_file24.png',
         'JsPlatform/Extensions/filesystem_load_file32.png'
       )
-      .addParameter('scenevar', t('Scene variable'), '', false)
-      .addParameter('string', t('Load path'), '', false)
+      .addParameter('scenevar', _('Scene variable'), '', false)
+      .addParameter('string', _('Load path'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -220,20 +220,20 @@ module.exports = {
     extension
       .addAction(
         'LoadVariableFromJSONFileSync',
-        t('Load a scene variable from a JSON file'),
-        t(
+        _('Load a scene variable from a JSON file'),
+        _(
           'Load a JSON formatted text from a file and convert it to a scene variable (potentially a structure variable with children). Only use this on small files to avoid any lag or freeze during the the game execution.'
         ),
-        t('Load JSON from _PARAM1_ into scene variable _PARAM0_'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Load JSON from _PARAM1_ into scene variable _PARAM0_'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_save_file24.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
-      .addParameter('scenevar', t('Scene variable'), '', false)
-      .addParameter('string', t('Load path'), '', false)
+      .addParameter('scenevar', _('Scene variable'), '', false)
+      .addParameter('string', _('Load path'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -246,20 +246,20 @@ module.exports = {
     extension
       .addAction(
         'LoadVariableFromJSONFileAsync',
-        t('Load a scene variable from a JSON file (Async)'),
-        t(
+        _('Load a scene variable from a JSON file (Async)'),
+        _(
           "Load a JSON formatted text from a file and convert it to a scene variable (potentially a structure variable with children), asynchronously. Use this for large files to avoid any lag or freeze during game execution. The content of the file will be available as a scene variable after a small delay (usually a few milliseconds). The 'result' variable gets updated when the operation has finished."
         ),
-        t('Load JSON from _PARAM1_ into scene variable _PARAM0_'),
-        t('Filesystem/Windows, Linux, MacOS/Asynchronous'),
+        _('Load JSON from _PARAM1_ into scene variable _PARAM0_'),
+        _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
         'JsPlatform/Extensions/filesystem_save_file24.png',
         'JsPlatform/Extensions/filesystem_save_file32.png'
       )
-      .addParameter('scenevar', t('Scene variable'), '', false)
-      .addParameter('string', t('Load path'), '', false)
+      .addParameter('scenevar', _('Scene variable'), '', false)
+      .addParameter('string', _('Load path'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -272,17 +272,17 @@ module.exports = {
     extension
       .addAction(
         'DeleteFile',
-        t('Delete a file'),
-        t('Delete a file from the filesystem.'),
-        t('Delete the file _PARAM0_'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Delete a file'),
+        _('Delete a file from the filesystem.'),
+        _('Delete the file _PARAM0_'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_delete_file24.png',
         'JsPlatform/Extensions/filesystem_delete_file32.png'
       )
-      .addParameter('string', t('File path'), '', false)
+      .addParameter('string', _('File path'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -295,17 +295,17 @@ module.exports = {
     extension
       .addAction(
         'DeleteFileAsync',
-        t('Delete a file (Async)'),
-        t('Delete a file from the filesystem asyncrounouse.'),
-        t('Delete the file _PARAM0_'),
-        t('Filesystem/Windows, Linux, MacOS/Asynchronous'),
+        _('Delete a file (Async)'),
+        _('Delete a file from the filesystem asyncrounouse.'),
+        _('Delete the file _PARAM0_'),
+        _('Filesystem/Windows, Linux, MacOS/Asynchronous'),
         'JsPlatform/Extensions/filesystem_delete_file24.png',
         'JsPlatform/Extensions/filesystem_delete_file32.png'
       )
-      .addParameter('string', t('File path'), '', false)
+      .addParameter('string', _('File path'), '', false)
       .addParameter(
         'scenevar',
-        t(
+        _(
           "(Optional) Variable to store the result. 'ok': task was successful, 'error': an error occured."
         ),
         '',
@@ -318,9 +318,9 @@ module.exports = {
     extension
       .addStrExpression(
         'DesktopPath',
-        t('Desktop folder'),
-        t('Get the path to the desktop folder.'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Desktop folder'),
+        _('Get the path to the desktop folder.'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
@@ -332,9 +332,9 @@ module.exports = {
     extension
       .addStrExpression(
         'DocumentsPath',
-        t('Documents folder'),
-        t('Get the path to the documents folder.'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Documents folder'),
+        _('Get the path to the documents folder.'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
@@ -346,9 +346,9 @@ module.exports = {
     extension
       .addStrExpression(
         'PicturesPath',
-        t('Pictures folder'),
-        t('Get the path to the pictures folder.'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Pictures folder'),
+        _('Get the path to the pictures folder.'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
@@ -360,9 +360,9 @@ module.exports = {
     extension
       .addStrExpression(
         'ExecutablePath',
-        t('This games executable folder'),
-        t('Get the path to this games executable folder.'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('This games executable folder'),
+        _('Get the path to this games executable folder.'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
@@ -374,9 +374,9 @@ module.exports = {
     extension
       .addStrExpression(
         'UserdataPath',
-        t('Userdata folder (For application settings)'),
-        t('Get the path to userdata folder. (For application settings)'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Userdata folder (For application settings)'),
+        _('Get the path to userdata folder. (For application settings)'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
@@ -388,9 +388,9 @@ module.exports = {
     extension
       .addStrExpression(
         'TempPath',
-        t('Temp folder'),
-        t('Get the path to temp folder.'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Temp folder'),
+        _('Get the path to temp folder.'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )
@@ -402,9 +402,9 @@ module.exports = {
     extension
       .addStrExpression(
         'PathDelimiter',
-        t('Path delimiter'),
-        t('Get the operating system agnostic path delimiter.'),
-        t('Filesystem/Windows, Linux, MacOS'),
+        _('Path delimiter'),
+        _('Get the operating system agnostic path delimiter.'),
+        _('Filesystem/Windows, Linux, MacOS'),
         'JsPlatform/Extensions/filesystem_folder24.png',
         'JsPlatform/Extensions/filesystem_folder32.png'
       )

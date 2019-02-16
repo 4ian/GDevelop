@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -25,9 +27,13 @@ export default ({ message, onLogin }: Props) => (
       </p>
     </Line>
     <Line justifyContent="center" alignItems="center">
-      <RaisedButton label="Create my account" onClick={onLogin} primary />
+      <RaisedButton
+        label={<Trans>Create my account</Trans>}
+        onClick={onLogin}
+        primary
+      />
       <span style={styles.orDivider}>or</span>
-      <FlatButton label="Login" onClick={onLogin} />
+      <FlatButton label={<Trans>Login</Trans>} onClick={onLogin} />
     </Line>
   </Column>
 );

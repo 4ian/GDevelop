@@ -1,4 +1,5 @@
 // @flow weak
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ObjectsEditorService from './ObjectsEditorService';
@@ -36,10 +37,14 @@ export class ObjectEditorDialog extends Component<*, StateType> {
 
   render() {
     const actions = [
-      <FlatButton key="cancel" label="Cancel" onClick={this.props.onCancel} />,
+      <FlatButton
+        key="cancel"
+        label={<Trans>Cancel</Trans>}
+        onClick={this.props.onCancel}
+      />,
       <FlatButton
         key="apply"
-        label="Apply"
+        label={<Trans>Apply</Trans>}
         primary
         keyboardFocused
         onClick={() => {
@@ -65,8 +70,16 @@ export class ObjectEditorDialog extends Component<*, StateType> {
         title={
           <div>
             <Tabs value={currentTab} onChange={this._onChangeTab}>
-              <Tab label="Properties" value={'properties'} key={'properties'} />
-              <Tab label="Behaviors" value={'behaviors'} key={'behaviors'} />
+              <Tab
+                label={<Trans>Properties</Trans>}
+                value={'properties'}
+                key={'properties'}
+              />
+              <Tab
+                label={<Trans>Behaviors</Trans>}
+                value={'behaviors'}
+                key={'behaviors'}
+              />
             </Tabs>
           </div>
         }
@@ -79,7 +92,7 @@ export class ObjectEditorDialog extends Component<*, StateType> {
               fullWidth
               commitOnBlur
               value={this.state.newObjectName}
-              hintText="Object Name"
+              hintText={<Trans>Object Name</Trans>}
               onChange={text => {
                 if (this.props.canRenameObject(text)) {
                   this.setState({ newObjectName: text });

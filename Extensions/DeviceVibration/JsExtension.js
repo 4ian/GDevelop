@@ -11,12 +11,12 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: function(t, gd) {
+  createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       "DeviceVibration",
-      t("Device vibration"),
-      t(
+      _("Device vibration"),
+      _(
         "Use the vibration of mobile devices."
       ),
       "Matthias Meike",
@@ -26,14 +26,14 @@ module.exports = {
     extension
       .addAction(
         "StartVibration",
-        t("Vibrate"),
-        t("Vibrate (Duration in ms)."),
-        t("Start vibration for _PARAM0_ ms"),
-        t("Vibration"),
+        _("Vibrate"),
+        _("Vibrate (Duration in ms)."),
+        _("Start vibration for _PARAM0_ ms"),
+        _("Vibration"),
         "JsPlatform/Extensions/vibration_start24.png",
         "JsPlatform/Extensions/vibration_start32.png"
       )
-        .addParameter("expression", t("Duration"), "", false)
+        .addParameter("expression", _("Duration"), "", false)
         .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/DeviceVibration/devicevibrationtools.js"
@@ -43,14 +43,14 @@ module.exports = {
       extension
       .addAction(
         "StartVibrationPattern",
-        t("Vibrate by pattern"),
-        t("Vibrate (Duration in ms). You can add multiple comma separated values where every second value determins the silense inbetween two vibrations. This is a string value so use quotes."),
-        t("Start vibration for _PARAM0_ ms"),
-        t("Vibration"),
+        _("Vibrate by pattern"),
+        _("Vibrate (Duration in ms). You can add multiple comma separated values where every second value determins the silense inbetween two vibrations. This is a string value so use quotes."),
+        _("Start vibration for _PARAM0_ ms"),
+        _("Vibration"),
         "JsPlatform/Extensions/vibration_pattern_start24.png",
         "JsPlatform/Extensions/vibration_pattern_start32.png"
       )
-        .addParameter("string", t("Intervals (for example \"500,100,200\""), "", false)
+        .addParameter("string", _("Intervals (for example \"500,100,200\""), "", false)
         .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/DeviceVibration/devicevibrationtools.js"
@@ -60,10 +60,10 @@ module.exports = {
       extension
       .addAction(
         "StopVibration",
-        t("Stop vibration"),
-        t("Stop the vibration"),
-        t("Stop vibration"),
-        t("Vibration"),
+        _("Stop vibration"),
+        _("Stop the vibration"),
+        _("Stop vibration"),
+        _("Vibration"),
         "JsPlatform/Extensions/vibration_stop24.png",
         "JsPlatform/Extensions/vibration_stop32.png"
       )

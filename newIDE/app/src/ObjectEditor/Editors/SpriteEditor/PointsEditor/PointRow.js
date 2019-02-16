@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React from 'react';
 import { TableRow, TableRowColumn } from 'material-ui/Table';
 import IconButton from 'material-ui/IconButton';
@@ -47,7 +48,9 @@ const ThemablePointRow = ({
           onChange={(e, value) => onChangePointX(parseFloat(value || 0, 10))}
         />
       ) : (
-        <p>(auto)</p>
+        <p>
+          <Trans>(auto)</Trans>
+        </p>
       )}
     </TableRowColumn>
     <TableRowColumn style={styles.coordinateColumn}>
@@ -59,7 +62,9 @@ const ThemablePointRow = ({
           onChange={(e, value) => onChangePointY(parseFloat(value || 0, 10))}
         />
       ) : (
-        <p>(auto)</p>
+        <p>
+          <Trans>(auto)</Trans>
+        </p>
       )}
     </TableRowColumn>
     <TableRowColumn style={styles.toolColumn}>

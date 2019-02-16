@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import localFileSystem from '../LocalFileSystem';
 import optionalRequire from '../../../Utils/OptionalRequire';
@@ -211,7 +213,8 @@ export default class LocalPreviewLauncher extends React.Component<
             if (this.props.onChangeSubscription)
               this.props.onChangeSubscription();
           }}
-          title="Preview over wifi"
+          id="Preview over wifi"
+          title={<Trans>Preview over wifi</Trans>}
           mode="try"
         />
         <LocalNetworkPreviewDialog

@@ -1,5 +1,4 @@
 // @flow
-import { type TFunction } from 'react-i18next';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import values from 'lodash/values';
 
@@ -12,6 +11,8 @@ export type ProjectError = {
 export type ProjectErrors = {
   [string]: Array<ProjectError>,
 };
+
+type TFunction = string => string; //TODO
 
 export const getErrors = (t: TFunction, project: gdProject): ProjectErrors => {
   const errors: ProjectErrors = {};

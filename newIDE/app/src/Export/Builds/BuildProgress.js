@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
@@ -64,14 +65,21 @@ export default ({ build, onDownload }: Props) => {
   return build.status === 'error' ? (
     <React.Fragment>
       <Line alignItems="center">
-        <p>Something wrong happened :(</p>
+        <p>
+          <Trans>Something wrong happened :(</Trans>
+        </p>
         <Spacer />
-        <RaisedButton label="See logs" onClick={() => onDownload('logsKey')} />
+        <RaisedButton
+          label={<Trans>See logs</Trans>}
+          onClick={() => onDownload('logsKey')}
+        />
       </Line>
       <Line alignItems="center">
         <EmptyMessage>
-          Check the logs to see if there is an explanation about what went
-          wrong, or try again later.
+          <Trans>
+            Check the logs to see if there is an explanation about what went
+            wrong, or try again later.
+          </Trans>
         </EmptyMessage>
       </Line>
     </React.Fragment>
@@ -85,9 +93,13 @@ export default ({ build, onDownload }: Props) => {
       />
       <Spacer />
       {estimatedRemainingTime > 0 ? (
-        <p>~{Math.round(estimatedRemainingTime / 60)} minutes.</p>
+        <p>
+          <Trans>~{Math.round(estimatedRemainingTime / 60)} minutes.</Trans>
+        </p>
       ) : (
-        <p>Should finish soon.</p>
+        <p>
+          <Trans>Should finish soon.</Trans>
+        </p>
       )}
     </Line>
   ) : build.status === 'complete' ? (
@@ -105,11 +117,16 @@ export default ({ build, onDownload }: Props) => {
               />
             </React.Fragment>
           ))}
-        <FlatButton label="See logs" onClick={() => onDownload('logsKey')} />
+        <FlatButton
+          label={<Trans>See logs</Trans>}
+          onClick={() => onDownload('logsKey')}
+        />
       </Line>
       <Line expand>{config && config.completeDescription}</Line>
     </React.Fragment>
   ) : (
-    <Line>Unknown status</Line>
+    <Line>
+      <Trans>Unknown status</Trans>
+    </Line>
   );
 };

@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { AutoSizer, Table, Column } from 'react-virtualized';
 import ThemeConsumer from '../../UI/Theme/ThemeConsumer';
@@ -97,7 +98,7 @@ export default class InstancesList extends Component {
                 width={width}
               >
                 <Column
-                  label="Object name"
+                  label={<Trans>Object name</Trans>}
                   dataKey="name"
                   width={width * 0.35}
                   className={'tableColumn'}
@@ -109,31 +110,31 @@ export default class InstancesList extends Component {
                   className={'tableColumn'}
                 />
                 <Column
-                  label="X"
+                  label={<Trans>X</Trans>}
                   dataKey="x"
                   width={width * 0.1}
                   className={'tableColumn'}
                 />
                 <Column
-                  label="Y"
+                  label={<Trans>Y</Trans>}
                   dataKey="y"
                   width={width * 0.1}
                   className={'tableColumn'}
                 />
                 <Column
-                  label="Angle"
+                  label={<Trans>Angle</Trans>}
                   dataKey="angle"
                   width={width * 0.1}
                   className={'tableColumn'}
                 />
                 <Column
-                  label="Layer"
+                  label={<Trans>Layer</Trans>}
                   dataKey="layer"
                   width={width * 0.2}
                   className={'tableColumn'}
                 />
                 <Column
-                  label="Z Order"
+                  label={<Trans>Z Order</Trans>}
                   dataKey="zOrder"
                   width={width * 0.1}
                   className={'tableColumn'}

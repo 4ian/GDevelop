@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -96,8 +97,10 @@ export default class LocalExport extends Component {
     return (
       <Column noMargin>
         <Line>
-          This will export your game to a folder that you can then upload on a
-          website or on game hosting like itch.io.
+          <Trans>
+            This will export your game to a folder that you can then upload on a
+            website or on game hosting like itch.io.
+          </Trans>
         </Line>
         <Line>
           <LocalFolderPicker
@@ -110,24 +113,24 @@ export default class LocalExport extends Component {
         <Line>
           <Spacer expand />
           <RaisedButton
-            label="Export"
+            label={<Trans>Export</Trans>}
             primary={true}
             onClick={this.launchExport}
             disabled={!this.state.outputDir}
           />
         </Line>
         <Dialog
-          title="Export finished"
+          title={<Trans>Export finished</Trans>}
           actions={[
             <FlatButton
               key="open"
-              label="Open folder"
+              label={<Trans>Open folder</Trans>}
               primary={true}
               onClick={this.openExportFolder}
             />,
             <FlatButton
               key="close"
-              label="Close"
+              label={<Trans>Close</Trans>}
               primary={false}
               onClick={() =>
                 this.setState({
@@ -140,18 +143,20 @@ export default class LocalExport extends Component {
           open={this.state.exportFinishedDialogOpen}
         >
           <p>
-            You can now upload the game to a web hosting to play to the game.
+            <Trans>
+              You can now upload the game to a web hosting to play to the game.
+            </Trans>
           </p>
           <RaisedButton
             fullWidth
             primary
             onClick={() => this.openItchioHelp()}
-            label="Publish your game on Itch.io"
+            label={<Trans>Publish your game on Itch.io</Trans>}
           />
           <FlatButton
             fullWidth
             onClick={() => this.openLearnMore()}
-            label="Learn more about publishing"
+            label={<Trans>Learn more about publishing</Trans>}
           />
         </Dialog>
       </Column>

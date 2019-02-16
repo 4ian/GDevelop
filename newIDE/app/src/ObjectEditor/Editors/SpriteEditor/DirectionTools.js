@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import Timer from 'material-ui/svg-icons/image/timer';
 import FlatButton from 'material-ui/FlatButton';
@@ -119,7 +121,7 @@ export default class DirectionTools extends Component<Props, State> {
           />
         )}
         <FlatButton
-          label="Preview"
+          label={<Trans>Preview</Trans>}
           icon={<PlayArrow />}
           onClick={() => this.openPreview(true)}
         />
@@ -151,7 +153,7 @@ export default class DirectionTools extends Component<Props, State> {
           <Dialog
             actions={
               <FlatButton
-                label="OK"
+                label={<Trans>OK</Trans>}
                 primary
                 onClick={() => this.openPreview(false)}
               />

@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import classNames from 'classnames';
 import TextField from 'material-ui/TextField';
@@ -72,7 +74,7 @@ export default class GroupEvent extends React.Component<EventRendererProps, *> {
           <TextField
             ref={textField => (this._textField = textField)}
             value={groupEvent.getName()}
-            hintText="<Enter group name>"
+            hintText={<Trans>&lt;Enter group name&gt;</Trans>}
             onBlur={this.endEditing}
             onChange={(e, text) => {
               groupEvent.setName(text);

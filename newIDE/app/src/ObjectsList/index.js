@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import { ListItem } from 'material-ui/List';
@@ -71,7 +73,7 @@ class ObjectsList extends Component<*, *> {
                 style={style}
                 disabled
                 onClick={this.props.onAddNewObject}
-                primaryText="Click to add an object"
+                primaryText={<Trans>Click to add an object</Trans>}
               />
             );
           }

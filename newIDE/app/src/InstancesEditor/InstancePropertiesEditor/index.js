@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
@@ -99,7 +100,9 @@ export default class InstancePropertiesEditor extends Component {
   _renderEmpty() {
     return (
       <EmptyMessage>
-        Click on an instance in the scene to display its properties
+        <Trans>
+          Click on an instance in the scene to display its properties
+        </Trans>
       </EmptyMessage>
     );
   }

@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
@@ -19,9 +20,13 @@ export class VariablesEditorDialog extends Component {
       variablesContainer,
     } = this.props;
     const actions = [
-      <FlatButton label="Cancel" onClick={onCancel} key={'Cancel'} />,
       <FlatButton
-        label="Apply"
+        label={<Trans>Cancel</Trans>}
+        onClick={this.props.onCancel}
+        key={'Cancel'}
+      />,
+      <FlatButton
+        label={<Trans>Apply</Trans>}
         primary
         keyboardFocused
         onClick={onApply}

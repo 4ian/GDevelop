@@ -9,6 +9,7 @@
 /ExtLibs/*.7z
 /scripts/Repository keys
 /scripts/logs/*.txt
+/scripts/gdcore-gdcpp-gdjs-extensions-messages.pot
 /Binaries/.build*
 /Binaries/.embuild*
 /Binaries/build*

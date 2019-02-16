@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -62,9 +64,13 @@ export default class InstructionEditorDialog extends React.Component<
       ...otherProps
     } = this.props;
     const actions = [
-      <FlatButton label="Cancel" primary={false} onClick={onCancel} />,
       <FlatButton
-        label="Ok"
+        label={<Trans>Cancel</Trans>}
+        primary={false}
+        onClick={onCancel}
+      />,
+      <FlatButton
+        label={<Trans>Ok</Trans>}
         primary={true}
         keyboardFocused={false}
         onClick={onSubmit}

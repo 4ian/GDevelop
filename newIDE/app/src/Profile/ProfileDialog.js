@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
@@ -37,7 +38,7 @@ export default class ProfileDialog extends Component<Props, State> {
     const { open, onClose } = this.props;
     const actions = [
       <FlatButton
-        label="Close"
+        label={<Trans>Close</Trans>}
         key="close"
         primary={false}
         onClick={onClose}
@@ -53,7 +54,7 @@ export default class ProfileDialog extends Component<Props, State> {
               <HelpButton key="help" helpPagePath="/interface/profile" />,
               userProfile.authenticated && userProfile.profile && (
                 <FlatButton
-                  label="Logout"
+                  label={<Trans>Logout</Trans>}
                   key="logout"
                   onClick={userProfile.onLogout}
                 />
@@ -65,7 +66,7 @@ export default class ProfileDialog extends Component<Props, State> {
             autoScrollBodyContent
           >
             <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
-              <Tab label="My Profile" value="profile">
+              <Tab label={<Trans>My Profile</Trans>} value="profile">
                 {userProfile.authenticated ? (
                   <Column noMargin>
                     <ProfileDetails profile={userProfile.profile} />
@@ -80,15 +81,17 @@ export default class ProfileDialog extends Component<Props, State> {
                   </Column>
                 )}
               </Tab>
-              <Tab label="Online services usage" value="usage">
+              <Tab label={<Trans>Online services usage</Trans>} value="usage">
                 {userProfile.authenticated ? (
                   <Column noMargin>
                     <UsagesDetails usages={userProfile.usages} />
                   </Column>
                 ) : (
                   <EmptyMessage>
-                    Register to see the usage that you've made of the online
-                    services
+                    <Trans>
+                      Register to see the usage that you've made of the online
+                      services
+                    </Trans>
                   </EmptyMessage>
                 )}
               </Tab>

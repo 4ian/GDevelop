@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
@@ -114,7 +115,9 @@ export default class BrowserExamples extends Component {
     return (
       <Column noMargin>
         <Column>
-          <p>Choose or search for an example to open:</p>
+          <p>
+            <Trans>Choose or search for an example to open:</Trans>
+          </p>
         </Column>
         <Line>
           <ExamplesList

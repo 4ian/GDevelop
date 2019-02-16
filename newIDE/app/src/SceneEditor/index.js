@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import uniq from 'lodash/uniq';
 import ObjectsList from '../ObjectsList';
@@ -842,7 +844,7 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const editors = {
       properties: (
-        <MosaicWindow title="Properties">
+        <MosaicWindow title={<Trans>Properties</Trans>}>
           <InstancePropertiesEditor
             project={project}
             layout={layout}
@@ -889,7 +891,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       ),
       'objects-list': (
         <MosaicWindow
-          title="Objects"
+          title={<Trans>Objects</Trans>}
           selectedObjectNames={
             this.state
               .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/
@@ -925,7 +927,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         </MosaicWindow>
       ),
       'object-groups-list': (
-        <MosaicWindow title="Object Groups">
+        <MosaicWindow title={<Trans>Object Groups</Trans>}>
           <ObjectGroupsList
             project={project}
             objectsContainer={layout}
@@ -1008,7 +1010,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           containerStyle={{ overflow: 'hidden' }}
         >
           <EditorBar
-            title="Instances"
+            title={<Trans>Instances</Trans>}
             iconElementLeft={
               <IconButton onClick={this.toggleInstancesList}>
                 <NavigationClose />
@@ -1028,7 +1030,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           openSecondary={true}
         >
           <EditorBar
-            title="Layers"
+            title={<Trans>Layers</Trans>}
             iconElementLeft={
               <IconButton onClick={this.toggleLayersList}>
                 <NavigationClose />
@@ -1043,15 +1045,24 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         </Drawer>
         <InfoBar
-          message="Drag and Drop the object to the scene or use the right click menu to add an instance of it."
+          message={
+            <Trans>
+              Drag and Drop the object to the scene or use the right click menu
+              to add an instance of it.
+            </Trans>
+          }
           show={!!this.state.selectedObjectNames.length}
         />
         <InfoBar
-          message="Objects panel is already opened: use it to add and edit objects."
+          message={
+            <Trans>
+              Objects panel is already opened: use it to add and edit objects.
+            </Trans>
+          }
           show={!!this.state.showObjectsListInfoBar}
         />
         <InfoBar
-          message="Properties panel is already opened."
+          message={<Trans>Properties panel is already opened.</Trans>}
           show={!!this.state.showPropertiesInfoBar}
         />
         <SetupGridDialog

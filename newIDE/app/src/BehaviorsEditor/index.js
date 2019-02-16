@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
 import Add from 'material-ui/svg-icons/content/add';
@@ -150,7 +151,7 @@ export default class BehaviorsEditor extends Component {
                     Behavior{' '}
                     <TextField
                       value={behaviorName}
-                      hintText="Behavior name"
+                      hintText={<Trans>Behavior name</Trans>}
                       disabled
                       onChange={(e, text) =>
                         this._onChangeBehaviorName(behavior, text)

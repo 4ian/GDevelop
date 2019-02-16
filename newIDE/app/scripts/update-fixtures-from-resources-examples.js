@@ -36,9 +36,10 @@ const updateResources = (project, baseUrl) => {
   project.exposeResources(worker);
 };
 
+const noopTranslationFunction = str => str;
 const extensionsLoader = makeExtensionsLoader({ gd, filterExamples: false });
 extensionsLoader
-  .loadAllExtensions()
+  .loadAllExtensions(noopTranslationFunction)
   .then(loadingResults => {
     console.info('Loaded extensions', loadingResults);
 

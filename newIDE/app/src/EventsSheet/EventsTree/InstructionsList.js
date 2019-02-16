@@ -16,6 +16,7 @@ import {
   type ConnectDropTarget,
 } from 'react-dnd';
 import DropIndicator from './DropIndicator';
+import { Trans } from '@lingui/macro';
 
 const styles = {
   addButton: {
@@ -47,7 +48,7 @@ type Props = {
   ) => void,
   onParameterClick: ParameterContext => void,
   selection: any,
-  addButtonLabel?: string,
+  addButtonLabel?: React.Node,
   extraClassName?: string,
   style?: Object,
   disabled: boolean,
@@ -134,9 +135,11 @@ class InstructionsList extends React.Component<Props, *> {
       isCondition: areConditions,
       instrsList: instrsList,
     };
-    const addButtonDefaultLabel = areConditions
-      ? 'Add condition'
-      : 'Add action';
+    const addButtonDefaultLabel = areConditions ? (
+      <Trans>Add condition</Trans>
+    ) : (
+      <Trans>Add action</Trans>
+    );
     const instructionsList = connectDropTarget(
       <div
         className={`${
@@ -146,7 +149,7 @@ class InstructionsList extends React.Component<Props, *> {
       >
         {instructions}
         {isOver && <DropIndicator canDrop={canDrop} />}
-        <a
+        <button
           style={styles.addButton}
           className="add-link"
           onClick={this.onAddNewInstruction}
@@ -160,7 +163,7 @@ class InstructionsList extends React.Component<Props, *> {
           }}
         >
           {addButtonLabel || addButtonDefaultLabel}
-        </a>
+        </button>
       </div>
     );
 
@@ -198,6 +201,7 @@ function targetCollect(
   };
 }
 
+// $FlowFixMe - Typing of DragSource/DropTarget is a pain to get correctly
 export default DropTarget(
   reactDndInstructionType,
   instructionsListTarget,

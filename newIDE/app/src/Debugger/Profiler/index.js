@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton/RaisedButton';
 import MeasuresTable from './MeasuresTable';
@@ -30,17 +32,25 @@ export default class Profiler extends React.Component<Props, void> {
         <Line alignItems="center" justifyContent="center">
           {!profilingInProgress && profilerOutput && (
             <p>
-              Last run collected on {profilerOutput.stats.framesCount} frames.
+              <Trans>
+                Last run collected on {profilerOutput.stats.framesCount} frames.
+              </Trans>
             </p>
           )}
           {!profilingInProgress && profilerOutput && (
-            <RaisedButton label="Restart" onClick={onStart} />
+            <RaisedButton label={<Trans>Restart</Trans>} onClick={onStart} />
           )}
           {!profilingInProgress && !profilerOutput && (
-            <RaisedButton label="Start profiling" onClick={onStart} />
+            <RaisedButton
+              label={<Trans>Start profiling</Trans>}
+              onClick={onStart}
+            />
           )}
           {profilingInProgress && (
-            <RaisedButton label="Stop profiling" onClick={onStop} />
+            <RaisedButton
+              label={<Trans>Stop profiling</Trans>}
+              onClick={onStop}
+            />
           )}
         </Line>
         {profilingInProgress && (
@@ -56,8 +66,10 @@ export default class Profiler extends React.Component<Props, void> {
           )}
           {!profilerOutput && (
             <EmptyMessage>
-              Start profiling and then stop it after a few seconds to see the
-              results.
+              <Trans>
+                Start profiling and then stop it after a few seconds to see the
+                results.
+              </Trans>
             </EmptyMessage>
           )}
         </div>

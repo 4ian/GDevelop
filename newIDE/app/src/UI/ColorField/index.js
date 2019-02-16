@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import TextField from 'material-ui/TextField';
 import ColorPicker from './ColorPicker';
@@ -33,7 +34,7 @@ export default class ColorField extends Component {
           floatingLabelText={this.props.floatingLabelText}
           floatingLabelFixed
           type="text"
-          hintText="Click to choose"
+          hintText={<Trans>Click to choose</Trans>}
           onClick={this.onClick}
           onFocus={this.onClick}
           value=""

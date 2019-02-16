@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Column, Line } from '../../UI/Grid';
@@ -13,15 +14,17 @@ export default class BrowserExport extends Component {
       <div style={{ height: 200 }}>
         <Column>
           <Line>
-            Export is not yet available in GDevelop online version. Instead,
-            download the full GDevelop desktop version to export and publish
-            your game!
+            <Trans>
+              Export is not yet available in GDevelop online version. Instead,
+              download the full GDevelop desktop version to export and publish
+              your game!
+            </Trans>
           </Line>
           <Line>
             <RaisedButton
               onClick={this.openWebsite}
               primary
-              label="Download GDevelop"
+              label={<Trans>Download GDevelop</Trans>}
             />
           </Line>
         </Column>

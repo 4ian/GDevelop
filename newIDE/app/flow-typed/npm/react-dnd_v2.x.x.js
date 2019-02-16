@@ -1,5 +1,5 @@
-// flow-typed signature: 6457154c7e96ef3ce4b654781625f315
-// flow-typed version: 7bc41826e1/react-dnd_v2.x.x/flow_>=v0.53.x
+// flow-typed signature: cf6cf392ef13583af7c89327c319a5a5
+// flow-typed version: 45acb9a3f7/react-dnd_v2.x.x/flow_>=v0.53.x
 
 declare module "react-dnd" {
   declare type Identifier = string;
@@ -23,11 +23,11 @@ declare module "react-dnd" {
   declare type InstanceOf<C> = _InstanceOf<*, C>;
 
   declare class ConnectedComponent<C, I, P> extends React$Component<P> {
-    static DecoratedComponent: C,
-    getDecoratedComponentInstance(): I,
-    getHandlerId(): Identifier,
-    props: P,
-    state: void
+    static DecoratedComponent: C;
+    getDecoratedComponentInstance(): I;
+    getHandlerId(): Identifier;
+    props: P;
+    state: void;
   }
 
   declare type Connector<SP: {}, CP: {}> = (<
@@ -200,6 +200,18 @@ declare module "react-dnd" {
 
   // Drag Drop Context
   // ----------------------------------------------------------------------
+
+  declare type ProviderProps = {
+    backend: mixed,
+    children: React$Element<any>,
+    window?: Object
+  };
+
+  declare class DragDropContextProvider<ProviderProps> extends React$Component<
+    ProviderProps
+  > {
+    props: ProviderProps;
+  }
 
   declare function DragDropContext<OP: {}, CP: {}>(
     backend: mixed

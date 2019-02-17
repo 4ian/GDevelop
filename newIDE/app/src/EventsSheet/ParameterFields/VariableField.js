@@ -133,7 +133,7 @@ export const renderVariableWithIcon = (
 ) => {
   return (
     <span title={tooltip}>
-      <img style={styles.variableIcon} src={iconPath} alt=''/>
+      <img style={styles.variableIcon} src={iconPath} alt="" />
       {value}
     </span>
   );

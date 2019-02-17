@@ -16,6 +16,7 @@ const styles = {
   },
   variableIcon: {
     verticalAlign: 'middle',
+    marginLeft: 2,
     marginRight: 2,
     width: 16,
     height: 16,

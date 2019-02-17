@@ -101,9 +101,11 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
 
   renderObjectThumbnail = objectName => {
     const { project, layout } = this.props;
-    if (!layout) return;//to pass flow
+    if (!layout) return; //to pass flow
     const object = this.getObject(objectName, layout, project);
-    return getThumbnail(project, object);
+    if (object) {
+      return getThumbnail(project, object);
+    }
   };
 
   render() {

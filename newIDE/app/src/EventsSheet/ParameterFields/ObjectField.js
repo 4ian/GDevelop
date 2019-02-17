@@ -5,9 +5,10 @@ import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
 const styles = {
   objectThumbnail: {
+    marginLeft: 2,
     marginRight: 2,
     height: 16,
-    maxWidth: 48,
+    maxWidth: 24,
     width: 'auto',
     verticalAlign: 'middle',
   },

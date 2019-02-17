@@ -94,6 +94,7 @@ export const renderObjectWithThumbnail = (
   return (
     <span title={value}>
       <img
+        alt=''
         style={styles.objectThumbnail}
         src={getObjectThumbnail ? getObjectThumbnail(value) : ''}
       />

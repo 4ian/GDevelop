@@ -1,5 +1,5 @@
 // Note: this file don't use export/imports to allow its usage from Node.js
-const nodeRequire = require('node-require-function')(arguments);
+const nodeRequire = require('node-require-function')(); //TODO
 
 /**
  * Allow to require a Node.js/npm module without having it bundled by webpack.

@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import { mapVector } from '../Utils/MapFor';
 import Chip from 'material-ui/Chip';
@@ -68,7 +70,7 @@ export default class ExamplesSearchbar extends Component<Props> {
       <Column noMargin>
         <TextField
           fullWidth
-          hintText="Search in examples"
+          hintText={<Trans>Search in examples</Trans>}
           id="examples-searchbar"
           value={value}
           onChange={(e, value) => {

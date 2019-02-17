@@ -10,7 +10,6 @@ import {
   selectableArea,
 } from '../ClassNames';
 import { getHelpLink } from '../../../Utils/HelpLink';
-import Window from '../../../Utils/Window';
 import { type EventRendererProps } from './EventRenderer.flow';
 import Measure from 'react-measure';
 import { CodeEditor } from '../../../CodeEditor';
@@ -113,10 +112,6 @@ export default class JsCodeEvent extends React.Component<
     });
   };
 
-  openHelp = () => {
-    Window.openExternalURL(getHelpLink('/events/js-code'));
-  };
-
   render() {
     const jsCodeEvent = gd.asJsCodeEvent(this.props.event);
     const parameterObjects = jsCodeEvent.getParameterObjects();
@@ -146,7 +141,12 @@ export default class JsCodeEvent extends React.Component<
         <span>{');'}</span>
         <span style={styles.comment}>
           {' // '}
-          <a onClick={this.openHelp} style={styles.commentLink}>
+          <a
+            href={getHelpLink('/events/js-code')}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={styles.commentLink}
+          >
             Read the documentation and help
           </a>
         </span>

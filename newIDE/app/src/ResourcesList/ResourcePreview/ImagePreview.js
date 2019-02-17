@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import ResourcesLoader from '../../ResourcesLoader';
 
@@ -123,7 +125,11 @@ export default class ImagePreview extends React.Component<Props, State> {
         style={{ ...styles.imagePreviewContainer, ...style }}
         ref={container => (this._container = container)}
       >
-        {!!this.state.errored && <p>Unable to load the image</p>}
+        {!!this.state.errored && (
+          <p>
+            <Trans>Unable to load the image</Trans>
+          </p>
+        )}
         {!this.state.errored && (
           <img
             style={styles.spriteThumbnailImage}

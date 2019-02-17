@@ -147,7 +147,7 @@ gd::PlatformExtension *CreateGDJSParticleSystemExtension();
 }
 #endif
 
-JsPlatform::JsPlatform() : gd::Platform() {
+void JsPlatform::ReloadBuiltinExtensions() {
   // Adding built-in extensions.
   std::cout << "* Loading builtin extensions... ";
   std::cout.flush();
@@ -255,9 +255,12 @@ JsPlatform::JsPlatform() : gd::Platform() {
   std::cout << "done." << std::endl;
 };
 
-void JsPlatform::AddNewExtension(const gd::PlatformExtension & extension) {
-    AddExtension(std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension(extension)));
+void JsPlatform::AddNewExtension(const gd::PlatformExtension &extension) {
+  AddExtension(std::shared_ptr<gd::PlatformExtension>(
+      new gd::PlatformExtension(extension)));
 }
+
+JsPlatform::JsPlatform() : gd::Platform() { ReloadBuiltinExtensions(); }
 
 JsPlatform &JsPlatform::Get() {
   if (!singleton) singleton = new JsPlatform;

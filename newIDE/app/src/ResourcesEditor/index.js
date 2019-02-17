@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import ResourcesList from '../ResourcesList';
 import ResourcePropertiesEditor from './ResourcePropertiesEditor';
@@ -124,7 +126,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     const editors = {
       properties: (
         <MosaicWindow
-          title="Properties"
+          title={<Trans>Properties</Trans>}
           // Pass resources to force MosaicWindow update when selectedResource is changed
           resources={selectedResource ? [selectedResource] : []}
         >
@@ -171,7 +173,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           }}
         />
         <InfoBar
-          message="Properties panel is already opened"
+          message={<Trans>Properties panel is already opened</Trans>}
           show={!!this.state.showPropertiesInfoBar}
         />
       </div>

@@ -4,6 +4,7 @@ import { Column, Line } from '../UI/Grid';
 import { sendTutorialOpened } from '../Utils/Analytics/EventSender';
 import Window from '../Utils/Window';
 import { getHelpLink } from '../Utils/HelpLink';
+import { Trans } from '@lingui/macro';
 
 export default class Tutorials extends PureComponent {
   render() {
@@ -12,15 +13,17 @@ export default class Tutorials extends PureComponent {
         <Line>
           <Column>
             <p>
-              Tutorials are available on GDevelop wiki. Choose a tutorial to
-              read:
+              <Trans>
+                Tutorials are available on GDevelop wiki. Choose a tutorial to
+                read:
+              </Trans>
             </p>
           </Column>
         </Line>
         <Line>
           <Column expand noMargin>
             <FlatButton
-              label="Make a platform game from scratch"
+              label={<Trans>Make a platform game from scratch</Trans>}
               fullWidth
               primary
               onClick={() => {
@@ -31,7 +34,9 @@ export default class Tutorials extends PureComponent {
               }}
             />
             <FlatButton
-              label="Make a simple tank shooter game from scratch"
+              label={
+                <Trans>Make a simple tank shooter game from scratch</Trans>
+              }
               fullWidth
               primary
               onClick={() => {
@@ -40,7 +45,7 @@ export default class Tutorials extends PureComponent {
               }}
             />
             <FlatButton
-              label="Other tutorials coming soon!"
+              label={<Trans>Other tutorials coming soon!</Trans>}
               fullWidth
               primary
               disabled

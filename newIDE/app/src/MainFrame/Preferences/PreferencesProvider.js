@@ -24,6 +24,7 @@ const LocalStorageItem = 'gd-preferences';
 export default class PreferencesProvider extends React.Component<Props, State> {
   state = {
     values: this._loadValuesFromLocalStorage() || initialPreferences.values,
+    setLanguage: this._setLanguage.bind(this),
     setThemeName: this._setThemeName.bind(this),
     setCodeEditorThemeName: this._setCodeEditorThemeName.bind(this),
     setAutoDownloadUpdates: this._setAutoDownloadUpdates.bind(this),
@@ -35,6 +36,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
 
   componentDidMount() {
     setTimeout(() => this._checkUpdates(), 10000);
+  }
+
+  _setLanguage(language: string) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          language,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
   }
 
   _setThemeName(themeName: string) {

@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import EventsSheet from '../EventsSheet';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
@@ -146,7 +148,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           editors={{
             parameters: (
               <MosaicWindow
-                title="Function Configuration"
+                title={<Trans>Function Configuration</Trans>}
                 toolbarControls={[]}
                 selectedEventsFunction={selectedEventsFunction}
               >
@@ -165,7 +167,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     />
                   ) : (
                     <EmptyMessage>
-                      Choose a function to set the parameters that it accepts.
+                      <Trans>
+                        Choose a function to set the parameters that it accepts.
+                      </Trans>
                     </EmptyMessage>
                   )}
                 </Background>
@@ -197,13 +201,13 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               ) : (
                 <Background>
                   <EmptyMessage>
-                    Choose a function to edit its events.
+                    <Trans>Choose a function to edit its events.</Trans>
                   </EmptyMessage>
                 </Background>
               ),
             'functions-list': (
               <MosaicWindow
-                title="Functions list"
+                title={<Trans>Functions list</Trans>}
                 toolbarControls={[]}
                 selectedEventsFunction={selectedEventsFunction}
               >

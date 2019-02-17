@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import { Step, Stepper, StepLabel, StepContent } from 'material-ui/Stepper';
 import CircularProgress from 'material-ui/CircularProgress';
@@ -62,7 +64,9 @@ export default ({
         <Line alignItems="center">
           <CircularProgress size={20} />
           <Spacer />
-          <p>Export in progress...</p>
+          <p>
+            <Trans>Export in progress...</Trans>
+          </p>
         </Line>
       </StepContent>
     </Step>
@@ -71,14 +75,18 @@ export default ({
       <StepContent>
         {errored ? (
           <p>
-            Can't upload your game to the build service. Please check your
-            internet connection or try again later.
+            <Trans>
+              Can't upload your game to the build service. Please check your
+              internet connection or try again later.
+            </Trans>
           </p>
         ) : exportStep === 'compress' ? (
           <Line alignItems="center">
             <CircularProgress size={20} />
             <Spacer />
-            <p>Compressing before upload...</p>
+            <p>
+              <Trans>Compressing before upload...</Trans>
+            </p>
           </Line>
         ) : (
           <Line alignItems="center" expand>
@@ -95,13 +103,19 @@ export default ({
     <Step>
       <StepLabel>Build and download</StepLabel>
       <StepContent>
-        {!build && <p>Build is starting...</p>}
+        {!build && (
+          <p>
+            <Trans>Build is starting...</Trans>
+          </p>
+        )}
         {build && <BuildProgress build={build} onDownload={onDownload} />}
         {showSeeAllMyBuildsExplanation && (
           <EmptyMessage>
-            If you close this window while the build is being done, you can see
-            its progress and download the game later by clicking on See All My
-            Builds below.
+            <Trans>
+              If you close this window while the build is being done, you can
+              see its progress and download the game later by clicking on See
+              All My Builds below.
+            </Trans>
           </EmptyMessage>
         )}
       </StepContent>

@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import ResourceSelector from '../../ResourcesList/ResourceSelector';
 import ResourcesLoader from '../../ResourcesLoader';
@@ -38,7 +40,7 @@ export default class AudioResourceField extends Component<
         fullWidth
         initialResourceName={this.props.value}
         onChange={this.props.onChange}
-        floatingLabelText="Choose the audio file to use"
+        floatingLabelText={<Trans>Choose the audio file to use</Trans>}
         ref={field => (this._field = field)}
       />
     );

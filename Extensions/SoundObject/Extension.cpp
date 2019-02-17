@@ -142,7 +142,7 @@ class SoundObjectCppExtension : public ExtensionBase {
                     _("Play"),
                     _("Play a sound."),
                     _("Play sound _PARAM0_"),
-                    _(""),
+                    "",
                     "res/actions/son24.png",
                     "res/actions/son.png")
 
@@ -154,7 +154,7 @@ class SoundObjectCppExtension : public ExtensionBase {
                     _("Stop"),
                     _("Stop a sound."),
                     _("Stop _PARAM0_"),
-                    _(""),
+                    "",
                     "res/actions/son24.png",
                     "res/actions/son.png")
 
@@ -166,7 +166,7 @@ class SoundObjectCppExtension : public ExtensionBase {
                     _("Pause"),
                     _("Pause a sound."),
                     _("Pause _PARAM0_"),
-                    _(""),
+                    "",
                     "res/actions/son24.png",
                     "res/actions/son.png")
 
@@ -266,7 +266,7 @@ class SoundObjectCppExtension : public ExtensionBase {
                        _("Being played"),
                        _("Test if a sound is being played."),
                        _("_PARAM0_ is being played"),
-                       _(""),
+                       "",
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -278,7 +278,7 @@ class SoundObjectCppExtension : public ExtensionBase {
                        _("Paused"),
                        _("A sound is paused"),
                        _("_PARAM0_ is paused"),
-                       _(""),
+                       "",
                        "res/actions/son24.png",
                        "res/actions/son.png")
 
@@ -290,7 +290,7 @@ class SoundObjectCppExtension : public ExtensionBase {
                        _("Stopped"),
                        _("Test if a sound is stopped."),
                        _("_PARAM0_ is stopped"),
-                       _(""),
+                       "",
                        "res/actions/son24.png",
                        "res/actions/son.png")
 

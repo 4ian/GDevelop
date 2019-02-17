@@ -284,7 +284,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     depth: number = 0,
     parentDisabled: boolean = false
   ) => {
-    const treeData = mapFor(0, eventsList.getEventsCount(), i => {
+    const treeData = mapFor<any>(0, eventsList.getEventsCount(), i => {
       const event = eventsList.getEventAt(i);
       flatData.push(event);
 

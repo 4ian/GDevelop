@@ -183,13 +183,14 @@ class MainFrame extends React.Component<Props, State> {
       this._openIntroDialog(true);
   }
 
-  _languageDidChanged() {
+  _languageDidChange() {
     // A change in the language will automatically be applied
     // on all React components, as it's handled by GDI18nProvider.
     // We still have this method that will be called when the language
     // dialog is closed after a language change. We then reload GDevelop
     // extensions so that they declare all objects/actions/condition/etc...
     // using the new language.
+    gd.JsPlatform.get().reloadBuiltinExtensions();
     this._loadExtensions();
   }
 
@@ -1447,10 +1448,10 @@ class MainFrame extends React.Component<Props, State> {
         />
         <LanguageDialog
           open={this.state.languageDialogOpen}
-          onClose={(languageChanged) => {
+          onClose={languageChanged => {
             this.openLanguage(false);
             if (languageChanged) {
-              this._languageDidChanged();
+              this._languageDidChange();
             }
           }}
         />

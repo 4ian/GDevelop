@@ -15,12 +15,18 @@ import { I18n } from '@lingui/react';
 
 type Props = {|
   open: boolean,
-  onClose: Function,
+  onClose: (languageDidChange: boolean) => void,
 |};
 
-type State = {||};
+type State = {|
+  languageDidChange: boolean,
+|};
 
 export default class LanguageDialog extends Component<Props, State> {
+  state = {
+    languageDidChange: false,
+  };
+
   render() {
     const { open, onClose } = this.props;
     if (!open) return null;
@@ -48,7 +54,7 @@ export default class LanguageDialog extends Component<Props, State> {
                       disabled={isLoadingLanguage}
                     />,
                   ]}
-                  onRequestClose={onClose}
+                  onRequestClose={() => onClose(this.state.languageDidChange)}
                   open={open}
                   title={<Trans>Language</Trans>}
                 >
@@ -68,7 +74,12 @@ export default class LanguageDialog extends Component<Props, State> {
                           <Trans>Choose GDevelop language</Trans>
                         }
                         value={values.language}
-                        onChange={(e, i, value) => setLanguage(value)}
+                        onChange={(e, i, value) => {
+                          setLanguage(value);
+                          this.setState({
+                            languageDidChange: true,
+                          });
+                        }}
                         fullWidth
                       >
                         <MenuItem value="en" primaryText="English (default)" />

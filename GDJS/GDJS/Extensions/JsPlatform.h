@@ -65,7 +65,14 @@ class GD_API JsPlatform : public gd::Platform {
   GetProjectExporters() const;
 #endif
 
-  void AddNewExtension(const gd::PlatformExtension & extension);
+  void AddNewExtension(const gd::PlatformExtension& extension);
+
+  /**
+   * \brief (Re)load platform built-in extensions.
+   * \note Can be useful if, for example, the user changed the language
+   * of the editor.
+   */
+  virtual void ReloadBuiltinExtensions();
 
   /**
    * \brief When the IDE is ready, start the tiny web server used for preview.

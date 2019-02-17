@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
@@ -19,7 +21,7 @@ type Props = {|
   floatingLabelText?: ?string,
   errorText?: ?string,
   openOnFocus?: boolean,
-  hintText?: ?string,
+  hintText?: ?React.Node,
   autoCompleteStyle?: Object,
 |};
 
@@ -97,7 +99,7 @@ export default class ObjectSelector extends React.Component<Props, State> {
     return (
       <AutoComplete
         {...defaultAutocompleteProps}
-        hintText="Choose an object"
+        hintText={<Trans>Choose an object</Trans>}
         searchText={this.state.focused ? this.state.text : value}
         onFocus={() => {
           this.setState({

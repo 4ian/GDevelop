@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import ReactErrorBoundary from 'react-error-boundary';
 import BugReport from 'material-ui/svg-icons/action/bug-report';
@@ -47,7 +49,7 @@ export const ErrorFallbackComponent = ({
       GDevelop is developed:
     </p>
     <RaisedButton
-      label="Report the issue on GitHub"
+      label={<Trans>Report the issue on GitHub</Trans>}
       onClick={() => {
         const body = `
 => Please write here a short description of when the error occured and how to reproduce it.

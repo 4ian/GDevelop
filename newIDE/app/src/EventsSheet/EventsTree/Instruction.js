@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import { mapFor } from '../../Utils/MapFor';
 import classNames from 'classnames';
@@ -218,7 +220,7 @@ class Instruction extends React.Component<Props, *> {
                 this.props.onSubInstructionsListContextMenu
               }
               onParameterClick={this.props.onSubParameterClick}
-              addButtonLabel="Add a sub-condition"
+              addButtonLabel={<Trans>Add a sub-condition</Trans>}
               disabled={this.props.disabled}
             />
           )}
@@ -291,6 +293,7 @@ function targetCollect(
   };
 }
 
+// $FlowFixMe - Typing of DragSource/DropTarget is a pain to get correctly
 export default DragSource(
   reactDndInstructionType,
   instructionSource,

@@ -130,6 +130,22 @@ cd newIDE/web-app
 yarn deploy # or npm run deploy
 ```
 
+### (Optional) Updating translations
+
+Extract translations from the editor, as well as GDevelop Core and extensions:
+```bash
+cd newIDE/app
+yarn extract-all-translations # or npm run extract-all-translations
+```
+
+This will create `ide-messages.po` (in `newIDE/app/src/locales`) and `gdcore-gdcpp-gdjs-extensions-messages.pot` (in `scripts`). Upload both of them to [the GDevelop Crowdin project](https://crowdin.com/project/gdevelop).
+
+To update translations, build and download the translations from Crowdin. Extract everything in `newIDE/app/src/locales`. And run:
+
+```bash
+yarn compile-translations # or npm run compile-translations
+```
+
 ## 3) How to contribute? 😎
 
 The editor, the game engine and extensions are always in development. Your contribution is welcome!

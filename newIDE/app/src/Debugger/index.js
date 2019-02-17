@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Toolbar from './Toolbar';
 import DebuggerContent from './DebuggerContent';
@@ -304,14 +306,18 @@ export default class Debugger extends React.Component<Props, State> {
         {!debuggerServerStarted && !debuggerServerError && (
           <PlaceholderMessage>
             <PlaceholderLoader />
-            <p>Debugger is starting...</p>
+            <p>
+              <Trans>Debugger is starting...</Trans>
+            </p>
           </PlaceholderMessage>
         )}
         {!debuggerServerStarted && debuggerServerError && (
           <PlaceholderMessage>
             <p>
-              Unable to start the debugger server! Make sure that you are
-              authorized to run servers on this computer.
+              <Trans>
+                Unable to start the debugger server! Make sure that you are
+                authorized to run servers on this computer.
+              </Trans>
             </p>
           </PlaceholderMessage>
         )}
@@ -345,8 +351,10 @@ export default class Debugger extends React.Component<Props, State> {
             )}
             {!this._hasSelectedDebugger() && (
               <EmptyMessage>
-                Run a preview and you will be able to inspect it with the
-                debugger.
+                <Trans>
+                  Run a preview and you will be able to inspect it with the
+                  debugger.
+                </Trans>
               </EmptyMessage>
             )}
           </Column>

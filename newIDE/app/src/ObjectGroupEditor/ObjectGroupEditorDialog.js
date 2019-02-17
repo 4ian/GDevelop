@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ObjectGroupEditor from '.';
@@ -12,12 +13,12 @@ export class ObjectGroupEditorDialog extends Component {
 
     const actions = [
       <FlatButton
-        label="Cancel"
+        label={<Trans>Cancel</Trans>}
         keyboardFocused
         onClick={this.props.onCancel}
       />,
       <FlatButton
-        label="Apply"
+        label={<Trans>Apply</Trans>}
         primary
         keyboardFocused
         onClick={this.props.onApply}

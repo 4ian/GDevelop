@@ -12,7 +12,6 @@ import localFileSystem from '../LocalFileSystem';
 import Progress from './Progress';
 import { archiveFolder } from '../../../Utils/Archiver';
 import optionalRequire from '../../../Utils/OptionalRequire.js';
-import { translate, type TranslatorProps } from 'react-i18next';
 import Window from '../../../Utils/Window';
 import { getHelpLink } from '../../../Utils/HelpLink';
 const path = optionalRequire('path');
@@ -34,7 +33,7 @@ type State = {|
   errored: boolean,
 |};
 
-type Props = TranslatorProps & {
+type Props = {
   project: gdProject,
   onChangeSubscription: Function,
 };
@@ -78,7 +77,8 @@ class LocalFacebookInstantGamesExport extends Component<Props, State> {
   };
 
   launchExport = (): Promise<string> => {
-    const { project, t } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return Promise.reject();
 
     return LocalFacebookInstantGamesExport.prepareExporter()
@@ -105,7 +105,7 @@ class LocalFacebookInstantGamesExport extends Component<Props, State> {
   };
 
   launchWholeExport = () => {
-    const { t } = this.props;
+    const t = str => str; //TODO
     sendExportLaunched('local-facebook-instant-games');
 
     const handleError = (message: string) => err => {
@@ -152,7 +152,8 @@ class LocalFacebookInstantGamesExport extends Component<Props, State> {
 
   render() {
     const { exportStep, errored } = this.state;
-    const { project, t } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return null;
 
     return (
@@ -202,4 +203,4 @@ class LocalFacebookInstantGamesExport extends Component<Props, State> {
   }
 }
 
-export default translate()(LocalFacebookInstantGamesExport);
+export default LocalFacebookInstantGamesExport;

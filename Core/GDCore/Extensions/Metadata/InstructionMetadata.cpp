@@ -15,7 +15,11 @@
 
 namespace gd {
 InstructionMetadata::InstructionMetadata()
-    : sentence(_("Unknown or unsupported instruction")),
+    : sentence(
+          "Unknown or unsupported instruction"),  // Avoid translating this
+                                                  // string, so that it's safe
+                                                  // and *fast* to use a
+                                                  // InstructionMetadata.
       canHaveSubInstructions(false),
       hidden(true) {}
 

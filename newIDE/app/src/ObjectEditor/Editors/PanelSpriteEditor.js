@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
@@ -35,12 +37,16 @@ export default class PanelSpriteEditor extends React.Component<
               panelSpriteObject.setTexture(resourceName);
               this.forceUpdate();
             }}
-            floatingLabelText="Select an image"
+            floatingLabelText={<Trans>Select an image</Trans>}
           />
         </Line>
         <Line>
           <Checkbox
-            label="Repeat borders and center textures (instead of stretching them)"
+            label={
+              <Trans>
+                Repeat borders and center textures (instead of stretching them)
+              </Trans>
+            }
             checked={panelSpriteObject.isTiled()}
             onCheck={(e, checked) => {
               panelSpriteObject.setTiled(checked);
@@ -50,7 +56,7 @@ export default class PanelSpriteEditor extends React.Component<
         </Line>
         <Line>
           <TextField
-            floatingLabelText="Top margin"
+            floatingLabelText={<Trans>Top margin</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getTopMargin()}
@@ -60,7 +66,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
           <TextField
-            floatingLabelText="Bottom margin"
+            floatingLabelText={<Trans>Bottom margin</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getBottomMargin()}
@@ -72,7 +78,7 @@ export default class PanelSpriteEditor extends React.Component<
         </Line>
         <Line>
           <TextField
-            floatingLabelText="Left margin"
+            floatingLabelText={<Trans>Left margin</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getLeftMargin()}
@@ -82,7 +88,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
           <TextField
-            floatingLabelText="Right margin"
+            floatingLabelText={<Trans>Right margin</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getRightMargin()}
@@ -94,7 +100,7 @@ export default class PanelSpriteEditor extends React.Component<
         </Line>
         <Line>
           <TextField
-            floatingLabelText="Default width (in pixels)"
+            floatingLabelText={<Trans>Default width (in pixels)</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getWidth()}
@@ -104,7 +110,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
           <TextField
-            floatingLabelText="Default height (in pixels)"
+            floatingLabelText={<Trans>Default height (in pixels)</Trans>}
             fullWidth
             type="number"
             value={panelSpriteObject.getHeight()}

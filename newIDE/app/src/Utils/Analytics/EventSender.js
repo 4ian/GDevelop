@@ -172,16 +172,16 @@ export const sendSignupDone = (email: string) => {
 
 export const sendSubscriptionCheckDialogShown = ({
   mode,
-  title,
+  id,
 }: {|
   mode: string,
-  title: string,
+  id: string,
 |}) => {
   if (isDev || !client) return;
 
   client.recordEvent('subscription-check-dialog-shown', {
     mode,
-    title,
+    title: id,
   });
 };
 

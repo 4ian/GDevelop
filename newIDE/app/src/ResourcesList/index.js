@@ -47,15 +47,6 @@ type Props = {|
 |};
 
 export default class ResourcesList extends React.Component<Props, State> {
-  static defaultProps = {
-    onDeleteResource: (resource: gdResource, cb: boolean => void) => cb(true),
-    onRenameResource: (
-      resource: gdResource,
-      newName: string,
-      cb: boolean => void
-    ) => cb(true),
-  };
-
   sortableList: any;
   state: State = {
     renamedResource: null,

@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
@@ -21,12 +22,18 @@ export default class RelationalOperatorField extends Component {
         onChange={(e, i, value) => this.props.onChange(value)}
         ref={field => (this._field = field)}
       >
-        <MenuItem value="=" primaryText="= (equal to)" />
-        <MenuItem value="<" primaryText="< (less than)" />
-        <MenuItem value=">" primaryText="> (greater than)" />
-        <MenuItem value="<=" primaryText="<= (less or equal to)" />
-        <MenuItem value=">=" primaryText=">= (greater or equal to)" />
-        <MenuItem value="!=" primaryText="!= (different than)" />
+        <MenuItem value="=" primaryText={<Trans>= (equal to)</Trans>} />
+        <MenuItem value="<" primaryText={<Trans>&lt; (less than)</Trans>} />
+        <MenuItem value=">" primaryText={<Trans>&gt; (greater than)</Trans>} />
+        <MenuItem
+          value="<="
+          primaryText={<Trans>&lt;= (less or equal to)</Trans>}
+        />
+        <MenuItem
+          value=">="
+          primaryText={<Trans>&gt;= (greater or equal to)</Trans>}
+        />
+        <MenuItem value="!=" primaryText={<Trans>!= (different than)</Trans>} />
       </SelectField>
     );
   }

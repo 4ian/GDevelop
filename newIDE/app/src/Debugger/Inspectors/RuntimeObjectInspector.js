@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import ReactJsonView from 'react-json-view';
 import {
@@ -53,7 +55,9 @@ const handleEdit = (edit, { onCall, onEdit }: Props) => {
 
 export default (props: Props) => (
   <div style={styles.container}>
-    <p>General:</p>
+    <p>
+      <Trans>General:</Trans>
+    </p>
     <ReactJsonView
       collapsed={false}
       name={false}
@@ -65,7 +69,9 @@ export default (props: Props) => (
       groupArraysAfterLength={50}
       theme="monokai"
     />
-    <p>Instance variables:</p>
+    <p>
+      <Trans>Instance variables:</Trans>
+    </p>
     <VariablesContainerInspector
       variablesContainer={
         props.runtimeObject ? props.runtimeObject._variables : null

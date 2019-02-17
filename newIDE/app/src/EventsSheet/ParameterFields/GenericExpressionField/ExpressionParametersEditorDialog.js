@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import ExpressionParametersEditor from './ExpressionParametersEditor';
@@ -56,8 +58,8 @@ export default class ExpressionParametersEditorDialog extends Component<
         open={this.props.open}
         actions={
           <FlatButton
-            key="done"
-            label="Done"
+            key="apply"
+            label={<Trans>Apply</Trans>}
             primary
             onClick={() => this.props.onDone(this.state.parameterValues)}
           />

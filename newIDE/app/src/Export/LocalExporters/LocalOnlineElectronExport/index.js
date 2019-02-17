@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import assignIn from 'lodash/assignIn';
@@ -26,7 +27,6 @@ import {
   displayProjectErrorsBox,
   getErrors,
 } from '../../../ProjectManager/ProjectErrorsChecker';
-import { translate, type TranslatorProps } from 'react-i18next';
 import { type Limit } from '../../../Utils/GDevelopServices/Usage';
 import { type TargetName } from '../../../Utils/GDevelopServices/Build';
 import BuildsWatcher from '../../Builds/BuildsWatcher';
@@ -48,7 +48,7 @@ type State = {
   targets: Array<TargetName>,
 };
 
-type Props = TranslatorProps & {
+type Props = {
   project: gdProject,
   onChangeSubscription: Function,
 };
@@ -98,7 +98,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
   }
 
   launchExport = (): Promise<string> => {
-    const { project, t } = this.props;
+    const t = str => str; //TODO
+    const { project } = this.props;
     if (!project) return Promise.reject();
 
     return LocalOnlineElectronExport.prepareExporter()
@@ -175,7 +176,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
   };
 
   launchWholeExport = (userProfile: UserProfile) => {
-    const { t, project } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     sendExportLaunched('local-online-electron');
 
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
@@ -259,7 +261,8 @@ class LocalOnlineElectronExport extends Component<Props, State> {
       uploadProgress,
       errored,
     } = this.state;
-    const { project, t } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return null;
 
     const getBuildLimit = (userProfile: UserProfile): ?Limit =>
@@ -285,22 +288,22 @@ class LocalOnlineElectronExport extends Component<Props, State> {
               )}
             </Line>
             <Checkbox
-              label="Windows (zip file)"
+              label={<Trans>Windows (zip file)</Trans>}
               checked={this.state.targets.indexOf('winZip') !== -1}
               onCheck={(e, checked) => this._setTarget('winZip', checked)}
             />
             <Checkbox
-              label="Windows (auto-installer file)"
+              label={<Trans>Windows (auto-installer file)</Trans>}
               checked={this.state.targets.indexOf('winExe') !== -1}
               onCheck={(e, checked) => this._setTarget('winExe', checked)}
             />
             <Checkbox
-              label="macOS (zip file)"
+              label={<Trans>macOS (zip file)</Trans>}
               checked={this.state.targets.indexOf('macZip') !== -1}
               onCheck={(e, checked) => this._setTarget('macZip', checked)}
             />
             <Checkbox
-              label="Linux (AppImage)"
+              label={<Trans>Linux (AppImage)</Trans>}
               checked={this.state.targets.indexOf('linuxAppImage') !== -1}
               onCheck={(e, checked) =>
                 this._setTarget('linuxAppImage', checked)
@@ -349,4 +352,4 @@ class LocalOnlineElectronExport extends Component<Props, State> {
   }
 }
 
-export default translate()(LocalOnlineElectronExport);
+export default LocalOnlineElectronExport;

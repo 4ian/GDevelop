@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
@@ -19,7 +21,11 @@ export default class PanelSpriteEditor extends React.Component<
       <Column>
         <Line>
           <Checkbox
-            label="Draw the shapes relative to the object position on the scene"
+            label={
+              <Trans>
+                Draw the shapes relative to the object position on the scene
+              </Trans>
+            }
             checked={!shapePainterObject.areCoordinatesAbsolute()}
             onCheck={(e, checked) => {
               if (!checked) shapePainterObject.setCoordinatesAbsolute();
@@ -30,7 +36,7 @@ export default class PanelSpriteEditor extends React.Component<
         </Line>
         <Line>
           <ColorField
-            floatingLabelText="Outline color"
+            floatingLabelText={<Trans>Outline color</Trans>}
             disableAlpha
             fullWidth
             color={{
@@ -49,7 +55,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
           <TextField
-            floatingLabelText="Outline opacity (0-255)"
+            floatingLabelText={<Trans>Outline opacity (0-255)</Trans>}
             fullWidth
             type="number"
             value={shapePainterObject.getOutlineOpacity()}
@@ -59,7 +65,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
           <TextField
-            floatingLabelText="Outline size (in pixels)"
+            floatingLabelText={<Trans>Outline size (in pixels)</Trans>}
             fullWidth
             type="number"
             value={shapePainterObject.getOutlineSize()}
@@ -71,7 +77,7 @@ export default class PanelSpriteEditor extends React.Component<
         </Line>
         <Line>
           <ColorField
-            floatingLabelText="Fill color"
+            floatingLabelText={<Trans>Fill color</Trans>}
             disableAlpha
             fullWidth
             color={{
@@ -90,7 +96,7 @@ export default class PanelSpriteEditor extends React.Component<
             }}
           />
           <TextField
-            floatingLabelText="Fill opacity (0-255)"
+            floatingLabelText={<Trans>Fill opacity (0-255)</Trans>}
             fullWidth
             type="number"
             value={shapePainterObject.getFillOpacity()}

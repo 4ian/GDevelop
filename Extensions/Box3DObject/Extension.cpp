@@ -147,7 +147,7 @@ class Extension : public ExtensionBase {
                     _("Z Position"),
                     _("Modify the Z Position of a 3D Box."),
                     _("Do _PARAM1__PARAM2_ to the Z position of _PARAM0_"),
-                    _(""),
+                    "",
                     "res/actions/position24.png",
                     "res/actions/position.png")
 
@@ -164,7 +164,7 @@ class Extension : public ExtensionBase {
                        _("Z Position"),
                        _("Compare the Z position of a 3D Box."),
                        _("Z position of _PARAM0_ is _PARAM1__PARAM2_"),
-                       _(""),
+                       "",
                        "res/conditions/position24.png",
                        "res/conditions/position.png")
 

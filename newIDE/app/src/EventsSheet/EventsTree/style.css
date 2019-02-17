@@ -104,6 +104,12 @@
  * Links to add a condition or an action
  */
 .gd-events-sheet .add-link {
+    background:none!important;
+    color:inherit;
+    border:none; 
+    padding:0!important;
+    font: inherit;
+    cursor: pointer;
     opacity: 0.3;
 }
 .gd-events-sheet .add-link:hover {

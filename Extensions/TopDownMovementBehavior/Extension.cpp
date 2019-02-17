@@ -121,7 +121,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
                    _("Is moving"),
                    _("Check if the object is moving."),
                    _("_PARAM0_ is moving"),
-                   _(""),
+                   "",
                    "CppPlatform/Extensions/topdownmovementicon24.png",
                    "CppPlatform/Extensions/topdownmovementicon16.png")
       .AddParameter("object", _("Object"))

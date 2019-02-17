@@ -476,8 +476,8 @@ export default class EventsSheet extends React.Component<Props, State> {
   };
 
   openParameterEditor = (parameterContext: ParameterContext) => {
+    // $FlowFixMe
     this.setState({
-      // $FlowFixMe
       editedParameter: parameterContext,
       inlineEditing: true,
       inlineEditingAnchorEl: parameterContext.domEvent

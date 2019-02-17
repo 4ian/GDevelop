@@ -109,7 +109,7 @@ bool Exporter::ExportWholePixiProject(
 
     wxProgressDialog* progressDialogPtr = NULL;
 #if !defined(GD_NO_WX_GUI)
-    wxProgressDialog progressDialog(_("Export in progress ( 1/2 )"),
+    wxProgressDialog progressDialog(_("Export in progress (1/2)"),
                                     _("Exporting the project..."));
     progressDialogPtr = &progressDialog;
 #endif
@@ -229,7 +229,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
 
   wxProgressDialog* progressDialogPtr = NULL;
 #if !defined(GD_NO_WX_GUI)
-  wxProgressDialog progressDialog(_("Export in progress ( 1/2 )"),
+  wxProgressDialog progressDialog(_("Export in progress (1/2)"),
                                   _("Exporting the project..."));
   progressDialogPtr = &progressDialog;
 #endif

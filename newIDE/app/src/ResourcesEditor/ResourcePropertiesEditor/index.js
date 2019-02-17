@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Background from '../../UI/Background';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -57,8 +59,10 @@ export default class ResourcePropertiesEditor extends React.Component<
   _renderEmpty() {
     return (
       <EmptyMessage>
-        Resources are automatically added to your project whenever you add an
-        image to an object. Choose a resource to display its properties.
+        <Trans>
+          Resources are automatically added to your project whenever you add an
+          image to an object. Choose a resource to display its properties.
+        </Trans>
       </EmptyMessage>
     );
   }

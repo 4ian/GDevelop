@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import { Line, Column } from '../../../UI/Grid';
 import Checkbox from 'material-ui/Checkbox';
@@ -120,17 +122,17 @@ export default class Physics2Editor extends React.Component<Props, State> {
               <MenuItem
                 key={'dynamic'}
                 value={'Dynamic'}
-                primaryText={'Dynamic'}
+                primaryText={<Trans>Dynamic</Trans>}
               />,
               <MenuItem
                 key={'static'}
                 value={'Static'}
-                primaryText={'Static'}
+                primaryText={<Trans>Static</Trans>}
               />,
               <MenuItem
                 key={'kinematic'}
                 value={'Kinematic'}
-                primaryText={'Kinematic'}
+                primaryText={<Trans>Kinematic</Trans>}
               />,
             ]}
           </SelectField>
@@ -185,13 +187,25 @@ export default class Physics2Editor extends React.Component<Props, State> {
               this.forceUpdate();
             }}
           >
-            <MenuItem key={'box'} value={'Box'} primaryText={'Box'} />
-            <MenuItem key={'circle'} value={'Circle'} primaryText={'Circle'} />
-            <MenuItem key={'edge'} value={'Edge'} primaryText={'Edge'} />
+            <MenuItem
+              key={'box'}
+              value={'Box'}
+              primaryText={<Trans>Box</Trans>}
+            />
+            <MenuItem
+              key={'circle'}
+              value={'Circle'}
+              primaryText={<Trans>Circle</Trans>}
+            />
+            <MenuItem
+              key={'edge'}
+              value={'Edge'}
+              primaryText={<Trans>Edge</Trans>}
+            />
             <MenuItem
               key={'polygon'}
               value={'Polygon'}
-              primaryText={'Polygon'}
+              primaryText={<Trans>Polygon</Trans>}
             />
           </SelectField>
         </Line>
@@ -256,17 +270,17 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 <MenuItem
                   key={'center'}
                   value={'Center'}
-                  primaryText={'Center'}
+                  primaryText={<Trans>Center</Trans>}
                 />,
                 <MenuItem
                   key={'origin'}
                   value={'Origin'}
-                  primaryText={'Origin'}
+                  primaryText={<Trans>Origin</Trans>}
                 />,
                 <MenuItem
                   key={'topLeft'}
                   value={'TopLeft'}
-                  primaryText={'Top-Left'}
+                  primaryText={<Trans>Top-Left</Trans>}
                 />,
               ]}
             </SelectField>

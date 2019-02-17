@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import localFileSystem from '../LocalFileSystem';
 import optionalRequire from '../../../Utils/OptionalRequire';
@@ -29,6 +31,7 @@ type State = {
   previewBrowserWindowConfig: ?{
     width: number,
     height: number,
+    useContentSize: boolean,
     title: string,
     backgroundColor: string,
   },
@@ -72,6 +75,7 @@ export default class LocalPreviewLauncher extends React.Component<
         previewBrowserWindowConfig: {
           width: project.getMainWindowDefaultWidth(),
           height: project.getMainWindowDefaultHeight(),
+          useContentSize: true,
           title: `Preview of ${project.getName()}`,
           backgroundColor: '#000000',
         },
@@ -209,7 +213,8 @@ export default class LocalPreviewLauncher extends React.Component<
             if (this.props.onChangeSubscription)
               this.props.onChangeSubscription();
           }}
-          title="Preview over wifi"
+          id="Preview over wifi"
+          title={<Trans>Preview over wifi</Trans>}
           mode="try"
         />
         <LocalNetworkPreviewDialog

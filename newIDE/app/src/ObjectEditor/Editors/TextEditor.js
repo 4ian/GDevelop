@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Checkbox from 'material-ui/Checkbox';
 import TextField from 'material-ui/TextField';
@@ -66,7 +68,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             }}
           />
           <Checkbox
-            label="Bold"
+            label={<Trans>Bold</Trans>}
             checked={textObject.isBold()}
             onCheck={(e, checked) => {
               textObject.setBold(checked);
@@ -75,7 +77,7 @@ export default class TextEditor extends React.Component<EditorProps, void> {
             style={styles.checkbox}
           />
           <Checkbox
-            label="Italic"
+            label={<Trans>Italic</Trans>}
             checked={textObject.isItalic()}
             onCheck={(e, checked) => {
               textObject.setItalic(checked);
@@ -96,14 +98,16 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               textObject.setFontName(resourceName);
               this.forceUpdate();
             }}
-            hintText="Choose a font"
+            hintText={<Trans>Choose a font</Trans>}
           />
         </MiniToolbar>
         <Line noMargin>
           <Column expand>
             <Line>
               <TextField
-                hintText="Enter the text to be displayed by the object"
+                hintText={
+                  <Trans>Enter the text to be displayed by the object</Trans>
+                }
                 fullWidth
                 multiLine
                 value={textObject.getString()}

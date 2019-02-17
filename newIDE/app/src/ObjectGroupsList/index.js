@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import { AutoSizer, List } from 'react-virtualized';
 import Background from '../UI/Background';
@@ -66,7 +68,7 @@ class GroupsList extends Component<*, *> {
                 style={style}
                 disabled
                 onClick={this.props.onAddGroup}
-                primaryText="Click to add a group"
+                primaryText={<Trans>Click to add a group</Trans>}
               />
             );
           }

@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { List, ListItem } from 'material-ui/List';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -10,18 +11,22 @@ export default class BrowserStarters extends Component {
       <Column noMargin>
         <Line>
           <Column>
-            <p>Choose a game to use as a starter:</p>
+            <p>
+              <Trans>Choose a game to use as a starter:</Trans>
+            </p>
           </Column>
         </Line>
         <Line>
           <Column expand noMargin>
             <List>
               <ListItem
-                primaryText="Platformer"
+                primaryText={<Trans>Platformer</Trans>}
                 secondaryText={
                   <p>
-                    A simple platform game, with coins to collect, moving
-                    platforms and enemies.
+                    <Trans>
+                      A simple platform game, with coins to collect, moving
+                      platforms and enemies.
+                    </Trans>
                   </p>
                 }
                 secondaryTextLines={2}
@@ -31,11 +36,13 @@ export default class BrowserStarters extends Component {
                 }}
               />
               <ListItem
-                primaryText="Space Shooter"
+                primaryText={<Trans>Space Shooter</Trans>}
                 secondaryText={
                   <p>
-                    A side-scrolling shooter where you must defeat incoming
-                    enemies with your spaceship.
+                    <Trans>
+                      A side-scrolling shooter where you must defeat incoming
+                      enemies with your spaceship.
+                    </Trans>
                   </p>
                 }
                 secondaryTextLines={2}
@@ -45,11 +52,13 @@ export default class BrowserStarters extends Component {
                 }}
               />
               <ListItem
-                primaryText="Isometric game"
+                primaryText={<Trans>Isometric game</Trans>}
                 secondaryText={
                   <p>
-                    An example of an isometric game where you can explore a map
-                    with your character.
+                    <Trans>
+                      An example of an isometric game where you can explore a
+                      map with your character.
+                    </Trans>
                   </p>
                 }
                 secondaryTextLines={2}
@@ -61,7 +70,7 @@ export default class BrowserStarters extends Component {
             </List>
             <Line alignItems="center" justifyContent="center">
               <RaisedButton
-                label="See examples"
+                label={<Trans>See examples</Trans>}
                 onClick={() => this.props.onShowExamples()}
               />
             </Line>

@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -14,7 +16,6 @@ import {
   displayProjectErrorsBox,
   getErrors,
 } from '../../ProjectManager/ProjectErrorsChecker';
-import { translate, type TranslatorProps } from 'react-i18next';
 import assignIn from 'lodash/assignIn';
 import optionalRequire from '../../Utils/OptionalRequire';
 const electron = optionalRequire('electron');
@@ -22,7 +23,7 @@ const shell = electron ? electron.shell : null;
 
 const gd = global.gd;
 
-type Props = TranslatorProps & {|
+type Props = {|
   project: gdProject,
 |};
 
@@ -67,7 +68,8 @@ class LocalElectronExport extends Component<Props, State> {
   };
 
   launchExport = () => {
-    const { t, project } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return;
 
     sendExportLaunched('local-electron');
@@ -99,7 +101,8 @@ class LocalElectronExport extends Component<Props, State> {
   };
 
   render() {
-    const { t, project } = this.props;
+    const t = str => str; //TODO;
+    const { project } = this.props;
     if (!project) return null;
 
     return (
@@ -107,9 +110,12 @@ class LocalElectronExport extends Component<Props, State> {
         <Line>
           <Column noMargin>
             <p>
-              This will export your game so that you can package it for Windows,
-              macOS or Linux. You will need to install third-party tools
-              (Node.js, Electron Builder) to package your game by yourself.
+              <Trans>
+                This will export your game so that you can package it for
+                Windows, macOS or Linux. You will need to install third-party
+                tools (Node.js, Electron Builder) to package your game by
+                yourself.
+              </Trans>
             </p>
           </Column>
         </Line>
@@ -124,7 +130,7 @@ class LocalElectronExport extends Component<Props, State> {
         <Line>
           <Spacer expand />
           <RaisedButton
-            label="Export"
+            label={<Trans>Export</Trans>}
             primary={true}
             onClick={this.launchExport}
             disabled={!this.state.outputDir}
@@ -135,13 +141,13 @@ class LocalElectronExport extends Component<Props, State> {
           actions={[
             <FlatButton
               key="open"
-              label="Open folder"
+              label={<Trans>Open folder</Trans>}
               primary={true}
               onClick={this.openExportFolder}
             />,
             <FlatButton
               key="close"
-              label="Close"
+              label={<Trans>Close</Trans>}
               primary={false}
               onClick={() =>
                 this.setState({
@@ -157,9 +163,11 @@ class LocalElectronExport extends Component<Props, State> {
           open={this.state.exportFinishedDialogOpen}
         >
           <p>
-            The game was properly exported. You can now use Electron Builder
-            (you need Node.js installed and to use the command-line to run it)
-            to create an executable.
+            <Trans>
+              The game was properly exported. You can now use Electron Builder
+              (you need Node.js installed and to use the command-line to run it)
+              to create an executable.
+            </Trans>
           </p>
         </Dialog>
       </Column>
@@ -167,4 +175,4 @@ class LocalElectronExport extends Component<Props, State> {
   }
 }
 
-export default translate()(LocalElectronExport);
+export default LocalElectronExport;

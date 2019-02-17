@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import Background from '../UI/Background';
@@ -80,14 +82,18 @@ export default class DebuggerContent extends React.Component<Props, State> {
         editors={{
           inspectors: (
             <MosaicWindow
-              title="Inspectors"
+              title={<Trans>Inspectors</Trans>}
               toolbarControls={[]}
               gameData={gameData}
             >
               <Background>
                 <Column expand noMargin>
                   <Line justifyContent="center">
-                    <RaisedButton label="Refresh" onClick={onRefresh} primary />
+                    <RaisedButton
+                      label={<Trans>Refresh</Trans>}
+                      onClick={onRefresh}
+                      primary
+                    />
                   </Line>
                   <Line expand noMargin>
                     <InspectorsList
@@ -133,8 +139,10 @@ export default class DebuggerContent extends React.Component<Props, State> {
                     }
                   ) || (
                     <EmptyMessage>
-                      No inspector, choose another element in the list or toggle
-                      the raw data view.
+                      <Trans>
+                        No inspector, choose another element in the list or
+                        toggle the raw data view.
+                      </Trans>
                     </EmptyMessage>
                   )
                 )
@@ -166,7 +174,7 @@ export default class DebuggerContent extends React.Component<Props, State> {
           ),
           profiler: (
             <MosaicWindow
-              title="Profiler"
+              title={<Trans>Profiler</Trans>}
               // Pass profilerOutput to force MosaicWindow update when profilerOutput is changed
               profilerOutput={profilerOutput}
               profilingInProgress={profilingInProgress}

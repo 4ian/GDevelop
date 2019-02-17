@@ -96,7 +96,7 @@ Make sure to have the standalone app running with Electron.
 
 ### Recommended tools for development
 
-Any text editor is fine, but it's a good idea to have one with *Prettier* (code formatting), *ESLint* (code linting) and *Flow* (type checking) integration.
+Any text editor is fine, but it's a good idea to have one with *Prettier* (code formatting), *ESLint* (code linting) and *Flow* (type checking) integration. [Modern JavaScript is used for the editor](https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md).
 
 👉 You can use [Visual Studio Code](https://code.visualstudio.com) with these extensions: [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode), [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [Flow Language Support](https://github.com/flowtype/flow-for-vscode).
 
@@ -128,6 +128,22 @@ GH_TOKEN=xxx yarn build --mac --win --linux tar.gz --publish always
 ```bash
 cd newIDE/web-app
 yarn deploy # or npm run deploy
+```
+
+### (Optional) Updating translations
+
+Extract translations from the editor, as well as GDevelop Core and extensions:
+```bash
+cd newIDE/app
+yarn extract-all-translations # or npm run extract-all-translations
+```
+
+This will create `ide-messages.po` (in `newIDE/app/src/locales`) and `gdcore-gdcpp-gdjs-extensions-messages.pot` (in `scripts`). Upload both of them to [the GDevelop Crowdin project](https://crowdin.com/project/gdevelop).
+
+To update translations, build and download the translations from Crowdin. Extract everything in `newIDE/app/src/locales`. And run:
+
+```bash
+yarn compile-translations # or npm run compile-translations
 ```
 
 ## 3) How to contribute? 😎

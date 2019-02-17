@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React from 'react';
 
 const styles = {
@@ -54,7 +55,9 @@ export default class Welcome extends React.Component {
     return (
       <div style={styles.main}>
         <h1>Welcome to STORYBOOK</h1>
-        <p>This is a UI component dev environment for GDevelop.</p>
+        <p>
+          <Trans>This is a UI component dev environment for GDevelop.</Trans>
+        </p>
         <p>
           We've added some basic stories inside the{' '}
           <code style={styles.code}>src/stories</code> directory.

@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
@@ -90,7 +91,7 @@ export default class LoginDialog extends Component<Props, State> {
     } = this.props;
     const actions = [
       <FlatButton
-        label="Close"
+        label={<Trans>Close</Trans>}
         key="close"
         primary={false}
         onClick={onClose}
@@ -99,7 +100,7 @@ export default class LoginDialog extends Component<Props, State> {
 
     return (
       <Dialog
-        title="Login or create a GDevelop account"
+        title={<Trans>Login or create a GDevelop account</Trans>}
         actions={actions}
         secondaryActions={[
           <RightLoader
@@ -107,7 +108,7 @@ export default class LoginDialog extends Component<Props, State> {
             key="forgot-password"
           >
             <FlatButton
-              label="I forgot my password"
+              label={<Trans>I forgot my password</Trans>}
               primary={false}
               disabled={
                 loginInProgress ||
@@ -125,7 +126,7 @@ export default class LoginDialog extends Component<Props, State> {
         <Column noMargin>
           <TextField
             value={this.state.form.email}
-            floatingLabelText="Email"
+            floatingLabelText={<Trans>Email</Trans>}
             errorText={getEmailErrorText(error)}
             fullWidth
             onChange={(e, value) => {
@@ -139,7 +140,7 @@ export default class LoginDialog extends Component<Props, State> {
           />
           <TextField
             value={this.state.form.password}
-            floatingLabelText="Password"
+            floatingLabelText={<Trans>Password</Trans>}
             errorText={getPasswordErrorText(error)}
             type="password"
             fullWidth
@@ -156,7 +157,7 @@ export default class LoginDialog extends Component<Props, State> {
           <Line expand justifyContent="space-between">
             <RightLoader isLoading={createAccountInProgress}>
               <RaisedButton
-                label="Create my account"
+                label={<Trans>Create my account</Trans>}
                 disabled={
                   loginInProgress ||
                   createAccountInProgress ||
@@ -168,7 +169,7 @@ export default class LoginDialog extends Component<Props, State> {
 
             <LeftLoader isLoading={loginInProgress}>
               <FlatButton
-                label="Login"
+                label={<Trans>Login</Trans>}
                 onClick={this._onLogin}
                 disabled={
                   loginInProgress ||
@@ -181,10 +182,10 @@ export default class LoginDialog extends Component<Props, State> {
         </Column>
         <Dialog
           open={resetPasswordDialogOpen}
-          title="Reset your password"
+          title={<Trans>Reset your password</Trans>}
           actions={[
             <FlatButton
-              label="Close"
+              label={<Trans>Close</Trans>}
               key="close"
               onClick={onCloseResetPasswordDialog}
             />,
@@ -192,9 +193,11 @@ export default class LoginDialog extends Component<Props, State> {
         >
           <Column noMargin>
             <p>
-              You should have received an email containing instructions to reset
-              and set a new password. Once it's done, you can use your new
-              password in GDevelop.
+              <Trans>
+                You should have received an email containing instructions to
+                reset and set a new password. Once it's done, you can use your
+                new password in GDevelop.
+              </Trans>
             </p>
           </Column>
         </Dialog>

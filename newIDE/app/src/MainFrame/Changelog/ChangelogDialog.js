@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -20,19 +22,27 @@ export default class ChangelogDialog extends React.Component<Props, State> {
     }
 
     const actions = [
-      <FlatButton label="Close" primary={true} onClick={onClose} />,
+      <FlatButton
+        label={<Trans>Close</Trans>}
+        primary={true}
+        onClick={onClose}
+      />,
     ];
 
     return (
       <Dialog
-        title="What's new in GDevelop?"
+        title={<Trans>What's new in GDevelop?</Trans>}
         actions={actions}
         open={open}
         onRequestClose={onClose}
         autoScrollBodyContent
         modal
       >
-        <p>GDevelop was upgraded to a new version! Check out the changes.</p>
+        <p>
+          <Trans>
+            GDevelop was upgraded to a new version! Check out the changes.
+          </Trans>
+        </p>
         <Changelog
           onUpdated={() => {
             this.forceUpdate(); /*Force update to ensure dialog is properly positionned*/

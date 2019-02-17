@@ -9,13 +9,17 @@
 #endif
 #include <algorithm>
 #include "GDCore/CommonTools.h"
-#include "GDCore/Tools/Localization.h"
 #include "GDCore/Serialization/SerializerElement.h"
+#include "GDCore/Tools/Localization.h"
 #include "InstructionMetadata.h"
 
 namespace gd {
 InstructionMetadata::InstructionMetadata()
-    : sentence(_("Unknown or unsupported instruction")),
+    : sentence(
+          "Unknown or unsupported instruction"),  // Avoid translating this
+                                                  // string, so that it's safe
+                                                  // and *fast* to use a
+                                                  // InstructionMetadata.
       canHaveSubInstructions(false),
       hidden(true) {}
 
@@ -65,7 +69,20 @@ InstructionMetadata& InstructionMetadata::AddParameter(
   info.codeOnly = false;
   info.optional = parameterIsOptional;
   info.supplementaryInformation =
-      optionalObjectType.empty() ? "" : extensionNamespace + optionalObjectType;
+      // For objects/behavior, the supplementary information
+      // parameter is an object/behavior type...
+      (gd::ParameterMetadata::IsObject(type) ||
+       gd::ParameterMetadata::IsBehavior(type))
+          ? (optionalObjectType.empty()
+                 ? ""
+                 : extensionNamespace +
+                       optionalObjectType  //... so prefix it with the extension
+                                           // namespace.
+             )
+          : optionalObjectType;  // Otherwise don't change anything
+
+  // TODO: Assert against optionalObjectType === "emsc" (when running with
+  // Emscripten), and warn about a missing argument when calling addParameter.
 
   parameters.push_back(info);
   return *this;
@@ -94,7 +111,8 @@ void ParameterMetadata::SerializeTo(SerializerElement& element) const {
 
 void ParameterMetadata::UnserializeFrom(const SerializerElement& element) {
   type = element.GetStringAttribute("type");
-  supplementaryInformation = element.GetStringAttribute("supplementaryInformation");
+  supplementaryInformation =
+      element.GetStringAttribute("supplementaryInformation");
   optional = element.GetBoolAttribute("optional");
   description = element.GetStringAttribute("description");
   codeOnly = element.GetBoolAttribute("codeOnly");

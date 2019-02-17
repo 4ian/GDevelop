@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import {
   type Release,
@@ -39,13 +41,15 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
         </Line>
         <Line>
           <EmptyMessage>
-            Unable to load the information about the latest GDevelop releases.
-            Verify your internet connection or retry later.
+            <Trans>
+              Unable to load the information about the latest GDevelop releases.
+              Verify your internet connection or retry later.
+            </Trans>
           </EmptyMessage>
         </Line>
         <Line justifyContent="center">
           <RaisedButton
-            label="See the releases notes online"
+            label={<Trans>See the releases notes online</Trans>}
             onClick={openReleaseNote}
           />
         </Line>
@@ -90,7 +94,7 @@ const ChangelogRenderer = ({ releases, error, currentReleaseName }: Props) => {
           )}
           <Line justifyContent="center">
             <FlatButton
-              label="See all the releases notes"
+              label={<Trans>See all the releases notes</Trans>}
               onClick={openReleaseNote}
             />
           </Line>

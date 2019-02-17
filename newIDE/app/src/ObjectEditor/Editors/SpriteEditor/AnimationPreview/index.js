@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import { Line } from '../../../../UI/Grid';
@@ -164,7 +165,11 @@ export default class AnimationPreview extends Component<Props, State> {
             max={5}
             style={styles.timeField}
           />
-          <FlatButton icon={<Replay />} label="Replay" onClick={this.replay} />
+          <FlatButton
+            icon={<Replay />}
+            label={<Trans>Replay</Trans>}
+            onClick={this.replay}
+          />
           <FlatButton
             icon={paused ? <PlayArrow /> : <Pause />}
             label={paused ? 'Play' : 'Pause'}

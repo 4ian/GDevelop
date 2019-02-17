@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { PureComponent } from 'react';
 import { List, ListItem } from 'material-ui/List';
 import Dialog from '../UI/Dialog';
@@ -131,11 +133,15 @@ export default class AboutDialog extends PureComponent<Props, *> {
       <Dialog
         actions={[
           <FlatButton
-            label="GDevelop Website"
+            label={<Trans>GDevelop Website</Trans>}
             primary={false}
             onClick={() => Window.openExternalURL('http://gdevelop-app.com')}
           />,
-          <FlatButton label="Close" primary={false} onClick={onClose} />,
+          <FlatButton
+            label={<Trans>Close</Trans>}
+            primary={false}
+            onClick={onClose}
+          />,
         ]}
         onRequestClose={onClose}
         open={open}
@@ -155,11 +161,13 @@ export default class AboutDialog extends PureComponent<Props, *> {
                 height="283"
               />
               <Tabs onChange={() => this.forceUpdate()}>
-                <Tab label="About GDevelop" value="about">
+                <Tab label={<Trans>About GDevelop</Trans>} value="about">
                   <Column>
                     <Line>
-                      GDevelop {getIDEVersion()} based on GDevelop.js{' '}
-                      {getGDCoreVersion()}
+                      <Trans>
+                        GDevelop {getIDEVersion()} based on GDevelop.js{' '}
+                        {getGDCoreVersion()}
+                      </Trans>
                     </Line>
                     <Line>{updateStatusString}</Line>
                     <Line justifyContent="center">
@@ -174,15 +182,21 @@ export default class AboutDialog extends PureComponent<Props, *> {
                     </Line>
                   </Column>
                 </Tab>
-                <Tab label="What's new?" value="changelog">
+                <Tab label={<Trans>What's new?</Trans>} value="changelog">
                   <Column>
                     <Changelog />
                   </Column>
                 </Tab>
-                <Tab label="Contributors" value="contributors">
+                <Tab label={<Trans>Contributors</Trans>} value="contributors">
                   <Column>
-                    <p>GDevelop was created by Florian "4ian" Rival.</p>
-                    <p>Contributors, in no particular order:</p>
+                    <p>
+                      <Trans>
+                        GDevelop was created by Florian "4ian" Rival.
+                      </Trans>
+                    </p>
+                    <p>
+                      <Trans>Contributors, in no particular order:</Trans>
+                    </p>
                   </Column>
                   <List>
                     {contributors.map(contributor => (
@@ -209,13 +223,15 @@ export default class AboutDialog extends PureComponent<Props, *> {
                   </List>
                   <Column expand>
                     <p>
-                      Thanks to all users of GDevelop! There must be missing
-                      tons of people, please send your name if you've
-                      contributed and you're not listed.
+                      <Trans>
+                        Thanks to all users of GDevelop! There must be missing
+                        tons of people, please send your name if you've
+                        contributed and you're not listed.
+                      </Trans>
                     </p>
                     <Line alignItems="center" justifyContent="center">
                       <FlatButton
-                        label="Contribute to GDevelop"
+                        label={<Trans>Contribute to GDevelop</Trans>}
                         onClick={this._openContributePage}
                       />
                     </Line>

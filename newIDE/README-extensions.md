@@ -47,7 +47,7 @@ Refer to the [GDevelop IDE Readme](./README.md) for more information about the i
 
 > ℹ️ Implement your extension in file called `extensionnametools.js` (for general functions), `objectnameruntimeobject.js` (for objects) or `behaviornameruntimebehavior.js` (for behaviors). See then the next section for declaring these files and the content of the extension to the IDE.
 
-Check the [GDJS game engine documentation here](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation/index.html). It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to see directly how the game engine is done when needed.
+Check the [GDJS game engine documentation here](http://4ian.github.io/GD-Documentation/GDJS%20Runtime%20Documentation/index.html). It's also a good idea to check the [Runtime folder of GDJS](../GDJS/README.md) to see directly how the game engine is done when needed. Files for the game engine should [mostly be written in JavaScript "ES5 flavor" (i.e: usual, classic good old JavaScript) (click to learn more)](https://github.com/4ian/GDevelop/blob/master/newIDE/docs/Supported-JavaScript-features-and-coding-style.md).
 
 #### How to create functions to be called by events
 

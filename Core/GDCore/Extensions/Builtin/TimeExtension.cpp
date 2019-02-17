@@ -61,14 +61,15 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
       .MarkAsAdvanced();
 
   extension
-      .AddAction("ResetTimer",
-                 _("Start (or reset) a scene timer"),
-                 _("Reset the specified scene timer, if the timer doesn't exist "
-                   "it's created and started."),
-                 _("Reset the timer _PARAM1_"),
-                 _("Timers and time"),
-                 "res/actions/timer24.png",
-                 "res/actions/timer.png")
+      .AddAction(
+          "ResetTimer",
+          _("Start (or reset) a scene timer"),
+          _("Reset the specified scene timer, if the timer doesn't exist "
+            "it's created and started."),
+          _("Reset the timer _PARAM1_"),
+          _("Timers and time"),
+          "res/actions/timer24.png",
+          "res/actions/timer.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("string", _("Timer's name"));
 
@@ -197,10 +198,13 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsTimeExtension(
                      "res/actions/time.png")
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter(
-          "",
-          _("Hour : hour\nMinutes : min\nSeconds : sec\nDay of the month : "
-            "mday\nMonths since January : mon\nYear since 1900 : year\nDays "
-            "since sunday :wday\nDays since January 1st : yday"));
+          "stringWithSelector",
+          _("Hour: hour - Minutes: min - Seconds: sec - Day of month: "
+            "mday - Months since January: mon - Year since 1900: year - Days "
+            "since Sunday: wday - Days since Jan 1st: yday - Timestamp (ms): "
+            "timestamp\""),
+          "[\"hour\", \"min\", \"sec\", \"mon\", \"year\", \"wday\", \"mday\", "
+          "\"yday\", \"timestamp\"]");
 
 #endif
 }

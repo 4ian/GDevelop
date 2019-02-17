@@ -73,6 +73,12 @@ const buildMainMenuFor = window => {
         click() {
           window.webContents.send('main-menu-open-preferences');
         },
+      },
+      {
+        label: 'Language',
+        click() {
+          window.webContents.send('main-menu-open-language');
+        },
       }
     );
   }
@@ -123,7 +129,7 @@ const buildMainMenuFor = window => {
 
   const windowTemplate = {
     role: 'window',
-    submenu: [{ role: 'minimize' }, { role: 'close' }],
+    submenu: [{ role: 'minimize' }],
   };
 
   const helpTemplate = {
@@ -156,6 +162,12 @@ const buildMainMenuFor = window => {
         },
       },
       {
+        label: 'Help to Translate GDevelop',
+        click() {
+          electron.shell.openExternal('https://crowdin.com/project/gdevelop');
+        },
+      },
+      {
         label: 'Create Extensions for GDevelop',
         click() {
           electron.shell.openExternal('https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md');
@@ -164,7 +176,7 @@ const buildMainMenuFor = window => {
     ],
   };
   if (process.platform !== 'darwin') {
-    fileTemplate.submenu.push(
+    helpTemplate.submenu.push(
       { type: 'separator' },
       {
         label: 'About GDevelop',
@@ -204,6 +216,12 @@ const buildMainMenuFor = window => {
           label: 'Preferences',
           click() {
             window.webContents.send('main-menu-open-preferences');
+          },
+        },
+        {
+          label: 'Language',
+          click() {
+            window.webContents.send('main-menu-open-language');
           },
         },
         { type: 'separator' },

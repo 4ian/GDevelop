@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Dialog from '../../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -30,15 +32,24 @@ export default class LocalNetworkDialog extends React.Component<Props, {}> {
     return (
       <Dialog
         actions={[
-          <FlatButton key="close" label="Close" primary onClick={onClose} />,
+          <FlatButton
+            key="close"
+            label={<Trans>Close</Trans>}
+            primary
+            onClick={onClose}
+          />,
         ]}
         secondaryActions={[
           onExport && (
-            <FlatButton key="export" label="Export game" onClick={onExport} />
+            <FlatButton
+              key="export"
+              label={<Trans>Export game</Trans>}
+              onClick={onExport}
+            />
           ),
           <FlatButton
             key="run-preview-locally"
-            label="Run on this computer"
+            label={<Trans>Run on this computer</Trans>}
             onClick={onRunPreviewLocally}
           />,
         ]}
@@ -48,22 +59,28 @@ export default class LocalNetworkDialog extends React.Component<Props, {}> {
       >
         {error && (
           <Line>
-            Unable to start the server for the preview! Make sure that you are
-            authorized to run servers on this computer. Otherwise, use classic
-            preview to test your game.
+            <Trans>
+              Unable to start the server for the preview! Make sure that you are
+              authorized to run servers on this computer. Otherwise, use classic
+              preview to test your game.
+            </Trans>
           </Line>
         )}
         {!error && !url && <PlaceholderLoader />}
         {!error && url && (
           <div>
             <Line>
-              Your preview is ready! On your mobile or tablet, open your browser
-              and enter in the address bar:
+              <Trans>
+                Your preview is ready! On your mobile or tablet, open your
+                browser and enter in the address bar:
+              </Trans>
             </Line>
             <TextField value={url} fullWidth />
             <Line>
-              Please note that your device should be connected on the same
-              network as this computer.
+              <Trans>
+                Please note that your device should be connected on the same
+                network as this computer.
+              </Trans>
             </Line>
           </div>
         )}

@@ -210,7 +210,7 @@ module.exports = {
         _(
           "Tween the angle of _PARAM0_ to _PARAM3_° with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        _("Tween animation"),
+        _("Tween animation/Angle"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -335,7 +335,7 @@ module.exports = {
         _(
           "Tween the opacity of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        _("Tween animation"),
+        _("Tween animation/Opacity"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )

@@ -7,8 +7,8 @@ const styles = {
   objectThumbnail: {
     marginLeft: 2,
     marginRight: 2,
-    height: 16,
-    maxWidth: 24,
+    height: 24,
+    maxWidth: 48,
     width: 'auto',
     verticalAlign: 'middle',
   },

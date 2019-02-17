@@ -89,7 +89,9 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
     this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
   };
 
-  getObject(objectName, layout, project) {
+  getObject(objectName: string) {
+    const { project, layout } = this.props;
+    if (!layout) return;
     //Todo -use the generic method from the other pull when it gets merged instead
     var associatedObject = null;
     if (layout.hasObjectNamed(objectName))
@@ -99,10 +101,10 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
     return associatedObject;
   }
 
-  renderObjectThumbnail = objectName => {
-    const { project, layout } = this.props;
-    if (!layout) return; //to pass flow
-    const object = this.getObject(objectName, layout, project);
+  renderObjectThumbnail = (objectName: string) => {
+    const { project } = this.props;
+    //to pass flow
+    const object = this.getObject(objectName);
     if (object) {
       return getThumbnail(project, object);
     }

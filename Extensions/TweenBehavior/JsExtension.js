@@ -16,8 +16,8 @@ module.exports = {
     extension
       .setExtensionInformation(
         "Tween",
-        t("Tween animation"),
-        t("Animate object properties via tweening."),
+        _("Tween animation"),
+        _("Animate object properties via tweening."),
         "Matthias Meike",
         "Open source (MIT License)"
       )
@@ -69,9 +69,9 @@ module.exports = {
     const behavior = extension
       .addBehavior(
         "TweenBehavior",
-        t("Tween animation"),
+        _("Tween animation"),
         "TweenBehavior",
-        t("Tween animation"),
+        _("Tween animation"),
         "",
         "CppPlatform/Extensions/topdownmovementicon.png",
         "TweenBehavior",
@@ -86,27 +86,27 @@ module.exports = {
     behavior
       .addAction(
         "AddObjectVariableTween",
-        t("Add object variable tween"),
-        t("Add a tween animation for an object variable."),
-        t(
+        _("Add object variable tween"),
+        _("Add a tween animation for an object variable."),
+        _(
           "Tween the variable _PARAM3_ of _PARAM0_ from _PARAM4_ to _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_"
         ),
-        t("Tween animation/Variables"),
+        _("Tween animation/Variables"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("objectvar", t("Object variable"), "", false)
-      .addParameter("expression", t("From value"), "", false)
-      .addParameter("expression", t("To value"), "", false)
-      .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("objectvar", _("Object variable"), "", false)
+      .addParameter("expression", _("From value"), "", false)
+      .addParameter("expression", _("To value"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
-      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("expression", _("Duration"), "", false)
       .addParameter(
         "yesorno",
-        t("Destroy this object when tween finishes"),
+        _("Destroy this object when tween finishes"),
         "",
         false
       )
@@ -117,26 +117,26 @@ module.exports = {
     behavior
       .addAction(
         "AddObjectPositionTween",
-        t("Add object position tween"),
-        t("Add a tween animation for the object position."),
-        t(
+        _("Add object position tween"),
+        _("Add a tween animation for the object position."),
+        _(
           "Tween the position of _PARAM0_ to x: _PARAM3_, y: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_"
         ),
-        t("Tween animation/Position"),
+        _("Tween animation/Position"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("expression", t("To X"), "", false)
-      .addParameter("expression", t("To Y"), "", false)
-      .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To X"), "", false)
+      .addParameter("expression", _("To Y"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
-      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("expression", _("Duration"), "", false)
       .addParameter(
         "yesorno",
-        t("Destroy this object when tween finishes"),
+        _("Destroy this object when tween finishes"),
         "",
         false
       )
@@ -147,25 +147,25 @@ module.exports = {
     behavior
       .addAction(
         "AddObjectPositionXTween",
-        t("Add object position X tween"),
-        t("Add a tween animation for the object X position."),
-        t(
+        _("Add object position X tween"),
+        _("Add a tween animation for the object X position."),
+        _(
           "Tween the X position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        t("Tween animation/Position"),
+        _("Tween animation/Position"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("expression", t("To X"), "", false)
-      .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To X"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
-      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("expression", _("Duration"), "", false)
       .addParameter(
         "yesorno",
-        t("Destroy this object when tween finishes"),
+        _("Destroy this object when tween finishes"),
         "",
         false
       )
@@ -176,25 +176,25 @@ module.exports = {
     behavior
       .addAction(
         "AddObjectPositionYTween",
-        t("Add object position Y tween"),
-        t("Add a tween animation for the object Y position."),
-        t(
+        _("Add object position Y tween"),
+        _("Add a tween animation for the object Y position."),
+        _(
           "Tween the Y position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        t("Tween animation/Position"),
+        _("Tween animation/Position"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("expression", t("To Y"), "", false)
-      .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To Y"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
-      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("expression", _("Duration"), "", false)
       .addParameter(
         "yesorno",
-        t("Destroy this object when tween finishes"),
+        _("Destroy this object when tween finishes"),
         "",
         false
       )
@@ -205,25 +205,25 @@ module.exports = {
     behavior
       .addAction(
         "AddObjectAngleTween",
-        t("Add object angle tween"),
-        t("Add a tween animation for the object angle."),
-        t(
+        _("Add object angle tween"),
+        _("Add a tween animation for the object angle."),
+        _(
           "Tween the angle of _PARAM0_ to _PARAM3_° with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        t("Tween animation"),
+        _("Tween animation"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("expression", t("To angle (in degrees)"), "", false)
-      .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To angle (in degrees)"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
-      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("expression", _("Duration"), "", false)
       .addParameter(
         "yesorno",
-        t("Destroy this object when tween finishes"),
+        _("Destroy this object when tween finishes"),
         "",
         false
       )
@@ -234,28 +234,28 @@ module.exports = {
     behavior
       .addAction(
         "AddObjectScaleTween",
-        t("Add object scale tween"),
-        t(
+        _("Add object scale tween"),
+        _(
           "Add a tween animation for the object scale. (Note: the scale can never be less than 0)"
         ),
-        t(
+        _(
           "Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_"
         ),
-        t("Tween animation/Scale"),
+        _("Tween animation/Scale"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("expression", t("To scale X"), "", false)
-      .addParameter("expression", t("To scale Y"), "", false)
-      .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To scale X"), "", false)
+      .addParameter("expression", _("To scale Y"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
-      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("expression", _("Duration"), "", false)
       .addParameter(
         "yesorno",
-        t("Destroy this object when tween finishes"),
+        _("Destroy this object when tween finishes"),
         "",
         false
       )
@@ -266,27 +266,27 @@ module.exports = {
     behavior
       .addAction(
         "AddObjectScaleXTween",
-        t("Add object X-scale tween"),
-        t(
+        _("Add object X-scale tween"),
+        _(
           "Add a tween animation for the object X-scale. (Note: the scale can never be less than 0)"
         ),
-        t(
+        _(
           "Tween the X-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        t("Tween animation/Scale"),
+        _("Tween animation/Scale"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("expression", t("To scale X"), "", false)
-      .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To scale X"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
-      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("expression", _("Duration"), "", false)
       .addParameter(
         "yesorno",
-        t("Destroy this object when tween finishes"),
+        _("Destroy this object when tween finishes"),
         "",
         false
       )
@@ -297,27 +297,27 @@ module.exports = {
     behavior
       .addAction(
         "AddObjectScaleYTween",
-        t("Add object Y-scale tween"),
-        t(
+        _("Add object Y-scale tween"),
+        _(
           "Add a tween animation for the object Y-scale. (Note: the scale can never be less than 0)"
         ),
-        t(
+        _(
           "Tween the Y-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        t("Tween animation/Scale"),
+        _("Tween animation/Scale"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("expression", t("To scale Y"), "", false)
-      .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To scale Y"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
-      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("expression", _("Duration"), "", false)
       .addParameter(
         "yesorno",
-        t("Destroy this object when tween finishes"),
+        _("Destroy this object when tween finishes"),
         "",
         false
       )
@@ -328,27 +328,27 @@ module.exports = {
     behavior
       .addAction(
         "AddObjectOpacityTween",
-        t("Add object opacity tween"),
-        t(
+        _("Add object opacity tween"),
+        _(
           "Add a tween animation for the object opacity. (Value between 0 and 255)"
         ),
-        t(
+        _(
           "Tween the opacity of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        t("Tween animation"),
+        _("Tween animation"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("expression", t("To opacity"), "", false)
-      .addParameter("stringWithSelector", t("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To opacity"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
-      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("expression", _("Duration"), "", false)
       .addParameter(
         "yesorno",
-        t("Destroy this object when tween finishes"),
+        _("Destroy this object when tween finishes"),
         "",
         false
       )
@@ -359,27 +359,27 @@ module.exports = {
       behavior
       .addAction(
         "AddObjectColorTween",
-        t("Add object color tween"),
-        t(
+        _("Add object color tween"),
+        _(
           'Add a tween animation for the object color. Format: "128;200;255" with values between 0 and 255 for red, green and blue'
         ),
-        t(
+        _(
           "Tween the color of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        t("Tween animation/Color"),
+        _("Tween animation/Color"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("string", t("To color"), "", false)
-      .addParameter("stringWithSelector", t("Items"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("string", _("To color"), "", false)
+      .addParameter("stringWithSelector", _("Items"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
       .setDefaultValue("linear")
-      .addParameter("expression", t("Duration"), "", false)
+      .addParameter("expression", _("Duration"), "", false)
       .addParameter(
         "yesorno",
-        t("Destroy this object when tween finishes"),
+        _("Destroy this object when tween finishes"),
         "",
         false
       )
@@ -390,128 +390,128 @@ module.exports = {
       behavior
       .addCondition(
         "Exists",
-        t("Tween exists"),
-        t("Check if the tween animation exists."),
-        t("Tween _PARAM2_ on _PARAM0_ exists"),
-        t("Tween animation"),
+        _("Tween exists"),
+        _("Check if the tween animation exists."),
+        _("Tween _PARAM2_ on _PARAM0_ exists"),
+        _("Tween animation"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("exists");
 
     behavior
       .addCondition(
         "IsPlaying",
-        t("Tween is playing"),
-        t("Check if the tween animation is currently playing."),
-        t("Tween _PARAM2_ on _PARAM0_ is playing"),
-        t("Tween animation"),
+        _("Tween is playing"),
+        _("Check if the tween animation is currently playing."),
+        _("Tween _PARAM2_ on _PARAM0_ is playing"),
+        _("Tween animation"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isPlaying");
 
     behavior
       .addCondition(
         "HasFinished",
-        t("Tween finished playing"),
-        t("Check if the tween animation has finished playing."),
-        t("Tween _PARAM2_ on _PARAM0_ has finished playing"),
-        t("Tween animation"),
+        _("Tween finished playing"),
+        _("Check if the tween animation has finished playing."),
+        _("Tween _PARAM2_ on _PARAM0_ has finished playing"),
+        _("Tween animation"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("hasFinished");
 
     behavior
       .addAction(
         "PauseTween",
-        t("Pause a tween"),
-        t("Pause the running tween animation."),
-        t("Pause the tween _PARAM2_ on _PARAM0_"),
-        t("Tween animation"),
+        _("Pause a tween"),
+        _("Pause the running tween animation."),
+        _("Pause the tween _PARAM2_ on _PARAM0_"),
+        _("Tween animation"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("pauseTween");
 
     behavior
       .addAction(
         "StopTween",
-        t("Stop a tween"),
-        t("Stop the running tween animation."),
-        t("Stop the tween _PARAM2_ on _PARAM0_"),
-        t("Tween animation"),
+        _("Stop a tween"),
+        _("Stop the running tween animation."),
+        _("Stop the tween _PARAM2_ on _PARAM0_"),
+        _("Tween animation"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
-      .addParameter("yesorno", t("Jump to end"), "", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("yesorno", _("Jump to end"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("stopTween");
 
     behavior
       .addAction(
         "ResumeTween",
-        t("Resume a tween"),
-        t("Resume the tween animation."),
-        t("Resume the tween _PARAM2_ on _PARAM0_"),
-        t("Tween animation"),
+        _("Resume a tween"),
+        _("Resume the tween animation."),
+        _("Resume the tween _PARAM2_ on _PARAM0_"),
+        _("Tween animation"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("resumeTween");
 
     behavior
       .addAction(
         "RemoveTween",
-        t("Remove a tween"),
-        t("Remove the tween animation from the object."),
-        t("Remove the tween _PARAM2_ from _PARAM0_"),
-        t("Tween animation"),
+        _("Remove a tween"),
+        _("Remove the tween animation from the object."),
+        _("Remove the tween _PARAM2_ from _PARAM0_"),
+        _("Tween animation"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("removeTween");
 
     behavior
       .addExpression(
         "GetProgress",
-        t("Progress of a tween"),
-        t("Progress of a tween (between 0.0 and 1.0)"),
-        t("Tween animation"),
+        _("Progress of a tween"),
+        _("Progress of a tween (between 0.0 and 1.0)"),
+        _("Tween animation"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
-      .addParameter("object", t("Object"), "", false)
-      .addParameter("behavior", t("Behavior"), "TweenBehavior", false)
-      .addParameter("string", t("Tween Identifier"), "", false)
+      .addParameter("object", _("Object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("getProgress");
 

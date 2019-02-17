@@ -1,13 +1,14 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import HelpOutline from 'material-ui/svg-icons/action/help-outline';
 import Window from '../../Utils/Window';
 import { getHelpLink } from '../../Utils/HelpLink';
+import { Trans } from '@lingui/macro';
 
 type PropsType = {
   helpPagePath: ?string,
-  label?: string,
+  label?: React.Node,
 };
 
 /**
@@ -24,7 +25,7 @@ const HelpButton = (props: PropsType) => {
         }
       }}
       target="_blank"
-      label={props.label || 'Help'}
+      label={props.label || <Trans>Help</Trans>}
       icon={<HelpOutline />}
     />
   );

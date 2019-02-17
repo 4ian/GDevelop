@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -18,16 +20,26 @@ export default class EventsContextAnalyzerDialog extends React.Component<
     const { open, onClose, objectsNames, objectOrGroupNames } = this.props;
     if (!objectsNames || !objectOrGroupNames) return null;
     const actions = [
-      <FlatButton label="Close" primary={true} onClick={this.props.onClose} />,
+      <FlatButton
+        label={<Trans>Close</Trans>}
+        primary={true}
+        onClick={this.props.onClose}
+      />,
     ];
 
     return (
       <Dialog actions={actions} open={open} onRequestClose={onClose}>
         <p>
-          Objects or groups being directly referenced in the events:{' '}
-          {objectOrGroupNames.join(', ')}
+          <Trans>
+            Objects or groups being directly referenced in the events:{' '}
+            {objectOrGroupNames.join(', ')}
+          </Trans>
         </p>
-        <p>All objects potentially used in events: {objectsNames.join(', ')}</p>
+        <p>
+          <Trans>
+            All objects potentially used in events: {objectsNames.join(', ')}
+          </Trans>
+        </p>
       </Dialog>
     );
   }

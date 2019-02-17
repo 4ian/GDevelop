@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -45,9 +47,13 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
 
     return (
       <Dialog
-        title="Create a new game"
+        title={<Trans>Create a new game</Trans>}
         actions={[
-          <FlatButton label="Close" primary={false} onClick={onClose} />,
+          <FlatButton
+            label={<Trans>Close</Trans>}
+            primary={false}
+            onClick={onClose}
+          />,
         ]}
         onRequestClose={onClose}
         open={open}
@@ -55,21 +61,21 @@ export default class CreateProjectDialog extends React.Component<Props, State> {
         autoScrollBodyContent
       >
         <Tabs value={this.state.currentTab} onChange={this._onChangeTab}>
-          <Tab label="Starters" value="starters">
+          <Tab label={<Trans>Starters</Trans>} value="starters">
             <StartersComponent
               onOpen={onOpen}
               onCreate={onCreate}
               onShowExamples={this._showExamples}
             />
           </Tab>
-          <Tab label="Examples" value="examples">
+          <Tab label={<Trans>Examples</Trans>} value="examples">
             <ExamplesComponent
               onOpen={onOpen}
               onCreate={onCreate}
               onExamplesLoaded={this._onExamplesLoaded}
             />
           </Tab>
-          <Tab label="Tutorials" value="tutorials">
+          <Tab label={<Trans>Tutorials</Trans>} value="tutorials">
             <Tutorials />
           </Tab>
         </Tabs>

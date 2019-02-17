@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react';
-import { translate, type TFunction, type Translator } from 'react-i18next';
 import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
+import { I18n } from '@lingui/react';
+import { t } from '@lingui/macro';
 
-type OwnProps = {|
+type Props = {|
   onPlay: () => void,
   canPlay: boolean,
   onPause: () => void,
@@ -13,46 +14,37 @@ type OwnProps = {|
   onOpenProfiler: () => void,
 |};
 
-type Props = {|
-  t: TFunction,
-  ...OwnProps,
-|};
-
 export class Toolbar extends React.PureComponent<Props> {
   render() {
-    const {
-      t,
-      onPlay,
-      onPause,
-      canPlay,
-      canPause,
-      onOpenProfiler,
-    } = this.props;
+    const { onPlay, onPause, canPlay, canPause, onOpenProfiler } = this.props;
 
     return (
-      <ToolbarGroup lastChild>
-        <ToolbarIcon
-          onClick={onPlay}
-          src="res/ribbon_default/preview32.png"
-          disabled={!canPlay}
-          tooltip={t('Play the game')}
-        />
-        <ToolbarIcon
-          onClick={onPause}
-          src="res/ribbon_default/pause32.png"
-          disabled={!canPause}
-          tooltip={t('Pause the game')}
-        />
-        <ToolbarSeparator />
-        <ToolbarIcon
-          onClick={onOpenProfiler}
-          src="res/ribbon_default/profiler32.png"
-          tooltip={t('Open the performance profiler')}
-        />
-      </ToolbarGroup>
+      <I18n>
+        {({ i18n }) => (
+          <ToolbarGroup lastChild>
+            <ToolbarIcon
+              onClick={onPlay}
+              src="res/ribbon_default/preview32.png"
+              disabled={!canPlay}
+              tooltip={i18n._(t`Play the game`)}
+            />
+            <ToolbarIcon
+              onClick={onPause}
+              src="res/ribbon_default/pause32.png"
+              disabled={!canPause}
+              tooltip={i18n._(t`Pause the game`)}
+            />
+            <ToolbarSeparator />
+            <ToolbarIcon
+              onClick={onOpenProfiler}
+              src="res/ribbon_default/profiler32.png"
+              tooltip={i18n._(t`Open the performance profiler`)}
+            />
+          </ToolbarGroup>
+        )}
+      </I18n>
     );
   }
 }
 
-const translator: Translator<OwnProps, Props> = translate();
-export default translator(Toolbar);
+export default Toolbar;

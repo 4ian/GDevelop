@@ -75,6 +75,12 @@ class GD_CORE_API Platform {
    * Member functions used to manage the extensions
    */
   ///@{
+  /**
+   * \brief (Re)load platform built-in extensions.
+   * \note Can be useful if, for example, the user changed the language
+   * of the editor.
+   */
+  virtual void ReloadBuiltinExtensions(){};
 
   /**
    * \brief Must return the name of the function that is used to create an

@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import { List, ListItem } from 'material-ui/List';
 import IconButton from 'material-ui/IconButton';
@@ -113,7 +115,7 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
           onChoose={this.addObject}
           openOnFocus
           noGroups
-          hintText="Choose an object to add to the group"
+          hintText={<Trans>Choose an object to add to the group</Trans>}
           fullWidth
         />
       </div>

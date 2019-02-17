@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
@@ -38,31 +40,38 @@ export default class ForceMultiplierField extends Component<
           </Column>
           <Column>
             <p>
-              The force will only push the object during the time of one frame.
-              Typically used in an event with no conditions or with conditions
-              that stay valid for a certain amount of time.
+              <Trans>
+                The force will only push the object during the time of one
+                frame. Typically used in an event with no conditions or with
+                conditions that stay valid for a certain amount of time.
+              </Trans>
             </p>
           </Column>
         </Line>
         <Line expand alignItems="center">
           <Column>
             <RaisedButton
-              label="Permanent"
+              label={<Trans>Permanent</Trans>}
               primary={this.props.value === '1'}
               onClick={() => this.props.onChange('1')}
             />
           </Column>
           <Column>
             <p>
-              The force will push the object forever, unless you use the action
-              "Stop the object". Typically used in an event with conditions that
-              are only true once, or with a "Trigger Once" condition.
+              <Trans>
+                The force will push the object forever, unless you use the
+                action "Stop the object". Typically used in an event with
+                conditions that are only true once, or with a "Trigger Once"
+                condition.
+              </Trans>
             </p>
           </Column>
         </Line>
         {showDeprecatedNumericValue && (
           <React.Fragment>
-            <BackgroundText>or</BackgroundText>
+            <BackgroundText>
+              <Trans>or</Trans>
+            </BackgroundText>
             <Line expand>
               <Column expand>
                 <GenericExpressionField
@@ -72,8 +81,10 @@ export default class ForceMultiplierField extends Component<
               </Column>
             </Line>
             <BackgroundText>
-              The usage of a number or expression is deprecated. Please now use
-              only "Permanent" or "Instant" for configuring forces.
+              <Trans>
+                The usage of a number or expression is deprecated. Please now
+                use only "Permanent" or "Instant" for configuring forces.
+              </Trans>
             </BackgroundText>
           </React.Fragment>
         )}

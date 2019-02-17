@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
@@ -27,18 +28,18 @@ export default class VariablesEditorDialog extends Component {
 
     const actions = [
       <FlatButton
-        label="Cancel"
+        label={<Trans>Cancel</Trans>}
         secondary={true}
         keyboardFocused={true}
         onClick={() => this.props.onClose(false)}
       />,
       <FlatButton
-        label="Remove objects"
+        label={<Trans>Remove objects</Trans>}
         secondary={true}
         onClick={() => this.props.onClose(true, null)}
       />,
       <FlatButton
-        label="Move objects"
+        label={<Trans>Move objects</Trans>}
         primary={true}
         onClick={() => this.props.onClose(true, this.state.selectedLayer)}
       />,

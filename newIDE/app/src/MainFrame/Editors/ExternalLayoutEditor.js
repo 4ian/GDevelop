@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import SceneEditor from '../../SceneEditor';
@@ -138,14 +140,14 @@ export default class ExternalLayoutEditor extends BaseEditor {
             To edit the external layout, choose the scene in which it will be
             included:
             <RaisedButton
-              label="Choose the scene"
+              label={<Trans>Choose the scene</Trans>}
               primary
               onClick={this.openLayoutChooser}
             />
           </PlaceholderMessage>
         )}
         <LayoutChooserDialog
-          title="Choose the associated scene"
+          title={<Trans>Choose the associated scene</Trans>}
           open={this.state.layoutChooserOpen}
           project={project}
           onChoose={this.setAssociatedLayout}

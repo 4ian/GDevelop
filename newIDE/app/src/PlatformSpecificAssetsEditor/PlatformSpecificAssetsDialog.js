@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -204,12 +206,12 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
   render() {
     const actions = [
       <FlatButton
-        label="Cancel"
+        label={<Trans>Cancel</Trans>}
         primary={false}
         onClick={this.props.onClose}
       />,
       <FlatButton
-        label="Apply"
+        label={<Trans>Apply</Trans>}
         primary={true}
         keyboardFocused={true}
         onClick={this._onApply}
@@ -238,17 +240,21 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
           {isResizeSupported() ? (
             <RaisedButton
               primary
-              label="Generate icons from a file"
+              label={<Trans>Generate icons from a file</Trans>}
               onClick={this._generateFromFile}
             />
           ) : (
             <p>
-              Download GDevelop desktop version to generate the Android and iOS
-              icons of your game.
+              <Trans>
+                Download GDevelop desktop version to generate the Android and
+                iOS icons of your game.
+              </Trans>
             </p>
           )}
         </Line>
-        <p>Desktop (Windows, macOS and Linux) icon:</p>
+        <p>
+          <Trans>Desktop (Windows, macOS and Linux) icon:</Trans>
+        </p>
         {desktopSizes.map((size, index) => (
           <ResourceSelectorWithThumbnail
             key={size}
@@ -268,7 +274,9 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             }}
           />
         ))}
-        <p>Android icons:</p>
+        <p>
+          <Trans>Android icons:</Trans>
+        </p>
         {androidSizes.map((size, index) => (
           <ResourceSelectorWithThumbnail
             key={size}
@@ -288,7 +296,9 @@ export default class PlatformSpecificAssetsDialog extends React.Component<
             }}
           />
         ))}
-        <p>iOS (iPhone and iPad) icons:</p>
+        <p>
+          <Trans>iOS (iPhone and iPad) icons:</Trans>
+        </p>
         {iosSizes.map((size, index) => (
           <ResourceSelectorWithThumbnail
             key={size}

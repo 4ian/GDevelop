@@ -1,6 +1,6 @@
 // @flow
 
-import React, { Component } from 'react';
+import * as React from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
@@ -12,9 +12,11 @@ import {
   sendSubscriptionCheckDialogShown,
   sendSubscriptionCheckDismiss,
 } from '../Utils/Analytics/EventSender';
+import { Trans } from '@lingui/macro';
 
 type Props = {|
-  title: string,
+  title: React.Node,
+  id: string,
   onChangeSubscription?: () => void,
   mode: 'try' | 'mandatory',
 |};
@@ -34,14 +36,14 @@ const styles = {
   thanksText: { textAlign: 'right', marginRight: 20, marginBottom: 0 },
 };
 
-export class SubscriptionCheckDialog extends Component<
+export class SubscriptionCheckDialog extends React.Component<
   DialogProps,
   DialogState
 > {
   state = { open: false };
 
   checkHasSubscription() {
-    const { userProfile, mode, title } = this.props;
+    const { userProfile, mode, id } = this.props;
     if (userProfile.subscription) {
       const hasPlan = !!userProfile.subscription.planId;
       if (hasPlan) {
@@ -55,7 +57,7 @@ export class SubscriptionCheckDialog extends Component<
     this.setState({
       open: true,
     });
-    sendSubscriptionCheckDialogShown({ mode, title });
+    sendSubscriptionCheckDialogShown({ mode, id });
 
     return false;
   }
@@ -75,7 +77,7 @@ export class SubscriptionCheckDialog extends Component<
         actions={[
           onChangeSubscription && (
             <RaisedButton
-              label="Get a subscription or login"
+              label={<Trans>Get a subscription or login</Trans>}
               key="subscribe"
               primary
               onClick={() => {
@@ -87,7 +89,13 @@ export class SubscriptionCheckDialog extends Component<
         ]}
         secondaryActions={[
           <FlatButton
-            label={mode === 'try' ? 'Continue anyway' : 'Not now, thanks!'}
+            label={
+              mode === 'try' ? (
+                <Trans>Continue anyway</Trans>
+              ) : (
+                <Trans>Not now, thanks!</Trans>
+              )
+            }
             key="close"
             primary={false}
             onClick={this._closeDialog}
@@ -102,34 +110,44 @@ export class SubscriptionCheckDialog extends Component<
           <Line noMargin alignItems="center">
             {mode === 'try' ? (
               <p>
-                You can try this feature, but if you're using it regularly, we
-                ask you to get a subscription to GDevelop.
+                <Trans>
+                  You can try this feature, but if you're using it regularly, we
+                  ask you to get a subscription to GDevelop.
+                </Trans>
               </p>
             ) : (
               <p>
-                To use this feature, we ask you to get a subscription to
-                GDevelop.
+                <Trans>
+                  To use this feature, we ask you to get a subscription to
+                  GDevelop.
+                </Trans>
               </p>
             )}
           </Line>
           <Line noMargin alignItems="center">
             <Star style={styles.icon} />
             <p style={styles.iconText}>
-              Having a subscription allows you to use the one-click export for
-              Android, Windows, macOS and Linux, launch live previews over wifi,
-              disable the GDevelop splashscreen during loading and more!
+              <Trans>
+                Having a subscription allows you to use the one-click export for
+                Android, Windows, macOS and Linux, launch live previews over
+                wifi, disable the GDevelop splashscreen during loading and more!
+              </Trans>
             </p>
           </Line>
           <Line noMargin alignItems="center">
             <Favorite style={styles.icon} />
             <p style={styles.iconText}>
-              You're also supporting the development of GDevelop, an open-source
-              software! In the future, more online services will be available
-              for users with a subscription.
+              <Trans>
+                You're also supporting the development of GDevelop, an
+                open-source software! In the future, more online services will
+                be available for users with a subscription.
+              </Trans>
             </p>
           </Line>
           <p style={styles.thanksText}>
-            <b>Thanks!</b>
+            <b>
+              <Trans>Thanks!</Trans>
+            </b>
           </p>
         </Column>
       </Dialog>
@@ -137,7 +155,7 @@ export class SubscriptionCheckDialog extends Component<
   }
 }
 
-class SubscriptionChecker extends Component<Props, {}> {
+class SubscriptionChecker extends React.Component<Props, {}> {
   _dialog: ?SubscriptionCheckDialog = null;
 
   checkHasSubscription() {
@@ -156,6 +174,7 @@ class SubscriptionChecker extends Component<Props, {}> {
             userProfile={userProfile}
             ref={dialog => (this._dialog = dialog)}
             onChangeSubscription={this.props.onChangeSubscription}
+            id={this.props.id}
             title={this.props.title}
             mode={this.props.mode}
           />

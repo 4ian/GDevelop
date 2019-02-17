@@ -35,7 +35,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
                 _("Text in memory"),
                 _("Modify text in memory of the object"),
                 _("Do _PARAM1__PARAM2_ to the text in memory of _PARAM0_"),
-                _(""),
+                "",
                 "CppPlatform/Extensions/textentry24.png",
                 "CppPlatform/Extensions/textentryicon.png")
 
@@ -51,7 +51,7 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
                    _("Text in memory"),
                    _("Test the text of a Text Entry object."),
                    _("The text of _PARAM0_ is _PARAM1__PARAM2_"),
-                   _(""),
+                   "",
                    "CppPlatform/Extensions/textentry24.png",
                    "CppPlatform/Extensions/textentryicon.png")
 

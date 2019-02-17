@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import ResourcesLoader from '../ResourcesLoader';
 import ResourceSelector from '../ResourcesList/ResourceSelector';
 import {
@@ -18,8 +18,8 @@ type Props = {|
   resourceKind: ResourceKind,
   resourceName: string,
   onChange: string => void,
-  floatingLabelText?: string,
-  hintText?: string,
+  floatingLabelText?: React.Node,
+  hintText?: React.Node,
 |};
 
 const ResourceSelectorWithThumbnail = ({

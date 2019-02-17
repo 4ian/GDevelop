@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Paper from 'material-ui/Paper';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -15,7 +16,7 @@ export default class SerializedObjectDisplay extends Component {
         {this.props.children}
         <Paper zDepth={2}>
           Object serialized to JSON:{' '}
-          <RaisedButton label="Update" onClick={this.update} />
+          <RaisedButton label={<Trans>Update</Trans>} onClick={this.update} />
           <pre>
             {JSON.stringify(
               serializeToJSObject(

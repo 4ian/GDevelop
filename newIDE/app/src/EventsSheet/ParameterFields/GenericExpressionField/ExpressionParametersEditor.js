@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import { mapFor } from '../../../Utils/MapFor';
 import EmptyMessage from '../../../UI/EmptyMessage';
@@ -95,7 +97,11 @@ export default class ExpressionParametersEditor extends React.Component<
         })}
         {ExpressionParametersEditor.getNonCodeOnlyParametersCount(
           expressionMetadata
-        ) === 0 && <EmptyMessage>There is nothing to configure.</EmptyMessage>}
+        ) === 0 && (
+          <EmptyMessage>
+            <Trans>There is nothing to configure.</Trans>
+          </EmptyMessage>
+        )}
       </div>
     );
   }

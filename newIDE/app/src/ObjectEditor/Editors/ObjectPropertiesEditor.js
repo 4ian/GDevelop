@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
@@ -25,8 +27,10 @@ export default class ObjectPropertiesEditor extends React.Component<Props> {
           <PropertiesEditor schema={propertiesSchema} instances={[object]} />
         ) : (
           <EmptyMessage>
-            There is nothing to configure for this object. You can still use
-            events to interact with the object.
+            <Trans>
+              There is nothing to configure for this object. You can still use
+              events to interact with the object.
+            </Trans>
           </EmptyMessage>
         )}
       </Column>

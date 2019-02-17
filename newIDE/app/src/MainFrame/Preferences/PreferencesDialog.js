@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import SelectField from 'material-ui/SelectField';
@@ -43,7 +44,11 @@ export default class PreferencesDialog extends Component<Props, State> {
   render() {
     const { open, onClose } = this.props;
     const actions = [
-      <FlatButton label="Close" primary={false} onClick={onClose} />,
+      <FlatButton
+        label={<Trans>Close</Trans>}
+        primary={false}
+        onClick={onClose}
+      />,
     ];
 
     return (
@@ -51,7 +56,7 @@ export default class PreferencesDialog extends Component<Props, State> {
         actions={actions}
         onRequestClose={onClose}
         open={open}
-        title="GDevelop preferences"
+        title={<Trans>GDevelop preferences</Trans>}
       >
         <PreferencesContext.Consumer>
           {({
@@ -70,7 +75,7 @@ export default class PreferencesDialog extends Component<Props, State> {
               <Column noMargin>
                 <Line noMargin>
                   <SelectField
-                    floatingLabelText={'UI Theme'}
+                    floatingLabelText={<Trans>UI Theme</Trans>}
                     value={values.themeName}
                     onChange={(e, i, value) => setThemeName(value)}
                   >
@@ -83,7 +88,7 @@ export default class PreferencesDialog extends Component<Props, State> {
                     ))}
                   </SelectField>
                   <SelectField
-                    floatingLabelText={'Code editor Theme'}
+                    floatingLabelText={<Trans>Code editor Theme</Trans>}
                     value={values.codeEditorThemeName}
                     onChange={(e, i, value) => setCodeEditorThemeName(value)}
                   >
@@ -99,7 +104,10 @@ export default class PreferencesDialog extends Component<Props, State> {
                 <Line noMargin>
                   <p>
                     You can contribute and create your own themes:{' '}
-                    <FlatButton label="Learn more" onClick={this.createTheme} />{' '}
+                    <FlatButton
+                      label={<Trans>Learn more</Trans>}
+                      onClick={this.createTheme}
+                    />{' '}
                   </p>
                 </Line>
                 <Line>
@@ -107,7 +115,11 @@ export default class PreferencesDialog extends Component<Props, State> {
                     onToggle={(e, check) => setAutoDownloadUpdates(check)}
                     toggled={values.autoDownloadUpdates}
                     labelPosition="right"
-                    label="Auto download and install updates (recommended)"
+                    label={
+                      <Trans>
+                        Auto download and install updates (recommended)
+                      </Trans>
+                    }
                   />
                 </Line>
                 <Line>
@@ -115,7 +127,12 @@ export default class PreferencesDialog extends Component<Props, State> {
                     onToggle={(e, check) => setAutoDisplayChangelog(check)}
                     toggled={values.autoDisplayChangelog}
                     labelPosition="right"
-                    label="Display What's New when a new version is launched (recommended)"
+                    label={
+                      <Trans>
+                        Display What's New when a new version is launched
+                        (recommended)
+                      </Trans>
+                    }
                   />
                 </Line>
                 <Line>
@@ -128,15 +145,22 @@ export default class PreferencesDialog extends Component<Props, State> {
                       !gd.ExpressionCodeGenerator.isUsingOldExpressionParser()
                     }
                     labelPosition="right"
-                    label="Use the new expression parser (alpha, please report any bugs)"
+                    label={
+                      <Trans>
+                        Use the new expression parser (alpha, please report any
+                        bugs)
+                      </Trans>
+                    }
                   />
                 </Line>
                 <Line>
                   {dismissedAlertMessages.length ? (
                     <Column noMargin>
                       <p>
-                        You have dismissed some hints. Click to enable them
-                        again:
+                        <Trans>
+                          You have dismissed some hints. Click to enable them
+                          again:
+                        </Trans>
                       </p>
                       {dismissedAlertMessages.map(name => (
                         <FlatButton
@@ -147,8 +171,10 @@ export default class PreferencesDialog extends Component<Props, State> {
                     </Column>
                   ) : (
                     <EmptyMessage>
-                      If you dismiss some hints, they will be shown here in case
-                      you want to enable them again.
+                      <Trans>
+                        If you dismiss some hints, they will be shown here in
+                        case you want to enable them again.
+                      </Trans>
                     </EmptyMessage>
                   )}
                 </Line>

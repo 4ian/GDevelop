@@ -11,13 +11,13 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: function(t, gd) {
+  createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(
         "FacebookInstantGames",
-        t("Facebook Instant Games"),
-        t(
+        _("Facebook Instant Games"),
+        _(
           "Allow your game to send scores and interact with Facebook Instant Games"
         ),
         "Florian Rival",
@@ -28,14 +28,14 @@ module.exports = {
     extension
       .addAction(
         "SavePlayerData",
-        t("Save player data"),
-        t(
+        _("Save player data"),
+        _(
           "Save the content of the given variable in the player data, stored on Facebook Instant Games servers"
         ),
-        t(
+        _(
           "Save the content of _PARAM1_ in key _PARAM0_ of player data (store success message in _PARAM2_ or error in _PARAM3_)"
         ),
-        t("Facebook Instant Games/Player data"),
+        _("Facebook Instant Games/Player data"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
@@ -43,13 +43,13 @@ module.exports = {
       .addParameter("scenevar", "Variable with the content to save", "", false)
       .addParameter(
         "scenevar",
-        t("Variable where to store the success message (optional)"),
+        _("Variable where to store the success message (optional)"),
         "",
         true
       )
       .addParameter(
         "scenevar",
-        t("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -62,25 +62,25 @@ module.exports = {
     extension
       .addAction(
         "LoadPlayerData",
-        t("Load player data"),
-        t("Load the player data with the given key in a variable"),
-        t(
+        _("Load player data"),
+        _("Load the player data with the given key in a variable"),
+        _(
           "Load player data with key _PARAM0_ in _PARAM1_ (or error in _PARAM2_)"
         ),
-        t("Facebook Instant Games/Player data"),
+        _("Facebook Instant Games/Player data"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
-      .addParameter("string", t('Data key name (e.g: "Lives")'), "", false)
+      .addParameter("string", _('Data key name (e.g: "Lives")'), "", false)
       .addParameter(
         "scenevar",
-        t("Variable where to store loaded data"),
+        _("Variable where to store loaded data"),
         "",
         false
       )
       .addParameter(
         "scenevar",
-        t("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -93,14 +93,14 @@ module.exports = {
     extension
       .addAction(
         "SavePlayerScore",
-        t("Save player score"),
-        t(
+        _("Save player score"),
+        _(
           "Save the score, and optionally the content of the given variable in the player score, for the given metadata."
         ),
-        t(
+        _(
           "In leaderboard _PARAM0_, save score _PARAM1_ for the player and extra data from _PARAM2_ (store success message in _PARAM3_ or error in _PARAM4_)"
         ),
-        t("Facebook Instant Games/Leaderboards"),
+        _("Facebook Instant Games/Leaderboards"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
@@ -113,19 +113,19 @@ module.exports = {
       .addParameter("expression", "Score to register for the player", "", false)
       .addParameter(
         "scenevar",
-        t("Optional variable with metadata to save"),
+        _("Optional variable with metadata to save"),
         "",
         true
       )
       .addParameter(
         "scenevar",
-        t("Variable where to store the success message (optional)"),
+        _("Variable where to store the success message (optional)"),
         "",
         true
       )
       .addParameter(
         "scenevar",
-        t("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -138,42 +138,42 @@ module.exports = {
     extension
       .addAction(
         "LoadPlayerEntry",
-        t("Load player entry"),
-        t("Load the player entry in the given leaderboard"),
-        t(
+        _("Load player entry"),
+        _("Load the player entry in the given leaderboard"),
+        _(
           "Load player entry from leaderboard _PARAM0_. Set rank in _PARAM1_, score in _PARAM2_ (extra data if any in _PARAM3_ and error in _PARAM4_)"
         ),
-        t("Facebook Instant Games/Leaderboards"),
+        _("Facebook Instant Games/Leaderboards"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter(
         "string",
-        t('Leaderboard name (e.g: "PlayersBestTimes")'),
+        _('Leaderboard name (e.g: "PlayersBestTimes")'),
         "",
         false
       )
       .addParameter(
         "scenevar",
-        t("Variable where to store the player rank (of -1 if not ranked)"),
+        _("Variable where to store the player rank (of -1 if not ranked)"),
         "",
         true
       )
       .addParameter(
         "scenevar",
-        t("Variable where to store the player score (of -1 if no score)"),
+        _("Variable where to store the player score (of -1 if no score)"),
         "",
         true
       )
       .addParameter(
         "scenevar",
-        t("Variable where to store extra data (if any)"),
+        _("Variable where to store extra data (if any)"),
         "",
         true
       )
       .addParameter(
         "scenevar",
-        t("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -186,10 +186,10 @@ module.exports = {
     extension
       .addCondition(
         "AreAdsSupported",
-        t("Check if ads are supported"),
-        t("Check if showind ads is supported on this device (only mobile phones can show ads)"),
-        t("Ads can be shown on this device"),
-        t("Facebook Instant Games/Ads"),
+        _("Check if ads are supported"),
+        _("Check if showind ads is supported on this device (only mobile phones can show ads)"),
+        _("Ads can be shown on this device"),
+        _("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
@@ -202,10 +202,10 @@ module.exports = {
     extension
       .addCondition(
         "IsInterstitialAdReady",
-        t("Is the interstitial ad ready"),
-        t("Check if the interstitial ad requested from Facebook is loaded and ready to be shown."),
-        t("The interstitial ad is loaded and ready to be shown"),
-        t("Facebook Instant Games/Ads"),
+        _("Is the interstitial ad ready"),
+        _("Check if the interstitial ad requested from Facebook is loaded and ready to be shown."),
+        _("The interstitial ad is loaded and ready to be shown"),
+        _("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
@@ -218,22 +218,22 @@ module.exports = {
     extension
       .addAction(
         "LoadInterstitialAd",
-        t("Load and prepare an interstitial ad"),
-        t("Request and load an interstitial ad from Facebook, so that it is ready to be shown."),
-        t("Request and load an interstitial ad from Facebook (ad placement id: _PARAM0_, error in _PARAM1_)"),
-        t("Facebook Instant Games/Ads"),
+        _("Load and prepare an interstitial ad"),
+        _("Request and load an interstitial ad from Facebook, so that it is ready to be shown."),
+        _("Request and load an interstitial ad from Facebook (ad placement id: _PARAM0_, error in _PARAM1_)"),
+        _("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter(
         "string",
-        t("The Ad Placement id (can be found while setting up the ad on Facebook)"),
+        _("The Ad Placement id (can be found while setting up the ad on Facebook)"),
         "",
         false
       )
       .addParameter(
         "scenevar",
-        t("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -246,16 +246,16 @@ module.exports = {
     extension
       .addAction(
         "ShowInterstitialAd",
-        t("Show the loaded interstitial ad"),
-        t("Show the interstitial ad previously loaded in memory. This won't work if you did not load the interstitial before."),
-        t("Show the interstitial ad previously loaded in memory (if any error, store it in _PARAM0_)"),
-        t("Facebook Instant Games/Ads"),
+        _("Show the loaded interstitial ad"),
+        _("Show the interstitial ad previously loaded in memory. This won't work if you did not load the interstitial before."),
+        _("Show the interstitial ad previously loaded in memory (if any error, store it in _PARAM0_)"),
+        _("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter(
         "scenevar",
-        t("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -268,10 +268,10 @@ module.exports = {
     extension
       .addCondition(
         "IsRewardedVideoReady",
-        t("Is the rewarded video ready"),
-        t("Check if the rewarded video requested from Facebook is loaded and ready to be shown."),
-        t("The rewarded video is loaded and ready to be shown"),
-        t("Facebook Instant Games/Ads"),
+        _("Is the rewarded video ready"),
+        _("Check if the rewarded video requested from Facebook is loaded and ready to be shown."),
+        _("The rewarded video is loaded and ready to be shown"),
+        _("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
@@ -284,22 +284,22 @@ module.exports = {
     extension
       .addAction(
         "LoadRewardedVideo",
-        t("Load and prepare a rewarded video"),
-        t("Request and load a rewarded video from Facebook, so that it is ready to be shown."),
-        t("Request and load a rewarded video from Facebook (ad placement id: _PARAM0_, error in _PARAM1_)"),
-        t("Facebook Instant Games/Ads"),
+        _("Load and prepare a rewarded video"),
+        _("Request and load a rewarded video from Facebook, so that it is ready to be shown."),
+        _("Request and load a rewarded video from Facebook (ad placement id: _PARAM0_, error in _PARAM1_)"),
+        _("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter(
         "string",
-        t("The Ad Placement id (can be found while setting up the ad on Facebook)"),
+        _("The Ad Placement id (can be found while setting up the ad on Facebook)"),
         "",
         false
       )
       .addParameter(
         "scenevar",
-        t("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -312,16 +312,16 @@ module.exports = {
     extension
       .addAction(
         "ShowRewardedVideo",
-        t("Show the loaded rewarded video"),
-        t("Show the rewarded video previously loaded in memory. This won't work if you did not load the video before."),
-        t("Show the rewarded video previously loaded in memory (if any error, store it in _PARAM0_)"),
-        t("Facebook Instant Games/Ads"),
+        _("Show the loaded rewarded video"),
+        _("Show the rewarded video previously loaded in memory. This won't work if you did not load the video before."),
+        _("Show the rewarded video previously loaded in memory (if any error, store it in _PARAM0_)"),
+        _("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .addParameter(
         "scenevar",
-        t("Variable where to error message (optional, if an error occurs)"),
+        _("Variable where to error message (optional, if an error occurs)"),
         "",
         true
       )
@@ -334,9 +334,9 @@ module.exports = {
     extension
       .addStrExpression(
         "PlayerId",
-        t("Player identifier"),
-        t("Get the player unique identifier"),
-        t("Facebook Instant Games"),
+        _("Player identifier"),
+        _("Get the player unique identifier"),
+        _("Facebook Instant Games"),
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .getCodeExtraInformation()
@@ -348,9 +348,9 @@ module.exports = {
     extension
       .addStrExpression(
         "PlayerName",
-        t("Player name"),
-        t("Get the player name"),
-        t("Facebook Instant Games"),
+        _("Player name"),
+        _("Get the player name"),
+        _("Facebook Instant Games"),
         "JsPlatform/Extensions/facebookicon16.png"
       )
       .getCodeExtraInformation()

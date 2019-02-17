@@ -1,6 +1,5 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { translate, type TranslatorProps } from 'react-i18next';
 import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
@@ -9,13 +8,14 @@ type Props = {|
   onDeleteSelection: () => void,
   canDelete: boolean,
   onOpenProperties: () => void,
-|} & TranslatorProps;
+|};
 
 type State = {||};
 
 export class Toolbar extends PureComponent<Props, State> {
   render() {
-    const { t, canDelete } = this.props;
+    const t = str => str; //TODO
+    const { canDelete } = this.props;
 
     return (
       <ToolbarGroup lastChild>
@@ -36,4 +36,4 @@ export class Toolbar extends PureComponent<Props, State> {
   }
 }
 
-export default translate()(Toolbar);
+export default Toolbar;

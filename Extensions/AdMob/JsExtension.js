@@ -11,12 +11,12 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: function(t, gd) {
+  createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       'AdMob',
-      t('AdMob'),
-      t(
+      _('AdMob'),
+      _(
         'Allow the game to display AdMob banner, interstitial and reward video ads'
       ),
       'Franco Maciel',
@@ -27,10 +27,10 @@ module.exports = {
     extension
       .addCondition(
         'BannerLoading',
-        t('Banner loading'),
-        t('Check if a banner is currently loading.'),
-        t('Banner is loading'),
-        t('AdMob'),
+        _('Banner loading'),
+        _('Check if a banner is currently loading.'),
+        _('Banner is loading'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -41,10 +41,10 @@ module.exports = {
     extension
       .addCondition(
         'BannerReady',
-        t('Banner ready'),
-        t('Check if a banner is ready to be displayed.'),
-        t('Banner is ready'),
-        t('AdMob'),
+        _('Banner ready'),
+        _('Check if a banner is ready to be displayed.'),
+        _('Banner is ready'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -55,10 +55,10 @@ module.exports = {
     extension
       .addCondition(
         'BannerShowing',
-        t('Banner showing'),
-        t('Check if there is a banner being displayed.'),
-        t('Banner is showing'),
-        t('AdMob'),
+        _('Banner showing'),
+        _('Check if there is a banner being displayed.'),
+        _('Banner is showing'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -69,10 +69,10 @@ module.exports = {
     extension
       .addCondition(
         'BannerExists',
-        t('Banner exists'),
-        t('Check if there is a banner in memory (visible or hidden).'),
-        t('Banner exists'),
-        t('AdMob'),
+        _('Banner exists'),
+        _('Check if there is a banner in memory (visible or hidden).'),
+        _('Banner exists'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -83,31 +83,31 @@ module.exports = {
     extension
       .addAction(
         'LoadBanner',
-        t('Load banner'),
-        t(
+        _('Load banner'),
+        _(
           'Start loading a banner, you can display it automatically when finish loading.\nIf test mode is set to true a test banner will be displayed.'
         ),
-        t(
+        _(
           'Load banner (at top: _PARAM2_, overlap: _PARAM3_, show on load: _PARAM4_, test mode: _PARAM5_)'
         ),
-        t('AdMob'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
-      .addParameter('string', t('Android banner ID'), '', false)
-      .addParameter('string', t('iOS banner ID'), '', false)
+      .addParameter('string', _('Android banner ID'), '', false)
+      .addParameter('string', _('iOS banner ID'), '', false)
       .addParameter(
         'yesorno',
-        t('Display at top? (bottom otherwise)'),
+        _('Display at top? (bottom otherwise)'),
         '',
         false
       )
       .setDefaultValue('false')
-      .addParameter('yesorno', t('Overlap webview?'), '', false)
+      .addParameter('yesorno', _('Overlap webview?'), '', false)
       .setDefaultValue('true')
-      .addParameter('yesorno', t('Display on load complete?'), '', false)
+      .addParameter('yesorno', _('Display on load complete?'), '', false)
       .setDefaultValue('true')
-      .addParameter('yesorno', t('Test mode?'), '', false)
+      .addParameter('yesorno', _('Test mode?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
@@ -116,10 +116,10 @@ module.exports = {
     extension
       .addAction(
         'ShowBanner',
-        t('Show banner'),
-        t('Show the banner, will work only when the banner is fully loaded.'),
-        t('Show banner'),
-        t('AdMob'),
+        _('Show banner'),
+        _('Show the banner, will work only when the banner is fully loaded.'),
+        _('Show banner'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -130,12 +130,12 @@ module.exports = {
     extension
       .addAction(
         'HideBanner',
-        t('Hide banner'),
-        t(
+        _('Hide banner'),
+        _(
           'Hide the banner. You can show it again with the corresponding action.'
         ),
-        t('Hide banner'),
-        t('AdMob'),
+        _('Hide banner'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -146,12 +146,12 @@ module.exports = {
     extension
       .addAction(
         'RemoveBanner',
-        t('Remove banner'),
-        t(
+        _('Remove banner'),
+        _(
           'Remove the banner. You have to load another banner to show it again.'
         ),
-        t('Remove banner'),
-        t('AdMob'),
+        _('Remove banner'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -163,10 +163,10 @@ module.exports = {
     extension
       .addCondition(
         'InterstitialLoading',
-        t('Interstitial loading'),
-        t('Check if an interstitial is currently loading.'),
-        t('Interstitial is loading'),
-        t('AdMob'),
+        _('Interstitial loading'),
+        _('Check if an interstitial is currently loading.'),
+        _('Interstitial is loading'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -177,10 +177,10 @@ module.exports = {
     extension
       .addCondition(
         'InterstitialReady',
-        t('Interstitial ready'),
-        t('Check if an interstitial is ready to be displayed.'),
-        t('Interstitial is ready'),
-        t('AdMob'),
+        _('Interstitial ready'),
+        _('Check if an interstitial is ready to be displayed.'),
+        _('Interstitial is ready'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -191,10 +191,10 @@ module.exports = {
     extension
       .addCondition(
         'InterstitialShowing',
-        t('Interstitial showing'),
-        t('Check if there is an interstitial being displayed.'),
-        t('Interstitial is showing'),
-        t('AdMob'),
+        _('Interstitial showing'),
+        _('Check if there is an interstitial being displayed.'),
+        _('Interstitial is showing'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -205,20 +205,20 @@ module.exports = {
     extension
       .addAction(
         'LoadInterstitial',
-        t('Load interstitial'),
-        t(
+        _('Load interstitial'),
+        _(
           'Start loading an interstitial, you can display it automatically when finish loading.\nIf test mode is set to true a test interstitial will be displayed.'
         ),
-        t('Load interstitial (show on load: _PARAM2_, test mode: _PARAM3_)'),
-        t('AdMob'),
+        _('Load interstitial (show on load: _PARAM2_, test mode: _PARAM3_)'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
-      .addParameter('string', t('Android interstitial ID'), '', false)
-      .addParameter('string', t('iOS interstitial ID'), '', false)
-      .addParameter('yesorno', t('Display on load complete?'), '', false)
+      .addParameter('string', _('Android interstitial ID'), '', false)
+      .addParameter('string', _('iOS interstitial ID'), '', false)
+      .addParameter('yesorno', _('Display on load complete?'), '', false)
       .setDefaultValue('true')
-      .addParameter('yesorno', t('Test mode?'), '', false)
+      .addParameter('yesorno', _('Test mode?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
@@ -227,12 +227,12 @@ module.exports = {
     extension
       .addAction(
         'ShowInterstitial',
-        t('Show interstitial'),
-        t(
+        _('Show interstitial'),
+        _(
           'Show the interstitial, will work only when the interstitial is fully loaded.'
         ),
-        t('Show interstitial'),
-        t('AdMob'),
+        _('Show interstitial'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -244,10 +244,10 @@ module.exports = {
     extension
       .addCondition(
         'VideoLoading',
-        t('Video loading'),
-        t('Check if a reward video is currently loading.'),
-        t('Reward video is loading'),
-        t('AdMob'),
+        _('Video loading'),
+        _('Check if a reward video is currently loading.'),
+        _('Reward video is loading'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -258,10 +258,10 @@ module.exports = {
     extension
       .addCondition(
         'VideoReady',
-        t('Video ready'),
-        t('Check if a reward video is ready to be displayed.'),
-        t('Reward video is ready'),
-        t('AdMob'),
+        _('Video ready'),
+        _('Check if a reward video is ready to be displayed.'),
+        _('Reward video is ready'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -272,10 +272,10 @@ module.exports = {
     extension
       .addCondition(
         'VideoShowing',
-        t('Video showing'),
-        t('Check if there is a reward video being displayed.'),
-        t('Reward video is showing'),
-        t('AdMob'),
+        _('Video showing'),
+        _('Check if there is a reward video being displayed.'),
+        _('Reward video is showing'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -286,16 +286,16 @@ module.exports = {
     extension
       .addCondition(
         'VideoReward',
-        t('Video reward'),
-        t(
+        _('Video reward'),
+        _(
           'Check if there is a video reward.\nYou can mark it as non-claimed yet, so you can check this reward in other events.'
         ),
-        t('Video reward given'),
-        t('AdMob'),
+        _('Video reward given'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
-      .addParameter('yesorno', t('Mark as claimed'), '', false)
+      .addParameter('yesorno', _('Mark as claimed'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
@@ -304,20 +304,20 @@ module.exports = {
     extension
       .addAction(
         'LoadVideo',
-        t('Load video'),
-        t(
+        _('Load video'),
+        _(
           'Start loading a reward video, you can display it automatically when finish loading.\nIf test mode is set to true a test video will be displayed.'
         ),
-        t('Load reward video (show on load: _PARAM2_, test mode: _PARAM3_)'),
-        t('AdMob'),
+        _('Load reward video (show on load: _PARAM2_, test mode: _PARAM3_)'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
-      .addParameter('string', t('Android reward video ID'), '', false)
-      .addParameter('string', t('iOS reward video ID'), '', false)
-      .addParameter('yesorno', t('Display on load complete?'), '', false)
+      .addParameter('string', _('Android reward video ID'), '', false)
+      .addParameter('string', _('iOS reward video ID'), '', false)
+      .addParameter('yesorno', _('Display on load complete?'), '', false)
       .setDefaultValue('true')
-      .addParameter('yesorno', t('Test mode?'), '', false)
+      .addParameter('yesorno', _('Test mode?'), '', false)
       .setDefaultValue('true')
       .getCodeExtraInformation()
       .setIncludeFile('Extensions/AdMob/admobtools.js')
@@ -326,12 +326,12 @@ module.exports = {
     extension
       .addAction(
         'ShowVideo',
-        t('Show video'),
-        t(
+        _('Show video'),
+        _(
           'Show the reward video, will work only when the video is fully loaded.'
         ),
-        t('Show reward video'),
-        t('AdMob'),
+        _('Show reward video'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )
@@ -342,10 +342,10 @@ module.exports = {
     extension
       .addAction(
         'ClaimReward',
-        t('Claim reward'),
-        t('Mark the video reward as claimed.'),
-        t('Claim video reward'),
-        t('AdMob'),
+        _('Claim reward'),
+        _('Mark the video reward as claimed.'),
+        _('Claim video reward'),
+        _('AdMob'),
         'JsPlatform/Extensions/admobicon24.png',
         'JsPlatform/Extensions/admobicon16.png'
       )

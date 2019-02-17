@@ -88,6 +88,7 @@ type Props = {|
     instructionContext: InstructionContext
   ) => void,
   onParameterClick: (event: any, parameterIndex: number) => void,
+  renderObjectThumbnail: string => React.Node,
 |};
 
 class Instruction extends React.Component<Props, *> {
@@ -120,7 +121,6 @@ class Instruction extends React.Component<Props, *> {
             return <span key={i}>{formattedTexts.getString(i)}</span>;
 
           const parameterType = metadata.getParameter(parameterIndex).getType();
-          console.log(parameterType + ':' + formattedTexts.getString(i));
           return (
             <span
               key={i}
@@ -222,6 +222,7 @@ class Instruction extends React.Component<Props, *> {
               onParameterClick={this.props.onSubParameterClick}
               addButtonLabel="Add a sub-condition"
               disabled={this.props.disabled}
+              renderObjectThumbnail={this.props.renderObjectThumbnail}
             />
           )}
         </div>

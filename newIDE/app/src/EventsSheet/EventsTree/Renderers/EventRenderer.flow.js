@@ -1,4 +1,6 @@
 // @flow
+import * as React from 'react';
+
 import {
   type InstructionsListContext,
   type InstructionContext,
@@ -35,4 +37,5 @@ export type EventRendererProps = {
   onOpenExternalEvents: string => void,
 
   leftIndentWidth: number,
+  renderObjectThumbnail: string => React.Node,
 };

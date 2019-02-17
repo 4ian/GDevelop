@@ -14,6 +14,12 @@ const styles = {
   moreButton: {
     marginLeft: 10,
   },
+  variableIcon: {
+    verticalAlign: 'middle',
+    marginRight: 2,
+    width: 16,
+    height: 16,
+  },
 };
 
 type Props = {
@@ -119,10 +125,14 @@ export default class VariableField extends Component<Props, State> {
   }
 }
 
-export const VariableWithIcon = (value, iconPath, tooltip = '') => {
+export const renderVariableWithIcon = (
+  value: string,
+  iconPath: string,
+  tooltip: string = ''
+) => {
   return (
     <span title={tooltip}>
-      <img style={{maxWidth:48}} width={'auto'} height={24} src={iconPath} />
+      <img style={styles.variableIcon} src={iconPath} />
       {value}
     </span>
   );

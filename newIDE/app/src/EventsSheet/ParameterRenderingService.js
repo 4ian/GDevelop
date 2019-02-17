@@ -1,10 +1,13 @@
 // @flow
+import * as React from 'react';
 import DefaultField from './ParameterFields/DefaultField';
 import RelationalOperatorField from './ParameterFields/RelationalOperatorField';
 import OperatorField from './ParameterFields/OperatorField';
 import MouseField from './ParameterFields/MouseField';
 import KeyField from './ParameterFields/KeyField';
-import ObjectField, {renderObjectWithThumbnail} from './ParameterFields/ObjectField';
+import ObjectField, {
+  renderObjectWithThumbnail,
+} from './ParameterFields/ObjectField';
 import YesNoField from './ParameterFields/YesNoField';
 import TrueFalseField from './ParameterFields/TrueFalseField';
 import ExpressionField from './ParameterFields/ExpressionField';
@@ -13,13 +16,13 @@ import StringWithSelectorField from './ParameterFields/StringWithSelectorField';
 import BehaviorField from './ParameterFields/BehaviorField';
 
 import SceneVariableField, {
-  renderForceSceneVariable,
+  renderSceneVariable,
 } from './ParameterFields/SceneVariableField';
 import GlobalVariableField, {
-  renderForceGlobalVariable,
+  renderGlobalVariable,
 } from './ParameterFields/GlobalVariableField';
 import ObjectVariableField, {
-  renderForceObjectVariable,
+  renderObjectVariable,
 } from './ParameterFields/ObjectVariableField';
 
 import LayerField from './ParameterFields/LayerField';
@@ -58,9 +61,9 @@ const components = {
 
 const stringRenderers = {
   forceMultiplier: renderForceMultiplierString,
-  globalvar: renderForceGlobalVariable,
-  scenevar: renderForceSceneVariable,
-  objectvar: renderForceObjectVariable,
+  globalvar: renderGlobalVariable,
+  scenevar: renderSceneVariable,
+  objectvar: renderObjectVariable,
   object: renderObjectWithThumbnail,
 };
 
@@ -72,10 +75,13 @@ export default {
     if (components.hasOwnProperty(fieldType)) return components[fieldType];
     else return components.default;
   },
-  renderParameterString: (type: string, value: string, renderObjectThumnail=null) => {
-    if (renderObjectThumnail) {
-      return stringRenderers[type] ? stringRenderers[type](value,renderObjectThumnail) : value;
-    }
-    return stringRenderers[type] ? stringRenderers[type](value) : value;
+  renderParameterString: (
+    type: string,
+    value: string,
+    renderObjectThumnail: string => React.Node
+  ) => {
+    return stringRenderers[type]
+      ? stringRenderers[type](value, renderObjectThumnail)
+      : value;
   },
 };

@@ -20,9 +20,9 @@ import {
   type ParameterContext,
 } from '../SelectionHandler';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
-const getThumbnail=ObjectsRenderingService.getThumbnail.bind(
+const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
   ObjectsRenderingService
-)
+);
 
 const gd = global.gd;
 
@@ -89,11 +89,22 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
     this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
   };
 
-  renderObjectThumbnail = (objectName) =>{
-    const { project, layout } = this.props;
-    const object = layout.getObject(objectName)
-    return getThumbnail(project,object)
+  getObject(objectName, layout, project) {
+    //Todo -use the generic method from the other pull when it gets merged instead
+    var associatedObject = null;
+    if (layout.hasObjectNamed(objectName))
+      associatedObject = layout.getObject(objectName);
+    else if (project.hasObjectNamed(objectName))
+      associatedObject = project.getObject(objectName);
+    return associatedObject;
   }
+
+  renderObjectThumbnail = objectName => {
+    const { project, layout } = this.props;
+    if (!layout) return;//to pass flow
+    const object = this.getObject(objectName, layout, project);
+    return getThumbnail(project, object);
+  };
 
   render() {
     const { event, project, layout, disabled } = this.props;

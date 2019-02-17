@@ -51,6 +51,7 @@ type Props = {
   extraClassName?: string,
   style?: Object,
   disabled: boolean,
+  renderObjectThumbnail: string => React.Node,
   ...DropTargetProps,
 };
 

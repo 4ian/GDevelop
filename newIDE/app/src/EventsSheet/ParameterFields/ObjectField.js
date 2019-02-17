@@ -3,6 +3,16 @@ import * as React from 'react';
 import ObjectSelector from '../../ObjectsList/ObjectSelector';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
+const styles = {
+  objectThumbnail: {
+    marginRight: 2,
+    height: 16,
+    maxWidth: 48,
+    width: 'auto',
+    verticalAlign: 'middle',
+  },
+};
+
 type State = {|
   errorText: ?string,
 |};
@@ -76,6 +86,17 @@ export default class ObjectField extends React.Component<
     );
   }
 }
-export const renderObjectWithThumbnail = (value: string,getObjectThumbnail) => {
-  return (<span title={value}><img style={{maxWidth:48}} width={'auto'} height={24} src={getObjectThumbnail? getObjectThumbnail(value):''}></img>{value}</span>);
+export const renderObjectWithThumbnail = (
+  value: string,
+  getObjectThumbnail: string => React.Node
+) => {
+  return (
+    <span title={value}>
+      <img
+        style={styles.objectThumbnail}
+        src={getObjectThumbnail ? getObjectThumbnail(value) : ''}
+      />
+      {value}
+    </span>
+  );
 };

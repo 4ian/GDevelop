@@ -3,6 +3,7 @@ import * as React from 'react';
 import { I18nProvider } from '@lingui/react';
 import { setupI18n } from '@lingui/core';
 import { getTranslationFunction } from './getTranslationFunction';
+import { type I18n as I18nType } from '@lingui/core';
 const gd = global.gd;
 
 type Catalog = any;
@@ -16,12 +17,14 @@ type Props = {|
 |};
 
 type State = {
-  i18n: ?any, //TODO
+  language: string,
+  i18n: ?I18nType,
   catalogs: Catalogs,
 };
 
 export default class GDI18nProvider extends React.Component<Props, State> {
   state = {
+    language: 'en',
     catalogs: {},
     i18n: null,
   };
@@ -57,6 +60,7 @@ export default class GDI18nProvider extends React.Component<Props, State> {
     this._loadCatalog(language).then(catalogs => {
       this.setState(
         {
+          language,
           catalogs,
           i18n: setupI18n({
             language: language,
@@ -73,13 +77,17 @@ export default class GDI18nProvider extends React.Component<Props, State> {
   }
 
   render() {
-    const { i18n } = this.state;
-    const { language, children } = this.props;
+    // Use language from the state, as it is synchronized with the catalogs,
+    // while the language from props is the "target language", and sometime
+    // can be a language for which the catalog is not loaded yet (which would
+    // create warning and a "flash" effect when changing language).
+    const { i18n, catalogs, language } = this.state;
+    const { children } = this.props;
 
     if (!i18n) return null; // Skip rendering when catalog isn't loaded.
 
     return (
-      <I18nProvider i18n={i18n} language={language}>
+      <I18nProvider i18n={i18n} language={language} catalogs={catalogs}>
         {children}
       </I18nProvider>
     );

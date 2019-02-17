@@ -174,7 +174,7 @@ class MainFrame extends React.Component<Props, State> {
   componentDidMount() {
     const { initialPathsOrURLsToOpen } = this.props;
 
-    this.loadExtensions();
+    this._loadExtensions();
     if (initialPathsOrURLsToOpen && initialPathsOrURLsToOpen[0]) {
       this.openFromPathOrURL(initialPathsOrURLsToOpen[0], () =>
         this.openSceneOrProjectManager()
@@ -183,15 +183,17 @@ class MainFrame extends React.Component<Props, State> {
       this._openIntroDialog(true);
   }
 
-  componentDidUpdate(prevProps: Props) {
-    // Any change in the language or the i18n configuration
-    // must reload extensions.
-    if (prevProps.i18n !== this.props.i18n) {
-      this.loadExtensions();
-    }
+  _languageDidChanged() {
+    // A change in the language will automatically be applied
+    // on all React components, as it's handled by GDI18nProvider.
+    // We still have this method that will be called when the language
+    // dialog is closed after a language change. We then reload GDevelop
+    // extensions so that they declare all objects/actions/condition/etc...
+    // using the new language.
+    this._loadExtensions();
   }
 
-  loadExtensions = () => {
+  _loadExtensions = () => {
     const { extensionsLoader, i18n } = this.props;
     if (!extensionsLoader) {
       console.info(
@@ -1445,7 +1447,12 @@ class MainFrame extends React.Component<Props, State> {
         />
         <LanguageDialog
           open={this.state.languageDialogOpen}
-          onClose={() => this.openLanguage(false)}
+          onClose={(languageChanged) => {
+            this.openLanguage(false);
+            if (languageChanged) {
+              this._languageDidChanged();
+            }
+          }}
         />
         <AboutDialog
           open={aboutDialogOpen}

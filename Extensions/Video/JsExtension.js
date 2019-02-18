@@ -157,7 +157,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("play");
 
@@ -171,7 +171,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("pause");
 
@@ -185,7 +185,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .addParameter("yesorno", _("Loop or not"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("setLoop");
@@ -200,7 +200,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .addParameter("yesorno", _("Mute or not"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("mute");
@@ -215,7 +215,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .addParameter("operator", _("Modification's sign"), "", false)
       .addParameter("expression", _("Time in seconds"), "", false)
       .getCodeExtraInformation()
@@ -233,7 +233,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .addParameter("operator", _("Modification's sign"), "", false)
       .addParameter("expression", _("Volume in %"), "", false)
       .getCodeExtraInformation()
@@ -275,7 +275,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isPlayed");
 
@@ -289,7 +289,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isPaused");
 
@@ -327,7 +327,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isLooped");
 
@@ -365,7 +365,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .addParameter("relationalOperator", _("Sign of the test"))
       .addParameter("expression", _("Value 0-100"))
       .getCodeExtraInformation()
@@ -382,7 +382,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isMuted");
 
@@ -432,7 +432,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isEnded");
 
@@ -446,7 +446,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .addParameter("operator", _("Modification's sign"), "", false)
       .addParameter("expression", _("Opacity in %"), "", false)
       .getCodeExtraInformation()
@@ -464,7 +464,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .addParameter("relationalOperator", _("Sign of the test"))
       .addParameter("expression", _("Opacity 0-100"))
       .getCodeExtraInformation()
@@ -493,7 +493,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .addParameter("operator", _("Modification's sign"), "", false)
       .addParameter("expression", _("Speed in %"), "", false)
       .getCodeExtraInformation()
@@ -511,7 +511,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .addParameter("relationalOperator", _("Sign of the test"))
       .addParameter("expression", _("Speed 0-100"))
       .getCodeExtraInformation()
@@ -548,7 +548,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .addParameter("yesorno", _("Display or not"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("controls");
@@ -575,7 +575,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose an object video"), "", false)
+      .addParameter("object", _("Choose a video object"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("controlsAreShowing"); */
 

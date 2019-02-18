@@ -26,7 +26,7 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
-import { type variableOrigin } from './VariablesList.flow';
+import { type VariableOrigin } from './VariablesList.flow';
 
 const gd = global.gd;
 
@@ -46,7 +46,7 @@ type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
 
 type Props = {|
   variablesContainer: gdVariablesContainer,
-  inheritedVariablesContainer?: gdVariablesContainer,
+  inheritedVariablesContainer?: ?gdVariablesContainer,
   emptyExplanationMessage?: string,
   emptyExplanationSecondMessage?: string,
   onSizeUpdated?: () => void,
@@ -141,7 +141,7 @@ export default class VariablesList extends React.Component<Props, State> {
     variable: gdVariable,
     newValue: string,
     index: number,
-    origin: ?variableOrigin
+    origin: ?VariableOrigin
   ) => {
     const { variablesContainer, inheritedVariablesContainer } = this.props;
 
@@ -164,7 +164,7 @@ export default class VariablesList extends React.Component<Props, State> {
     name: string,
     parentVariable: gdVariable,
     depth: number,
-    origin: variableOrigin
+    origin: VariableOrigin
   ): Array<React.Node> {
     const names = parentVariable.getAllChildrenNames().toJSArray();
 
@@ -197,7 +197,7 @@ export default class VariablesList extends React.Component<Props, State> {
     depth: number,
     index: number,
     parentVariable: ?gdVariable,
-    parentOrigin: ?variableOrigin = null
+    parentOrigin: ?VariableOrigin = null
   ) {
     const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
@@ -311,7 +311,7 @@ export default class VariablesList extends React.Component<Props, State> {
       ? mapFor(0, inheritedVariablesContainer.count(), index => {
           const name = inheritedVariablesContainer.getNameAt(index);
           if (!variablesContainer.has(name)) {
-            // Show only object variables that have no instance variable
+            // Show only variables from parent container that are not redefined
             const variable = inheritedVariablesContainer.getAt(index);
             return this._renderVariableAndChildrenRows(
               name,

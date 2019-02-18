@@ -7,7 +7,6 @@ const styles = {
   },
   noMarginBody: {
     padding: 0,
-    paddingBottom: 25, //required for tooltips to work
     overflowX: 'hidden',
   },
   actionsContainer: {},

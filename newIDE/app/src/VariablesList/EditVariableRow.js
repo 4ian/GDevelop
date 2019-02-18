@@ -19,17 +19,13 @@ const EditVariableRow = ({
 }) => (
   <TreeTableRow key="add-row">
     <TreeTableCell style={styles.toolColumnHeader}>
-      <IconButton onClick={onCopy} disabled={!hasSelection} tooltip={'Copy'}>
+      <IconButton onClick={onCopy} disabled={!hasSelection}>
         <ContentCopy />
       </IconButton>
-      <IconButton onClick={onPaste} disabled={!hasClipboard} tooltip={'Paste'}>
+      <IconButton onClick={onPaste} disabled={!hasClipboard}>
         <ContentPaste />
       </IconButton>
-      <IconButton
-        onClick={onDeleteSelection}
-        disabled={!hasSelection}
-        tooltip={'Delete'}
-      >
+      <IconButton onClick={onDeleteSelection} disabled={!hasSelection}>
         <Delete />
       </IconButton>
     </TreeTableCell>
@@ -39,7 +35,7 @@ const EditVariableRow = ({
     </TreeTableCell>
 
     <TreeTableCell style={styles.toolColumn}>
-      <IconButton onClick={onAdd} tooltip={'Add new variable'}>
+      <IconButton onClick={onAdd}>
         <Add />
       </IconButton>
     </TreeTableCell>

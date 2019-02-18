@@ -6,7 +6,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import VariablesList from '../../VariablesList';
-import getObjectFromInstance from '../../Utils/GetObjectFromInstance';
+import GetObjectByName from '../../Utils/GetObjectByName';
 import IconButton from 'material-ui/IconButton';
 import { Line } from '../../UI/Grid';
 
@@ -110,7 +110,8 @@ export default class InstancePropertiesEditor extends Component {
   _renderInstancesProperties() {
     const { project, layout, instances } = this.props;
     const instance = instances[0];
-    const object = getObjectFromInstance(instance, layout, project);
+    const associatedObjectName = instance.getObjectName();
+    const object = GetObjectByName(project, layout, associatedObjectName);
     //TODO: multiple instances support
     const properties = instance.getCustomProperties(project, layout);
     const instanceSchema = propertiesMapToSchema(
@@ -141,7 +142,7 @@ export default class InstancePropertiesEditor extends Component {
           </IconButton>
         </Line>
         <VariablesList
-          inheritedVariablesContainer={object ? object.getVariables() : []}
+          inheritedVariablesContainer={object ? object.getVariables() : null}
           variablesContainer={instance.getVariables()}
           onSizeUpdated={
             () =>

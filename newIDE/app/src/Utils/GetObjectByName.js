@@ -1,6 +1,11 @@
-export default function getObjectFromInstance(instance, layout, project) {
-  var associatedObjectName = instance.getObjectName();
-  var associatedObject = null;
+// @flow
+
+export default function GetObjectByName(
+  project: gdProject,
+  layout: gdLayout,
+  associatedObjectName: string
+): ?gdObject {
+  let associatedObject = null;
   if (layout.hasObjectNamed(associatedObjectName))
     associatedObject = layout.getObject(associatedObjectName);
   else if (project.hasObjectNamed(associatedObjectName))

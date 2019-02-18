@@ -11,7 +11,7 @@ import IconButton from 'material-ui/IconButton';
 import Reset from 'material-ui/svg-icons/av/replay';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import styles from './styles';
-import { type variableOrigin } from './VariablesList.flow';
+import { type VariableOrigin } from './VariablesList.flow';
 
 //TODO: Refactor into TreeTable?
 const Indent = ({ width }) => (
@@ -38,7 +38,7 @@ type Props = {|
   showSelectionCheckbox: boolean,
   isSelected: boolean,
   onSelect: boolean => void,
-  origin: variableOrigin,
+  origin: VariableOrigin,
 |};
 
 const ThemableVariableRow = ({

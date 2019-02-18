@@ -505,7 +505,7 @@ export default class ObjectsListContainer extends React.Component<
             }
             onCancel={() => this._editVariables(null)}
             onApply={() => this._editVariables(null)}
-            titleMessage="Object Variables:"
+            title="Object Variables"
             emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
             emptyExplanationSecondMessage="For example, you can have a variable called Life representing the health of the object."
           />

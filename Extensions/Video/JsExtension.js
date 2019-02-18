@@ -24,7 +24,7 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: function(t, gd) {
+  createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension
       .setExtensionInformation(

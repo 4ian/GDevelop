@@ -157,7 +157,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("play");
 
@@ -171,7 +171,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("pause");
 
@@ -185,7 +185,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .addParameter("yesorno", _("Loop or not"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("setLoop");
@@ -200,7 +200,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .addParameter("yesorno", _("Mute or not"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("mute");
@@ -275,7 +275,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isPlayed");
 
@@ -289,7 +289,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isPaused");
 
@@ -327,7 +327,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isLooped");
 
@@ -382,7 +382,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isMuted");
 
@@ -432,7 +432,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isEnded");
 
@@ -548,7 +548,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .addParameter("yesorno", _("Display or not"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("controls");
@@ -556,12 +556,12 @@ module.exports = {
       object
       .addExpression(
         'controlsAreShowing',
-        t('Controls on video'),
-        t('Return state of controls on video'),
-        t('Global'),
+        _('Controls on video'),
+        _('Return state of controls on video'),
+        _('Global'),
         'res/physics16.png'
       )
-      .addParameter('object', t('Object'), '', false)
+      .addParameter('object', _("Object"), '', false)
       .getCodeExtraInformation()
       .setFunctionName('controlsAreShowing');
 
@@ -575,7 +575,7 @@ module.exports = {
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", "Choose an object video", "", false)
+      .addParameter("object", _("Choose an object video"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("controlsAreShowing"); */
 

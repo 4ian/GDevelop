@@ -22,6 +22,13 @@ type State = {|
   languageDidChange: boolean,
 |};
 
+const displayLocaleMetadata = localeMetadata => {
+  if (localeMetadata.languageCode === 'en') return false;
+  if (localeMetadata.languageCode === 'pseudo_LOCALE') return Window.isDev();
+
+  return true;
+};
+
 export default class LanguageDialog extends Component<Props, State> {
   state = {
     languageDidChange: false,
@@ -83,29 +90,31 @@ export default class LanguageDialog extends Component<Props, State> {
                         fullWidth
                       >
                         <MenuItem value="en" primaryText="English (default)" />
-                        {LocalesMetadata.map(localeMetadata => {
-                          let translationRatio =
-                            localeMetadata.translationRatio || 0;
-                          const percent = (
-                            100 * localeMetadata.translationRatio
-                          ).toFixed(0);
-                          const isStarted = translationRatio > 0;
+                        {LocalesMetadata.filter(displayLocaleMetadata).map(
+                          localeMetadata => {
+                            let translationRatio =
+                              localeMetadata.translationRatio || 0;
+                            const percent = (
+                              100 * localeMetadata.translationRatio
+                            ).toFixed(0);
+                            const isStarted = translationRatio > 0;
 
-                          return (
-                            <MenuItem
-                              value={localeMetadata.languageCode}
-                              primaryText={
-                                localeMetadata.languageNativeName +
-                                ' (' +
-                                localeMetadata.languageName +
-                                ')' +
-                                (isStarted ? ` - ~${percent}%` : '')
-                              }
-                              disabled={!isStarted}
-                              key={localeMetadata.languageCode}
-                            />
-                          );
-                        })}
+                            return (
+                              <MenuItem
+                                value={localeMetadata.languageCode}
+                                primaryText={
+                                  localeMetadata.languageNativeName +
+                                  ' (' +
+                                  localeMetadata.languageName +
+                                  ')' +
+                                  (isStarted ? ` - ~${percent}%` : '')
+                                }
+                                disabled={!isStarted}
+                                key={localeMetadata.languageCode}
+                              />
+                            );
+                          }
+                        )}
                       </SelectField>
                     </Line>
                     <Line expand>

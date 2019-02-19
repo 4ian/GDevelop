@@ -6,7 +6,7 @@ import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
 import VariablesList from '../../VariablesList';
-import GetObjectByName from '../../Utils/GetObjectByName';
+import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from 'material-ui/IconButton';
 import { Line } from '../../UI/Grid';
 
@@ -111,7 +111,7 @@ export default class InstancePropertiesEditor extends Component {
     const { project, layout, instances } = this.props;
     const instance = instances[0];
     const associatedObjectName = instance.getObjectName();
-    const object = GetObjectByName(project, layout, associatedObjectName);
+    const object = getObjectByName(project, layout, associatedObjectName);
     //TODO: multiple instances support
     const properties = instance.getCustomProperties(project, layout);
     const instanceSchema = propertiesMapToSchema(

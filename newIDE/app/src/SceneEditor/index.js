@@ -849,7 +849,6 @@ export default class SceneEditor extends React.Component<Props, State> {
             project={project}
             layout={layout}
             instances={selectedInstances}
-            onInstancesModified={this._onInstancesModified}
             editInstanceVariables={this.editInstanceVariables}
             editObjectVariables={this.editObjectVariables}
             onEditObjectByName={this.editObjectByName}

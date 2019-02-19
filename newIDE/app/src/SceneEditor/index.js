@@ -36,7 +36,7 @@ import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import { roundPosition } from '../Utils/GridHelpers';
-import GetObjectByName from '../Utils/GetObjectByName';
+import getObjectByName from '../Utils/GetObjectByName';
 
 import {
   type ResourceSource,
@@ -1091,13 +1091,15 @@ export default class SceneEditor extends React.Component<Props, State> {
             const associatedObjectName = this.instancesSelection
               .getSelectedInstances()[0]
               .getObjectName();
-            const object = GetObjectByName(
+            const object = getObjectByName(
               project,
               layout,
               associatedObjectName
             );
-            this.editObjectVariables(object);
-            this.editInstanceVariables(null);
+            if (object) {
+              this.editObjectVariables(object);
+              this.editInstanceVariables(null);
+            }
           }}
         />
         <VariablesEditorDialog

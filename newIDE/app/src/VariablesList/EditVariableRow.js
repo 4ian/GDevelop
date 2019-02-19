@@ -17,7 +17,7 @@ const EditVariableRow = ({
   hasClipboard,
   onDeleteSelection,
 }) => (
-  <TreeTableRow key="add-row">
+  <TreeTableRow>
     <TreeTableCell style={styles.toolColumnHeader}>
       <IconButton onClick={onCopy} disabled={!hasSelection}>
         <ContentCopy />

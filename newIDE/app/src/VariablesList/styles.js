@@ -4,7 +4,7 @@ export default {
     paddingRight: 4,
   },
   toolColumn: {
-    minWidth: 30,
+    minWidth: 48,
     flex: 0,
     justifyContent: 'flex-end',
   },

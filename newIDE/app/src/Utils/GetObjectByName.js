@@ -1,6 +1,6 @@
 // @flow
 
-export default function GetObjectByName(
+export default function getObjectByName(
   project: gdProject,
   layout: gdLayout,
   associatedObjectName: string

@@ -1,5 +1,6 @@
+// @flow
 import { Trans } from '@lingui/macro';
-import React, { Component } from 'react';
+import * as React from 'react';
 import Background from '../../UI/Background';
 import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -12,90 +13,105 @@ import { Line, Column } from '../../UI/Grid';
 
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 
-export default class InstancePropertiesEditor extends Component {
-  constructor() {
-    super();
+type Props = {|
+  project: gdProject,
+  layout: gdLayout,
+  instances: Array<gdInitialInstance>,
+  onEditObjectByName: string => void,
+  editObjectVariables: (?gdObject) => void,
+  editInstanceVariables: gdInitialInstance => void,
+|};
 
-    this.schema = [
-      {
-        name: 'Object name',
-        valueType: 'string',
-        disabled: true,
-        getValue: instance => instance.getObjectName(),
-        setValue: (instance, newValue) => instance.setObjectName(newValue),
-        onEditButtonClick: instance =>
-          this.props.onEditObjectByName(instance.getObjectName()),
-      },
-      {
-        name: 'Position',
-        type: 'row',
-        children: [
-          {
-            name: 'X',
-            valueType: 'number',
-            getValue: instance => instance.getX(),
-            setValue: (instance, newValue) => instance.setX(newValue),
-          },
-          {
-            name: 'Y',
-            valueType: 'number',
-            getValue: instance => instance.getY(),
-            setValue: (instance, newValue) => instance.setY(newValue),
-          },
-        ],
-      },
-      {
-        name: 'Angle',
-        valueType: 'number',
-        getValue: instance => instance.getAngle(),
-        setValue: (instance, newValue) => instance.setAngle(newValue),
-      },
-      {
-        name: 'Lock position/angle in the editor',
-        valueType: 'boolean',
-        getValue: instance => instance.isLocked(),
-        setValue: (instance, newValue) => instance.setLocked(newValue),
-      },
-      {
-        name: 'Z Order',
-        valueType: 'number',
-        getValue: instance => instance.getZOrder(),
-        setValue: (instance, newValue) => instance.setZOrder(newValue),
-      },
-      {
-        name: 'Layer',
-        valueType: 'string',
-        getChoices: () => enumerateLayers(this.props.layout),
-        getValue: instance => instance.getLayer(),
-        setValue: (instance, newValue) => instance.setLayer(newValue),
-      },
-      {
-        name: 'Custom size',
-        type: 'row',
-        children: [
-          {
-            name: 'Width',
-            valueType: 'number',
-            getValue: instance => instance.getCustomWidth(),
-            setValue: (instance, newValue) => instance.setCustomWidth(newValue),
-          },
-          {
-            name: 'Height',
-            valueType: 'number',
-            getValue: instance => instance.getCustomHeight(),
-            setValue: (instance, newValue) =>
-              instance.setCustomHeight(newValue),
-          },
-        ],
-      },
-      {
-        name: 'Custom size?',
-        valueType: 'boolean',
-        getValue: instance => instance.hasCustomSize(),
-        setValue: (instance, newValue) => instance.setHasCustomSize(newValue),
-      },
-    ];
-  }
+export default class InstancePropertiesEditor extends React.Component<Props> {
+  _instanceVariablesList: { current: null | VariablesList } = React.createRef();
+  schema = [
+    {
+      name: 'Object name',
+      valueType: 'string',
+      disabled: true,
+      getValue: (instance: gdInitialInstance) => instance.getObjectName(),
+      setValue: (instance: gdInitialInstance, newValue: string) =>
+        instance.setObjectName(newValue),
+      onEditButtonClick: (instance: gdInitialInstance) =>
+        this.props.onEditObjectByName(instance.getObjectName()),
+    },
+    {
+      name: 'Position',
+      type: 'row',
+      children: [
+        {
+          name: 'X',
+          valueType: 'number',
+          getValue: (instance: gdInitialInstance) => instance.getX(),
+          setValue: (instance: gdInitialInstance, newValue: number) =>
+            instance.setX(newValue),
+        },
+        {
+          name: 'Y',
+          valueType: 'number',
+          getValue: (instance: gdInitialInstance) => instance.getY(),
+          setValue: (instance: gdInitialInstance, newValue: number) =>
+            instance.setY(newValue),
+        },
+      ],
+    },
+    {
+      name: 'Angle',
+      valueType: 'number',
+      getValue: (instance: gdInitialInstance) => instance.getAngle(),
+      setValue: (instance: gdInitialInstance, newValue: number) =>
+        instance.setAngle(newValue),
+    },
+    {
+      name: 'Lock position/angle in the editor',
+      valueType: 'boolean',
+      getValue: (instance: gdInitialInstance) => instance.isLocked(),
+      setValue: (instance: gdInitialInstance, newValue: boolean) =>
+        instance.setLocked(newValue),
+    },
+    {
+      name: 'Z Order',
+      valueType: 'number',
+      getValue: (instance: gdInitialInstance) => instance.getZOrder(),
+      setValue: (instance: gdInitialInstance, newValue: number) =>
+        instance.setZOrder(newValue),
+    },
+    {
+      name: 'Layer',
+      valueType: 'string',
+      getChoices: () => enumerateLayers(this.props.layout),
+      getValue: (instance: gdInitialInstance) => instance.getLayer(),
+      setValue: (instance: gdInitialInstance, newValue: string) =>
+        instance.setLayer(newValue),
+    },
+    {
+      name: 'Custom size',
+      type: 'row',
+      children: [
+        {
+          name: 'Width',
+          valueType: 'number',
+          getValue: (instance: gdInitialInstance) => instance.getCustomWidth(),
+          setValue: (instance: gdInitialInstance, newValue: number) =>
+            instance.setCustomWidth(newValue),
+        },
+        {
+          name: 'Height',
+          valueType: 'number',
+          getValue: (instance: gdInitialInstance) => instance.getCustomHeight(),
+          setValue: (instance: gdInitialInstance, newValue: number) =>
+            instance.setCustomHeight(newValue),
+        },
+      ],
+    },
+    {
+      name: 'Custom size?',
+      valueType: 'boolean',
+      getValue: (instance: gdInitialInstance) => instance.hasCustomSize(),
+      setValue: (instance: gdInitialInstance, newValue: boolean) =>
+        instance.setHasCustomSize(newValue),
+    },
+  ];
 
   _renderEmpty() {
     return (
@@ -116,15 +132,18 @@ export default class InstancePropertiesEditor extends Component {
     const properties = instance.getCustomProperties(project, layout);
     const instanceSchema = propertiesMapToSchema(
       properties,
-      instance => instance.getCustomProperties(project, layout),
-      (instance, name, value) =>
+      (instance: gdInitialInstance) =>
+        instance.getCustomProperties(project, layout),
+      (instance: gdInitialInstance, name, value) =>
         instance.updateCustomProperty(name, value, project, layout)
     );
 
     return (
       <div
         style={{ overflowY: 'scroll', overflowX: 'hidden' }}
-        key={instances.map(instance => '' + instance.ptr).join(';')}
+        key={instances
+          .map((instance: gdInitialInstance) => '' + instance.ptr)
+          .join(';')}
       >
         <Column>
           <PropertiesEditor
@@ -149,9 +168,7 @@ export default class InstancePropertiesEditor extends Component {
             () =>
               this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
           }
-          onEditObjectVariables={() => {
-            this.props.editObjectVariables(object);
-          }}
+          ref={this._instanceVariablesList}
         />
       </div>
     );

@@ -10,7 +10,7 @@ import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from 'material-ui/IconButton';
 import { Line, Column } from '../../UI/Grid';
 
-import PopOut from 'material-ui/svg-icons/action/open-in-new';
+import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 
 export default class InstancePropertiesEditor extends Component {
   constructor() {
@@ -138,7 +138,7 @@ export default class InstancePropertiesEditor extends Component {
                 this.props.editInstanceVariables(instance);
               }}
             >
-              <PopOut />
+              <OpenInNew />
             </IconButton>
           </Line>
         </Column>

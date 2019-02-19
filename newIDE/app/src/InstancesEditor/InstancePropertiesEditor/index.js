@@ -5,6 +5,12 @@ import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import VariablesList from '../../VariablesList';
+import getObjectByName from '../../Utils/GetObjectByName';
+import IconButton from 'material-ui/IconButton';
+import { Line } from '../../UI/Grid';
+
+import PopOut from 'material-ui/svg-icons/action/open-in-new';
 
 export default class InstancePropertiesEditor extends Component {
   constructor() {
@@ -88,17 +94,6 @@ export default class InstancePropertiesEditor extends Component {
         getValue: instance => instance.hasCustomSize(),
         setValue: (instance, newValue) => instance.setHasCustomSize(newValue),
       },
-      {
-        name: 'Instance variables',
-        children: [
-          {
-            name: 'Edit variables',
-            getLabel: instance =>
-              'Edit variables (' + instance.getVariables().count() + ')',
-            onClick: instance => this.props.editInstanceVariables(instance),
-          },
-        ],
-      },
     ];
   }
 
@@ -114,9 +109,11 @@ export default class InstancePropertiesEditor extends Component {
 
   _renderInstancesProperties() {
     const { project, layout, instances } = this.props;
-
+    const instance = instances[0];
+    const associatedObjectName = instance.getObjectName();
+    const object = getObjectByName(project, layout, associatedObjectName);
     //TODO: multiple instances support
-    const properties = instances[0].getCustomProperties(project, layout);
+    const properties = instance.getCustomProperties(project, layout);
     const instanceSchema = propertiesMapToSchema(
       properties,
       instance => instance.getCustomProperties(project, layout),
@@ -132,6 +129,28 @@ export default class InstancePropertiesEditor extends Component {
         <PropertiesEditor
           schema={this.schema.concat(instanceSchema)}
           instances={instances}
+        />
+        <Line alignItems="center">
+          Instance Variables
+          <IconButton
+            tooltip={'Edit instance variables'}
+            onClick={() => {
+              this.props.editInstanceVariables(instance);
+            }}
+          >
+            <PopOut />
+          </IconButton>
+        </Line>
+        <VariablesList
+          inheritedVariablesContainer={object ? object.getVariables() : null}
+          variablesContainer={instance.getVariables()}
+          onSizeUpdated={
+            () =>
+              this.forceUpdate() /*Force update to ensure dialog is properly positionned*/
+          }
+          onEditObjectVariables={() => {
+            this.props.editObjectVariables(object);
+          }}
         />
       </div>
     );

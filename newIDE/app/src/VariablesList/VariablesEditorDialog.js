@@ -35,7 +35,7 @@ export class VariablesEditorDialog extends Component {
     ];
     const secondaryActions = onEditObjectVariables ? (
       <FlatButton
-        label="Edit Object Variables"
+        label={<Trans>Edit Object Variables</Trans>}
         primary={false}
         onClick={onEditObjectVariables}
       />

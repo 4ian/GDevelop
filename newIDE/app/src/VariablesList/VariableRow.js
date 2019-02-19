@@ -103,7 +103,7 @@ const ThemableVariableRow = ({
             }
           }}
           multiLine
-          disabled={depth !== 0 && limitEditing} //GD doesn't support deep merging
+          disabled={origin === 'parent' && depth !== 0}
         />
       </TreeTableCell>
     );
@@ -119,7 +119,7 @@ const ThemableVariableRow = ({
   }
   columns.push(
     <TreeTableCell key="tools" style={styles.toolColumn}>
-      {origin === 'inherited' && !isStructure && (
+      {origin === 'inherited' && depth === 0 && (
         <IconButton
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
@@ -128,11 +128,10 @@ const ThemableVariableRow = ({
           <Reset />
         </IconButton>
       )}
-      {!limitEditing && (
+      {!(origin === 'inherited' && depth === 0) && origin !== 'parent' && (
         <IconButton
           onClick={onAddChild}
           style={isStructure ? undefined : styles.fadedButton}
-          disabled={limitEditing}
           tooltip={'Add child variable'}
         >
           <AddCircle />

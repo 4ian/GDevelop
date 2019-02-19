@@ -116,13 +116,18 @@ export default class VariablesList extends React.Component<Props, State> {
     const selection: Array<VariableAndName> = getSelection(
       this.state.selectedVariables
     );
+
     // Only delete ancestor variables, as selection can be composed of variables
     // that are contained inside others.
-    const ancestorOnlyVariables = selection.filter(({ variable }) => {
-      return selection.filter(
+    const ancestorOnlyVariables = selection.filter(variableAndName => {
+      // Make sure that the variable has no ancestor containing it
+      return !selection.find(
         otherVariableAndName =>
-          variable !== otherVariableAndName &&
-          otherVariableAndName.variable.contains(variable)
+          variableAndName !== otherVariableAndName &&
+          otherVariableAndName.variable.contains(
+            variableAndName.variable,
+            /*recursive=*/ true
+          )
       );
     });
 
@@ -131,12 +136,16 @@ export default class VariablesList extends React.Component<Props, State> {
     ancestorOnlyVariables.forEach(({ variable }: VariableAndName) =>
       variablesContainer.removeRecursively(variable)
     );
+    this.clearSelection();
+  };
+
+  clearSelection = () => {
     this.setState({
       selectedVariables: getInitialSelection(),
     });
   };
 
-  updateOrDefineVariable = (
+  _updateOrDefineVariable = (
     name: string,
     variable: gdVariable,
     newValue: string,
@@ -219,7 +228,7 @@ export default class VariablesList extends React.Component<Props, State> {
             : undefined
         }
         onChangeValue={text => {
-          this.updateOrDefineVariable(name, variable, text, index, origin);
+          this._updateOrDefineVariable(name, variable, text, index, origin);
 
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();

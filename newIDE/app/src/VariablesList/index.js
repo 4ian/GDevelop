@@ -6,17 +6,13 @@ import {
   TableHeaderColumn,
   TableRow,
 } from 'material-ui/Table';
-import IconButton from 'material-ui/IconButton';
-import ContentCopy from 'material-ui/svg-icons/content/content-copy';
-import ContentPaste from 'material-ui/svg-icons/content/content-paste';
-import Delete from 'material-ui/svg-icons/action/delete';
 import flatten from 'lodash/flatten';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { mapFor } from '../Utils/MapFor';
 import EmptyMessage from '../UI/EmptyMessage';
 import newNameGenerator from '../Utils/NewNameGenerator';
 import VariableRow from './VariableRow';
-import AddVariableRow from './AddVariableRow';
+import EditVariableRow from './EditVariableRow';
 import styles from './styles';
 import {
   getInitialSelection,
@@ -30,10 +26,12 @@ import {
   serializeToJSObject,
   unserializeFromJSObject,
 } from '../Utils/Serializer';
+import { type VariableOrigin } from './VariablesList.flow';
+
 const gd = global.gd;
 
 const SortableVariableRow = SortableElement(VariableRow);
-const SortableAddVariableRow = SortableElement(AddVariableRow);
+const SortableAddVariableRow = SortableElement(EditVariableRow);
 
 class VariablesListBody extends React.Component<*, *> {
   render() {
@@ -48,6 +46,7 @@ type VariableAndName = {| name: string, ptr: number, variable: gdVariable |};
 
 type Props = {|
   variablesContainer: gdVariablesContainer,
+  inheritedVariablesContainer?: ?gdVariablesContainer,
   emptyExplanationMessage?: string,
   emptyExplanationSecondMessage?: string,
   onSizeUpdated?: () => void,
@@ -86,14 +85,18 @@ export default class VariablesList extends React.Component<Props, State> {
   };
 
   paste = () => {
-    const { variablesContainer } = this.props;
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!Clipboard.has(CLIPBOARD_KIND)) return;
 
     const variables = Clipboard.get(CLIPBOARD_KIND);
     variables.forEach(({ name, serializedVariable }) => {
       const newName = newNameGenerator(
         name,
-        name => variablesContainer.has(name),
+        name =>
+          inheritedVariablesContainer
+            ? inheritedVariablesContainer.has(name) ||
+              variablesContainer.has(name)
+            : variablesContainer.has(name),
         'CopyOf'
       );
       const newVariable = new gd.Variable();
@@ -116,11 +119,15 @@ export default class VariablesList extends React.Component<Props, State> {
 
     // Only delete ancestor variables, as selection can be composed of variables
     // that are contained inside others.
-    const ancestorOnlyVariables = selection.filter(({ variable }) => {
-      return selection.filter(
+    const ancestorOnlyVariables = selection.filter(variableAndName => {
+      // Make sure that the variable has no ancestor containing it
+      return !selection.find(
         otherVariableAndName =>
-          variable !== otherVariableAndName &&
-          otherVariableAndName.variable.contains(variable)
+          variableAndName !== otherVariableAndName &&
+          otherVariableAndName.variable.contains(
+            variableAndName.variable,
+            /*recursive=*/ true
+          )
       );
     });
 
@@ -129,15 +136,44 @@ export default class VariablesList extends React.Component<Props, State> {
     ancestorOnlyVariables.forEach(({ variable }: VariableAndName) =>
       variablesContainer.removeRecursively(variable)
     );
+    this.clearSelection();
+  };
+
+  clearSelection = () => {
     this.setState({
       selectedVariables: getInitialSelection(),
     });
   };
 
+  _updateOrDefineVariable = (
+    name: string,
+    variable: gdVariable,
+    newValue: string,
+    index: number,
+    origin: ?VariableOrigin
+  ) => {
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
+
+    if (inheritedVariablesContainer && origin === 'parent') {
+      const serializedVariable = serializeToJSObject(
+        inheritedVariablesContainer.get(name)
+      );
+      const newVariable = new gd.Variable();
+      unserializeFromJSObject(newVariable, serializedVariable);
+      variablesContainer.insert(name, newVariable, index);
+      newVariable.delete();
+
+      variablesContainer.get(name).setString(newValue);
+    } else {
+      variable.setString(newValue);
+    }
+  };
+
   _renderVariableChildren(
     name: string,
     parentVariable: gdVariable,
-    depth: number
+    depth: number,
+    origin: VariableOrigin
   ): Array<React.Node> {
     const names = parentVariable.getAllChildrenNames().toJSArray();
 
@@ -149,21 +185,33 @@ export default class VariablesList extends React.Component<Props, State> {
           variable,
           depth + 1,
           index,
-          parentVariable
+          parentVariable,
+          origin
         );
       })
     );
   }
+
+  _getVariableOrigin = (name: string) => {
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
+
+    if (!inheritedVariablesContainer || !inheritedVariablesContainer.has(name))
+      return '';
+    return variablesContainer.has(name) ? 'inherited' : 'parent';
+  };
 
   _renderVariableAndChildrenRows(
     name: string,
     variable: gdVariable,
     depth: number,
     index: number,
-    parentVariable: ?gdVariable
+    parentVariable: ?gdVariable,
+    parentOrigin: ?VariableOrigin = null
   ) {
     const { variablesContainer } = this.props;
     const isStructure = variable.isStructure();
+
+    const origin = parentOrigin ? parentOrigin : this._getVariableOrigin(name);
 
     return (
       <SortableVariableRow
@@ -173,13 +221,20 @@ export default class VariablesList extends React.Component<Props, State> {
         variable={variable}
         disabled={depth !== 0}
         depth={depth}
+        origin={origin}
         errorText={
           this.state.nameErrors[variable.ptr]
             ? 'This name is already taken'
             : undefined
         }
         onChangeValue={text => {
-          variable.setString(text);
+          this._updateOrDefineVariable(name, variable, text, index, origin);
+
+          this.forceUpdate();
+          if (this.props.onSizeUpdated) this.props.onSizeUpdated();
+        }}
+        onResetToDefaultValue={() => {
+          variablesContainer.removeRecursively(variable);
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
@@ -189,7 +244,7 @@ export default class VariablesList extends React.Component<Props, State> {
 
           let success = true;
           if (!parentVariable) {
-            success = this.props.variablesContainer.rename(name, text);
+            success = variablesContainer.rename(name, text);
           } else {
             success = parentVariable.renameChild(name, text);
           }
@@ -222,7 +277,7 @@ export default class VariablesList extends React.Component<Props, State> {
         }}
         children={
           isStructure
-            ? this._renderVariableChildren(name, variable, depth)
+            ? this._renderVariableChildren(name, variable, depth, origin)
             : null
         }
         showHandle={this.state.mode === 'move'}
@@ -237,26 +292,47 @@ export default class VariablesList extends React.Component<Props, State> {
 
   _renderEmpty() {
     return (
-      <div>
-        <EmptyMessage
-          style={styles.emptyExplanation}
-          messageStyle={styles.emptyExplanationMessage}
-        >
-          {this.props.emptyExplanationMessage || ''}
-        </EmptyMessage>
-        <EmptyMessage
-          style={styles.emptyExplanation}
-          messageStyle={styles.emptyExplanationMessage}
-        >
-          {this.props.emptyExplanationSecondMessage}
-        </EmptyMessage>
-      </div>
+      !!this.props.emptyExplanationMessage && (
+        <div>
+          <EmptyMessage
+            style={styles.emptyExplanation}
+            messageStyle={styles.emptyExplanationMessage}
+          >
+            {this.props.emptyExplanationMessage}
+          </EmptyMessage>
+          <EmptyMessage
+            style={styles.emptyExplanation}
+            messageStyle={styles.emptyExplanationMessage}
+          >
+            {this.props.emptyExplanationSecondMessage}
+          </EmptyMessage>
+        </div>
+      )
     );
   }
 
   render() {
-    const { variablesContainer } = this.props;
+    const { variablesContainer, inheritedVariablesContainer } = this.props;
     if (!variablesContainer) return null;
+
+    // Display inherited variables, if any
+    const containerInheritedVariablesTree = inheritedVariablesContainer
+      ? mapFor(0, inheritedVariablesContainer.count(), index => {
+          const name = inheritedVariablesContainer.getNameAt(index);
+          if (!variablesContainer.has(name)) {
+            // Show only variables from parent container that are not redefined
+            const variable = inheritedVariablesContainer.getAt(index);
+            return this._renderVariableAndChildrenRows(
+              name,
+              variable,
+              0,
+              index,
+              undefined,
+              'parent'
+            );
+          }
+        })
+      : [];
 
     const containerVariablesTree = mapFor(
       0,
@@ -275,7 +351,7 @@ export default class VariablesList extends React.Component<Props, State> {
       }
     );
 
-    const addRow = (
+    const editRow = (
       <SortableAddVariableRow
         index={0}
         key={'add-variable-row'}
@@ -284,13 +360,20 @@ export default class VariablesList extends React.Component<Props, State> {
           const variable = new gd.Variable();
           variable.setString('');
           const name = newNameGenerator('Variable', name =>
-            variablesContainer.has(name)
+            inheritedVariablesContainer
+              ? inheritedVariablesContainer.has(name) ||
+                variablesContainer.has(name)
+              : variablesContainer.has(name)
           );
           variablesContainer.insert(name, variable, variablesContainer.count());
-
           this.forceUpdate();
           if (this.props.onSizeUpdated) this.props.onSizeUpdated();
         }}
+        onCopy={this.copySelection}
+        onPaste={this.paste}
+        onDeleteSelection={this.deleteSelection}
+        hasSelection={hasSelection(this.state.selectedVariables)}
+        hasClipboard={Clipboard.has(CLIPBOARD_KIND)}
       />
     );
 
@@ -301,26 +384,7 @@ export default class VariablesList extends React.Component<Props, State> {
             <TableRow>
               <TableHeaderColumn>Name</TableHeaderColumn>
               <TableHeaderColumn>Value</TableHeaderColumn>
-              <TableHeaderColumn style={styles.toolColumnHeader}>
-                <IconButton
-                  onClick={this.copySelection}
-                  disabled={!hasSelection(this.state.selectedVariables)}
-                >
-                  <ContentCopy />
-                </IconButton>
-                <IconButton
-                  onClick={this.paste}
-                  disabled={!Clipboard.has(CLIPBOARD_KIND)}
-                >
-                  <ContentPaste />
-                </IconButton>
-                <IconButton
-                  onClick={this.deleteSelection}
-                  disabled={!hasSelection(this.state.selectedVariables)}
-                >
-                  <Delete />
-                </IconButton>
-              </TableHeaderColumn>
+              <TableHeaderColumn style={styles.toolColumnHeader} />
             </TableRow>
           </TableHeader>
         </Table>
@@ -334,9 +398,11 @@ export default class VariablesList extends React.Component<Props, State> {
           useDragHandle
           lockToContainerEdges
         >
+          {!!containerInheritedVariablesTree.length &&
+            containerInheritedVariablesTree}
           {!containerVariablesTree.length && this._renderEmpty()}
           {!!containerVariablesTree.length && containerVariablesTree}
-          {addRow}
+          {editRow}
         </SortableVariablesListBody>
       </div>
     );

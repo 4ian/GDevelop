@@ -1,7 +1,7 @@
 export default {
   toolColumnHeader: {
-    textAlign: 'right',
-    paddingRight: 8,
+    textAlign: 'left',
+    paddingRight: 4,
   },
   toolColumn: {
     minWidth: 48,

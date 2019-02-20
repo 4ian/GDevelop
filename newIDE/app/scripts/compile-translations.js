@@ -4,6 +4,7 @@ const fs = require('fs');
 const {
   getLocales,
   getLocalePath,
+  getLocaleSourceCatalogFiles,
   getLocaleCatalogPath,
   getLocaleCompiledCatalogPath,
   getLocaleMetadataPath,
@@ -135,10 +136,7 @@ getLocales()
             // Concatenate all message catalogs into a single one for lingui-js.
             // For "en", don't concatenate with gdcore-gdcpp-gdjs-extensions-messages.po
             // as it's the source language.
-            const files =
-              locale === 'en'
-                ? 'ide-messages.pot'
-                : 'ide-messages.po gdcore-gdcpp-gdjs-extensions-messages.po';
+            const files = getLocaleSourceCatalogFiles(locale).join(' ');
 
             // Run msgcat. Use --no-wrap to allow to sanitize the catalog with
             // regex/string replace.

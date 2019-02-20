@@ -56,13 +56,15 @@ export default class VariablesEditorDialog extends Component {
 
     return (
       <Dialog
-        title={'Objects on ' + this.props.layerRemoved}
+        title={<Trans>Objects on {this.props.layerRemoved}</Trans>}
         actions={actions}
         modal={true}
         open={this.props.open}
         onRequestClose={this.props.onCancel}
       >
-        <div>Move objects on layer {this.props.layerRemoved} to:</div>
+        <div>
+          <Trans>Move objects on layer {this.props.layerRemoved} to:</Trans>
+        </div>
         <SelectField
           value={this.state.selectedLayer}
           onChange={(event, index, newValue) => {

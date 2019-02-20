@@ -10,7 +10,8 @@ import { mapFor } from '../../Utils/MapFor';
 import { getInitialSelection, isEventSelected } from '../SelectionHandler';
 import EventsRenderingService from './EventsRenderingService';
 import EventHeightsCache from './EventHeightsCache';
-import { eventsTree, eventsTreeWithSearchResults } from './ClassNames';
+import classNames from 'classnames';
+import { eventsTree, eventsTreeWithSearchResults, icon } from './ClassNames';
 import './style.css';
 import {
   type SelectionState,
@@ -19,6 +20,7 @@ import {
   type InstructionContext,
   type ParameterContext,
 } from '../SelectionHandler';
+import getObjectByName from '../../Utils/GetObjectByName';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
 const getThumbnail = ObjectsRenderingService.getThumbnail.bind(
   ObjectsRenderingService
@@ -89,24 +91,19 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
     this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
   };
 
-  getObject(objectName: string) {
+  renderObjectThumbnail = (objectName: string, thumbnailSize: number = 20) => {
     const { project, layout } = this.props;
-    if (!layout) return;
-    //Todo -use the generic method from the other pull when it gets merged instead
-    var associatedObject = null;
-    if (layout.hasObjectNamed(objectName))
-      associatedObject = layout.getObject(objectName);
-    else if (project.hasObjectNamed(objectName))
-      associatedObject = project.getObject(objectName);
-    return associatedObject;
-  }
-
-  renderObjectThumbnail = (objectName: string) => {
-    const { project } = this.props;
-    //to pass flow
-    const object = this.getObject(objectName);
+    const object = getObjectByName(project, layout, objectName);
     if (object) {
-      return getThumbnail(project, object);
+      return (
+        <img
+          className={classNames({
+            [icon]: true,
+          })}
+          alt=""
+          src={getThumbnail(project, object)}
+        />
+      );
     }
   };
 

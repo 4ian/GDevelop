@@ -10,6 +10,7 @@ import {
   subInstructionsContainer,
   instructionParameter,
   disabledText,
+  icon,
 } from './ClassNames';
 import {
   type InstructionsListContext,
@@ -38,11 +39,6 @@ const styles = {
     wordWrap: 'break-word',
     cursor: 'pointer',
     marginBottom: 1,
-  },
-  icon: {
-    verticalAlign: 'middle',
-    paddingLeft: 2,
-    paddingRight: 2,
   },
 };
 
@@ -191,19 +187,19 @@ class Instruction extends React.Component<Props, *> {
         >
           {instruction.isInverted() && (
             <img
+              className={classNames({
+                [icon]: true,
+              })}
               src="res/contraire.png"
               alt="Condition is negated"
-              style={styles.icon}
-              width="20"
-              height="16"
             />
           )}
           <img
+            className={classNames({
+              [icon]: true,
+            })}
             src={metadata.getSmallIconFilename()}
-            style={styles.icon}
             alt=""
-            width="20"
-            height="16"
           />
           {this._renderInstructionText(metadata)}
           {metadata.canHaveSubInstructions() && (

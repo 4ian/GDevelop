@@ -179,3 +179,10 @@
   color: #b77cff;
   font-weight: bold;
 }
+
+/* Theming icons */
+.gd-events-sheet-dark-theme .icon {
+  padding-right: 2px;
+  width:20px;
+  height:20px;
+}

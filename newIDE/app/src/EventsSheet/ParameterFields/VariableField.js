@@ -7,6 +7,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
+import classNames from 'classnames';
+import { icon } from '../EventsTree/ClassNames';
 
 const styles = {
   container: {
@@ -15,13 +17,6 @@ const styles = {
   },
   moreButton: {
     marginLeft: 10,
-  },
-  variableIcon: {
-    verticalAlign: 'middle',
-    marginLeft: 2,
-    marginRight: 2,
-    width: 16,
-    height: 16,
   },
 };
 
@@ -135,7 +130,13 @@ export const renderVariableWithIcon = (
 ) => {
   return (
     <span title={tooltip}>
-      <img style={styles.variableIcon} src={iconPath} alt="" />
+      <img
+        className={classNames({
+          [icon]: true,
+        })}
+        src={iconPath}
+        alt=""
+      />
       {value}
     </span>
   );

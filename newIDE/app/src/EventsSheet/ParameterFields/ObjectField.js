@@ -3,17 +3,6 @@ import * as React from 'react';
 import ObjectSelector from '../../ObjectsList/ObjectSelector';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
-const styles = {
-  objectThumbnail: {
-    marginLeft: 2,
-    marginRight: 2,
-    height: 24,
-    maxWidth: 48,
-    width: 'auto',
-    verticalAlign: 'middle',
-  },
-};
-
 type State = {|
   errorText: ?string,
 |};
@@ -93,11 +82,7 @@ export const renderObjectWithThumbnail = (
 ) => {
   return (
     <span title={value}>
-      <img
-        alt=""
-        style={styles.objectThumbnail}
-        src={getObjectThumbnail ? getObjectThumbnail(value) : ''}
-      />
+      {getObjectThumbnail && getObjectThumbnail(value)}
       {value}
     </span>
   );

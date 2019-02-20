@@ -63,6 +63,8 @@ const theme: Theme = {
     iconButtonSize: 24,
   },
   snackbar: {
+    backgroundColor: backgroundColor,
+    textColor: lightWhite,
     actionColor: blue,
   },
   stepper: {

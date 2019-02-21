@@ -56,7 +56,6 @@ module.exports = {
       )
       .setIncludeFile("Extensions/TweenBehavior/tweenruntimebehavior.js")
       .addIncludeFile("Extensions/TweenBehavior/shifty.js");
-    //.addIncludeFile("Extensions/TweenBehavior/LICENSE-MIT.txt");
 
     // Behavior related
     behavior

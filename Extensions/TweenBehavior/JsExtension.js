@@ -30,40 +30,16 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName === "My first property") {
-        behaviorContent.property1 = newValue;
-        return true;
-      }
-      if (propertyName === "My other property") {
-        behaviorContent.property2 = newValue === "1";
-        return true;
-      }
-
       return false;
     };
 
     tweenBehavior.getProperties = function (behaviorContent) {
       var behaviorProperties = new gd.MapStringPropertyDescriptor();
-
-      behaviorProperties.set(
-        "My first property",
-        new gd.PropertyDescriptor(behaviorContent.property1)
-      );
-      behaviorProperties.set(
-        "My other property",
-        new gd.PropertyDescriptor(
-          behaviorContent.property2 ? "true" : "false"
-        ).setType("Boolean")
-      );
-
       return behaviorProperties;
     };
 
     tweenBehavior.setRawJSONContent(
-      JSON.stringify({
-        property1: "Initial value 1",
-        property2: true
-      })
+      JSON.stringify({})
     );
 
     const behavior = extension

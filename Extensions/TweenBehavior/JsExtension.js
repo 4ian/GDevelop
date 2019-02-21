@@ -57,6 +57,8 @@ module.exports = {
       .setIncludeFile("Extensions/TweenBehavior/tweenruntimebehavior.js")
       .addIncludeFile("Extensions/TweenBehavior/shifty.js");
 
+      const easingChoices = JSON.stringify(["linear", "easeInQuad", "easeOutQuad", "easeInOutQuad", "easeInCubic", "easeOutCubic", "easeInOutCubic", "easeInQuart", "easeOutQuart", "easeInOutQuart", "easeInQuint", "easeOutQuint", "easeInOutQuint", "easeInSine", "easeOutSine", "easeInOutSine", "easeInExpo", "easeOutExpo", "easeInOutExpo", "easeInCirc", "easeOutCirc", "easeInOutCirc", "easeOutBounce", "easeInBack", "easeOutBack", "easeInOutBack", "elastic", "swingFromTo", "swingFrom", "swingTo", "bounce", "bouncePast", "easeFromTo", "easeFrom", "easeTo"]);
+
     // Behavior related
     behavior
       .addAction(
@@ -76,7 +78,7 @@ module.exports = {
       .addParameter("objectvar", _("Object variable"), "", false)
       .addParameter("expression", _("From value"), "", false)
       .addParameter("expression", _("To value"), "", false)
-      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(
@@ -106,7 +108,7 @@ module.exports = {
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To X"), "", false)
       .addParameter("expression", _("To Y"), "", false)
-      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(
@@ -135,7 +137,7 @@ module.exports = {
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To X"), "", false)
-      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(
@@ -164,7 +166,7 @@ module.exports = {
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To Y"), "", false)
-      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(
@@ -193,7 +195,7 @@ module.exports = {
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To angle (in degrees)"), "", false)
-      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(
@@ -225,7 +227,7 @@ module.exports = {
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To scale X"), "", false)
       .addParameter("expression", _("To scale Y"), "", false)
-      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(
@@ -256,7 +258,7 @@ module.exports = {
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To scale X"), "", false)
-      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(
@@ -287,7 +289,7 @@ module.exports = {
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To scale Y"), "", false)
-      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(
@@ -318,7 +320,7 @@ module.exports = {
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To opacity"), "", false)
-      .addParameter("stringWithSelector", _("Easing"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(
@@ -349,7 +351,7 @@ module.exports = {
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("string", _("To color"), "", false)
-      .addParameter("stringWithSelector", _("Items"), "[\"linear\", \"easeInQuad\", \"easeOutQuad\", \"easeInOutQuad\", \"easeInCubic\", \"easeOutCubic\", \"easeInOutCubic\", \"easeInQuart\", \"easeOutQuart\", \"easeInOutQuart\", \"easeInQuint\", \"easeOutQuint\", \"easeInOutQuint\", \"easeInSine\", \"easeOutSine\", \"easeInOutSine\", \"easeInExpo\", \"easeOutExpo\", \"easeInOutExpo\", \"easeInCirc\", \"easeOutCirc\", \"easeInOutCirc\", \"easeOutBounce\", \"easeInBack\", \"easeOutBack\", \"easeInOutBack\", \"elastic\", \"swingFromTo\", \"swingFrom\", \"swingTo\", \"bounce\", \"bouncePast\", \"easeFromTo\", \"easeFrom\", \"easeTo\"]", false)
+      .addParameter("stringWithSelector", _("Items"), easingChoices, false)
       .setDefaultValue("linear")
       .addParameter("expression", _("Duration"), "", false)
       .addParameter(

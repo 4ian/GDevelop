@@ -67,7 +67,7 @@ module.exports = {
         _(
           "Tween the variable _PARAM3_ of _PARAM0_ from _PARAM4_ to _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_"
         ),
-        _("Tween animation/Variables"),
+        _("Variables"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -98,7 +98,7 @@ module.exports = {
         _(
           "Tween the position of _PARAM0_ to x: _PARAM3_, y: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_"
         ),
-        _("Tween animation/Position"),
+        _("Position"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -128,7 +128,7 @@ module.exports = {
         _(
           "Tween the X position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        _("Tween animation/Position"),
+        _("Position"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -157,7 +157,7 @@ module.exports = {
         _(
           "Tween the Y position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        _("Tween animation/Position"),
+        _("Position"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -186,7 +186,7 @@ module.exports = {
         _(
           "Tween the angle of _PARAM0_ to _PARAM3_° with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        _("Tween animation/Angle"),
+        _("Angle"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -217,7 +217,7 @@ module.exports = {
         _(
           "Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_"
         ),
-        _("Tween animation/Scale"),
+        _("Scale"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -249,7 +249,7 @@ module.exports = {
         _(
           "Tween the X-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        _("Tween animation/Scale"),
+        _("Scale"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -280,7 +280,7 @@ module.exports = {
         _(
           "Tween the Y-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        _("Tween animation/Scale"),
+        _("Scale"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -311,7 +311,7 @@ module.exports = {
         _(
           "Tween the opacity of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        _("Tween animation/Opacity"),
+        _("Opacity"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -342,7 +342,7 @@ module.exports = {
         _(
           "Tween the color of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
-        _("Tween animation/Color"),
+        _("Color"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -369,7 +369,7 @@ module.exports = {
         _("Tween exists"),
         _("Check if the tween animation exists."),
         _("Tween _PARAM2_ on _PARAM0_ exists"),
-        _("Tween animation"),
+        _(""),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -385,7 +385,7 @@ module.exports = {
         _("Tween is playing"),
         _("Check if the tween animation is currently playing."),
         _("Tween _PARAM2_ on _PARAM0_ is playing"),
-        _("Tween animation"),
+        _(""),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -401,7 +401,7 @@ module.exports = {
         _("Tween finished playing"),
         _("Check if the tween animation has finished playing."),
         _("Tween _PARAM2_ on _PARAM0_ has finished playing"),
-        _("Tween animation"),
+        _(""),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -417,7 +417,7 @@ module.exports = {
         _("Pause a tween"),
         _("Pause the running tween animation."),
         _("Pause the tween _PARAM2_ on _PARAM0_"),
-        _("Tween animation"),
+        _(""),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -433,7 +433,7 @@ module.exports = {
         _("Stop a tween"),
         _("Stop the running tween animation."),
         _("Stop the tween _PARAM2_ on _PARAM0_"),
-        _("Tween animation"),
+        _(""),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -450,7 +450,7 @@ module.exports = {
         _("Resume a tween"),
         _("Resume the tween animation."),
         _("Resume the tween _PARAM2_ on _PARAM0_"),
-        _("Tween animation"),
+        _(""),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -466,7 +466,7 @@ module.exports = {
         _("Remove a tween"),
         _("Remove the tween animation from the object."),
         _("Remove the tween _PARAM2_ from _PARAM0_"),
-        _("Tween animation"),
+        _(""),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
@@ -481,7 +481,7 @@ module.exports = {
         "GetProgress",
         _("Progress of a tween"),
         _("Progress of a tween (between 0.0 and 1.0)"),
-        _("Tween animation"),
+        _(""),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )

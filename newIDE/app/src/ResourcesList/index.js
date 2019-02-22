@@ -263,6 +263,16 @@ export default class ResourcesList extends React.Component<Props, State> {
         },
         enabled: hasElectron,
       },
+      {
+        label: 'Scan for Videos',
+        click: () => {
+          this._scanForNewResources(
+            RESOURCE_EXTENSIONS.video,
+            () => new gd.VideoResource()
+          );
+        },
+        enabled: hasElectron,
+      },
       { type: 'separator' },
       {
         label: 'Remove Unused Images',

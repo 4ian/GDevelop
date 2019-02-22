@@ -131,7 +131,7 @@ class StartPage extends BaseEditor {
                 onClick={onOpenAboutDialog}
               />
               <FlatButton
-                label={<Trans>Gdevelop Forums</Trans>}
+                label={<Trans>GDevelop Forums</Trans>}
                 onClick={() =>
                   Window.openExternalURL('http://forum.compilgames.net')
                 }

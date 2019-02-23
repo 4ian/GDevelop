@@ -28,6 +28,7 @@ export default (
       .toJSArray()
       .map(value => ({ value, label: value }));
 
+    // $FlowFixMe
     return {
       name,
       valueType,

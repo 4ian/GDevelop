@@ -11,7 +11,46 @@ import IconButton from 'material-ui/IconButton';
 
 export type Instance = Object; // This could be improved using generics.
 export type Instances = Array<Instance>;
-export type Field = Object;
+export type ValueFieldCommonProperties = {|
+  name: string,
+  getChoices?: ?() => Array<{| value: string, label: string |}>,
+  getLabel?: Instance => string,
+  disabled?: boolean,
+  onEditButtonClick?: Instance => void,
+  onClick?: Instance => void,
+|};
+export type ValueField =
+  | {|
+      valueType: 'number',
+      getValue: Instance => number,
+      setValue: (instance: Instance, newValue: number) => void,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
+      valueType: 'string',
+      getValue: Instance => string,
+      setValue: (instance: Instance, newValue: string) => void,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
+      valueType: 'boolean',
+      getValue: Instance => boolean,
+      setValue: (instance: Instance, newValue: boolean) => void,
+      ...ValueFieldCommonProperties,
+    |}
+  | {|
+      valueType: 'choice',
+      getValue: Instance => string,
+      setValue: (instance: Instance, newValue: string) => void,
+      ...ValueFieldCommonProperties,
+    |};
+export type Field =
+  | ValueField
+  | {|
+      name: string,
+      type: 'row' | 'column',
+      children: Array<Object>,
+    |};
 export type Schema = Array<Field>;
 
 type Props = {|
@@ -59,7 +98,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     else this.forceUpdate();
   };
 
-  _getFieldValue(instances: Instances, field: Field, defaultValue?: any): any {
+  _getFieldValue(instances: Instances, field: ValueField, defaultValue?: any): any {
     if (!instances[0]) {
       console.log(
         'PropertiesEditor._getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
@@ -78,7 +117,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     return value;
   }
 
-  _getFieldLabel(instances: Instances, field: Field): any {
+  _getFieldLabel(instances: Instances, field: ValueField): any {
     if (!instances[0]) {
       console.log(
         'PropertiesEditor._getFieldLabel was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
@@ -91,7 +130,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     return field.name;
   }
 
-  _renderEditField = (field: Field) => {
+  _renderEditField = (field: ValueField) => {
     if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
     if (field.valueType === 'boolean') {
@@ -108,6 +147,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         />
       );
     } else if (field.valueType === 'number') {
+      const { setValue } = field;
       return (
         <SemiControlledTextField
           value={this._getFieldValue(this.props.instances, field)}
@@ -117,7 +157,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           floatingLabelFixed
           onChange={newValue => {
             this.props.instances.forEach(i =>
-              field.setValue(i, parseFloat(newValue) || 0)
+              setValue(i, parseFloat(newValue) || 0)
             );
             this._onInstancesModified(this.props.instances);
           }}
@@ -127,6 +167,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         />
       );
     } else {
+      const { onEditButtonClick, setValue } = field;
       return (
         <div style={styles.fieldContainer} key={field.name}>
           <SemiControlledTextField
@@ -139,18 +180,16 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
             floatingLabelText={this._getFieldLabel(this.props.instances, field)}
             floatingLabelFixed
             onChange={newValue => {
-              this.props.instances.forEach(i =>
-                field.setValue(i, newValue || '')
-              );
+              this.props.instances.forEach(i => setValue(i, newValue || ''));
               this._onInstancesModified(this.props.instances);
             }}
             style={styles.field}
             disabled={field.disabled}
           />
-          {field.onEditButtonClick && (
+          {onEditButtonClick && (
             <IconButton
               disabled={this.props.instances.length !== 1}
-              onClick={() => field.onEditButtonClick(this.props.instances[0])}
+              onClick={() => onEditButtonClick(this.props.instances[0])}
             >
               <Edit />
             </IconButton>
@@ -160,7 +199,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     }
   };
 
-  _renderSelectField = (field: Field) => {
+  _renderSelectField = (field: ValueField) => {
+    if (!field.getChoices || !field.getValue) return;
+
     const children = field
       .getChoices()
       .map(({ value, label }) => (
@@ -168,6 +209,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       ));
 
     if (field.valueType === 'number') {
+      const { setValue } = field;
       return (
         <SelectField
           value={this._getFieldValue(this.props.instances, field)}
@@ -176,7 +218,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
           floatingLabelFixed
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
-              field.setValue(i, parseFloat(newValue) || 0)
+              setValue(i, parseFloat(newValue) || 0)
             );
             this._onInstancesModified(this.props.instances);
           }}
@@ -212,7 +254,7 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     }
   };
 
-  _renderButton = (field: Field) => {
+  _renderButton = (field: ValueField) => {
     //TODO: multi selection handling
     return (
       <FlatButton
@@ -220,7 +262,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         fullWidth
         primary
         label={this._getFieldLabel(this.props.instances, field)}
-        onClick={() => field.onClick(this.props.instances[0])}
+        onClick={() => {
+          if (field.onClick) field.onClick(this.props.instances[0]);
+        }}
       />
     );
   };
@@ -233,10 +277,6 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         style={mode === 'row' ? styles.rowContainer : styles.columnContainer}
       >
         {this.props.schema.map(field => {
-          if (field.getChoices && field.getValue)
-            return this._renderSelectField(field);
-          if (field.getValue) return this._renderEditField(field);
-          if (field.onClick) return this._renderButton(field);
           if (field.children) {
             if (field.type === 'row') {
               return (
@@ -261,6 +301,11 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                 </div>
               </div>
             );
+          } else {
+            if (field.getChoices && field.getValue)
+              return this._renderSelectField(field);
+            if (field.getValue) return this._renderEditField(field);
+            if (field.onClick) return this._renderButton(field);
           }
 
           return null;

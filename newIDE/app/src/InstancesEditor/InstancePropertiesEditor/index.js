@@ -6,7 +6,7 @@ import enumerateLayers from '../../LayersList/EnumerateLayers';
 import EmptyMessage from '../../UI/EmptyMessage';
 import PropertiesEditor from '../../PropertiesEditor';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
-import {type Schema} from '../../PropertiesEditor';
+import { type Schema } from '../../PropertiesEditor';
 import VariablesList from '../../VariablesList';
 import getObjectByName from '../../Utils/GetObjectByName';
 import IconButton from 'material-ui/IconButton';

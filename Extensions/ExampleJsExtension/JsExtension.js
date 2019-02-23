@@ -235,6 +235,10 @@ module.exports = {
         objectContent.property3 = newValue;
         return true;
       }
+      if (propertyName === "myImage") {
+        objectContent.myImage = newValue;
+        return true;
+      }
 
       return false;
     };
@@ -257,6 +261,15 @@ module.exports = {
           "number"
         )
       );
+      objectProperties.set(
+        "myImage",
+        new gd.PropertyDescriptor(objectContent.myImage)
+          .setType("resource")
+          .addExtraInfo("image")
+          .setLabel(
+            _("Image resource (won't be shown, just for demonstration purpose)")
+          )
+      );
 
       return objectProperties;
     };
@@ -264,7 +277,8 @@ module.exports = {
       JSON.stringify({
         property1: "Hello world",
         property2: true,
-        property3: 123
+        property3: 123,
+        myImage: ""
       })
     );
 
@@ -377,7 +391,7 @@ module.exports = {
   },
   /**
    * Register editors for objects.
-   * 
+   *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
   registerEditorConfigurations: function(objectsEditorService) {
@@ -388,7 +402,7 @@ module.exports = {
   },
   /**
    * Register renderers for instance of objects on the scene editor.
-   * 
+   *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
   registerInstanceRenderers: function(objectsRenderingService) {
@@ -463,7 +477,7 @@ module.exports = {
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
-      // Custom size can be read in instance.getCustomWidth() and 
+      // Custom size can be read in instance.getCustomWidth() and
       // instance.getCustomHeight()
     };
 

@@ -463,7 +463,7 @@ exports[`StartPage renders the start page with a project 1`] = `
                 }
               }
             >
-              Gdevelop Forums
+              GDevelop Forums
             </span>
           </div>
         </button>
@@ -1066,7 +1066,7 @@ exports[`StartPage renders the start page with no project opened 1`] = `
                 }
               }
             >
-              Gdevelop Forums
+              GDevelop Forums
             </span>
           </div>
         </button>

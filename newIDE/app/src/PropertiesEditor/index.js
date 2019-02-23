@@ -2,24 +2,36 @@
 import * as React from 'react';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import InlineCheckbox from '../UI/InlineCheckbox';
+import ResourceSelector from '../ResourcesList/ResourceSelector';
+import ResourcesLoader from '../ResourcesLoader';
 import Subheader from 'material-ui/Subheader';
 import FlatButton from 'material-ui/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import Edit from 'material-ui/svg-icons/image/edit';
 import IconButton from 'material-ui/IconButton';
+import {
+  type ResourceKind,
+  type ResourceSource,
+  type ChooseResourceFunction,
+} from '../ResourcesList/ResourceSource.flow';
+import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 
+// An "instance" here is the objects for which properties are shown
 export type Instance = Object; // This could be improved using generics.
 export type Instances = Array<Instance>;
+
+// "Value" fields are fields displayed in the properties.
 export type ValueFieldCommonProperties = {|
   name: string,
-  getChoices?: ?() => Array<{| value: string, label: string |}>,
   getLabel?: Instance => string,
   disabled?: boolean,
   onEditButtonClick?: Instance => void,
   onClick?: Instance => void,
 |};
-export type ValueField =
+
+// "Primitive" value fields are "simple" fields.
+export type PrimitiveValueField =
   | {|
       valueType: 'number',
       getValue: Instance => number,
@@ -30,6 +42,7 @@ export type ValueField =
       valueType: 'string',
       getValue: Instance => string,
       setValue: (instance: Instance, newValue: string) => void,
+      getChoices?: ?() => Array<{| value: string, label: string |}>,
       ...ValueFieldCommonProperties,
     |}
   | {|
@@ -37,28 +50,52 @@ export type ValueField =
       getValue: Instance => boolean,
       setValue: (instance: Instance, newValue: boolean) => void,
       ...ValueFieldCommonProperties,
-    |}
-  | {|
-      valueType: 'choice',
-      getValue: Instance => string,
-      setValue: (instance: Instance, newValue: string) => void,
-      ...ValueFieldCommonProperties,
     |};
+
+// "Resource" fields are showing a resource selector.
+type ResourceField = {|
+  valueType: 'resource',
+  resourceKind: ResourceKind,
+  getValue: Instance => string,
+  setValue: (instance: Instance, newValue: string) => void,
+  ...ValueFieldCommonProperties,
+|};
+
+// A value field is a primitive or a resource.
+export type ValueField = PrimitiveValueField | ResourceField;
+
+// A field can be a primitive, a resource or a list of fields
 export type Field =
-  | ValueField
+  | PrimitiveValueField
+  | ResourceField
   | {|
       name: string,
       type: 'row' | 'column',
       children: Array<Object>,
     |};
+
+// The schema is the tree of all fields.
 export type Schema = Array<Field>;
 
-type Props = {|
+// Mandatory props in any case when using the component
+type MandatoryProps = {|
   onInstancesModified?: Instances => void,
   instances: Instances,
   schema: Schema,
   mode?: 'column' | 'row',
 |};
+
+type Props =
+  // Mandatory props in all cases:
+  | MandatoryProps
+  // Props to be used when you want to display resources:
+  | {|
+      ...MandatoryProps,
+      project: gdProject,
+      resourceSources: Array<ResourceSource>,
+      onChooseResource: ChooseResourceFunction,
+      resourceExternalEditors: Array<ResourceExternalEditor>,
+    |};
 
 const styles = {
   columnContainer: {
@@ -88,6 +125,42 @@ const styles = {
   },
 };
 
+const getFieldValue = (
+  instances: Instances,
+  field: ValueField,
+  defaultValue?: any
+): any => {
+  if (!instances[0]) {
+    console.log(
+      'getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+    );
+    return defaultValue;
+  }
+
+  let value = field.getValue(instances[0]);
+  for (var i = 1; i < instances.length; ++i) {
+    if (value !== field.getValue(instances[i])) {
+      if (typeof defaultValue !== 'undefined') value = defaultValue;
+      break;
+    }
+  }
+
+  return value;
+};
+
+const getFieldLabel = (instances: Instances, field: ValueField): any => {
+  if (!instances[0]) {
+    console.log(
+      'PropertiesEditor._getFieldLabel was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
+    );
+    return field.name;
+  }
+
+  if (field.getLabel) return field.getLabel(instances[0]);
+
+  return field.name;
+};
+
 export default class PropertiesEditor extends React.Component<Props, {||}> {
   _onInstancesModified = (instances: Instances) => {
     // This properties editor is dealing with fields that are
@@ -98,51 +171,15 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     else this.forceUpdate();
   };
 
-  _getFieldValue(
-    instances: Instances,
-    field: ValueField,
-    defaultValue?: any
-  ): any {
-    if (!instances[0]) {
-      console.log(
-        'PropertiesEditor._getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
-      );
-      return defaultValue;
-    }
-
-    let value = field.getValue(instances[0]);
-    for (var i = 1; i < instances.length; ++i) {
-      if (value !== field.getValue(instances[i])) {
-        if (typeof defaultValue !== 'undefined') value = defaultValue;
-        break;
-      }
-    }
-
-    return value;
-  }
-
-  _getFieldLabel(instances: Instances, field: ValueField): any {
-    if (!instances[0]) {
-      console.log(
-        'PropertiesEditor._getFieldLabel was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'
-      );
-      return field.name;
-    }
-
-    if (field.getLabel) return field.getLabel(instances[0]);
-
-    return field.name;
-  }
-
-  _renderEditField = (field: ValueField) => {
+  _renderInputField = (field: ValueField) => {
     if (field.name === 'PLEASE_ALSO_SHOW_EDIT_BUTTON_THANKS') return null; // This special property was used in GDevelop 4 IDE to ask for a Edit button to be shown, ignore it.
 
     if (field.valueType === 'boolean') {
       return (
         <InlineCheckbox
-          label={this._getFieldLabel(this.props.instances, field)}
+          label={getFieldLabel(this.props.instances, field)}
           key={field.name}
-          checked={this._getFieldValue(this.props.instances, field)}
+          checked={getFieldValue(this.props.instances, field)}
           onCheck={(event, newValue) => {
             this.props.instances.forEach(i => field.setValue(i, !!newValue));
             this._onInstancesModified(this.props.instances);
@@ -154,10 +191,10 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       const { setValue } = field;
       return (
         <SemiControlledTextField
-          value={this._getFieldValue(this.props.instances, field)}
+          value={getFieldValue(this.props.instances, field)}
           key={field.name}
           id={field.name}
-          floatingLabelText={this._getFieldLabel(this.props.instances, field)}
+          floatingLabelText={getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
           onChange={newValue => {
             this.props.instances.forEach(i =>
@@ -175,13 +212,13 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       return (
         <div style={styles.fieldContainer} key={field.name}>
           <SemiControlledTextField
-            value={this._getFieldValue(
+            value={getFieldValue(
               this.props.instances,
               field,
               '(Multiple values)'
             )}
             id={field.name}
-            floatingLabelText={this._getFieldLabel(this.props.instances, field)}
+            floatingLabelText={getFieldLabel(this.props.instances, field)}
             floatingLabelFixed
             onChange={newValue => {
               this.props.instances.forEach(i => setValue(i, newValue || ''));
@@ -216,9 +253,9 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
       const { setValue } = field;
       return (
         <SelectField
-          value={this._getFieldValue(this.props.instances, field)}
+          value={getFieldValue(this.props.instances, field)}
           key={field.name}
-          floatingLabelText={this._getFieldLabel(this.props.instances, field)}
+          floatingLabelText={getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
@@ -235,13 +272,13 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     } else {
       return (
         <SelectField
-          value={this._getFieldValue(
+          value={getFieldValue(
             this.props.instances,
             field,
             '(Multiple values)'
           )}
           key={field.name}
-          floatingLabelText={this._getFieldLabel(this.props.instances, field)}
+          floatingLabelText={getFieldLabel(this.props.instances, field)}
           floatingLabelFixed
           onChange={(event, index, newValue) => {
             this.props.instances.forEach(i =>
@@ -265,10 +302,43 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
         key={field.name}
         fullWidth
         primary
-        label={this._getFieldLabel(this.props.instances, field)}
+        label={getFieldLabel(this.props.instances, field)}
         onClick={() => {
           if (field.onClick) field.onClick(this.props.instances[0]);
         }}
+      />
+    );
+  };
+
+  _renderResourceField = (field: ResourceField) => {
+    if (!this.props.project) {
+      console.error(
+        'You tried to display a resource field in a PropertiesEditor that does not support display resources. If you need to display resources, pass additional props (project, resourceSources, etc...)'
+      );
+      return;
+    }
+
+    const { setValue } = field;
+    return (
+      <ResourceSelector
+        key={field.name}
+        project={this.props.project}
+        resourceSources={this.props.resourceSources}
+        onChooseResource={this.props.onChooseResource}
+        resourceExternalEditors={this.props.resourceExternalEditors}
+        resourcesLoader={ResourcesLoader}
+        resourceKind={field.resourceKind}
+        fullWidth
+        initialResourceName={getFieldValue(
+          this.props.instances,
+          field,
+          '(Multiple values)' //TODO
+        )}
+        onChange={newValue => {
+          this.props.instances.forEach(i => setValue(i, newValue));
+          this._onInstancesModified(this.props.instances);
+        }}
+        floatingLabelText={getFieldLabel(this.props.instances, field)}
       />
     );
   };
@@ -305,10 +375,12 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
                 </div>
               </div>
             );
+          } else if (field.valueType === 'resource') {
+            return this._renderResourceField(field);
           } else {
             if (field.getChoices && field.getValue)
               return this._renderSelectField(field);
-            if (field.getValue) return this._renderEditField(field);
+            if (field.getValue) return this._renderInputField(field);
             if (field.onClick) return this._renderButton(field);
           }
 

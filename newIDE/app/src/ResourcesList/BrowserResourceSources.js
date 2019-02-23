@@ -286,7 +286,7 @@ export default [
     },
   },
   {
-    name: 'publicFontUrlChooser',
+    name: 'publicVideoUrlChooser',
     displayName: 'Choose a video from library',
     kind: 'video',
     component: class VideoResourceChooser extends React.Component {

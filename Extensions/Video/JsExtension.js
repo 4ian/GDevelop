@@ -1,4 +1,19 @@
 /**
+ * 
+ * //NOTE  Les icones dans les events 
+ * 
+ * "JsPlatform/Extensions/videoicon24.png",
+   "JsPlatform/Extensions/videoicon16.png"
+
+   seule le 24 est affiché, il n'y a pas de responsive sur les icones, le 16 ne sert donc pas, je le remove ?
+
+ * 
+ * 
+ */
+
+
+
+/**
  *
  * JsExtention.js :  Permet de déclarer les events et fait l'affichage des instances d'object dans l'éditeur de GD grace à RenderedVideoObjectInstance
  *
@@ -30,7 +45,7 @@ module.exports = {
       .setExtensionInformation(
         "Video",
         "Video",
-        "Display a video in your scene",
+        _("Display a video on the scene"),
         "Aurélien vivet",
         "Open source (MIT License)"
       )
@@ -48,16 +63,16 @@ module.exports = {
       propertyName,
       newValue
     ) {
-      if (propertyName === "Video object opacity") {
-        objectContent.property1 = newValue;
+      if (propertyName === "Opacity") {
+        objectContent.opacity = parseFloat(newValue);
         return true;
       }
-      if (propertyName === "Video Looped or no") {
-        objectContent.property2 = newValue === "1";
+      if (propertyName === "Looped") {
+        objectContent.loop = newValue === "1"
         return true;
       }
       if (propertyName === "Volume") {
-        objectContent.property3 = newValue;
+        objectContent.volume = parseFloat(newValue);
         return true;
       }
 
@@ -67,29 +82,27 @@ module.exports = {
       var objectProperties = new gd.MapStringPropertyDescriptor();
 
       objectProperties.set(
-        "Video object opacity",
-        new gd.PropertyDescriptor(objectContent.property1)
+        "Opacity",
+        new gd.PropertyDescriptor(objectContent.opacity).setType("number") //FIXME error with toString()
       );
       objectProperties.set(
-        "Video Looped or no",
+        "Looped",
         new gd.PropertyDescriptor(
-          objectContent.property2 ? "true" : "false"
+          objectContent.loop ? "true" : "false"
         ).setType("boolean")
       );
       objectProperties.set(
         "Volume",
-        new gd.PropertyDescriptor(objectContent.property3.toString()).setType(
-          "number"
-        )
+        new gd.PropertyDescriptor(objectContent.volume).setType("number") //FIXME error with toString()
       );
 
       return objectProperties;
     };
     videoObject.setRawJSONContent(
       JSON.stringify({
-        property1: "Hello world",
-        property2: false,
-        property3: 100
+        opacity: 255,
+        loop: false,
+        volume: 100
       })
     );
 
@@ -101,16 +114,20 @@ module.exports = {
       project,
       layout
     ) {
-      if (propertyName === "Video instance opacity") {
+      if (propertyName === "Opacity") {
         instance.setRawStringProperty("instanceprop1", newValue);
         return true;
       }
-      if (propertyName === "My other instance property") {
+      if (propertyName === "Looped") {
         instance.setRawFloatProperty("instanceprop2", parseFloat(newValue));
         return true;
       }
+      if (propertyName === "Volume") {
+        instance.setRawStringProperty("instanceprop1", newValue);
+        return true;
+      }
 
-      return false;
+      //return false;
     };
     videoObject.getInitialInstanceProperties = function(
       content,
@@ -120,18 +137,18 @@ module.exports = {
     ) {
       var instanceProperties = new gd.MapStringPropertyDescriptor();
 
-      instanceProperties.set(
-        "Video instance opacity",
-        new gd.PropertyDescriptor(
-          instance.getRawStringProperty("instanceprop1")
-        )
-      );
-      instanceProperties.set(
-        "My other instance property",
-        new gd.PropertyDescriptor(
-          instance.getRawFloatProperty("instanceprop2").toString()
-        ).setType("number")
-      );
+      // instanceProperties.set(
+      //   "Video instance opacity",
+      //   new gd.PropertyDescriptor(
+      //     instance.getRawStringProperty("instanceprop1")
+      //   )
+      // );
+      // instanceProperties.set(
+      //   "My other instance property",
+      //   new gd.PropertyDescriptor(
+      //     instance.getRawFloatProperty("instanceprop2").toString()
+      //   ).setType("number")
+      // );
 
       return instanceProperties;
     };
@@ -139,8 +156,8 @@ module.exports = {
     const object = extension
       .addObject(
         "VideoObject",
-        _("Video object for testing"),
-        _("This video object does nothing"),
+        _("Video object"),
+        _("This video object showing a video in your game."),
         "JsPlatform/Extensions/videoicon32.png",
         videoObject
       )
@@ -151,13 +168,13 @@ module.exports = {
       .addAction(
         "Play",
         _("Play an video"),
-        _("Play an video"),
+        _("Play an video (Recommended : MPEG4 file format, with H264 video codec and AAC audio codec)"),
         _("Play the video of : _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("play");
 
@@ -166,12 +183,12 @@ module.exports = {
         "Pause",
         _("Pause an video"),
         _("Pause an video"),
-        _("Pause the video on my object : _PARAM0_"),
+        _("Pause video _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("pause");
 
@@ -180,13 +197,13 @@ module.exports = {
         "Loop",
         _("Loop an video"),
         _("Loop an video"),
-        _("Loop the video on my object : _PARAM0_ is on : _PARAM1_"),
+        _("Loop video of _PARAM0_: _PARAM1_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
-      .addParameter("yesorno", _("Loop or not"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter("yesorno", _("Activate loop"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("setLoop");
 
@@ -195,27 +212,27 @@ module.exports = {
         "Mute",
         _("Mute an video"),
         _("Mute an video"),
-        _("Mute the video on my object : _PARAM0_ is on : _PARAM1_"),
+        _("Mute video of _PARAM0_: _PARAM1_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
-      .addParameter("yesorno", _("Mute or not"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter("yesorno", _("Activate mute"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("mute");
 
     object
       .addAction(
         "SetTime",
-        _("Set time (in seconds)"),
-        _("Set time (in seconds)"),
-        _("Set time of my object : _PARAM0_ is _PARAM1_ _PARAM2_ seconds"),
+        _("Set time"),
+        _("Set the time of the video object in seconds"),
+        _("Set time of _PARAM0_: _PARAM1__PARAM2_ seconds"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .addParameter("operator", _("Modification's sign"), "", false)
       .addParameter("expression", _("Time in seconds"), "", false)
       .getCodeExtraInformation()
@@ -226,16 +243,16 @@ module.exports = {
     object
       .addAction(
         "SetVolume",
-        _("Set volume (in %)"),
-        _("Set volume (in %)"),
-        _("Do _PARAM1_ _PARAM2_ % to the volume of _PARAM0_"),
+        _("Set volume"),
+        _("Set the volume of the video object, between 0 (muted) and 100 (maximum)."),
+        _("Do _PARAM1__PARAM2_ to the volume of _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .addParameter("operator", _("Modification's sign"), "", false)
-      .addParameter("expression", _("Volume in %"), "", false)
+      .addParameter("expression", _("Value"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("setVolume")
       .setManipulatedType("number")
@@ -243,39 +260,27 @@ module.exports = {
 
     object
       .addExpression(
-        "GetVolume",
+        "Volume",
         _("Get the volume"),
-        _("Get the volume of an video object."),
+        _("Get the volume of a video object, between 0 (muted) and 100 (maximum)."),
         _("Volume"),
-        "res/physics16.png"
+        "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Object"), "", false)
+      .addParameter("object", _("Object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("getVolume");
-
-    object
-      .addExpression(
-        "IsMuted",
-        _("Video is muted"),
-        _("Return if video is muted"),
-        _("Volume"),
-        "res/physics16.png"
-      )
-      .addParameter("object", _("Object"), "", false)
-      .getCodeExtraInformation()
-      .setFunctionName("isMuted");
 
     object
       .addCondition(
         "Play",
         _("Is played"),
-        _("Test if an video is played"),
-        _("_PARAM0_  is played"),
-        "Control time",
+        _("Check if a video is played"),
+        _("_PARAM0_ is played"),
+        "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("isPlayed");
 
@@ -283,91 +288,45 @@ module.exports = {
       .addCondition(
         "Pause",
         _("Is paused"),
-        _("Test if an video is paused"),
-        _("_PARAM0_  is paused"),
-        "Control time",
+        _("Check if a video is paused"),
+        _("_PARAM0_ is paused"),
+        "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("isPaused");
-
-    object
-      .addExpression(
-        "IsPaused",
-        _("Video is played"),
-        _("Return if video is played"),
-        _("Time"),
-        "res/physics16.png"
-      )
-      .addParameter("object", _("Object"), "", false)
-      .getCodeExtraInformation()
-      .setFunctionName("isPaused");
-
-    object
-      .addExpression(
-        "IsPlayed",
-        _("Video is played"),
-        _("Return if video is played"),
-        _("Time"),
-        "res/physics16.png"
-      )
-      .addParameter("object", _("Object"), "", false)
-      .getCodeExtraInformation()
-      .setFunctionName("isPlayed");
 
     object
       .addCondition(
         "Loop",
         _("Is looped"),
-        _("Is looped"),
-        _("_PARAM0_  is looped"),
-        "Control time",
+        _("Check if a video is looped"),
+        _("_PARAM0_ is looped"),
+        "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("isLooped");
 
-    object
-      .addExpression(
-        "IsPaused",
-        _("Video is paused"),
-        _("Return if video is paused"),
-        _("Time"),
-        "res/physics16.png"
-      )
-      .addParameter("object", _("Object"), "", false)
-      .getCodeExtraInformation()
-      .setFunctionName("isPaused");
-
-    object
-      .addExpression(
-        "IsLooped",
-        _("Video is looped"),
-        _("Return if video is looped"),
-        _("Time"),
-        "res/physics16.png"
-      )
-      .addParameter("object", _("Object"), "", false)
-      .getCodeExtraInformation()
-      .setFunctionName("isLooped");
+    
 
     object
       .addCondition(
         "Volume",
         _("Volume"),
-        _("Test the volume of an video object"),
-        _("Volume of _PARAM0_ is _PARAM1_ _PARAM2_"),
-        "Volume",
+        _("Compare the current volume of a video object."),
+        _("Volume of _PARAM0_ is _PARAM1__PARAM2_"),
+        "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .addParameter("relationalOperator", _("Sign of the test"))
-      .addParameter("expression", _("Value 0-100"))
+      .addParameter("expression", _("Value (0-100)"))
       .getCodeExtraInformation()
       .setFunctionName("getVolume")
       .setManipulatedType("number");
@@ -376,79 +335,85 @@ module.exports = {
       .addCondition(
         "Mute",
         _("Is muted"),
-        _("Test if an video is muted"),
-        _("_PARAM0_  is muted"),
-        "Volume",
+        _("Check if a video is muted"),
+        _("_PARAM0_ is muted"),
+        "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("isMuted");
 
     object
       .addExpression(
-        "GetCurrentTime",
+        "CurrentTime",
         _("Get current time"),
-        _("Return the current time of an video object (in seconds)"),
-        _("Time"),
-        "res/physics16.png"
+        _("Return the current time of a video object (in seconds)"),
+        "",
+        "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Object"), "", false)
+      .addParameter("object", _("Object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("getCurrentTime");
 
     object
       .addExpression(
-        "GetDuration",
+        "Duration",
         _("Get the duration"),
-        _("Return the duration of an video object (in seconds)"),
-        _("Time"),
-        "res/physics16.png"
+        _("Return the duration of a video object (in seconds)"),
+        "",
+        "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Object"), "", false)
+      .addParameter("object", _("Object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("getDuration");
 
+//TODO ça marche pas 
     object
-      .addExpression(
-        "IsEnded",
-        _("Get the duration"),
-        _("Get the duration of an video object (in seconds)"),
-        _("Time"),
-        "res/physics16.png"
+      .addCondition(
+        "Duration",
+        _("Duration"),
+        _("Compare the duration of a video object"),
+        _("Duration of _PARAM0_ is _PARAM1__PARAM2_ sc"),
+        "",
+        "JsPlatform/Extensions/videoicon24.png",
+        "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("expression", _("Value"))
       .getCodeExtraInformation()
-      .setFunctionName("isEnded");
+      .setFunctionName("getDuration")
+      .setManipulatedType("number");
 
     object
       .addCondition(
         "Ended",
         _("Is ended"),
-        _("Is ended"),
+        _("Check if a video is ended"),
         _("_PARAM0_ is ended"),
-        _("Control time"),
+        "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("isEnded");
 
     object
       .addAction(
         "SetOpacity",
-        _("Set opacity (in %)"),
-        _("Set opacity (in %)"),
-        _("Do _PARAM1_ _PARAM2_ % to the opacity of _PARAM0_"),
+        _("Change Video opacity"),
+        _("Set opacity of the specified video object, between 0 (fully transparent) and 255 (opaque)."),
+        _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .addParameter("operator", _("Modification's sign"), "", false)
-      .addParameter("expression", _("Opacity in %"), "", false)
+      .addParameter("expression", _("Opacity (0-255)"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("setOpacity")
       .setManipulatedType("number")
@@ -458,44 +423,47 @@ module.exports = {
       .addCondition(
         "GetOpacity",
         _("Opacity"),
-        _("Test the opacity of an video object"),
-        _("Opacity of _PARAM0_ is _PARAM1_ _PARAM2_"),
+        _("Compare the opacity of a video object"),
+        _("Opacity of _PARAM0_ is _PARAM1__PARAM2_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .addParameter("relationalOperator", _("Sign of the test"))
-      .addParameter("expression", _("Opacity 0-100"))
+      .addParameter("expression", _("Opacity (0-255)"))
       .getCodeExtraInformation()
       .setFunctionName("getOpacity")
       .setManipulatedType("number");
 
     object
       .addExpression(
-        "GetOpacity",
+        "Opacity",
         _("Get current opacity"),
-        _("Return the opacity of an video object"),
+        _("Return the opacity of a video object"),
         "",
-        "res/physics16.png"
+        "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Object"), "", false)
+      .addParameter("object", _("Object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("getOpacity");
 
+//TODO base on 0 : stoped, 1 : normal, 1.5 : 50% fastest
+//Like Animation speed scale
+//Need update in functions !
     object
       .addAction(
         "SetPlaybackSpeed",
-        _("Set playback speed (in %)"),
-        _("Set playback speed (in %)"),
-        _("Do _PARAM1_ _PARAM2_ % to the playback speed of _PARAM0_"),
+        _("Set playback speed"),
+        _("Set playback speed of the specified video object, between 0 (stoped) and 100 (speed x1)."),
+        _("Do _PARAM1__PARAM2_ to the playback speed of _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .addParameter("operator", _("Modification's sign"), "", false)
-      .addParameter("expression", _("Speed in %"), "", false)
+      .addParameter("expression", _("Speed "), "", false)
       .getCodeExtraInformation()
       .setFunctionName("setPlaybackSpeed")
       .setManipulatedType("number")
@@ -505,30 +473,93 @@ module.exports = {
       .addCondition(
         "GetPlaybackSpeed",
         _("Playback speed "),
-        _("Test the playback speed of an video object"),
-        _("Playback speed of _PARAM0_ is _PARAM1_ _PARAM2_"),
+        _("Compare the playback speed of a video object"),
+        _("Playback speed of _PARAM0_ is _PARAM1__PARAM2_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Choose a video object"), "", false)
+      .addParameter("object", _("Video object"), "VideoObject", false)
       .addParameter("relationalOperator", _("Sign of the test"))
-      .addParameter("expression", _("Speed 0-100"))
+      .addParameter("expression", _("Speed (0-100)"))
       .getCodeExtraInformation()
       .setFunctionName("getPlaybackSpeed")
       .setManipulatedType("number");
 
     object
       .addExpression(
-        "GetPlaybackSpeed",
+        "PlaybackSpeed",
         _("Get current playback speed"),
-        _("Return the playback speed of an video object"),
+        _("Return the playback speed of a video object"),
         "",
-        "res/physics16.png"
+        "JsPlatform/Extensions/videoicon16.png"
       )
-      .addParameter("object", _("Object"), "", false)
+      .addParameter("object", _("Object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("getPlaybackSpeed");
+
+/*
+      object
+        .addExpression(
+          "IsPlayed",
+          _("Video is played"),
+          _("Return if video is played"),
+          _("Time"),
+          "JsPlatform/Extensions/videoicon16.png"
+        )
+        .addParameter("object", _("Object"), "VideoObject", false)
+        .getCodeExtraInformation()
+        .setFunctionName("isPlayed");
+    
+      object
+        .addExpression(
+          "IsPaused",
+          _("Video is paused"),
+          _("Return if video is paused"),
+          _("Time"),
+          "JsPlatform/Extensions/videoicon16.png"
+        )
+        .addParameter("object", _("Object"), "VideoObject", false)
+        .getCodeExtraInformation()
+        .setFunctionName("isPaused");
+
+      object
+        .addExpression(
+          "IsEnded",
+          _("Get the duration"),
+          _("Get the duration of a video object (in seconds)"),
+          _("Time"),
+          "JsPlatform/Extensions/videoicon16.png"
+        )
+        .addParameter("object", _("Object"), "VideoObject", false)
+        .getCodeExtraInformation()
+        .setFunctionName("isEnded");
+
+      object
+        .addExpression(
+          "IsLooped",
+          _("Video is looped"),
+          _("Return if video is looped"),
+          _("Time"),
+          "JsPlatform/Extensions/videoicon16.png"
+        )
+        .addParameter("object", _("Object"), "VideoObject", false)
+        .getCodeExtraInformation()
+        .setFunctionName("isLooped");
+
+      object
+        .addExpression(
+          "IsMuted",
+          _("Video is muted"),
+          _("Return if video is muted"),
+          _("Volume"),
+          "JsPlatform/Extensions/videoicon16.png"
+        )
+        .addParameter("object", _("Object"), "VideoObject", false)
+        .getCodeExtraInformation()
+        .setFunctionName("isMuted");
+
+*/
 
     /**
      *
@@ -536,48 +567,6 @@ module.exports = {
      * Condition : if video is ready to play
      * Expression :  return if video is ready to play
      */
-
-    //NOTE This don't work, because controls can't be displayed, need comfirmation please.
-    /* object
-      .addAction(
-        "Controls",
-        _("Toggle controls on video"),
-        _("Display or hide the controls on my video"),
-        _("Controls on my object : _PARAM0_ is on : _PARAM1_"),
-        "Global",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
-      )
-      .addParameter("object", _("Choose a video object"), "", false)
-      .addParameter("yesorno", _("Display or not"), "", false)
-      .getCodeExtraInformation()
-      .setFunctionName("controls");
-
-      object
-      .addExpression(
-        'controlsAreShowing',
-        _('Controls on video'),
-        _('Return state of controls on video'),
-        _('Global'),
-        'res/physics16.png'
-      )
-      .addParameter('object', _("Object"), '', false)
-      .getCodeExtraInformation()
-      .setFunctionName('controlsAreShowing');
-
-      object
-      .addCondition(
-        "controlsAreShowing",
-        _("Controls on video"),
-        _("Controls on video"),
-        _("The controls are showing on _PARAM0_ "),
-        "Global",
-        "JsPlatform/Extensions/videoicon24.png",
-        "JsPlatform/Extensions/videoicon16.png"
-      )
-      .addParameter("object", _("Choose a video object"), "", false)
-      .getCodeExtraInformation()
-      .setFunctionName("controlsAreShowing"); */
 
     return extension;
   },
@@ -651,8 +640,6 @@ module.exports = {
       //FIXME This autoplay don't work
       textureVideo.baseTexture.source.autoplay = false;
 
-      console.log(textureVideo);
-
       //Setup the PIXI object:
       this._pixiObject = new PIXI.Sprite(textureVideo);
       this._pixiObject.anchor.x = 0.5;
@@ -681,7 +668,7 @@ module.exports = {
     RenderedVideoObjectInstance.prototype.update = function() {
       //FIXME need help here i can't catch err_file_not_found like this :
       video_is_ok = true;
-      this._pixiObject._texture.baseTexture.error = function() {
+      this._pixiObject._texture.baseTexture.onerror = function() {
         console.log("Starting to load video");
         console.log("Force pause");
         //this._pixiObject._texture.baseTexture.source.pause();
@@ -726,9 +713,8 @@ module.exports = {
       // Read a property from the object
       const property1Value = this._associatedObject
         .getProperties(this.project)
-        .get("Video object opacity")
+        .get("Opacity")
         .getValue();
-      this._pixiObject.text = property1Value;
 
       // Read position and angle from the instance
       this._pixiObject.position.x =

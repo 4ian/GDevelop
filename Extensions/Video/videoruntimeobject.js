@@ -1,5 +1,5 @@
 /**
- * A video object doing showing a text on screen
+ * A video object doing showing a video on screen
  *
  * @memberof gdjs
  * @class VideoRuntimeObject
@@ -10,29 +10,20 @@ gdjs.VideoRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
   // Load any required data from the object properties.
-  this._property1 = objectData.content.property1;
+  this._opacity = objectData.opacity;
+  this._loop = objectData.loop;
+  this._volume = objectData.volume;
 
-  // Create the renderer (see videoruntimeobject-pixi-renderer.js)
   if (this._renderer)
     gdjs.VideoRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
   else this._renderer = new gdjs.VideoRuntimeObjectRenderer(this, runtimeScene);
 };
 
 gdjs.VideoRuntimeObject.prototype = Object.create(gdjs.RuntimeObject.prototype);
-gdjs.VideoRuntimeObject.thisIsARuntimeObjectConstructor = "Video::VideoObject"; //Replace by your extension + object name.
+gdjs.VideoRuntimeObject.thisIsARuntimeObjectConstructor = "Video::VideoObject";
 
 gdjs.VideoRuntimeObject.prototype.getRendererObject = function() {
   return this._renderer.getRendererObject();
-};
-
-/**
- * Called once during the game loop, before events and rendering.
- * @param {gdjs.RuntimeScene} runtimeScene The gdjs.RuntimeScene the object belongs to.
- */
-gdjs.VideoRuntimeObject.prototype.update = function(runtimeScene) {
-  // This is an example: typically you want to make sure the renderer
-  // is up to date with the object.
-  this._renderer.ensureUpToDate();
 };
 
 /**
@@ -89,9 +80,8 @@ gdjs.VideoRuntimeObject.prototype.setAngle = function(angle) {
 gdjs.VideoRuntimeObject.prototype.setOpacity = function(opacity) {
   if (opacity < 0) opacity = 0;
   if (opacity > 255) opacity = 255;
-  var new_opacity = opacity / 255;
-  //this.opacity = opacity || this.getOpacity() ;
-  this._renderer.updateOpacity(new_opacity); // Tell the renderer to update the rendered object
+  this._opacity = opacity / 255;
+  this._renderer.updateOpacity();
 };
 
 /**
@@ -99,14 +89,7 @@ gdjs.VideoRuntimeObject.prototype.setOpacity = function(opacity) {
  * return 0-1
  */
 gdjs.VideoRuntimeObject.prototype.getOpacity = function() {
-  return this._renderer.getOpacity() * 255;
-};
-
-/**
- * A supprimer
- */
-gdjs.VideoRuntimeObject.prototype.getText = function() {
-  return this._property1;
+  return this._opacity;
 };
 
 /**
@@ -224,7 +207,7 @@ gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
     0,
     1
   );
-  this._renderer.setPlaybackSpeed(new_playbackSpeed); // Tell the renderer to update the rendered object
+  this._renderer.setPlaybackSpeed(new_playbackSpeed);
 };
 
 /**
@@ -234,8 +217,3 @@ gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
 gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
   return this._normalize(this._renderer.getPlaybackSpeed(), 0, 1) * 100;
 };
-
-//NOTE Controls impossible to display ?
-/* gdjs.VideoRuntimeObject.prototype.controls = function(bool) {
-  this._renderer.setControls(bool);
-}; */

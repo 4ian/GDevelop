@@ -19,6 +19,9 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     this._pixiObject = new PIXI.Sprite(this._textureVideo);
 
     this._pixiObject._texture.baseTexture.source.pause();
+  } else {
+    this._pixiObject._texture.baseTexture.source.currentTime = 0;
+    this._pixiObject._texture.baseTexture.source.pause();
   }
 
   //this._pixiObject.anchor.x = 0.5;
@@ -28,7 +31,9 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     .getRenderer()
     .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
-  //this.updatePosition();
+    this.updatePosition();
+    this.updateAngle();
+    this.updateOpacity();
 };
 
 gdjs.VideoRuntimeObjectRenderer = gdjs.VideoRuntimeObjectPixiRenderer; //Register the class to let the engine use it.
@@ -36,10 +41,6 @@ gdjs.VideoRuntimeObjectRenderer = gdjs.VideoRuntimeObjectPixiRenderer; //Registe
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
   // Mandatory, return the internal PIXI object used for your object:
   return this._pixiObject;
-};
-
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
-  this.updatePosition();
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
@@ -51,20 +52,8 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateAngle = function() {
   this._pixiObject.rotation = gdjs.toRad(this._object.angle);
 };
 
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateOpacity = function(number) {
-  //this._object.opacity = this.getOpacity()*255
-  //console.log("opacity avant : " + this._pixiObject.alpha + ", "+ this._object.opacity+"/255");
-
-  //need 0-1
-  //console.log("opacity apres : " + this._pixiObject.alpha + ", "+ this._object.opacity+"/255");
-  this._pixiObject.alpha = number;
-};
-
-/**
- * Return alpha 0-1
- */
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.getOpacity = function() {
-  return this._pixiObject.alpha;
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateOpacity = function() {
+  this._pixiObject.alpha = this._object._opacity / 255;
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getWidth = function() {
@@ -73,10 +62,6 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.getWidth = function() {
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getHeight = function() {
   return this._pixiObject.height;
-};
-
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateWidth = function() {
-  this._pixiObject.width = this._object.width;
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateWidth = function() {
@@ -146,7 +131,6 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.setMute = function(bool) {
  * return state of mute on video in renderer
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.isMuted = function() {
-  //console.log("#get muted : runtime-renderer ");
   return this._pixiObject._texture.baseTexture.source.muted;
 };
 

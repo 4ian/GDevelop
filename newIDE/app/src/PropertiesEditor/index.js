@@ -98,7 +98,11 @@ export default class PropertiesEditor extends React.Component<Props, {||}> {
     else this.forceUpdate();
   };
 
-  _getFieldValue(instances: Instances, field: ValueField, defaultValue?: any): any {
+  _getFieldValue(
+    instances: Instances,
+    field: ValueField,
+    defaultValue?: any
+  ): any {
     if (!instances[0]) {
       console.log(
         'PropertiesEditor._getFieldValue was called with an empty list of instances (or containing undefined). This is a bug that should be fixed'

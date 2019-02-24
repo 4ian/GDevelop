@@ -73,6 +73,10 @@ module.exports = {
         objectContent.volume = parseFloat(newValue);
         return true;
       }
+      if (propertyName === "myVideo") {
+        objectContent.myVideo = newValue;
+        return true;
+      }
 
       return false;
     };
@@ -93,6 +97,13 @@ module.exports = {
         "Volume",
         new gd.PropertyDescriptor(objectContent.volume).setType("number") //FIXME error with toString()
       );
+      objectProperties.set(
+        "myVideo",
+        new gd.PropertyDescriptor(objectContent.myVideo)
+          .setType("resource")
+          .addExtraInfo("video")
+          .setLabel(_("Video resource"))
+      );
 
       return objectProperties;
     };
@@ -100,7 +111,8 @@ module.exports = {
       JSON.stringify({
         opacity: 255,
         loop: false,
-        volume: 100
+        volume: 100,
+        myVideo: ""
       })
     );
 
@@ -648,19 +660,24 @@ module.exports = {
     RenderedVideoObjectInstance.prototype.update = function() {
       //FIXME need help here i can't catch err_file_not_found like this :
       video_is_ok = true;
-      this._pixiObject._texture.baseTexture.onerror = function() {
+      this._pixiObject._texture.baseTexture.onerror = function(callback) {
+  
+        function callback(){
+          video_missing = new PIXI.Texture.fromImage(
+            "C:/GDevelop/newIDE/electron-app/app/www/JsPlatform/Extensions/missing_video24.png"
+          );
+         return this._pixiObject.texture = video_missing;
+        };
         console.log("Starting to load video");
         console.log("Force pause");
         //this._pixiObject._texture.baseTexture.source.pause();
-        video_is_ok = false;
-      };
-
-      if (video_is_ok == false) {
+       /*
         video_missing = new PIXI.Texture.fromImage(
           "C:/GDevelop/newIDE/electron-app/app/www/JsPlatform/Extensions/missing_video24.png"
         );
         this._pixiObject.texture = video_missing;
-      }
+        */
+      };
 
       if (
         typeof this._pixiObject._texture.baseTexture.source.pause ===

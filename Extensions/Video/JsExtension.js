@@ -11,8 +11,6 @@
  * 
  */
 
-
-
 /**
  *
  * JsExtention.js :  Permet de déclarer les events et fait l'affichage des instances d'object dans l'éditeur de GD grace à RenderedVideoObjectInstance
@@ -68,7 +66,7 @@ module.exports = {
         return true;
       }
       if (propertyName === "Looped") {
-        objectContent.loop = newValue === "1"
+        objectContent.loop = newValue === "1";
         return true;
       }
       if (propertyName === "Volume") {
@@ -114,20 +112,7 @@ module.exports = {
       project,
       layout
     ) {
-      if (propertyName === "Opacity") {
-        instance.setRawStringProperty("instanceprop1", newValue);
-        return true;
-      }
-      if (propertyName === "Looped") {
-        instance.setRawFloatProperty("instanceprop2", parseFloat(newValue));
-        return true;
-      }
-      if (propertyName === "Volume") {
-        instance.setRawStringProperty("instanceprop1", newValue);
-        return true;
-      }
-
-      //return false;
+      return false; // No instance properties
     };
     videoObject.getInitialInstanceProperties = function(
       content,
@@ -135,21 +120,8 @@ module.exports = {
       project,
       layout
     ) {
+      // No instance properties
       var instanceProperties = new gd.MapStringPropertyDescriptor();
-
-      // instanceProperties.set(
-      //   "Video instance opacity",
-      //   new gd.PropertyDescriptor(
-      //     instance.getRawStringProperty("instanceprop1")
-      //   )
-      // );
-      // instanceProperties.set(
-      //   "My other instance property",
-      //   new gd.PropertyDescriptor(
-      //     instance.getRawFloatProperty("instanceprop2").toString()
-      //   ).setType("number")
-      // );
-
       return instanceProperties;
     };
 
@@ -157,7 +129,7 @@ module.exports = {
       .addObject(
         "VideoObject",
         _("Video object"),
-        _("This video object showing a video in your game."),
+        _("Display a video on the screen."),
         "JsPlatform/Extensions/videoicon32.png",
         videoObject
       )
@@ -167,9 +139,11 @@ module.exports = {
     object
       .addAction(
         "Play",
-        _("Play an video"),
-        _("Play an video (Recommended : MPEG4 file format, with H264 video codec and AAC audio codec)"),
-        _("Play the video of : _PARAM0_"),
+        _("Play a video"),
+        _(
+          "Play a video (recommended file format is MPEG4, with H264 video codec and AAC audio codec)."
+        ),
+        _("Play the video of _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
@@ -181,8 +155,8 @@ module.exports = {
     object
       .addAction(
         "Pause",
-        _("Pause an video"),
-        _("Pause an video"),
+        _("Pause a video"),
+        _("Pause the specified video."),
         _("Pause video _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
@@ -195,8 +169,8 @@ module.exports = {
     object
       .addAction(
         "Loop",
-        _("Loop an video"),
-        _("Loop an video"),
+        _("Loop a video"),
+        _("Loop the specified video."),
         _("Loop video of _PARAM0_: _PARAM1_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
@@ -210,8 +184,8 @@ module.exports = {
     object
       .addAction(
         "Mute",
-        _("Mute an video"),
-        _("Mute an video"),
+        _("Mute a video"),
+        _("Mute, or unmute, the specified video."),
         _("Mute video of _PARAM0_: _PARAM1_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
@@ -244,7 +218,9 @@ module.exports = {
       .addAction(
         "SetVolume",
         _("Set volume"),
-        _("Set the volume of the video object, between 0 (muted) and 100 (maximum)."),
+        _(
+          "Set the volume of the video object, between 0 (muted) and 100 (maximum)."
+        ),
         _("Do _PARAM1__PARAM2_ to the volume of _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
@@ -262,7 +238,9 @@ module.exports = {
       .addExpression(
         "Volume",
         _("Get the volume"),
-        _("Get the volume of a video object, between 0 (muted) and 100 (maximum)."),
+        _(
+          "Get the volume of a video object, between 0 (muted) and 100 (maximum)."
+        ),
         _("Volume"),
         "JsPlatform/Extensions/videoicon16.png"
       )
@@ -274,7 +252,7 @@ module.exports = {
       .addCondition(
         "Play",
         _("Is played"),
-        _("Check if a video is played"),
+        _("Check if a video is played."),
         _("_PARAM0_ is played"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
@@ -288,7 +266,7 @@ module.exports = {
       .addCondition(
         "Pause",
         _("Is paused"),
-        _("Check if a video is paused"),
+        _("Check if the video is paused."),
         _("_PARAM0_ is paused"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
@@ -302,7 +280,7 @@ module.exports = {
       .addCondition(
         "Loop",
         _("Is looped"),
-        _("Check if a video is looped"),
+        _("Check if the video is looped."),
         _("_PARAM0_ is looped"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
@@ -311,8 +289,6 @@ module.exports = {
       .addParameter("object", _("Video object"), "VideoObject", false)
       .getCodeExtraInformation()
       .setFunctionName("isLooped");
-
-    
 
     object
       .addCondition(
@@ -335,7 +311,7 @@ module.exports = {
       .addCondition(
         "Mute",
         _("Is muted"),
-        _("Check if a video is muted"),
+        _("Check if a video is muted."),
         _("_PARAM0_ is muted"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
@@ -349,7 +325,7 @@ module.exports = {
       .addExpression(
         "CurrentTime",
         _("Get current time"),
-        _("Return the current time of a video object (in seconds)"),
+        _("Return the current time of a video object (in seconds)."),
         "",
         "JsPlatform/Extensions/videoicon16.png"
       )
@@ -361,7 +337,7 @@ module.exports = {
       .addExpression(
         "Duration",
         _("Get the duration"),
-        _("Return the duration of a video object (in seconds)"),
+        _("Return the duration of a video object (in seconds)."),
         "",
         "JsPlatform/Extensions/videoicon16.png"
       )
@@ -369,13 +345,13 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("getDuration");
 
-//TODO ça marche pas 
+    //TODO ça marche pas
     object
       .addCondition(
         "Duration",
         _("Duration"),
         _("Compare the duration of a video object"),
-        _("Duration of _PARAM0_ is _PARAM1__PARAM2_ sc"),
+        _("Duration of _PARAM0_ is _PARAM1__PARAM2_ seconds"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
         "JsPlatform/Extensions/videoicon16.png"
@@ -405,7 +381,9 @@ module.exports = {
       .addAction(
         "SetOpacity",
         _("Change Video opacity"),
-        _("Set opacity of the specified video object, between 0 (fully transparent) and 255 (opaque)."),
+        _(
+          "Set opacity of the specified video object, between 0 (fully transparent) and 255 (opaque)."
+        ),
         _("Do _PARAM1__PARAM2_ to the opacity of _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
@@ -448,14 +426,16 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("getOpacity");
 
-//TODO base on 0 : stoped, 1 : normal, 1.5 : 50% fastest
-//Like Animation speed scale
-//Need update in functions !
+    //TODO base on 0 : stoped, 1 : normal, 1.5 : 50% fastest
+    //Like Animation speed scale
+    //Need update in functions !
     object
       .addAction(
         "SetPlaybackSpeed",
         _("Set playback speed"),
-        _("Set playback speed of the specified video object, between 0 (stoped) and 100 (speed x1)."),
+        _(
+          "Set playback speed of the specified video object, between 0 (stopped) and 100 (normal speed)."
+        ),
         _("Do _PARAM1__PARAM2_ to the playback speed of _PARAM0_"),
         "",
         "JsPlatform/Extensions/videoicon24.png",
@@ -498,7 +478,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("getPlaybackSpeed");
 
-/*
+    /*
       object
         .addExpression(
           "IsPlayed",

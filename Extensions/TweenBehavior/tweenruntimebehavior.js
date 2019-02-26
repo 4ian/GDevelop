@@ -1,10 +1,10 @@
 /**
  * @memberof gdjs
- * @class tween
- * @static
- * @private
+ * @class TweenRuntimeBehavior
+ * @param {gdjs.RuntimeScene} runtimeScene The runtime scene the behavior belongs to.
+ * @param {Object} behaviorData The data to initialize the behavior
+ * @param {gdjs.RuntimeObject} owner The runtime object the behavior belongs to.
  */
-
 gdjs.TweenRuntimeBehavior = function(runtimeScene, behaviorData, owner) {
   gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
 
@@ -12,6 +12,7 @@ gdjs.TweenRuntimeBehavior = function(runtimeScene, behaviorData, owner) {
   this._tweens = {};
   this._runtimeScene = runtimeScene;
   this._easings = [
+    // TODO: Move to a static value on gdjs.TweenRuntimeBehavior (to avoid duplicating this in all behaviors)
     "linear",
     "easeInQuad",
     "easeOutQuad",
@@ -163,7 +164,7 @@ gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
 /**
  * Add an object variable tween.
  * @param {string} identifier Unique id to idenfify the tween
- * @param {objectvar} variable The object variable to store the tweened value
+ * @param {gdjs.Variable} variable The object variable to store the tweened value
  * @param {number} fromValue Start value
  * @param {number} toVaue End value
  * @param {string} easingValue Type of easing
@@ -722,6 +723,41 @@ gdjs.TweenRuntimeBehavior.prototype.getProgress = function(identifier) {
   }
 };
 
-gdjs.TweenRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {};
+gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function() {
+  // TODO: Pause the tweens of the behavior
+};
 
-gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function() {};
+gdjs.TweenRuntimeBehavior.prototype.onActivate = function() {
+  // TODO: Resume the tweens of the behavior
+};
+
+// Handle Shifty.js updates (the time and the "tick" of tweens
+// is controlled by the behavior)
+gdjs.TweenRuntimeBehavior._tweensProcessed = false;
+gdjs.TweenRuntimeBehavior._currentTweenTime = 0;
+
+gdjs.TweenRuntimeBehavior.prototype.doStepPreEvents = function(runtimeScene) {
+  // Process tweens (once per frame).
+  if (!gdjs.TweenRuntimeBehavior._tweensProcessed) {
+    gdjs.TweenRuntimeBehavior._currentTweenTime = runtimeScene
+      .getTimeManager()
+      .getTimeFromStart();
+    shifty.processTweens();
+    gdjs.TweenRuntimeBehavior._tweensProcessed = true;
+  }
+};
+
+gdjs.TweenRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
+  gdjs.TweenRuntimeBehavior._tweensProcessed = false;
+};
+
+// Set up Shifty.js so that the processing ("tick"/updates) is handled
+// by the behavior (once per frame):
+shifty.Tweenable.setScheduleFunction(function() {
+  /* Do nothing, we'll call processTweens manually. */
+});
+// Set up Shifty.js so that the time is handled by the behavior
+// (will be set to the time of the current scene).
+shifty.Tweenable.now = function() {
+  return gdjs.TweenRuntimeBehavior._currentTweenTime;
+};

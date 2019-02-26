@@ -687,6 +687,21 @@
           "numberProperties": [],
           "stringProperties": [],
           "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "layer": "",
+          "locked": false,
+          "name": "ColourTweenProgress",
+          "width": 0,
+          "x": 400,
+          "y": 368,
+          "zOrder": 27,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": []
         }
       ],
       "objects": [
@@ -1389,6 +1404,24 @@
           }
         },
         {
+          "bold": false,
+          "italic": false,
+          "name": "ColourTweenProgress",
+          "smoothed": true,
+          "type": "TextObject::Text",
+          "underlined": false,
+          "variables": [],
+          "behaviors": [],
+          "string": "0",
+          "font": "",
+          "characterSize": 20,
+          "color": {
+            "b": 255,
+            "g": 255,
+            "r": 255
+          }
+        },
+        {
           "name": "ColourTweenSprite",
           "type": "Sprite",
           "updateIfNotVisible": false,
@@ -1784,18 +1817,6 @@
                     {
                       "type": {
                         "inverted": false,
-                        "value": "Tween::RemoveTween"
-                      },
-                      "parameters": [
-                        "PositionTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionTweenFirst\""
-                      ],
-                      "subInstructions": []
-                    },
-                    {
-                      "type": {
-                        "inverted": false,
                         "value": "Tween::AddObjectPositionTween"
                       },
                       "parameters": [
@@ -1862,18 +1883,6 @@
                     }
                   ],
                   "actions": [
-                    {
-                      "type": {
-                        "inverted": false,
-                        "value": "Tween::RemoveTween"
-                      },
-                      "parameters": [
-                        "PositionTweenSprite",
-                        "TweenBehavior",
-                        "\"PositionTweenSecond\""
-                      ],
-                      "subInstructions": []
-                    },
                     {
                       "type": {
                         "inverted": false,
@@ -3954,7 +3963,20 @@
           "folded": false,
           "type": "BuiltinCommonInstructions::Standard",
           "conditions": [],
-          "actions": [],
+          "actions": [
+            {
+              "type": {
+                "inverted": false,
+                "value": "TextObject::String"
+              },
+              "parameters": [
+                "ColourTweenProgress",
+                "=",
+                "ToString(ColourTweenSprite.TweenBehavior::GetProgress(\"ColorTweenToRed\"))"
+              ],
+              "subInstructions": []
+            }
+          ],
           "events": []
         }
       ]

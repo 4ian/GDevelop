@@ -150,7 +150,12 @@ gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
       })
       .then(() => {
         this._removeObjectFromScene(identifier);
-      });
+      }).catch(() => {
+        // Do nothing if the Promise is rejected. Rejection is used
+        // by Shifty.js to signal that the tween was not finished.
+        // We catch it to avoid an uncaught promise error, and to
+        // ensure that the content of the "then" is always applied:
+      })
   } else {
     this._tweens[identifier].instance
       .tween()
@@ -164,7 +169,12 @@ gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
         if (this._tweens[identifier]) {
           this._tweens[identifier].hasFinished = true;
         }
-      });
+      }).catch(() => {
+        // Do nothing if the Promise is rejected. Rejection is used
+        // by Shifty.js to signal that the tween was not finished.
+        // We catch it to avoid an uncaught promise error, and to
+        // ensure that the content of the "then" is always applied:
+      })
   }
 };
 
@@ -212,7 +222,6 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function(
 
       tween.progress = state.progress;
       variable.setNumber(state.value);
-      console.log(state);
     }
   });
 
@@ -265,7 +274,6 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
       tween.progress = state.progress;
       this.owner.setX(state.x);
       this.owner.setY(state.y);
-      console.log(state);
     }
   });
 
@@ -313,7 +321,6 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function(
 
       tween.progress = state.progress;
       this.owner.setX(state.x);
-      console.log(state);
     }
   });
 
@@ -361,7 +368,6 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function(
 
       tween.progress = state.progress;
       this.owner.setY(state.y);
-      console.log(state);
     }
   });
 
@@ -409,7 +415,6 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function(
 
       tween.progress = state.progress;
       this.owner.setAngle(state.angle);
-      console.log(state);
     }
   });
 
@@ -467,7 +472,6 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
       tween.progress = state.progress;
       this.owner.setScaleX(state.scaleX);
       this.owner.setScaleY(state.scaleY);
-      console.log(state);
     }
   });
 
@@ -517,7 +521,6 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
 
       tween.progress = state.progress;
       this.owner.setScaleX(state.scaleX);
-      console.log(state);
     }
   });
 
@@ -567,7 +570,6 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
 
       tween.progress = state.progress;
       this.owner.setScaleY(state.scaleY);
-      console.log(state);
     }
   });
 
@@ -617,7 +619,6 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
 
       tween.progress = state.progress;
       this.owner.setOpacity(state.opacity);
-      console.log(state);
     }
   });
 
@@ -687,7 +688,6 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
         ";" +
         Math.floor(state.blue)
       );
-      console.log(state);
     }
   });
 

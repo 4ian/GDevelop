@@ -93,7 +93,14 @@ gdjs.TweenRuntimeBehavior.prototype._pauseTween = function(identifier) {
 };
 
 gdjs.TweenRuntimeBehavior.prototype._resumeTween = function(identifier) {
-  return this._tweens[identifier].instance.resume();
+  return this._tweens[identifier].instance
+    .resume()
+    .catch(() => {
+      // Do nothing if the Promise is rejected. Rejection is used
+      // by Shifty.js to signal that the tween was not finished.
+      // We catch it to avoid an uncaught promise error, and to
+      // ensure that the content of the "then" is always applied:
+    })
 };
 
 gdjs.TweenRuntimeBehavior.prototype._stopTween = function(
@@ -189,8 +196,14 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function(
   var newTweenable = new shifty.Tweenable();
 
   newTweenable.setConfig({
-    from: { value: fromValue, progress: 0.0 },
-    to: { value: toValue, progress: 1.0 },
+    from: {
+      value: fromValue,
+      progress: 0.0
+    },
+    to: {
+      value: toValue,
+      progress: 1.0
+    },
     duration: durationValue,
     easing: easingValue,
     step: state => {
@@ -233,8 +246,16 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
 
   var newTweenable = new shifty.Tweenable();
   newTweenable.setConfig({
-    from: { x: this.owner.getX(), y: this.owner.getY(), progress: 0.0 },
-    to: { x: toX, y: toY, progress: 1.0 },
+    from: {
+      x: this.owner.getX(),
+      y: this.owner.getY(),
+      progress: 0.0
+    },
+    to: {
+      x: toX,
+      y: toY,
+      progress: 1.0
+    },
     duration: durationValue,
     easing: easingValue,
     step: state => {
@@ -276,8 +297,14 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function(
 
   var newTweenable = new shifty.Tweenable();
   newTweenable.setConfig({
-    from: { x: this.owner.getX(), progress: 0.0 },
-    to: { x: toX, progress: 1.0 },
+    from: {
+      x: this.owner.getX(),
+      progress: 0.0
+    },
+    to: {
+      x: toX,
+      progress: 1.0
+    },
     duration: durationValue,
     easing: easingValue,
     step: state => {
@@ -318,8 +345,14 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function(
 
   var newTweenable = new shifty.Tweenable();
   newTweenable.setConfig({
-    from: { y: this.owner.getY(), progress: 0.0 },
-    to: { y: toY, progress: 1.0 },
+    from: {
+      y: this.owner.getY(),
+      progress: 0.0
+    },
+    to: {
+      y: toY,
+      progress: 1.0
+    },
     duration: durationValue,
     easing: easingValue,
     step: state => {
@@ -360,8 +393,14 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function(
 
   var newTweenable = new shifty.Tweenable();
   newTweenable.setConfig({
-    from: { angle: this.owner.getAngle(), progress: 0.0 },
-    to: { angle: toAngle, progress: 1.0 },
+    from: {
+      angle: this.owner.getAngle(),
+      progress: 0.0
+    },
+    to: {
+      angle: toAngle,
+      progress: 1.0
+    },
     duration: durationValue,
     easing: easingValue,
     step: state => {
@@ -414,7 +453,11 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
       scaleY: this.owner.getScaleY(),
       progress: 0.0
     },
-    to: { scaleX: toScaleX, scaleY: toScaleY, progress: 1.0 },
+    to: {
+      scaleX: toScaleX,
+      scaleY: toScaleY,
+      progress: 1.0
+    },
     duration: durationValue,
     easing: easingValue,
     step: state => {
@@ -458,8 +501,14 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
 
   var newTweenable = new shifty.Tweenable();
   newTweenable.setConfig({
-    from: { scaleX: this.owner.getScaleX(), progress: 0.0 },
-    to: { scaleX: toScaleX, progress: 1.0 },
+    from: {
+      scaleX: this.owner.getScaleX(),
+      progress: 0.0
+    },
+    to: {
+      scaleX: toScaleX,
+      progress: 1.0
+    },
     duration: durationValue,
     easing: easingValue,
     step: state => {
@@ -502,8 +551,14 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
 
   var newTweenable = new shifty.Tweenable();
   newTweenable.setConfig({
-    from: { scaleY: this.owner.getScaleY(), progress: 0.0 },
-    to: { scaleY: toScaleY, progress: 1.0 },
+    from: {
+      scaleY: this.owner.getScaleY(),
+      progress: 0.0
+    },
+    to: {
+      scaleY: toScaleY,
+      progress: 1.0
+    },
     duration: durationValue,
     easing: easingValue,
     step: state => {
@@ -546,8 +601,14 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
 
   var newTweenable = new shifty.Tweenable();
   newTweenable.setConfig({
-    from: { opacity: this.owner.getOpacity(), progress: 0.0 },
-    to: { opacity: toOpacity, progress: 1.0 },
+    from: {
+      opacity: this.owner.getOpacity(),
+      progress: 0.0
+    },
+    to: {
+      opacity: toOpacity,
+      progress: 1.0
+    },
     duration: durationValue,
     easing: easingValue,
     step: state => {
@@ -621,10 +682,10 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
       tween.progress = state.progress;
       this.owner.setColor(
         Math.floor(state.red) +
-          ";" +
-          Math.floor(state.green) +
-          ";" +
-          Math.floor(state.blue)
+        ";" +
+        Math.floor(state.green) +
+        ";" +
+        Math.floor(state.blue)
       );
       console.log(state);
     }

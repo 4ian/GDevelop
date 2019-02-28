@@ -413,7 +413,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
 
   obj.AddCondition("ParticleGravityAngle",
                    _("Gravity angle"),
-                   _("Test the gravity angle the emitter"),
+                   _("Test the gravity angle of the emitter"),
                    _("Gravity angle of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",

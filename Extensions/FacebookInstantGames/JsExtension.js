@@ -187,7 +187,7 @@ module.exports = {
       .addCondition(
         "AreAdsSupported",
         _("Check if ads are supported"),
-        _("Check if showind ads is supported on this device (only mobile phones can show ads)"),
+        _("Check if showing ads is supported on this device (only mobile phones can show ads)"),
         _("Ads can be shown on this device"),
         _("Facebook Instant Games/Ads"),
         "JsPlatform/Extensions/facebookicon24.png",

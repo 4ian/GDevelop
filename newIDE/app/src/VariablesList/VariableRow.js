@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 import * as React from 'react';
 import { TreeTableRow, TreeTableCell } from '../UI/TreeTable';
 import DragHandle from '../UI/DragHandle';
@@ -123,7 +124,7 @@ const ThemableVariableRow = ({
         <IconButton
           onClick={onResetToDefaultValue}
           style={isStructure ? undefined : styles.fadedButton}
-          tooltip={'Reset'}
+          tooltip={<Trans>Reset</Trans>}
         >
           <Reset />
         </IconButton>
@@ -132,7 +133,8 @@ const ThemableVariableRow = ({
         <IconButton
           onClick={onAddChild}
           style={isStructure ? undefined : styles.fadedButton}
-          tooltip={'Add child variable'}
+          tooltip={<Trans>Add child variable</Trans>}
+          tooltipPosition="bottom-left"
         >
           <AddCircle />
         </IconButton>

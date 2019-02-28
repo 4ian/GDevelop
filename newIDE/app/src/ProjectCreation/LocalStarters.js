@@ -113,7 +113,9 @@ export default class LocalStarters extends Component {
                   </p>
                 }
                 secondaryTextLines={2}
-                onClick={() => this.createFromExample('downhill-bike-physics-demo')}
+                onClick={() =>
+                  this.createFromExample('downhill-bike-physics-demo')
+                }
               />
               <ListItem
                 primaryText={<Trans>Empty game</Trans>}

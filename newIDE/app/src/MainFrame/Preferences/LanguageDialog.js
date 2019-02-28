@@ -12,6 +12,7 @@ import PreferencesContext from './PreferencesContext';
 import AlertMessage from '../../UI/AlertMessage';
 import LocalesMetadata from '../../locales/LocalesMetadata';
 import { I18n } from '@lingui/react';
+import Divider from 'material-ui/Divider';
 
 type Props = {|
   open: boolean,
@@ -29,6 +30,27 @@ const displayLocaleMetadata = localeMetadata => {
   return true;
 };
 
+const renderLanguageMenuItem = localeMetadata => {
+  const translationRatio = localeMetadata.translationRatio || 0;
+  const percent = (100 * localeMetadata.translationRatio).toFixed(0);
+  const isStarted = translationRatio > 0;
+
+  return (
+    <MenuItem
+      value={localeMetadata.languageCode}
+      primaryText={
+        localeMetadata.languageNativeName +
+        ' (' +
+        localeMetadata.languageName +
+        ')' +
+        (isStarted ? ` - ~${percent}%` : '')
+      }
+      disabled={!isStarted}
+      key={localeMetadata.languageCode}
+    />
+  );
+};
+
 export default class LanguageDialog extends Component<Props, State> {
   state = {
     languageDidChange: false,
@@ -37,6 +59,14 @@ export default class LanguageDialog extends Component<Props, State> {
   render() {
     const { open, onClose } = this.props;
     if (!open) return null;
+
+    const localesToDisplay = LocalesMetadata.filter(displayLocaleMetadata);
+    const goodProgressLocales = localesToDisplay.filter(
+      localeMetadata => localeMetadata.translationRatio > 0.5
+    );
+    const startedLocales = localesToDisplay.filter(
+      localeMetadata => localeMetadata.translationRatio < 0.5
+    );
 
     return (
       <I18n>
@@ -90,30 +120,12 @@ export default class LanguageDialog extends Component<Props, State> {
                         fullWidth
                       >
                         <MenuItem value="en" primaryText="English (default)" />
-                        {LocalesMetadata.filter(displayLocaleMetadata).map(
-                          localeMetadata => {
-                            let translationRatio =
-                              localeMetadata.translationRatio || 0;
-                            const percent = (
-                              100 * localeMetadata.translationRatio
-                            ).toFixed(0);
-                            const isStarted = translationRatio > 0;
-
-                            return (
-                              <MenuItem
-                                value={localeMetadata.languageCode}
-                                primaryText={
-                                  localeMetadata.languageNativeName +
-                                  ' (' +
-                                  localeMetadata.languageName +
-                                  ')' +
-                                  (isStarted ? ` - ~${percent}%` : '')
-                                }
-                                disabled={!isStarted}
-                                key={localeMetadata.languageCode}
-                              />
-                            );
-                          }
+                        {goodProgressLocales.map(localeMetadata =>
+                          renderLanguageMenuItem(localeMetadata)
+                        )}
+                        <Divider />
+                        {startedLocales.map(localeMetadata =>
+                          renderLanguageMenuItem(localeMetadata)
                         )}
                       </SelectField>
                     </Line>

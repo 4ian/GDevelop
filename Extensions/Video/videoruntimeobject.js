@@ -6,10 +6,8 @@
  * @extends RuntimeObject
  */
 gdjs.VideoRuntimeObject = function(runtimeScene, objectData) {
-  // Always call the base gdjs.RuntimeObject constructor.
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-  // Load any required data from the object properties.
   this._opacity = objectData.opacity;
   this._loop = objectData.loop;
   this._volume = objectData.volume;
@@ -53,7 +51,7 @@ gdjs.VideoRuntimeObject.prototype._updatePosition = function() {
  * Set object position on X axis.
  */
 gdjs.VideoRuntimeObject.prototype.setX = function(x) {
-  gdjs.RuntimeObject.prototype.setX.call(this, x); // Always call the parent method first.
+  gdjs.RuntimeObject.prototype.setX.call(this, x);
   this._updatePosition();
 };
 
@@ -61,7 +59,7 @@ gdjs.VideoRuntimeObject.prototype.setX = function(x) {
  * Set object position on Y axis.
  */
 gdjs.VideoRuntimeObject.prototype.setY = function(y) {
-  gdjs.RuntimeObject.prototype.setY.call(this, y); // Always call the parent method first.
+  gdjs.RuntimeObject.prototype.setY.call(this, y);
   this._updatePosition();
 };
 
@@ -70,12 +68,13 @@ gdjs.VideoRuntimeObject.prototype.setY = function(y) {
  * @param {number} angle The new angle of the object
  */
 gdjs.VideoRuntimeObject.prototype.setAngle = function(angle) {
-  gdjs.RuntimeObject.prototype.setAngle.call(this, angle); // Always call the parent method first.
-  this._renderer.updateAngle(); // Tell the renderer to update the rendered object
+  gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
+  this._renderer.updateAngle();
 };
 
 /**
  * Set object opacity.
+ * @param {number} opacity The new opacity of the object
  */
 gdjs.VideoRuntimeObject.prototype.setOpacity = function(opacity) {
   if (opacity < 0) opacity = 0;
@@ -138,14 +137,8 @@ gdjs.VideoRuntimeObject.prototype.isMuted = function() {
   return this._renderer.isMuted();
 };
 
-/* Tool normalize for value 
-
-input 0-1, return a number 0-100
-this._normalize(volume, 1, 0)*100;
-
-input 0-100, return output 0-1
-this._normalize(parseFloat(number), 100, 0)
-*/
+/* Input 0-1, return a number 0-100
+   Tool normalize for value  */
 
 gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
   return (val - min) / (max - min);
@@ -154,7 +147,6 @@ gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
 /**
  * Limit value in an interval
  */
-
 gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
   return val <= min ? min : val >= max ? max : val;
 };
@@ -202,18 +194,11 @@ gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
 };
 
 gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
-  var new_playbackSpeed = this._clamp(
-    this._normalize(playbackSpeed, 0, 100),
-    0,
-    1
-  );
+  this._playbackSpeed = playbackSpeed;
+  var new_playbackSpeed = playbackSpeed;
   this._renderer.setPlaybackSpeed(new_playbackSpeed);
 };
 
-/**
- * Get playblack speed.
- * return 0-100
- */
 gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
-  return this._normalize(this._renderer.getPlaybackSpeed(), 0, 1) * 100;
+  return this._renderer.getPlaybackSpeed();
 };

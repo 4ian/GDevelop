@@ -1,30 +1,4 @@
 /**
- * 
- * //NOTE  Les icones dans les events 
- * 
- * "JsPlatform/Extensions/videoicon24.png",
-   "JsPlatform/Extensions/videoicon16.png"
-
-   seule le 24 est affiché, il n'y a pas de responsive sur les icones, le 16 ne sert donc pas, je le remove ?
-
- * 
- * 
- */
-
-/**
- *
- * JsExtention.js :  Permet de déclarer les events et fait l'affichage des instances d'object dans l'éditeur de GD grace à RenderedVideoObjectInstance
- *
- * videoruntimeobject-pixi-renderer.js  : Gère le rendu des object dans la preview et les exports.
- *
- * Les actions : a déclarer dans JsExtention.js, puis ça appel dans videoruntimeobject.js, puis vers videoruntimeobject-pixi-renderer.js
- * Si il y a un operator il faut un .setManipulatedType('number')  et     .setGetter('getVolume');
- * la nouvelle valeur calculé avec l'opérateur est envoyé directement à setFunctionName("setVolume") !
- *
- *
- */
-
-/**
  * This is a declaration of an extension for GDevelop 5.
  *
  * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change
@@ -49,12 +23,6 @@ module.exports = {
       )
       .setExtensionHelpPath("/all-features/video");
 
-    // Declare an object.
-    // Create a new gd.ObjectJsImplementation object and implement the methods
-    // that are called to get and set the properties of the object, as well
-    // as the properties of the initial instances of this object
-    // Everything that is stored inside the object is in "content" and is automatically
-    // saved/loaded to JSON.
     var videoObject = new gd.ObjectJsImplementation();
     videoObject.updateProperty = function(
       objectContent,
@@ -85,7 +53,7 @@ module.exports = {
 
       objectProperties.set(
         "Opacity",
-        new gd.PropertyDescriptor(objectContent.opacity).setType("number") //FIXME error with toString()
+        new gd.PropertyDescriptor(objectContent.opacity).setType("number")
       );
       objectProperties.set(
         "Looped",
@@ -95,7 +63,7 @@ module.exports = {
       );
       objectProperties.set(
         "Volume",
-        new gd.PropertyDescriptor(objectContent.volume).setType("number") //FIXME error with toString()
+        new gd.PropertyDescriptor(objectContent.volume).setType("number")
       );
       objectProperties.set(
         "myVideo",
@@ -124,7 +92,7 @@ module.exports = {
       project,
       layout
     ) {
-      return false; // No instance properties
+      return false;
     };
     videoObject.getInitialInstanceProperties = function(
       content,
@@ -132,7 +100,6 @@ module.exports = {
       project,
       layout
     ) {
-      // No instance properties
       var instanceProperties = new gd.MapStringPropertyDescriptor();
       return instanceProperties;
     };
@@ -357,7 +324,6 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("getDuration");
 
-    //TODO ça marche pas
     object
       .addCondition(
         "Duration",
@@ -446,7 +412,8 @@ module.exports = {
         "SetPlaybackSpeed",
         _("Set playback speed"),
         _(
-          "Set playback speed of the specified video object, between 0 (stopped) and 100 (normal speed)."
+          "Set playback speed of the specified video object, (1 = the default speed, >1 = "
+          "faster and <1 = slower)."
         ),
         _("Do _PARAM1__PARAM2_ to the playback speed of _PARAM0_"),
         "",
@@ -490,6 +457,7 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("getPlaybackSpeed");
 
+      //This expressions are not enabled because the core can't use booleans for check
     /*
       object
         .addExpression(
@@ -553,13 +521,6 @@ module.exports = {
 
 */
 
-    /**
-     *
-     * //TODO Action for change video (with PATH expression fileSystem) of an object video
-     * Condition : if video is ready to play
-     * Expression :  return if video is ready to play
-     */
-
     return extension;
   },
   /**
@@ -622,15 +583,9 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      //TODO Need ressource manager and can select only video files
-      //Codec can be played : https://www.w3schools.com/tags/av_met_canplaytype.asp
-
       var textureVideo = new PIXI.Texture.fromVideo(
         "C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4"
       );
-
-      //FIXME This autoplay don't work
-      textureVideo.baseTexture.source.autoplay = false;
 
       //Setup the PIXI object:
       this._pixiObject = new PIXI.Sprite(textureVideo);
@@ -658,36 +613,22 @@ module.exports = {
      * This is called to update the PIXI object on the scene editor
      */
     RenderedVideoObjectInstance.prototype.update = function() {
-      //FIXME need help here i can't catch err_file_not_found like this :
-      video_is_ok = true;
-      this._pixiObject._texture.baseTexture.onerror = function(callback) {
-  
-        function callback(){
-          video_missing = new PIXI.Texture.fromImage(
-            "C:/GDevelop/newIDE/electron-app/app/www/JsPlatform/Extensions/missing_video24.png"
-          );
-         return this._pixiObject.texture = video_missing;
-        };
-        console.log("Starting to load video");
-        console.log("Force pause");
-        //this._pixiObject._texture.baseTexture.source.pause();
-       /*
+      this._pixiObject._texture.baseTexture.error = function(callback) {
+        callback();
+      };
+
+      this._pixiObject._texture.baseTexture.addListener("onerror", function() {
         video_missing = new PIXI.Texture.fromImage(
           "C:/GDevelop/newIDE/electron-app/app/www/JsPlatform/Extensions/missing_video24.png"
         );
-        this._pixiObject.texture = video_missing;
-        */
-      };
+        this._pixiObject._texture = video_missing;
+      });
 
       if (
-        typeof this._pixiObject._texture.baseTexture.source.pause ===
-          "function" &&
-        video_is_ok == true
+        typeof this._pixiObject._texture.baseTexture.source.pause === "function"
       ) {
-        //NOTE This stop the video but is not very clean i guess
         //Stop video in scene editor
         if (!this._pixiObject._texture.baseTexture.source.paused) {
-          //promise added here for avoid error in IDE
           var promise = this._pixiObject._texture.baseTexture.source.pause();
 
           if (promise !== undefined) {
@@ -695,13 +636,10 @@ module.exports = {
               .then(_ => {
                 // Autoplay started!
                 console.log("action pause > play !");
-                //this._pixiObject._texture.baseTexture.source.pause();
               })
               .catch(error => {
                 // Autoplay was prevented.
                 console.log("action pause > pause !");
-                //this._pixiObject._texture.baseTexture.source.play();
-                // Show a "Play" button so that user can start playback.
               });
           }
         }

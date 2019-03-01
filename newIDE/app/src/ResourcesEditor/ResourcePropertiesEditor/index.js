@@ -8,6 +8,7 @@ import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import { type Schema } from '../../PropertiesEditor';
 
 import {
   type ResourceSource,
@@ -37,7 +38,7 @@ export default class ResourcePropertiesEditor extends React.Component<
   Props,
   {}
 > {
-  schema = [
+  schema: Schema = [
     {
       name: 'Resource name',
       valueType: 'string',

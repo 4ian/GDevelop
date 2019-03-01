@@ -358,7 +358,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddAction(
            "AllowDiagonals",
-           _("Diagonals moves"),
+           _("Diagonal movement"),
            _("Allow or restrict diagonal movement on the path"),
            _("Allow diagonal movement for _PARAM0_ on the path: _PARAM2_"),
            _("Path"),
@@ -372,7 +372,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
 
     aut.AddCondition("DiagonalsAllowed",
-                     _("Diagonals moves"),
+                     _("Diagonal movement"),
                      _("Return true if the object is allowed to move "
                        "diagonally on the path"),
                      _("Diagonal moves allowed for _PARAM0_"),

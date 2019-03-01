@@ -361,7 +361,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
 
   aut.AddAction("AllowDiagonals",
-                _("Diagonals moves"),
+                _("Diagonal movement"),
                 _("Allow or restrict diagonal movemment"),
                 _("Allow diagonal moves for _PARAM0_: _PARAM2_"),
                 _("Movement"),
@@ -374,7 +374,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
 
   aut.AddCondition("DiagonalsAllowed",
-                   _("Diagonals moves"),
+                   _("Diagonal movement"),
                    _("Return true if the object is allowed to move diagonally"),
                    _("Allow diagonal moves for _PARAM0_"),
                    _("Movement"),

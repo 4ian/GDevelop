@@ -118,6 +118,8 @@ import AlertMessage from '../UI/AlertMessage';
 import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
 
+// No i18n in this file
+
 const gd = global.gd;
 const {
   project,

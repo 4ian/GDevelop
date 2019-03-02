@@ -42,6 +42,7 @@ const analyzeFile = filePath =>
           content.includes('tooltip=') ||
           content.includes('tooltip={') ||
           content.includes('<EmptyMessage') ||
+          content.includes('<MiniToolbarText') ||
           content.includes('<BackgroundText'))
         // /(?<!key)=("|\{["'])/.test(content)
       ) {

@@ -42,7 +42,9 @@ export default class TextEditor extends React.Component<EditorProps, void> {
     return (
       <Column noMargin>
         <MiniToolbar>
-          <MiniToolbarText>Size:</MiniToolbarText>
+          <MiniToolbarText>
+            <Trans>Size:</Trans>
+          </MiniToolbarText>
           <TextField
             type="number"
             style={styles.sizeTextField}
@@ -52,7 +54,9 @@ export default class TextEditor extends React.Component<EditorProps, void> {
               this.forceUpdate();
             }}
           />
-          <MiniToolbarText>Color:</MiniToolbarText>
+          <MiniToolbarText>
+            <Trans>Color:</Trans>
+          </MiniToolbarText>
           <ColorPicker
             style={styles.sizeTextField}
             disableAlpha

@@ -44,7 +44,7 @@ export default class GDI18nProvider extends React.Component<Props, State> {
       return Promise.resolve(this.state.catalogs);
     }
 
-    return import(/* webpackMode: "lazy", webpackChunkName: "locales-[index]-messages" */
+    return import(/* webpackMode: "lazy", webpackChunkName: "locales-[request]" */
     `../../locales/${language}/messages`).then(
       catalog => {
         return { ...this.state.catalogs, [language]: catalog };

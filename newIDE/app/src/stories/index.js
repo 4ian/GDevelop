@@ -54,6 +54,7 @@ import BehaviorsEditor from '../BehaviorsEditor';
 import ObjectGroupEditor from '../ObjectGroupEditor';
 import ObjectGroupsList from '../ObjectGroupsList';
 import muiDecorator from './MuiDecorator';
+import i18nProviderDecorator from './I18nProviderDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
@@ -888,7 +889,10 @@ storiesOf('LocalFilePicker', module)
 
 storiesOf('StartPage', module)
   .addDecorator(muiDecorator)
-  .add('default', () => <StartPage />);
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <StartPage onOpenLanguageDialog={action('open language dialog')} />
+  ));
 
 storiesOf('DebuggerContent', module)
   .addDecorator(muiDecorator)

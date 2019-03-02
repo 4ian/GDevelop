@@ -956,6 +956,7 @@ class MainFrame extends React.Component<Props, State> {
               onCloseProject={() => this.askToCloseProject()}
               onOpenAboutDialog={() => this.openAboutDialog()}
               onOpenHelpFinder={() => this.openHelpFinderDialog()}
+              onOpenLanguageDialog={() => this.openLanguage()}
               isActive={isActive}
               ref={editorRef}
             />

@@ -20,7 +20,7 @@ const {
   getLocalNetworkIps
 } = require("./ServeFolder");
 const { startDebuggerServer, sendMessage } = require("./DebuggerServer");
-const { buildMainMenuFor } = require("./MainMenu");
+const { buildMainMenuFor, buildPlaceholderMainMenu } = require("./MainMenu");
 const { loadModalWindow } = require("./ModalWindow");
 const { load, registerGdideProtocol } = require("./Utils/UrlLoader");
 const throttle = require("lodash.throttle");
@@ -98,7 +98,7 @@ app.on("ready", function() {
     devTools
   });
 
-  Menu.setApplicationMenu(buildMainMenuFor(mainWindow));
+  Menu.setApplicationMenu(buildPlaceholderMainMenu());
 
   mainWindow.on("closed", function() {
     // Dereference the window object, usually you would store windows
@@ -106,6 +106,10 @@ app.on("ready", function() {
     // when you should delete the corresponding element.
     mainWindow = null;
     stopServer(() => {});
+  });
+
+  ipcMain.on("set-main-menu", (event, mainMenuTemplate) => {
+    Menu.setApplicationMenu(buildMainMenuFor(mainWindow, mainMenuTemplate));
   });
 
   //Prevent any navigation inside the main window.
@@ -132,7 +136,10 @@ app.on("ready", function() {
       indexSubPath: "piskel/piskel-index.html",
       backgroundColor: "#000000",
       onReady: piskelWindow => {
-        piskelWindow.webContents.send("piskel-load-animation", externalEditorData),
+        piskelWindow.webContents.send(
+          "piskel-load-animation",
+          externalEditorData
+        ),
           piskelWindow.show();
       }
     });

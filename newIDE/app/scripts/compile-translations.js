@@ -134,14 +134,30 @@ getLocales()
         locales.map(locale => {
           return new Promise(resolve => {
             // Concatenate all message catalogs into a single one for lingui-js.
-            // For "en", don't concatenate with gdcore-gdcpp-gdjs-extensions-messages.po
-            // as it's the source language.
-            const files = getLocaleSourceCatalogFiles(locale).join(' ');
+            const files = getLocaleSourceCatalogFiles(locale);
+
+            if (files.length === 1) {
+              // For languages with a single source ("en", "pseudo_LOCALE"),
+              // don't concatenate anything.
+              const cpResult = shell.cp(
+                path.join(getLocalePath(locale), files[0]),
+                path.join(getLocalePath(locale), 'messages.po')
+              );
+
+              return resolve({
+                locale,
+                shellOutput: {
+                  code: cpResult.code,
+                  stdout: cpResult.stdout,
+                  stderr: cpResult.stderr,
+                },
+              });
+            }
 
             // Run msgcat. Use --no-wrap to allow to sanitize the catalog with
             // regex/string replace.
             shell.exec(
-              msgcat + ` --no-wrap ${files} -o messages.po`,
+              msgcat + ` --no-wrap ${files.join(' ')} -o messages.po`,
               {
                 cwd: getLocalePath(locale),
                 silent: true,
@@ -168,6 +184,7 @@ getLocales()
     }
   )
   .then(results => {
+    //Display success and errors while concatenating translation catalogs for each locale.
     const successes = results.filter(
       ({ shellOutput }) => shellOutput.code === 0
     );

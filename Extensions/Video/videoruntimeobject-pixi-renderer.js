@@ -9,26 +9,25 @@
 gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   this._object = runtimeObject;
 
+  // Load (or reset) the video
   if (this._pixiObject === undefined) {
-    this._textureVideo = new PIXI.Texture.fromVideo(
-      "C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4"
+    this._pixiObject = new PIXI.Sprite(
+      runtimeScene
+        .getGame()
+        .getImageManager()
+        .getPIXIVideoTexture(this._object._videoResource)
     );
-
-    this._pixiObject = new PIXI.Sprite(this._textureVideo);
-
-    this._pixiObject._texture.baseTexture.source.pause();
   } else {
     this._pixiObject._texture.baseTexture.source.currentTime = 0;
-    this._pixiObject._texture.baseTexture.source.pause();
   }
 
-  //this._pixiObject.anchor.x = 0.5;
-  //this._pixiObject.anchor.y = 0.5;
   runtimeScene
     .getLayer("")
     .getRenderer()
     .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
+  this._pixiObject.anchor.x = 0.5;
+  this._pixiObject.anchor.y = 0.5;
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
@@ -80,7 +79,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.play = function() {
   if (promise !== undefined) {
     promise
       .then(_ => {
-        // Autoplay started!
+        // Autoplay started
       })
       .catch(error => {
         // Autoplay was prevented.
@@ -97,7 +96,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.pause = function() {
   if (promise !== undefined) {
     promise
       .then(_ => {
-        // Autoplay started!
+        // Autoplay started
       })
       .catch(error => {
         // Autoplay was prevented.

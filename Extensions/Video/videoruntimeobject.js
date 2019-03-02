@@ -8,9 +8,14 @@
 gdjs.VideoRuntimeObject = function(runtimeScene, objectData) {
   gdjs.RuntimeObject.call(this, runtimeScene, objectData);
 
-  this._opacity = objectData.opacity;
-  this._loop = objectData.loop;
-  this._volume = objectData.volume;
+  /** @type number */
+  this._opacity = objectData.content.opacity;
+  /** @type boolean */
+  this._loop = objectData.content.loop;
+  /** @type number */
+  this._volume = objectData.content.volume;
+  /** @type string */
+  this._videoResource = objectData.content.videoResource;
 
   if (this._renderer)
     gdjs.VideoRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -77,15 +82,12 @@ gdjs.VideoRuntimeObject.prototype.setAngle = function(angle) {
  * @param {number} opacity The new opacity of the object
  */
 gdjs.VideoRuntimeObject.prototype.setOpacity = function(opacity) {
-  if (opacity < 0) opacity = 0;
-  if (opacity > 255) opacity = 255;
-  this._opacity = opacity / 255;
+  this._opacity = opacity;
   this._renderer.updateOpacity();
 };
 
 /**
  * Get object opacity.
- * return 0-1
  */
 gdjs.VideoRuntimeObject.prototype.getOpacity = function() {
   return this._opacity;

@@ -18,7 +18,7 @@ module.exports = {
         "Video",
         "Video",
         _("Display a video on the scene"),
-        "Aurélien vivet",
+        "Aurélien Vivet",
         "Open source (MIT License)"
       )
       .setExtensionHelpPath("/all-features/video");
@@ -41,8 +41,8 @@ module.exports = {
         objectContent.volume = parseFloat(newValue);
         return true;
       }
-      if (propertyName === "myVideo") {
-        objectContent.myVideo = newValue;
+      if (propertyName === "videoResource") {
+        objectContent.videoResource = newValue;
         return true;
       }
 
@@ -66,8 +66,8 @@ module.exports = {
         new gd.PropertyDescriptor(objectContent.volume).setType("number")
       );
       objectProperties.set(
-        "myVideo",
-        new gd.PropertyDescriptor(objectContent.myVideo)
+        "videoResource",
+        new gd.PropertyDescriptor(objectContent.videoResource)
           .setType("resource")
           .addExtraInfo("video")
           .setLabel(_("Video resource"))
@@ -80,7 +80,7 @@ module.exports = {
         opacity: 255,
         loop: false,
         volume: 100,
-        myVideo: ""
+        videoResource: ""
       })
     );
 
@@ -582,12 +582,10 @@ module.exports = {
         pixiResourcesLoader
       );
 
-      var textureVideo = new PIXI.Texture.fromVideo(
-        "C:/Users/RTX-Bouh/Desktop/test_video_GD.mp4"
-      );
+      this._videoResource = undefined;
 
       //Setup the PIXI object:
-      this._pixiObject = new PIXI.Sprite(textureVideo);
+      this._pixiObject = new PIXI.Sprite(this._getVideoTexture());
       this._pixiObject.anchor.x = 0.5;
       this._pixiObject.anchor.y = 0.5;
       this._pixiContainer.addChild(this._pixiObject);
@@ -608,47 +606,33 @@ module.exports = {
       return "JsPlatform/Extensions/videoicon24.png";
     };
 
+    RenderedVideoObjectInstance.prototype._getVideoTexture = function() {
+      // Get the video resource to use
+      const videoResource = this._associatedObject
+        .getProperties(this.project)
+        .get("videoResource")
+        .getValue();
+
+      return this._pixiResourcesLoader.getPIXIVideoTexture(
+        this._project,
+        videoResource
+      );
+    };
+
     /**
      * This is called to update the PIXI object on the scene editor
      */
     RenderedVideoObjectInstance.prototype.update = function() {
-      this._pixiObject._texture.baseTexture.error = function(callback) {
-        callback();
-      };
-
-      this._pixiObject._texture.baseTexture.addListener("onerror", function() {
-        video_missing = new PIXI.Texture.fromImage(
-          "C:/GDevelop/newIDE/electron-app/app/www/JsPlatform/Extensions/missing_video24.png"
-        );
-        this._pixiObject._texture = video_missing;
-      });
-
-      if (
-        typeof this._pixiObject._texture.baseTexture.source.pause === "function"
-      ) {
-        //Stop video in scene editor
-        if (!this._pixiObject._texture.baseTexture.source.paused) {
-          var promise = this._pixiObject._texture.baseTexture.source.pause();
-
-          if (promise !== undefined) {
-            promise
-              .then(_ => {
-                // Autoplay started!
-                console.log("action pause > play !");
-              })
-              .catch(error => {
-                // Autoplay was prevented.
-                console.log("action pause > pause !");
-              });
-          }
-        }
-      }
-
-      // Read a property from the object
-      const property1Value = this._associatedObject
+      // Check if the video resource has changed
+      const videoResource = this._associatedObject
         .getProperties(this.project)
-        .get("Opacity")
+        .get("videoResource")
         .getValue();
+      if (videoResource !== this._videoResource) {
+        this._videoResource = videoResource;
+          
+        this._pixiObject.texture = this._getVideoTexture();
+      }
 
       // Read position and angle from the instance
       this._pixiObject.position.x =

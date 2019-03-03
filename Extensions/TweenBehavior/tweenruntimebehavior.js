@@ -61,21 +61,21 @@ gdjs.TweenRuntimeBehavior.thisIsARuntimeBehaviorConstructor =
 gdjs.TweenRuntimeBehavior.TweenInstance = function(
   instance,
   hasFinished,
-  currentDuration,
-  fullDuration
+  startTime,
+  totalDuration
 ) {
   this.instance = instance;
   this.hasFinished = hasFinished;
-  this.currentDuration = currentDuration;
-  this.fullDuration = fullDuration;
+  this.startTime = startTime;
+  this.totalDuration = totalDuration;
 };
 
-gdjs.TweenRuntimeBehavior.prototype._addTween = function(identifier, instance, fullDuration) {
+gdjs.TweenRuntimeBehavior.prototype._addTween = function(identifier, instance, startTime, totalDuration) {
   this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.TweenInstance(
     instance,
     false,
-    0,
-    fullDuration
+    startTime,
+    totalDuration
   );
 };
 
@@ -218,15 +218,11 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function(
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      var tween = this._getTween(identifier);
-      if (!tween) return;
-      tween.currentDuration += 1;
-      
       variable.setNumber(state.value);
     }
   });
 
-  this._addTween(identifier, newTweenable, durationValue);
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -267,16 +263,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      var tween = this._getTween(identifier);
-      if (!tween) return;
-      tween.currentDuration += 1;
-      
       this.owner.setX(state.x);
       this.owner.setY(state.y);
     }
   });
 
-  this._addTween(identifier, newTweenable, durationValue);
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -313,15 +305,11 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function(
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      var tween = this._getTween(identifier);
-      if (!tween) return;
-      tween.currentDuration += 1;
-      
       this.owner.setX(state.x);
     }
   });
 
-  this._addTween(identifier, newTweenable, durationValue);
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -358,15 +346,11 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function(
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      var tween = this._getTween(identifier);
-      if (!tween) return;
-      tween.currentDuration += 1;
-      
       this.owner.setY(state.y);
     }
   });
 
-  this._addTween(identifier, newTweenable, durationValue);
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -403,15 +387,11 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function(
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      var tween = this._getTween(identifier);
-      if (!tween) return;
-      tween.currentDuration += 1;
-      
       this.owner.setAngle(state.angle);
     }
   });
 
-  this._addTween(identifier, newTweenable, durationValue);
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -457,16 +437,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      var tween = this._getTween(identifier);
-      if (!tween) return;
-      tween.currentDuration += 1;
-      
       this.owner.setScaleX(state.scaleX);
       this.owner.setScaleY(state.scaleY);
     }
   });
 
-  this._addTween(identifier, newTweenable, durationValue);
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -505,15 +481,11 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      var tween = this._getTween(identifier);
-      if (!tween) return;
-      tween.currentDuration += 1;
-      
       this.owner.setScaleX(state.scaleX);
     }
   });
 
-  this._addTween(identifier, newTweenable, durationValue);
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -552,15 +524,11 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      var tween = this._getTween(identifier);
-      if (!tween) return;
-      tween.currentDuration += 1;
-      
       this.owner.setScaleY(state.scaleY);
     }
   });
 
-  this._addTween(identifier, newTweenable, durationValue);
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -599,15 +567,11 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      var tween = this._getTween(identifier);
-      if (!tween) return;
-      tween.currentDuration += 1;
-      
       this.owner.setOpacity(state.opacity);
     }
   });
 
-  this._addTween(identifier, newTweenable, durationValue);
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -660,10 +624,6 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
     duration: durationValue,
     easing: easingValue,
     step: state => {
-      var tween = this._getTween(identifier);
-      if (!tween) return;
-      tween.currentDuration += 1;
-
       this.owner.setColor(
         Math.floor(state.red) +
         ";" +
@@ -674,7 +634,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, durationValue);
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -762,9 +722,12 @@ gdjs.TweenRuntimeBehavior.prototype.removeTween = function(identifier) {
 gdjs.TweenRuntimeBehavior.prototype.getProgress = function(identifier) {
   const tween = this._getTween(identifier);
   if (tween) {    
-    return Math.min(((tween.currentDuration) / (tween.fullDuration))/60*1000);
+    var currentTime = this._runtimeScene.getTimeManager().getTimeFromStart();
+    if (currentTime >= tween.startTime + tween.totalDuration) return 1;
+
+    return (currentTime - tween.startTime)/tween.totalDuration;
   } else {
-    return 0.0;
+    return 0;
   }
 };
 

@@ -14,6 +14,8 @@ if (isWin) {
     cwd: gdjsScriptsFolder,
   });
 } else {
+  shell.rm('-rf', destFolder);
+  shell.rm('-rf', destFolder2);
   shell.exec('./CopyRuntimeToGD.sh ' + destFolder, {
     cwd: gdjsScriptsFolder,
   });

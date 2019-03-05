@@ -21,7 +21,7 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     this._pixiObject._texture.baseTexture.source.currentTime = 0;
   }
 
-  if(!this._pixiObject.texture.baseTexture.source.paused){
+  if (!this._pixiObject.texture.baseTexture.source.paused) {
     this._pixiObject.texture.baseTexture.source.pause();
   }
 
@@ -46,10 +46,8 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
-  this._pixiObject.position.x = this._object.x;
-  this._pixiObject.position.y = this._object.y;
-  // this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
-  // this._pixiObject.position.y = this._object.y + this._pixiObject.height / 2;
+  this._pixiObject.position.x = this._object.x + this._pixiObject.width / 2;
+  this._pixiObject.position.y = this._object.y + this._pixiObject.height / 2;
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateLoop = function() {
@@ -58,7 +56,8 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateLoop = function() {
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateVolume = function() {
-  this._pixiObject._texture.baseTexture.source.volume = this._object._volume / 100;
+  this._pixiObject._texture.baseTexture.source.volume =
+    this._object._volume / 100;
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateAngle = function() {

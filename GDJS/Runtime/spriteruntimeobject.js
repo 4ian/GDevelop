@@ -85,7 +85,7 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
  * @return The requested point.
  */
 gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
-	if ( name == "Centre" ) return this.center;
+	if ( name == "Centre" || name == "Center") return this.center;
 	else if ( name == "Origin" ) return this.origin;
 
 	return this.points.containsKey(name) ? this.points.get(name) : this.origin;

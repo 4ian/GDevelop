@@ -42,6 +42,10 @@ gdjs.VideoRuntimeObject.prototype.extraInitializationFromInitialInstance = funct
   }
 };
 
+gdjs.VideoRuntimeObject.prototype.update = function(runtimeScene) {
+  this._renderer.ensureUpToDate();
+};
+
 /**
  * Set object position on X axis.
  */

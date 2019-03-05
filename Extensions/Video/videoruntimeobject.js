@@ -153,10 +153,10 @@ gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
   return val <= min ? min : val >= max ? max : val;
 };
 
-gdjs.VideoRuntimeObject.prototype.setVolume = function(newVolume) {
+gdjs.VideoRuntimeObject.prototype.setVolume = function(volume) {
   //newVolume = 0-100 , newVolume = normalize(newVolume) = 0-1, clamp = clamp(newVolume) = 0-1
-  var _newVolume = this._clamp(this._normalize(newVolume, 0, 100), 0, 1);
-  this._renderer.setVolume(_newVolume);
+  this._volume = this._clamp(this._normalize(volume, 0, 100), 0, 1);
+  this._renderer.updateVolume();
 };
 
 gdjs.VideoRuntimeObject.prototype.getVolume = function() {
@@ -197,8 +197,7 @@ gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
 
 gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
   this._playbackSpeed = playbackSpeed;
-  var new_playbackSpeed = playbackSpeed;
-  this._renderer.setPlaybackSpeed(new_playbackSpeed);
+  this._renderer.setPlaybackSpeed(this._playbackSpeed);
 };
 
 gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {

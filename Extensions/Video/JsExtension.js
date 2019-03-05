@@ -21,7 +21,7 @@ module.exports = {
         "Aurélien Vivet",
         "Open source (MIT License)"
       )
-      .setExtensionHelpPath("/all-features/video");
+      .setExtensionHelpPath("/objects/video");
 
     var videoObject = new gd.ObjectJsImplementation();
     videoObject.updateProperty = function(
@@ -53,7 +53,9 @@ module.exports = {
 
       objectProperties.set(
         "Opacity",
-        new gd.PropertyDescriptor(objectContent.opacity).setType("number")
+        new gd.PropertyDescriptor(objectContent.opacity.toString())
+          .setType("number")
+          .setLabel(_("Video opacity"))
       );
       objectProperties.set(
         "Looped",
@@ -63,7 +65,9 @@ module.exports = {
       );
       objectProperties.set(
         "Volume",
-        new gd.PropertyDescriptor(objectContent.volume).setType("number")
+        new gd.PropertyDescriptor(objectContent.volume.toString())
+          .setType("number")
+          .setLabel(_("Video volume"))
       );
       objectProperties.set(
         "videoResource",
@@ -404,9 +408,6 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("getOpacity");
 
-    //TODO base on 0 : stoped, 1 : normal, 1.5 : 50% fastest
-    //Like Animation speed scale
-    //Need update in functions !
     object
       .addAction(
         "SetPlaybackSpeed",
@@ -630,9 +631,30 @@ module.exports = {
         .getValue();
       if (videoResource !== this._videoResource) {
         this._videoResource = videoResource;
-          
         this._pixiObject.texture = this._getVideoTexture();
       }
+
+      if (!this._pixiObject.texture.baseTexture.source.paused) {
+        this._pixiObject.texture.baseTexture.source.pause();
+      }
+
+      const opacity = this._associatedObject
+        .getProperties(this.project)
+        .get("Opacity")
+        .getValue();
+      this._pixiObject._opacity = opacity;
+
+      const volume = this._associatedObject
+        .getProperties(this.project)
+        .get("Volume")
+        .getValue();
+      this._pixiObject._volume = volume;
+
+      const looped = this._associatedObject
+        .getProperties(this.project)
+        .get("Looped")
+        .getValue();
+      this._pixiObject._looped = looped;
 
       // Read position and angle from the instance
       this._pixiObject.position.x =

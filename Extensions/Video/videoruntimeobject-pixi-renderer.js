@@ -20,6 +20,7 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   } else {
     this._pixiObject._texture.baseTexture.source.currentTime = 0;
   }
+  this._textureWasValid = false; // Will be set to true when video texture is loaded.
 
   if (!this._pixiObject.texture.baseTexture.source.paused) {
     this._pixiObject.texture.baseTexture.source.pause();
@@ -30,8 +31,11 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
     .getRenderer()
     .addRendererObject(this._pixiObject, runtimeObject.getZOrder());
 
+  // Set the anchor in the center, so that the object rotates around
+  // its center
   this._pixiObject.anchor.x = 0.5;
   this._pixiObject.anchor.y = 0.5;
+
   this.updatePosition();
   this.updateAngle();
   this.updateOpacity();
@@ -43,6 +47,19 @@ gdjs.VideoRuntimeObjectRenderer = gdjs.VideoRuntimeObjectPixiRenderer;
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
   return this._pixiObject;
+};
+
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
+  // Make sure that the video is repositioned after the texture was loaded
+  // (as width and height will change).
+  if (
+    !this._textureWasValid &&
+    this._pixiObject.texture &&
+    this._pixiObject.texture.valid
+  ) {
+    this.updatePosition();
+    this._textureWasValid = true;
+  }
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updatePosition = function() {

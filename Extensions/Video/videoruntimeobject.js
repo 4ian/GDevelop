@@ -43,21 +43,11 @@ gdjs.VideoRuntimeObject.prototype.extraInitializationFromInitialInstance = funct
 };
 
 /**
- * Update the object position.
- * @private
- */
-gdjs.VideoRuntimeObject.prototype._updatePosition = function() {
-  // This is an example: typically you want to tell the renderer to update
-  // the position of the object.
-  this._renderer.updatePosition();
-};
-
-/**
  * Set object position on X axis.
  */
 gdjs.VideoRuntimeObject.prototype.setX = function(x) {
   gdjs.RuntimeObject.prototype.setX.call(this, x);
-  this._updatePosition();
+  this._renderer.updatePosition();
 };
 
 /**
@@ -65,7 +55,7 @@ gdjs.VideoRuntimeObject.prototype.setX = function(x) {
  */
 gdjs.VideoRuntimeObject.prototype.setY = function(y) {
   gdjs.RuntimeObject.prototype.setY.call(this, y);
-  this._updatePosition();
+  this._renderer.updatePosition();
 };
 
 /**
@@ -79,7 +69,7 @@ gdjs.VideoRuntimeObject.prototype.setAngle = function(angle) {
 
 /**
  * Set object opacity.
- * @param {number} opacity The new opacity of the object
+ * @param {number} opacity The new opacity of the object (0-255)
  */
 gdjs.VideoRuntimeObject.prototype.setOpacity = function(opacity) {
   this._opacity = opacity;
@@ -94,29 +84,33 @@ gdjs.VideoRuntimeObject.prototype.getOpacity = function() {
 };
 
 /**
- * Set the width of video instance and renderer
+ * Set the width of the video.
  * @param {number} width The new width in pixels.
  */
 gdjs.VideoRuntimeObject.prototype.setWidth = function(width) {
-  this._width = width;
-  this._renderer.updateWidth();
+  this._renderer.setWidth(width);
 };
 
 /**
- * Set the height of video instance and renderer
+ * Set the height of the video.
  * @param {number} height The new height in pixels.
  */
 gdjs.VideoRuntimeObject.prototype.setHeight = function(height) {
-  this._height = height;
-  this._renderer.updateHeight();
+  this._renderer.setHeight(height);
 };
 
+/**
+ * Get the width of the video object.
+ */
 gdjs.VideoRuntimeObject.prototype.getWidth = function() {
-  return this._width;
+  return this._renderer.getWidth();
 };
 
+/**
+ * Get the height of the video object.
+ */
 gdjs.VideoRuntimeObject.prototype.getHeight = function() {
-  return this._height;
+  return this._renderer.getHeight();
 };
 
 gdjs.VideoRuntimeObject.prototype.play = function() {
@@ -139,22 +133,21 @@ gdjs.VideoRuntimeObject.prototype.isMuted = function() {
   return this._renderer.isMuted();
 };
 
-/* Input 0-1, return a number 0-100
-   Tool normalize for value  */
-
+/**
+ * Normalize a value between 0 and 100 to a value between 0 and 1.
+ */
 gdjs.VideoRuntimeObject.prototype._normalize = function(val, min, max) {
   return (val - min) / (max - min);
 };
 
 /**
- * Limit value in an interval
+ * Restrict the value in the given interval
  */
 gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
   return val <= min ? min : val >= max ? max : val;
 };
 
 gdjs.VideoRuntimeObject.prototype.setVolume = function(volume) {
-  //newVolume = 0-100 , newVolume = normalize(newVolume) = 0-1, clamp = clamp(newVolume) = 0-1
   this._volume = this._clamp(this._normalize(volume, 0, 100), 0, 1);
   this._renderer.updateVolume();
 };

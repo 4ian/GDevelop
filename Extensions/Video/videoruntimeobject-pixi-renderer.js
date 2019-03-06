@@ -22,8 +22,11 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
   }
   this._textureWasValid = false; // Will be set to true when video texture is loaded.
 
-  if (!this._pixiObject.texture.baseTexture.source.paused) {
-    this._pixiObject.texture.baseTexture.source.pause();
+  if (
+    this._textureWasValid &&
+    !this._pixiObject.texture.baseTexture.source.paused
+  ) {
+    this.pause();
   }
 
   runtimeScene

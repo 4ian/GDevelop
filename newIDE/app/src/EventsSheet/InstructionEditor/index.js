@@ -38,6 +38,10 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   style?: Object,
+  openInstructionOrExpression: (
+    extension: gdPlatformExtension,
+    type: string
+  ) => void,
 |};
 type State = {||};
 
@@ -84,6 +88,7 @@ export default class InstructionEditor extends React.Component<Props, State> {
             resourceSources={this.props.resourceSources}
             onChooseResource={this.props.onChooseResource}
             resourceExternalEditors={this.props.resourceExternalEditors}
+            openInstructionOrExpression={this.props.openInstructionOrExpression}
             ref={instructionParametersEditor =>
               (this._instructionParametersEditor = instructionParametersEditor)
             }

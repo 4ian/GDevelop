@@ -17,6 +17,10 @@ export default class BaseEditor extends React.Component<*, *> {
     return null;
   }
 
+  saveUiSettings = () => {
+    // Implement in the editor, if needed.
+  };
+
   shouldComponentUpdate(nextProps: *) {
     // Prevent any update to the editor if the editor is not active,
     // and so not visible to the user. For editors that do special work when isActive

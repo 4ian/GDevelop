@@ -27,6 +27,11 @@ type Props = {|
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
+  openInstructionOrExpression: (
+    extension: gdPlatformExtension,
+    type: string
+  ) => void,
+  initiallyFocusedFunctionName: ?string,
 |};
 
 type State = {|
@@ -46,6 +51,12 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _editors: ?EditorMosaic;
   _globalObjectsContainer: ?gdObjectsContainer;
   _objectsContainer: ?gdObjectsContainer;
+
+  componentDidMount() {
+    if (this.props.initiallyFocusedFunctionName) {
+      this.selectEventsFunctionByName(this.props.initiallyFocusedFunctionName);
+    }
+  }
 
   componentWillUnmount() {
     if (this._globalObjectsContainer) this._globalObjectsContainer.delete();
@@ -76,6 +87,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.props.setToolbar(<div />);
     }
   }
+
+  selectEventsFunctionByName = (name: string) => {
+    const { eventsFunctionsExtension } = this.props;
+    if (eventsFunctionsExtension.hasEventsFunctionNamed(name)) {
+      this._selectEventsFunction(
+        eventsFunctionsExtension.getEventsFunction(name)
+      );
+    }
+  };
 
   _selectEventsFunction = (selectedEventsFunction: ?gdEventsFunction) => {
     if (!selectedEventsFunction) {
@@ -204,6 +224,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       onChooseResource={this.props.onChooseResource}
                       resourceExternalEditors={
                         this.props.resourceExternalEditors
+                      }
+                      openInstructionOrExpression={
+                        this.props.openInstructionOrExpression
                       }
                       setToolbar={this.props.setToolbar}
                       onOpenDebugger={() => {}}

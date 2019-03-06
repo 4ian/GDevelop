@@ -111,8 +111,8 @@ module.exports = {
     const object = extension
       .addObject(
         "VideoObject",
-        _("Video object"),
-        _("Display a video on the screen."),
+        _("Video"),
+        _("Displays a video"),
         "JsPlatform/Extensions/videoicon32.png",
         videoObject
       )
@@ -634,7 +634,11 @@ module.exports = {
         this._pixiObject.texture = this._getVideoTexture();
       }
 
-      if (!this._pixiObject.texture.baseTexture.source.paused) {
+      if (
+        this._pixiObject.texture.baseTexture.hasLoaded &&
+        this._pixiObject.texture.baseTexture.source.nodeName == "VIDEO" &&
+        !this._pixiObject.texture.baseTexture.source.paused
+      ) {
         this._pixiObject.texture.baseTexture.source.pause();
       }
 
@@ -690,7 +694,13 @@ module.exports = {
      */
     RenderedVideoObjectInstance.prototype.instanceRemovedFromScene = function() {
       RenderedInstance.prototype.instanceRemovedFromScene.call(this);
-      this._pixiObject._texture.baseTexture.source.pause();
+
+      if (
+        this._pixiObject.texture.baseTexture.source.nodeName == "VIDEO" &&
+        !this._pixiObject.texture.baseTexture.source.paused
+      ) {
+        this._pixiObject._texture.baseTexture.source.pause();
+      }
     };
 
     objectsRenderingService.registerInstanceRenderer(

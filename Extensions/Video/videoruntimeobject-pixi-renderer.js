@@ -68,7 +68,6 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.updatePosition = function() {
 };
 
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.updateLoop = function() {
-  console.log(this._object._loop);
   this._pixiObject._texture.baseTexture.source.loop = this._object._loop;
 };
 

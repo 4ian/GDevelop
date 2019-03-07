@@ -291,9 +291,11 @@ export default class InstructionParametersEditor extends React.Component<
                 <HelpButton
                   helpPagePath={instructionMetadata.getHelpPath()}
                   label={
-                    this.props.isCondition
-                      ? <Trans>Help for this condition</Trans>
-                      : <Trans>Help for this action</Trans>
+                    this.props.isCondition ? (
+                      <Trans>Help for this condition</Trans>
+                    ) : (
+                      <Trans>Help for this action</Trans>
+                    )
                   }
                 />
               )}

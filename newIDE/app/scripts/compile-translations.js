@@ -156,8 +156,10 @@ getLocales()
 
             // Run msgcat. Use --no-wrap to allow to sanitize the catalog with
             // regex/string replace.
+            // Use --use-first to avoid merging multiple translations for the same
+            // string.
             shell.exec(
-              msgcat + ` --no-wrap ${files.join(' ')} -o messages.po`,
+              msgcat + ` --no-wrap --use-first ${files.join(' ')} -o messages.po`,
               {
                 cwd: getLocalePath(locale),
                 silent: true,

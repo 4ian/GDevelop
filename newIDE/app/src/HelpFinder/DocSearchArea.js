@@ -173,7 +173,7 @@ export default class DocSearchArea extends React.Component<Props, State> {
           This search is powered by{' '}
           <FlatButton
             onClick={() => Window.openExternalURL('http://algolia.com/')}
-            label={<Trans>Algolia</Trans>}
+            label={"Algolia"}
           />
         </p>
       </div>

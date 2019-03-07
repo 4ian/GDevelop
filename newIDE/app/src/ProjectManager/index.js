@@ -218,7 +218,13 @@ class Item extends React.Component<ItemProps, {||}> {
             onContextMenu={this._onContextMenu}
             primaryText={label}
             rightIconButton={rightIconButton}
-            onClick={this.props.onEdit}
+            onClick={() => {
+              // It's essential to discard clicks when editing the name,
+              // to avoid weird opening of an editor (accompanied with a
+              // closing of the project manager) when clicking on the text
+              // field.
+              if (!this.props.editingName) this.props.onEdit();
+            }}
           />
         )}
       </ThemeConsumer>

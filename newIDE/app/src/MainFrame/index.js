@@ -561,7 +561,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasLayoutNamed(oldName)) return;
+    if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
 
     if (currentProject.hasLayoutNamed(newName)) {
       showWarningBox(i18n._(t`Another scene with this name already exists.`));
@@ -585,7 +585,8 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasExternalLayoutNamed(oldName)) return;
+    if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
+      return;
 
     if (currentProject.hasExternalLayoutNamed(newName)) {
       showWarningBox(
@@ -614,7 +615,8 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasExternalEventsNamed(oldName)) return;
+    if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
+      return;
 
     if (currentProject.hasExternalEventsNamed(newName)) {
       showWarningBox(
@@ -644,7 +646,11 @@ class MainFrame extends React.Component<Props, State> {
     const { eventsFunctionWriter } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasEventsFunctionsExtensionNamed(oldName)) return;
+    if (
+      !currentProject.hasEventsFunctionsExtensionNamed(oldName) ||
+      newName === oldName
+    )
+      return;
 
     if (currentProject.hasEventsFunctionsExtensionNamed(newName)) {
       showWarningBox(

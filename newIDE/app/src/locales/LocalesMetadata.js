@@ -5,276 +5,276 @@ module.exports = [
     "languageCode": "af_ZA",
     "languageName": "Afrikaans",
     "languageNativeName": "Afrikaans",
-    "translationRatio": 0.0029396044895777518
+    "translationRatio": 0.002935681878836416
   },
   {
     "languageCode": "ar_SA",
     "languageName": "Arabic",
     "languageNativeName": "اللغة العربية",
-    "translationRatio": 0.13174772848743987
+    "translationRatio": 0.13157192420603148
   },
   {
     "languageCode": "az_AZ",
     "languageName": "Azerbaijani",
     "languageNativeName": "azərbaycan dili",
-    "translationRatio": 0.02084446819882413
+    "translationRatio": 0.02081665332265814
   },
   {
     "languageCode": "bg_BG",
     "languageName": "Bulgarian",
     "languageNativeName": "български език",
-    "translationRatio": 0.0256547300908605
+    "translationRatio": 0.02562049639711772
   },
   {
     "languageCode": "ca_ES",
     "languageName": "Catalan",
     "languageNativeName": "català",
-    "translationRatio": 0.00668091929449488
+    "translationRatio": 0.006672004270082743
   },
   {
     "languageCode": "cs_CZ",
     "languageName": "Czech",
     "languageNativeName": "čeština",
-    "translationRatio": 0.036344200962052375
+    "translationRatio": 0.03629570322925002
   },
   {
     "languageCode": "da_DK",
     "languageName": "Danish",
     "languageNativeName": "dansk",
-    "translationRatio": 0.01950828433992513
+    "translationRatio": 0.019482252468641548
   },
   {
     "languageCode": "de_DE",
     "languageName": "German",
     "languageNativeName": "Deutsch",
-    "translationRatio": 0.9380010689470871
+    "translationRatio": 0.9367493995196157
   },
   {
     "languageCode": "el_GR",
     "languageName": "Greek",
     "languageNativeName": "ελληνικά",
-    "translationRatio": 0.3212185996793159
+    "translationRatio": 0.3207899653055778
   },
   {
     "languageCode": "en",
     "languageName": "English",
     "languageNativeName": "English",
-    "translationRatio": 0.02004008016032066
+    "translationRatio": 0.019960079840319334
   },
   {
     "languageCode": "eo_UY",
     "languageName": "Esperanto",
     "languageNativeName": "Esperanto",
-    "translationRatio": 0.007482629609834368
+    "translationRatio": 0.0074726447824926545
   },
   {
     "languageCode": "es_ES",
     "languageName": "Spanish",
     "languageNativeName": "Español",
-    "translationRatio": 0.9906467129877071
+    "translationRatio": 0.9893247931678676
   },
   {
     "languageCode": "fa_IR",
     "languageName": "Persian",
     "languageNativeName": "فارسی",
-    "translationRatio": 0.023516835916622125
+    "translationRatio": 0.023485455030691216
   },
   {
     "languageCode": "fi_FI",
     "languageName": "Finnish",
     "languageNativeName": "suomi",
-    "translationRatio": 0.5082843399251737
+    "translationRatio": 0.5076060848678943
   },
   {
     "languageCode": "fil_PH",
     "languageName": "Filipino",
     "languageNativeName": "Mga Filipino",
-    "translationRatio": 0.7017637626937467
+    "translationRatio": 0.7008273285294903
   },
   {
     "languageCode": "fr_FR",
     "languageName": "French",
     "languageNativeName": "Français",
-    "translationRatio": 0.8019775521111705
+    "translationRatio": 0.800640512409928
   },
   {
     "languageCode": "ha_HG",
     "languageName": "Hausa",
     "languageNativeName": "هَوُسَ",
-    "translationRatio": 0.0026723677177979965
+    "translationRatio": 0.002668801708033075
   },
   {
     "languageCode": "he_IL",
     "languageName": "Hebrew",
     "languageNativeName": "עברית",
-    "translationRatio": 0.00668091929449488
+    "translationRatio": 0.006672004270082743
   },
   {
     "languageCode": "hu_HU",
     "languageName": "Hungarian",
     "languageNativeName": "magyar",
-    "translationRatio": 0.04569748797434525
+    "translationRatio": 0.04563650920736584
   },
   {
     "languageCode": "id_ID",
     "languageName": "Indonesian",
     "languageNativeName": "Indonesian",
-    "translationRatio": 0.572421165152325
+    "translationRatio": 0.5716573258606885
   },
   {
     "languageCode": "it_IT",
     "languageName": "Italian",
     "languageNativeName": "Italiano",
-    "translationRatio": 0.5916622127204703
+    "translationRatio": 0.5908726981585268
   },
   {
     "languageCode": "ja_JP",
     "languageName": "Japanese",
     "languageNativeName": "日本語",
-    "translationRatio": 0.009353287012292877
+    "translationRatio": 0.009340805978115818
   },
   {
     "languageCode": "ko_KR",
     "languageName": "Korean",
     "languageNativeName": "한국어",
-    "translationRatio": 0.06761090326028862
+    "translationRatio": 0.06752068321323723
   },
   {
     "languageCode": "lt_LT",
     "languageName": "Lithuanian",
     "languageNativeName": "lietuvių kalba",
-    "translationRatio": 0.00614644575093537
+    "translationRatio": 0.0061382439284760615
   },
   {
     "languageCode": "mr_IN",
     "languageName": "Marathi",
     "languageNativeName": "मराठी",
-    "translationRatio": 0.0026723677177979965
+    "translationRatio": 0.002668801708033075
   },
   {
     "languageCode": "ms_MY",
     "languageName": "Malay",
     "languageNativeName": "هاس ملايو‎",
-    "translationRatio": 0.007215392838054502
+    "translationRatio": 0.007205764611689314
   },
   {
     "languageCode": "my_MM",
     "languageName": "Burmese",
     "languageNativeName": "ဗမာစာ",
-    "translationRatio": 0.004008551576696995
+    "translationRatio": 0.004003202562049668
   },
   {
     "languageCode": "nl_NL",
     "languageName": "Dutch",
     "languageNativeName": "Nederlands",
-    "translationRatio": 0.467129877071085
+    "translationRatio": 0.46650653856418467
   },
   {
     "languageCode": "no_NO",
     "languageName": "Norwegian",
     "languageNativeName": "Norsk",
-    "translationRatio": 0.004543025120256505
+    "translationRatio": 0.004536962903656239
   },
   {
     "languageCode": "pl_PL",
     "languageName": "Polish",
     "languageNativeName": "język polski",
-    "translationRatio": 0.5280598610368787
+    "translationRatio": 0.5273552175073393
   },
   {
     "languageCode": "pseudo_LOCALE",
     "languageName": "for development only",
     "languageNativeName": "Pseudolocalization",
-    "translationRatio": 0.9959919839679359
+    "translationRatio": 0.9960079840319361
   },
   {
     "languageCode": "pt_BR",
     "languageName": "Brazilian Portuguese",
     "languageNativeName": "Português brasileiro",
-    "translationRatio": 0.15579903794762162
+    "translationRatio": 0.15559113957832937
   },
   {
     "languageCode": "pt_PT",
     "languageName": "Portuguese",
     "languageNativeName": "Português",
-    "translationRatio": 0.5649385355424906
+    "translationRatio": 0.5641846810781959
   },
   {
     "languageCode": "ro_RO",
     "languageName": "Romanian",
     "languageNativeName": "limba română",
-    "translationRatio": 0.01656867985034738
+    "translationRatio": 0.016546570589805132
   },
   {
     "languageCode": "ru_RU",
     "languageName": "Russian",
     "languageNativeName": "Русский",
-    "translationRatio": 0.6074291822554784
+    "translationRatio": 0.606618628235922
   },
   {
     "languageCode": "sk_SK",
     "languageName": "Slovak",
     "languageNativeName": "slovenčina",
-    "translationRatio": 0.007215392838054502
+    "translationRatio": 0.007205764611689314
   },
   {
     "languageCode": "sr_CS",
     "languageName": "Serbian (Latin)",
     "languageNativeName": "srpski",
-    "translationRatio": 0.4636557990379476
+    "translationRatio": 0.4630370963437417
   },
   {
     "languageCode": "sr_SP",
     "languageName": "Serbian",
     "languageNativeName": "српски језик",
-    "translationRatio": 0.46606092998396575
+    "translationRatio": 0.4654390178809714
   },
   {
     "languageCode": "sv_SE",
     "languageName": "Swedish",
     "languageNativeName": "svenska",
-    "translationRatio": 0.20710849812934262
+    "translationRatio": 0.2068321323725647
   },
   {
     "languageCode": "th_TH",
     "languageName": "Thai",
     "languageNativeName": "ไทย",
-    "translationRatio": 0.03260288615713525
+    "translationRatio": 0.03255938083800369
   },
   {
     "languageCode": "tr_TR",
     "languageName": "Turkish",
     "languageNativeName": "Türkçe",
-    "translationRatio": 0.5638695884553715
+    "translationRatio": 0.5631171603949827
   },
   {
     "languageCode": "uk_UA",
     "languageName": "Ukrainian",
     "languageNativeName": "Українська",
-    "translationRatio": 0.022982362373062504
+    "translationRatio": 0.022951694689084645
   },
   {
     "languageCode": "ur_PK",
     "languageName": "Urdu",
     "languageNativeName": "اردو",
-    "translationRatio": 0.00427578834847675
+    "translationRatio": 0.004270082732852898
   },
   {
     "languageCode": "yo_NG",
     "languageName": "Yoruba",
     "languageNativeName": "Yorùbá",
-    "translationRatio": 0.8356493853554249
+    "translationRatio": 0.8345342941019482
   },
   {
     "languageCode": "zh_CN",
     "languageName": "Chinese Simplified",
     "languageNativeName": "简化字",
-    "translationRatio": 0.5665419561731695
+    "translationRatio": 0.5657859621030157
   },
   {
     "languageCode": "zh_TW",
     "languageName": "Chinese Traditional",
     "languageNativeName": "正體字",
-    "translationRatio": 0.07776590058792088
+    "translationRatio": 0.07766212970376296
   }
 ];

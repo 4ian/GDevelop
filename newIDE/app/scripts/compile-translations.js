@@ -79,10 +79,6 @@ const sanitizeMessagePo = path => {
       let forbiddenStringsFound = [];
       let forbiddenStrings = [
         {
-          str: 'n \\',
-          regex: /n \\/g,
-        },
-        {
           str: 'n\\\\',
           regex: /n\\\\/g,
         },

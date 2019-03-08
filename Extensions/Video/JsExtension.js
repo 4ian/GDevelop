@@ -347,6 +347,23 @@ module.exports = {
 
     object
       .addCondition(
+        "CurrentTime",
+        _("Current time"),
+        _("Compare the current time of a video object"),
+        _("Current time of _PARAM0_ is _PARAM1__PARAM2_ seconds"),
+        "",
+        "JsPlatform/Extensions/videoicon24.png",
+        "JsPlatform/Extensions/videoicon16.png"
+      )
+      .addParameter("object", _("Video object"), "VideoObject", false)
+      .addParameter("relationalOperator", _("Sign of the test"))
+      .addParameter("expression", _("Value"))
+      .getCodeExtraInformation()
+      .setFunctionName("getCurrentTime")
+      .setManipulatedType("number");
+
+    object
+      .addCondition(
         "Ended",
         _("Is ended"),
         _("Check if a video is ended"),

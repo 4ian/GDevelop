@@ -18,7 +18,7 @@ import {
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { Line } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
-import { getDeprecatedInstructionInformation } from '../../Hints';
+import { getExtraInstructionInformation } from '../../Hints';
 import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
 import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
 import IconButton from 'material-ui/IconButton';
@@ -181,10 +181,7 @@ export default class InstructionParametersEditor extends React.Component<
 
     const helpPage = instructionMetadata.getHelpPath();
 
-    const deprecatedInstructionInformation = getDeprecatedInstructionInformation(
-      _ => _,
-      type
-    );
+    const instructionExtraInformation = getExtraInstructionInformation(type);
 
     //TODO?
     instruction.setParametersCount(instructionMetadata.getParametersCount());
@@ -207,10 +204,10 @@ export default class InstructionParametersEditor extends React.Component<
                 </IconButton>
               )}
             </Line>
-            {deprecatedInstructionInformation && (
+            {instructionExtraInformation && (
               <Line>
                 <AlertMessage kind="warning">
-                  {deprecatedInstructionInformation.warning}
+                  {i18n._(instructionExtraInformation.warning)}
                 </AlertMessage>
               </Line>
             )}

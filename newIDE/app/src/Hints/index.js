@@ -20,6 +20,11 @@ export const getExtraInstructionInformation = (
   Physics2, you can't mix the behaviors).`,
     };
   }
+  if (type === 'TextObject::Size') {
+    return {
+      warning: t`This action will create a new texture and re-render the text each time it is called, which is expensive and can reduce performances. Prefer to avoid changing a lot the character size of a text.`,
+    };
+  }
 
   return null;
 };

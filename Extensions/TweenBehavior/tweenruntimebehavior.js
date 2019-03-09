@@ -11,6 +11,7 @@ gdjs.TweenRuntimeBehavior = function(runtimeScene, behaviorData, owner) {
   /** @type Object.<string, gdjs.TweenRuntimeBehavior.TweenInstance > */
   this._tweens = {};
   this._runtimeScene = runtimeScene;
+  this._isActive = true;
   this._easings = [
     // TODO: Move to a static value on gdjs.TweenRuntimeBehavior (to avoid duplicating this in all behaviors)
     "linear",
@@ -68,6 +69,7 @@ gdjs.TweenRuntimeBehavior.TweenInstance = function(
   this.hasFinished = hasFinished;
   this.startTime = startTime;
   this.totalDuration = totalDuration;
+  this.resumeOnActivate = false;
 };
 
 gdjs.TweenRuntimeBehavior.prototype._addTween = function(identifier, instance, startTime, totalDuration) {
@@ -200,6 +202,7 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -244,6 +247,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -288,6 +292,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -329,6 +334,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -370,6 +376,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
@@ -413,6 +420,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!this.owner.setScaleX || !this.owner.setScaleY) return;
 
   if (!!this._easings[easingValue]) return;
@@ -462,6 +470,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!this.owner.setScaleX) return;
 
   if (!!this._easings[easingValue]) return;
@@ -505,6 +514,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!this.owner.setScaleY) return;
 
   if (!!this._easings[easingValue]) return;
@@ -548,6 +558,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!this.owner.getOpacity || !this.owner.setOpacity) return;
 
   if (!!this._easings[easingValue]) return;
@@ -591,6 +602,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!this.owner.getColor || !this.owner.setColor) return;
   if (
     !toColor.match(
@@ -654,6 +666,7 @@ gdjs.TweenRuntimeBehavior.prototype.addTextObjectCharacterSizeTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
+  if(!this._isActive) return;
   if (!this.owner.setCharacterSize) return;
 
   if (!!this._easings[easingValue]) return;
@@ -720,6 +733,8 @@ gdjs.TweenRuntimeBehavior.prototype.hasFinished = function(identifier) {
  * @param {string} identifier Unique id to idenfify the tween
  */
 gdjs.TweenRuntimeBehavior.prototype.pauseTween = function(identifier) {
+  if(!this._isActive) return;
+
   if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
     this._pauseTween(identifier);
   }
@@ -734,6 +749,8 @@ gdjs.TweenRuntimeBehavior.prototype.stopTween = function(
   identifier,
   jumpToDest
 ) {
+  if(!this._isActive) return;
+
   if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
     this._stopTween(identifier, jumpToDest);
   }
@@ -744,6 +761,8 @@ gdjs.TweenRuntimeBehavior.prototype.stopTween = function(
  * @param {string} identifier Unique id to idenfify the tween
  */
 gdjs.TweenRuntimeBehavior.prototype.resumeTween = function(identifier) {
+  if(!this._isActive) return;
+
   if (this._tweenExists(identifier) && !this._tweenIsPlaying(identifier)) {
     this._resumeTween(identifier);
   }
@@ -764,22 +783,46 @@ gdjs.TweenRuntimeBehavior.prototype.removeTween = function(identifier) {
  */
 gdjs.TweenRuntimeBehavior.prototype.getProgress = function(identifier) {
   const tween = this._getTween(identifier);
-  if (tween) {    
+  if (tween) {
     var currentTime = this._runtimeScene.getTimeManager().getTimeFromStart();
     if (currentTime >= tween.startTime + tween.totalDuration) return 1;
 
-    return (currentTime - tween.startTime)/tween.totalDuration;
+    return (currentTime - tween.startTime) / tween.totalDuration;
   } else {
     return 0;
   }
 };
 
 gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function() {
-  // TODO: Pause the tweens of the behavior
+  if(!this._isActive) return;
+
+  for (const key in this._tweens) {
+    if (this._tweens.hasOwnProperty(key)) {
+      const tween = this._tweens[key];
+
+      if (tween.instance.isPlaying) {
+        tween.resumeOnActivate = true;
+        tween.instance.pause();
+      }
+    }
+  }
+  this._isActive = false;
 };
 
 gdjs.TweenRuntimeBehavior.prototype.onActivate = function() {
-  // TODO: Resume the tweens of the behavior
+  if(this._isActive) return;
+
+  for (const key in this._tweens) {
+    if (this._tweens.hasOwnProperty(key)) {
+      const tween = this._tweens[key];
+
+      if (tween.resumeOnActivate) {
+        tween.resumeOnActivate = false;
+        tween.instance.resume();
+      }
+    }
+  }
+  this._isActive = true;
 };
 
 // Handle Shifty.js updates (the time and the "tick" of tweens

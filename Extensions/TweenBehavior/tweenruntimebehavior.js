@@ -640,6 +640,49 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
 };
 
 /**
+ * Add a text object character size tween.
+ * @param {string} identifier Unique id to idenfify the tween
+ * @param {number} toSize The target character size
+ * @param {string} easingValue Type of easing
+ * @param {number} durationValue Duration in milliseconds
+ * @param {boolean} destroyObjectWhenFinished Destroy this object when the tween ends
+ */
+gdjs.TweenRuntimeBehavior.prototype.addTextObjectCharacterSizeTween = function(
+  identifier,
+  toSize,
+  easingValue,
+  durationValue,
+  destroyObjectWhenFinished
+) {
+  if (!this.owner.setCharacterSize) return;
+
+  if (!!this._easings[easingValue]) return;
+
+  if (this._tweenExists(identifier)) {
+    this.removeTween(identifier);
+  }
+
+  var newTweenable = new shifty.Tweenable();
+  newTweenable.setConfig({
+    from: {
+      size: this.owner.getCharacterSize()
+    },
+    to: {
+      size: toSize
+    },
+    duration: durationValue,
+    easing: easingValue,
+    step: state => {
+      this.owner.setCharacterSize(state.size);
+    }
+  });
+
+  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+
+  this._setupTweenEnding(identifier, destroyObjectWhenFinished);
+};
+
+/**
  * Tween is playing.
  * @param {string} identifier Unique id to idenfify the tween
  */

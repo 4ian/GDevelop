@@ -302,6 +302,37 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("addObjectScaleYTween");
 
+      behavior
+      .addAction(
+        "AddTextObjectCharacterSizeTween",
+        _("Add text size tween"),
+        _(
+          "Add a tween animation for the text object character size. (Note: the size can never be less than 1)"
+        ),
+        _(
+          "Tween the character size of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
+        ),
+        _("Text"),
+        "JsPlatform/Extensions/take_screenshot24.png",
+        "JsPlatform/Extensions/take_screenshot32.png"
+      )
+      .addParameter("object", _("Text object"), "", false)
+      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("string", _("Tween Identifier"), "", false)
+      .addParameter("expression", _("To character size"), "", false)
+      .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
+      .setDefaultValue("linear")
+      .addParameter("expression", _("Duration"), "", false)
+      .addParameter(
+        "yesorno",
+        _("Destroy this object when tween finishes"),
+        "",
+        false
+      )
+      .setDefaultValue("no")
+      .getCodeExtraInformation()
+      .setFunctionName("addTextObjectCharacterSizeTween");
+
     behavior
       .addAction(
         "AddObjectOpacityTween",

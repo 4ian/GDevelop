@@ -62,7 +62,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   updateToolbar() {
     this.props.setToolbar(
       <Toolbar
-        onOpenResourcesFolder={this.openResourcesFolder}
+        onOpenProjectFolder={this.openProjectFolder}
         onOpenProperties={this.openProperties}
         canDelete={!!this.state.selectedResource}
         onDeleteSelection={() =>
@@ -98,11 +98,11 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     });
   };
 
-  openResourcesFolder = () => {
-      const project = this.props.project;
-      if (shell) shell.openItem(path.dirname(project.getProjectFile()));
-    };
-    
+  openProjectFolder = () => {
+    const project = this.props.project;
+    if (shell) shell.openItem(path.dirname(project.getProjectFile()));
+  };
+
   openProperties = () => {
     if (!this.editorMosaic) return;
     if (!this.editorMosaic.openEditor('properties')) {

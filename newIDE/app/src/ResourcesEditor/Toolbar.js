@@ -21,9 +21,9 @@ export class Toolbar extends PureComponent<Props, State> {
     return (
       <ToolbarGroup lastChild>
         <ToolbarIcon
-          onClick={this.props.onOpenResourcesFolder}
+          onClick={this.props.onOpenProjectFolder}
           src="res/ribbon_default/open32.png"
-          tooltip={t('Open the ressource folder')}
+          tooltip={t('Open the project folder')}
         />
         <ToolbarSeparator />
         <ToolbarIcon

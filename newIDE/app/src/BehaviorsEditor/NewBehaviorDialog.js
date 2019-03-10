@@ -130,9 +130,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
       />,
     ];
 
-    const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation(
-      _ => _
-    );
+    const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation();
 
     const behaviors = behaviorMetadata.filter(
       ({ type }) => !deprecatedBehaviorsInformation[type]

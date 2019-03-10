@@ -5,7 +5,7 @@ import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 
 type Props = {|
-  onOpenRessourcesFolder: () => void,
+  onOpenProjectFolder: () => void,
   onDeleteSelection: () => void,
   canDelete: boolean,
   onOpenProperties: () => void,

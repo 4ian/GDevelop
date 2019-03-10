@@ -8,12 +8,16 @@ import Toolbar from './Toolbar';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import InfoBar from '../UI/Messages/InfoBar';
 import ResourcesLoader from '../ResourcesLoader';
+import optionalRequire from '../Utils/OptionalRequire';
 
 import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 
+const electron = optionalRequire('electron');
+const shell = electron ? electron.shell : null;
+const path = optionalRequire('path');
 const styles = {
   container: {
     display: 'flex',
@@ -58,6 +62,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   updateToolbar() {
     this.props.setToolbar(
       <Toolbar
+        onOpenResourcesFolder={this.openResourcesFolder}
         onOpenProperties={this.openProperties}
         canDelete={!!this.state.selectedResource}
         onDeleteSelection={() =>
@@ -93,6 +98,11 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     });
   };
 
+  openResourcesFolder = () => {
+      const project = this.props.project;
+      if (shell) shell.openItem(path.dirname(project.getProjectFile()));
+    };
+    
   openProperties = () => {
     if (!this.editorMosaic) return;
     if (!this.editorMosaic.openEditor('properties')) {

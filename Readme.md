@@ -36,7 +36,7 @@ Links
 
 ### Community
 
-* [GDevelop forums](http://forum.compilgames.net) and [Discord chat](https://discord.gg/JWcfHEB).
+* [GDevelop forums](https://forum.gdevelop-app.com) and [Discord chat](https://discord.gg/JWcfHEB).
 * [GDevelop homepage](https://gdevelop-app.com) ([open-source](https://github.com/4ian/GDevelop-website))
 * [GDevelop wiki (documentation)](http://wiki.compilgames.net)
 * Help translate GD in your language: [GDevelop project on Crowdin](https://crowdin.com/project/gdevelop).

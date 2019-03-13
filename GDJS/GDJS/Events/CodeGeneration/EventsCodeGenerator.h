@@ -197,6 +197,11 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       bool conditionInverted,
       gd::EventsCodeGenerationContext& context);
 
+  virtual gd::String GenerateObjectLoop(
+      const gd::String& objectName,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& innerLoopCode);
+
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
       const gd::ObjectMetadata& objInfo,

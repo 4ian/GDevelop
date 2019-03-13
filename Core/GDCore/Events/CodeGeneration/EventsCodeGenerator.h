@@ -148,19 +148,6 @@ class GD_CORE_API EventsCodeGenerator {
                                    EventsCodeGenerationContext& context);
 
   /**
-   * \brief Generate code for a single action
-   *
-   * The generation is really done in GenerateFreeAction/GenerateObjectAction or
-   * GenerateBehaviorAction.
-   *
-   * \param condition instruction to be done.
-   * \param context Context used for generation
-   * \return Code
-   */
-  gd::String GenerateActionCode(gd::Instruction& action,
-                                EventsCodeGenerationContext& context);
-
-  /**
    * \brief Generate code for declaring objects lists.
    *
    * This method is used for each event.
@@ -659,6 +646,11 @@ class GD_CORE_API EventsCodeGenerator {
       const gd::InstructionMetadata& instrInfos,
       gd::EventsCodeGenerationContext& context);
 
+  virtual gd::String GenerateObjectLoop(
+      const gd::String& objectName,
+      gd::EventsCodeGenerationContext& context,
+      const gd::String& innerLoopCode);
+      
   virtual gd::String GenerateObjectAction(
       const gd::String& objectName,
       const gd::ObjectMetadata& objInfo,
@@ -713,6 +705,8 @@ class GD_CORE_API EventsCodeGenerator {
    */
   virtual gd::String GenerateArgumentsList(
       const std::vector<gd::String>& arguments, size_t startFrom = 0);
+
+  void ValidateAction(gd::InstructionMetadata & instructionMetadata, gd::Instruction& action);
 
   const gd::Platform& platform;  ///< The platform being used.
 

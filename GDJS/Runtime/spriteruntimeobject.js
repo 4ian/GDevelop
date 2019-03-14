@@ -727,6 +727,15 @@ gdjs.SpriteRuntimeObject.prototype.setColor = function(rgbColor) {
     this._renderer.setColor(rgbColor);
 };
 
+/**
+ * Get the tint of the sprite object.
+ *
+ * @returns {string} rgbColor The color, in RGB format ("128;200;255").
+ */
+gdjs.SpriteRuntimeObject.prototype.getColor = function() {
+    return this._renderer.getColor();
+};
+
 gdjs.SpriteRuntimeObject.prototype.flipX = function(enable) {
     if ( enable !== this._flippedX ) {
         this._scaleX *= -1;

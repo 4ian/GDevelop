@@ -59,6 +59,13 @@ gdjs.TweenRuntimeBehavior.prototype = Object.create(
 gdjs.TweenRuntimeBehavior.thisIsARuntimeBehaviorConstructor =
   "Tween::TweenBehavior";
 
+/**
+ * A tween being played in a behavior.
+ * @param {shifty.Tweenable} instance The Shifty tween that is played
+ * @param {boolean} hasFinished
+ * @param {number} startTime The time at which the tween starts
+ * @param {number} totalDuration The time of the whole tween
+ */
 gdjs.TweenRuntimeBehavior.TweenInstance = function(
   instance,
   hasFinished,
@@ -72,7 +79,12 @@ gdjs.TweenRuntimeBehavior.TweenInstance = function(
   this.resumeOnActivate = false;
 };
 
-gdjs.TweenRuntimeBehavior.prototype._addTween = function(identifier, instance, startTime, totalDuration) {
+gdjs.TweenRuntimeBehavior.prototype._addTween = function(
+  identifier,
+  instance,
+  startTime,
+  totalDuration
+) {
   this._tweens[identifier] = new gdjs.TweenRuntimeBehavior.TweenInstance(
     instance,
     false,
@@ -98,14 +110,12 @@ gdjs.TweenRuntimeBehavior.prototype._pauseTween = function(identifier) {
 };
 
 gdjs.TweenRuntimeBehavior.prototype._resumeTween = function(identifier) {
-  return this._tweens[identifier].instance
-    .resume()
-    .catch(() => {
-      // Do nothing if the Promise is rejected. Rejection is used
-      // by Shifty.js to signal that the tween was not finished.
-      // We catch it to avoid an uncaught promise error, and to
-      // ensure that the content of the "then" is always applied:
-    })
+  return this._tweens[identifier].instance.resume().catch(() => {
+    // Do nothing if the Promise is rejected. Rejection is used
+    // by Shifty.js to signal that the tween was not finished.
+    // We catch it to avoid an uncaught promise error, and to
+    // ensure that the content of the "then" is always applied:
+  });
 };
 
 gdjs.TweenRuntimeBehavior.prototype._stopTween = function(
@@ -137,6 +147,10 @@ gdjs.TweenRuntimeBehavior.prototype._removeTween = function(identifier) {
   if (!this._tweens[identifier]) return;
 
   this._tweens[identifier].instance.stop();
+  gdjs.TweenRuntimeBehavior.removeFromScene(
+    this._runtimeScene,
+    this._tweens[identifier].instance
+  );
   delete this._tweens[identifier];
 };
 
@@ -155,12 +169,13 @@ gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
       })
       .then(() => {
         this._removeObjectFromScene(identifier);
-      }).catch(() => {
+      })
+      .catch(() => {
         // Do nothing if the Promise is rejected. Rejection is used
         // by Shifty.js to signal that the tween was not finished.
         // We catch it to avoid an uncaught promise error, and to
         // ensure that the content of the "then" is always applied:
-      })
+      });
   } else {
     this._tweens[identifier].instance
       .tween()
@@ -174,12 +189,13 @@ gdjs.TweenRuntimeBehavior.prototype._setupTweenEnding = function(
         if (this._tweens[identifier]) {
           this._tweens[identifier].hasFinished = true;
         }
-      }).catch(() => {
+      })
+      .catch(() => {
         // Do nothing if the Promise is rejected. Rejection is used
         // by Shifty.js to signal that the tween was not finished.
         // We catch it to avoid an uncaught promise error, and to
         // ensure that the content of the "then" is always applied:
-      })
+      });
   }
 };
 
@@ -202,14 +218,16 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
 
   newTweenable.setConfig({
     from: {
@@ -225,7 +243,12 @@ gdjs.TweenRuntimeBehavior.prototype.addVariableTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -247,14 +270,16 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
   newTweenable.setConfig({
     from: {
       x: this.owner.getX(),
@@ -272,7 +297,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -292,14 +322,16 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
   newTweenable.setConfig({
     from: {
       x: this.owner.getX()
@@ -314,7 +346,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionXTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -334,14 +371,16 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
   newTweenable.setConfig({
     from: {
       y: this.owner.getY()
@@ -356,7 +395,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectPositionYTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -376,14 +420,16 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!!this._easings[easingValue]) return;
 
   if (this._tweenExists(identifier)) {
     this.removeTween(identifier);
   }
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
   newTweenable.setConfig({
     from: {
       angle: this.owner.getAngle()
@@ -398,7 +444,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectAngleTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -420,7 +471,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!this.owner.setScaleX || !this.owner.setScaleY) return;
 
   if (!!this._easings[easingValue]) return;
@@ -432,7 +483,9 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
   if (toScaleX < 0) toScaleX = 0;
   if (toScaleY < 0) toScaleY = 0;
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
   newTweenable.setConfig({
     from: {
       scaleX: this.owner.getScaleX(),
@@ -450,7 +503,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -470,7 +528,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!this.owner.setScaleX) return;
 
   if (!!this._easings[easingValue]) return;
@@ -479,7 +537,9 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
     this.removeTween(identifier);
   }
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
   newTweenable.setConfig({
     from: {
       scaleX: this.owner.getScaleX()
@@ -494,7 +554,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleXTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -514,7 +579,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!this.owner.setScaleY) return;
 
   if (!!this._easings[easingValue]) return;
@@ -523,7 +588,9 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
     this.removeTween(identifier);
   }
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
   newTweenable.setConfig({
     from: {
       scaleY: this.owner.getScaleY()
@@ -538,7 +605,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectScaleYTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -558,7 +630,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!this.owner.getOpacity || !this.owner.setOpacity) return;
 
   if (!!this._easings[easingValue]) return;
@@ -567,7 +639,9 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
     this.removeTween(identifier);
   }
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
   newTweenable.setConfig({
     from: {
       opacity: this.owner.getOpacity()
@@ -582,7 +656,12 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectOpacityTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -602,7 +681,7 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!this.owner.getColor || !this.owner.setColor) return;
   if (
     !toColor.match(
@@ -621,7 +700,9 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
   var toColor = toColor.split(";");
   if (toColor.length !== 3) return;
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
   newTweenable.setConfig({
     from: {
       red: fromColor[0],
@@ -638,15 +719,20 @@ gdjs.TweenRuntimeBehavior.prototype.addObjectColorTween = function(
     step: state => {
       this.owner.setColor(
         Math.floor(state.red) +
-        ";" +
-        Math.floor(state.green) +
-        ";" +
-        Math.floor(state.blue)
+          ";" +
+          Math.floor(state.green) +
+          ";" +
+          Math.floor(state.blue)
       );
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -666,7 +752,7 @@ gdjs.TweenRuntimeBehavior.prototype.addTextObjectCharacterSizeTween = function(
   durationValue,
   destroyObjectWhenFinished
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
   if (!this.owner.setCharacterSize) return;
 
   if (!!this._easings[easingValue]) return;
@@ -675,7 +761,9 @@ gdjs.TweenRuntimeBehavior.prototype.addTextObjectCharacterSizeTween = function(
     this.removeTween(identifier);
   }
 
-  var newTweenable = new shifty.Tweenable();
+  var newTweenable = gdjs.TweenRuntimeBehavior.makeNewTweenable(
+    this._runtimeScene
+  );
   newTweenable.setConfig({
     from: {
       size: this.owner.getCharacterSize()
@@ -690,7 +778,12 @@ gdjs.TweenRuntimeBehavior.prototype.addTextObjectCharacterSizeTween = function(
     }
   });
 
-  this._addTween(identifier, newTweenable, this._runtimeScene.getTimeManager().getTimeFromStart(), durationValue);
+  this._addTween(
+    identifier,
+    newTweenable,
+    this._runtimeScene.getTimeManager().getTimeFromStart(),
+    durationValue
+  );
 
   this._setupTweenEnding(identifier, destroyObjectWhenFinished);
 };
@@ -733,7 +826,7 @@ gdjs.TweenRuntimeBehavior.prototype.hasFinished = function(identifier) {
  * @param {string} identifier Unique id to idenfify the tween
  */
 gdjs.TweenRuntimeBehavior.prototype.pauseTween = function(identifier) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
 
   if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
     this._pauseTween(identifier);
@@ -749,7 +842,7 @@ gdjs.TweenRuntimeBehavior.prototype.stopTween = function(
   identifier,
   jumpToDest
 ) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
 
   if (this._tweenExists(identifier) && this._tweenIsPlaying(identifier)) {
     this._stopTween(identifier, jumpToDest);
@@ -761,7 +854,7 @@ gdjs.TweenRuntimeBehavior.prototype.stopTween = function(
  * @param {string} identifier Unique id to idenfify the tween
  */
 gdjs.TweenRuntimeBehavior.prototype.resumeTween = function(identifier) {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
 
   if (this._tweenExists(identifier) && !this._tweenIsPlaying(identifier)) {
     this._resumeTween(identifier);
@@ -794,7 +887,7 @@ gdjs.TweenRuntimeBehavior.prototype.getProgress = function(identifier) {
 };
 
 gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function() {
-  if(!this._isActive) return;
+  if (!this._isActive) return;
 
   for (const key in this._tweens) {
     if (this._tweens.hasOwnProperty(key)) {
@@ -810,7 +903,7 @@ gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function() {
 };
 
 gdjs.TweenRuntimeBehavior.prototype.onActivate = function() {
-  if(this._isActive) return;
+  if (this._isActive) return;
 
   for (const key in this._tweens) {
     if (this._tweens.hasOwnProperty(key)) {
@@ -823,6 +916,63 @@ gdjs.TweenRuntimeBehavior.prototype.onActivate = function() {
     }
   }
   this._isActive = true;
+};
+
+/**
+ * Static function to create a Tweenable associated to a scene.
+ * Don't create manually shifty.Tweenable, otherwise they won't be
+ * associated to a scene (and will play even when scene is paused).
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @returns {shifty.Tweenable} The new tweenable
+ */
+gdjs.TweenRuntimeBehavior.makeNewTweenable = function(runtimeScene) {
+  if (!runtimeScene.shiftyJsScene) {
+    runtimeScene.shiftyJsScene = new shifty.Scene();
+    runtimeScene.shiftyJsScene.play(); // TODO: Check that
+  }
+
+  var tweenable = new shifty.Tweenable();
+  runtimeScene.shiftyJsScene.add(tweenable);
+  return tweenable;
+};
+
+/**
+ * Static function to remove a Tweenable from a scene.
+ *
+ * @param {gdjs.RuntimeScene} runtimeScene
+ * @param {shifty.Tweenable} tweenable
+ */
+gdjs.TweenRuntimeBehavior.removeFromScene = function(runtimeScene, tweenable) {
+  if (!runtimeScene.shiftyJsScene) return;
+
+  runtimeScene.shiftyJsScene.remove(tweenable);
+};
+
+// Callbacks called to pause/resume Shifty scene when a gdjs.RuntimeScene
+// is paused/resumed
+
+gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneUnloaded = function(
+  runtimeScene
+) {
+  if (!runtimeScene.shiftyJsScene) return;
+
+  runtimeScene.shiftyJsScene.stop(false); // TODO: check if necessary
+};
+
+gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeScenePaused = function(
+  runtimeScene
+) {
+  if (!runtimeScene.shiftyJsScene) return;
+
+  runtimeScene.shiftyJsScene.pause();
+};
+
+gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneResumed = function(
+  runtimeScene
+) {
+  if (!runtimeScene.shiftyJsScene) return;
+
+  runtimeScene.shiftyJsScene.resume();
 };
 
 // Handle Shifty.js updates (the time and the "tick" of tweens

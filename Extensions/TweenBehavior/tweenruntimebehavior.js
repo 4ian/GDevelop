@@ -956,7 +956,10 @@ gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneUnloaded = function(
 ) {
   if (!runtimeScene.shiftyJsScene) return;
 
-  runtimeScene.shiftyJsScene.stop(false); // TODO: check if necessary
+  runtimeScene.shiftyJsScene.stop(false);
+  runtimeScene.shiftyJsScene.tweenables.forEach(
+    runtimeScene.shiftyJsScene.remove.bind(runtimeScene.shiftyJsScene)
+  );
 };
 
 gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeScenePaused = function(

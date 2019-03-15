@@ -1,3 +1,8 @@
+Graphics are made by Matthias Meike 
+If you use these images in a game please mention me in the credits.
+
+=======================================================================
+
 Attribution-ShareAlike 4.0 International
 
 =======================================================================

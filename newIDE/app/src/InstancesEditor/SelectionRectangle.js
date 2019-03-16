@@ -1,4 +1,4 @@
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 const gd = global.gd;
 
 export default class SelectionRectangle {

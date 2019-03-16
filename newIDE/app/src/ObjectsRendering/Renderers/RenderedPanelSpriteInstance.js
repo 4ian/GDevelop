@@ -1,5 +1,5 @@
 import RenderedInstance from './RenderedInstance';
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 const gd = global.gd;
 
 /**

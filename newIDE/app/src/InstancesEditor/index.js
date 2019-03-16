@@ -15,7 +15,7 @@ import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
 import DropHandler from './DropHandler';
 import BackgroundColor from './BackgroundColor';
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 

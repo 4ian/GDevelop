@@ -171,10 +171,15 @@ export default class LayerRenderer {
   }
 
   _computeViewBounds() {
-    this.viewTopLeft = this.viewPosition.toSceneCoordinates(0, 0);
+    // Add a margin of 100 pixels around the view. Culling will hide PIXI objects,
+    // and hidden objects won't respond to events. Hence, a margin allow the cursor to go
+    // slightly out of the canvas when moving an instance, and still have the instance
+    // to follow the cursor.
+    const margin = 100;
+    this.viewTopLeft = this.viewPosition.toSceneCoordinates(-margin, -margin);
     this.viewBottomRight = this.viewPosition.toSceneCoordinates(
-      this.viewPosition.getWidth(),
-      this.viewPosition.getHeight()
+      this.viewPosition.getWidth() + margin,
+      this.viewPosition.getHeight() + margin
     );
   }
 

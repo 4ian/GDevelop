@@ -3,7 +3,8 @@ gdjs.LoadingScreenPixiRenderer = function(runtimeGamePixiRenderer, loadingScreen
   this._loadingScreen = new PIXI.Container();
 
   this._progressText = new PIXI.Text(' ', {
-    font: '30px Arial',
+    fontSize: '30px',
+    fontFamily: 'Arial',
     fill: '#FFFFFF',
     align: 'center',
   });
@@ -11,13 +12,15 @@ gdjs.LoadingScreenPixiRenderer = function(runtimeGamePixiRenderer, loadingScreen
 
   if (loadingScreenSetup && loadingScreenSetup.showGDevelopSplash) {
     this._madeWithText = new PIXI.Text('Made with', {
-      font: '30px Arial',
+      fontSize: '30px',
+      fontFamily: 'Arial',
       fill: '#FFFFFF',
       align: 'center',
     });
     this._madeWithText.position.y = this._pixiRenderer.height / 2 - 130;
     this._websiteText = new PIXI.Text('gdevelop-app.com', {
-      font: '30px Arial',
+      fontSize: '30px',
+      fontFamily: 'Arial',
       fill: '#FFFFFF',
       align: 'center',
     });

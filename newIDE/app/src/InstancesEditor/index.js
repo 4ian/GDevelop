@@ -37,6 +37,22 @@ export default class InstancesEditorContainer extends Component {
   }
 
   componentDidMount() {
+    // Initialize the PIXI renderer, if possible
+    if (this.canvasArea && !this.pixiRenderer) {
+      this._initializeCanvasAndRenderer();
+    }
+  }
+
+  componentDidUpdate() {
+    // Initialize the PIXI renderer, if not already done.
+    // This can happen if canvasArea was not rendered
+    // just after the mount (depends on react-dnd versions?).
+    if (this.canvasArea && !this.pixiRenderer) {
+      this._initializeCanvasAndRenderer();
+    }
+  }
+
+  _initializeCanvasAndRenderer() {
     this.pixiRenderer = PIXI.autoDetectRenderer(
       this.props.width,
       this.props.height
@@ -544,7 +560,7 @@ export default class InstancesEditorContainer extends Component {
     );
   };
 
-  getViewPosition = () => {
+  getViewPosition = () /*: ?ViewPosition */ => {
     return this.viewPosition;
   };
 

@@ -9,7 +9,7 @@ import RenderedParticleEmitterInstance from './Renderers/RenderedParticleEmitter
 import PixiResourcesLoader from './PixiResourcesLoader';
 import ResourcesLoader from '../ResourcesLoader';
 import RenderedInstance from './Renderers/RenderedInstance';
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 const gd = global.gd;
 
 /**

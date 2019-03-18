@@ -139,7 +139,7 @@ class StartPage extends BaseEditor {
                   <FlatButton
                     label={<Trans>GDevelop Forums</Trans>}
                     onClick={() =>
-                      Window.openExternalURL('http://forum.compilgames.net')
+                      Window.openExternalURL('https://forum.gdevelop-app.com')
                     }
                   />
                   <FlatButton

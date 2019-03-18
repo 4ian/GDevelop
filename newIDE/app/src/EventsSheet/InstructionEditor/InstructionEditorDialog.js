@@ -33,11 +33,14 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   style?: Object,
-
   isNewInstruction: boolean,
   onCancel: () => void,
   onSubmit: () => void,
   open: boolean,
+  openInstructionOrExpression: (
+    extension: gdPlatformExtension,
+    type: string
+  ) => void,
 |};
 type State = {||};
 

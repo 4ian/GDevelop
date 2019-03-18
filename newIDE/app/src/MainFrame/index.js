@@ -36,6 +36,7 @@ import {
   saveUiSettings,
   type EditorTabsState,
   type EditorTab,
+  getEventsFunctionsExtensionEditor,
 } from './EditorTabsHandler';
 import { watchPromiseInState } from '../Utils/WatchPromiseInState';
 import { timeFunction } from '../Utils/TimeFunction';
@@ -66,6 +67,7 @@ import {
   type EventsFunctionWriter,
   loadProjectEventsFunctionsExtensions,
   unloadProjectEventsFunctionsExtensions,
+  getFunctionNameFromType,
 } from '../EventsFunctionsExtensionsLoader';
 import {
   getUpdateNotificationTitle,
@@ -559,7 +561,7 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasLayoutNamed(oldName)) return;
+    if (!currentProject.hasLayoutNamed(oldName) || newName === oldName) return;
 
     if (currentProject.hasLayoutNamed(newName)) {
       showWarningBox(i18n._(t`Another scene with this name already exists.`));
@@ -583,7 +585,8 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasExternalLayoutNamed(oldName)) return;
+    if (!currentProject.hasExternalLayoutNamed(oldName) || newName === oldName)
+      return;
 
     if (currentProject.hasExternalLayoutNamed(newName)) {
       showWarningBox(
@@ -612,7 +615,8 @@ class MainFrame extends React.Component<Props, State> {
     const { i18n } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasExternalEventsNamed(oldName)) return;
+    if (!currentProject.hasExternalEventsNamed(oldName) || newName === oldName)
+      return;
 
     if (currentProject.hasExternalEventsNamed(newName)) {
       showWarningBox(
@@ -642,7 +646,11 @@ class MainFrame extends React.Component<Props, State> {
     const { eventsFunctionWriter } = this.props;
     if (!currentProject) return;
 
-    if (!currentProject.hasEventsFunctionsExtensionNamed(oldName)) return;
+    if (
+      !currentProject.hasEventsFunctionsExtensionNamed(oldName) ||
+      newName === oldName
+    )
+      return;
 
     if (currentProject.hasEventsFunctionsExtensionNamed(newName)) {
       showWarningBox(
@@ -787,6 +795,7 @@ class MainFrame extends React.Component<Props, State> {
           resourceSources={this.props.resourceSources}
           onChooseResource={this._onChooseResource}
           resourceExternalEditors={this.props.resourceExternalEditors}
+          openInstructionOrExpression={this._openInstructionOrExpression}
           isActive={isActive}
           ref={editorRef}
         />
@@ -828,6 +837,7 @@ class MainFrame extends React.Component<Props, State> {
               resourceSources={this.props.resourceSources}
               onChooseResource={this._onChooseResource}
               resourceExternalEditors={this.props.resourceExternalEditors}
+              openInstructionOrExpression={this._openInstructionOrExpression}
               isActive={isActive}
               ref={editorRef}
             />
@@ -874,7 +884,10 @@ class MainFrame extends React.Component<Props, State> {
     this.openProjectManager(false);
   };
 
-  openEventsFunctionsExtension = (name: string) => {
+  openEventsFunctionsExtension = (
+    name: string,
+    initiallyFocusedFunctionName?: string
+  ) => {
     if (!this.props.eventsFunctionWriter) return;
 
     this.setState(
@@ -893,6 +906,8 @@ class MainFrame extends React.Component<Props, State> {
               onReloadEventsFunctionsExtensions={
                 this._loadProjectEventsFunctionsExtensions
               }
+              initiallyFocusedFunctionName={initiallyFocusedFunctionName}
+              openInstructionOrExpression={this._openInstructionOrExpression}
               ref={editorRef}
             />
           ),
@@ -989,6 +1004,43 @@ class MainFrame extends React.Component<Props, State> {
       },
       () => this.updateToolbar()
     );
+  };
+
+  _openInstructionOrExpression = (
+    extension: gdPlatformExtension,
+    type: string
+  ) => {
+    const { currentProject } = this.state;
+    if (!currentProject) return;
+
+    const extensionName = extension.getName();
+    if (currentProject.hasEventsFunctionsExtensionNamed(extensionName)) {
+      // It's an events functions extension, open the editor for it.
+      const eventsFunctionsExtension = currentProject.getEventsFunctionsExtension(
+        extensionName
+      );
+      const functionName = getFunctionNameFromType(type);
+
+      const foundTab = getEventsFunctionsExtensionEditor(
+        this.state.editorTabs,
+        eventsFunctionsExtension
+      );
+      if (foundTab) {
+        // Open the given function and focus the tab
+        foundTab.editor.selectEventsFunctionByName(functionName);
+        this.setState(state => ({
+          editorTabs: changeCurrentTab(state.editorTabs, foundTab.tabIndex),
+        }));
+      } else {
+        // Open a new editor for the extension and the given function
+        this.openEventsFunctionsExtension(extensionName, functionName);
+      }
+    } else {
+      // It's not an events functions extension, we should not be here.
+      console.warn(
+        `Extension with name=${extensionName} can not be opened (no editor for this)`
+      );
+    }
   };
 
   openCreateDialog = (open: boolean = true) => {

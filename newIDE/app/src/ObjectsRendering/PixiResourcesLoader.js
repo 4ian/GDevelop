@@ -1,6 +1,6 @@
 // @flow
 import slugs from 'slugs';
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 const gd = global.gd;

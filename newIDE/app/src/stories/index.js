@@ -1075,6 +1075,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           showNetworkPreviewButton={false}
           showPreviewButton={false}
+          openInstructionOrExpression={action('open instruction or expression')}
         />
       </div>
     </DragDropContextProvider>
@@ -1101,6 +1102,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           showNetworkPreviewButton={false}
           showPreviewButton={false}
+          openInstructionOrExpression={action('open instruction or expression')}
         />
       </div>
     </DragDropContextProvider>
@@ -1185,6 +1187,7 @@ storiesOf('InstructionEditor', module)
         return Promise.reject();
       }}
       resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
     />
   ))
   .add('without layout', () => (
@@ -1201,6 +1204,7 @@ storiesOf('InstructionEditor', module)
         return Promise.reject();
       }}
       resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
     />
   ));
 
@@ -1803,6 +1807,8 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
             action('Choose resource from source', source)
           }
           resourceExternalEditors={[]}
+          openInstructionOrExpression={action('open instruction or expression')}
+          initiallyFocusedFunctionName={null}
         />
       </div>
     </DragDropContextProvider>

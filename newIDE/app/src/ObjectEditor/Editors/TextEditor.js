@@ -114,6 +114,8 @@ export default class TextEditor extends React.Component<EditorProps, void> {
                 }
                 fullWidth
                 multiLine
+                rows={8}
+                rowsMax={8}
                 value={textObject.getString()}
                 onChange={(e, value) => {
                   textObject.setString(value);

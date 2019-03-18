@@ -250,3 +250,29 @@ const addEventsFunctionParameters = (
   // (if any).
   instructionOrExpression.addCodeOnlyParameter('eventsFunctionContext', '');
 };
+
+/**
+ * Given metadata about an instruction or an expression, tells if this was created
+ * from an event function.
+ */
+export const isAnEventFunctionMetadata = (
+  instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
+) => {
+  const parametersCount = instructionOrExpression.getParametersCount();
+  if (parametersCount <= 0) return false;
+
+  return (
+    instructionOrExpression.getParameter(parametersCount - 1).getType() ===
+    'eventsFunctionContext'
+  );
+};
+
+/**
+ * Get back the name a function from its type
+ */
+export const getFunctionNameFromType = (type: string) => {
+  const parts = type.split('::');
+  if (!parts.length) return '';
+
+  return parts[parts.length - 1];
+};

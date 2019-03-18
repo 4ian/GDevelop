@@ -78,9 +78,10 @@ export default class BrowserStarters extends Component {
                   </p>
                 }
                 secondaryTextLines={2}
-                onClick={() =>
-                  this.createFromExample('downhill-bike-physics-demo')
-                }
+                onClick={() => {
+                  sendNewGameCreated('downhill-bike-physics-demo');
+                  this.props.onOpen('example://downhill-bike-physics-demo');
+                }}
               />
             </List>
             <Line alignItems="center" justifyContent="center">

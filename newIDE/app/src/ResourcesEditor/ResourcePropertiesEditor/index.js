@@ -62,7 +62,8 @@ export default class ResourcePropertiesEditor extends React.Component<
       <EmptyMessage>
         <Trans>
           Resources are automatically added to your project whenever you add an
-          image to an object. Choose a resource to display its properties.
+          image, a font or a video to an object or when you choose an audio file
+          in events. Choose a resource to display its properties.
         </Trans>
       </EmptyMessage>
     );

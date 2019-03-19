@@ -922,13 +922,13 @@ gdjs.TweenRuntimeBehavior.prototype.onActivate = function() {
  * Static function to create a Tweenable associated to a scene.
  * Don't create manually shifty.Tweenable, otherwise they won't be
  * associated to a scene (and will play even when scene is paused).
+ *
  * @param {gdjs.RuntimeScene} runtimeScene
  * @returns {shifty.Tweenable} The new tweenable
  */
 gdjs.TweenRuntimeBehavior.makeNewTweenable = function(runtimeScene) {
   if (!runtimeScene.shiftyJsScene) {
     runtimeScene.shiftyJsScene = new shifty.Scene();
-    runtimeScene.shiftyJsScene.play(); // TODO: Check that
   }
 
   var tweenable = new shifty.Tweenable();
@@ -951,6 +951,10 @@ gdjs.TweenRuntimeBehavior.removeFromScene = function(runtimeScene, tweenable) {
 // Callbacks called to pause/resume Shifty scene when a gdjs.RuntimeScene
 // is paused/resumed
 
+/**
+ * Stop and "destroy" all the tweens when a scene is unloaded.
+ * @private
+ */
 gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneUnloaded = function(
   runtimeScene
 ) {
@@ -962,6 +966,10 @@ gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneUnloaded = function(
   );
 };
 
+/**
+ * When a scene is paused, pause all the tweens of this scene.
+ * @private
+ */
 gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeScenePaused = function(
   runtimeScene
 ) {
@@ -970,11 +978,22 @@ gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeScenePaused = function(
   runtimeScene.shiftyJsScene.pause();
 };
 
+/**
+ * When a scene is paused, resume all the tweens of this scene.
+ * @private
+ */
 gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneResumed = function(
   runtimeScene
 ) {
   if (!runtimeScene.shiftyJsScene) return;
 
+  // It is important to set immediately the current Shifty time back to the
+  // time of the scene, as the call `resume` will process the tweens.
+  // (If not done, tweens will be resumed with the time of the previous
+  // scene, that could create weird result/make tweens act as if not paused).
+  gdjs.TweenRuntimeBehavior._currentTweenTime = runtimeScene
+    .getTimeManager()
+    .getTimeFromStart();
   runtimeScene.shiftyJsScene.resume();
 };
 
@@ -1003,8 +1022,10 @@ gdjs.TweenRuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 shifty.Tweenable.setScheduleFunction(function() {
   /* Do nothing, we'll call processTweens manually. */
 });
-// Set up Shifty.js so that the time is handled by the behavior
-// (will be set to the time of the current scene).
+
+// Set up Shifty.js so that the time is handled by the behavior.
+// It will be set to be the time of the current scene, and should be updated
+// before any tween processing (processTweens, resume).
 shifty.Tweenable.now = function() {
   return gdjs.TweenRuntimeBehavior._currentTweenTime;
 };

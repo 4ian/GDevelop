@@ -631,6 +631,7 @@ module.exports = {
         .get("videoResource")
         .getValue();
 
+      //Return VideoTexture with autoPlay = False
       return this._pixiResourcesLoader.getPIXIVideoTexture(
         this._project,
         videoResource
@@ -649,14 +650,6 @@ module.exports = {
       if (videoResource !== this._videoResource) {
         this._videoResource = videoResource;
         this._pixiObject.texture = this._getVideoTexture();
-      }
-
-      if (
-        this._pixiObject.texture.baseTexture.hasLoaded &&
-        this._pixiObject.texture.baseTexture.source.nodeName == "VIDEO" &&
-        !this._pixiObject.texture.baseTexture.source.paused
-      ) {
-        this._pixiObject.texture.baseTexture.source.pause();
       }
 
       const opacity = this._associatedObject

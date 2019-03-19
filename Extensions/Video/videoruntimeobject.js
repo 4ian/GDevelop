@@ -48,6 +48,7 @@ gdjs.VideoRuntimeObject.prototype.update = function(runtimeScene) {
 
 /**
  * Set object position on X axis.
+ * @param {number} x The new position X of the object.
  */
 gdjs.VideoRuntimeObject.prototype.setX = function(x) {
   gdjs.RuntimeObject.prototype.setX.call(this, x);
@@ -56,6 +57,7 @@ gdjs.VideoRuntimeObject.prototype.setX = function(x) {
 
 /**
  * Set object position on Y axis.
+ * @param {number} y The new position Y of the object.
  */
 gdjs.VideoRuntimeObject.prototype.setY = function(y) {
   gdjs.RuntimeObject.prototype.setY.call(this, y);
@@ -64,7 +66,7 @@ gdjs.VideoRuntimeObject.prototype.setY = function(y) {
 
 /**
  * Set the angle of the object.
- * @param {number} angle The new angle of the object
+ * @param {number} angle The new angle of the object.
  */
 gdjs.VideoRuntimeObject.prototype.setAngle = function(angle) {
   gdjs.RuntimeObject.prototype.setAngle.call(this, angle);
@@ -73,7 +75,7 @@ gdjs.VideoRuntimeObject.prototype.setAngle = function(angle) {
 
 /**
  * Set object opacity.
- * @param {number} opacity The new opacity of the object (0-255)
+ * @param {number} opacity The new opacity of the object (0-255).
  */
 gdjs.VideoRuntimeObject.prototype.setOpacity = function(opacity) {
   this._opacity = opacity;
@@ -117,22 +119,39 @@ gdjs.VideoRuntimeObject.prototype.getHeight = function() {
   return this._renderer.getHeight();
 };
 
+/**
+ * Get if the video object is playing
+ */
 gdjs.VideoRuntimeObject.prototype.play = function() {
   this._renderer.play();
 };
 
+/**
+ * Get if the video object is paused.
+ */
 gdjs.VideoRuntimeObject.prototype.pause = function() {
   this._renderer.pause();
 };
 
+/**
+ * Set the state looped of the video.
+ * @param {boolean} bool The new state.
+ */
 gdjs.VideoRuntimeObject.prototype.setLoop = function(bool) {
   this._renderer.setLoop(bool);
 };
 
+/**
+ * Set the state muted of the video.
+ * @param {boolean} bool The new state.
+ */
 gdjs.VideoRuntimeObject.prototype.mute = function(bool) {
   this._renderer.setMute(bool);
 };
 
+/**
+ * Return the state muted of video object.
+ */
 gdjs.VideoRuntimeObject.prototype.isMuted = function() {
   return this._renderer.isMuted();
 };
@@ -151,52 +170,84 @@ gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
   return val <= min ? min : val >= max ? max : val;
 };
 
+/**
+ * Set the volume of the video object.
+ * @param {number} volume The new volume.
+ */
 gdjs.VideoRuntimeObject.prototype.setVolume = function(volume) {
   this._volume = this._clamp(this._normalize(volume, 0, 100), 0, 1);
   this._renderer.updateVolume();
 };
 
+/**
+ * Get the volume of the video object.
+ */
 gdjs.VideoRuntimeObject.prototype.getVolume = function() {
   return this._normalize(this._renderer.getVolume(), 0, 1) * 100;
 };
 
+/**
+ * Return the state played of video object.
+ */
 gdjs.VideoRuntimeObject.prototype.isPlayed = function() {
   return this._renderer.isPlayed();
 };
 
+/**
+ * Return the state paused of video object.
+ */
 gdjs.VideoRuntimeObject.prototype.isPaused = function() {
   return !this._renderer.isPlayed();
 };
 
+/**
+ * Return the state looped paused of video object.
+ */
 gdjs.VideoRuntimeObject.prototype.isLooped = function() {
   return this._renderer.isLooped();
 };
 
-gdjs.VideoRuntimeObject.prototype.controlsAreShowing = function() {
-  return this._renderer.controlsAreShowing();
-};
-
+/**
+ * Return the state duration of video object.
+ */
 gdjs.VideoRuntimeObject.prototype.getDuration = function() {
   return this._renderer.getDuration();
 };
 
+/**
+ * Return the state ended of video object.
+ */
 gdjs.VideoRuntimeObject.prototype.isEnded = function() {
   return !this._renderer.isEnded();
 };
 
-gdjs.VideoRuntimeObject.prototype.setCurrentTime = function(number) {
-  this._renderer.setCurrentTime(number);
+/**
+ * Set the new timer of the video object.
+ * @param {number} time The new timer.
+ */
+gdjs.VideoRuntimeObject.prototype.setCurrentTime = function(time) {
+  this._renderer.setCurrentTime(time);
 };
 
+/**
+ * Get the current time of the video object.
+ */
 gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
   return this._renderer.getCurrentTime();
 };
 
+/**
+ * Set the new playback speed of the video object.
+ * @param {number} playbackSpeed The new playback speed.
+ */
 gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
   this._playbackSpeed = playbackSpeed;
   this._renderer.setPlaybackSpeed(this._playbackSpeed);
 };
 
+/**
+ * Get the playback speed of the video object.
+ */
 gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
   return this._renderer.getPlaybackSpeed();
 };

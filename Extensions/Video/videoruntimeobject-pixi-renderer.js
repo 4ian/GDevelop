@@ -17,17 +17,11 @@ gdjs.VideoRuntimeObjectPixiRenderer = function(runtimeObject, runtimeScene) {
         .getImageManager()
         .getPIXIVideoTexture(this._object._videoResource)
     );
+    this._pixiObject._texture.baseTexture.autoPlay = false;
   } else {
     this._pixiObject._texture.baseTexture.source.currentTime = 0;
   }
   this._textureWasValid = false; // Will be set to true when video texture is loaded.
-
-  if (
-    this._textureWasValid &&
-    !this._pixiObject.texture.baseTexture.source.paused
-  ) {
-    this.pause();
-  }
 
   runtimeScene
     .getLayer("")
@@ -149,6 +143,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.pause = function() {
 
 /**
  * Set the loop on video in renderer
+ * @param {boolean} bool The new state of looped.
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.setLoop = function(bool) {
   this._pixiObject._texture.baseTexture.source.loop = bool;
@@ -156,6 +151,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.setLoop = function(bool) {
 
 /**
  * Set or unset mute on the video.
+ * @param {boolean} bool The new state of muted.
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.setMute = function(bool) {
   this._pixiObject._texture.baseTexture.source.muted = bool;
@@ -179,6 +175,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.setCurrentTime = function(
 
 /**
  * Set the volume of the video, between 0 and 1.
+ * @param {number} volume The new volume.
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.setVolume = function(volume) {
   this._pixiObject._texture.baseTexture.source.volume = volume;

@@ -49,7 +49,7 @@ module.exports = {
         "TweenBehavior",
         _("Tween animation"),
         "",
-        "CppPlatform/Extensions/topdownmovementicon.png",
+        "JsPlatform/Extensions/tween_behavior32.png",
         "TweenBehavior",
         tweenBehavior,
         new gd.BehaviorsSharedData()
@@ -69,8 +69,8 @@ module.exports = {
           "Tween the variable _PARAM3_ of _PARAM0_ from _PARAM4_ to _PARAM5_ with easing _PARAM6_ over _PARAM7_ms as _PARAM2_"
         ),
         _("Variables"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -100,8 +100,8 @@ module.exports = {
           "Tween the position of _PARAM0_ to x: _PARAM3_, y: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_"
         ),
         _("Position"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -130,8 +130,8 @@ module.exports = {
           "Tween the X position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
         _("Position"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -159,8 +159,8 @@ module.exports = {
           "Tween the Y position of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
         _("Position"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -188,8 +188,8 @@ module.exports = {
           "Tween the angle of _PARAM0_ to _PARAM3_° with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
         _("Angle"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -219,8 +219,8 @@ module.exports = {
           "Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_"
         ),
         _("Scale"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -251,8 +251,8 @@ module.exports = {
           "Tween the X-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
         _("Scale"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -282,8 +282,8 @@ module.exports = {
           "Tween the Y-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
         _("Scale"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -313,8 +313,8 @@ module.exports = {
           "Tween the character size of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
         _("Text"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Text object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -344,8 +344,8 @@ module.exports = {
           "Tween the opacity of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
         _("Opacity"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -375,8 +375,8 @@ module.exports = {
           "Tween the color of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
         ),
         _("Color"),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -402,8 +402,8 @@ module.exports = {
         _("Check if the tween animation exists."),
         _("Tween _PARAM2_ on _PARAM0_ exists"),
         _(""),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -418,8 +418,8 @@ module.exports = {
         _("Check if the tween animation is currently playing."),
         _("Tween _PARAM2_ on _PARAM0_ is playing"),
         _(""),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -434,8 +434,8 @@ module.exports = {
         _("Check if the tween animation has finished playing."),
         _("Tween _PARAM2_ on _PARAM0_ has finished playing"),
         _(""),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -450,8 +450,8 @@ module.exports = {
         _("Pause the running tween animation."),
         _("Pause the tween _PARAM2_ on _PARAM0_"),
         _(""),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -466,8 +466,8 @@ module.exports = {
         _("Stop the running tween animation."),
         _("Stop the tween _PARAM2_ on _PARAM0_"),
         _(""),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -483,8 +483,8 @@ module.exports = {
         _("Resume the tween animation."),
         _("Resume the tween _PARAM2_ on _PARAM0_"),
         _(""),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -499,8 +499,8 @@ module.exports = {
         _("Remove the tween animation from the object."),
         _("Remove the tween _PARAM2_ from _PARAM0_"),
         _(""),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
@@ -514,8 +514,8 @@ module.exports = {
         _("Progress of a tween"),
         _("Progress of a tween (between 0.0 and 1.0)"),
         _(""),
-        "JsPlatform/Extensions/take_screenshot24.png",
-        "JsPlatform/Extensions/take_screenshot32.png"
+        "JsPlatform/Extensions/tween_behavior24.png",
+        "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
       .addParameter("behavior", _("Behavior"), "TweenBehavior", false)

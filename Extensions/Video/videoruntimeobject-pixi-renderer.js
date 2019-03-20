@@ -120,6 +120,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.play = function() {
       })
       .catch(() => {
         // Autoplay was prevented.
+        console.log("The video don't start because any interaction with the game has been captured before. This is blocked by the navigator. https://goo.gl/xX8pDD");
       });
   }
 };

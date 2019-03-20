@@ -135,18 +135,18 @@ gdjs.VideoRuntimeObject.prototype.pause = function() {
 
 /**
  * Set the state looped of the video.
- * @param {boolean} bool The new state.
+ * @param {boolean} enable true to loop the video
  */
-gdjs.VideoRuntimeObject.prototype.setLoop = function(bool) {
-  this._renderer.setLoop(bool);
+gdjs.VideoRuntimeObject.prototype.setLoop = function(enable) {
+  this._renderer.setLoop(enable);
 };
 
 /**
  * Set the state muted of the video.
- * @param {boolean} bool The new state.
+ * @param {boolean} enable The new state.
  */
-gdjs.VideoRuntimeObject.prototype.mute = function(bool) {
-  this._renderer.setMute(bool);
+gdjs.VideoRuntimeObject.prototype.mute = function(enable) {
+  this._renderer.setMute(enable);
 };
 
 /**
@@ -187,43 +187,43 @@ gdjs.VideoRuntimeObject.prototype.getVolume = function() {
 };
 
 /**
- * Return the state played of video object.
+ * Check if the video is being played.
  */
 gdjs.VideoRuntimeObject.prototype.isPlayed = function() {
   return this._renderer.isPlayed();
 };
 
 /**
- * Return the state paused of video object.
+ * Check if the video is paused.
  */
 gdjs.VideoRuntimeObject.prototype.isPaused = function() {
   return !this._renderer.isPlayed();
 };
 
 /**
- * Return the state looped paused of video object.
+ * Check if the video is looping.
  */
 gdjs.VideoRuntimeObject.prototype.isLooped = function() {
   return this._renderer.isLooped();
 };
 
 /**
- * Return the state duration of video object.
+ * Return the total time of the video.
  */
 gdjs.VideoRuntimeObject.prototype.getDuration = function() {
   return this._renderer.getDuration();
 };
 
 /**
- * Return the state ended of video object.
+ * Check if the video has ended.
  */
 gdjs.VideoRuntimeObject.prototype.isEnded = function() {
   return !this._renderer.isEnded();
 };
 
 /**
- * Set the new timer of the video object.
- * @param {number} time The new timer.
+ * Set the new time of the video object.
+ * @param {number} time The new time.
  */
 gdjs.VideoRuntimeObject.prototype.setCurrentTime = function(time) {
   this._renderer.setCurrentTime(time);
@@ -241,7 +241,7 @@ gdjs.VideoRuntimeObject.prototype.getCurrentTime = function() {
  * @param {number} playbackSpeed The new playback speed.
  */
 gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
-  this._playbackSpeed = playbackSpeed;
+  this._playbackSpeed = this._clamp(playbackSpeed, 0.5, 2);
   this._renderer.setPlaybackSpeed(this._playbackSpeed);
 };
 
@@ -250,4 +250,34 @@ gdjs.VideoRuntimeObject.prototype.setPlaybackSpeed = function(playbackSpeed) {
  */
 gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
   return this._renderer.getPlaybackSpeed();
+};
+
+gdjs.RuntimeScene.gdjsCallbackRuntimeScenePaused = function(runtimeScene) {
+  for (var instances in runtimeScene._instances.items) {
+    for (var object in runtimeScene._instances.items[instances]) {
+    
+      var obj = runtimeScene._instances.items[instances][object];
+      if (obj.type == "Video::VideoObject") {
+        obj._renderer._pixiObject._texture.baseTexture.source.pause();
+      }
+    }
+  }
+  console.log("gdjsCallbackRuntimeScenePaused", runtimeScene);
+};
+
+gdjs.RuntimeScene.gdjsCallbackRuntimeSceneResumed = function(runtimeScene) {
+  runtimeObject._renderer._pixiObject._texture.baseTexture.source.play();
+  console.log("gdjsCallbackRuntimeSceneResumed", runtimeScene);
+};
+
+gdjs.RuntimeScene.gdjsCallbackObjectDeletedFromScene = function(
+  runtimeScene,
+  runtimeObject
+) {
+  runtimeObject._renderer._pixiObject._texture.baseTexture.source.pause();
+  console.log(
+    "gdjsCallbackObjectDeletedFromScene",
+    runtimeScene,
+    runtimeObject
+  );
 };

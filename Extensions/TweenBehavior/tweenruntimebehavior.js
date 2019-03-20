@@ -893,7 +893,7 @@ gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function() {
     if (this._tweens.hasOwnProperty(key)) {
       const tween = this._tweens[key];
 
-      if (tween.instance.isPlaying) {
+      if (tween.instance.isPlaying()) {
         tween.resumeOnActivate = true;
         tween.instance.pause();
       }

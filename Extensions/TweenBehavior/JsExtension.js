@@ -18,7 +18,7 @@ module.exports = {
         "Tween",
         _("Tween animation"),
         _("Animate object properties via tweening."),
-        "Matthias Meike",
+        "Matthias Meike, Florian Rival",
         "Open source (MIT License)"
       )
       .setExtensionHelpPath("/all-features/tween");

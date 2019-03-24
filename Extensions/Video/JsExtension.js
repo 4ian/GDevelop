@@ -224,7 +224,7 @@ module.exports = {
         _(
           "Get the volume of a video object, between 0 (muted) and 100 (maximum)."
         ),
-        _("Volume"),
+        "",
         "JsPlatform/Extensions/videoicon16.png"
       )
       .addParameter("object", _("Object"), "VideoObject", false)
@@ -379,7 +379,7 @@ module.exports = {
     object
       .addAction(
         "SetOpacity",
-        _("Change Video opacity"),
+        _("Set opacity"),
         _(
           "Set opacity of the specified video object, between 0 (fully transparent) and 255 (opaque)."
         ),

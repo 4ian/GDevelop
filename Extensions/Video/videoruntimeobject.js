@@ -175,7 +175,7 @@ gdjs.VideoRuntimeObject.prototype._clamp = function(val, min, max) {
  * @param {number} volume The new volume.
  */
 gdjs.VideoRuntimeObject.prototype.setVolume = function(volume) {
-  this._volume = this._clamp(this._normalize(volume, 0, 100), 0, 1);
+  this._volume = this._clamp(this._normalize(volume, 0, 100), 0, 1)*100;
   this._renderer.updateVolume();
 };
 
@@ -266,7 +266,15 @@ gdjs.RuntimeScene.gdjsCallbackRuntimeScenePaused = function(runtimeScene) {
 };
 
 gdjs.RuntimeScene.gdjsCallbackRuntimeSceneResumed = function(runtimeScene) {
-  runtimeObject._renderer._pixiObject._texture.baseTexture.source.play();
+  for (var instances in runtimeScene._instances.items) {
+    for (var object in runtimeScene._instances.items[instances]) {
+    
+      var obj = runtimeScene._instances.items[instances][object];
+      if (obj.type == "Video::VideoObject") {
+        obj._renderer._pixiObject._texture.baseTexture.source.play();
+      }
+    }
+  }
   console.log("gdjsCallbackRuntimeSceneResumed", runtimeScene);
 };
 

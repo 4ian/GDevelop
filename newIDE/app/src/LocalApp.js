@@ -17,7 +17,7 @@ import LocalProjectWriter from './ProjectsStorage/LocalProjectWriter';
 import LocalProjectOpener from './ProjectsStorage/LocalProjectOpener';
 import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
-import ElectronEventsBridge from './MainFrame/ElectronEventsBridge';
+import ElectronMainMenu from './MainFrame/ElectronMainMenu';
 import makeExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
 import { makeLocalEventsFunctionWriter } from './EventsFunctionsExtensionsLoader/LocalEventsFunctionWriter';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
@@ -65,7 +65,7 @@ export const create = (authentification: Authentification) => {
         disableCheckForUpdates={!!appArguments['disable-update-check']}
       >
         {({ i18n }) => (
-          <ElectronEventsBridge>
+          <ElectronMainMenu i18n={i18n}>
             <MainFrame
               i18n={i18n}
               previewLauncher={<LocalPreviewLauncher />}
@@ -91,7 +91,7 @@ export const create = (authentification: Authentification) => {
               initialPathsOrURLsToOpen={appArguments['_']}
               eventsFunctionWriter={makeLocalEventsFunctionWriter()}
             />
-          </ElectronEventsBridge>
+          </ElectronMainMenu>
         )}
       </Providers>
     );

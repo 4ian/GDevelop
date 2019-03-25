@@ -84,11 +84,43 @@ export default [
           multiSelections,
           title: 'Choose a font file',
           name: 'Font files',
-          extensions: ['ttf'],
+          extensions: ['ttf', 'otf'],
         };
         return selectLocalResourcePath(project, options).then(resources => {
           return resources.map(resourcePath => {
             const fontResource = new gd.FontResource();
+            const projectPath = path.dirname(project.getProjectFile());
+            fontResource.setFile(path.relative(projectPath, resourcePath));
+            fontResource.setName(path.relative(projectPath, resourcePath));
+
+            return fontResource;
+          });
+        });
+      };
+
+      render() {
+        return null;
+      }
+    },
+  },
+  {
+    name: 'localVideoFileOpener',
+    displayName: 'Choose a new video file',
+    kind: 'video',
+    component: class LocalVideoFileOpener extends Component {
+      chooseResources = (
+        project,
+        multiSelections = true
+      ): Promise<Array<any>> => {
+        const options = {
+          multiSelections,
+          title: 'Choose a video file',
+          name: 'Video files',
+          extensions: ['mp4'],
+        };
+        return selectLocalResourcePath(project, options).then(resources => {
+          return resources.map(resourcePath => {
+            const fontResource = new gd.VideoResource();
             const projectPath = path.dirname(project.getProjectFile());
             fontResource.setFile(path.relative(projectPath, resourcePath));
             fontResource.setName(path.relative(projectPath, resourcePath));

@@ -81,6 +81,8 @@ std::shared_ptr<Resource> ResourcesManager::CreateResource(
     return std::make_shared<AudioResource>();
   else if (kind == "font")
     return std::make_shared<FontResource>();
+  else if (kind == "video")
+    return std::make_shared<VideoResource>();
 
   std::cout << "Bad resource created (type: " << kind << ")" << std::endl;
   return std::make_shared<Resource>();
@@ -583,6 +585,28 @@ void FontResource::UnserializeFrom(const SerializerElement& element) {
 
 #if defined(GD_IDE_ONLY)
 void FontResource::SerializeTo(SerializerElement& element) const {
+  element.SetAttribute("userAdded", IsUserAdded());
+  element.SetAttribute(
+      "file", GetFile());  // Keep the resource path in the current locale (but
+                           // save it in UTF8 for compatibility on other OSes)
+}
+#endif
+
+void VideoResource::SetFile(const gd::String& newFile) {
+  file = newFile;
+
+  // Convert all backslash to slashs.
+  while (file.find('\\') != gd::String::npos)
+    file.replace(file.find('\\'), 1, "/");
+}
+
+void VideoResource::UnserializeFrom(const SerializerElement& element) {
+  SetUserAdded(element.GetBoolAttribute("userAdded"));
+  SetFile(element.GetStringAttribute("file"));
+}
+
+#if defined(GD_IDE_ONLY)
+void VideoResource::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("userAdded", IsUserAdded());
   element.SetAttribute(
       "file", GetFile());  // Keep the resource path in the current locale (but

@@ -67,6 +67,21 @@ export default class BrowserStarters extends Component {
                   this.props.onOpen('example://isometric-game');
                 }}
               />
+              <ListItem
+                primaryText="Downhill Bike Racing"
+                secondaryText={
+                  <p>
+                    <Trans>
+                      An example of a 2D physics based driving game, where
+                      player have to reach the end as fast as possible.
+                    </Trans>
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() =>
+                  this.createFromExample('downhill-bike-physics-demo')
+                }
+              />
             </List>
             <Line alignItems="center" justifyContent="center">
               <RaisedButton

@@ -135,15 +135,20 @@ gdjs.registerBehaviors = function() {
 };
 
 /**
- * Register the callbacks that will be called when a runtimeScene is loaded/unloaded or
- * when an object is deleted from a scene.<br>
- * Callbacks must be called respectively gdjsCallbackRuntimeSceneLoaded, gdjsCallbackRuntimeSceneUnloaded
- * or gdjsCallbackObjectDeletedFromScene and be part of a (nested) child object of gdjs.<br>
+ * Register the callbacks that will be called when a runtimeScene is loaded/unloaded,
+ * paused/resumed or when an object is deleted from a scene.
+ *
+ * Callbacks must be called respectively `gdjsCallbackRuntimeSceneLoaded`, `gdjsCallbackRuntimeSceneUnloaded`,
+ * `callbacksRuntimeScenePaused`, `callbacksRuntimeSceneResumed` or `gdjsCallbackObjectDeletedFromScene`
+ * and be part of a (nested) child object of gdjs.
+ *
  * Arguments passed to the function are the runtimeScene and the object if applicable.
  */
 gdjs.registerGlobalCallbacks = function() {
   gdjs.callbacksRuntimeSceneLoaded = [];
   gdjs.callbacksRuntimeSceneUnloaded = [];
+  gdjs.callbacksRuntimeScenePaused = [];
+  gdjs.callbacksRuntimeSceneResumed = [];
   gdjs.callbacksObjectDeletedFromScene = [];
 
   var totalprop = 0;
@@ -165,6 +170,16 @@ gdjs.registerGlobalCallbacks = function() {
         if (obj[p].gdjsCallbackRuntimeSceneUnloaded !== undefined) {
           gdjs.callbacksRuntimeSceneUnloaded.push(
             obj[p].gdjsCallbackRuntimeSceneUnloaded
+          );
+        }
+        if (obj[p].gdjsCallbackRuntimeScenePaused !== undefined) {
+          gdjs.callbacksRuntimeScenePaused.push(
+            obj[p].gdjsCallbackRuntimeScenePaused
+          );
+        }
+        if (obj[p].gdjsCallbackRuntimeSceneResumed !== undefined) {
+          gdjs.callbacksRuntimeSceneResumed.push(
+            obj[p].gdjsCallbackRuntimeSceneResumed
           );
         }
         if (obj[p].gdjsCallbackObjectDeletedFromScene !== undefined) {

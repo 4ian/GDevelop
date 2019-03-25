@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Divider from 'material-ui/Divider';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -54,55 +55,82 @@ export default class LocalStarters extends Component {
       <Column noMargin>
         <Line>
           <Column>
-            <p>Choose a game to use as a starter:</p>
+            <p>
+              <Trans>Choose a game to use as a starter:</Trans>
+            </p>
           </Column>
         </Line>
         <Line>
           <Column expand noMargin>
             <List>
               <ListItem
-                primaryText="Platformer"
+                primaryText={<Trans>Platformer</Trans>}
                 secondaryText={
                   <p>
-                    A simple platform game, with coins to collect, moving
-                    platforms and enemies.
+                    <Trans>
+                      A simple platform game, with coins to collect, moving
+                      platforms and enemies.
+                    </Trans>
                   </p>
                 }
                 secondaryTextLines={2}
                 onClick={() => this.createFromExample('platformer')}
               />
               <ListItem
-                primaryText="Space Shooter"
+                primaryText={<Trans>Space Shooter</Trans>}
                 secondaryText={
                   <p>
-                    A side-scrolling shooter where you must defeat incoming
-                    enemies with your spaceship.
+                    <Trans>
+                      A side-scrolling shooter where you must defeat incoming
+                      enemies with your spaceship.
+                    </Trans>
                   </p>
                 }
                 secondaryTextLines={2}
                 onClick={() => this.createFromExample('space-shooter')}
               />
               <ListItem
-                primaryText="Isometric game"
+                primaryText={<Trans>Isometric game</Trans>}
                 secondaryText={
                   <p>
-                    An example of an isometric game where you can explore a map
-                    with your character.
+                    <Trans>
+                      An example of an isometric game where you can explore a
+                      map with your character.
+                    </Trans>
                   </p>
                 }
                 secondaryTextLines={2}
                 onClick={() => this.createFromExample('isometric-game')}
               />
               <ListItem
-                primaryText="Empty game"
-                secondaryText={<p>Start a new game from scratch.</p>}
+                primaryText="Downhill Bike Racing"
+                secondaryText={
+                  <p>
+                    <Trans>
+                      An example of a 2D physics based driving game, where
+                      player have to reach the end as fast as possible.
+                    </Trans>
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() =>
+                  this.createFromExample('downhill-bike-physics-demo')
+                }
+              />
+              <ListItem
+                primaryText={<Trans>Empty game</Trans>}
+                secondaryText={
+                  <p>
+                    <Trans>Start a new game from scratch.</Trans>
+                  </p>
+                }
                 secondaryTextLines={2}
                 onClick={() => this.createEmptyGame()}
               />
             </List>
             <Line alignItems="center" justifyContent="center">
               <RaisedButton
-                label="See examples"
+                label={<Trans>See examples</Trans>}
                 onClick={() => this.props.onShowExamples()}
               />
             </Line>
@@ -115,8 +143,8 @@ export default class LocalStarters extends Component {
               fullWidth
               value={this.state.outputPath}
               onChange={this._handleChangePath}
-              title="Folder where to create the game"
-              message="Choose where to create the game"
+              title={<Trans>Folder where to create the game</Trans>}
+              message={<Trans>Choose where to create the game</Trans>}
             />
           </Column>
         </Line>

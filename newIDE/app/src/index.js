@@ -14,10 +14,7 @@ import './UI/iconmoon-font.css'; // Styles for Iconmoon font.
 import optionalRequire from './Utils/OptionalRequire.js';
 import { showErrorBox } from './UI/Messages/MessageBox';
 
-// Uncomment to enable logs in console when a component is potentially doing
-// an unnecessary update
-// import { profileUnnecessaryUpdates } from './Utils/DevTools/UpdatesProfiler';
-// profileUnnecessaryUpdates();
+// No i18n in this file
 
 const electron = optionalRequire('electron');
 

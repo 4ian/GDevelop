@@ -1,6 +1,8 @@
 import gesture from 'pixi-simple-gesture';
 import ObjectsRenderingService from '../../ObjectsRendering/ObjectsRenderingService';
-import PIXI from 'pixi.js';
+import getObjectByName from '../../Utils/GetObjectByName';
+
+import * as PIXI from 'pixi.js';
 const gd = global.gd;
 
 export default class LayerRenderer {
@@ -100,13 +102,13 @@ export default class LayerRenderer {
     var renderedInstance = this.renderedInstances[instance.ptr];
     if (renderedInstance === undefined) {
       //No renderer associated yet, the instance must have been just created!...
-      var associatedObjectName = instance.getObjectName();
-      var associatedObject = null;
-      if (this.layout.hasObjectNamed(associatedObjectName))
-        associatedObject = this.layout.getObject(associatedObjectName);
-      else if (this.project.hasObjectNamed(associatedObjectName))
-        associatedObject = this.project.getObject(associatedObjectName);
-      else return;
+      const associatedObjectName = instance.getObjectName();
+      const associatedObject = getObjectByName(
+        this.project,
+        this.layout,
+        associatedObjectName
+      );
+      if (!associatedObject) return;
 
       //...so let's create a renderer.
       renderedInstance = this.renderedInstances[
@@ -169,10 +171,15 @@ export default class LayerRenderer {
   }
 
   _computeViewBounds() {
-    this.viewTopLeft = this.viewPosition.toSceneCoordinates(0, 0);
+    // Add a margin of 100 pixels around the view. Culling will hide PIXI objects,
+    // and hidden objects won't respond to events. Hence, a margin allow the cursor to go
+    // slightly out of the canvas when moving an instance, and still have the instance
+    // to follow the cursor.
+    const margin = 100;
+    this.viewTopLeft = this.viewPosition.toSceneCoordinates(-margin, -margin);
     this.viewBottomRight = this.viewPosition.toSceneCoordinates(
-      this.viewPosition.getWidth(),
-      this.viewPosition.getHeight()
+      this.viewPosition.getWidth() + margin,
+      this.viewPosition.getHeight() + margin
     );
   }
 

@@ -2,6 +2,7 @@
 import * as React from 'react';
 import ThemeConsumer from './Theme/ThemeConsumer';
 import BackgroundText from './BackgroundText';
+// No i18n in this file
 
 const styles = {
   containerStyle: {

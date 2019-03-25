@@ -1,4 +1,4 @@
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 
 export default class ViewPosition {
   constructor({ width, height, options }) {

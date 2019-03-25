@@ -11,12 +11,12 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: function (t, gd) {
+  createExtension: function (_, gd) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       "Screenshot",
-      t("Screenshot"),
-      t(
+      _("Screenshot"),
+      _(
         "Save screenshots of a running game."
       ),
       "Matthias Meike",
@@ -26,15 +26,15 @@ module.exports = {
     extension
       .addAction(
         "TakeScreenshot",
-        t("Take screenshot"),
-        t("Take a screenshot of the game, and save it to a png file (supported only when running on Windows/Linux/macOS)."),
-        t("Take a screenshot and save at _PARAM1_"),
-        t("Screenshot"),
+        _("Take screenshot"),
+        _("Take a screenshot of the game, and save it to a png file (supported only when running on Windows/Linux/macOS)."),
+        _("Take a screenshot and save at _PARAM1_"),
+        _("Screenshot"),
         "JsPlatform/Extensions/take_screenshot24.png",
         "JsPlatform/Extensions/take_screenshot32.png"
       )
       .addCodeOnlyParameter('currentScene', '')
-      .addParameter("string", t("Save path"), "", false)
+      .addParameter("string", _("Save path"), "", false)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/Screenshot/screenshottools.js"

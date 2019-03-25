@@ -5,16 +5,26 @@
   "license": "MIT",
   "homepage": ".",
   "devDependencies": {
-    "flow-bin": "0.78.0",
+    "@babel/core": "^7.2.2",
+    "@lingui/cli": "^2.7.3",
+    "@lingui/macro": "^2.7.3",
+    "@storybook/addon-actions": "^4.1.11",
+    "@storybook/addon-links": "^4.1.11",
+    "@storybook/react": "4.1.11",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-loader": "8.0.5",
+    "flow-bin": "^0.92.0",
     "flow-coverage-report": "^0.4.0",
     "follow-redirects": "^1.2.3",
+    "iso-639-1": "^2.0.3",
     "prettier": "1.15.3",
-    "react-scripts": "1.0.17",
+    "react-scripts": "2.1.4",
+    "recursive-readdir": "^2.2.2",
     "shelljs": "^0.7.7",
     "unzip2": "^0.2.5"
   },
   "dependencies": {
-    "@storybook/react": "3.2.19",
+    "@lingui/react": "git://github.com/4ian/lingui-react.git#master",
     "algoliasearch": "^3.30.0",
     "aws-sdk": "^2.100.0",
     "axios": "^0.16.1",
@@ -26,14 +36,13 @@
     "firebase": "^4.8.2",
     "flat": "2.0.1",
     "fontfaceobserver": "2.0.13",
-    "i18next": "^10.0.3",
     "keen-tracking": "1.1.3",
     "lodash": "4.17.4",
     "material-ui": "0.20",
     "material-ui-search-bar": "0.4.1",
     "node-require-function": "^1.2.0",
-    "pixi-simple-gesture": "0.2.2",
-    "pixi.js": "3.0.11",
+    "pixi-simple-gesture": "git://github.com/4ian/pixi-simple-gesture#v3.0.0",
+    "pixi.js": "4.8.6",
     "prop-types": "^15.5.10",
     "randomcolor": "^0.5.3",
     "raven-js": "^3.19.1",
@@ -43,7 +52,6 @@
     "react-dnd-html5-backend": "2.5.4",
     "react-dom": "16.5.1",
     "react-error-boundary": "^1.2.0",
-    "react-i18next": "6.2.0",
     "react-json-view": "^1.16.1",
     "react-markdown": "^4.0.6",
     "react-measure": "1.4.7",
@@ -64,14 +72,16 @@
     "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-editor.js piskel 5.0.0-beta56 && node import-zipped-editor.js jfxr 5.0.0-beta55",
     "start": "npm run import-resources && react-scripts start",
     "build": "npm run import-resources && react-scripts build",
-    "format": "prettier --write \"src/**/*.js\"",
-    "check-format": "prettier --list-different \"src/**/*.js\"",
-    "test": "react-scripts test --env=jsdom",
+    "format": "prettier --write \"src/!(locales)/**/*.js\"",
+    "check-format": "prettier --list-different \"src/!(locales)/**/*.js\"",
+    "test": "react-scripts test",
     "flow": "flow",
     "storybook": "start-storybook -p 9009 -s public",
-    "analyze-test-coverage": "react-scripts test --env=jsdom --coverage",
+    "analyze-test-coverage": "react-scripts test --coverage",
     "analyze-flow-coverage": "flow-coverage-report",
-    "analyze-source-map": "source-map-explorer build/static/js/main.*"
+    "analyze-source-map": "source-map-explorer build/static/js/main.*",
+    "extract-all-translations": "node scripts/extract-all-translations.js",
+    "compile-translations": "node scripts/compile-translations.js"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -85,5 +95,11 @@
       "html",
       "json"
     ]
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }

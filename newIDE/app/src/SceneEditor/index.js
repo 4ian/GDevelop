@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import uniq from 'lodash/uniq';
 import ObjectsList from '../ObjectsList';
@@ -34,6 +36,7 @@ import ContextMenu from '../UI/Menu/ContextMenu';
 import { showWarningBox } from '../UI/Messages/MessageBox';
 import { shortenString } from '../Utils/StringHelpers';
 import { roundPosition } from '../Utils/GridHelpers';
+import getObjectByName from '../Utils/GetObjectByName';
 
 import {
   type ResourceSource,
@@ -101,6 +104,7 @@ type State = {|
   layerRemoved: ?string,
   editedObjectWithContext: ?ObjectWithContext,
   variablesEditedInstance: ?gdInitialInstance,
+  variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
 
   editedGroup: ?gdObjectGroup,
@@ -148,6 +152,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       layerRemoved: null,
       editedObjectWithContext: null,
       variablesEditedInstance: null,
+      variablesEditedObject: null,
       selectedObjectNames: [],
 
       editedGroup: null,
@@ -294,6 +299,10 @@ export default class SceneEditor extends React.Component<Props, State> {
 
   editInstanceVariables = (instance: ?gdInitialInstance) => {
     this.setState({ variablesEditedInstance: instance });
+  };
+
+  editObjectVariables = (object: ?gdObject) => {
+    this.setState({ variablesEditedObject: object });
   };
 
   editLayoutVariables = (open: boolean = true) => {
@@ -835,13 +844,13 @@ export default class SceneEditor extends React.Component<Props, State> {
 
     const editors = {
       properties: (
-        <MosaicWindow title="Properties">
+        <MosaicWindow title={<Trans>Properties</Trans>}>
           <InstancePropertiesEditor
             project={project}
             layout={layout}
             instances={selectedInstances}
-            onInstancesModified={this._onInstancesModified}
             editInstanceVariables={this.editInstanceVariables}
+            editObjectVariables={this.editObjectVariables}
             onEditObjectByName={this.editObjectByName}
             ref={propertiesEditor =>
               (this._propertiesEditor = propertiesEditor)
@@ -881,7 +890,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       ),
       'objects-list': (
         <MosaicWindow
-          title="Objects"
+          title={<Trans>Objects</Trans>}
           selectedObjectNames={
             this.state
               .selectedObjectNames /*Ensure MosaicWindow content is updated when selectedObjectNames changes*/
@@ -917,7 +926,7 @@ export default class SceneEditor extends React.Component<Props, State> {
         </MosaicWindow>
       ),
       'object-groups-list': (
-        <MosaicWindow title="Object Groups">
+        <MosaicWindow title={<Trans>Object Groups</Trans>}>
           <ObjectGroupsList
             project={project}
             objectsContainer={layout}
@@ -1000,7 +1009,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           containerStyle={{ overflow: 'hidden' }}
         >
           <EditorBar
-            title="Instances"
+            title={<Trans>Instances</Trans>}
             iconElementLeft={
               <IconButton onClick={this.toggleInstancesList}>
                 <NavigationClose />
@@ -1020,7 +1029,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           openSecondary={true}
         >
           <EditorBar
-            title="Layers"
+            title={<Trans>Layers</Trans>}
             iconElementLeft={
               <IconButton onClick={this.toggleLayersList}>
                 <NavigationClose />
@@ -1035,15 +1044,24 @@ export default class SceneEditor extends React.Component<Props, State> {
           />
         </Drawer>
         <InfoBar
-          message="Drag and Drop the object to the scene or use the right click menu to add an instance of it."
+          message={
+            <Trans>
+              Drag and Drop the object to the scene or use the right click menu
+              to add an instance of it.
+            </Trans>
+          }
           show={!!this.state.selectedObjectNames.length}
         />
         <InfoBar
-          message="Objects panel is already opened: use it to add and edit objects."
+          message={
+            <Trans>
+              Objects panel is already opened: use it to add and edit objects.
+            </Trans>
+          }
           show={!!this.state.showObjectsListInfoBar}
         />
         <InfoBar
-          message="Properties panel is already opened."
+          message={<Trans>Properties panel is already opened.</Trans>}
           show={!!this.state.showPropertiesInfoBar}
         />
         <SetupGridDialog
@@ -1064,6 +1082,35 @@ export default class SceneEditor extends React.Component<Props, State> {
           onCancel={() => this.editInstanceVariables(null)}
           onApply={() => this.editInstanceVariables(null)}
           emptyExplanationMessage="Instance variables will override the default values of the variables of the object."
+          title="Instance Variables"
+          onEditObjectVariables={() => {
+            if (!this.instancesSelection.hasSelectedInstances()) {
+              return;
+            }
+            const associatedObjectName = this.instancesSelection
+              .getSelectedInstances()[0]
+              .getObjectName();
+            const object = getObjectByName(
+              project,
+              layout,
+              associatedObjectName
+            );
+            if (object) {
+              this.editObjectVariables(object);
+              this.editInstanceVariables(null);
+            }
+          }}
+        />
+        <VariablesEditorDialog
+          open={!!this.state.variablesEditedObject}
+          variablesContainer={
+            this.state.variablesEditedObject &&
+            this.state.variablesEditedObject.getVariables()
+          }
+          onCancel={() => this.editObjectVariables(null)}
+          onApply={() => this.editObjectVariables(null)}
+          emptyExplanationMessage="When you add variables to an object, any instance of the object put on the scene or created during the game will have these variables attached to it."
+          title="Object Variables"
         />
         <LayerRemoveDialog
           open={!!this.state.layerRemoveDialogOpen}
@@ -1085,6 +1132,7 @@ export default class SceneEditor extends React.Component<Props, State> {
           variablesContainer={layout.getVariables()}
           onCancel={() => this.editLayoutVariables(false)}
           onApply={() => this.editLayoutVariables(false)}
+          title="Scene variables"
           emptyExplanationMessage="Scene variables can be used to store any value or text during the game."
           emptyExplanationSecondMessage="For example, you can have a variable called Score representing the current score of the player."
         />

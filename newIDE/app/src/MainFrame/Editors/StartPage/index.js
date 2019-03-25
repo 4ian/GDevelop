@@ -1,8 +1,12 @@
 // @flow
+import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+
 import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Paper from 'material-ui/Paper';
 import IconButton from 'material-ui/IconButton';
+import Language from 'material-ui/svg-icons/action/language';
 import BaseEditor from '../BaseEditor';
 import Window from '../../../Utils/Window';
 import { Line } from '../../../UI/Grid';
@@ -62,100 +66,117 @@ class StartPage extends BaseEditor {
       onCloseProject,
       onOpenAboutDialog,
       onOpenHelpFinder,
+      onOpenLanguageDialog,
     } = this.props;
 
     return (
-      <ScrollBackground>
-        <div style={styles.innerContainer}>
-          <Line expand justifyContent="center">
-            <div style={styles.centerContainer}>
-              <Paper
-                zDepth={1}
-                style={{
-                  ...styles.logoPaper,
-                }}
-              >
-                <GDevelopLogo />
-                <p>
-                  GDevelop is an easy-to-use game creator with no programming
-                  language to learn.
-                </p>
-              </Paper>
-              {!project && canOpen && (
-                <RaisedButton
-                  label="Open a project"
-                  fullWidth
-                  onClick={onOpen}
-                  primary
-                />
-              )}
-              {!project && (
-                <RaisedButton
-                  label="Create a new project"
-                  fullWidth
-                  onClick={onCreate}
-                  primary
-                />
-              )}
-              {!!project && (
-                <RaisedButton
-                  label="Open Project Manager"
-                  fullWidth
-                  onClick={onOpenProjectManager}
-                  primary
-                />
-              )}
-              {!!project && (
-                <FlatButton
-                  label="Close project"
-                  fullWidth
-                  onClick={onCloseProject}
-                />
-              )}
-              {
-                <FlatButton
-                  label="Search the documentation"
-                  fullWidth
-                  onClick={onOpenHelpFinder}
-                />
-              }
+      <I18n>
+        {({ i18n }) => (
+          <ScrollBackground>
+            <div style={styles.innerContainer}>
+              <Line expand justifyContent="center">
+                <div style={styles.centerContainer}>
+                  <Paper
+                    zDepth={1}
+                    style={{
+                      ...styles.logoPaper,
+                    }}
+                  >
+                    <GDevelopLogo />
+                    <p>
+                      <Trans>
+                        GDevelop is an easy-to-use game creator with no
+                        programming language to learn.
+                      </Trans>
+                    </p>
+                  </Paper>
+                  {!project && canOpen && (
+                    <RaisedButton
+                      label={<Trans>Open a project</Trans>}
+                      fullWidth
+                      onClick={onOpen}
+                      primary
+                    />
+                  )}
+                  {!project && (
+                    <RaisedButton
+                      label={<Trans>Create a new project</Trans>}
+                      fullWidth
+                      onClick={onCreate}
+                      primary
+                    />
+                  )}
+                  {!!project && (
+                    <RaisedButton
+                      label={<Trans>Open Project Manager</Trans>}
+                      fullWidth
+                      onClick={onOpenProjectManager}
+                      primary
+                    />
+                  )}
+                  {!!project && (
+                    <FlatButton
+                      label={<Trans>Close project</Trans>}
+                      fullWidth
+                      onClick={onCloseProject}
+                    />
+                  )}
+                  {
+                    <FlatButton
+                      label={<Trans>Search the documentation</Trans>}
+                      fullWidth
+                      onClick={onOpenHelpFinder}
+                    />
+                  }
+                </div>
+              </Line>
+              <Line alignItems="center" justifyContent="space-between">
+                <Line>
+                  <FlatButton
+                    label={<Trans>About GDevelop</Trans>}
+                    onClick={onOpenAboutDialog}
+                  />
+                  <FlatButton
+                    label={<Trans>GDevelop Forums</Trans>}
+                    onClick={() =>
+                      Window.openExternalURL('https://forum.gdevelop-app.com')
+                    }
+                  />
+                  <FlatButton
+                    label={<Trans>Help and tutorials</Trans>}
+                    onClick={() =>
+                      Window.openExternalURL(
+                        'http://wiki.compilgames.net/doku.php/gdevelop5/start'
+                      )
+                    }
+                  />
+                </Line>
+                <Line alignItems="center">
+                  <FlatButton
+                    label={i18n.language}
+                    onClick={onOpenLanguageDialog}
+                    icon={<Language />}
+                  />
+                  <IconButton
+                    iconClassName="icon-facebook"
+                    onClick={() =>
+                      Window.openExternalURL(
+                        'https://www.facebook.com/GDevelopApp'
+                      )
+                    }
+                  />
+                  <IconButton
+                    iconClassName="icon-twitter"
+                    onClick={() =>
+                      Window.openExternalURL('https://twitter.com/GDevelopApp')
+                    }
+                  />
+                </Line>
+              </Line>
             </div>
-          </Line>
-          <Line alignItems="center" justifyContent="space-between">
-            <div>
-              <FlatButton label="About GDevelop" onClick={onOpenAboutDialog} />
-              <FlatButton
-                label="Gdevelop Forums"
-                onClick={() =>
-                  Window.openExternalURL('http://forum.compilgames.net')
-                }
-              />
-              <FlatButton
-                label="Help and tutorials"
-                onClick={() =>
-                  Window.openExternalURL(
-                    'http://wiki.compilgames.net/doku.php/gdevelop5/start'
-                  )
-                }
-              />
-            </div>
-            <div>
-              <IconButton
-                iconClassName="icon-facebook"
-                onClick={() =>
-                  Window.openExternalURL('https://www.facebook.com/GDevelopApp')
-                }
-              />
-              <IconButton
-                iconClassName="icon-twitter"
-                onClick={() =>
-                  Window.openExternalURL('https://twitter.com/GDevelopApp')
-                }
-              />
-            </div>
-          </Line>
-        </div>
-      </ScrollBackground>
+          </ScrollBackground>
+        )}
+      </I18n>
     );
   }
 }

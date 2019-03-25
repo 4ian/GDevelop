@@ -1,4 +1,9 @@
 // @flow
+import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+
 import * as React from 'react';
 import TextField from 'material-ui/TextField';
 import { Column, Line } from '../UI/Grid';
@@ -45,10 +50,12 @@ const styles = {
   },
 };
 
-const validateParameterName = (newName: string) => {
+const validateParameterName = (i18n: I18nType, newName: string) => {
   if (!gd.Project.validateObjectName(newName)) {
     showWarningBox(
-      'This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your parameter name.'
+      i18n._(
+        t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your parameter name.`
+      )
     );
     return false;
   }
@@ -97,203 +104,225 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     const type = eventsFunction.getFunctionType();
 
     return (
-      <Column noMargin>
-        <div style={styles.scrollView}>
-          <Column>
-            <Line noMargin alignItems="center">
-              <img src="res/function32.png" alt="" style={styles.icon} />
-              <SelectField
-                value={type}
-                onChange={(e, i, value) => {
-                  eventsFunction.setFunctionType(value);
-                  this.forceUpdate();
-                }}
-              >
-                <MenuItem
-                  value={gd.EventsFunction.Action}
-                  primaryText="Action"
-                />
-                <MenuItem
-                  value={gd.EventsFunction.Condition}
-                  primaryText="Condition"
-                />
-                <MenuItem
-                  value={gd.EventsFunction.Expression}
-                  primaryText="Expression"
-                />
-                <MenuItem
-                  value={gd.EventsFunction.StringExpression}
-                  primaryText="String Expression"
-                />
-              </SelectField>
-              <TextField
-                hintText="Full name displayed in editor"
-                value={eventsFunction.getFullName()}
-                onChange={(e, text) => {
-                  eventsFunction.setFullName(text);
-                  this.forceUpdate();
-                }}
-              />
-            </Line>
-            <Line noMargin>
-              <TextField
-                hintText="Description, displayed in editor"
-                fullWidth
-                multiLine
-                value={eventsFunction.getDescription()}
-                onChange={(e, text) => {
-                  eventsFunction.setDescription(text);
-                  this.forceUpdate();
-                }}
-              />
-            </Line>
-            <Line noMargin>
-              {type === gd.EventsFunction.Action ||
-              type === gd.EventsFunction.Condition ? (
-                <TextField
-                  hintText="Sentence in Events Sheet (write _PARAMx_ for parameters, e.g: _PARAM1_)"
-                  fullWidth
-                  value={eventsFunction.getSentence()}
-                  onChange={(e, text) => {
-                    eventsFunction.setSentence(text);
-                    this.forceUpdate();
-                  }}
-                />
-              ) : null}
-            </Line>
-          </Column>
-          <Line noMargin>
-            <div style={styles.parametersContainer}>
-              {mapVector(
-                parameters,
-                (parameter: gdParameterMetadata, i: number) => (
-                  <React.Fragment key={i}>
-                    <MiniToolbar>
-                      <MiniToolbarText>Parameter #{i + 1}:</MiniToolbarText>
-                      <Column expand noMargin>
-                        <SemiControlledTextField
-                          hintText="Enter the parameter name"
-                          value={parameter.getName()}
-                          onChange={text => {
-                            if (!validateParameterName(text)) return;
-
-                            parameter.setName(text);
-                            this.forceUpdate();
-                            this.props.onParametersUpdated();
-                          }}
-                          commitOnBlur
-                        />
-                      </Column>
-                      <IconMenu
-                        iconButtonElement={
-                          <IconButton>
-                            <MoreVertIcon />
-                          </IconButton>
-                        }
-                        buildMenuTemplate={() => [
-                          {
-                            label: 'Delete',
-                            click: () => this._removeParameter(i),
-                          },
-                        ]}
-                      />
-                    </MiniToolbar>
-                    <Line expand noMargin>
-                      <Column expand>
-                        <SelectField
-                          floatingLabelText="Type"
-                          value={parameter.getType()}
-                          onChange={(e, i, value) => {
-                            parameter.setType(value);
-                            this.forceUpdate();
-                            this.props.onParametersUpdated();
-                          }}
-                          fullWidth
-                        >
-                          <MenuItem value="objectList" primaryText="Objects" />
-                          <MenuItem value="expression" primaryText="Number" />
-                          <MenuItem
-                            value="string"
-                            primaryText="String (text)"
-                          />
-                          <MenuItem
-                            value="key"
-                            primaryText="Keyboard Key (text)"
-                          />
-                          <MenuItem
-                            value="mouse"
-                            primaryText="Mouse button (text)"
-                          />
-                        </SelectField>
-                      </Column>
-                      {parameter.getType() === 'objectList' && (
-                        <Column expand>
-                          <SelectField
-                            floatingLabelText="Object type"
-                            floatingLabelFixed
-                            value={parameter.getExtraInfo()}
-                            onChange={(e, i, value) => {
-                              parameter.setExtraInfo(value);
-                              this.forceUpdate();
-                              this.props.onParametersUpdated();
-                            }}
-                            fullWidth
-                          >
-                            <MenuItem value="" primaryText="Any object" />
-                            {objectMetadata.map(
-                              (metadata: EnumeratedObjectMetadata) => {
-                                if (metadata.name === '') {
-                                  // Base object is an "abstract" object
-                                  return null;
-                                }
-
-                                return (
-                                  <MenuItem
-                                    key={metadata.name}
-                                    value={metadata.name}
-                                    primaryText={metadata.fullName}
-                                  />
-                                );
-                              }
-                            )}
-                          </SelectField>
-                        </Column>
-                      )}
-                    </Line>
-                    <Line expand noMargin>
-                      <Column expand>
-                        <TextField
-                          floatingLabelText="Description"
-                          value={parameter.getDescription()}
-                          onChange={(e, text) => {
-                            parameter.setDescription(text);
-                            this.forceUpdate();
-                          }}
-                          fullWidth
-                        />
-                      </Column>
-                    </Line>
-                  </React.Fragment>
-                )
-              )}
-              {parameters.size() === 0 ? (
-                <EmptyMessage>No parameters for this function.</EmptyMessage>
-              ) : null}
-              <Line justifyContent="space-between">
-                <Column>
-                  <HelpButton helpPagePath="/events/functions" />
-                </Column>
-                <Column>
-                  <FlatButton
-                    label="Add a parameter"
-                    onClick={this._addParameter}
+      <I18n>
+        {({ i18n }) => (
+          <Column noMargin>
+            <div style={styles.scrollView}>
+              <Column>
+                <Line noMargin alignItems="center">
+                  <img src="res/function32.png" alt="" style={styles.icon} />
+                  <SelectField
+                    value={type}
+                    onChange={(e, i, value) => {
+                      eventsFunction.setFunctionType(value);
+                      this.forceUpdate();
+                    }}
+                  >
+                    <MenuItem
+                      value={gd.EventsFunction.Action}
+                      primaryText={<Trans>Action</Trans>}
+                    />
+                    <MenuItem
+                      value={gd.EventsFunction.Condition}
+                      primaryText={<Trans>Condition</Trans>}
+                    />
+                    <MenuItem
+                      value={gd.EventsFunction.Expression}
+                      primaryText={<Trans>Expression</Trans>}
+                    />
+                    <MenuItem
+                      value={gd.EventsFunction.StringExpression}
+                      primaryText={<Trans>String Expression</Trans>}
+                    />
+                  </SelectField>
+                  <TextField
+                    hintText={<Trans>Full name displayed in editor</Trans>}
+                    value={eventsFunction.getFullName()}
+                    onChange={(e, text) => {
+                      eventsFunction.setFullName(text);
+                      this.forceUpdate();
+                    }}
                   />
-                </Column>
+                </Line>
+                <Line noMargin>
+                  <TextField
+                    hintText={<Trans>Description, displayed in editor</Trans>}
+                    fullWidth
+                    multiLine
+                    value={eventsFunction.getDescription()}
+                    onChange={(e, text) => {
+                      eventsFunction.setDescription(text);
+                      this.forceUpdate();
+                    }}
+                  />
+                </Line>
+                <Line noMargin>
+                  {type === gd.EventsFunction.Action ||
+                  type === gd.EventsFunction.Condition ? (
+                    <TextField
+                      hintText={
+                        <Trans>
+                          Sentence in Events Sheet (write _PARAMx_ for
+                          parameters, e.g: _PARAM1_)
+                        </Trans>
+                      }
+                      fullWidth
+                      value={eventsFunction.getSentence()}
+                      onChange={(e, text) => {
+                        eventsFunction.setSentence(text);
+                        this.forceUpdate();
+                      }}
+                    />
+                  ) : null}
+                </Line>
+              </Column>
+              <Line noMargin>
+                <div style={styles.parametersContainer}>
+                  {mapVector(
+                    parameters,
+                    (parameter: gdParameterMetadata, i: number) => (
+                      <React.Fragment key={i}>
+                        <MiniToolbar>
+                          <MiniToolbarText>
+                            <Trans>Parameter #{i + 1}:</Trans>
+                          </MiniToolbarText>
+                          <Column expand noMargin>
+                            <SemiControlledTextField
+                              hintText={<Trans>Enter the parameter name</Trans>}
+                              value={parameter.getName()}
+                              onChange={text => {
+                                if (!validateParameterName(i18n, text)) return;
+
+                                parameter.setName(text);
+                                this.forceUpdate();
+                                this.props.onParametersUpdated();
+                              }}
+                              commitOnBlur
+                            />
+                          </Column>
+                          <IconMenu
+                            iconButtonElement={
+                              <IconButton>
+                                <MoreVertIcon />
+                              </IconButton>
+                            }
+                            buildMenuTemplate={() => [
+                              {
+                                label: i18n._(t`Delete`),
+                                click: () => this._removeParameter(i),
+                              },
+                            ]}
+                          />
+                        </MiniToolbar>
+                        <Line expand noMargin>
+                          <Column expand>
+                            <SelectField
+                              floatingLabelText={<Trans>Type</Trans>}
+                              value={parameter.getType()}
+                              onChange={(e, i, value) => {
+                                parameter.setType(value);
+                                this.forceUpdate();
+                                this.props.onParametersUpdated();
+                              }}
+                              fullWidth
+                            >
+                              <MenuItem
+                                value="objectList"
+                                primaryText={<Trans>Objects</Trans>}
+                              />
+                              <MenuItem
+                                value="expression"
+                                primaryText={<Trans>Number</Trans>}
+                              />
+                              <MenuItem
+                                value="string"
+                                primaryText={<Trans>String (text)</Trans>}
+                              />
+                              <MenuItem
+                                value="key"
+                                primaryText={<Trans>Keyboard Key (text)</Trans>}
+                              />
+                              <MenuItem
+                                value="mouse"
+                                primaryText={<Trans>Mouse button (text)</Trans>}
+                              />
+                            </SelectField>
+                          </Column>
+                          {parameter.getType() === 'objectList' && (
+                            <Column expand>
+                              <SelectField
+                                floatingLabelText={<Trans>Object type</Trans>}
+                                floatingLabelFixed
+                                value={parameter.getExtraInfo()}
+                                onChange={(e, i, value) => {
+                                  parameter.setExtraInfo(value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                fullWidth
+                              >
+                                <MenuItem
+                                  value=""
+                                  primaryText={<Trans>Any object</Trans>}
+                                />
+                                {objectMetadata.map(
+                                  (metadata: EnumeratedObjectMetadata) => {
+                                    if (metadata.name === '') {
+                                      // Base object is an "abstract" object
+                                      return null;
+                                    }
+
+                                    return (
+                                      <MenuItem
+                                        key={metadata.name}
+                                        value={metadata.name}
+                                        primaryText={metadata.fullName}
+                                      />
+                                    );
+                                  }
+                                )}
+                              </SelectField>
+                            </Column>
+                          )}
+                        </Line>
+                        <Line expand noMargin>
+                          <Column expand>
+                            <TextField
+                              floatingLabelText={<Trans>Description</Trans>}
+                              value={parameter.getDescription()}
+                              onChange={(e, text) => {
+                                parameter.setDescription(text);
+                                this.forceUpdate();
+                              }}
+                              fullWidth
+                            />
+                          </Column>
+                        </Line>
+                      </React.Fragment>
+                    )
+                  )}
+                  {parameters.size() === 0 ? (
+                    <EmptyMessage>
+                      <Trans>No parameters for this function.</Trans>
+                    </EmptyMessage>
+                  ) : null}
+                  <Line justifyContent="space-between">
+                    <Column>
+                      <HelpButton helpPagePath="/events/functions" />
+                    </Column>
+                    <Column>
+                      <FlatButton
+                        label={<Trans>Add a parameter</Trans>}
+                        onClick={this._addParameter}
+                      />
+                    </Column>
+                  </Line>
+                </div>
               </Line>
             </div>
-          </Line>
-        </div>
-      </Column>
+          </Column>
+        )}
+      </I18n>
     );
   }
 }

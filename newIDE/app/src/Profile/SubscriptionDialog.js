@@ -1,4 +1,5 @@
 // @flow
+import { Trans } from '@lingui/macro';
 
 import React, { Component } from 'react';
 import { Card, CardActions, CardHeader } from 'material-ui/Card';
@@ -163,7 +164,7 @@ export default class SubscriptionDialog extends Component<Props, State> {
           <Dialog
             actions={[
               <FlatButton
-                label="Close"
+                label={<Trans>Close</Trans>}
                 key="close"
                 primary={false}
                 onClick={onClose}
@@ -177,10 +178,12 @@ export default class SubscriptionDialog extends Component<Props, State> {
             <Column>
               <Line>
                 <p>
-                  Get a subscription to package your games for Android, Windows,
-                  macOS and Linux, use live preview over wifi and more. With a
-                  subscription, you're also supporting the development of
-                  GDevelop, which is an open-source software.
+                  <Trans>
+                    Get a subscription to package your games for Android,
+                    Windows, macOS and Linux, use live preview over wifi and
+                    more. With a subscription, you're also supporting the
+                    development of GDevelop, which is an open-source software.
+                  </Trans>
                 </p>
               </Line>
             </Column>
@@ -210,7 +213,7 @@ export default class SubscriptionDialog extends Component<Props, State> {
                   userProfile.subscription.planId === plan.planId ? (
                     <FlatButton
                       disabled
-                      label="This is your current plan"
+                      label={<Trans>This is your current plan</Trans>}
                       onClick={() => this.choosePlan(userProfile, plan)}
                     />
                   ) : plan.planId ? (
@@ -218,14 +221,14 @@ export default class SubscriptionDialog extends Component<Props, State> {
                       <RaisedButton
                         primary
                         disabled={this._isLoading(userProfile)}
-                        label="Choose this plan"
+                        label={<Trans>Choose this plan</Trans>}
                         onClick={() => this.choosePlan(userProfile, plan)}
                       />
                     </LeftLoader>
                   ) : (
                     <LeftLoader isLoading={this._isLoading(userProfile)}>
                       <FlatButton
-                        label="Choose"
+                        label={<Trans>Choose</Trans>}
                         onClick={() => this.choosePlan(userProfile, plan)}
                       />
                     </LeftLoader>
@@ -236,26 +239,33 @@ export default class SubscriptionDialog extends Component<Props, State> {
             <Column>
               <Line>
                 <EmptyMessage>
-                  Subscriptions can be stopped at any time. GDevelop uses
-                  Stripe.com for secure payment. No credit card data is stored
-                  by GDevelop: everything is managed by Stripe secure
-                  infrastructure.
+                  <Trans>
+                    Subscriptions can be stopped at any time. GDevelop uses
+                    Stripe.com for secure payment. No credit card data is stored
+                    by GDevelop: everything is managed by Stripe secure
+                    infrastructure.
+                  </Trans>
                 </EmptyMessage>
               </Line>
             </Column>
             {!userProfile.authenticated && (
               <PlaceholderMessage>
                 <p>
-                  Create a GDevelop account to continue. It's free and you'll be
-                  able to access to online services like one-click build for
-                  Android:
+                  <Trans>
+                    Create a GDevelop account to continue. It's free and you'll
+                    be able to access to online services like one-click build
+                    for Android:
+                  </Trans>
                 </p>
                 <RaisedButton
-                  label="Create my account"
+                  label={<Trans>Create my account</Trans>}
                   primary
                   onClick={userProfile.onLogin}
                 />
-                <FlatButton label="Not now, thanks" onClick={onClose} />
+                <FlatButton
+                  label={<Trans>Not now, thanks</Trans>}
+                  onClick={onClose}
+                />
               </PlaceholderMessage>
             )}
           </Dialog>

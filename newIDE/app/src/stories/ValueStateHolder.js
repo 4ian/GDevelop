@@ -3,7 +3,7 @@ import * as React from 'react';
 
 type Props = {|
   initialValue: any,
-  render: (value: any, onChange: (value: any) => void) => React.Element<*>,
+  render: (value: any, onChange: (value: any) => void) => React.Node,
 |};
 
 type State = {|

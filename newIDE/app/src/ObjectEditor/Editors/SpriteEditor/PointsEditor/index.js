@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import EmptyMessage from '../../../../UI/EmptyMessage';
 import { Line, Column } from '../../../../UI/Grid';
@@ -191,8 +192,14 @@ export default class PointsEditor extends Component {
               sameForAllSprites={samePointsForSprites}
               setSameForAllAnimations={this._setSamePointsForAllAnimations}
               setSameForAllSprites={this._setSamePointsForAllSprites}
-              setSameForAllAnimationsLabel="Share same points for all animations"
-              setSameForAllSpritesLabel="Share same points for all sprites of this animation"
+              setSameForAllAnimationsLabel={
+                <Trans>Share same points for all animations</Trans>
+              }
+              setSameForAllSpritesLabel={
+                <Trans>
+                  Share same points for all sprites of this animation
+                </Trans>
+              }
             />
           </Column>
         </Line>
@@ -204,7 +211,7 @@ export default class PointsEditor extends Component {
         )}
         {!sprite && (
           <EmptyMessage>
-            Choose an animation and frame to edit the points
+            <Trans>Choose an animation and frame to edit the points</Trans>
           </EmptyMessage>
         )}
       </div>

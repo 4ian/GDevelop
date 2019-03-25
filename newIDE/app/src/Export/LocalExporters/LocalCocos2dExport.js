@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -86,9 +87,11 @@ export default class LocalCocos2dExport extends Component {
     return (
       <Column noMargin>
         <Line>
-          This will export your game using Cocos2d-JS game engine. The game can
-          be compiled for Android or iOS if you install Cocos2d-JS developer
-          tools.
+          <Trans>
+            This will export your game using Cocos2d-JS game engine. The game
+            can be compiled for Android or iOS if you install Cocos2d-JS
+            developer tools.
+          </Trans>
         </Line>
         <Line>
           <LocalFolderPicker
@@ -107,30 +110,34 @@ export default class LocalCocos2dExport extends Component {
             }
             toggled={this.state.debugMode}
             labelPosition="right"
-            label="Debug mode (show FPS counter and stats in the bottom left)"
+            label={
+              <Trans>
+                Debug mode (show FPS counter and stats in the bottom left)
+              </Trans>
+            }
           />
         </Line>
         <Line>
           <Spacer expand />
           <RaisedButton
-            label="Export"
+            label={<Trans>Export</Trans>}
             primary={true}
             onClick={this.launchExport}
             disabled={!this.state.outputDir}
           />
         </Line>
         <Dialog
-          title="Export finished"
+          title={<Trans>Export finished</Trans>}
           actions={[
             <FlatButton
               key="open"
-              label="Open folder"
+              label={<Trans>Open folder</Trans>}
               primary={true}
               onClick={this.openExportFolder}
             />,
             <FlatButton
               key="close"
-              label="Close"
+              label={<Trans>Close</Trans>}
               primary={false}
               onClick={() =>
                 this.setState({

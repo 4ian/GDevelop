@@ -54,6 +54,7 @@ import BehaviorsEditor from '../BehaviorsEditor';
 import ObjectGroupEditor from '../ObjectGroupEditor';
 import ObjectGroupsList from '../ObjectGroupsList';
 import muiDecorator from './MuiDecorator';
+import i18nProviderDecorator from './I18nProviderDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
@@ -99,7 +100,7 @@ import BuildStepsProgress from '../Export/Builds/BuildStepsProgress';
 import MeasuresTable from '../Debugger/Profiler/MeasuresTable';
 import Profiler from '../Debugger/Profiler';
 import SearchPanel from '../EventsSheet/SearchPanel';
-import { I18nextProvider } from 'react-i18next';
+import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
 import PlaceholderMessage from '../UI/PlaceholderMessage';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
 import InlineCheckbox from '../UI/InlineCheckbox';
@@ -107,7 +108,6 @@ import LoaderModal from '../UI/LoaderModal';
 import ColorField from '../UI/ColorField';
 import EmptyMessage from '../UI/EmptyMessage';
 import BackgroundText from '../UI/BackgroundText';
-import i18n from '../UI/i18n';
 import ObjectField from '../EventsSheet/ParameterFields/ObjectField';
 import { getInitialSelection } from '../EventsSheet/SelectionHandler';
 import EventsFunctionConfigurationEditor from '../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor';
@@ -118,6 +118,8 @@ import ProjectManager from '../ProjectManager';
 import AlertMessage from '../UI/AlertMessage';
 import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
+
+// No i18n in this file
 
 const gd = global.gd;
 const {
@@ -640,27 +642,27 @@ storiesOf('LocalExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <I18nextProvider i18n={i18n}>
+    <GDI18nProvider language="en">
       <LocalExport open project={project} onClose={action('close')} />
-    </I18nextProvider>
+    </GDI18nProvider>
   ));
 
 storiesOf('LocalS3Export', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <I18nextProvider i18n={i18n}>
+    <GDI18nProvider language="en">
       <LocalS3Export open project={project} onClose={action('close')} />
-    </I18nextProvider>
+    </GDI18nProvider>
   ));
 
 storiesOf('LocalCordovaExport', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <I18nextProvider i18n={i18n}>
+    <GDI18nProvider language="en">
       <LocalCordovaExport project={project} />
-    </I18nextProvider>
+    </GDI18nProvider>
   ));
 
 storiesOf('BuildStepsProgress', module)
@@ -887,7 +889,10 @@ storiesOf('LocalFilePicker', module)
 
 storiesOf('StartPage', module)
   .addDecorator(muiDecorator)
-  .add('default', () => <StartPage />);
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <StartPage onOpenLanguageDialog={action('open language dialog')} />
+  ));
 
 storiesOf('DebuggerContent', module)
   .addDecorator(muiDecorator)
@@ -1070,6 +1075,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           showNetworkPreviewButton={false}
           showPreviewButton={false}
+          openInstructionOrExpression={action('open instruction or expression')}
         />
       </div>
     </DragDropContextProvider>
@@ -1096,6 +1102,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           showNetworkPreviewButton={false}
           showPreviewButton={false}
+          openInstructionOrExpression={action('open instruction or expression')}
         />
       </div>
     </DragDropContextProvider>
@@ -1180,6 +1187,7 @@ storiesOf('InstructionEditor', module)
         return Promise.reject();
       }}
       resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
     />
   ))
   .add('without layout', () => (
@@ -1196,6 +1204,7 @@ storiesOf('InstructionEditor', module)
         return Promise.reject();
       }}
       resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
     />
   ));
 
@@ -1375,6 +1384,9 @@ storiesOf('InstancePropertiesEditor', module)
         project={project}
         layout={testLayout}
         instances={[testLayoutInstance1]}
+        editInstanceVariables={action('edit instance variables')}
+        editObjectVariables={action('edit object variables')}
+        onEditObjectByName={action('edit object')}
       />
     </SerializedObjectDisplay>
   ));
@@ -1688,6 +1700,7 @@ storiesOf('SubscriptionCheckDialog', module)
     <RefGetter onRef={ref => ref.checkHasSubscription()}>
       <SubscriptionCheckDialog
         title="Preview over wifi"
+        id="Preview over wifi"
         userProfile={fakeNoSubscriptionUserProfile}
         onChangeSubscription={action('change subscription')}
         mode="try"
@@ -1698,6 +1711,7 @@ storiesOf('SubscriptionCheckDialog', module)
     <RefGetter onRef={ref => ref.checkHasSubscription()}>
       <SubscriptionCheckDialog
         title="Preview over wifi"
+        id="Preview over wifi"
         userProfile={fakeNoSubscriptionUserProfile}
         onChangeSubscription={action('change subscription')}
         mode="mandatory"
@@ -1793,6 +1807,8 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
             action('Choose resource from source', source)
           }
           resourceExternalEditors={[]}
+          openInstructionOrExpression={action('open instruction or expression')}
+          initiallyFocusedFunctionName={null}
         />
       </div>
     </DragDropContextProvider>

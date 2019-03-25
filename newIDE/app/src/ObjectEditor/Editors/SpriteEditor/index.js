@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import { GridList, GridTile } from 'material-ui/GridList';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
@@ -120,7 +122,7 @@ class Animation extends React.Component<AnimationProps, void> {
             <SemiControlledTextField
               commitOnBlur
               value={animation.getName()}
-              hintText="Optional animation name"
+              hintText={<Trans>Optional animation name</Trans>}
               onChange={text => onChangeName(text)}
             />
           </span>
@@ -439,13 +441,13 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           extraBottomTools={
             <div>
               <RaisedButton
-                label="Edit hitboxes"
+                label={<Trans>Edit hitboxes</Trans>}
                 primary={false}
                 onClick={() => this.openCollisionMasksEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
               />
               <RaisedButton
-                label="Edit points"
+                label={<Trans>Edit points</Trans>}
                 primary={false}
                 onClick={() => this.openPointsEditor(true)}
                 disabled={spriteObject.getAnimationsCount() === 0}
@@ -457,7 +459,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           <Dialog
             actions={
               <FlatButton
-                label="Close"
+                label={<Trans>Close</Trans>}
                 primary
                 onClick={() => this.openPointsEditor(false)}
               />
@@ -483,7 +485,7 @@ export default class SpriteEditor extends React.Component<EditorProps, State> {
           <Dialog
             actions={
               <FlatButton
-                label="Close"
+                label={<Trans>Close</Trans>}
                 primary
                 onClick={() => this.openCollisionMasksEditor(false)}
               />

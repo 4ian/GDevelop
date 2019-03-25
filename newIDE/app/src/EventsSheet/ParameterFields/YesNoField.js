@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import { Line, Column } from '../../UI/Grid';
@@ -29,7 +31,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
         <Column noMargin>
           <RaisedButton
             style={styles.button}
-            label="Yes"
+            label={<Trans>Yes</Trans>}
             primary={this.props.value === 'yes'}
             onClick={() => this.props.onChange('yes')}
           />
@@ -37,7 +39,7 @@ export default class YesNoField extends Component<ParameterFieldProps, void> {
         <Column noMargin>
           <RaisedButton
             style={styles.button}
-            label="No"
+            label={<Trans>No</Trans>}
             primary={this.props.value === 'no'}
             onClick={() => this.props.onChange('no')}
           />

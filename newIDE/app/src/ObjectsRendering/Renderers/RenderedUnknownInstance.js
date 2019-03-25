@@ -1,5 +1,5 @@
 import RenderedInstance from './RenderedInstance';
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 
 /**
  * Objects with an unknown type are rendered with a placeholder rectangle.

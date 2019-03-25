@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import { setupAutocompletions } from './LocalCodeEditorAutocompletions';
 import PlaceholderLoader from '../UI/PlaceholderLoader';
@@ -103,8 +105,13 @@ export class CodeEditor extends React.Component<Props, State> {
     if (error) {
       return (
         <React.Fragment>
-          <p>Unable to load the code editor</p>
-          <RaisedButton label="Retry" onClick={this.loadMonacoEditor} />
+          <p>
+            <Trans>Unable to load the code editor</Trans>
+          </p>
+          <RaisedButton
+            label={<Trans>Retry</Trans>}
+            onClick={this.loadMonacoEditor}
+          />
         </React.Fragment>
       );
     }

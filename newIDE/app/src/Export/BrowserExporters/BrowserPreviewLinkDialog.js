@@ -1,22 +1,28 @@
+// @flow
+import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+
 import React, { Component } from 'react';
 import Dialog from '../../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import { showErrorBox } from '../../UI/Messages/MessageBox';
 import { Column, Line } from '../../UI/Grid';
 
-export default class BrowserPreviewLinkDialog extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      value: 0,
-    };
-  }
+type Props = {|
+  url: ?string,
+  onClose: () => void,
+|};
 
-  _onOpen = value => {
+export default class BrowserPreviewLinkDialog extends Component<Props> {
+  _makeOnOpen = (i18n: I18nType) => () => {
     const windowObjectReference = window.open(this.props.url, '_blank');
     if (!windowObjectReference) {
       showErrorBox(
-        'Unable to open the preview! Be sure that popup are allowed for this website.',
+        i18n._(
+          t`Unable to open the preview! Be sure that popup are allowed for this website.`
+        ),
         undefined
       );
     }
@@ -24,30 +30,46 @@ export default class BrowserPreviewLinkDialog extends Component {
   };
 
   render() {
-    const { url, open } = this.props;
-    if (!open || !url) return null;
-
-    const actions = [
-      <FlatButton label="Launch the preview" primary onClick={this._onOpen} />,
-    ];
+    const { url } = this.props;
+    if (!url) return null;
 
     return (
-      <Dialog actions={actions} modal open={open}>
-        <Line>
-          <Column>
-            Your preview is ready! Click on the button to launch the preview.
-          </Column>
-        </Line>
-        <Line>
-          <Column>
-            <span>
-              To skip this dialog and <b>directly open the preview next time</b>
-              , please allow popups to be opened for this website in your
-              browser.
-            </span>
-          </Column>
-        </Line>
-      </Dialog>
+      <I18n>
+        {({ i18n }) => (
+          <Dialog
+            actions={[
+              <FlatButton
+                key="launch-preview"
+                label={<Trans>Launch the preview</Trans>}
+                primary
+                onClick={this._makeOnOpen(i18n)}
+              />,
+            ]}
+            modal
+            open
+          >
+            <Line>
+              <Column>
+                <Trans>
+                  Your preview is ready! Click on the button to launch the
+                  preview.
+                </Trans>
+              </Column>
+            </Line>
+            <Line>
+              <Column>
+                <span>
+                  <Trans>
+                    To skip this dialog and{' '}
+                    <b>directly open the preview next time</b>, please allow
+                    popups to be opened for this website in your browser.
+                  </Trans>
+                </span>
+              </Column>
+            </Line>
+          </Dialog>
+        )}
+      </I18n>
     );
   }
 }

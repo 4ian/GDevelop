@@ -86,6 +86,10 @@ CppPlatform::CppPlatform() : gd::Platform() {
     CodeCompiler::Get()->SetMustDeleteTemporaries(deleteTemporaries);
 #endif
 
+  ReloadBuiltinExtensions();
+}
+
+void CppPlatform::ReloadBuiltinExtensions() {
   std::cout << "* Loading builtin extensions... ";
   std::cout.flush();
   AddExtension(std::make_shared<BaseObjectExtension>());

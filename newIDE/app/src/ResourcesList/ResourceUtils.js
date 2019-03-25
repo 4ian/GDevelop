@@ -6,22 +6,23 @@ const fs = optionalRequire('fs');
 export const RESOURCE_EXTENSIONS = {
   image: 'png,jpg,jpeg,PNG,JPG,JPEG',
   audio: 'wav,mp3,ogg,WAV,MP3,OGG',
-  font: 'ttf,ttc,TTF,TTC',
+  font: 'ttf,ttc,otf,TTF,TTC,OTF',
+  video: 'mp4,MP4',
 };
 
 export const createOrUpdateResource = (
   project: gdProject,
-  gdResource: gdResource,
+  resource: gdResource,
   resourceName: string
 ) => {
   const resourcesManager = project.getResourcesManager();
   if (resourcesManager.hasResource(resourceName)) {
     resourcesManager.removeResource(resourceName);
   }
-  gdResource.setFile(resourceName);
-  gdResource.setName(resourceName);
-  resourcesManager.addResource(gdResource);
-  gdResource.delete();
+  resource.setFile(resourceName);
+  resource.setName(resourceName);
+  resourcesManager.addResource(resource);
+  resource.delete();
 };
 
 export const getLocalResourceFullPath = (

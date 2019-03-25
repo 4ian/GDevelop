@@ -6,6 +6,7 @@ export type AlertMessageIdentifier =
   | 'use-nearest-scale-mode';
 
 export type PreferencesValues = {|
+  language: string,
   autoDownloadUpdates: boolean,
   themeName: string,
   codeEditorThemeName: string,
@@ -16,6 +17,7 @@ export type PreferencesValues = {|
 
 export type Preferences = {|
   values: PreferencesValues,
+  setLanguage: (language: string) => void,
   setThemeName: (themeName: string) => void,
   setCodeEditorThemeName: (codeEditorThemeName: string) => void,
   setAutoDownloadUpdates: (enabled: boolean) => void,
@@ -27,6 +29,7 @@ export type Preferences = {|
 
 export const initialPreferences = {
   values: {
+    language: 'en',
     autoDownloadUpdates: true,
     themeName: 'GDevelop default',
     codeEditorThemeName: 'vs-dark',
@@ -34,6 +37,7 @@ export const initialPreferences = {
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
   },
+  setLanguage: () => {},
   setThemeName: () => {},
   setCodeEditorThemeName: () => {},
   setAutoDownloadUpdates: () => {},

@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import { sendNewGameCreated } from '../Utils/Analytics/EventSender';
 import { Column, Line } from '../UI/Grid';
@@ -16,6 +17,7 @@ const exampleNames = [
   'basic-ai-with-pathfinding',
   'basic-artificial-intelligence',
   'basic-topdown-car-driving',
+  'betabox-basics-learning-experience',
   'bomb-the-crate',
   'bouncing-ball-and-rope',
   'breakout',
@@ -42,6 +44,7 @@ const exampleNames = [
   'exit-app',
   'facebook-instant-game',
   'find-diagonals',
+  'geodash',
   'health-bar',
   'infinite-scrolling-background',
   'inventory-system',
@@ -114,7 +117,9 @@ export default class BrowserExamples extends Component {
     return (
       <Column noMargin>
         <Column>
-          <p>Choose or search for an example to open:</p>
+          <p>
+            <Trans>Choose or search for an example to open:</Trans>
+          </p>
         </Column>
         <Line>
           <ExamplesList

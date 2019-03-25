@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -46,11 +48,11 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
 
     return (
       <Dialog
-        title="Help!"
+        title={<Trans>Help!</Trans>}
         onRequestClose={onClose}
         actions={[
           <FlatButton
-            label="Close"
+            label={<Trans>Close</Trans>}
             key="close"
             primary={false}
             onClick={onClose}
@@ -61,9 +63,9 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
             key="forum"
             primary={false}
             onClick={() => {
-              Window.openExternalURL('http://forum.compilgames.net');
+              Window.openExternalURL('https://forum.gdevelop-app.com');
             }}
-            label="Community forum"
+            label={<Trans>Community forum</Trans>}
           />,
           <FlatButton
             key="wiki"
@@ -73,7 +75,7 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
                 'http://wiki.compilgames.net/doku.php/gdevelop5/start'
               );
             }}
-            label="Wiki"
+            label={<Trans>Wiki</Trans>}
           />,
         ]}
         open={open}

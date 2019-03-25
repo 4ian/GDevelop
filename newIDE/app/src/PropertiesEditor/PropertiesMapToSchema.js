@@ -23,54 +23,110 @@ export default (
     const name = propertyNames.at(i);
     const property = properties.get(name);
     const valueType = property.getType().toLowerCase();
-    const choices = property
-      .getExtraInfo()
-      .toJSArray()
-      .map(value => ({ value, label: value }));
-
-    return {
-      name,
-      valueType,
-      getChoices: valueType === 'choice' ? () => choices : undefined,
-      getValue: instance => {
-        // Instance custom properties are always stored as string, cast them if necessary
-        const rawValue = getProperties(instance)
-          .get(name)
-          .getValue();
-        if (valueType === 'boolean') {
-          return rawValue === 'true';
-        } else if (valueType === 'number') {
-          return parseFloat(rawValue);
-        }
-
-        return rawValue;
-      },
-      setValue: (instance, newValue) => {
-        // Instance custom properties are always stored as string, cast them if necessary
-        let value;
-        if (typeof newValue === 'boolean') {
-          value = newValue ? '1' : '0';
-        } else {
-          value = '' + newValue;
-        }
-
-        onUpdateProperty(instance, name, value);
-      },
-      getLabel: instance => {
-        const propertyName = getProperties(instance)
-          .get(name)
-          .getLabel();
-        if (propertyName) return propertyName;
-        return (
-          name.charAt(0).toUpperCase() +
-          name
-            .slice(1)
-            .split(/(?=[A-Z])/)
-            .join(' ')
-        );
-      },
+    const getLabel = (instance: Instance) => {
+      const propertyName = getProperties(instance)
+        .get(name)
+        .getLabel();
+      if (propertyName) return propertyName;
+      return (
+        name.charAt(0).toUpperCase() +
+        name
+          .slice(1)
+          .split(/(?=[A-Z])/)
+          .join(' ')
+      );
     };
-  });
+
+    if (valueType === 'number') {
+      return {
+        name,
+        valueType,
+        getValue: (instance: Instance): number => {
+          return parseFloat(
+            getProperties(instance)
+              .get(name)
+              .getValue()
+          );
+        },
+        setValue: (instance: Instance, newValue: number) => {
+          onUpdateProperty(instance, name, '' + newValue);
+        },
+        getLabel,
+      };
+    } else if (valueType === 'string' || valueType === '') {
+      return {
+        name,
+        valueType: 'string',
+        getValue: (instance: Instance): string => {
+          return getProperties(instance)
+            .get(name)
+            .getValue();
+        },
+        setValue: (instance: Instance, newValue: string) => {
+          onUpdateProperty(instance, name, newValue);
+        },
+        getLabel,
+      };
+    } else if (valueType === 'boolean') {
+      return {
+        name,
+        valueType,
+        getValue: (instance: Instance): boolean => {
+          return (
+            getProperties(instance)
+              .get(name)
+              .getValue() === 'true'
+          );
+        },
+        setValue: (instance: Instance, newValue: boolean) => {
+          onUpdateProperty(instance, name, newValue ? '1' : '0');
+        },
+        getLabel,
+      };
+    } else if (valueType === 'choice') {
+      // Choice is a "string" (with a selector for the user in the UI)
+      const choices = property
+        .getExtraInfo()
+        .toJSArray()
+        .map(value => ({ value, label: value }));
+      return {
+        name,
+        valueType: 'string',
+        getChoices: () => choices,
+        getValue: (instance: Instance): string => {
+          return getProperties(instance)
+            .get(name)
+            .getValue();
+        },
+        setValue: (instance: Instance, newValue: string) => {
+          onUpdateProperty(instance, name, newValue);
+        },
+        getLabel,
+      };
+    } else if (valueType === 'resource') {
+      // Resource is a "string" (with a selector in the UI)
+      const kind = property.getExtraInfo().toJSArray()[0] || '';
+      return {
+        name,
+        valueType: 'resource',
+        resourceKind: kind,
+        getValue: (instance: Instance): string => {
+          return getProperties(instance)
+            .get(name)
+            .getValue();
+        },
+        setValue: (instance: Instance, newValue: string) => {
+          onUpdateProperty(instance, name, newValue);
+        },
+        getLabel,
+      };
+    } else {
+      console.error(
+        `A property with type=${valueType} could not be mapped to a field. Ensure that this type is correct and understood by the IDE.`
+      );
+      return null;
+    }
+  }).filter(Boolean);
 
   return propertyFields;
 };

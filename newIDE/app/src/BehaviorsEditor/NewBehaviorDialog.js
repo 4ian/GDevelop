@@ -1,4 +1,8 @@
 // @flow
+import { Trans } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
+
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import HelpButton from '../UI/HelpButton';
@@ -120,15 +124,13 @@ export default class NewBehaviorDialog extends Component<Props, State> {
     const actions = [
       <FlatButton
         key="close"
-        label="Close"
+        label={<Trans>Close</Trans>}
         primary={false}
         onClick={onClose}
       />,
     ];
 
-    const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation(
-      _ => _
-    );
+    const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation();
 
     const behaviors = behaviorMetadata.filter(
       ({ type }) => !deprecatedBehaviorsInformation[type]
@@ -137,66 +139,72 @@ export default class NewBehaviorDialog extends Component<Props, State> {
       ({ type }) => !!deprecatedBehaviorsInformation[type]
     );
 
-    const chooseBehavior = ({
-      type,
-      defaultName,
-    }: EnumeratedBehaviorMetadata) => {
+    const chooseBehavior = (
+      i18n: I18nType,
+      { type, defaultName }: EnumeratedBehaviorMetadata
+    ) => {
       if (deprecatedBehaviorsInformation[type]) {
-        showMessageBox(deprecatedBehaviorsInformation[type].warning);
+        showMessageBox(i18n._(deprecatedBehaviorsInformation[type].warning));
       }
 
       return this.props.onChoose(type, defaultName);
     };
 
     return (
-      <Dialog
-        title="Add a new behavior to the object"
-        actions={actions}
-        secondaryActions={<HelpButton helpPagePath="/behaviors" />}
-        open={open}
-        noMargin
-        autoScrollBodyContent
-      >
-        <List>
-          {behaviors.map((behaviorMetadata, index) => (
-            <BehaviorListItem
-              key={index}
-              behaviorMetadata={behaviorMetadata}
-              onClick={() => chooseBehavior(behaviorMetadata)}
-            />
-          ))}
-          {showDeprecated && (
-            <Subheader>Deprecated (old, prefer not to use anymore)</Subheader>
-          )}
-          {showDeprecated &&
-            deprecatedBehaviors.map((behaviorMetadata, index) => (
-              <BehaviorListItem
-                key={index}
-                behaviorMetadata={behaviorMetadata}
-                onClick={() => chooseBehavior(behaviorMetadata)}
-              />
-            ))}
-        </List>
-        <Line justifyContent="center" alignItems="center">
-          {!showDeprecated ? (
-            <FlatButton
-              key="toggle-experimental"
-              icon={<Visibility />}
-              primary={false}
-              onClick={() => this._showDeprecated(true)}
-              label="Show deprecated (old) behaviors"
-            />
-          ) : (
-            <FlatButton
-              key="toggle-experimental"
-              icon={<VisibilityOff />}
-              primary={false}
-              onClick={() => this._showDeprecated(false)}
-              label="Show deprecated (old) behaviors"
-            />
-          )}
-        </Line>
-      </Dialog>
+      <I18n>
+        {({ i18n }) => (
+          <Dialog
+            title={<Trans>Add a new behavior to the object</Trans>}
+            actions={actions}
+            secondaryActions={<HelpButton helpPagePath="/behaviors" />}
+            open={open}
+            noMargin
+            autoScrollBodyContent
+          >
+            <List>
+              {behaviors.map((behaviorMetadata, index) => (
+                <BehaviorListItem
+                  key={index}
+                  behaviorMetadata={behaviorMetadata}
+                  onClick={() => chooseBehavior(i18n, behaviorMetadata)}
+                />
+              ))}
+              {showDeprecated && (
+                <Subheader>
+                  Deprecated (old, prefer not to use anymore)
+                </Subheader>
+              )}
+              {showDeprecated &&
+                deprecatedBehaviors.map((behaviorMetadata, index) => (
+                  <BehaviorListItem
+                    key={index}
+                    behaviorMetadata={behaviorMetadata}
+                    onClick={() => chooseBehavior(i18n, behaviorMetadata)}
+                  />
+                ))}
+            </List>
+            <Line justifyContent="center" alignItems="center">
+              {!showDeprecated ? (
+                <FlatButton
+                  key="toggle-experimental"
+                  icon={<Visibility />}
+                  primary={false}
+                  onClick={() => this._showDeprecated(true)}
+                  label={<Trans>Show deprecated (old) behaviors</Trans>}
+                />
+              ) : (
+                <FlatButton
+                  key="toggle-experimental"
+                  icon={<VisibilityOff />}
+                  primary={false}
+                  onClick={() => this._showDeprecated(false)}
+                  label={<Trans>Show deprecated (old) behaviors</Trans>}
+                />
+              )}
+            </Line>
+          </Dialog>
+        )}
+      </I18n>
     );
   }
 }

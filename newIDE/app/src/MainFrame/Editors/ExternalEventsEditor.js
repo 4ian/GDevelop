@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React from 'react';
 import EventsSheet from '../../EventsSheet';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -103,6 +104,7 @@ export default class ExternalEventsEditor extends BaseEditor {
             resourceSources={this.props.resourceSources}
             onChooseResource={this.props.onChooseResource}
             resourceExternalEditors={this.props.resourceExternalEditors}
+            openInstructionOrExpression={this.props.openInstructionOrExpression}
           />
         )}
         {!layout && (
@@ -110,14 +112,14 @@ export default class ExternalEventsEditor extends BaseEditor {
             To edit the external events, choose the scene in which it will be
             included:
             <RaisedButton
-              label="Choose the scene"
+              label={<Trans>Choose the scene</Trans>}
               primary
               onClick={this.openLayoutChooser}
             />
           </PlaceholderMessage>
         )}
         <LayoutChooserDialog
-          title="Choose the associated scene"
+          title={<Trans>Choose the associated scene</Trans>}
           helpText="You still need to add a Link event in the scene to import the external events"
           open={this.state.layoutChooserOpen}
           project={project}

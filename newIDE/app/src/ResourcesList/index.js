@@ -47,15 +47,6 @@ type Props = {|
 |};
 
 export default class ResourcesList extends React.Component<Props, State> {
-  static defaultProps = {
-    onDeleteResource: (resource: gdResource, cb: boolean => void) => cb(true),
-    onRenameResource: (
-      resource: gdResource,
-      newName: string,
-      cb: boolean => void
-    ) => cb(true),
-  };
-
   sortableList: any;
   state: State = {
     renamedResource: null,
@@ -268,6 +259,16 @@ export default class ResourcesList extends React.Component<Props, State> {
           this._scanForNewResources(
             RESOURCE_EXTENSIONS.font,
             () => new gd.FontResource()
+          );
+        },
+        enabled: hasElectron,
+      },
+      {
+        label: 'Scan for Videos',
+        click: () => {
+          this._scanForNewResources(
+            RESOURCE_EXTENSIONS.video,
+            () => new gd.VideoResource()
           );
         },
         enabled: hasElectron,

@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import ReactJsonView from 'react-json-view';
 import { type GameData } from '../GDJSInspectorDescriptions';
@@ -23,8 +25,10 @@ const styles = {
 export default ({ gameData, onEdit }: Props) => (
   <div style={styles.container}>
     <EmptyMessage>
-      You are in raw mode. You can edit the fields, but be aware that this can
-      lead to unexpected results or even crash the debugged game!
+      <Trans>
+        You are in raw mode. You can edit the fields, but be aware that this can
+        lead to unexpected results or even crash the debugged game!
+      </Trans>
     </EmptyMessage>
     <ReactJsonView
       collapsed={1}

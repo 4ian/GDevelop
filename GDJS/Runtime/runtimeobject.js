@@ -761,7 +761,7 @@ gdjs.RuntimeObject.prototype.updateHitBoxes = function() {
         this.hitBoxes[0].vertices[2][1] =+height/2.0;
         this.hitBoxes[0].vertices[3][0] =-width/2.0;
         this.hitBoxes[0].vertices[3][1] =+height/2.0;
-        -
+
         this.hitBoxes[0].rotate(this.getAngle()/180*Math.PI);
         this.hitBoxes[0].move(this.getDrawableX()+this.getCenterX(), this.getDrawableY()+this.getCenterY());
     } else {

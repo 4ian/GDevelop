@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import Background from '../../UI/Background';
 import EmptyMessage from '../../UI/EmptyMessage';
@@ -6,6 +8,7 @@ import PropertiesEditor from '../../PropertiesEditor';
 import ResourcePreview from '../../ResourcesList/ResourcePreview';
 import ResourcesLoader from '../../ResourcesLoader';
 import propertiesMapToSchema from '../../PropertiesEditor/PropertiesMapToSchema';
+import { type Schema } from '../../PropertiesEditor';
 
 import {
   type ResourceSource,
@@ -35,7 +38,7 @@ export default class ResourcePropertiesEditor extends React.Component<
   Props,
   {}
 > {
-  schema = [
+  schema: Schema = [
     {
       name: 'Resource name',
       valueType: 'string',
@@ -57,8 +60,11 @@ export default class ResourcePropertiesEditor extends React.Component<
   _renderEmpty() {
     return (
       <EmptyMessage>
-        Resources are automatically added to your project whenever you add an
-        image to an object. Choose a resource to display its properties.
+        <Trans>
+          Resources are automatically added to your project whenever you add an
+          image, a font or a video to an object or when you choose an audio file
+          in events. Choose a resource to display its properties.
+        </Trans>
       </EmptyMessage>
     );
   }

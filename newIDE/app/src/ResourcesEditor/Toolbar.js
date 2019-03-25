@@ -1,24 +1,31 @@
 // @flow
 import React, { PureComponent } from 'react';
-import { translate, type TranslatorProps } from 'react-i18next';
 import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 
 type Props = {|
+  onOpenProjectFolder: () => void,
   onDeleteSelection: () => void,
   canDelete: boolean,
   onOpenProperties: () => void,
-|} & TranslatorProps;
+|};
 
 type State = {||};
 
 export class Toolbar extends PureComponent<Props, State> {
   render() {
-    const { t, canDelete } = this.props;
+    const t = str => str; //TODO
+    const { canDelete } = this.props;
 
     return (
       <ToolbarGroup lastChild>
+        <ToolbarIcon
+          onClick={this.props.onOpenProjectFolder}
+          src="res/ribbon_default/open32.png"
+          tooltip={t('Open the project folder')}
+        />
+        <ToolbarSeparator />
         <ToolbarIcon
           onClick={this.props.onOpenProperties}
           src="res/ribbon_default/editprop32.png"
@@ -36,4 +43,4 @@ export class Toolbar extends PureComponent<Props, State> {
   }
 }
 
-export default translate()(Toolbar);
+export default Toolbar;

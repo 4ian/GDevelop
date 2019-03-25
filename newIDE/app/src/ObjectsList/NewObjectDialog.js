@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -41,9 +42,15 @@ export default class NewObjectDialog extends Component {
 
     return (
       <Dialog
-        title="Add a new object"
+        title={<Trans>Add a new object</Trans>}
         secondaryActions={<HelpButton helpPagePath="/objects" />}
-        actions={<FlatButton label="Close" primary={false} onClick={onClose} />}
+        actions={
+          <FlatButton
+            label={<Trans>Close</Trans>}
+            primary={false}
+            onClick={onClose}
+          />
+        }
         onRequestClose={onClose}
         open={open}
         noMargin

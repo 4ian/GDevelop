@@ -34,7 +34,7 @@ const styles = {
 
 type ScrollableComponent = {
   scrollTo: (number, number) => void,
-  getViewPosition: () => ViewPosition,
+  getViewPosition: () => ?ViewPosition,
 };
 
 type Props = {
@@ -121,7 +121,9 @@ export const addScrollbars = (WrappedComponent: any) => {
     };
 
     _handleViewPositionChange = throttle(
-      (viewPosition: ViewPosition) => {
+      (viewPosition: ?ViewPosition) => {
+        if (!viewPosition) return;
+
         this._setAndAdjust({
           xValue: viewPosition.getViewX(),
           yValue: viewPosition.getViewY(),

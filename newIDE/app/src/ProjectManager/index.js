@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import { List, ListItem } from 'material-ui/List';
 import TextField from 'material-ui/TextField';
@@ -62,7 +64,7 @@ type ProjectStructureItemProps = {|
   initiallyOpen: boolean,
   leftIcon: React$Element<any>,
   nestedItems: Array<React$Element<any>>,
-  primaryText: string,
+  primaryText: React.Node,
   primaryTogglesNestedList: boolean,
   error?: ?Error,
   onRefresh?: () => void,
@@ -216,7 +218,13 @@ class Item extends React.Component<ItemProps, {||}> {
             onContextMenu={this._onContextMenu}
             primaryText={label}
             rightIconButton={rightIconButton}
-            onClick={this.props.onEdit}
+            onClick={() => {
+              // It's essential to discard clicks when editing the name,
+              // to avoid weird opening of an editor (accompanied with a
+              // closing of the project manager) when clicking on the text
+              // field.
+              if (!this.props.editingName) this.props.onEdit();
+            }}
           />
         )}
       </ThemeConsumer>
@@ -516,7 +524,7 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     return (
       <ProjectStructureItem
-        primaryText="Menu"
+        primaryText={<Trans>Menu</Trans>}
         leftIcon={
           <ListIcon
             iconSize={32}
@@ -530,7 +538,7 @@ export default class ProjectManager extends React.Component<Props, State> {
         nestedItems={[
           <ListItem
             key="save"
-            primaryText="Save"
+            primaryText={<Trans>Save</Trans>}
             leftIcon={
               <ListIcon
                 iconSize={32}
@@ -542,7 +550,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           />,
           <ListItem
             key="close"
-            primaryText="Close"
+            primaryText={<Trans>Close</Trans>}
             leftIcon={
               <ListIcon
                 iconSize={32}
@@ -554,7 +562,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           />,
           <ListItem
             key="export"
-            primaryText="Export"
+            primaryText={<Trans>Export</Trans>}
             leftIcon={
               <ListIcon
                 iconSize={32}
@@ -566,7 +574,7 @@ export default class ProjectManager extends React.Component<Props, State> {
           />,
           <ListItem
             key="preferences"
-            primaryText="Preferences"
+            primaryText={<Trans>Preferences</Trans>}
             leftIcon={
               <ListIcon
                 iconSize={32}
@@ -596,7 +604,7 @@ export default class ProjectManager extends React.Component<Props, State> {
         <List style={styles.list}>
           {this._renderMenu()}
           <ProjectStructureItem
-            primaryText="Game settings"
+            primaryText={<Trans>Game settings</Trans>}
             leftIcon={
               <ListIcon
                 iconSize={32}
@@ -610,7 +618,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             nestedItems={[
               <ListItem
                 key="properties"
-                primaryText="Properties"
+                primaryText={<Trans>Properties</Trans>}
                 leftIcon={
                   <ListIcon
                     iconSize={32}
@@ -624,7 +632,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               />,
               <ListItem
                 key="global-variables"
-                primaryText="Global variables"
+                primaryText={<Trans>Global variables</Trans>}
                 leftIcon={
                   <ListIcon
                     iconSize={32}
@@ -636,7 +644,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               />,
               <ListItem
                 key="icons"
-                primaryText="Icons"
+                primaryText={<Trans>Icons</Trans>}
                 leftIcon={
                   <ListIcon
                     iconSize={32}
@@ -648,7 +656,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               />,
               <ListItem
                 key="resources"
-                primaryText="Resources"
+                primaryText={<Trans>Resources</Trans>}
                 leftIcon={
                   <ListIcon
                     iconSize={32}
@@ -663,7 +671,7 @@ export default class ProjectManager extends React.Component<Props, State> {
             ]}
           />
           <ProjectStructureItem
-            primaryText="Scenes"
+            primaryText={<Trans>Scenes</Trans>}
             leftIcon={
               <ListIcon
                 iconSize={32}
@@ -710,12 +718,12 @@ export default class ProjectManager extends React.Component<Props, State> {
                 <AddItem
                   key={'add-scene'}
                   onClick={this.props.onAddLayout}
-                  primaryText="Click to add a scene"
+                  primaryText={<Trans>Click to add a scene</Trans>}
                 />
               )}
           />
           <ProjectStructureItem
-            primaryText="External events"
+            primaryText={<Trans>External events</Trans>}
             leftIcon={
               <ListIcon
                 iconSize={32}
@@ -766,13 +774,13 @@ export default class ProjectManager extends React.Component<Props, State> {
               .concat(
                 <AddItem
                   key={'add-external-events'}
-                  primaryText="Click to add external events"
+                  primaryText={<Trans>Click to add external events</Trans>}
                   onClick={this.props.onAddExternalEvents}
                 />
               )}
           />
           <ProjectStructureItem
-            primaryText="External layouts"
+            primaryText={<Trans>External layouts</Trans>}
             leftIcon={
               <ListIcon
                 iconSize={32}
@@ -823,13 +831,13 @@ export default class ProjectManager extends React.Component<Props, State> {
               .concat(
                 <AddItem
                   key={'add-external-layout'}
-                  primaryText="Click to add an external layout"
+                  primaryText={<Trans>Click to add an external layout</Trans>}
                   onClick={this.props.onAddExternalLayout}
                 />
               )}
           />
           <ProjectStructureItem
-            primaryText="Functions/Extensions"
+            primaryText={<Trans>Functions/Extensions</Trans>}
             error={eventsFunctionsExtensionsError}
             onRefresh={onReloadEventsFunctionsExtensions}
             leftIcon={
@@ -903,7 +911,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               .concat(
                 <AddItem
                   key={'add-events-functions-extension'}
-                  primaryText="Click to add functions"
+                  primaryText={<Trans>Click to add functions</Trans>}
                   onClick={this.props.onAddEventsFunctionsExtension}
                 />
               )}

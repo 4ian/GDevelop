@@ -40,7 +40,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                   _("Move to a position"),
                   _("Move the object to a position"),
                   _("Move _PARAM0_ to _PARAM3_;_PARAM4_"),
-                  _(""),
+                  "",
                   "CppPlatform/Extensions/AStaricon24.png",
                   "CppPlatform/Extensions/AStaricon16.png")
         .AddParameter("object", _("Object"))
@@ -56,7 +56,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Path found"),
                      _("Return true if a path has been found."),
                      _("A path has been found for _PARAM0_"),
-                     _(""),
+                     "",
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -69,7 +69,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
                      _("Destination reached"),
                      _("Return true if the destination was reached."),
                      _("_PARAM0_ reached its destination"),
-                     _(""),
+                     "",
                      "CppPlatform/Extensions/AStaricon24.png",
                      "CppPlatform/Extensions/AStaricon16.png")
 
@@ -358,7 +358,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
     aut.AddAction(
            "AllowDiagonals",
-           _("Diagonals moves"),
+           _("Diagonal movement"),
            _("Allow or restrict diagonal movement on the path"),
            _("Allow diagonal movement for _PARAM0_ on the path: _PARAM2_"),
            _("Path"),
@@ -372,7 +372,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
 
     aut.AddCondition("DiagonalsAllowed",
-                     _("Diagonals moves"),
+                     _("Diagonal movement"),
                      _("Return true if the object is allowed to move "
                        "diagonally on the path"),
                      _("Diagonal moves allowed for _PARAM0_"),

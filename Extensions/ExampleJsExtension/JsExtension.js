@@ -11,7 +11,7 @@
  * More information on https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md
  */
 module.exports = {
-  createExtension: function(t, gd) {
+  createExtension: function(_, gd) {
     const extension = new gd.PlatformExtension();
     extension.setExtensionInformation(
       "MyDummyExtension",
@@ -25,17 +25,17 @@ module.exports = {
     extension
       .addCondition(
         "MyNewCondition",
-        t("Dummy condition example"),
-        t(
+        _("Dummy condition example"),
+        _(
           "This is an example of a condition displayed in the events sheet. Will return true if the number is less than 10 and the length of the text is less than 5."
         ),
-        t("Call the example condition with _PARAM0_ and _PARAM1_"),
-        t("Dummy Extension"),
+        _("Call the example condition with _PARAM0_ and _PARAM1_"),
+        _("Dummy Extension"),
         "res/conditions/camera24.png",
         "res/conditions/camera.png"
       )
-      .addParameter("expression", t("Number 1"), "", false)
-      .addParameter("string", t("Text 1"), "", false)
+      .addParameter("expression", _("Number 1"), "", false)
+      .addParameter("string", _("Text 1"), "", false)
       .getCodeExtraInformation()
       .setIncludeFile(
         "Extensions/ExampleJsExtension/examplejsextensiontools.js"
@@ -45,21 +45,21 @@ module.exports = {
     extension
       .addExpression(
         "DummyExpression",
-        t("Dummy expression example"),
-        t("This is an example of an expression"),
-        t("Dummy Extension"),
+        _("Dummy expression example"),
+        _("This is an example of an expression"),
+        _("Dummy Extension"),
         "res/actions/camera.png"
       )
-      .addParameter("expression", t("Maximum"), "", false)
+      .addParameter("expression", _("Maximum"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("gdjs.random");
 
     extension
       .addStrExpression(
         "DummyStrExpression",
-        t("Dummy string expression example"),
-        t("This is an example of an expression returning a string"),
-        t("Dummy Extension"),
+        _("Dummy string expression example"),
+        _("This is an example of an expression returning a string"),
+        _("Dummy Extension"),
         "res/actions/camera.png"
       )
       .getCodeExtraInformation()
@@ -115,9 +115,9 @@ module.exports = {
     extension
       .addBehavior(
         "DummyBehavior",
-        t("Dummy behavior for testing"),
+        _("Dummy behavior for testing"),
         "DummyBehavior",
-        t("This dummy behavior does nothing"),
+        _("This dummy behavior does nothing"),
         "",
         "CppPlatform/Extensions/topdownmovementicon.png",
         "DummyBehavior",
@@ -194,9 +194,9 @@ module.exports = {
     extension
       .addBehavior(
         "DummyBehaviorWithSharedData",
-        t("Dummy behavior with shared data for testing"),
+        _("Dummy behavior with shared data for testing"),
         "DummyBehaviorWithSharedData",
-        t("This dummy behavior uses shared data and does nothing"),
+        _("This dummy behavior uses shared data and does nothing"),
         "",
         "CppPlatform/Extensions/topdownmovementicon.png",
         "DummyBehaviorWithSharedData",
@@ -235,6 +235,10 @@ module.exports = {
         objectContent.property3 = newValue;
         return true;
       }
+      if (propertyName === "myImage") {
+        objectContent.myImage = newValue;
+        return true;
+      }
 
       return false;
     };
@@ -257,6 +261,15 @@ module.exports = {
           "number"
         )
       );
+      objectProperties.set(
+        "myImage",
+        new gd.PropertyDescriptor(objectContent.myImage)
+          .setType("resource")
+          .addExtraInfo("image")
+          .setLabel(
+            _("Image resource (won't be shown, just for demonstration purpose)")
+          )
+      );
 
       return objectProperties;
     };
@@ -264,7 +277,8 @@ module.exports = {
       JSON.stringify({
         property1: "Hello world",
         property2: true,
-        property3: 123
+        property3: 123,
+        myImage: ""
       })
     );
 
@@ -314,8 +328,8 @@ module.exports = {
     const object = extension
       .addObject(
         "DummyObject",
-        t("Dummy object for testing"),
-        t("This dummy object does nothing"),
+        _("Dummy object for testing"),
+        _("This dummy object does nothing"),
         "CppPlatform/Extensions/topdownmovementicon.png",
         dummyObject
       )
@@ -327,18 +341,18 @@ module.exports = {
     object
       .addAction(
         "MyMethod",
-        t("Display a dummy text in Developer console"),
-        t(
+        _("Display a dummy text in Developer console"),
+        _(
           "Display a dummy text in Developer console. Open it with CTRL-SHIFT-J (Cmd-Alt-J on macOS)."
         ),
-        t("Display a dummy text for _PARAM0_, with params: _PARAM1_, _PARAM2_"),
+        _("Display a dummy text for _PARAM0_, with params: _PARAM1_, _PARAM2_"),
         "",
         "res/conditions/camera24.png",
         "res/conditions/camera.png"
       )
-      .addParameter("object", t("Object"), "DummyObject", false) // This parameter is mandatory for any object action/condition
-      .addParameter("expression", t("Number 1"), "", false)
-      .addParameter("string", t("Text 1"), "", false)
+      .addParameter("object", _("Object"), "DummyObject", false) // This parameter is mandatory for any object action/condition
+      .addParameter("expression", _("Number 1"), "", false)
+      .addParameter("string", _("Text 1"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("myMethod");
 
@@ -377,7 +391,7 @@ module.exports = {
   },
   /**
    * Register editors for objects.
-   * 
+   *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
   registerEditorConfigurations: function(objectsEditorService) {
@@ -388,7 +402,7 @@ module.exports = {
   },
   /**
    * Register renderers for instance of objects on the scene editor.
-   * 
+   *
    * ℹ️ Run `node import-GDJS-Runtime.js` (in newIDE/app/scripts) if you make any change.
    */
   registerInstanceRenderers: function(objectsRenderingService) {
@@ -463,7 +477,7 @@ module.exports = {
       this._pixiObject.rotation = RenderedInstance.toRad(
         this._instance.getAngle()
       );
-      // Custom size can be read in instance.getCustomWidth() and 
+      // Custom size can be read in instance.getCustomWidth() and
       // instance.getCustomHeight()
     };
 

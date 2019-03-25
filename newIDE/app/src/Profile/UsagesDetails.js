@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import {
   Table,
@@ -23,7 +25,7 @@ export default ({ usages }: Props) => (
         <PlaceholderLoader />
       ) : usages.length === 0 ? (
         <EmptyMessage>
-          You don't have any usage of the online services for now
+          <Trans>You don't have any usage of the online services for now</Trans>
         </EmptyMessage>
       ) : (
         <Table selectable={false}>

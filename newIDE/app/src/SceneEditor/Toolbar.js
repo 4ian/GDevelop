@@ -1,14 +1,13 @@
 import React, { PureComponent } from 'react';
-import { translate } from 'react-i18next';
 import { ToolbarGroup } from 'material-ui/Toolbar';
 import ToolbarSeparator from '../UI/ToolbarSeparator';
 import ToolbarIcon from '../UI/ToolbarIcon';
 import IconMenu from '../UI/Menu/IconMenu';
 
+const t = str => str; //TODO
+
 export class Toolbar extends PureComponent {
   render() {
-    const { t } = this.props;
-
     return (
       <ToolbarGroup lastChild>
         {this.props.showPreviewButton && (
@@ -155,4 +154,4 @@ export class Toolbar extends PureComponent {
   }
 }
 
-export default translate()(Toolbar);
+export default Toolbar;

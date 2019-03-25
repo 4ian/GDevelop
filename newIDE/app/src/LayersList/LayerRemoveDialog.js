@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
@@ -27,18 +28,18 @@ export default class VariablesEditorDialog extends Component {
 
     const actions = [
       <FlatButton
-        label="Cancel"
+        label={<Trans>Cancel</Trans>}
         secondary={true}
         keyboardFocused={true}
         onClick={() => this.props.onClose(false)}
       />,
       <FlatButton
-        label="Remove objects"
+        label={<Trans>Remove objects</Trans>}
         secondary={true}
         onClick={() => this.props.onClose(true, null)}
       />,
       <FlatButton
-        label="Move objects"
+        label={<Trans>Move objects</Trans>}
         primary={true}
         onClick={() => this.props.onClose(true, this.state.selectedLayer)}
       />,
@@ -55,13 +56,15 @@ export default class VariablesEditorDialog extends Component {
 
     return (
       <Dialog
-        title={'Objects on ' + this.props.layerRemoved}
+        title={<Trans>Objects on {this.props.layerRemoved}</Trans>}
         actions={actions}
         modal={true}
         open={this.props.open}
         onRequestClose={this.props.onCancel}
       >
-        <div>Move objects on layer {this.props.layerRemoved} to:</div>
+        <div>
+          <Trans>Move objects on layer {this.props.layerRemoved} to:</Trans>
+        </div>
         <SelectField
           value={this.state.selectedLayer}
           onChange={(event, index, newValue) => {

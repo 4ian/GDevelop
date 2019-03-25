@@ -13,10 +13,8 @@
 #include "GDCpp/Runtime/CommonTools.h"
 namespace gd {
 class Behavior;
-}
-namespace gd {
 class Object;
-}
+}  // namespace gd
 class RuntimeObject;
 class RuntimeScene;
 
@@ -97,6 +95,13 @@ class GD_API CppPlatform : public gd::Platform {
    */
   virtual void OnIDEClosed();
 #endif
+
+  /**
+   * \brief (Re)load platform built-in extensions.
+   * \note Can be useful if, for example, the user changed the language
+   * of the editor.
+   */
+  virtual void ReloadBuiltinExtensions();
 
   /**
    * \brief Get access to the CppPlatform instance. ( CppPlatform is a singleton

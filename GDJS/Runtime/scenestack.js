@@ -1,7 +1,7 @@
 
 /**
  * Hold the stack of scenes (gdjs.RuntimeScene) being played.
- * 
+ *
  * @memberof gdjs
  * @param {gdjs.RuntimeGame} runtimeGame The runtime game that is using the scene stack
  * @class SceneStack
@@ -62,12 +62,27 @@ gdjs.SceneStack.prototype.renderWithoutStep = function(elapsedTime) {
 gdjs.SceneStack.prototype.pop = function() {
 	if (this._stack.length <= 1) return null;
 
+    // Unload the current scene
     var scene = this._stack.pop();
     scene.unloadScene();
+
+    // Tell the new current scene it's being resumed
+    var currentScene = this._stack[this._stack.length - 1];
+    if (currentScene) {
+        currentScene.onResume();
+    }
+
 	return scene;
 };
 
 gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
+    // Tell the scene it's being paused
+    var currentScene = this._stack[this._stack.length - 1];
+    if (currentScene) {
+        currentScene.onPause();
+    }
+
+    // Load the new one
     var newScene = new gdjs.RuntimeScene(this._runtimeGame);
     newScene.loadFromScene(this._runtimeGame.getSceneData(newSceneName));
 
@@ -84,11 +99,13 @@ gdjs.SceneStack.prototype.push = function(newSceneName, externalLayoutName) {
 
 gdjs.SceneStack.prototype.replace = function(newSceneName, clear) {
 	if (!!clear) {
+        // Unload all the scenes
         while (this._stack.length !== 0) {
             var scene = this._stack.pop();
             scene.unloadScene();
         }
     } else {
+        // Unload the current scene
         if (this._stack.length !== 0) {
             var scene = this._stack.pop();
             scene.unloadScene();

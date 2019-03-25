@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
@@ -94,12 +95,15 @@ const publicFontUrls = [
   'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/kenvector_future.ttf',
 ];
 
+const publicVideoUrls = [];
+
 const nameFromUrl = (url: string): string => {
   const urlParts = url.split('/');
   return urlParts[urlParts.length - 1]
     .replace('.png', '')
     .replace('.wav', '')
-    .replace('.ogg', '');
+    .replace('.ogg', '')
+    .replace('.mp4', '');
 };
 
 class GenericResourcesChooser extends Component {
@@ -121,7 +125,11 @@ class GenericResourcesChooser extends Component {
           key={url}
           primaryText={nameFromUrl(url)}
           leftAvatar={
-            props.urlsAreImages && <ListIcon iconSize={32} src={url} />
+            props.urlsAreImages ? (
+              <ListIcon iconSize={32} src={url} />
+            ) : (
+              undefined
+            )
           }
         />
       );
@@ -174,9 +182,13 @@ class GenericResourcesChooser extends Component {
     if (!this.state.open) return null;
 
     const actions = [
-      <FlatButton label="Close" primary={false} onClick={this._onClose} />,
       <FlatButton
-        label="Choose"
+        label={<Trans>Close</Trans>}
+        primary={false}
+        onClick={this._onClose}
+      />,
+      <FlatButton
+        label={<Trans>Choose</Trans>}
         primary={false}
         disabled={!this.state.chosenResourceUrl}
         onClick={this._onChoose}
@@ -193,8 +205,10 @@ class GenericResourcesChooser extends Component {
       >
         <div style={styles.explanations}>
           <p>
-            Adding resources from Dropbox, Google Drive... is coming soon!
-            Download GDevelop desktop version to use your own assets.
+            <Trans>
+              Adding resources from Dropbox, Google Drive... is coming soon!
+              Download GDevelop desktop version to use your own assets.
+            </Trans>
           </p>
         </div>
         <SelectableList
@@ -224,7 +238,7 @@ export default [
             urls={publicAudioUrls}
             urlsAreImages={false}
             createNewResource={() => new gd.AudioResource()}
-            title="Choose an audio file from the library"
+            title={<Trans>Choose an audio file from the library</Trans>}
             ref={chooser => (this._chooser = chooser)}
           />
         );
@@ -246,7 +260,7 @@ export default [
             urls={publicImageUrls}
             urlsAreImages
             createNewResource={() => new gd.ImageResource()}
-            title="Choose an image from the library"
+            title={<Trans>Choose an image from the library</Trans>}
             ref={chooser => (this._chooser = chooser)}
           />
         );
@@ -268,7 +282,29 @@ export default [
             urls={publicFontUrls}
             urlsAreImages={false}
             createNewResource={() => new gd.FontResource()}
-            title="Choose a font from the library"
+            title={<Trans>Choose a font from the library</Trans>}
+            ref={chooser => (this._chooser = chooser)}
+          />
+        );
+      }
+    },
+  },
+  {
+    name: 'publicVideoUrlChooser',
+    displayName: 'Choose a video from library',
+    kind: 'video',
+    component: class VideoResourceChooser extends React.Component {
+      chooseResources = () => {
+        if (this._chooser) return this._chooser.chooseResources();
+      };
+      render() {
+        return (
+          <GenericResourcesChooser
+            {...this.props}
+            urls={publicVideoUrls}
+            urlsAreImages={false}
+            createNewResource={() => new gd.VideoResource()}
+            title={<Trans>Choose a video from the library</Trans>}
             ref={chooser => (this._chooser = chooser)}
           />
         );

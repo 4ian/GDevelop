@@ -1,4 +1,6 @@
 // @flow
+import { Trans } from '@lingui/macro';
+
 import * as React from 'react';
 import ResourcesList from '../ResourcesList';
 import ResourcePropertiesEditor from './ResourcePropertiesEditor';
@@ -6,12 +8,16 @@ import Toolbar from './Toolbar';
 import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import InfoBar from '../UI/Messages/InfoBar';
 import ResourcesLoader from '../ResourcesLoader';
+import optionalRequire from '../Utils/OptionalRequire';
 
 import {
   type ResourceSource,
   type ChooseResourceFunction,
 } from '../ResourcesList/ResourceSource.flow';
 
+const electron = optionalRequire('electron');
+const shell = electron ? electron.shell : null;
+const path = optionalRequire('path');
 const styles = {
   container: {
     display: 'flex',
@@ -56,6 +62,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
   updateToolbar() {
     this.props.setToolbar(
       <Toolbar
+        onOpenProjectFolder={this.openProjectFolder}
         onOpenProperties={this.openProperties}
         canDelete={!!this.state.selectedResource}
         onDeleteSelection={() =>
@@ -91,6 +98,11 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     });
   };
 
+  openProjectFolder = () => {
+    const project = this.props.project;
+    if (shell) shell.openItem(path.dirname(project.getProjectFile()));
+  };
+
   openProperties = () => {
     if (!this.editorMosaic) return;
     if (!this.editorMosaic.openEditor('properties')) {
@@ -124,7 +136,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
     const editors = {
       properties: (
         <MosaicWindow
-          title="Properties"
+          title={<Trans>Properties</Trans>}
           // Pass resources to force MosaicWindow update when selectedResource is changed
           resources={selectedResource ? [selectedResource] : []}
         >
@@ -171,7 +183,7 @@ export default class ResourcesEditor extends React.Component<Props, State> {
           }}
         />
         <InfoBar
-          message="Properties panel is already opened"
+          message={<Trans>Properties panel is already opened</Trans>}
           show={!!this.state.showPropertiesInfoBar}
         />
       </div>

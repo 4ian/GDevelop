@@ -6,7 +6,7 @@
 var shell = require('shelljs');
 var https = require('follow-redirects').https;
 var fs = require('fs');
-var unzip2 = require('unzip2');
+var unzipper = require('unzipper');
 var process = require('process')
 
 const editor = process.argv[2];
@@ -45,7 +45,7 @@ if (shell.test('-d', basePath)) {
         try {
           fs
             .createReadStream(zipFilePath)
-            .pipe(unzip2.Extract({
+            .pipe(unzipper.Extract({
               path: '../public/external/' + editor
             }))
             .on('close', function () {

@@ -21,7 +21,7 @@
     "react-scripts": "2.1.4",
     "recursive-readdir": "^2.2.2",
     "shelljs": "^0.7.7",
-    "unzip2": "^0.2.5"
+    "unzipper": "^0.9.11"
   },
   "dependencies": {
     "@lingui/react": "git://github.com/4ian/lingui-react.git#master",

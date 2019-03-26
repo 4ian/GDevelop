@@ -276,6 +276,12 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
+  _selectionCanReceiveSubEvents = () => {
+    return getSelectedEvents(this.state.selection).some(event => {
+      return event.canHaveSubEvents();
+    });
+  };
+
   addNewEvent = (type: string, context: ?EventContext) => {
     const { project } = this.props;
     const hasEventsSelected = hasEventSelected(this.state.selection);
@@ -929,6 +935,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                 {
                   label: 'Add Sub Event',
                   click: () => this.addSubEvents(),
+                  enabled: this._selectionCanReceiveSubEvents(),
                 },
                 {
                   label: 'Add Other',

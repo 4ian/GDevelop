@@ -136,6 +136,15 @@ export default class BrowserS3PreviewLauncher extends React.Component<
     const { showPreviewLinkDialog, url } = this.state;
     if (!showPreviewLinkDialog) return null;
 
-    return <BrowserPreviewLinkDialog url={url} />;
+    return (
+      <BrowserPreviewLinkDialog
+        url={url}
+        onClose={() =>
+          this.setState({
+            showPreviewLinkDialog: false,
+          })
+        }
+      />
+    );
   }
 }

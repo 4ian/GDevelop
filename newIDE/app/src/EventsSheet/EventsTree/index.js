@@ -241,6 +241,13 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
    */
   onHeightsChanged(cb: ?() => void) {
     this.forceUpdate(() => {
+      // Help the developer updating react-sortable-tree
+      if (this._list && !this._list.wrappedInstance.recomputeRowHeights) {
+        console.error(
+          'recomputeRowHeights not on wrappedInstance, this must be fixed after updating react-virtualized/react-sortable-tree'
+        );
+      }
+
       if (this._list) this._list.wrappedInstance.recomputeRowHeights();
       if (cb) cb();
     });
@@ -252,6 +259,13 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
    */
   forceEventsUpdate(cb: ?() => void) {
     this.setState(this._eventsToTreeData(this.props.events), () => {
+      // Help the developer updating react-sortable-tree
+      if (this._list && !this._list.wrappedInstance.recomputeRowHeights) {
+        console.error(
+          'recomputeRowHeights not on wrappedInstance, this must be fixed after updating react-virtualized/react-sortable-tree'
+        );
+      }
+
       if (this._list) this._list.wrappedInstance.recomputeRowHeights();
       if (cb) cb();
     });

@@ -5,6 +5,7 @@ import asteroids from '../fixtures/asteroids/asteroids.json';
 import basicAiWithPathfinding from '../fixtures/basic-ai-with-pathfinding/basic-ai-with-pathfinding.json';
 import basicArtificialIntelligence from '../fixtures/basic-artificial-intelligence/basic-artificial-intelligence.json';
 import basicTopdownCarDriving from '../fixtures/basic-topdown-car-driving/basic-topdown-car-driving.json';
+import betaboxBasicsLearningExperience from '../fixtures/betabox-basics-learning-experience/betabox-basics-learning-experience.json';
 import bombTheCrate from '../fixtures/bomb-the-crate/bomb-the-crate.json';
 import bouncingBallAndRope from '../fixtures/bouncing-ball-and-rope/bouncing-ball-and-rope.json';
 import breakout from '../fixtures/breakout/breakout.json';
@@ -31,6 +32,7 @@ import endlessUpRunner from '../fixtures/endless-up-runner/endless-up-runner.jso
 import exitApp from '../fixtures/exit-app/exit-app.json';
 import facebookInstantGame from '../fixtures/facebook-instant-game/facebook-instant-game.json';
 import findDiagonals from '../fixtures/find-diagonals/find-diagonals.json';
+import geodash from '../fixtures/geodash/geodash.json';
 import healthBar from '../fixtures/health-bar/health-bar.json';
 import infiniteScrollingBackground from '../fixtures/infinite-scrolling-background/infinite-scrolling-background.json';
 import inventorySystem from '../fixtures/inventory-system/inventory-system.json';
@@ -113,6 +115,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(basicArtificialIntelligence);
     } else if (url === 'example://basic-topdown-car-driving') {
       return Promise.resolve(basicTopdownCarDriving);
+    } else if (url === 'example://betabox-basics-learning-experience') {
+      return Promise.resolve(betaboxBasicsLearningExperience);
     } else if (url === 'example://bomb-the-crate') {
       return Promise.resolve(bombTheCrate);
     } else if (url === 'example://bouncing-ball-and-rope') {
@@ -173,6 +177,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(facebookInstantGame);
     } else if (url === 'example://find-diagonals') {
       return Promise.resolve(findDiagonals);
+    } else if (url === 'example://geodash') {
+      return Promise.resolve(geodash);
     } else if (url === 'example://health-bar') {
       return Promise.resolve(healthBar);
     } else if (url === 'example://infinite-scrolling-background') {

@@ -1,6 +1,6 @@
 import gesture from 'pixi-simple-gesture';
 import transformRect from '../Utils/TransformRect';
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 
 const buttonSize = 10;
 const smallButtonSize = 8;
@@ -82,7 +82,7 @@ export default class InstancesSelection {
   _makeButton(objectButton, onMove, onEnd, cursor) {
     objectButton.interactive = true;
     objectButton.buttonMode = true;
-    objectButton.defaultCursor = cursor;
+    objectButton.cursor = cursor;
     gesture.panable(objectButton);
     objectButton.on('panmove', onMove);
     objectButton.on('panend', onEnd);

@@ -42,6 +42,7 @@ const analyzeFile = filePath =>
           content.includes('tooltip=') ||
           content.includes('tooltip={') ||
           content.includes('<EmptyMessage') ||
+          content.includes('<MiniToolbarText') ||
           content.includes('<BackgroundText'))
         // /(?<!key)=("|\{["'])/.test(content)
       ) {
@@ -49,9 +50,9 @@ const analyzeFile = filePath =>
         results.reason = 'React with string properties';
       }
 
-      if (content.includes('label: ')) {
+      if (content.includes('label: \'')) {
         results.requiresTrans = true;
-        results.reason = '"label:" found';
+        results.reason = '"label: " with a string found';
       }
 
       if (
@@ -66,6 +67,12 @@ const analyzeFile = filePath =>
       if (content.includes('confirm(')) {
         results.requiresI18n = true;
         results.reason = 'confirm function found';
+      }
+
+      if (content.includes('No i18n in this file')) {
+        results.requiresTrans = false;
+        results.requiresI18n = false;
+        results.reason = "Explict comment telling no i18n required";
       }
 
       // Other things: (Base layer)

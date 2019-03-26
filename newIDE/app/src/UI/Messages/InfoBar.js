@@ -1,3 +1,4 @@
+import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Snackbar from 'material-ui/Snackbar';
 
@@ -35,7 +36,7 @@ export default class InfoBar extends Component {
         open={this.props.show && !hidden && !this.state.dismissed}
         message={this.props.message}
         onRequestClose={() => this.setState({ dismissed: true })}
-        action="Got it"
+        action={<Trans>Got it</Trans>}
         onActionClick={this.handleGotIt}
       />
     );

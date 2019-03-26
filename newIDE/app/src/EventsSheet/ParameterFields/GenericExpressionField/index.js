@@ -264,6 +264,7 @@ export default class ExpressionField extends React.Component<Props, State> {
             <SemiControlledTextField
               value={value}
               floatingLabelText={description}
+              hintText={expressionType === 'string' ? '""' : undefined}
               inputStyle={styles.input}
               onChange={this._handleChange}
               onBlur={this._handleBlur}
@@ -307,6 +308,13 @@ export default class ExpressionField extends React.Component<Props, State> {
         {!this.props.isInline && (
           <RaisedButton
             icon={<Functions />}
+            label={
+              expressionType === 'string'
+                ? '"ABC"'
+                : expressionType === 'number'
+                ? '123'
+                : ''
+            }
             primary
             style={
               description

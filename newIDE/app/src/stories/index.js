@@ -54,6 +54,7 @@ import BehaviorsEditor from '../BehaviorsEditor';
 import ObjectGroupEditor from '../ObjectGroupEditor';
 import ObjectGroupsList from '../ObjectGroupsList';
 import muiDecorator from './MuiDecorator';
+import i18nProviderDecorator from './I18nProviderDecorator';
 import paperDecorator from './PaperDecorator';
 import ValueStateHolder from './ValueStateHolder';
 import RefGetter from './RefGetter';
@@ -117,6 +118,8 @@ import ProjectManager from '../ProjectManager';
 import AlertMessage from '../UI/AlertMessage';
 import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
+
+// No i18n in this file
 
 const gd = global.gd;
 const {
@@ -886,7 +889,10 @@ storiesOf('LocalFilePicker', module)
 
 storiesOf('StartPage', module)
   .addDecorator(muiDecorator)
-  .add('default', () => <StartPage />);
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <StartPage onOpenLanguageDialog={action('open language dialog')} />
+  ));
 
 storiesOf('DebuggerContent', module)
   .addDecorator(muiDecorator)
@@ -1069,6 +1075,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           showNetworkPreviewButton={false}
           showPreviewButton={false}
+          openInstructionOrExpression={action('open instruction or expression')}
         />
       </div>
     </DragDropContextProvider>
@@ -1095,6 +1102,7 @@ storiesOf('EventsSheet', module)
           setToolbar={() => {}}
           showNetworkPreviewButton={false}
           showPreviewButton={false}
+          openInstructionOrExpression={action('open instruction or expression')}
         />
       </div>
     </DragDropContextProvider>
@@ -1179,6 +1187,7 @@ storiesOf('InstructionEditor', module)
         return Promise.reject();
       }}
       resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
     />
   ))
   .add('without layout', () => (
@@ -1195,6 +1204,7 @@ storiesOf('InstructionEditor', module)
         return Promise.reject();
       }}
       resourceSources={[]}
+      openInstructionOrExpression={action('open instruction or expression')}
     />
   ));
 
@@ -1797,6 +1807,8 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
             action('Choose resource from source', source)
           }
           resourceExternalEditors={[]}
+          openInstructionOrExpression={action('open instruction or expression')}
+          initiallyFocusedFunctionName={null}
         />
       </div>
     </DragDropContextProvider>

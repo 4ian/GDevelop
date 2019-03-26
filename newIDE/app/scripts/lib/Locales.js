@@ -64,7 +64,7 @@ const getLocaleName = langCode => {
   } else if (langCode === 'fil_PH') {
     return 'Filipino';
   } else if (langCode === 'pseudo_LOCALE') {
-    return 'Pseudolocalization';
+    return 'for development only';
   }
 
   return ISO6391.getName(getShortestCode(langCode));
@@ -81,7 +81,7 @@ const getLocaleNativeName = langCode => {
   } else if (langCode === 'fil_PH') {
     return 'Mga Filipino';
   } else if (langCode === 'pseudo_LOCALE') {
-    return 'for development only';
+    return 'Pseudolocalization';
   }
 
   return ISO6391.getNativeName(getShortestCode(langCode));

@@ -245,7 +245,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
         { type: 'separator' },
         {
           label: i18n._(t`Community Forums`),
-          onClickOpenLink: 'http://forum.compilgames.net',
+          onClickOpenLink: 'https://forum.gdevelop-app.com',
         },
         {
           label: i18n._(t`Community Discord Chat`),
@@ -257,13 +257,18 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
           onClickOpenLink: 'https://gdevelop-app.com/contribute/',
         },
         {
+          label: i18n._(t`Create Extensions for GDevelop`),
+          onClickOpenLink:
+            'https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md',
+        },
+        { type: 'separator' },
+        {
           label: i18n._(t`Help to Translate GDevelop`),
           onClickOpenLink: 'https://crowdin.com/project/gdevelop',
         },
         {
-          label: i18n._(t`Create Extensions for GDevelop`),
-          onClickOpenLink:
-            'https://github.com/4ian/GDevelop/blob/master/newIDE/README-extensions.md',
+          label: i18n._(t`Report a wrong translation`),
+          onClickOpenLink: 'https://github.com/4ian/GDevelop/issues/969',
         },
       ],
     };

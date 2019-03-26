@@ -91,6 +91,18 @@ export default class LanguageDialog extends Component<Props, State> {
                       disabled={isLoadingLanguage}
                     />,
                   ]}
+                  secondaryActions={[
+                    <FlatButton
+                      label={<Trans>Report a wrong translation</Trans>}
+                      key="report-wrong-translation"
+                      primary={false}
+                      onClick={() =>
+                        Window.openExternalURL(
+                          'https://github.com/4ian/GDevelop/issues/969'
+                        )
+                      }
+                    />,
+                  ]}
                   onRequestClose={() => onClose(this.state.languageDidChange)}
                   open={open}
                   title={<Trans>Language</Trans>}

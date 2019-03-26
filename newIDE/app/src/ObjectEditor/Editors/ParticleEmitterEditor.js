@@ -203,7 +203,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
           <SemiControlledTextField
-            floatingLabelText={<Trans>Start end (0-255)</Trans>}
+            floatingLabelText={<Trans>End opacity (0-255)</Trans>}
             fullWidth
             type="number"
             value={particleEmitterObject.getParticleAlpha2()}

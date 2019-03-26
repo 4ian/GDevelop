@@ -276,7 +276,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  _selectionCanReceiveSubEvents = () => {
+  _selectionCanHaveSubEvents = () => {
     return getSelectedEvents(this.state.selection).some(event => {
       return event.canHaveSubEvents();
     });
@@ -284,7 +284,7 @@ export default class EventsSheet extends React.Component<Props, State> {
 
   _selectionCanToggleDisabled = () => {
     return getSelectedEvents(this.state.selection).some(event => {
-      return event.getType() !== 'BuiltinCommonInstructions::Comment';
+      return event.isExecutable();
     });
   };
 
@@ -942,7 +942,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                 {
                   label: 'Add Sub Event',
                   click: () => this.addSubEvents(),
-                  enabled: this._selectionCanReceiveSubEvents(),
+                  enabled: this._selectionCanHaveSubEvents(),
                 },
                 {
                   label: 'Add Other',

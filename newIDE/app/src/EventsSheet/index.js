@@ -282,6 +282,12 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
+  _selectionCanToggleDisabled = () => {
+    return getSelectedEvents(this.state.selection).some(event => {
+      return event.getType() !== 'BuiltinCommonInstructions::Comment';
+    });
+  };
+
   addNewEvent = (type: string, context: ?EventContext) => {
     const { project } = this.props;
     const hasEventsSelected = hasEventSelected(this.state.selection);
@@ -925,6 +931,7 @@ export default class EventsSheet extends React.Component<Props, State> {
                 {
                   label: 'Toggle disabled',
                   click: () => this.toggleDisabled(),
+                  enabled: this._selectionCanToggleDisabled(),
                 },
                 { type: 'separator' },
                 {

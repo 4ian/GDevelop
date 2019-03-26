@@ -31,6 +31,10 @@ type Props = {|
     extension: gdPlatformExtension,
     type: string
   ) => void,
+  onCreateEventsFunction: (
+    extensionName: string,
+    eventsFunction: gdEventsFunction
+  ) => void,
   initiallyFocusedFunctionName: ?string,
 |};
 
@@ -184,6 +188,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         <EventsFunctionConfigurationEditor
                           project={project}
                           eventsFunction={selectedEventsFunction}
+                          helpPagePath="/events/functions"
                           onParametersUpdated={() => {
                             this._loadEventsFunctionFrom(
                               project,
@@ -230,6 +235,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       }
                       setToolbar={this.props.setToolbar}
                       onOpenDebugger={() => {}}
+                      onCreateEventsFunction={this.props.onCreateEventsFunction}
                     />
                   ) : (
                     <Background>

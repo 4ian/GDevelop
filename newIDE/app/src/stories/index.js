@@ -118,6 +118,7 @@ import ProjectManager from '../ProjectManager';
 import AlertMessage from '../UI/AlertMessage';
 import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
+import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtractor/EventsFunctionExtractorDialog';
 
 // No i18n in this file
 
@@ -137,6 +138,8 @@ const {
   emptyLayout,
   testEventsFunction,
   testEventsFunctionsExtension,
+  testSerializedEvents,
+  testSerializedEventsWithLotsOfObjects,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -1094,6 +1097,7 @@ storiesOf('EventsSheet', module)
           showNetworkPreviewButton={false}
           showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
+          onCreateEventsFunction={action('create events function')}
         />
       </div>
     </DragDropContextProvider>
@@ -1121,9 +1125,34 @@ storiesOf('EventsSheet', module)
           showNetworkPreviewButton={false}
           showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
+          onCreateEventsFunction={action('create events function')}
         />
       </div>
     </DragDropContextProvider>
+  ));
+
+storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <EventsFunctionExtractorDialog
+      project={project}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      serializedEvents={testSerializedEvents}
+      onClose={action('close')}
+      onCreate={action('create')}
+    />
+  ))
+  .add('with a lot of parameters', () => (
+    <EventsFunctionExtractorDialog
+      project={project}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      serializedEvents={testSerializedEventsWithLotsOfObjects}
+      onClose={action('close')}
+      onCreate={action('create')}
+    />
   ));
 
 storiesOf('SearchPanel', module)
@@ -1783,10 +1812,12 @@ storiesOf('ResourcesList', module)
 storiesOf('EventsFunctionConfigurationEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <div style={{ height: 500, display: 'flex' }}>
       <EventsFunctionConfigurationEditor
         project={project}
+        helpPagePath="/events/functions"
         eventsFunction={testEventsFunction}
         onParametersUpdated={() => {}}
       />
@@ -1827,6 +1858,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           resourceExternalEditors={[]}
           openInstructionOrExpression={action('open instruction or expression')}
           initiallyFocusedFunctionName={null}
+          onCreateEventsFunction={action('on create events function')}
         />
       </div>
     </DragDropContextProvider>

@@ -187,7 +187,7 @@ export const makeTestProject = gd => {
     condition.setType('KeyPressed');
     condition.setParametersCount(2);
     condition.setParameter(1, 'Space');
-    return condition;
+    return condition; // This leaks memory if not deleted
   };
 
   const makeDeleteAction = objectToDelete => {
@@ -195,7 +195,7 @@ export const makeTestProject = gd => {
     action.setType('Delete');
     action.setParametersCount(2);
     action.setParameter(0, objectToDelete);
-    return action;
+    return action; // This leaks memory if not deleted
   };
 
   var standardEvt = gd.asStandardEvent(evt);
@@ -329,6 +329,14 @@ export const makeTestProject = gd => {
 
   testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction2', 1);
 
+  const testSerializedEvents = JSON.parse(
+    `[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoLeft","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","-150","0","1"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoRight","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","150","0","1"],"subInstructions":[]}],"events":[]}]`
+  ); 
+
+  const testSerializedEventsWithLotsOfObjects = JSON.parse(
+    `[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoLeft","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","-150","0","1"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoRight","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","150","0","1"],"subInstructions":[]}],"events":[]}, {"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":true,"value":"SystemInfo::IsMobile"},"parameters":[],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls2"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls3"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["HiddenStuff"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["Markers"],"subInstructions":[]}],"events":[]}]`
+  ); 
+
   return {
     project,
     shapePainterObject,
@@ -347,5 +355,7 @@ export const makeTestProject = gd => {
     emptyLayout,
     testEventsFunction,
     testEventsFunctionsExtension,
+    testSerializedEvents,
+    testSerializedEventsWithLotsOfObjects,
   };
 };

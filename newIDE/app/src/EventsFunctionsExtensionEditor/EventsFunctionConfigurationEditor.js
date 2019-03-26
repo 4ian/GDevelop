@@ -5,8 +5,7 @@ import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
-import TextField from 'material-ui/TextField';
-import { Column, Line } from '../UI/Grid';
+import { Column, Line, Spacer } from '../UI/Grid';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import { mapVector } from '../Utils/MapFor';
@@ -30,6 +29,11 @@ type Props = {|
   project: gdProject,
   eventsFunction: gdEventsFunction,
   onParametersUpdated: () => void,
+  helpPagePath?: string,
+  onConfigurationUpdated?: () => void,
+  freezeParameters?: boolean,
+  noScroll?: boolean,
+  freezeEventsFunctionType?: boolean,
 |};
 
 type State = {|
@@ -61,6 +65,36 @@ const validateParameterName = (i18n: I18nType, newName: string) => {
   }
 
   return true;
+};
+
+const getSentenceErrorText = (
+  i18n: I18nType,
+  eventsFunction: gdEventsFunction
+) => {
+  const sentence = eventsFunction.getSentence();
+  if (!sentence)
+    return i18n._(
+      t`Enter the sentence that will be displayed in the events sheet`
+    );
+
+  const missingParameters = mapVector(
+    eventsFunction.getParameters(),
+    (_, index) => {
+      const expectedString = `_PARAM${index + 1}_`;
+      if (sentence.indexOf(expectedString) === -1) return expectedString;
+
+      return null;
+    }
+  ).filter(Boolean);
+
+  if (missingParameters.length) {
+    return (
+      i18n._(t`The sentence is missing this/these parameter(s):`) +
+      missingParameters.join(', ')
+    );
+  }
+
+  return undefined;
 };
 
 export default class EventsFunctionConfigurationEditor extends React.Component<
@@ -98,23 +132,34 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
 
   render() {
     const { objectMetadata } = this.state;
-    const { eventsFunction } = this.props;
+    const {
+      eventsFunction,
+      freezeEventsFunctionType,
+      onConfigurationUpdated,
+      freezeParameters,
+      helpPagePath,
+      noScroll,
+    } = this.props;
 
     const parameters = eventsFunction.getParameters();
     const type = eventsFunction.getFunctionType();
+
+    //TODO: Add warning if parameters missing in description
 
     return (
       <I18n>
         {({ i18n }) => (
           <Column noMargin>
-            <div style={styles.scrollView}>
+            <div style={noScroll ? undefined : styles.scrollView}>
               <Column>
-                <Line noMargin alignItems="center">
+                <Line alignItems="center">
                   <img src="res/function32.png" alt="" style={styles.icon} />
                   <SelectField
                     value={type}
+                    disabled={!!freezeEventsFunctionType}
                     onChange={(e, i, value) => {
                       eventsFunction.setFunctionType(value);
+                      if (onConfigurationUpdated) onConfigurationUpdated();
                       this.forceUpdate();
                     }}
                   >
@@ -135,31 +180,36 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                       primaryText={<Trans>String Expression</Trans>}
                     />
                   </SelectField>
-                  <TextField
+                  <SemiControlledTextField
+                    commitOnBlur
                     hintText={<Trans>Full name displayed in editor</Trans>}
                     value={eventsFunction.getFullName()}
-                    onChange={(e, text) => {
+                    onChange={text => {
                       eventsFunction.setFullName(text);
+                      if (onConfigurationUpdated) onConfigurationUpdated();
                       this.forceUpdate();
                     }}
                   />
                 </Line>
                 <Line noMargin>
-                  <TextField
+                  <SemiControlledTextField
+                    commitOnBlur
                     hintText={<Trans>Description, displayed in editor</Trans>}
                     fullWidth
                     multiLine
                     value={eventsFunction.getDescription()}
-                    onChange={(e, text) => {
+                    onChange={text => {
                       eventsFunction.setDescription(text);
+                      if (onConfigurationUpdated) onConfigurationUpdated();
                       this.forceUpdate();
                     }}
                   />
                 </Line>
-                <Line noMargin>
+                <Line>
                   {type === gd.EventsFunction.Action ||
                   type === gd.EventsFunction.Condition ? (
-                    <TextField
+                    <SemiControlledTextField
+                      commitOnBlur
                       hintText={
                         <Trans>
                           Sentence in Events Sheet (write _PARAMx_ for
@@ -168,10 +218,12 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                       }
                       fullWidth
                       value={eventsFunction.getSentence()}
-                      onChange={(e, text) => {
+                      onChange={text => {
                         eventsFunction.setSentence(text);
+                        if (onConfigurationUpdated) onConfigurationUpdated();
                         this.forceUpdate();
                       }}
+                      errorText={getSentenceErrorText(i18n, eventsFunction)}
                     />
                   ) : null}
                 </Line>
@@ -188,6 +240,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                           </MiniToolbarText>
                           <Column expand noMargin>
                             <SemiControlledTextField
+                              commitOnBlur
                               hintText={<Trans>Enter the parameter name</Trans>}
                               value={parameter.getName()}
                               onChange={text => {
@@ -197,7 +250,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                                 this.forceUpdate();
                                 this.props.onParametersUpdated();
                               }}
-                              commitOnBlur
+                              disabled={!!freezeParameters}
                             />
                           </Column>
                           <IconMenu
@@ -209,6 +262,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                             buildMenuTemplate={() => [
                               {
                                 label: i18n._(t`Delete`),
+                                enabled: !freezeParameters,
                                 click: () => this._removeParameter(i),
                               },
                             ]}
@@ -224,6 +278,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                                 this.forceUpdate();
                                 this.props.onParametersUpdated();
                               }}
+                              disabled={!!freezeParameters}
                               fullWidth
                             >
                               <MenuItem
@@ -259,6 +314,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                                   this.forceUpdate();
                                   this.props.onParametersUpdated();
                                 }}
+                                disabled={!!freezeParameters}
                                 fullWidth
                               >
                                 <MenuItem
@@ -287,10 +343,12 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                         </Line>
                         <Line expand noMargin>
                           <Column expand>
-                            <TextField
+                            <SemiControlledTextField
+                              commitOnBlur
                               floatingLabelText={<Trans>Description</Trans>}
+                              floatingLabelFixed
                               value={parameter.getDescription()}
-                              onChange={(e, text) => {
+                              onChange={text => {
                                 parameter.setDescription(text);
                                 this.forceUpdate();
                               }}
@@ -307,15 +365,21 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                     </EmptyMessage>
                   ) : null}
                   <Line justifyContent="space-between">
-                    <Column>
-                      <HelpButton helpPagePath="/events/functions" />
-                    </Column>
-                    <Column>
-                      <FlatButton
-                        label={<Trans>Add a parameter</Trans>}
-                        onClick={this._addParameter}
-                      />
-                    </Column>
+                    {helpPagePath ? (
+                      <Column>
+                        <HelpButton helpPagePath={helpPagePath} />
+                      </Column>
+                    ) : (
+                      <Spacer />
+                    )}
+                    {!freezeParameters && (
+                      <Column>
+                        <FlatButton
+                          label={<Trans>Add a parameter</Trans>}
+                          onClick={this._addParameter}
+                        />
+                      </Column>
+                    )}
                   </Line>
                 </div>
               </Line>

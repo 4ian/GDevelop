@@ -24,6 +24,9 @@ const styles = {
 
 class ThemableObjectRow extends React.Component {
   _renderObjectMenu(object) {
+    const clipboardObjectName = Clipboard.has(CLIPBOARD_KIND)
+      ? '"' + Clipboard.get(CLIPBOARD_KIND).name + '"'
+      : '';
     return (
       <IconMenu
         ref={iconMenu => (this._iconMenu = iconMenu)}
@@ -75,8 +78,8 @@ class ThemableObjectRow extends React.Component {
           },
           {
             label: this.props.isGlobalObject
-              ? 'Paste as a Global Object'
-              : 'Paste',
+              ? 'Paste ' + clipboardObjectName + ' as a Global Object'
+              : 'Paste ' + clipboardObjectName,
             enabled: Clipboard.has(CLIPBOARD_KIND),
             click: () => this.props.onPasteObject(),
           },

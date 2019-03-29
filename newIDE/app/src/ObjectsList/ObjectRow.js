@@ -74,7 +74,9 @@ class ThemableObjectRow extends React.Component {
             click: () => this.props.onCutObject(),
           },
           {
-            label: 'Paste',
+            label: this.props.isGlobalObject
+              ? 'Paste as a Global Object'
+              : 'Paste',
             enabled: Clipboard.has(CLIPBOARD_KIND),
             click: () => this.props.onPasteObject(),
           },

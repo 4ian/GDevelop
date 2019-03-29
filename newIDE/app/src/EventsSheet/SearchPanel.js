@@ -29,6 +29,8 @@ type State = {|
   searchText: string,
   replaceText: string,
   matchCase: boolean,
+  searchInActions: boolean,
+  searchInConditions: boolean,
   searchInSelection: boolean,
 |};
 
@@ -39,6 +41,8 @@ export default class SearchPanel extends PureComponent<Props, State> {
     searchText: '',
     replaceText: '',
     matchCase: false,
+    searchInActions: true,
+    searchInConditions: true,
     searchInSelection: false,
   };
 
@@ -49,13 +53,19 @@ export default class SearchPanel extends PureComponent<Props, State> {
   };
 
   launchSearch = () => {
-    const { searchText, searchInSelection, matchCase } = this.state;
+    const {
+      searchText,
+      searchInSelection,
+      matchCase,
+      searchInActions,
+      searchInConditions,
+    } = this.state;
     this.props.onSearchInEvents({
       searchInSelection,
       searchText,
       matchCase,
-      searchInActions: true,
-      searchInConditions: true,
+      searchInActions,
+      searchInConditions,
     });
     this.setState({
       searchDirty: false,
@@ -69,21 +79,27 @@ export default class SearchPanel extends PureComponent<Props, State> {
       replaceText,
       searchInSelection,
       matchCase,
+      searchInActions,
+      searchInConditions,
     } = this.state;
-    if (searchDirty) {
-      showMessageBox(
-        'Click on Search first, inspect the results and then click on Replace to do the replacement(s).'
-      );
-      return;
-    }
+    // if (searchDirty) {
+    //   showMessageBox(
+    //     'Click on Search first, inspect the results and then click on Replace to do the replacement(s).'
+    //   );
+    //   return;
+    // }
+
+    this.launchSearch();
 
     this.props.onReplaceInEvents({
       searchInSelection,
       searchText,
       replaceText,
       matchCase,
-      searchInActions: true,
-      searchInConditions: true,
+      searchInActions,
+      searchInConditions,
+      searchInActions,
+      searchInConditions,
     });
   };
 
@@ -141,6 +157,21 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 label={<Trans>Case insensitive</Trans>}
                 checked={!this.state.matchCase}
                 onCheck={(e, checked) => this.setState({ matchCase: !checked })}
+              />
+              <p>{'Filter by:'}</p>
+              <InlineCheckbox
+                label={<Trans>Conditions</Trans>}
+                checked={this.state.searchInConditions}
+                onCheck={(e, checked) =>
+                  this.setState({ searchInConditions: checked })
+                }
+              />
+              <InlineCheckbox
+                label={<Trans>Actions</Trans>}
+                checked={this.state.searchInActions}
+                onCheck={(e, checked) =>
+                  this.setState({ searchInActions: checked })
+                }
               />
               {/* <InlineCheckbox //TODO: Implement search/replace in selection
                 label={<Trans>Replace in selection</Trans>}

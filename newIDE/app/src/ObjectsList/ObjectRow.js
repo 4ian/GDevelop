@@ -133,6 +133,7 @@ class ThemableObjectRow extends React.Component {
           ...styles.objectName,
           color: selected ? muiTheme.listItem.selectedTextColor : undefined,
           fontStyle: isGlobalObject ? 'italic' : undefined,
+          fontWeight: isGlobalObject ? 'bold' : 'normal',
         }}
       >
         {objectName}

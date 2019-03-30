@@ -97,9 +97,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       replaceText,
       matchCase,
       searchInActions,
-      searchInConditions,
-      searchInActions,
-      searchInConditions,
+      searchInConditions
     });
   };
 
@@ -158,7 +156,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 checked={!this.state.matchCase}
                 onCheck={(e, checked) => this.setState({ matchCase: !checked })}
               />
-              <p>{'Filter by:'}</p>
+              <p><Trans>Filter by</Trans></p>
               <InlineCheckbox
                 label={<Trans>Conditions</Trans>}
                 checked={this.state.searchInConditions}

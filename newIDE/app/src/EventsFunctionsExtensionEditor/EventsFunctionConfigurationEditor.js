@@ -22,6 +22,10 @@ import HelpButton from '../UI/HelpButton';
 import SemiControlledTextField from '../UI/SemiControlledTextField';
 import MiniToolbar, { MiniToolbarText } from '../UI/MiniToolbar';
 import { showWarningBox } from '../UI/Messages/MessageBox';
+import {
+  type EnumeratedBehaviorMetadata,
+  enumerateBehaviorsMetadata,
+} from '../BehaviorsEditor/EnumerateBehaviorsMetadata';
 
 const gd = global.gd;
 
@@ -38,6 +42,7 @@ type Props = {|
 
 type State = {|
   objectMetadata: Array<EnumeratedObjectMetadata>,
+  behaviorMetadata: Array<EnumeratedBehaviorMetadata>,
 |};
 
 const styles = {
@@ -101,11 +106,15 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   Props,
   State
 > {
-  state = { objectMetadata: [] };
+  state = { objectMetadata: [], behaviorMetadata: [] };
 
   componentDidMount() {
     this.setState({
       objectMetadata: enumerateObjectTypes(this.props.project),
+      behaviorMetadata: enumerateBehaviorsMetadata(
+        this.props.project.getCurrentPlatform(),
+        this.props.project
+      ),
     });
   }
 
@@ -131,7 +140,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
   };
 
   render() {
-    const { objectMetadata } = this.state;
+    const { objectMetadata, behaviorMetadata } = this.state;
     const {
       eventsFunction,
       freezeEventsFunctionType,
@@ -143,8 +152,6 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
 
     const parameters = eventsFunction.getParameters();
     const type = eventsFunction.getFunctionType();
-
-    //TODO: Add warning if parameters missing in description
 
     return (
       <I18n>
@@ -286,6 +293,14 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                                 primaryText={<Trans>Objects</Trans>}
                               />
                               <MenuItem
+                                value="behavior"
+                                primaryText={
+                                  <Trans>
+                                    Behavior (for the previous object)
+                                  </Trans>
+                                }
+                              />
+                              <MenuItem
                                 value="expression"
                                 primaryText={<Trans>Number</Trans>}
                               />
@@ -336,6 +351,32 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
                                       />
                                     );
                                   }
+                                )}
+                              </SelectField>
+                            </Column>
+                          )}
+                          {parameter.getType() === 'behavior' && (
+                            <Column expand>
+                              <SelectField
+                                floatingLabelText={<Trans>Behavior type</Trans>}
+                                floatingLabelFixed
+                                value={parameter.getExtraInfo()}
+                                onChange={(e, i, value) => {
+                                  parameter.setExtraInfo(value);
+                                  this.forceUpdate();
+                                  this.props.onParametersUpdated();
+                                }}
+                                disabled={!!freezeParameters}
+                                fullWidth
+                              >
+                                {behaviorMetadata.map(
+                                  (metadata: EnumeratedBehaviorMetadata) => (
+                                    <MenuItem
+                                      key={metadata.type}
+                                      value={metadata.type}
+                                      primaryText={metadata.fullName}
+                                    />
+                                  )
                                 )}
                               </SelectField>
                             </Column>

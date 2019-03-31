@@ -112,11 +112,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
             label={<Trans>Create</Trans>}
             primary
             disabled={
-              !canCreateEventsFunction(
-                project,
-                extensionName,
-                eventsFunction
-              )
+              !canCreateEventsFunction(project, extensionName, eventsFunction)
             }
             onClick={() => onCreate(extensionName, eventsFunction)}
           />,
@@ -215,9 +211,14 @@ export default class EventsFunctionExtractorDialog extends React.Component<
               }}
               fullWidth
               errorText={
-                !validateEventsFunctionNameUniqueness(project, extensionName, eventsFunction) ? (
+                !validateEventsFunctionNameUniqueness(
+                  project,
+                  extensionName,
+                  eventsFunction
+                ) ? (
                   <Trans>
-                    This name is already taken by another function. Choose another name.
+                    This name is already taken by another function. Choose
+                    another name.
                   </Trans>
                 ) : !validateEventsFunctionName(eventsFunction.getName()) ? (
                   <Trans>

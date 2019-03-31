@@ -44,7 +44,6 @@ export const setupFunctionFromEvents = ({
     .getObjectOrGroupNames()
     .toNewVectorString()
     .toJSArray();
-  eventsContextAnalyzer.delete();
 
   const parameters = eventsFunction.getParameters();
   parameters.clear();
@@ -61,7 +60,29 @@ export const setupFunctionFromEvents = ({
       )
     );
     parameters.push_back(newParameter);
+
+    // TODO: Renamed behaviors are not working in events function. Would need a "getBehavior"/"getBehaviorName" indirection :/
+    // CAn also prohibit renaming behaviors??
+    const behaviorNames: Array<string> = eventsContext
+      .getBehaviorNamesOf(objectName)
+      .toNewVectorString()
+      .toJSArray();
+
+    behaviorNames.forEach(behaviorName => {
+      const newParameter = new gd.ParameterMetadata();
+      newParameter.setType('behavior');
+      newParameter.setName(behaviorName);
+      newParameter.setExtraInfo(
+        gd.getTypeOfBehavior(
+          globalObjectsContainer,
+          objectsContainer,
+          behaviorName
+        )
+      );
+      parameters.push_back(newParameter);
+    });
   });
+  eventsContextAnalyzer.delete();
 };
 
 /**

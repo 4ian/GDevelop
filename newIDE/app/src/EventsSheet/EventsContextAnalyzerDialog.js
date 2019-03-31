@@ -5,11 +5,51 @@ import * as React from 'react';
 import Dialog from '../UI/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
-type Props = {|
-  open: boolean,
-  onClose: () => void,
+export type EventsContextResult = {|
   objectsNames: Array<string>,
   objectOrGroupNames: Array<string>,
+  objectOrGroupBehaviorNames: {
+    [string]: Array<string>,
+  },
+|};
+
+// Store in a EventsContextResult the content of a gd.EventsContext.
+// In theory not necessary, but easier than storing,
+// passing around, and properly delete a gd.EventsContext.
+export const toEventsContextResult = (
+  eventsContext: gdEventsContext
+): EventsContextResult => {
+  const objectsNames = eventsContext
+    .getObjectNames()
+    .toNewVectorString()
+    .toJSArray();
+  const objectOrGroupNames = eventsContext
+    .getObjectOrGroupNames()
+    .toNewVectorString()
+    .toJSArray();
+
+  const objectOrGroupBehaviorNames = {};
+  objectOrGroupNames.forEach(objectOrGroupName => {
+    const behaviorNames = eventsContext
+      .getBehaviorNamesOf(objectOrGroupName)
+      .toNewVectorString()
+      .toJSArray();
+
+    if (behaviorNames.length) {
+      objectOrGroupBehaviorNames[objectOrGroupName] = behaviorNames;
+    }
+  });
+
+  return {
+    objectsNames,
+    objectOrGroupNames,
+    objectOrGroupBehaviorNames,
+  };
+};
+
+type Props = {|
+  onClose: () => void,
+  eventsContextResult: EventsContextResult,
 |};
 
 export default class EventsContextAnalyzerDialog extends React.Component<
@@ -17,8 +57,7 @@ export default class EventsContextAnalyzerDialog extends React.Component<
   {}
 > {
   render() {
-    const { open, onClose, objectsNames, objectOrGroupNames } = this.props;
-    if (!objectsNames || !objectOrGroupNames) return null;
+    const { onClose, eventsContextResult } = this.props;
     const actions = [
       <FlatButton
         label={<Trans>Close</Trans>}
@@ -28,17 +67,34 @@ export default class EventsContextAnalyzerDialog extends React.Component<
     ];
 
     return (
-      <Dialog actions={actions} open={open} onRequestClose={onClose}>
+      <Dialog actions={actions} open onRequestClose={onClose}>
         <p>
           <Trans>
             Objects or groups being directly referenced in the events:{' '}
-            {objectOrGroupNames.join(', ')}
+            {eventsContextResult.objectOrGroupNames.join(', ')}
           </Trans>
         </p>
         <p>
           <Trans>
-            All objects potentially used in events: {objectsNames.join(', ')}
+            All objects potentially used in events:{' '}
+            {eventsContextResult.objectsNames.join(', ')}
           </Trans>
+        </p>
+        <p>
+          <Trans>All behaviors being directly referenced in the events:</Trans>
+          {Object.keys(eventsContextResult.objectOrGroupBehaviorNames).map(
+            objectOrGroupName => {
+              return (
+                <Trans key={objectOrGroupName}>
+                  Behaviors of {objectOrGroupName}:{' '}
+                  {eventsContextResult.objectOrGroupBehaviorNames[
+                    objectOrGroupName
+                  ].join(', ')}
+                  ;
+                </Trans>
+              );
+            }
+          )}
         </p>
       </Dialog>
     );

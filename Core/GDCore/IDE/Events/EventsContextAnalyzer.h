@@ -33,9 +33,11 @@ class GD_CORE_API EventsContext {
       : project(project_), layout(layout_){};
   virtual ~EventsContext(){};
 
-  void AddObjectName(const gd::String& objectName);
+  void AddObjectName(const gd::String& objectOrGroupName);
+  void AddBehaviorName(const gd::String& objectOrGroupName,
+                       const gd::String& behaviorName);
 
-  std::vector<gd::String> ExpandObjectsName(const gd::String& objectName);
+  std::vector<gd::String> ExpandObjectsName(const gd::String& objectOrGroupName);
 
   /**
    * \brief Get object or group names being referenced in the events.
@@ -50,9 +52,18 @@ class GD_CORE_API EventsContext {
    */
   const std::set<gd::String>& GetObjectNames() { return objectNames; }
 
+  /**
+   * \brief Get behaviors referenced in the events for the given object (or
+   * group) name.
+   */
+  const std::set<gd::String>& GetBehaviorNamesOf(const gd::String& objectOrGroupName) {
+    return objectOrGroupBehaviorNames[objectOrGroupName];
+  }
+
  private:
   std::set<gd::String> objectOrGroupNames;
   std::set<gd::String> objectNames;
+  std::map<gd::String, std::set<gd::String>> objectOrGroupBehaviorNames;
   gd::ObjectsContainer& project;
   gd::ObjectsContainer& layout;
 };
@@ -83,7 +94,8 @@ class GD_CORE_API EventsContextAnalyzer : public ArbitraryEventsWorker {
                                const gd::ObjectsContainer& layout,
                                const gd::ParameterMetadata& metadata,
                                const gd::Expression& parameter,
-                               EventsContext& context);
+                               EventsContext& context,
+                               const gd::String& lastObjectName);
 
  private:
   virtual bool DoVisitInstruction(gd::Instruction& instruction,

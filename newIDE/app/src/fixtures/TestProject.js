@@ -331,11 +331,11 @@ export const makeTestProject = gd => {
 
   const testSerializedEvents = JSON.parse(
     `[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoLeft","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","-150","0","1"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoRight","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","150","0","1"],"subInstructions":[]}],"events":[]}]`
-  ); 
+  );
 
   const testSerializedEventsWithLotsOfObjects = JSON.parse(
     `[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoLeft","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","-150","0","1"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoRight","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","150","0","1"],"subInstructions":[]}],"events":[]}, {"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":true,"value":"SystemInfo::IsMobile"},"parameters":[],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls2"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls3"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["HiddenStuff"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["Markers"],"subInstructions":[]}],"events":[]}]`
-  ); 
+  );
 
   return {
     project,

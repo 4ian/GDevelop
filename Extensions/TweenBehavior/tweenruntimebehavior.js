@@ -106,16 +106,30 @@ gdjs.TweenRuntimeBehavior.prototype._tweenIsPlaying = function(identifier) {
 };
 
 gdjs.TweenRuntimeBehavior.prototype._pauseTween = function(identifier) {
-  return this._tweens[identifier].instance.pause();
+  var tween = this._tweens[identifier];
+
+  // Pause the tween, and remove it from the scene of living tweens
+  // (the invariant is that scene only contains tweens being played).
+  tween.instance.pause();
+  if (this._runtimeScene.shiftyJsScene) {
+    this._runtimeScene.shiftyJsScene.remove(tween.instance);
+  }
 };
 
 gdjs.TweenRuntimeBehavior.prototype._resumeTween = function(identifier) {
-  return this._tweens[identifier].instance.resume().catch(() => {
+  var tween = this._tweens[identifier];
+
+  // Resume the tween, and add it back to the scene of living tweens
+  // (the invariant is that scene only contains tweens being played).
+  tween.instance.resume().catch(() => {
     // Do nothing if the Promise is rejected. Rejection is used
     // by Shifty.js to signal that the tween was not finished.
     // We catch it to avoid an uncaught promise error, and to
     // ensure that the content of the "then" is always applied:
   });
+  if (this._runtimeScene.shiftyJsScene) {
+    this._runtimeScene.shiftyJsScene.add(tween.instance);
+  }
 };
 
 gdjs.TweenRuntimeBehavior.prototype._stopTween = function(
@@ -895,7 +909,7 @@ gdjs.TweenRuntimeBehavior.prototype.onDeActivate = function() {
 
       if (tween.instance.isPlaying()) {
         tween.resumeOnActivate = true;
-        tween.instance.pause();
+        this._pauseTween(key);
       }
     }
   }
@@ -911,7 +925,7 @@ gdjs.TweenRuntimeBehavior.prototype.onActivate = function() {
 
       if (tween.resumeOnActivate) {
         tween.resumeOnActivate = false;
-        tween.instance.resume();
+        this._resumeTween(key);
       }
     }
   }
@@ -960,6 +974,8 @@ gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneUnloaded = function(
 ) {
   if (!runtimeScene.shiftyJsScene) return;
 
+  // Stop and explictly remove all tweenables to be sure to drop
+  // all references to the tweenables of the scene.
   runtimeScene.shiftyJsScene.stop(false);
   runtimeScene.shiftyJsScene.tweenables.forEach(
     runtimeScene.shiftyJsScene.remove.bind(runtimeScene.shiftyJsScene)
@@ -995,6 +1011,9 @@ gdjs.TweenRuntimeBehavior.gdjsCallbackRuntimeSceneResumed = function(
     .getTimeManager()
     .getTimeFromStart();
   runtimeScene.shiftyJsScene.resume();
+
+  // Note that per the invariant of shiftyJsScene, shiftyJsScene will only
+  // contains tweenables that should be playing (so calling resume is safe).
 };
 
 // Handle Shifty.js updates (the time and the "tick" of tweens

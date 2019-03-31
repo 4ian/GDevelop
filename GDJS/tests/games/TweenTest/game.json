@@ -1851,6 +1851,72 @@
                 }
               ],
               "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "KeyReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "a"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "PositionTweenSprite",
+                    "TweenBehavior",
+                    "yes"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "disabled": false,
+              "folded": false,
+              "type": "BuiltinCommonInstructions::Standard",
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "KeyReleased"
+                  },
+                  "parameters": [
+                    "",
+                    "z"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ActivateBehavior"
+                  },
+                  "parameters": [
+                    "PositionTweenSprite",
+                    "TweenBehavior",
+                    "no"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
             }
           ]
         },
@@ -2154,6 +2220,18 @@
                         "no"
                       ],
                       "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::RemoveTween"
+                      },
+                      "parameters": [
+                        "PositionTweenSprite",
+                        "TweenBehavior",
+                        "\"PositionTweenFirst\""
+                      ],
+                      "subInstructions": []
                     }
                   ],
                   "events": []
@@ -2213,6 +2291,18 @@
                         "\"linear\"",
                         "1000",
                         "no"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "Tween::RemoveTween"
+                      },
+                      "parameters": [
+                        "PositionTweenSprite",
+                        "TweenBehavior",
+                        "\"PositionTweenSecond\""
                       ],
                       "subInstructions": []
                     }

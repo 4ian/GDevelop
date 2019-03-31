@@ -77,7 +77,9 @@
         "cstdint": "cpp",
         "forward_list": "cpp",
         "mutex": "cpp",
-        "__hash": "cpp"
+        "__hash": "cpp",
+        "__debug": "cpp",
+        "__threading_support": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

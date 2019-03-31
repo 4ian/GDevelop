@@ -53,5 +53,7 @@ declare type gdVectorEventsFunction = EmscriptenObject;
 declare type gdVectorEventsSearchResult = EmscriptenObject;
 declare type gdMapStringPropertyDescriptor = EmscriptenObject;
 
+declare type gdEventsContext = EmscriptenObject;
+
 //Represents all objects that have serializeTo and unserializeFrom methods.
 declare type gdSerializable = EmscriptenObject;

@@ -210,6 +210,7 @@ class GD_CORE_API ExpressionMetadata {
     return parameters[id];
   };
   std::size_t GetParametersCount() const { return parameters.size(); };
+  const std::vector<gd::ParameterMetadata> & GetParameters() const { return parameters; };
 
   std::vector<gd::ParameterMetadata> parameters;
 

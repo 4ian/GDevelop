@@ -15,6 +15,7 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
+#include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
 #include "GDCore/IDE/Events/ExpressionValidator.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
@@ -65,8 +66,11 @@ class GD_CORE_API ExpressionObjectsAnalyzer
   void OnVisitFunctionNode(FunctionNode& node) override {
     if (!node.objectName.empty()) {
       context.AddObjectName(node.objectName);
-    }
 
+      if (!node.behaviorName.empty()) {
+        context.AddBehaviorName(node.objectName, node.behaviorName);
+      }
+    }
     for (auto& parameter : node.parameters) {
       parameter->Visit(*this);
     }
@@ -85,16 +89,20 @@ bool EventsContextAnalyzer::DoVisitInstruction(gd::Instruction& instruction,
                   : MetadataProvider::GetActionMetadata(platform,
                                                         instruction.GetType());
 
-  for (int i = 0; i < instruction.GetParametersCount() &&
-                  i < instrInfo.GetParametersCount();
-       ++i) {
-    AnalyzeParameter(platform,
-                     project,
-                     layout,
-                     instrInfo.GetParameter(i),
-                     instruction.GetParameter(i),
-                     context);
-  }
+  gd::ParameterMetadataTools::IterateOverParameters(
+      instruction.GetParameters(),
+      instrInfo.parameters,
+      [this](const gd::ParameterMetadata& parameterMetadata,
+             const gd::String& parameterValue,
+             const gd::String& lastObjectName) {
+        AnalyzeParameter(platform,
+                         project,
+                         layout,
+                         parameterMetadata,
+                         parameterValue,
+                         context,
+                         lastObjectName);
+      });
 
   return false;
 }
@@ -105,7 +113,8 @@ void EventsContextAnalyzer::AnalyzeParameter(
     const gd::ObjectsContainer& layout,
     const gd::ParameterMetadata& metadata,
     const gd::Expression& parameter,
-    EventsContext& context) {
+    EventsContext& context,
+    const gd::String& lastObjectName) {
   const auto& value = parameter.GetPlainString();
   const auto& type = metadata.GetType();
   if (ParameterMetadata::IsObject(type)) {
@@ -122,6 +131,8 @@ void EventsContextAnalyzer::AnalyzeParameter(
 
     ExpressionObjectsAnalyzer analyzer(context);
     node->Visit(analyzer);
+  } else if (ParameterMetadata::IsBehavior(type)) {
+    context.AddBehaviorName(lastObjectName, value);
   }
 }
 
@@ -130,6 +141,11 @@ void EventsContext::AddObjectName(const gd::String& objectName) {
     objectNames.insert(realObjectName);
   }
   objectOrGroupNames.insert(objectName);
+}
+
+void EventsContext::AddBehaviorName(const gd::String& objectName,
+                                    const gd::String& behaviorName) {
+  objectOrGroupBehaviorNames[objectName].insert(behaviorName);
 }
 
 std::vector<gd::String> EventsContext::ExpandObjectsName(

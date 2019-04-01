@@ -10,7 +10,6 @@ import ChevronLeft from 'material-ui/svg-icons/navigation/chevron-left';
 import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import IconButton from 'material-ui/IconButton';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import { showMessageBox } from '../UI/Messages/MessageBox';
 import {
   type SearchInEventsInputs,
   type ReplaceInEventsInputs,
@@ -25,7 +24,6 @@ type Props = {|
   onGoToNextSearchResult: () => ?gdBaseEvent,
 |};
 type State = {|
-  searchDirty: boolean,
   searchText: string,
   replaceText: string,
   matchCase: boolean,
@@ -37,7 +35,6 @@ type State = {|
 export default class SearchPanel extends PureComponent<Props, State> {
   searchTextField: ?TextField;
   state = {
-    searchDirty: false,
     searchText: '',
     replaceText: '',
     matchCase: false,
@@ -67,14 +64,10 @@ export default class SearchPanel extends PureComponent<Props, State> {
       searchInActions,
       searchInConditions,
     });
-    this.setState({
-      searchDirty: false,
-    });
   };
 
   launchReplace = () => {
     const {
-      searchDirty,
       searchText,
       replaceText,
       searchInSelection,
@@ -82,12 +75,6 @@ export default class SearchPanel extends PureComponent<Props, State> {
       searchInActions,
       searchInConditions,
     } = this.state;
-    // if (searchDirty) {
-    //   showMessageBox(
-    //     'Click on Search first, inspect the results and then click on Replace to do the replacement(s).'
-    //   );
-    //   return;
-    // }
 
     this.launchSearch();
 
@@ -97,7 +84,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
       replaceText,
       matchCase,
       searchInActions,
-      searchInConditions
+      searchInConditions,
     });
   };
 
@@ -119,9 +106,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 (this.searchTextField = _searchTextField)
               }
               hintText={<Trans>Text to search</Trans>}
-              onChange={(e, searchText) =>
-                this.setState({ searchText, searchDirty: true })
-              }
+              onChange={(e, searchText) => this.setState({ searchText })}
               value={searchText}
               fullWidth
             />
@@ -156,7 +141,9 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 checked={!this.state.matchCase}
                 onCheck={(e, checked) => this.setState({ matchCase: !checked })}
               />
-              <p><Trans>Filter by</Trans></p>
+              <p>
+                <Trans>Filter by</Trans>
+              </p>
               <InlineCheckbox
                 label={<Trans>Conditions</Trans>}
                 checked={this.state.searchInConditions}

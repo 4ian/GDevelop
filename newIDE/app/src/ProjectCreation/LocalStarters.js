@@ -1,3 +1,4 @@
+// @flow
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Divider from 'material-ui/Divider';
@@ -15,19 +16,29 @@ const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
 const gd = global.gd;
 
-export default class LocalStarters extends Component {
+type Props = {|
+  onOpen: string => void,
+  onCreate: gdProject => void,
+  onShowExamples: () => void,
+|};
+
+type State = {|
+  outputPath: string,
+|};
+
+export default class LocalStarters extends Component<Props, State> {
   state = {
     outputPath: findEmptyPath(
-      path ? path.join(app.getPath('home'), 'GDevelop projects') : ''
+      path && app ? path.join(app.getPath('home'), 'GDevelop projects') : ''
     ),
   };
 
-  _handleChangePath = outputPath =>
+  _handleChangePath = (outputPath: string) =>
     this.setState({
       outputPath,
     });
 
-  createFromExample(exampleName) {
+  createFromExample(exampleName: string) {
     const { outputPath } = this.state;
     if (!fs || !outputPath) return;
 
@@ -143,8 +154,7 @@ export default class LocalStarters extends Component {
               fullWidth
               value={this.state.outputPath}
               onChange={this._handleChangePath}
-              title={<Trans>Folder where to create the game</Trans>}
-              message={<Trans>Choose where to create the game</Trans>}
+              type="create-game"
             />
           </Column>
         </Line>

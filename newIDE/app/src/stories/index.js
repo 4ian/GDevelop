@@ -857,9 +857,26 @@ storiesOf('BuildProgress', module)
 storiesOf('LocalFolderPicker', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
-  .add('default', () => <LocalFolderPicker floatingLabelText="Export folder" />)
+  .add('default', () => (
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <LocalFolderPicker value={value} onChange={onChange} type="export" />
+      )}
+    />
+  ))
   .add('full width', () => (
-    <LocalFolderPicker floatingLabelText="Export folder" fullWidth />
+    <ValueStateHolder
+      initialValue={'Test'}
+      render={(value, onChange) => (
+        <LocalFolderPicker
+          value={value}
+          onChange={onChange}
+          type="export"
+          fullWidth
+        />
+      )}
+    />
   ));
 
 storiesOf('LocalFilePicker', module)

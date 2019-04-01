@@ -29,7 +29,7 @@ type SearchEnhancedExampleInformation = {|
 |};
 
 type Props = {|
-  exampleNames: Array<string>,
+  exampleNames: ?Array<string>,
   onCreateFromExample: string => void,
 |};
 

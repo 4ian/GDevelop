@@ -365,8 +365,9 @@ gdjs.RuntimeGamePixiRenderer.prototype.getWindowTitle = function() {
 gdjs.RuntimeGamePixiRenderer.prototype.startGameLoop = function(fn) {
     requestAnimationFrame(gameLoop);
 
-    var oldTime = null;
-    function gameLoop(time) {
+    var oldTime = 0;
+    function gameLoop(/*Don't use time provided by requestAnimationFrame as might not reflect real time passed on some monitors*/) {
+        var time = performance.now();
         var dt = oldTime ? time - oldTime : 0;
         oldTime = time;
 

@@ -136,15 +136,6 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
           value={this.state.windowTitle}
           onChange={(e, value) => this.setState({ windowTitle: value })}
         />
-        <ColorField
-          floatingLabelText={<Trans>Scene background color</Trans>}
-          fullWidth
-          disableAlpha
-          color={this.state.backgroundColor}
-          onChangeComplete={color =>
-            this.setState({ backgroundColor: color.rgb })
-          }
-        />
         <Checkbox
           checked={this.state.shouldStopSoundsOnStartup}
           label={<Trans>Stop musics and sounds on startup</Trans>}
@@ -152,6 +143,15 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
             this.setState({
               shouldStopSoundsOnStartup: check,
             })
+          }
+        />
+        <ColorField
+          floatingLabelText={<Trans>Scene background color</Trans>}
+          fullWidth
+          disableAlpha
+          color={this.state.backgroundColor}
+          onChangeComplete={color =>
+            this.setState({ backgroundColor: color.rgb })
           }
         />
         <RaisedButton

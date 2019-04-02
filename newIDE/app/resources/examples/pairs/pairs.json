@@ -971,8 +971,8 @@
           ],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1049,8 +1049,8 @@
           ],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1127,8 +1127,8 @@
           ],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1205,8 +1205,8 @@
           ],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1283,8 +1283,8 @@
           ],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1361,8 +1361,8 @@
           ],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1439,8 +1439,8 @@
           ],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1517,8 +1517,8 @@
           ],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1628,8 +1628,8 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1751,8 +1751,8 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1775,8 +1775,8 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1870,8 +1870,8 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -1914,8 +1914,8 @@
           "variables": [],
           "behaviors": [
             {
-              "name": "TweenBehavior",
-              "type": "Tween::TweenBehavior",
+              "name": "Tween",
+              "type": "Tween::Tween",
               "content": {}
             }
           ],
@@ -2088,7 +2088,7 @@
                           },
                           "parameters": [
                             "cards",
-                            "TweenBehavior",
+                            "Tween",
                             "\"fly_in\"",
                             "position_placeholder.X()",
                             "position_placeholder.Y()",
@@ -2175,7 +2175,7 @@
                       },
                       "parameters": [
                         "screen_fade",
-                        "TweenBehavior",
+                        "Tween",
                         "\"fade_in\"",
                         "0",
                         "\"linear\"",
@@ -2336,7 +2336,7 @@
                           },
                           "parameters": [
                             "cards",
-                            "TweenBehavior",
+                            "Tween",
                             "\"uncover_1\""
                           ],
                           "subInstructions": []
@@ -2348,7 +2348,7 @@
                           },
                           "parameters": [
                             "cards",
-                            "TweenBehavior",
+                            "Tween",
                             "\"uncover_0\"",
                             "0",
                             "\"linear\"",
@@ -2533,7 +2533,7 @@
                   },
                   "parameters": [
                     "cards",
-                    "TweenBehavior",
+                    "Tween",
                     "\"uncover_0\""
                   ],
                   "subInstructions": []
@@ -2565,7 +2565,7 @@
                       },
                       "parameters": [
                         "cards",
-                        "TweenBehavior",
+                        "Tween",
                         "\"uncover_0\""
                       ],
                       "subInstructions": []
@@ -2577,7 +2577,7 @@
                       },
                       "parameters": [
                         "cards",
-                        "TweenBehavior",
+                        "Tween",
                         "\"uncover_1\"",
                         "1",
                         "\"linear\"",
@@ -2690,7 +2690,7 @@
                           },
                           "parameters": [
                             "pairs",
-                            "TweenBehavior",
+                            "Tween",
                             "\"flash\"",
                             "\"179;211;48\"",
                             "\"easeInOutQuad\"",
@@ -2850,7 +2850,7 @@
                                           },
                                           "parameters": [
                                             "cards",
-                                            "TweenBehavior",
+                                            "Tween",
                                             "\"vanish\"",
                                             "0",
                                             "0",
@@ -2919,7 +2919,7 @@
                           },
                           "parameters": [
                             "cards",
-                            "TweenBehavior",
+                            "Tween",
                             "\"cover_1\""
                           ],
                           "subInstructions": []
@@ -2931,7 +2931,7 @@
                           },
                           "parameters": [
                             "cards",
-                            "TweenBehavior",
+                            "Tween",
                             "\"cover_0\"",
                             "0",
                             "\"linear\"",
@@ -3051,7 +3051,7 @@
                   },
                   "parameters": [
                     "cards",
-                    "TweenBehavior",
+                    "Tween",
                     "\"cover_0\""
                   ],
                   "subInstructions": []
@@ -3091,7 +3091,7 @@
                       },
                       "parameters": [
                         "cards",
-                        "TweenBehavior",
+                        "Tween",
                         "\"cover_0\""
                       ],
                       "subInstructions": []
@@ -3103,7 +3103,7 @@
                       },
                       "parameters": [
                         "cards",
-                        "TweenBehavior",
+                        "Tween",
                         "\"cover_1\"",
                         "1",
                         "\"linear\"",
@@ -3220,7 +3220,7 @@
                       },
                       "parameters": [
                         "newgame_button",
-                        "TweenBehavior",
+                        "Tween",
                         "\"pop_up\"",
                         "1",
                         "1",
@@ -3306,7 +3306,7 @@
                           },
                           "parameters": [
                             "newgame_button",
-                            "TweenBehavior",
+                            "Tween",
                             "\"shine\"",
                             "\"255;255;255\"",
                             "\"easeFromTo\"",
@@ -3425,7 +3425,7 @@
                           },
                           "parameters": [
                             "newgame_button",
-                            "TweenBehavior",
+                            "Tween",
                             "\"shine\"",
                             "\"200;200;200\"",
                             "\"easeFromTo\"",
@@ -3549,7 +3549,7 @@
                       },
                       "parameters": [
                         "ui_background",
-                        "TweenBehavior",
+                        "Tween",
                         "\"fade_out\"",
                         "175",
                         "\"linear\"",
@@ -3600,8 +3600,8 @@
       ],
       "behaviorsSharedData": [
         {
-          "name": "TweenBehavior",
-          "type": "Tween::TweenBehavior"
+          "name": "Tween",
+          "type": "Tween::Tween"
         }
       ]
     }

@@ -44,10 +44,10 @@ module.exports = {
 
     const behavior = extension
       .addBehavior(
-        "TweenBehavior",
-        _("Tween animation"),
-        "TweenBehavior",
-        _("Tween animation"),
+        "Tween",
+        _("Tween"),
+        "Tween",
+        _("Smoothly animate position, angle, scale and other properties of the object"),
         "",
         "JsPlatform/Extensions/tween_behavior32.png",
         "TweenBehavior",
@@ -213,7 +213,7 @@ module.exports = {
         "AddObjectScaleTween",
         _("Add object scale tween"),
         _(
-          "Add a tween animation for the object scale. (Note: the scale can never be less than 0)"
+          "Add a tween animation for the object scale (Note: the scale can never be less than 0)."
         ),
         _(
           "Tween the scale of _PARAM0_ to X-scale: _PARAM3_, Y-scale: _PARAM4_ with easing _PARAM5_ over _PARAM6_ms as _PARAM2_"
@@ -245,7 +245,7 @@ module.exports = {
         "AddObjectScaleXTween",
         _("Add object X-scale tween"),
         _(
-          "Add a tween animation for the object X-scale. (Note: the scale can never be less than 0)"
+          "Add a tween animation for the object X-scale (Note: the scale can never be less than 0)."
         ),
         _(
           "Tween the X-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
@@ -276,7 +276,7 @@ module.exports = {
         "AddObjectScaleYTween",
         _("Add object Y-scale tween"),
         _(
-          "Add a tween animation for the object Y-scale. (Note: the scale can never be less than 0)"
+          "Add a tween animation for the object Y-scale (Note: the scale can never be less than 0)."
         ),
         _(
           "Tween the Y-scale of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
@@ -307,7 +307,7 @@ module.exports = {
         "AddTextObjectCharacterSizeTween",
         _("Add text size tween"),
         _(
-          "Add a tween animation for the text object character size. (Note: the size can never be less than 1)"
+          "Add a tween animation for the text object character size (Note: the size can never be less than 1)."
         ),
         _(
           "Tween the character size of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
@@ -338,7 +338,7 @@ module.exports = {
         "AddObjectOpacityTween",
         _("Add object opacity tween"),
         _(
-          "Add a tween animation for the object opacity. (Value between 0 and 255)"
+          "Add a tween animation for the object opacity (Value between 0 and 255)."
         ),
         _(
           "Tween the opacity of _PARAM0_ to _PARAM3_ with easing _PARAM4_ over _PARAM5_ms as _PARAM2_"
@@ -510,7 +510,7 @@ module.exports = {
 
     behavior
       .addExpression(
-        "GetProgress",
+        "Progress",
         _("Progress of a tween"),
         _("Progress of a tween (between 0.0 and 1.0)"),
         _(""),

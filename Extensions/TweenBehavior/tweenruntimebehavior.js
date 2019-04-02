@@ -19,7 +19,7 @@ gdjs.TweenRuntimeBehavior.prototype = Object.create(
 );
 
 gdjs.TweenRuntimeBehavior.thisIsARuntimeBehaviorConstructor =
-  "Tween::TweenBehavior";
+  "Tween::Tween";
 
 gdjs.TweenRuntimeBehavior.easings = [
   "linear",

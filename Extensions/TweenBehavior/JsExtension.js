@@ -50,7 +50,7 @@ module.exports = {
         _("Smoothly animate position, angle, scale and other properties of the object"),
         "",
         "JsPlatform/Extensions/tween_behavior32.png",
-        "TweenBehavior",
+        "Tween",
         tweenBehavior,
         new gd.BehaviorsSharedData()
       )
@@ -73,7 +73,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("objectvar", _("Object variable"), "", false)
       .addParameter("expression", _("From value"), "", false)
@@ -104,7 +104,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To X"), "", false)
       .addParameter("expression", _("To Y"), "", false)
@@ -134,7 +134,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To X"), "", false)
       .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
@@ -163,7 +163,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To Y"), "", false)
       .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
@@ -192,7 +192,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To angle (in degrees)"), "", false)
       .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
@@ -223,7 +223,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To scale X"), "", false)
       .addParameter("expression", _("To scale Y"), "", false)
@@ -255,7 +255,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To scale X"), "", false)
       .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
@@ -286,7 +286,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To scale Y"), "", false)
       .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
@@ -317,7 +317,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Text object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To character size"), "", false)
       .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
@@ -348,7 +348,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("expression", _("To opacity"), "", false)
       .addParameter("stringWithSelector", _("Easing"), easingChoices, false)
@@ -379,7 +379,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("string", _("To color"), "", false)
       .addParameter("stringWithSelector", _("Items"), easingChoices, false)
@@ -406,7 +406,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("exists");
@@ -422,7 +422,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("isPlaying");
@@ -438,7 +438,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("hasFinished");
@@ -454,7 +454,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("pauseTween");
@@ -470,7 +470,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .addParameter("yesorno", _("Jump to end"), "", false)
       .getCodeExtraInformation()
@@ -487,7 +487,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("resumeTween");
@@ -503,7 +503,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("removeTween");
@@ -518,7 +518,7 @@ module.exports = {
         "JsPlatform/Extensions/tween_behavior32.png"
       )
       .addParameter("object", _("Object"), "", false)
-      .addParameter("behavior", _("Behavior"), "TweenBehavior", false)
+      .addParameter("behavior", _("Behavior"), "Tween", false)
       .addParameter("string", _("Tween Identifier"), "", false)
       .getCodeExtraInformation()
       .setFunctionName("getProgress");

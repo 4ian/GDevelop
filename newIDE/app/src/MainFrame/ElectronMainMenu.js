@@ -249,7 +249,7 @@ class ElectronMainMenu extends React.Component<Props, {||}> {
         },
         {
           label: i18n._(t`Community Discord Chat`),
-          onClickOpenLink: 'https://discord.gg/JWcfHEB',
+          onClickOpenLink: 'https://discord.gg/rjdYHvj',
         },
         { type: 'separator' },
         {

@@ -100,6 +100,11 @@ gdjs.SpriteRuntimeObjectPixiRenderer.prototype.setColor = function(rgbColor) {
    this._sprite.tint = "0x" + gdjs.rgbToHex(parseInt(colors[0], 10), parseInt(colors[1], 10), parseInt(colors[2], 10));
 };
 
+gdjs.SpriteRuntimeObjectPixiRenderer.prototype.getColor = function() {
+    var rgb = PIXI.utils.hex2rgb(this._sprite.tint)
+    return Math.floor(rgb[0]*255) + ';' + Math.floor(rgb[1]*255) + ';' + Math.floor(rgb[2]*255);
+}
+
 gdjs.SpriteRuntimeObjectPixiRenderer.prototype.getWidth = function() {
     if ( this._spriteDirty ) this._updatePIXISprite();
     return this._cachedWidth;

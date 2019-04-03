@@ -118,6 +118,11 @@ gdjs.SpriteRuntimeObjectCocosRenderer.prototype.setColor = function(rgbColor) {
     );
 };
 
+gdjs.SpriteRuntimeObjectCocosRenderer.prototype.getColor = function() {
+    var color = this._sprite.getColor();
+    return color.r + ';' + color.g + ';' + color.b;
+};
+
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.getWidth = function() {
     if ( this._spriteDirty ) this._updateCocosSprite();
     return this._cachedWidth || 0;

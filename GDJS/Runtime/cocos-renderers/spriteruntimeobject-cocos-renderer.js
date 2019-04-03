@@ -119,8 +119,8 @@ gdjs.SpriteRuntimeObjectCocosRenderer.prototype.setColor = function(rgbColor) {
 };
 
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.getColor = function() {
-    var rgb = cc.color.fromHEX(this._sprite.tint);
-    return rgb.r + ';' + rgb.g + ';' + rgb.b;
+    var color = this._sprite.getColor();
+    return color.r + ';' + color.g + ';' + color.b;
 };
 
 gdjs.SpriteRuntimeObjectCocosRenderer.prototype.getWidth = function() {

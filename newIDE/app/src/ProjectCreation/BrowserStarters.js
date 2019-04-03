@@ -83,6 +83,23 @@ export default class BrowserStarters extends Component {
                   this.props.onOpen('example://downhill-bike-physics-demo');
                 }}
               />
+              <ListItem
+                primaryText="Pairs"
+                secondaryText={
+                  <p>
+                    <Trans>
+                      Find all matching pairs of cards in this relaxing game.
+                      Use tweens to create smooth, natural animations with a few
+                      events.
+                    </Trans>
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => {
+                  sendNewGameCreated('pairs');
+                  this.props.onOpen('example://pairs');
+                }}
+              />
             </List>
             <Line alignItems="center" justifyContent="center">
               <RaisedButton

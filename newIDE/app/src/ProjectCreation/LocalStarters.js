@@ -129,6 +129,20 @@ export default class LocalStarters extends Component<Props, State> {
                 }
               />
               <ListItem
+                primaryText="Pairs"
+                secondaryText={
+                  <p>
+                    <Trans>
+                      Find all matching pairs of cards in this relaxing game.
+                      Use tweens to create smooth, natural animations with a few
+                      events.
+                    </Trans>
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => this.createFromExample('pairs')}
+              />
+              <ListItem
                 primaryText={<Trans>Empty game</Trans>}
                 secondaryText={
                   <p>

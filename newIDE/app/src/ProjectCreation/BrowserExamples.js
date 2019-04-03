@@ -66,6 +66,7 @@ const exampleNames = [
   'object-selection',
   'objects-timers',
   'open-url-in-browser',
+  'pairs',
   'parallax-scrolling',
   'parallax',
   'parse-json-from-api',

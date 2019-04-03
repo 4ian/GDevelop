@@ -54,6 +54,7 @@ import objectGravity from '../fixtures/object-gravity/object-gravity.json';
 import objectSelection from '../fixtures/object-selection/object-selection.json';
 import objectsTimers from '../fixtures/objects-timers/objects-timers.json';
 import openUrlInBrowser from '../fixtures/open-url-in-browser/open-url-in-browser.json';
+import pairs from '../fixtures/pairs/pairs.json';
 import parallax from '../fixtures/parallax/parallax.json';
 import parallaxScrolling from '../fixtures/parallax-scrolling/parallax-scrolling.json';
 import parseJsonFromApi from '../fixtures/parse-json-from-api/parse-json-from-api.json';
@@ -221,6 +222,8 @@ export default class BrowserProjectOpener {
       return Promise.resolve(objectsTimers);
     } else if (url === 'example://open-url-in-browser') {
       return Promise.resolve(openUrlInBrowser);
+    } else if (url === 'example://pairs') {
+      return Promise.resolve(pairs);
     } else if (url === 'example://parallax') {
       return Promise.resolve(parallax);
     } else if (url === 'example://parallax-scrolling') {

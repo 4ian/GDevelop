@@ -78,11 +78,11 @@ export default class ObjectField extends React.Component<
 }
 export const renderObjectWithThumbnail = (
   value: string,
-  getObjectThumbnail: string => React.Node
+  renderObjectThumbnail: string => React.Node
 ) => {
   return (
     <span title={value}>
-      {getObjectThumbnail && getObjectThumbnail(value)}
+      {renderObjectThumbnail(value)}
       {value}
     </span>
   );

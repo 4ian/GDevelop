@@ -91,7 +91,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
     this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
   };
 
-  renderObjectThumbnail = (objectName: string, thumbnailSize: number = 20) => {
+  renderObjectThumbnail = (objectName: string) => {
     const { project, layout } = this.props;
     const object = getObjectByName(project, layout, objectName);
     if (object) {

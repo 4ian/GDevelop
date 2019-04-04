@@ -141,6 +141,6 @@
 }
 
 .gd-events-sheet .icon {
-    vertical-align: baseline;
+    vertical-align: sub;
     object-fit: contain;
 }

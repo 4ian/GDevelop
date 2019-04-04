@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, type Node } from 'react';
 import muiThemeable from 'material-ui/styles/muiThemeable';
 import findIndex from 'lodash/findIndex';
 import {
@@ -63,6 +63,7 @@ type EventsContainerProps = {|
   onEventContextMenu: (x: number, y: number) => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
+  renderObjectThumbnail: string => Node,
 |};
 
 /**
@@ -89,22 +90,6 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
   _onEventContextMenu = (domEvent: any) => {
     domEvent.preventDefault();
     this.props.onEventContextMenu(domEvent.clientX, domEvent.clientY);
-  };
-
-  renderObjectThumbnail = (objectName: string) => {
-    const { project, layout } = this.props;
-    const object = getObjectByName(project, layout, objectName);
-    if (object) {
-      return (
-        <img
-          className={classNames({
-            [icon]: true,
-          })}
-          alt=""
-          src={getThumbnail(project, object)}
-        />
-      );
-    }
   };
 
   render() {
@@ -143,7 +128,7 @@ class EventContainer extends Component<EventsContainerProps, {||}> {
             disabled={
               disabled /* Use disabled (not event.disabled) as it is true if a parent event is disabled*/
             }
-            renderObjectThumbnail={this.renderObjectThumbnail}
+            renderObjectThumbnail={this.props.renderObjectThumbnail}
           />
         )}
       </div>
@@ -380,6 +365,22 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
     this.forceEventsUpdate();
   };
 
+  _renderObjectThumbnail = (objectName: string) => {
+    const { project, layout } = this.props;
+    const object = getObjectByName(project, layout, objectName);
+    if (!object) return null;
+
+    return (
+      <img
+        className={classNames({
+          [icon]: true,
+        })}
+        alt=""
+        src={getThumbnail(project, object)}
+      />
+    );
+  };
+
   _renderEvent = ({ node }: { node: SortableTreeNode }) => {
     const { event, depth, disabled } = node;
 
@@ -423,6 +424,7 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
         disabled={
           disabled /* Use node.disabled (not event.disabled) as it is true if a parent event is disabled*/
         }
+        renderObjectThumbnail={this._renderObjectThumbnail}
       />
     );
   };

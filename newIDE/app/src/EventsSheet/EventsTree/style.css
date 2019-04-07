@@ -139,3 +139,8 @@
     text-decoration: line-through;
     opacity: 0.6;
 }
+
+.gd-events-sheet .icon {
+    vertical-align: sub;
+    object-fit: contain;
+}

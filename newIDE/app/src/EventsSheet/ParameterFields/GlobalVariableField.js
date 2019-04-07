@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react';
-import VariableField from './VariableField';
+import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 
@@ -53,3 +53,11 @@ export default class GlobalVariableField extends React.Component<
     );
   }
 }
+
+export const renderGlobalVariable = (value: string) => {
+  return renderVariableWithIcon(
+    value,
+    'res/types/globalvar.png',
+    'global variable'
+  );
+};

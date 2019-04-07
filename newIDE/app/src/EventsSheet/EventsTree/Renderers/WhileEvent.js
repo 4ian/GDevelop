@@ -66,6 +66,7 @@ export default class ForEachEvent extends React.Component<
           }
           onParameterClick={this.props.onParameterClick}
           disabled={this.props.disabled}
+          renderObjectThumbnail={this.props.renderObjectThumbnail}
         />
         <div
           className={classNames({
@@ -91,6 +92,7 @@ export default class ForEachEvent extends React.Component<
             }
             onParameterClick={this.props.onParameterClick}
             disabled={this.props.disabled}
+            renderObjectThumbnail={this.props.renderObjectThumbnail}
           />
           <InstructionsList
             instrsList={whileEvent.getActions()}
@@ -108,6 +110,7 @@ export default class ForEachEvent extends React.Component<
             }
             onParameterClick={this.props.onParameterClick}
             disabled={this.props.disabled}
+            renderObjectThumbnail={this.props.renderObjectThumbnail}
           />
         </div>
       </div>

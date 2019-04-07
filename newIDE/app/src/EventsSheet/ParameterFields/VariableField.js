@@ -7,6 +7,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { enumerateVariables } from './EnumerateVariables';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
 import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
+import classNames from 'classnames';
+import { icon } from '../EventsTree/ClassNames';
 
 const styles = {
   container: {
@@ -120,3 +122,22 @@ export default class VariableField extends Component<Props, State> {
     );
   }
 }
+
+export const renderVariableWithIcon = (
+  value: string,
+  iconPath: string,
+  tooltip: string = ''
+) => {
+  return (
+    <span title={tooltip}>
+      <img
+        className={classNames({
+          [icon]: true,
+        })}
+        src={iconPath}
+        alt=""
+      />
+      {value}
+    </span>
+  );
+};

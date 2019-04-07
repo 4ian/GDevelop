@@ -61,6 +61,7 @@ import {
   enumerateEventsMetadata,
   type EventMetadata,
 } from './EnumerateEventsMetadata';
+import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -797,312 +798,327 @@ export default class EventsSheet extends React.Component<Props, State> {
     if (!project) return null;
 
     return (
-      <EventsSearcher
-        key={events.ptr}
-        ref={eventSearcher => (this._eventSearcher = eventSearcher)}
-        events={events}
-        globalObjectsContainer={globalObjectsContainer}
-        objectsContainer={objectsContainer}
-        selection={this.state.selection}
-      >
-        {({
-          eventsSearchResultEvents,
-          searchFocusOffset,
-          searchInEvents,
-          replaceInEvents,
-          goToPreviousSearchResult,
-          goToNextSearchResult,
-        }) => (
-          <div
-            className="gd-events-sheet"
-            style={styles.container}
-            onFocus={() => this._keyboardShortcuts.focus()}
-            onBlur={() => this._keyboardShortcuts.blur()}
-            tabIndex={1}
+      <PreferencesContext.Consumer>
+        {({ values }) => (
+          <EventsSearcher
+            key={events.ptr}
+            ref={eventSearcher => (this._eventSearcher = eventSearcher)}
+            events={events}
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            selection={this.state.selection}
           >
-            <EventsTree
-              ref={eventsTree => (this._eventsTree = eventsTree)}
-              key={events.ptr}
-              events={events}
-              project={project}
-              layout={layout}
-              globalObjectsContainer={globalObjectsContainer}
-              objectsContainer={objectsContainer}
-              selection={this.state.selection}
-              onInstructionClick={this.selectInstruction}
-              onInstructionDoubleClick={this.openInstructionEditor}
-              onInstructionContextMenu={this.openInstructionContextMenu}
-              onInstructionsListContextMenu={
-                this.openInstructionsListContextMenu
-              }
-              onAddNewInstruction={this.openInstructionEditor}
-              onMoveToInstruction={this.moveSelectionToInstruction}
-              onMoveToInstructionsList={this.moveSelectionToInstructionsList}
-              onParameterClick={this.openParameterEditor}
-              onEventClick={this.selectEvent}
-              onEventContextMenu={this.openEventContextMenu}
-              onAddNewEvent={context =>
-                this.addNewEvent('BuiltinCommonInstructions::Standard', context)
-              }
-              onOpenExternalEvents={onOpenExternalEvents}
-              onOpenLayout={onOpenLayout}
-              searchResults={eventsSearchResultEvents}
-              searchFocusOffset={searchFocusOffset}
-              onEventMoved={this._onEventMoved}
-            />
-            {this.state.showSearchPanel && (
-              <SearchPanel
-                ref={searchPanel => (this._searchPanel = searchPanel)}
-                onSearchInEvents={inputs =>
-                  this._searchInEvents(searchInEvents, inputs)
-                }
-                onReplaceInEvents={inputs =>
-                  this._replaceInEvents(replaceInEvents, inputs)
-                }
-                resultsCount={
-                  eventsSearchResultEvents
-                    ? eventsSearchResultEvents.length
-                    : null
-                }
-                hasEventSelected={hasEventSelected(this.state.selection)}
-                onGoToPreviousSearchResult={() =>
-                  this._ensureEventUnfolded(goToPreviousSearchResult)
-                }
-                onGoToNextSearchResult={() =>
-                  this._ensureEventUnfolded(goToNextSearchResult)
-                }
-              />
-            )}
-            {events && events.getEventsCount() === 0 && (
-              <EmptyEventsPlaceholder />
-            )}
-            <InlineParameterEditor
-              open={this.state.inlineEditing}
-              anchorEl={this.state.inlineEditingAnchorEl}
-              onRequestClose={this.closeParameterEditor}
-              project={project}
-              layout={layout}
-              globalObjectsContainer={globalObjectsContainer}
-              objectsContainer={objectsContainer}
-              isCondition={this.state.editedParameter.isCondition}
-              instruction={this.state.editedParameter.instruction}
-              parameterIndex={this.state.editedParameter.parameterIndex}
-              onChange={value => {
-                const {
-                  instruction,
-                  parameterIndex,
-                } = this.state.editedParameter;
-                if (!instruction) return;
-                instruction.setParameter(parameterIndex, value);
-                this.setState({
-                  inlineEditingChangesMade: true,
-                });
-              }}
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this.props.onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-            />
-            <ContextMenu
-              ref={eventContextMenu =>
-                (this.eventContextMenu = eventContextMenu)
-              }
-              buildMenuTemplate={() => [
-                {
-                  label: 'Copy',
-                  click: () => this.copySelection(),
-                  accelerator: 'CmdOrCtrl+C',
-                },
-                {
-                  label: 'Cut',
-                  click: () => this.cutSelection(),
-                  accelerator: 'CmdOrCtrl+X',
-                },
-                {
-                  label: 'Paste',
-                  click: () => this.pasteEvents(),
-                  enabled: Clipboard.has(CLIPBOARD_KIND),
-                  accelerator: 'CmdOrCtrl+V',
-                },
-                {
-                  label: 'Delete',
-                  click: () => this.deleteSelection(),
-                  accelerator: 'Delete',
-                },
-                {
-                  label: 'Toggle disabled',
-                  click: () => this.toggleDisabled(),
-                  enabled: this._selectionCanToggleDisabled(),
-                },
-                { type: 'separator' },
-                {
-                  label: 'Add New Event Below',
-                  click: () =>
-                    this.addNewEvent('BuiltinCommonInstructions::Standard'),
-                },
-                {
-                  label: 'Add Sub Event',
-                  click: () => this.addSubEvents(),
-                  enabled: this._selectionCanHaveSubEvents(),
-                },
-                {
-                  label: 'Add Other',
-                  submenu: this.state.allEventsMetadata.map(metadata => {
-                    return {
-                      label: metadata.fullName,
-                      click: () => this.addNewEvent(metadata.type),
-                    };
-                  }),
-                },
-                { type: 'separator' },
-                {
-                  label: 'Undo',
-                  click: this.undo,
-                  enabled: canUndo(this.state.history),
-                  accelerator: 'CmdOrCtrl+Z',
-                },
-                {
-                  label: 'Redo',
-                  click: this.redo,
-                  enabled: canRedo(this.state.history),
-                  accelerator: 'CmdOrCtrl+Shift+Z',
-                },
-                { type: 'separator' },
-                {
-                  label: 'Analyze objects used in this event',
-                  click: this._openEventsContextAnalyzer,
-                },
-              ]}
-            />
-            <ContextMenu
-              ref={instructionContextMenu =>
-                (this.instructionContextMenu = instructionContextMenu)
-              }
-              buildMenuTemplate={() => [
-                {
-                  label: 'Copy',
-                  click: () => this.copySelection(),
-                  accelerator: 'CmdOrCtrl+C',
-                },
-                {
-                  label: 'Cut',
-                  click: () => this.cutSelection(),
-                  accelerator: 'CmdOrCtrl+X',
-                },
-                {
-                  label: 'Paste',
-                  click: () => this.pasteInstructions(),
-                  enabled: Clipboard.has(CLIPBOARD_KIND),
-                  accelerator: 'CmdOrCtrl+V',
-                },
-                { type: 'separator' },
-                {
-                  label: 'Delete',
-                  click: () => this.deleteSelection(),
-                  accelerator: 'Delete',
-                },
-                { type: 'separator' },
-                {
-                  label: 'Undo',
-                  click: this.undo,
-                  enabled: canUndo(this.state.history),
-                  accelerator: 'CmdOrCtrl+Z',
-                },
-                {
-                  label: 'Redo',
-                  click: this.redo,
-                  enabled: canRedo(this.state.history),
-                  accelerator: 'CmdOrCtrl+Shift+Z',
-                },
-                {
-                  label: 'Invert Condition',
-                  click: () => this._invertSelectedConditions(),
-                  visible: hasSelectedAtLeastOneCondition(this.state.selection),
-                },
-              ]}
-            />
-            <ContextMenu
-              ref={instructionsListContextMenu =>
-                (this.instructionsListContextMenu = instructionsListContextMenu)
-              }
-              buildMenuTemplate={() => [
-                {
-                  label: 'Paste',
-                  click: () => this.pasteInstructions(),
-                  enabled: Clipboard.has(CLIPBOARD_KIND),
-                  accelerator: 'CmdOrCtrl+V',
-                },
-                { type: 'separator' },
-                {
-                  label: 'Undo',
-                  click: this.undo,
-                  enabled: canUndo(this.state.history),
-                  accelerator: 'CmdOrCtrl+Z',
-                },
-                {
-                  label: 'Redo',
-                  click: this.redo,
-                  enabled: canRedo(this.state.history),
-                  accelerator: 'CmdOrCtrl+Shift+Z',
-                },
-              ]}
-            />
-            {this.state.editedInstruction.instruction && (
-              <InstructionEditorDialog
-                project={project}
-                layout={layout}
-                globalObjectsContainer={globalObjectsContainer}
-                objectsContainer={objectsContainer}
-                instruction={this.state.editedInstruction.instruction}
-                isCondition={this.state.editedInstruction.isCondition}
-                isNewInstruction={
-                  this.state.editedInstruction.indexInList === undefined
-                }
-                open={true}
-                onCancel={() => this.closeInstructionEditor()}
-                onSubmit={() => {
-                  const {
-                    instrsList,
-                    instruction,
-                    indexInList,
-                  } = this.state.editedInstruction;
-                  if (!instrsList) return;
-
-                  if (indexInList !== undefined) {
-                    // Replace an existing instruction
-                    instrsList.set(indexInList, instruction);
-                  } else {
-                    // Add a new instruction
-                    instrsList.insert(instruction, instrsList.size());
+            {({
+              eventsSearchResultEvents,
+              searchFocusOffset,
+              searchInEvents,
+              replaceInEvents,
+              goToPreviousSearchResult,
+              goToNextSearchResult,
+            }) => (
+              <div
+                className="gd-events-sheet"
+                style={styles.container}
+                onFocus={() => this._keyboardShortcuts.focus()}
+                onBlur={() => this._keyboardShortcuts.blur()}
+                tabIndex={1}
+              >
+                <EventsTree
+                  ref={eventsTree => (this._eventsTree = eventsTree)}
+                  key={events.ptr}
+                  events={events}
+                  project={project}
+                  layout={layout}
+                  globalObjectsContainer={globalObjectsContainer}
+                  objectsContainer={objectsContainer}
+                  selection={this.state.selection}
+                  onInstructionClick={this.selectInstruction}
+                  onInstructionDoubleClick={this.openInstructionEditor}
+                  onInstructionContextMenu={this.openInstructionContextMenu}
+                  onInstructionsListContextMenu={
+                    this.openInstructionsListContextMenu
                   }
-
-                  this.closeInstructionEditor(true);
-                  ensureSingleOnceInstructions(instrsList);
-                  if (this._eventsTree) this._eventsTree.forceEventsUpdate();
-                }}
-                resourceSources={this.props.resourceSources}
-                onChooseResource={this.props.onChooseResource}
-                resourceExternalEditors={this.props.resourceExternalEditors}
-                openInstructionOrExpression={(extension, type) => {
-                  this.closeInstructionEditor();
-                  this.props.openInstructionOrExpression(extension, type);
-                }}
-              />
-            )}
-            {this.state.eventsContextAnalyzerOpen &&
-              this.state.analyzedEventsContextObjectsNames &&
-              this.state.analyzedEventsContextObjectOrGroupNames && (
-                <EventsContextAnalyzerDialog
-                  open={this.state.eventsContextAnalyzerOpen}
-                  onClose={this._closeEventsContextAnalyzer}
-                  objectsNames={this.state.analyzedEventsContextObjectsNames}
-                  objectOrGroupNames={
-                    this.state.analyzedEventsContextObjectOrGroupNames
+                  onAddNewInstruction={this.openInstructionEditor}
+                  onMoveToInstruction={this.moveSelectionToInstruction}
+                  onMoveToInstructionsList={
+                    this.moveSelectionToInstructionsList
                   }
+                  onParameterClick={this.openParameterEditor}
+                  onEventClick={this.selectEvent}
+                  onEventContextMenu={this.openEventContextMenu}
+                  onAddNewEvent={context =>
+                    this.addNewEvent(
+                      'BuiltinCommonInstructions::Standard',
+                      context
+                    )
+                  }
+                  onOpenExternalEvents={onOpenExternalEvents}
+                  onOpenLayout={onOpenLayout}
+                  searchResults={eventsSearchResultEvents}
+                  searchFocusOffset={searchFocusOffset}
+                  onEventMoved={this._onEventMoved}
+                  showObjectThumbnails={values.eventsSheetShowObjectThumbnails}
                 />
-              )}
-          </div>
+                {this.state.showSearchPanel && (
+                  <SearchPanel
+                    ref={searchPanel => (this._searchPanel = searchPanel)}
+                    onSearchInEvents={inputs =>
+                      this._searchInEvents(searchInEvents, inputs)
+                    }
+                    onReplaceInEvents={inputs =>
+                      this._replaceInEvents(replaceInEvents, inputs)
+                    }
+                    resultsCount={
+                      eventsSearchResultEvents
+                        ? eventsSearchResultEvents.length
+                        : null
+                    }
+                    hasEventSelected={hasEventSelected(this.state.selection)}
+                    onGoToPreviousSearchResult={() =>
+                      this._ensureEventUnfolded(goToPreviousSearchResult)
+                    }
+                    onGoToNextSearchResult={() =>
+                      this._ensureEventUnfolded(goToNextSearchResult)
+                    }
+                  />
+                )}
+                {events && events.getEventsCount() === 0 && (
+                  <EmptyEventsPlaceholder />
+                )}
+                <InlineParameterEditor
+                  open={this.state.inlineEditing}
+                  anchorEl={this.state.inlineEditingAnchorEl}
+                  onRequestClose={this.closeParameterEditor}
+                  project={project}
+                  layout={layout}
+                  globalObjectsContainer={globalObjectsContainer}
+                  objectsContainer={objectsContainer}
+                  isCondition={this.state.editedParameter.isCondition}
+                  instruction={this.state.editedParameter.instruction}
+                  parameterIndex={this.state.editedParameter.parameterIndex}
+                  onChange={value => {
+                    const {
+                      instruction,
+                      parameterIndex,
+                    } = this.state.editedParameter;
+                    if (!instruction) return;
+                    instruction.setParameter(parameterIndex, value);
+                    this.setState({
+                      inlineEditingChangesMade: true,
+                    });
+                  }}
+                  resourceSources={this.props.resourceSources}
+                  onChooseResource={this.props.onChooseResource}
+                  resourceExternalEditors={this.props.resourceExternalEditors}
+                />
+                <ContextMenu
+                  ref={eventContextMenu =>
+                    (this.eventContextMenu = eventContextMenu)
+                  }
+                  buildMenuTemplate={() => [
+                    {
+                      label: 'Copy',
+                      click: () => this.copySelection(),
+                      accelerator: 'CmdOrCtrl+C',
+                    },
+                    {
+                      label: 'Cut',
+                      click: () => this.cutSelection(),
+                      accelerator: 'CmdOrCtrl+X',
+                    },
+                    {
+                      label: 'Paste',
+                      click: () => this.pasteEvents(),
+                      enabled: Clipboard.has(CLIPBOARD_KIND),
+                      accelerator: 'CmdOrCtrl+V',
+                    },
+                    {
+                      label: 'Delete',
+                      click: () => this.deleteSelection(),
+                      accelerator: 'Delete',
+                    },
+                    {
+                      label: 'Toggle disabled',
+                      click: () => this.toggleDisabled(),
+                      enabled: this._selectionCanToggleDisabled(),
+                    },
+                    { type: 'separator' },
+                    {
+                      label: 'Add New Event Below',
+                      click: () =>
+                        this.addNewEvent('BuiltinCommonInstructions::Standard'),
+                    },
+                    {
+                      label: 'Add Sub Event',
+                      click: () => this.addSubEvents(),
+                      enabled: this._selectionCanHaveSubEvents(),
+                    },
+                    {
+                      label: 'Add Other',
+                      submenu: this.state.allEventsMetadata.map(metadata => {
+                        return {
+                          label: metadata.fullName,
+                          click: () => this.addNewEvent(metadata.type),
+                        };
+                      }),
+                    },
+                    { type: 'separator' },
+                    {
+                      label: 'Undo',
+                      click: this.undo,
+                      enabled: canUndo(this.state.history),
+                      accelerator: 'CmdOrCtrl+Z',
+                    },
+                    {
+                      label: 'Redo',
+                      click: this.redo,
+                      enabled: canRedo(this.state.history),
+                      accelerator: 'CmdOrCtrl+Shift+Z',
+                    },
+                    { type: 'separator' },
+                    {
+                      label: 'Analyze objects used in this event',
+                      click: this._openEventsContextAnalyzer,
+                    },
+                  ]}
+                />
+                <ContextMenu
+                  ref={instructionContextMenu =>
+                    (this.instructionContextMenu = instructionContextMenu)
+                  }
+                  buildMenuTemplate={() => [
+                    {
+                      label: 'Copy',
+                      click: () => this.copySelection(),
+                      accelerator: 'CmdOrCtrl+C',
+                    },
+                    {
+                      label: 'Cut',
+                      click: () => this.cutSelection(),
+                      accelerator: 'CmdOrCtrl+X',
+                    },
+                    {
+                      label: 'Paste',
+                      click: () => this.pasteInstructions(),
+                      enabled: Clipboard.has(CLIPBOARD_KIND),
+                      accelerator: 'CmdOrCtrl+V',
+                    },
+                    { type: 'separator' },
+                    {
+                      label: 'Delete',
+                      click: () => this.deleteSelection(),
+                      accelerator: 'Delete',
+                    },
+                    { type: 'separator' },
+                    {
+                      label: 'Undo',
+                      click: this.undo,
+                      enabled: canUndo(this.state.history),
+                      accelerator: 'CmdOrCtrl+Z',
+                    },
+                    {
+                      label: 'Redo',
+                      click: this.redo,
+                      enabled: canRedo(this.state.history),
+                      accelerator: 'CmdOrCtrl+Shift+Z',
+                    },
+                    {
+                      label: 'Invert Condition',
+                      click: () => this._invertSelectedConditions(),
+                      visible: hasSelectedAtLeastOneCondition(
+                        this.state.selection
+                      ),
+                    },
+                  ]}
+                />
+                <ContextMenu
+                  ref={instructionsListContextMenu =>
+                    (this.instructionsListContextMenu = instructionsListContextMenu)
+                  }
+                  buildMenuTemplate={() => [
+                    {
+                      label: 'Paste',
+                      click: () => this.pasteInstructions(),
+                      enabled: Clipboard.has(CLIPBOARD_KIND),
+                      accelerator: 'CmdOrCtrl+V',
+                    },
+                    { type: 'separator' },
+                    {
+                      label: 'Undo',
+                      click: this.undo,
+                      enabled: canUndo(this.state.history),
+                      accelerator: 'CmdOrCtrl+Z',
+                    },
+                    {
+                      label: 'Redo',
+                      click: this.redo,
+                      enabled: canRedo(this.state.history),
+                      accelerator: 'CmdOrCtrl+Shift+Z',
+                    },
+                  ]}
+                />
+                {this.state.editedInstruction.instruction && (
+                  <InstructionEditorDialog
+                    project={project}
+                    layout={layout}
+                    globalObjectsContainer={globalObjectsContainer}
+                    objectsContainer={objectsContainer}
+                    instruction={this.state.editedInstruction.instruction}
+                    isCondition={this.state.editedInstruction.isCondition}
+                    isNewInstruction={
+                      this.state.editedInstruction.indexInList === undefined
+                    }
+                    open={true}
+                    onCancel={() => this.closeInstructionEditor()}
+                    onSubmit={() => {
+                      const {
+                        instrsList,
+                        instruction,
+                        indexInList,
+                      } = this.state.editedInstruction;
+                      if (!instrsList) return;
+
+                      if (indexInList !== undefined) {
+                        // Replace an existing instruction
+                        instrsList.set(indexInList, instruction);
+                      } else {
+                        // Add a new instruction
+                        instrsList.insert(instruction, instrsList.size());
+                      }
+
+                      this.closeInstructionEditor(true);
+                      ensureSingleOnceInstructions(instrsList);
+                      if (this._eventsTree)
+                        this._eventsTree.forceEventsUpdate();
+                    }}
+                    resourceSources={this.props.resourceSources}
+                    onChooseResource={this.props.onChooseResource}
+                    resourceExternalEditors={this.props.resourceExternalEditors}
+                    openInstructionOrExpression={(extension, type) => {
+                      this.closeInstructionEditor();
+                      this.props.openInstructionOrExpression(extension, type);
+                    }}
+                  />
+                )}
+                {this.state.eventsContextAnalyzerOpen &&
+                  this.state.analyzedEventsContextObjectsNames &&
+                  this.state.analyzedEventsContextObjectOrGroupNames && (
+                    <EventsContextAnalyzerDialog
+                      open={this.state.eventsContextAnalyzerOpen}
+                      onClose={this._closeEventsContextAnalyzer}
+                      objectsNames={
+                        this.state.analyzedEventsContextObjectsNames
+                      }
+                      objectOrGroupNames={
+                        this.state.analyzedEventsContextObjectOrGroupNames
+                      }
+                    />
+                  )}
+              </div>
+            )}
+          </EventsSearcher>
         )}
-      </EventsSearcher>
+      </PreferencesContext.Consumer>
     );
   }
 }

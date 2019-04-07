@@ -15,6 +15,7 @@ export type PreferencesValues = {|
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
+  eventsSheetShowObjectThumbnails: boolean,
 |};
 
 export type Preferences = {|
@@ -27,6 +28,7 @@ export type Preferences = {|
   setAutoDisplayChangelog: (enabled: boolean) => void,
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => void,
   verifyIfIsNewVersion: () => boolean,
+  setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -38,6 +40,7 @@ export const initialPreferences = {
     hiddenAlertMessages: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
+    eventsSheetShowObjectThumbnails: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -47,6 +50,7 @@ export const initialPreferences = {
   setAutoDisplayChangelog: () => {},
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => {},
   verifyIfIsNewVersion: () => false,
+  setEventsSheetShowObjectThumbnails: () => {},
 };
 
 const PreferencesContext: Context<Preferences> = createReactContext(

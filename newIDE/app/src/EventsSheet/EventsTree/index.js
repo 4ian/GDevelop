@@ -181,6 +181,7 @@ type EventsTreeProps = {|
   onAddNewEvent: (eventContext: EventContext) => void,
   onOpenExternalEvents: string => void,
   onOpenLayout: string => void,
+  showObjectThumbnails: boolean,
 
   searchResults: ?Array<gdBaseEvent>,
   searchFocusOffset: ?number,
@@ -366,7 +367,9 @@ export default class ThemableEventsTree extends Component<EventsTreeProps, *> {
   };
 
   _renderObjectThumbnail = (objectName: string) => {
-    const { project, layout } = this.props;
+    const { project, layout, showObjectThumbnails } = this.props;
+    if (!showObjectThumbnails) return null;
+
     const object = getObjectByName(project, layout, objectName);
     if (!object) return null;
 

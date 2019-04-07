@@ -474,70 +474,6 @@ module.exports = {
       .getCodeExtraInformation()
       .setFunctionName("getPlaybackSpeed");
 
-    //This expressions are not enabled because the core can't use booleans for check
-    /*
-      object
-        .addExpression(
-          "IsPlayed",
-          _("Video is played"),
-          _("Return if video is played"),
-          _("Time"),
-          "JsPlatform/Extensions/videoicon16.png"
-        )
-        .addParameter("object", _("Object"), "VideoObject", false)
-        .getCodeExtraInformation()
-        .setFunctionName("isPlayed");
-    
-      object
-        .addExpression(
-          "IsPaused",
-          _("Video is paused"),
-          _("Return if video is paused"),
-          _("Time"),
-          "JsPlatform/Extensions/videoicon16.png"
-        )
-        .addParameter("object", _("Object"), "VideoObject", false)
-        .getCodeExtraInformation()
-        .setFunctionName("isPaused");
-
-      object
-        .addExpression(
-          "IsEnded",
-          _("Get the duration"),
-          _("Get the duration of a video object (in seconds)"),
-          _("Time"),
-          "JsPlatform/Extensions/videoicon16.png"
-        )
-        .addParameter("object", _("Object"), "VideoObject", false)
-        .getCodeExtraInformation()
-        .setFunctionName("isEnded");
-
-      object
-        .addExpression(
-          "IsLooped",
-          _("Video is looped"),
-          _("Return if video is looped"),
-          _("Time"),
-          "JsPlatform/Extensions/videoicon16.png"
-        )
-        .addParameter("object", _("Object"), "VideoObject", false)
-        .getCodeExtraInformation()
-        .setFunctionName("isLooped");
-
-      object
-        .addExpression(
-          "IsMuted",
-          _("Video is muted"),
-          _("Return if video is muted"),
-          _("Volume"),
-          "JsPlatform/Extensions/videoicon16.png"
-        )
-        .addParameter("object", _("Object"), "VideoObject", false)
-        .getCodeExtraInformation()
-        .setFunctionName("isMuted");
-
-*/
-
     return extension;
   },
   /**
@@ -631,7 +567,7 @@ module.exports = {
         .get("videoResource")
         .getValue();
 
-      //Return VideoTexture with autoPlay = False
+      // This returns a VideoTexture with autoPlay set to false
       return this._pixiResourcesLoader.getPIXIVideoTexture(
         this._project,
         videoResource
@@ -650,25 +586,25 @@ module.exports = {
       if (videoResource !== this._videoResource) {
         this._videoResource = videoResource;
         this._pixiObject.texture = this._getVideoTexture();
+
+        if (this._pixiObject.texture.noFrame) {
+          var that = this;
+
+          // Try to display an error texture in case of error, though
+          // for some reason "error" is never called.
+          that._pixiObject.texture.on("error", function() {
+            that._pixiObject.texture.off("error", this);
+            that._pixiObject.texture = that._pixiResourcesLoader.getInvalidPIXITexture();
+          });
+        }
       }
 
+      // Update opacity
       const opacity = this._associatedObject
         .getProperties(this.project)
         .get("Opacity")
         .getValue();
-      this._pixiObject._opacity = opacity;
-
-      const volume = this._associatedObject
-        .getProperties(this.project)
-        .get("Volume")
-        .getValue();
-      this._pixiObject._volume = volume;
-
-      const looped = this._associatedObject
-        .getProperties(this.project)
-        .get("Looped")
-        .getValue();
-      this._pixiObject._looped = looped;
+      this._pixiObject.alpha = opacity / 255;
 
       // Read position and angle from the instance
       this._pixiObject.position.x =
@@ -699,19 +635,8 @@ module.exports = {
       return this._pixiObject.height;
     };
 
-    /**
-     * This is called when instance is removed on the scene editor.
-     */
-    RenderedVideoObjectInstance.prototype.instanceRemovedFromScene = function() {
-      RenderedInstance.prototype.instanceRemovedFromScene.call(this);
-
-      if (
-        this._pixiObject.texture.baseTexture.source.nodeName == "VIDEO" &&
-        !this._pixiObject.texture.baseTexture.source.paused
-      ) {
-        this._pixiObject._texture.baseTexture.source.pause();
-      }
-    };
+    // We don't do anything special when instance is removed from the scene,
+    // because the video is never really played.
 
     objectsRenderingService.registerInstanceRenderer(
       "Video::VideoObject",

@@ -253,9 +253,12 @@ gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
 };
 
 gdjs.RuntimeScene.gdjsCallbackRuntimeScenePaused = function(runtimeScene) {
+  // TODO: Add method to get list of all instances
   for (var instances in runtimeScene._instances.items) {
     for (var object in runtimeScene._instances.items[instances]) {
       var obj = runtimeScene._instances.items[instances][object];
+      // TODO: Move this to renderer
+      // TODO: Use instanceof instead of type
       if (
         obj.type == "Video::VideoObject" &&
         !obj._renderer._pixiObject._texture.baseTexture.source.paused &&
@@ -266,29 +269,26 @@ gdjs.RuntimeScene.gdjsCallbackRuntimeScenePaused = function(runtimeScene) {
       }
     }
   }
-  console.log("gdjsCallbackRuntimeScenePaused", runtimeScene);
 };
 
 gdjs.RuntimeScene.gdjsCallbackRuntimeSceneResumed = function(runtimeScene) {
+  // TODO: Add method to get list of all instances
   for (var instances in runtimeScene._instances.items) {
     for (var object in runtimeScene._instances.items[instances]) {
       var obj = runtimeScene._instances.items[instances][object];
+      // TODO: move this to renderer
+      // TODO: Use instanceof instead of type
       if (obj.type == "Video::VideoObject" && obj._pausedAsScenePaused) {
         obj._renderer._pixiObject._texture.baseTexture.source.play();
       }
     }
   }
-  console.log("gdjsCallbackRuntimeSceneResumed", runtimeScene);
 };
 
 gdjs.RuntimeScene.gdjsCallbackObjectDeletedFromScene = function(
   runtimeScene,
   runtimeObject
 ) {
+  // TODO: Move this to renderer
   runtimeObject._renderer._pixiObject._texture.baseTexture.source.pause();
-  console.log(
-    "gdjsCallbackObjectDeletedFromScene",
-    runtimeScene,
-    runtimeObject
-  );
 };

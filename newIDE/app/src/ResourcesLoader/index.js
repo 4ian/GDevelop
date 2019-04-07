@@ -33,14 +33,19 @@ class UrlsCache {
   cacheLocalFileUrl(
     project: gdProject,
     filename: string,
-    systemFilename: string
+    systemFilename: string,
+    disableCacheBurst: boolean
   ) {
     const cache = this._getProjectCache(project);
 
-    // The URL is cached with an extra "cache-bursting" parameter.
-    // If the cache is emptied or changed, local files will have another
-    // value for this parameter, forcing the browser to reload the images.
-    return (cache[filename] = `${systemFilename}?cache=${Date.now()}`);
+    if (!disableCacheBurst) {
+      // The URL is cached with an extra "cache-bursting" parameter.
+      // If the cache is emptied or changed, local files will have another
+      // value for this parameter, forcing the browser to reload the images.
+      return (cache[filename] = `${systemFilename}?cache=${Date.now()}`);
+    } else {
+      return (cache[filename] = systemFilename);
+    }
   }
 }
 
@@ -90,7 +95,11 @@ export default class ResourcesLoader {
   /**
    * Get the fully qualified URL/filename for a filename relative to the project.
    */
-  static getFullUrl(project: gdProject, filename: string) {
+  static getFullUrl(
+    project: gdProject,
+    filename: string,
+    disableCacheBurst: boolean = false
+  ) {
     const cachedUrl = ResourcesLoader._cache.getCachedUrl(project, filename);
     if (cachedUrl) return cachedUrl;
 
@@ -106,7 +115,8 @@ export default class ResourcesLoader {
       return this._cache.cacheLocalFileUrl(
         project,
         filename,
-        'file://' + resourceAbsolutePath
+        'file://' + resourceAbsolutePath,
+        disableCacheBurst
       );
     }
 
@@ -117,13 +127,21 @@ export default class ResourcesLoader {
   /**
    * Get the fully qualified URL/filename associated with the given resource.
    */
-  static getResourceFullUrl(project: gdProject, resourceName: string) {
+  static getResourceFullUrl(
+    project: gdProject,
+    resourceName: string,
+    disableCacheBurst: boolean = false
+  ) {
     if (project.getResourcesManager().hasResource(resourceName)) {
       const resourceRelativePath = project
         .getResourcesManager()
         .getResource(resourceName)
         .getFile();
-      return ResourcesLoader.getFullUrl(project, resourceRelativePath);
+      return ResourcesLoader.getFullUrl(
+        project,
+        resourceRelativePath,
+        disableCacheBurst
+      );
     }
 
     return resourceName;

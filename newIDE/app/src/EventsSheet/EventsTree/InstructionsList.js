@@ -52,6 +52,7 @@ type Props = {
   extraClassName?: string,
   style?: Object,
   disabled: boolean,
+  renderObjectThumbnail: string => React.Node,
   ...DropTargetProps,
 };
 
@@ -127,6 +128,7 @@ class InstructionsList extends React.Component<Props, *> {
           onSubInstructionsListContextMenu={onInstructionsListContextMenu}
           onSubParameterClick={onParameterClick}
           disabled={disabled}
+          renderObjectThumbnail={this.props.renderObjectThumbnail}
         />
       );
     });

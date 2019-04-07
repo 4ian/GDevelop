@@ -1063,6 +1063,7 @@ storiesOf('EventsTree', module)
           searchResults={null}
           searchFocusOffset={null}
           onEventMoved={() => {}}
+          showObjectThumbnails={true}
         />
       </div>
     </DragDropContextProvider>

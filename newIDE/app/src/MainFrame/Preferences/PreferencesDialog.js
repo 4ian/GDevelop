@@ -65,6 +65,7 @@ export default class PreferencesDialog extends Component<Props, State> {
             setAutoDownloadUpdates,
             showAlertMessage,
             setAutoDisplayChangelog,
+            setEventsSheetShowObjectThumbnails,
           }) => {
             const dismissedAlertMessages = getDismissedAlertMessages(
               values.hiddenAlertMessages
@@ -131,6 +132,18 @@ export default class PreferencesDialog extends Component<Props, State> {
                         Display What's New when a new version is launched
                         (recommended)
                       </Trans>
+                    }
+                  />
+                </Line>
+                <Line>
+                  <Toggle
+                    onToggle={(e, check) =>
+                      setEventsSheetShowObjectThumbnails(check)
+                    }
+                    toggled={values.eventsSheetShowObjectThumbnails}
+                    labelPosition="right"
+                    label={
+                      <Trans>Display object thumbnails in Events Sheets.</Trans>
                     }
                   />
                 </Line>

@@ -1,19 +1,30 @@
 // @flow
+import * as React from 'react';
 import DefaultField from './ParameterFields/DefaultField';
 import RelationalOperatorField from './ParameterFields/RelationalOperatorField';
 import OperatorField from './ParameterFields/OperatorField';
 import MouseField from './ParameterFields/MouseField';
 import KeyField from './ParameterFields/KeyField';
-import ObjectField from './ParameterFields/ObjectField';
+import ObjectField, {
+  renderObjectWithThumbnail,
+} from './ParameterFields/ObjectField';
 import YesNoField from './ParameterFields/YesNoField';
 import TrueFalseField from './ParameterFields/TrueFalseField';
 import ExpressionField from './ParameterFields/ExpressionField';
 import StringField from './ParameterFields/StringField';
 import StringWithSelectorField from './ParameterFields/StringWithSelectorField';
 import BehaviorField from './ParameterFields/BehaviorField';
-import SceneVariableField from './ParameterFields/SceneVariableField';
-import GlobalVariableField from './ParameterFields/GlobalVariableField';
-import ObjectVariableField from './ParameterFields/ObjectVariableField';
+
+import SceneVariableField, {
+  renderSceneVariable,
+} from './ParameterFields/SceneVariableField';
+import GlobalVariableField, {
+  renderGlobalVariable,
+} from './ParameterFields/GlobalVariableField';
+import ObjectVariableField, {
+  renderObjectVariable,
+} from './ParameterFields/ObjectVariableField';
+
 import LayerField from './ParameterFields/LayerField';
 import AudioResourceField from './ParameterFields/AudioResourceField';
 import VideoResourceField from './ParameterFields/VideoResourceField';
@@ -52,6 +63,10 @@ const components = {
 
 const stringRenderers = {
   forceMultiplier: renderForceMultiplierString,
+  globalvar: renderGlobalVariable,
+  scenevar: renderSceneVariable,
+  objectvar: renderObjectVariable,
+  object: renderObjectWithThumbnail,
 };
 
 export default {
@@ -62,7 +77,13 @@ export default {
     if (components.hasOwnProperty(fieldType)) return components[fieldType];
     else return components.default;
   },
-  renderParameterString: (type: string, value: string) => {
-    return stringRenderers[type] ? stringRenderers[type](value) : value;
+  renderParameterString: (
+    type: string,
+    value: string,
+    renderObjectThumnail: string => React.Node
+  ) => {
+    return stringRenderers[type]
+      ? stringRenderers[type](value, renderObjectThumnail)
+      : value;
   },
 };

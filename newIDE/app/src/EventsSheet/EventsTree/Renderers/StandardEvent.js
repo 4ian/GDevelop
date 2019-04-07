@@ -55,6 +55,7 @@ export default class StandardEvent extends React.Component<
           }
           onParameterClick={this.props.onParameterClick}
           disabled={this.props.disabled}
+          renderObjectThumbnail={this.props.renderObjectThumbnail}
         />
         <InstructionsList
           instrsList={standardEvent.getActions()}
@@ -72,6 +73,7 @@ export default class StandardEvent extends React.Component<
           }
           onParameterClick={this.props.onParameterClick}
           disabled={this.props.disabled}
+          renderObjectThumbnail={this.props.renderObjectThumbnail}
         />
       </div>
     );

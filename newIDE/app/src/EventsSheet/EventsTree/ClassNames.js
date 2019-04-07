@@ -1,6 +1,7 @@
 // @flow
 export const selectableArea = 'selectable';
 export const selectedArea = 'selected';
+export const icon = 'icon';
 
 export const largeSelectableArea = 'large-selectable';
 export const largeSelectedArea = 'large-selected';

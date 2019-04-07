@@ -1,5 +1,10 @@
 /**
- * A video object doing showing a video on screen
+ * An object displaying a video on screen.
+ *
+ * For the same video resource, only one video is being created in memory (
+ * as a HTMLVideoElement). This means that two objects displaying the same
+ * video will have the same state for this video (paused/playing, current time,
+ * volume, etc...).
  *
  * @memberof gdjs
  * @class VideoRuntimeObject
@@ -16,6 +21,11 @@ gdjs.VideoRuntimeObject = function(runtimeScene, objectData) {
   this._volume = objectData.content.volume;
   /** @type string */
   this._videoResource = objectData.content.videoResource;
+
+  // Use a boolean to track if the video was paused because we
+  // navigated to another scene, and so should resume if we're back.
+  /** @type boolean */
+  this._pausedAsScenePaused = false;
 
   if (this._renderer)
     gdjs.VideoRuntimeObjectRenderer.call(this._renderer, this, runtimeScene);
@@ -40,6 +50,12 @@ gdjs.VideoRuntimeObject.prototype.extraInitializationFromInitialInstance = funct
     this.setWidth(initialInstanceData.width);
     this.setHeight(initialInstanceData.height);
   }
+};
+
+gdjs.VideoRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
+  gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
+
+  this._renderer.ownerRemovedFromScene();
 };
 
 gdjs.VideoRuntimeObject.prototype.update = function(runtimeScene) {
@@ -252,43 +268,65 @@ gdjs.VideoRuntimeObject.prototype.getPlaybackSpeed = function() {
   return this._renderer.getPlaybackSpeed();
 };
 
-gdjs.RuntimeScene.gdjsCallbackRuntimeScenePaused = function(runtimeScene) {
-  // TODO: Add method to get list of all instances
-  for (var instances in runtimeScene._instances.items) {
-    for (var object in runtimeScene._instances.items[instances]) {
-      var obj = runtimeScene._instances.items[instances][object];
-      // TODO: Move this to renderer
-      // TODO: Use instanceof instead of type
-      if (
-        obj.type == "Video::VideoObject" &&
-        !obj._renderer._pixiObject._texture.baseTexture.source.paused &&
-        !obj._renderer._pixiObject._texture.baseTexture.source.ended
-      ) {
-        obj._renderer._pixiObject._texture.baseTexture.source.pause();
-        obj._pausedAsScenePaused = true;
-      }
-    }
-  }
-};
-
-gdjs.RuntimeScene.gdjsCallbackRuntimeSceneResumed = function(runtimeScene) {
-  // TODO: Add method to get list of all instances
-  for (var instances in runtimeScene._instances.items) {
-    for (var object in runtimeScene._instances.items[instances]) {
-      var obj = runtimeScene._instances.items[instances][object];
-      // TODO: move this to renderer
-      // TODO: Use instanceof instead of type
-      if (obj.type == "Video::VideoObject" && obj._pausedAsScenePaused) {
-        obj._renderer._pixiObject._texture.baseTexture.source.play();
-      }
-    }
-  }
-};
-
-gdjs.RuntimeScene.gdjsCallbackObjectDeletedFromScene = function(
-  runtimeScene,
-  runtimeObject
+/**
+ * When a scene is unloaded, pause any video being run.
+ * TODO: Investigate how to dispose the video source?
+ *
+ * @private
+ */
+gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneUnloaded = function(
+  runtimeScene
 ) {
-  // TODO: Move this to renderer
-  runtimeObject._renderer._pixiObject._texture.baseTexture.source.pause();
+  // Manually find all the gdjs.VideoRuntimeObject living on the scene,
+  // and pause them.
+  var instances = runtimeScene.getAdhocListOfAllInstances();
+  for (var i = 0; i < instances.length; ++i) {
+    var obj = instances[i];
+    if (obj instanceof gdjs.VideoRuntimeObject) {
+      if (obj.isPlayed()) {
+        obj.pause();
+      }
+    }
+  }
+};
+
+/**
+ * When a scene is paused, pause any video being run.
+ * @private
+ */
+gdjs.VideoRuntimeObject.gdjsCallbackRuntimeScenePaused = function(
+  runtimeScene
+) {
+  // Manually find all the gdjs.VideoRuntimeObject living on the scene,
+  // and pause them.
+  var instances = runtimeScene.getAdhocListOfAllInstances();
+  for (var i = 0; i < instances.length; ++i) {
+    var obj = instances[i];
+    if (obj instanceof gdjs.VideoRuntimeObject) {
+      if (obj.isPlayed()) {
+        obj.pause();
+        obj._pausedAsScenePaused = true; // Flag it to be started again when scene is resumed.
+      }
+    }
+  }
+};
+
+/**
+ * When a scene is resumed, resume any video previously paused.
+ * @private
+ */
+gdjs.VideoRuntimeObject.gdjsCallbackRuntimeSceneResumed = function(
+  runtimeScene
+) {
+  // Manually find all the gdjs.VideoRuntimeObject living on the scene,
+  // and play them if they have been previously paused.
+  var instances = runtimeScene.getAdhocListOfAllInstances();
+  for (var i = 0; i < instances.length; ++i) {
+    var obj = instances[i];
+    if (obj instanceof gdjs.VideoRuntimeObject) {
+      if (obj._pausedAsScenePaused) {
+        obj.play();
+      }
+    }
+  }
 };

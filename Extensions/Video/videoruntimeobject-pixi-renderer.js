@@ -46,6 +46,13 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
   return this._pixiObject;
 };
 
+/**
+ * To be called when the object is removed from the scene: will pause the video.
+ */
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.ownerRemovedFromScene = function() {
+  this.pause();
+};
+
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.ensureUpToDate = function() {
   // Make sure that the video is repositioned after the texture was loaded
   // (as width and height will change).
@@ -108,11 +115,33 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.setHeight = function(height) {
 };
 
 /**
+ * Get the internal HTMLVideoElement used for the video source.
+ * @returns {?HTMLVideoElement} The video element, if any.
+ */
+gdjs.VideoRuntimeObjectPixiRenderer.prototype._getHTMLVideoElementSource = function() {
+  if (
+    !this._pixiObject.texture ||
+    !this._pixiObject.texture.baseTexture.source
+  ) {
+    return null;
+  }
+
+  var source = this._pixiObject.texture.baseTexture.source;
+  if (!source instanceof HTMLVideoElement) {
+    return null;
+  }
+
+  return source;
+}
+
+/**
  * Start the video
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.play = function() {
-  var promise = this._pixiObject._texture.baseTexture.source.play();
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return;
 
+  var promise = source.play();
   if (promise !== undefined) {
     promise
       .then(() => {
@@ -120,7 +149,9 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.play = function() {
       })
       .catch(() => {
         // Autoplay was prevented.
-        console.log("The video don't start because any interaction with the game has been captured before. This is blocked by the navigator. https://goo.gl/xX8pDD");
+        console.warn(
+          "The video did not start because: video is invalid or no interaction with the game has been captured before (this is blocked by the navigator: https://goo.gl/xX8pDD)"
+        );
       });
   }
 };
@@ -129,8 +160,10 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.play = function() {
  * Pause the video
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.pause = function() {
-  var promise = this._pixiObject._texture.baseTexture.source.pause();
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return;
 
+  var promise = source.pause();
   if (promise !== undefined) {
     promise
       .then(() => {
@@ -144,25 +177,34 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.pause = function() {
 
 /**
  * Set the loop on video in renderer
- * @param {boolean} bool The new state of looped.
+ * @param {boolean} enable true to loop the video
  */
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.setLoop = function(bool) {
-  this._pixiObject._texture.baseTexture.source.loop = bool;
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.setLoop = function(enable) {
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return;
+
+  source.loop = enable;
 };
 
 /**
  * Set or unset mute on the video.
- * @param {boolean} bool The new state of muted.
+ * @param {boolean} enable true to mute
  */
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.setMute = function(bool) {
-  this._pixiObject._texture.baseTexture.source.muted = bool;
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.setMute = function(enable) {
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return;
+
+  this._pixiObject._texture.baseTexture.source.muted = enable;
 };
 
 /**
  * Return true if the video is muted.
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.isMuted = function() {
-  return this._pixiObject._texture.baseTexture.source.muted;
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return false;
+
+  return source.muted;
 };
 
 /**
@@ -171,7 +213,10 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.isMuted = function() {
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.setCurrentTime = function(
   number
 ) {
-  this._pixiObject._texture.baseTexture.source.currentTime = number;
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return;
+
+  source.currentTime = number;
 };
 
 /**
@@ -179,23 +224,32 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.setCurrentTime = function(
  * @param {number} volume The new volume.
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.setVolume = function(volume) {
-  this._pixiObject._texture.baseTexture.source.volume = volume;
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return;
+
+  source.volume = volume;
 };
 
 /**
  * Get the volume on video, between 0 and 1.
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getVolume = function() {
-  return this._pixiObject._texture.baseTexture.source.volume;
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return 0;
+
+  return source.volume;
 };
 
 /**
  * Return true if the video is playing
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.isPlayed = function() {
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return false;
+
   return (
-    !this._pixiObject._texture.baseTexture.source.paused &&
-    !this._pixiObject._texture.baseTexture.source.ended
+    !source.paused &&
+    !source.ended
   );
 };
 
@@ -203,42 +257,60 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.isPlayed = function() {
  * Return true if the video is looping
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.isLooped = function() {
-  return this._pixiObject._texture.baseTexture.source.loop;
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return false;
+
+  return source.loop;
 };
 
 /**
  * Get the current time of the playback.
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getCurrentTime = function() {
-  return this._pixiObject._texture.baseTexture.source.currentTime;
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return 0;
+
+  return source.currentTime;
 };
 
 /**
  * Get the duration of the video.
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getDuration = function() {
-  return this._pixiObject._texture.baseTexture.source.duration;
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return 0;
+
+  return source.duration;
 };
 
 /**
- * Return true if the video is ended.
+ * Return true if the video has ended.
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.isEnded = function() {
-  return this._pixiObject._texture.baseTexture.source.ended;
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return false;
+
+  return source.ended;
 };
 
 /**
  * Set the playback speed (1 = 100%)
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.setPlaybackSpeed = function(
-  number
+  playbackRate
 ) {
-  this._pixiObject._texture.baseTexture.source.playbackRate = number;
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return false;
+
+  source.playbackRate = playbackRate;
 };
 
 /**
  * Return the playback speed (1 = 100%)
  */
 gdjs.VideoRuntimeObjectPixiRenderer.prototype.getPlaybackSpeed = function() {
-  return this._pixiObject._texture.baseTexture.source.playbackRate;
+  var source = this._getHTMLVideoElementSource();
+  if (!source) return 0;
+
+  return source.playbackRate;
 };

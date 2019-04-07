@@ -33,6 +33,8 @@ type State = {|
   scaleMode: 'linear' | 'nearest',
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
+  minFPS: number,
+  maxFPS: number,
 |};
 
 class ProjectPropertiesDialog extends React.Component<Props, State> {

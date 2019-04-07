@@ -11,6 +11,7 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SubscriptionChecker from '../Profile/SubscriptionChecker';
 import { getErrors, displayProjectErrorsBox } from './ProjectErrorsChecker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
+import { Line, Column } from '../UI/Grid';
 
 type Props = {|
   project: gdProject,
@@ -55,6 +56,8 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       scaleMode: project.getScaleMode(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
+      minFPS: project.getMinimumFPS(),
+      maxFPS: project.getMaximumFPS(),
     };
   }
 
@@ -82,6 +85,8 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
+      minFPS,
+      maxFPS,
     } = this.state;
     project.setDefaultWidth(windowDefaultWidth);
     project.setDefaultHeight(windowDefaultHeight);
@@ -93,6 +98,8 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setAdMobAppId(adMobAppId);
     project.setScaleMode(scaleMode);
     project.setSizeOnStartupMode(sizeOnStartupMode);
+    project.setMinimumFPS(minFPS);
+    project.setMaximumFPS(maxFPS);
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
 
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
@@ -126,6 +133,8 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
+      minFPS,
+      maxFPS,
     } = this.state;
 
     const defaultPackageName = 'com.example.mygame';
@@ -185,6 +194,34 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             value={version}
             onChange={value => this.setState({ version: value })}
           />
+          <Line noMargin>
+            <Column expand noMargin>
+              <SemiControlledTextField
+                floatingLabelText={<Trans>Minimum FPS</Trans>}
+                fullWidth
+                type="number"
+                value={'' + minFPS}
+                onChange={value =>
+                  this.setState({
+                    minFPS: Math.max(0, parseInt(value, 10)),
+                  })
+                }
+              />
+            </Column>
+            <Column expand noMargin>
+              <SemiControlledTextField
+                floatingLabelText={<Trans>Maximum FPS</Trans>}
+                fullWidth
+                type="number"
+                value={'' + maxFPS}
+                onChange={value =>
+                  this.setState({
+                    maxFPS: Math.max(0, parseInt(value, 10)),
+                  })
+                }
+              />
+            </Column>
+          </Line>
           <SemiControlledTextField
             floatingLabelText={
               <Trans>Package name (for iOS and Android)</Trans>

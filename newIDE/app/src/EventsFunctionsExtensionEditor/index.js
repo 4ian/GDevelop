@@ -71,15 +71,23 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     project: gdProject,
     eventsFunction: gdEventsFunction
   ) => {
-    if (this._globalObjectsContainer) this._globalObjectsContainer.delete();
-    this._globalObjectsContainer = new gd.ObjectsContainer();
+    // Create an empty "context" of objects.
+    // Avoid recreating containers if they were already created, so that
+    // we keep the same objects in memory and avoid remounting components
+    // (like ObjectGroupsList) because objects "ptr" changed.
+    if (!this._globalObjectsContainer) {
+      this._globalObjectsContainer = new gd.ObjectsContainer();
+    }
 
-    if (this._objectsContainer) this._objectsContainer.delete();
-    this._objectsContainer = new gd.ObjectsContainer();
+    if (!this._objectsContainer) {
+      this._objectsContainer = new gd.ObjectsContainer();
+    }
 
-    gd.ParameterMetadataTools.parametersToObjectsContainer(
+    // Initialize this "context" of objects with the function
+    // (as done during code generation).
+    gd.EventsFunctionTools.eventsFunctionToObjectsContainer(
       project,
-      eventsFunction.getParameters(),
+      eventsFunction,
       this._objectsContainer
     );
   };
@@ -181,15 +189,25 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   <MosaicWindow
                     title={<Trans>Function Configuration</Trans>}
                     toolbarControls={[]}
+                    // /!\ Force re-rendering if selectedEventsFunction, globalObjectsContainer
+                    // or objectsContainer change,
+                    // otherwise we risk using deleted objects (because of the shouldComponentUpdate
+                    // optimization in MosaicWindow).
                     selectedEventsFunction={selectedEventsFunction}
+                    globalObjectsContainer={this._globalObjectsContainer}
+                    objectsContainer={this._objectsContainer}
                   >
                     <Background>
-                      {selectedEventsFunction ? (
+                      {selectedEventsFunction &&
+                      this._globalObjectsContainer &&
+                      this._objectsContainer ? (
                         <EventsFunctionConfigurationEditor
                           project={project}
                           eventsFunction={selectedEventsFunction}
+                          globalObjectsContainer={this._globalObjectsContainer}
+                          objectsContainer={this._objectsContainer}
                           helpPagePath="/events/functions"
-                          onParametersUpdated={() => {
+                          onParametersOrGroupsUpdated={() => {
                             this._loadEventsFunctionFrom(
                               project,
                               selectedEventsFunction

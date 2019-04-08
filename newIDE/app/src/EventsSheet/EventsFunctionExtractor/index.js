@@ -2,6 +2,7 @@
 import { unserializeFromJSObject } from '../../Utils/Serializer';
 import { mapVector } from '../../Utils/MapFor';
 import { getEventsFunctionType } from '../../EventsFunctionsExtensionsLoader';
+import getObjectGroupByName from '../../Utils/GetObjectGroupByName';
 const gd = global.gd;
 
 /**
@@ -40,8 +41,12 @@ export const setupFunctionFromEvents = ({
   );
   eventsContextAnalyzer.launch(eventsFunction.getEvents());
   const eventsContext = eventsContextAnalyzer.getEventsContext();
-  const objectNames: Array<string> = eventsContext
+  const objectOrGroupNames: Array<string> = eventsContext
     .getObjectOrGroupNames()
+    .toNewVectorString()
+    .toJSArray();
+  const objectNames: Array<string> = eventsContext
+    .getObjectNames()
     .toNewVectorString()
     .toJSArray();
 
@@ -82,6 +87,26 @@ export const setupFunctionFromEvents = ({
       parameters.push_back(newParameter);
     });
   });
+
+  // Import groups that are used in events
+  objectOrGroupNames
+    // Filter to only keep groups
+    .filter(
+      (objectOrGroupName: string) =>
+        objectNames.indexOf(objectOrGroupName) === -1
+    )
+    .forEach(groupName => {
+      const group = getObjectGroupByName(
+        globalObjectsContainer,
+        objectsContainer,
+        groupName
+      );
+
+      if (group) {
+        eventsFunction.getObjectGroups().insert(group, 0);
+      }
+    });
+
   eventsContextAnalyzer.delete();
 };
 

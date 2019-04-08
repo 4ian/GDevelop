@@ -12,8 +12,8 @@ import { showWarningBox } from '../UI/Messages/MessageBox';
 import { makeAddItem } from '../UI/ListAddItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import {
-  enumerateObjectsAndGroups,
   filterGroupsList,
+  enumerateGroups,
 } from '../ObjectsList/EnumerateObjects';
 import type {
   GroupWithContextList,
@@ -43,14 +43,14 @@ const SortableAddGroupRow = SortableElement(props => {
 });
 
 class GroupsList extends Component<*, *> {
-  list: any;
+  list: ?List;
 
   forceUpdateGrid() {
     if (this.list) this.list.forceUpdateGrid();
   }
 
   render() {
-    let { height, width, fullList, project } = this.props;
+    const { height, width, fullList } = this.props;
 
     return (
       <List
@@ -82,7 +82,6 @@ class GroupsList extends Component<*, *> {
             <SortableGroupRow
               index={index}
               key={groupWithContext.group.ptr}
-              project={project}
               group={groupWithContext.group}
               style={style}
               onEdit={
@@ -108,12 +107,27 @@ class GroupsList extends Component<*, *> {
 
 const SortableGroupsList = SortableContainer(GroupsList, { withRef: true });
 
-type StateType = {|
+type State = {|
   renamedGroupWithScope: ?GroupWithContext,
   searchText: string,
 |};
 
-export default class GroupsListContainer extends React.Component<*, StateType> {
+type Props = {|
+  globalObjectGroups: gdObjectGroupsContainer,
+  objectGroups: gdObjectGroupsContainer,
+  onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) => void,
+  onEditGroup: gdObjectGroup => void,
+  onRenameGroup: (
+    groupWithContext: GroupWithContext,
+    newName: string,
+    cb: Function
+  ) => void,
+  onGroupAdded?: () => void,
+  onGroupRemoved?: () => void,
+  onGroupRenamed?: () => void,
+|};
+
+export default class GroupsListContainer extends React.Component<Props, State> {
   static defaultProps = {
     onDeleteGroup: (groupWithContext: GroupWithContext, cb: Function) =>
       cb(true),
@@ -125,14 +139,14 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
   };
 
   sortableList: any;
-  containerGroupsList: GroupWithContextList = [];
-  projectGroupsList: GroupWithContextList = [];
-  state: StateType = {
+  objectGroupsList: GroupWithContextList = [];
+  globalObjectGroupsList: GroupWithContextList = [];
+  state: State = {
     renamedGroupWithScope: null,
     searchText: '',
   };
 
-  shouldComponentUpdate(nextProps: *, nextState: StateType) {
+  shouldComponentUpdate(nextProps: Props, nextState: State) {
     // The component is costly to render, so avoid any re-rendering as much
     // as possible.
     // We make the assumption that no changes to groups list is made outside
@@ -147,31 +161,34 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
       return true;
 
     if (
-      this.props.project !== nextProps.project ||
-      this.props.groups !== nextProps.groups
-    )
+      this.props.globalObjectGroups !== nextProps.globalObjectGroups ||
+      this.props.objectGroups !== nextProps.objectGroups
+    ) {
       return true;
+    }
 
     return false;
   }
 
   addGroup = () => {
-    const { project, objectsContainer } = this.props;
+    const { globalObjectGroups, objectGroups } = this.props;
 
-    const objectsContainerGroups = objectsContainer.getObjectGroups();
     const name = newNameGenerator(
       'Group',
-      name =>
-        objectsContainerGroups.has(name) || project.getObjectGroups().has(name)
+      name => objectGroups.has(name) || globalObjectGroups.has(name)
     );
 
-    objectsContainerGroups.insertNew(name, objectsContainerGroups.count());
+    objectGroups.insertNew(name, objectGroups.count());
     this.forceUpdate();
+
+    if (this.props.onGroupAdded) {
+      this.props.onGroupAdded();
+    }
   };
 
   _onDelete = (groupWithContext: GroupWithContext) => {
     const { group, global } = groupWithContext;
-    const { project, objectsContainer } = this.props;
+    const { globalObjectGroups, objectGroups } = this.props;
 
     //eslint-disable-next-line
     const answer = confirm(
@@ -183,12 +200,15 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
       if (!doRemove) return;
 
       if (global) {
-        project.getObjectGroups().remove(group.getName());
+        globalObjectGroups.remove(group.getName());
       } else {
-        objectsContainer.getObjectGroups().remove(group.getName());
+        objectGroups.remove(group.getName());
       }
 
       this.forceUpdate();
+      if (this.props.onGroupRemoved) {
+        this.props.onGroupRemoved();
+      }
     });
   };
 
@@ -203,7 +223,7 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
 
   _onRename = (groupWithContext: GroupWithContext, newName: string) => {
     const { group } = groupWithContext;
-    const { project, objectsContainer } = this.props;
+    const { globalObjectGroups, objectGroups } = this.props;
 
     this.setState({
       renamedGroupWithScope: null,
@@ -211,10 +231,7 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
 
     if (group.getName() === newName) return;
 
-    if (
-      objectsContainer.getObjectGroups().has(newName) ||
-      project.getObjectGroups().has(newName)
-    ) {
+    if (objectGroups.has(newName) || globalObjectGroups.has(newName)) {
       showWarningBox('Another object with this name already exists');
       return;
     }
@@ -223,31 +240,36 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
       if (!doRename) return;
 
       group.setName(newName);
+
       this.forceUpdate();
+      if (this.props.onGroupRenamed) {
+        this.props.onGroupRenamed();
+      }
     });
   };
 
   _onMove = (oldIndex: number, newIndex: number) => {
-    const { project, objectsContainer } = this.props;
+    const { globalObjectGroups, objectGroups } = this.props;
 
-    const isInGroupsList = oldIndex < this.containerGroupsList.length;
+    const isInGroupsList = oldIndex < this.objectGroupsList.length;
     if (isInGroupsList) {
-      objectsContainer
-        .getObjectGroups()
-        .move(
-          oldIndex,
-          Math.min(newIndex, this.containerGroupsList.length - 1)
-        );
+      objectGroups.move(
+        oldIndex,
+        Math.min(newIndex, this.objectGroupsList.length - 1)
+      );
     } else {
-      const projectOldIndex = oldIndex - this.containerGroupsList.length;
-      const projectNewIndex = newIndex - this.containerGroupsList.length;
+      const globalObjectGroupsOldIndex =
+        oldIndex - this.objectGroupsList.length;
+      const globalObjectGroupsNewIndex =
+        newIndex - this.objectGroupsList.length;
 
-      project
-        .getObjectGroups()
-        .move(
-          projectOldIndex,
-          Math.min(projectNewIndex, this.projectGroupsList.length - 1)
-        );
+      globalObjectGroups.move(
+        globalObjectGroupsOldIndex,
+        Math.min(
+          globalObjectGroupsNewIndex,
+          this.globalObjectGroupsList.length - 1
+        )
+      );
     }
 
     this.forceUpdate();
@@ -255,28 +277,33 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
   };
 
   render() {
-    const { project, objectsContainer } = this.props;
+    const { globalObjectGroups, objectGroups } = this.props;
     const { searchText } = this.state;
 
-    const lists = enumerateObjectsAndGroups(project, objectsContainer);
-    this.containerGroupsList = filterGroupsList(
-      lists.containerGroupsList,
+    const objectGroupsList: GroupWithContextList = enumerateGroups(
+      objectGroups
+    ).map(group => ({ group, global: false }));
+    const globalObjectGroupsList: GroupWithContextList = enumerateGroups(
+      globalObjectGroups
+    ).map(group => ({ group, global: true }));
+    this.objectGroupsList = filterGroupsList(objectGroupsList, searchText);
+    this.globalObjectGroupsList = filterGroupsList(
+      globalObjectGroupsList,
       searchText
     );
-    this.projectGroupsList = filterGroupsList(
-      lists.projectGroupsList,
+    const allGroupsList = filterGroupsList(
+      [...objectGroupsList, ...globalObjectGroupsList],
       searchText
     );
-    const allGroupsList = filterGroupsList(lists.allGroupsList, searchText);
     const fullList = allGroupsList.concat({
       key: 'add-groups-row',
       object: null,
     });
 
-    // Force List component to be mounted again if project or groups
+    // Force List component to be mounted again if globalObjectGroups or objectGroups
     // has been changed. Avoid accessing to invalid objects that could
     // crash the app.
-    const listKey = project.ptr + ';' + objectsContainer.ptr;
+    const listKey = objectGroups.ptr + ';' + globalObjectGroups.ptr;
 
     return (
       <Background>
@@ -287,7 +314,6 @@ export default class GroupsListContainer extends React.Component<*, StateType> {
                 key={listKey}
                 ref={sortableList => (this.sortableList = sortableList)}
                 fullList={fullList}
-                project={project}
                 width={width}
                 height={height}
                 renamedGroupWithScope={this.state.renamedGroupWithScope}

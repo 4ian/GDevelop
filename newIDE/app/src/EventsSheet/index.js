@@ -890,12 +890,12 @@ export default class EventsSheet extends React.Component<Props, State> {
                   onParameterClick={this.openParameterEditor}
                   onEventClick={this.selectEvent}
                   onEventContextMenu={this.openEventContextMenu}
-                  onAddNewEvent={context =>
+                  onAddNewEvent={context => {
                     this.addNewEvent(
                       'BuiltinCommonInstructions::Standard',
                       context
-                    )
-                  }
+                    );
+                  }}
                   onOpenExternalEvents={onOpenExternalEvents}
                   onOpenLayout={onOpenLayout}
                   searchResults={eventsSearchResultEvents}

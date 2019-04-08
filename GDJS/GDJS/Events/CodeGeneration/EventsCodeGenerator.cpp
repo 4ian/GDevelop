@@ -13,6 +13,7 @@
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Metadata/ParameterMetadataTools.h"
+#include "GDCore/IDE/EventsFunctionTools.h"
 #include "GDCore/IDE/SceneNameMangler.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/EventsFunction.h"
@@ -96,8 +97,8 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
   gd::ObjectsContainer
       emptyObjectsAndGroups;  // As opposed to layout events, we don't have
                               // objects in the "outer" scope.
-  gd::ParameterMetadataTools::ParametersToObjectsContainer(
-      project, eventsFunction.GetParameters(), objectsAndGroups);
+  gd::EventsFunctionTools::EventsFunctionToObjectsContainer(
+      project, eventsFunction, objectsAndGroups);
 
   // Prepare the global context
   unsigned int maxDepthLevelReached = 0;

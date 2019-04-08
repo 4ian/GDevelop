@@ -1442,7 +1442,11 @@ storiesOf('ObjectGroupEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ObjectGroupEditor project={project} layout={testLayout} group={group2} />
+    <ObjectGroupEditor
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      group={group2}
+    />
   ));
 
 storiesOf('ObjectGroupsList', module)
@@ -1452,8 +1456,8 @@ storiesOf('ObjectGroupsList', module)
     <SerializedObjectDisplay object={testLayout}>
       <div style={{ height: 250 }}>
         <ObjectGroupsList
-          project={project}
-          objectsContainer={testLayout}
+          globalObjectGroups={project.getObjectGroups()}
+          objectGroups={testLayout.getObjectGroups()}
           onEditGroup={() => {}}
         />
       </div>
@@ -1814,12 +1818,16 @@ storiesOf('EventsFunctionConfigurationEditor', module)
   .addDecorator(muiDecorator)
   .addDecorator(i18nProviderDecorator)
   .add('default', () => (
-    <div style={{ height: 500, display: 'flex' }}>
+    <div style={{ height: 500 }}>
       <EventsFunctionConfigurationEditor
         project={project}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout} //TODO?
         helpPagePath="/events/functions"
         eventsFunction={testEventsFunction}
-        onParametersUpdated={() => {}}
+        onParametersOrGroupsUpdated={action(
+          'Parameters or groups were updated'
+        )}
       />
     </div>
   ));
@@ -1844,6 +1852,7 @@ storiesOf('EventsFunctionsList', module)
 
 storiesOf('EventsFunctionsExtensionEditor/index', module)
   .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <DragDropContextProvider>
       <div style={{ height: 500, display: 'flex' }}>
@@ -1866,6 +1875,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
 
 storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
   .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <OptionsEditorDialog
       eventsFunctionsExtension={testEventsFunctionsExtension}

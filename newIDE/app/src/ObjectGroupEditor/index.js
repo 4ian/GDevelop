@@ -7,19 +7,13 @@ import IconButton from 'material-ui/IconButton';
 import Remove from 'material-ui/svg-icons/content/remove';
 import ObjectSelector from '../ObjectsList/ObjectSelector';
 import EmptyMessage from '../UI/EmptyMessage';
+import { Column } from '../UI/Grid';
 const gd = global.gd;
-
-const styles = {
-  newObjectSelector: {
-    marginLeft: 10,
-    marginRight: 10,
-  },
-};
 
 type Props = {|
   group: gdObjectGroup,
-  project: gdProject,
-  layout: gdLayout,
+  globalObjectsContainer: gdObjectsContainer,
+  objectsContainer: gdObjectsContainer,
   onSizeUpdated?: () => void,
 |};
 
@@ -52,7 +46,7 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
   };
 
   _renderExplanation() {
-    const { group, project, layout } = this.props;
+    const { group, globalObjectsContainer, objectsContainer } = this.props;
 
     let type = undefined;
     group
@@ -60,8 +54,8 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
       .toJSArray()
       .forEach(objectName => {
         const objectType = gd.getTypeOfObject(
-          project,
-          layout,
+          globalObjectsContainer,
+          objectsContainer,
           objectName,
           false
         );
@@ -83,7 +77,7 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
   }
 
   render() {
-    const { group, project, layout } = this.props;
+    const { group, globalObjectsContainer, objectsContainer } = this.props;
 
     return (
       <div>
@@ -106,18 +100,19 @@ export default class ObjectGroupEditor extends React.Component<Props, State> {
               );
             })}
         </List>
-        <ObjectSelector
-          autoCompleteStyle={styles.newObjectSelector}
-          globalObjectsContainer={project}
-          objectsContainer={layout}
-          value={this.state.newObjectName}
-          onChange={name => this.setState({ newObjectName: name })}
-          onChoose={this.addObject}
-          openOnFocus
-          noGroups
-          hintText={<Trans>Choose an object to add to the group</Trans>}
-          fullWidth
-        />
+        <Column>
+          <ObjectSelector
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            value={this.state.newObjectName}
+            onChange={name => this.setState({ newObjectName: name })}
+            onChoose={this.addObject}
+            openOnFocus
+            noGroups
+            hintText={<Trans>Choose an object to add to the group</Trans>}
+            fullWidth
+          />
+        </Column>
       </div>
     );
   }

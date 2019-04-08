@@ -50,6 +50,11 @@ export const setupFunctionFromEvents = ({
     .toNewVectorString()
     .toJSArray();
 
+  // TODO: We could do a smarter detection of groups:
+  // if a group is used and no object from this group is used
+  // alone (i.e: if the group is used as a single object),
+  // then don't use the expanded objects for it.
+
   const parameters = eventsFunction.getParameters();
   parameters.clear();
   objectNames.forEach(objectName => {
@@ -66,10 +71,11 @@ export const setupFunctionFromEvents = ({
     );
     parameters.push_back(newParameter);
 
-    // TODO: Renamed behaviors are not working in events function. Would need a "getBehavior"/"getBehaviorName" indirection :/
-    // CAn also prohibit renaming behaviors??
+    // TODO: Renamed behaviors are not working in events function.
+    // Would need a "getBehavior"/"getBehaviorName" indirection in the generated code :/
+    // We can also forbid renaming behaviors?
     const behaviorNames: Array<string> = eventsContext
-      .getBehaviorNamesOf(objectName)
+      .getBehaviorNamesOfObject(objectName)
       .toNewVectorString()
       .toJSArray();
 

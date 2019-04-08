@@ -31,7 +31,7 @@ export const toEventsContextResult = (
   const objectOrGroupBehaviorNames = {};
   objectOrGroupNames.forEach(objectOrGroupName => {
     const behaviorNames = eventsContext
-      .getBehaviorNamesOf(objectOrGroupName)
+      .getBehaviorNamesOfObjectOrGroup(objectOrGroupName)
       .toNewVectorString()
       .toJSArray();
 

@@ -136,16 +136,19 @@ void EventsContextAnalyzer::AnalyzeParameter(
   }
 }
 
-void EventsContext::AddObjectName(const gd::String& objectName) {
-  for (auto& realObjectName : ExpandObjectsName(objectName)) {
+void EventsContext::AddObjectName(const gd::String& objectOrGroupName) {
+  for (auto& realObjectName : ExpandObjectsName(objectOrGroupName)) {
     objectNames.insert(realObjectName);
   }
-  objectOrGroupNames.insert(objectName);
+  objectOrGroupNames.insert(objectOrGroupName);
 }
 
-void EventsContext::AddBehaviorName(const gd::String& objectName,
+void EventsContext::AddBehaviorName(const gd::String& objectOrGroupName,
                                     const gd::String& behaviorName) {
-  objectOrGroupBehaviorNames[objectName].insert(behaviorName);
+  for (auto& realObjectName : ExpandObjectsName(objectOrGroupName)) {
+    objectBehaviorNames[realObjectName].insert(behaviorName);
+  }
+  objectOrGroupBehaviorNames[objectOrGroupName].insert(behaviorName);
 }
 
 std::vector<gd::String> EventsContext::ExpandObjectsName(

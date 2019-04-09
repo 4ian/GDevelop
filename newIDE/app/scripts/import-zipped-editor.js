@@ -46,7 +46,7 @@ if (shell.test('-d', basePath)) {
           fs
             .createReadStream(zipFilePath)
             .pipe(unzipper.Extract({
-              path: '../public/external/' + editor
+              path: basePath
             }))
             .on('close', function () {
               shell.echo(

@@ -16,7 +16,7 @@ export type PreferencesValues = {|
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
   eventsSheetShowObjectThumbnails: boolean,
-  autosaveOnPlaytest: boolean,
+  autosaveOnPreview: boolean,
 |};
 
 export type Preferences = {|
@@ -30,7 +30,7 @@ export type Preferences = {|
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => void,
   verifyIfIsNewVersion: () => boolean,
   setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
-  setAutosaveOnPlaytest: (enabled: boolean) => void,
+  setAutosaveOnPreview: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -43,7 +43,7 @@ export const initialPreferences = {
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
     eventsSheetShowObjectThumbnails: true,
-    autosaveOnPlaytest: true,
+    autosaveOnPreview: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -54,7 +54,7 @@ export const initialPreferences = {
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => {},
   verifyIfIsNewVersion: () => false,
   setEventsSheetShowObjectThumbnails: () => {},
-  setAutosaveOnPlaytest: () => {},
+  setAutosaveOnPreview: () => {},
 };
 
 const PreferencesContext: Context<Preferences> = createReactContext(

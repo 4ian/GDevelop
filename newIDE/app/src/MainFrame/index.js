@@ -760,7 +760,7 @@ class MainFrame extends React.Component<Props, State> {
               setToolbar={this.setEditorToolbar}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
-                if (values.autosaveOnPlaytest) {
+                if (values.autosaveOnPreview) {
                   this.save();
                 }
               }}
@@ -794,7 +794,7 @@ class MainFrame extends React.Component<Props, State> {
               setToolbar={this.setEditorToolbar}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
-                if (values.autosaveOnPlaytest) {
+                if (values.autosaveOnPreview) {
                   this.save();
                 }
               }}
@@ -885,7 +885,7 @@ class MainFrame extends React.Component<Props, State> {
                   setToolbar={this.setEditorToolbar}
                   onPreview={(project, layout, options) => {
                     this._launchExternalLayoutPreview(project, layout, options);
-                    if (values.autosaveOnPlaytest) {
+                    if (values.autosaveOnPreview) {
                       this.save();
                     }
                   }}

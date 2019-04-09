@@ -81,6 +81,7 @@ import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunct
 import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
+import PreferencesContext from './Preferences/PreferencesContext';
 
 const gd = global.gd;
 
@@ -751,54 +752,74 @@ class MainFrame extends React.Component<Props, State> {
     const sceneEditorOptions = {
       name,
       renderEditor: ({ isActive, editorRef }) => (
-        <SceneEditor
-          project={this.state.currentProject}
-          layoutName={name}
-          setToolbar={this.setEditorToolbar}
-          onPreview={this._launchLayoutPreview}
-          showPreviewButton={!!this.props.previewLauncher}
-          showNetworkPreviewButton={
-            this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
-          }
-          onOpenDebugger={this.openDebugger}
-          onEditObject={this.props.onEditObject}
-          showObjectsList={!this.props.integratedEditor}
-          resourceSources={this.props.resourceSources}
-          onChooseResource={this._onChooseResource}
-          resourceExternalEditors={this.props.resourceExternalEditors}
-          isActive={isActive}
-          ref={editorRef}
-        />
+        <PreferencesContext.Consumer>
+          {({ values }) => (
+            <SceneEditor
+              project={this.state.currentProject}
+              layoutName={name}
+              setToolbar={this.setEditorToolbar}
+              onPreview={(project, layout, options) => {
+                this._launchLayoutPreview(project, layout, options);
+                if (values.autosaveOnPlaytest) {
+                  this.save();
+                }
+              }}
+              showPreviewButton={!!this.props.previewLauncher}
+              showNetworkPreviewButton={
+                this._previewLauncher &&
+                this._previewLauncher.canDoNetworkPreview()
+              }
+              onOpenDebugger={this.openDebugger}
+              onEditObject={this.props.onEditObject}
+              showObjectsList={!this.props.integratedEditor}
+              resourceSources={this.props.resourceSources}
+              onChooseResource={this._onChooseResource}
+              resourceExternalEditors={this.props.resourceExternalEditors}
+              isActive={isActive}
+              ref={editorRef}
+            />
+          )}
+        </PreferencesContext.Consumer>
       ),
       key: 'layout ' + name,
     };
     const eventsEditorOptions = {
       name: name + ' ' + i18n._(t`(Events)`),
       renderEditor: ({ isActive, editorRef }) => (
-        <EventsEditor
-          project={this.state.currentProject}
-          layoutName={name}
-          setToolbar={this.setEditorToolbar}
-          onPreview={this._launchLayoutPreview}
-          showPreviewButton={!!this.props.previewLauncher}
-          showNetworkPreviewButton={
-            this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
-          }
-          onOpenDebugger={this.openDebugger}
-          onOpenExternalEvents={this.openExternalEvents}
-          onOpenLayout={name =>
-            this.openLayout(name, {
-              openEventsEditor: true,
-              openSceneEditor: false,
-            })
-          }
-          resourceSources={this.props.resourceSources}
-          onChooseResource={this._onChooseResource}
-          resourceExternalEditors={this.props.resourceExternalEditors}
-          openInstructionOrExpression={this._openInstructionOrExpression}
-          isActive={isActive}
-          ref={editorRef}
-        />
+        <PreferencesContext.Consumer>
+          {({ values }) => (
+            <EventsEditor
+              project={this.state.currentProject}
+              layoutName={name}
+              setToolbar={this.setEditorToolbar}
+              onPreview={(project, layout, options) => {
+                this._launchLayoutPreview(project, layout, options);
+                if (values.autosaveOnPlaytest) {
+                  this.save();
+                }
+              }}
+              showPreviewButton={!!this.props.previewLauncher}
+              showNetworkPreviewButton={
+                this._previewLauncher &&
+                this._previewLauncher.canDoNetworkPreview()
+              }
+              onOpenDebugger={this.openDebugger}
+              onOpenExternalEvents={this.openExternalEvents}
+              onOpenLayout={name =>
+                this.openLayout(name, {
+                  openEventsEditor: true,
+                  openSceneEditor: false,
+                })
+              }
+              resourceSources={this.props.resourceSources}
+              onChooseResource={this._onChooseResource}
+              resourceExternalEditors={this.props.resourceExternalEditors}
+              openInstructionOrExpression={this._openInstructionOrExpression}
+              isActive={isActive}
+              ref={editorRef}
+            />
+          )}
+        </PreferencesContext.Consumer>
       ),
       key: 'layout events ' + name,
       dontFocusTab: openSceneEditor,
@@ -856,25 +877,34 @@ class MainFrame extends React.Component<Props, State> {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name,
           renderEditor: ({ isActive, editorRef }) => (
-            <ExternalLayoutEditor
-              project={this.state.currentProject}
-              externalLayoutName={name}
-              setToolbar={this.setEditorToolbar}
-              onPreview={this._launchExternalLayoutPreview}
-              showPreviewButton={!!this.props.previewLauncher}
-              showNetworkPreviewButton={
-                this._previewLauncher &&
-                this._previewLauncher.canDoNetworkPreview()
-              }
-              onOpenDebugger={this.openDebugger}
-              onEditObject={this.props.onEditObject}
-              showObjectsList={!this.props.integratedEditor}
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this._onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              isActive={isActive}
-              ref={editorRef}
-            />
+            <PreferencesContext.Consumer>
+              {({ values }) => (
+                <ExternalLayoutEditor
+                  project={this.state.currentProject}
+                  externalLayoutName={name}
+                  setToolbar={this.setEditorToolbar}
+                  onPreview={(project, layout, options) => {
+                    this._launchExternalLayoutPreview(project, layout, options);
+                    if (values.autosaveOnPlaytest) {
+                      this.save();
+                    }
+                  }}
+                  showPreviewButton={!!this.props.previewLauncher}
+                  showNetworkPreviewButton={
+                    this._previewLauncher &&
+                    this._previewLauncher.canDoNetworkPreview()
+                  }
+                  onOpenDebugger={this.openDebugger}
+                  onEditObject={this.props.onEditObject}
+                  showObjectsList={!this.props.integratedEditor}
+                  resourceSources={this.props.resourceSources}
+                  onChooseResource={this._onChooseResource}
+                  resourceExternalEditors={this.props.resourceExternalEditors}
+                  isActive={isActive}
+                  ref={editorRef}
+                />
+              )}
+            </PreferencesContext.Consumer>
           ),
           key: 'external layout ' + name,
         }),

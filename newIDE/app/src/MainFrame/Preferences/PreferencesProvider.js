@@ -35,6 +35,7 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
       this
     ),
+    setAutosaveOnPlaytest: this._setAutosaveOnPlaytest.bind(this),
   };
 
   componentDidMount() {
@@ -61,6 +62,18 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           eventsSheetShowObjectThumbnails,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setAutosaveOnPlaytest(autosaveOnPlaytest: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          autosaveOnPlaytest,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

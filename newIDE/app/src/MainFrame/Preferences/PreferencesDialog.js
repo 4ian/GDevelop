@@ -66,6 +66,7 @@ export default class PreferencesDialog extends Component<Props, State> {
             showAlertMessage,
             setAutoDisplayChangelog,
             setEventsSheetShowObjectThumbnails,
+            setAutosaveOnPlaytest,
           }) => {
             const dismissedAlertMessages = getDismissedAlertMessages(
               values.hiddenAlertMessages
@@ -145,6 +146,14 @@ export default class PreferencesDialog extends Component<Props, State> {
                     label={
                       <Trans>Display object thumbnails in Events Sheets.</Trans>
                     }
+                  />
+                </Line>
+                <Line>
+                  <Toggle
+                    onToggle={(e, check) => setAutosaveOnPlaytest(check)}
+                    toggled={values.autosaveOnPlaytest}
+                    labelPosition="right"
+                    label={<Trans>Auto-save project when playtested.</Trans>}
                   />
                 </Line>
                 <Line>

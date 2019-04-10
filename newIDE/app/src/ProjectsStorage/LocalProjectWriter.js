@@ -14,9 +14,11 @@ export default class LocalProjectWriter {
     }
   };
 
-  static saveProject = project => {
+  static saveProject = (project, autosave = false) => {
     return new Promise((resolve, reject) => {
-      const filepath = project.getProjectFile();
+      const autoSavePath = project.getProjectFile() + '.autosave';
+      const filepath = autosave ? autoSavePath : project.getProjectFile();
+
       if (!filepath) {
         console.warn('Unimplemented Saveas'); // TODO
         return;
@@ -29,6 +31,9 @@ export default class LocalProjectWriter {
         }
 
         resolve();
+        if (!autosave && fs.existsSync(autoSavePath)) {
+          fs.unlinkSync(autoSavePath); // delete the autosave when the save is ahead of it
+        }
       });
     });
   };

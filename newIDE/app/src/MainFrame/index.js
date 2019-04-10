@@ -761,7 +761,7 @@ class MainFrame extends React.Component<Props, State> {
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 if (values.autosaveOnPreview) {
-                  this.save();
+                  this.save(true);
                 }
               }}
               showPreviewButton={!!this.props.previewLauncher}
@@ -795,7 +795,7 @@ class MainFrame extends React.Component<Props, State> {
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 if (values.autosaveOnPreview) {
-                  this.save();
+                  this.save(true);
                 }
               }}
               showPreviewButton={!!this.props.previewLauncher}
@@ -886,7 +886,7 @@ class MainFrame extends React.Component<Props, State> {
                   onPreview={(project, layout, options) => {
                     this._launchExternalLayoutPreview(project, layout, options);
                     if (values.autosaveOnPreview) {
-                      this.save();
+                      this.save(true);
                     }
                   }}
                   showPreviewButton={!!this.props.previewLauncher}
@@ -1094,7 +1094,7 @@ class MainFrame extends React.Component<Props, State> {
       .catch(() => {});
   };
 
-  save = () => {
+  save = autosave => {
     saveUiSettings(this.state.editorTabs);
     if (!this.state.currentProject) return;
     const { i18n } = this.props;
@@ -1102,9 +1102,15 @@ class MainFrame extends React.Component<Props, State> {
     if (this.props.saveDialog) {
       this._openSaveDialog();
     } else if (this.props.onSaveProject) {
-      this.props.onSaveProject(this.state.currentProject).then(
+      this.props.onSaveProject(this.state.currentProject, autosave).then(
         () => {
-          this._showSnackMessage(i18n._(t`Project properly saved`));
+          this._showSnackMessage(
+            i18n._(
+              autosave
+                ? t`Project created an autosave`
+                : t`Project properly saved`
+            )
+          );
         },
         err => {
           showErrorBox(

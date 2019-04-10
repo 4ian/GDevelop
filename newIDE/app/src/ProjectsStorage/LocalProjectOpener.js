@@ -31,6 +31,15 @@ export default class LocalProjectOpener {
     return new Promise((resolve, reject) => {
       if (!fs) return reject('Not supported');
 
+      //If an autosave exists, load it instead of the save
+      if (fs.existsSync(filepath + '.autosave')) {
+        //eslint-disable-next-line
+        const answer = confirm(
+          `Autosave was detected in the project folder. Would you like to load it?`
+        );
+        if (answer) filepath += '.autosave';
+      }
+
       fs.readFile(filepath, { encoding: 'utf8' }, (err, data) => {
         if (err) return reject(err);
 

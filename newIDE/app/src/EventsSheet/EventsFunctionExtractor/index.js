@@ -33,7 +33,7 @@ export const setupFunctionFromEvents = ({
     project
   );
 
-  // Deduct parameters from events
+  // Analyze events...
   const eventsContextAnalyzer = new gd.EventsContextAnalyzer(
     gd.JsPlatform.get(),
     globalObjectsContainer,
@@ -41,7 +41,9 @@ export const setupFunctionFromEvents = ({
   );
   eventsContextAnalyzer.launch(eventsFunction.getEvents());
   const eventsContext = eventsContextAnalyzer.getEventsContext();
-  const objectOrGroupNames: Array<string> = eventsContext
+
+  // ...to extract objects and groups
+  const objectOrGroupNames: Array<string> = eventsContext //TODO: Rename to referenced objectOrGroupNames
     .getObjectOrGroupNames()
     .toNewVectorString()
     .toJSArray();
@@ -49,15 +51,35 @@ export const setupFunctionFromEvents = ({
     .getObjectNames()
     .toNewVectorString()
     .toJSArray();
+  const groups: Array<gdObjectGroup> = objectOrGroupNames
+    // Filter to only keep groups
+    .filter(
+      (objectOrGroupName: string) =>
+        objectNames.indexOf(objectOrGroupName) === -1
+    )
+    .map(groupName =>
+      getObjectGroupByName(globalObjectsContainer, objectsContainer, groupName)
+    )
+    .filter(Boolean);
 
-  // TODO: We could do a smarter detection of groups:
-  // if a group is used and no object from this group is used
-  // alone (i.e: if the group is used as a single object),
-  // then don't use the expanded objects for it.
+  // Compute what the parameters should be:
+  // 1) The groups, but only the ones that have no object directly referenced.
+  const parameterGroups: Array<gdObjectGroup> = groups.filter(group => {
+    return !objectOrGroupNames.some(referencedObjectOrGroupName =>
+      group.find(referencedObjectOrGroupName)
+    );
+  });
+  const parameterGroupNames: Array<string> = parameterGroups.map(group => group.getName());
 
+  // 2) The objects, but only the ones that are already in the groups in parameters
+  const parameterObjectNames: Array<string> = objectNames.filter(objectName => {
+    return !parameterGroups.some(group => group.find(objectName));
+  });
+
+  // Create parameters for these objects (or these groups without any object directly referenced)
   const parameters = eventsFunction.getParameters();
   parameters.clear();
-  objectNames.forEach(objectName => {
+  [...parameterGroupNames, ...parameterObjectNames].forEach(objectName => {
     const newParameter = new gd.ParameterMetadata();
     newParameter.setType('objectList');
     newParameter.setName(objectName);
@@ -75,7 +97,7 @@ export const setupFunctionFromEvents = ({
     // Would need a "getBehavior"/"getBehaviorName" indirection in the generated code :/
     // We can also forbid renaming behaviors?
     const behaviorNames: Array<string> = eventsContext
-      .getBehaviorNamesOfObject(objectName)
+      .getBehaviorNamesOfObjectOrGroup(objectName)
       .toNewVectorString()
       .toJSArray();
 
@@ -94,20 +116,11 @@ export const setupFunctionFromEvents = ({
     });
   });
 
-  // Import groups that are used in events
-  objectOrGroupNames
-    // Filter to only keep groups
-    .filter(
-      (objectOrGroupName: string) =>
-        objectNames.indexOf(objectOrGroupName) === -1
-    )
-    .forEach(groupName => {
-      const group = getObjectGroupByName(
-        globalObjectsContainer,
-        objectsContainer,
-        groupName
-      );
-
+  // Import groups that are used in events, but are not in parameters,
+  // inside the events function groups.
+  groups
+    .filter(group => !parameterGroupNames.includes(group.getName()))
+    .forEach(group => {
       if (group) {
         eventsFunction.getObjectGroups().insert(group, 0);
       }
@@ -201,7 +214,6 @@ export const canCreateEventsFunction = (
   return (
     extensionName !== '' &&
     validateExtensionName(extensionName) &&
-    validateExtensionNameUniqueness(project, extensionName) &&
     eventsFunction.getName() !== '' &&
     validateEventsFunctionName(eventsFunction.getName()) &&
     validateEventsFunctionNameUniqueness(

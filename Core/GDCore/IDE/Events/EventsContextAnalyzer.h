@@ -58,21 +58,12 @@ class GD_CORE_API EventsContext {
     return objectOrGroupBehaviorNames[objectOrGroupName];
   }
 
-  /**
-   * \brief Get behaviors referenced in the events for the given object, without groups (all groups
-   * have been "expanded" to the real objects being referenced by the group).
-   */
-  const std::set<gd::String>& GetBehaviorNamesOfObject(const gd::String& objectName) {
-    return objectBehaviorNames[objectName];
-  }
-
  private:
   std::vector<gd::String> ExpandObjectsName(const gd::String& objectOrGroupName);
 
   std::set<gd::String> objectOrGroupNames;
   std::set<gd::String> objectNames;
   std::map<gd::String, std::set<gd::String>> objectOrGroupBehaviorNames;
-  std::map<gd::String, std::set<gd::String>> objectBehaviorNames;
   gd::ObjectsContainer& project;
   gd::ObjectsContainer& layout;
 };

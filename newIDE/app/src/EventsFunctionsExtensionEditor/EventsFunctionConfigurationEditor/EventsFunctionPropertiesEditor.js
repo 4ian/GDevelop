@@ -44,7 +44,11 @@ const getSentenceErrorText = (
 
   const missingParameters = mapVector(
     eventsFunction.getParameters(),
-    (_, index) => {
+    (parameter, index) => {
+      if (gd.ParameterMetadata.isBehavior(parameter.getType())) {
+        return null; // Behaviors are usually not shown in sentences.
+      }
+
       const expectedString = `_PARAM${index + 1}_`;
       if (sentence.indexOf(expectedString) === -1) return expectedString;
 
@@ -54,7 +58,7 @@ const getSentenceErrorText = (
 
   if (missingParameters.length) {
     return (
-      i18n._(t`The sentence is missing this/these parameter(s):`) +
+      i18n._(t`The sentence is probably missing this/these parameter(s):`) +
       missingParameters.join(', ')
     );
   }

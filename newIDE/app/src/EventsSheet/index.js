@@ -988,11 +988,6 @@ export default class EventsSheet extends React.Component<Props, State> {
                     },
                     { type: 'separator' },
                     {
-                      label: 'Extract Events to a Function',
-                      click: () => this.extractEventsToFunction(),
-                    },
-                    { type: 'separator' },
-                    {
                       label: 'Add New Event Below',
                       click: () =>
                         this.addNewEvent('BuiltinCommonInstructions::Standard'),
@@ -1026,7 +1021,11 @@ export default class EventsSheet extends React.Component<Props, State> {
                     },
                     { type: 'separator' },
                     {
-                      label: 'Analyze objects used in this event',
+                      label: 'Extract Events to a Function',
+                      click: () => this.extractEventsToFunction(),
+                    },
+                    {
+                      label: 'Analyze Objects Used in this Event',
                       click: this._openEventsContextAnalyzer,
                     },
                   ]}

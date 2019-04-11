@@ -7,6 +7,7 @@ import { Tabs, Tab } from 'material-ui/Tabs';
 import EventsFunctionParametersEditor from './EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
 import ScrollView from '../../UI/ScrollView';
+import { Column } from '../../UI/Grid';
 
 type Props = {|
   project: gdProject,
@@ -55,17 +56,28 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     } = this.props;
 
     return (
-      <ScrollView>
+      <Column expand noMargin>
         <Tabs
           value={this.state.currentTab}
           onChange={this._chooseTab}
-          // contentContainerStyle={{ display: 'flex', flex: 1 }}
-          // tabTemplateStyle={{ display: 'flex', flex: 1 }}
         >
           <Tab
             label={<Trans>Configuration</Trans>}
             value={('config': TabNames)}
+          />
+          <Tab
+            label={<Trans>Parameters</Trans>}
+            value={('parameters': TabNames)}
+          />
+          <Tab
+            label={<Trans>Object groups</Trans>}
+            value={('groups': TabNames)}
           >
+            {/* Manually display tabs to support flex */}
+          </Tab>
+        </Tabs>
+        {this.state.currentTab === 'config' ? (
+          <ScrollView expand>
             <EventsFunctionPropertiesEditor
               eventsFunction={eventsFunction}
               helpPagePath={helpPagePath}
@@ -73,11 +85,10 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               renderConfigurationHeader={renderConfigurationHeader}
               freezeEventsFunctionType={freezeEventsFunctionType}
             />
-          </Tab>
-          <Tab
-            label={<Trans>Parameters</Trans>}
-            value={('parameters': TabNames)}
-          >
+          </ScrollView>
+        ) : null}
+        {this.state.currentTab === 'parameters' ? (
+          <ScrollView>
             <EventsFunctionParametersEditor
               project={project}
               eventsFunction={eventsFunction}
@@ -85,24 +96,18 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
               helpPagePath={helpPagePath}
               freezeParameters={freezeParameters}
             />
-          </Tab>
-          <Tab
-            label={<Trans>Object groups</Trans>}
-            value={('groups': TabNames)}
-          >
-            {/* TODO */}
-            <div style={{ height: 400 }}>
-              <ObjectGroupsListWithObjectGroupEditor
-                globalObjectsContainer={globalObjectsContainer}
-                objectsContainer={objectsContainer}
-                globalObjectGroups={globalObjectsContainer.getObjectGroups()}
-                objectGroups={eventsFunction.getObjectGroups()}
-                onGroupsUpdated={onParametersOrGroupsUpdated}
-              />
-            </div>
-          </Tab>
-        </Tabs>
-      </ScrollView>
+          </ScrollView>
+        ) : null}
+        {this.state.currentTab === 'groups' ? (
+          <ObjectGroupsListWithObjectGroupEditor
+            globalObjectsContainer={globalObjectsContainer}
+            objectsContainer={objectsContainer}
+            globalObjectGroups={globalObjectsContainer.getObjectGroups()}
+            objectGroups={eventsFunction.getObjectGroups()}
+            onGroupsUpdated={onParametersOrGroupsUpdated}
+          />
+        ) : null}
+      </Column>
     );
   }
 }

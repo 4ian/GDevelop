@@ -66,7 +66,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
       project,
       globalObjectsContainer,
       objectsContainer,
-      serializedEvents: serializedEvents,
+      serializedEvents,
       eventsFunction,
     });
     this.setState({

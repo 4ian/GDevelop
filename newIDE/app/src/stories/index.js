@@ -1822,7 +1822,7 @@ storiesOf('EventsFunctionConfigurationEditor', module)
       <EventsFunctionConfigurationEditor
         project={project}
         globalObjectsContainer={project}
-        objectsContainer={testLayout} //TODO?
+        objectsContainer={testLayout}
         helpPagePath="/events/functions"
         eventsFunction={testEventsFunction}
         onParametersOrGroupsUpdated={action(

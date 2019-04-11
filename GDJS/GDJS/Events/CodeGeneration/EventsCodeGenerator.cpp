@@ -166,33 +166,19 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     const vector<gd::ParameterMetadata>& parameters) {
-  gd::String objectsGetters;
+  gd::String objectsGettersMap;
   gd::String objectsCreators;
   gd::String argumentsGetters;
   for (const auto& parameter : parameters) {
     if (parameter.GetName().empty()) continue;
 
     if (gd::ParameterMetadata::IsObject(parameter.GetType())) {
-      // Generate getter that will be used to get the lists of objects passed
+      // Generate map that will be used to get the lists of objects passed
       // as parameters
-      objectsGetters +=
-          "if (objectName === " + ConvertToStringExplicit(parameter.GetName()) +
-          "&& !!" + parameter.GetName() + ") return gdjs.objectsListsToArray(" +
-          parameter.GetName() + ");\n";
-
-      // Generate creator functions that will be used to create new objects. We
-      // need to check if the function was given the context of the calling
-      // function (parentEventsFunctionContext). If this is the case, use it to
-      // create the new object as the object names used in the function are not
-      // the same as the objects available in the scene.
-      gd::String objectNameCode = parameter.GetName() + ".firstKey()";
-      objectsCreators +=
-          "if (objectName === " + ConvertToStringExplicit(parameter.GetName()) +
-          "&& !!" + parameter.GetName() +
-          ") return parentEventsFunctionContext ? "
-          "parentEventsFunctionContext.createObject(" +
-          objectNameCode + ") : runtimeScene.createObject(" + objectNameCode +
-          ");\n";
+      gd::String comma = objectsGettersMap.empty() ? "" : ", ";
+      objectsGettersMap += comma +
+                           ConvertToStringExplicit(parameter.GetName()) + ": " +
+                           parameter.GetName() + "\n";
     } else {
       argumentsGetters +=
           "if (argName === " + ConvertToStringExplicit(parameter.GetName()) +
@@ -201,12 +187,36 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
   }
 
   return gd::String("var eventsFunctionContext = {\n") +
-         "  getObjects: function(objectName) {\n" + objectsGetters +
-         "    return [];"
+         // The object name to parameter map:
+         "  objectsMap: {\n" + objectsGettersMap +
+         "},\n"
+         // Function that will be used to query objects, when a new object list
+         // is needed by events.
+         "  getObjects: function(objectName) {\n" +
+         "    var objectsList = "
+         "eventsFunctionContext.objectsMap[objectName];\n" +
+         "    return objectsList ? gdjs.objectsListsToArray(objectsList) : "
+         "[];\n"
          "  },\n" +
-         "  createObject: function(objectName) {\n" + objectsCreators +
+         // Creator function that will be used to create new objects. We
+         // need to check if the function was given the context of the calling
+         // function (parentEventsFunctionContext). If this is the case, use it
+         // to create the new object as the object names used in the function
+         // are not the same as the objects available in the scene.
+         "  createObject: function(objectName) {\n"
+         "    var objectsList = "
+         "eventsFunctionContext.objectsMap[objectName];\n" +
+         "    if (objectsList) {\n" +
+         "      return parentEventsFunctionContext ?\n" +
+         "        "
+         "parentEventsFunctionContext.createObject(objectsList.firstKey()) "
+         ":\n" +
+         "        runtimeScene.createObject(objectsList.firstKey());\n" +
+         "    }\n" +
+         // Unknown object, don't create anything:
          "    return null;\n" +
          "  },\n"
+         // Getter for arguments that are not objects
          "  getArgument: function(argName) {\n" +
          argumentsGetters + "    return \"\";\n" + "  }\n" + "};\n";
 }

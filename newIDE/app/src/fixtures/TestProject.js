@@ -118,8 +118,12 @@ export const makeTestProject = gd => {
   group2.setName('GroupOfObjects');
   group2.addObject('MySpriteObject');
   group2.addObject('MyTextObject');
+  const group3 = new gd.ObjectGroup();
+  group3.setName('GroupOfSpriteObjectsWithBehaviors');
+  group3.addObject('MySpriteObjectWithBehaviors');
   testLayout.getObjectGroups().insert(group1, 0);
   testLayout.getObjectGroups().insert(group2, 1);
+  testLayout.getObjectGroups().insert(group3, 2);
 
   const testLayoutInstance1 = testLayout
     .getInitialInstances()

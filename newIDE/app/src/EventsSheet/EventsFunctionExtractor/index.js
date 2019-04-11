@@ -20,7 +20,7 @@ export const setupFunctionFromEvents = ({
   project: gdProject,
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
-  serializedEvents: string,
+  serializedEvents: Object,
   eventsFunction: gdEventsFunction,
 }) => {
   // Set up the function
@@ -69,7 +69,9 @@ export const setupFunctionFromEvents = ({
       group.find(referencedObjectOrGroupName)
     );
   });
-  const parameterGroupNames: Array<string> = parameterGroups.map(group => group.getName());
+  const parameterGroupNames: Array<string> = parameterGroups.map(group =>
+    group.getName()
+  );
 
   // 2) The objects, but only the ones that are already in the groups in parameters
   const parameterObjectNames: Array<string> = objectNames.filter(objectName => {
@@ -151,7 +153,7 @@ export const createNewInstructionForEventsFunction = (
     action.setParameter(
       runtimeSceneParameterCount + index,
       parameterMetadata.getName()
-    ); //TODO
+    );
   });
 
   return action;

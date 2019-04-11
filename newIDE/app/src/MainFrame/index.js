@@ -1053,7 +1053,7 @@ class MainFrame extends React.Component<Props, State> {
     const { currentProject } = this.state;
     if (!currentProject) return;
 
-    //TODO: check for validity of names?
+    // Names are assumed to be already validated
     const createNewExtension = !currentProject.hasEventsFunctionsExtensionNamed(
       extensionName
     );

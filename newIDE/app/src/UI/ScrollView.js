@@ -2,9 +2,14 @@
 import * as React from 'react';
 
 const styles = {
-  overflowY: 'scroll',
+  container: {
+    overflowY: 'scroll',
+    flex: 1,
+  },
 };
 
 type Props = {| children: React.Node |};
 
-export default ({ children }: Props) => <div style={styles}>{children}</div>;
+export default ({ children }: Props) => (
+  <div style={{ ...styles.container }}>{children}</div>
+);

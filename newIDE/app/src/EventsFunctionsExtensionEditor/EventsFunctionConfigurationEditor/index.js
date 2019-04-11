@@ -6,6 +6,7 @@ import ObjectGroupsListWithObjectGroupEditor from '../../ObjectGroupsList/Object
 import { Tabs, Tab } from 'material-ui/Tabs';
 import EventsFunctionParametersEditor from './EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from './EventsFunctionPropertiesEditor';
+import ScrollView from '../../UI/ScrollView';
 
 type Props = {|
   project: gdProject,
@@ -25,12 +26,6 @@ type TabNames = 'config' | 'parameters' | 'groups';
 type State = {|
   currentTab: TabNames,
 |};
-
-const styles = {
-  scrollView: {
-    overflowY: 'scroll',
-  },
-};
 
 export default class EventsFunctionConfigurationEditor extends React.Component<
   Props,
@@ -60,8 +55,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
     } = this.props;
 
     return (
-      // TODO: ScrollView
-      <div style={styles.scrollView}>
+      <ScrollView>
         <Tabs
           value={this.state.currentTab}
           onChange={this._chooseTab}
@@ -96,6 +90,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             label={<Trans>Object groups</Trans>}
             value={('groups': TabNames)}
           >
+            {/* TODO */}
             <div style={{ height: 400 }}>
               <ObjectGroupsListWithObjectGroupEditor
                 globalObjectsContainer={globalObjectsContainer}
@@ -107,7 +102,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             </div>
           </Tab>
         </Tabs>
-      </div>
+      </ScrollView>
     );
   }
 }

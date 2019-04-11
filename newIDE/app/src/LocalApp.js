@@ -77,6 +77,7 @@ export const create = (authentification: Authentification) => {
                 />
               }
               onSaveProject={LocalProjectWriter.saveProject}
+              onAutoSaveProject={LocalProjectWriter.writeProjectJSONFile}
               onChooseProject={LocalProjectOpener.chooseProjectFile}
               onReadFromPathOrURL={LocalProjectOpener.readProjectJSONFile}
               resourceSources={localResourceSources}

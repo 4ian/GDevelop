@@ -1094,23 +1094,27 @@ class MainFrame extends React.Component<Props, State> {
       .catch(() => {});
   };
 
-  save = autosave => {
+  save = (autosave: boolean = false) => {
     saveUiSettings(this.state.editorTabs);
-    if (!this.state.currentProject) return;
+
+    const { currentProject } = this.state;
+    if (!currentProject) return;
     const { i18n } = this.props;
 
     if (this.props.saveDialog) {
       this._openSaveDialog();
-    } else if (this.props.onSaveProject) {
-      this.props.onSaveProject(this.state.currentProject, autosave).then(
+    } else if (this.props.onAutoSaveProject && autosave) {
+      this.props.onAutoSaveProject(
+        currentProject,
+        currentProject.getProjectFile() + '.autosave',
         () => {
-          this._showSnackMessage(
-            i18n._(
-              autosave
-                ? t`Project created an autosave`
-                : t`Project properly saved`
-            )
-          );
+          this._showSnackMessage(i18n._(t`Autosaved!`));
+        }
+      );
+    } else if (this.props.onSaveProject) {
+      this.props.onSaveProject(currentProject).then(
+        () => {
+          this._showSnackMessage(i18n._(t`Project properly saved`));
         },
         err => {
           showErrorBox(

@@ -3,8 +3,8 @@ import optionalRequire from '../Utils/OptionalRequire.js';
 const fs = optionalRequire('fs');
 
 export default class LocalProjectWriter {
-  static _writeProjectJSONFile = (project, filepath, cb) => {
-    if (!fs) return cb('Not supported');
+  static writeProjectJSONFile = (project, filepath, cb) => {
+    if (!fs || !filepath) return cb('Not supported');
 
     try {
       const content = JSON.stringify(serializeToJSObject(project), null, 2);
@@ -14,26 +14,21 @@ export default class LocalProjectWriter {
     }
   };
 
-  static saveProject = (project, autosave = false) => {
+  static saveProject = project => {
     return new Promise((resolve, reject) => {
-      const autoSavePath = project.getProjectFile() + '.autosave';
-      const filepath = autosave ? autoSavePath : project.getProjectFile();
-
+      const filepath = project.getProjectFile();
       if (!filepath) {
         console.warn('Unimplemented Saveas'); // TODO
         return;
       }
 
-      LocalProjectWriter._writeProjectJSONFile(project, filepath, err => {
+      LocalProjectWriter.writeProjectJSONFile(project, filepath, err => {
         if (err) {
           console.error('Unable to write project', err);
           return reject(err);
         }
 
         resolve();
-        if (!autosave && fs.existsSync(autoSavePath)) {
-          fs.unlinkSync(autoSavePath); // delete the autosave when the save is ahead of it
-        }
       });
     });
   };

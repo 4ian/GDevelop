@@ -82,6 +82,8 @@ import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
+import optionalRequire from '../Utils/OptionalRequire.js';
+const fs = optionalRequire('fs');
 
 const gd = global.gd;
 
@@ -129,6 +131,11 @@ type Props = {
   onChooseProject?: () => Promise<string>,
   saveDialog?: React.Element<*>,
   onSaveProject?: gdProject => Promise<any>,
+  onAutoSaveProject?: (
+    project: gdProject,
+    filepath: string,
+    cb: Function
+  ) => (?string) => void,
   loading?: boolean,
   requestUpdate?: () => void,
   exportDialog?: React.Element<*>,
@@ -305,6 +312,22 @@ class MainFrame extends React.Component<Props, State> {
 
   openFromPathOrURL = (url: string, cb: Function) => {
     const { i18n } = this.props;
+
+    const autoSavePath = url + '.autosave';
+    if (fs.existsSync(autoSavePath)) {
+      const autoSavedTime = fs.statSync(autoSavePath).mtime.getTime();
+      const saveTime = fs.statSync(url).mtime.getTime();
+      if (autoSavedTime > saveTime) {
+        //eslint-disable-next-line
+        const answer = confirm(
+          i18n._(
+            `Autosave newer than the project file exists. Would you like to load it?`
+          )
+        );
+        if (answer) url += '.autosave';
+      }
+    }
+
     this.props.onReadFromPathOrURL(url).then(
       projectObject => {
         this.setState({ loadingProject: true }, () =>
@@ -328,13 +351,26 @@ class MainFrame extends React.Component<Props, State> {
         );
       },
       err => {
-        showErrorBox(
-          i18n._(
-            t`Unable to open this project. Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`
-          ),
-          err
-        );
-        return;
+        if (fs.existsSync(autoSavePath)) {
+          //eslint-disable-next-line
+          const answer = confirm(
+            i18n._(
+              `The project file appears to be malformed, but an Autosave exists.\nWould you like to try to load it instead?`
+            )
+          );
+          if (answer) {
+            this.openFromPathOrURL(autoSavePath);
+            this.openProjectManager(true);
+          }
+        } else {
+          showErrorBox(
+            i18n._(
+              t`Unable to open this project. Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`
+            ),
+            err
+          );
+          return;
+        }
       }
     );
   };
@@ -1107,8 +1143,10 @@ class MainFrame extends React.Component<Props, State> {
       this.props.onAutoSaveProject(
         currentProject,
         currentProject.getProjectFile() + '.autosave',
-        () => {
-          this._showSnackMessage(i18n._(t`Autosaved!`));
+        err => {
+          this._showSnackMessage(
+            err ? i18n._(t`Autosave Failed!`) : i18n._(t`Autosaved!`)
+          );
         }
       );
     } else if (this.props.onSaveProject) {

@@ -27,23 +27,9 @@ export default class LocalProjectOpener {
     });
   }
 
-  static readProjectJSONFile(filepath) {
+  static readProjectJSONFile = filepath => {
     return new Promise((resolve, reject) => {
       if (!fs) return reject('Not supported');
-
-      //If an autosave exists and is newer, load it instead of the save
-      const autoSavePath = filepath + '.autosave';
-      if (fs.existsSync(autoSavePath)) {
-        const autoSavedTime = fs.statSync(autoSavePath).mtime.getTime();
-        const saveTime = fs.statSync(filepath).mtime.getTime();
-        if (autoSavedTime > saveTime) {
-          //eslint-disable-next-line
-          const answer = confirm(
-            `Autosave newer than the project file exists. Would you like to load it?`
-          );
-          if (answer) filepath += '.autosave';
-        }
-      }
 
       fs.readFile(filepath, { encoding: 'utf8' }, (err, data) => {
         if (err) return reject(err);
@@ -56,5 +42,5 @@ export default class LocalProjectOpener {
         }
       });
     });
-  }
+  };
 }

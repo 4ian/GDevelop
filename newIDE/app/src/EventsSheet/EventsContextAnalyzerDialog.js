@@ -81,7 +81,7 @@ export default class EventsContextAnalyzerDialog extends React.Component<
           </Trans>
         </p>
         <p>
-          <Trans>All behaviors being directly referenced in the events:</Trans>
+          <Trans>All behaviors being directly referenced in the events:</Trans>{' '}
           {Object.keys(eventsContextResult.objectOrGroupBehaviorNames).map(
             objectOrGroupName => {
               return (
@@ -90,7 +90,7 @@ export default class EventsContextAnalyzerDialog extends React.Component<
                   {eventsContextResult.objectOrGroupBehaviorNames[
                     objectOrGroupName
                   ].join(', ')}
-                  ;
+                  ;{' '}
                 </Trans>
               );
             }

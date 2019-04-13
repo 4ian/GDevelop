@@ -118,6 +118,8 @@ import ProjectManager from '../ProjectManager';
 import AlertMessage from '../UI/AlertMessage';
 import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
+import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtractor/EventsFunctionExtractorDialog';
+import FixedHeightFlexContainer from './FixedHeightFlexContainer';
 
 // No i18n in this file
 
@@ -137,6 +139,8 @@ const {
   emptyLayout,
   testEventsFunction,
   testEventsFunctionsExtension,
+  testSerializedEvents,
+  testSerializedEventsWithLotsOfObjects,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -273,7 +277,7 @@ storiesOf('UI Building Blocks/ColorField', module)
 storiesOf('UI Building Blocks/Tabs', module)
   .addDecorator(muiDecorator)
   .add('3 tabs', () => (
-    <div style={{ height: 400, display: 'flex' }}>
+    <FixedHeightFlexContainer height={400}>
       <Tabs>
         <Tab label="Tab 1" onClose={action('Close tab 1')}>
           <div style={{ backgroundColor: 'green', height: '100%' }}>
@@ -291,10 +295,10 @@ storiesOf('UI Building Blocks/Tabs', module)
           </div>
         </Tab>
       </Tabs>
-    </div>
+    </FixedHeightFlexContainer>
   ))
   .add('long labels', () => (
-    <div style={{ height: 400, display: 'flex' }}>
+    <FixedHeightFlexContainer height={400}>
       <Tabs>
         <Tab
           label="Tab 1 with a very very long label"
@@ -323,10 +327,10 @@ storiesOf('UI Building Blocks/Tabs', module)
           </div>
         </Tab>
       </Tabs>
-    </div>
+    </FixedHeightFlexContainer>
   ))
   .add('with ObjectsList (to check scrolling)', () => (
-    <div style={{ height: 400, display: 'flex' }}>
+    <FixedHeightFlexContainer height={400}>
       <Tabs>
         <Tab label="Tab 1" onClose={action('Close tab 1')}>
           <div style={{ backgroundColor: 'green', height: '100%' }}>
@@ -349,7 +353,7 @@ storiesOf('UI Building Blocks/Tabs', module)
           </div>
         </Tab>
       </Tabs>
-    </div>
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('UI Building Blocks/HelpButton', module)
@@ -915,7 +919,7 @@ storiesOf('DebuggerContent', module)
   .addDecorator(muiDecorator)
   .add('with data', () => (
     <DragDropContextProvider>
-      <div style={{ height: 550, display: 'flex' }}>
+      <FixedHeightFlexContainer height={550}>
         <DebuggerContent
           gameData={debuggerGameDataDump}
           onPause={action('on pause')}
@@ -928,12 +932,12 @@ storiesOf('DebuggerContent', module)
           profilerOutput={profilerOutput}
           profilingInProgress={false}
         />
-      </div>
+      </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ))
   .add('without data', () => (
     <DragDropContextProvider>
-      <div style={{ height: 550, display: 'flex' }}>
+      <FixedHeightFlexContainer height={550}>
         <DebuggerContent
           gameData={null}
           onPause={action('on pause')}
@@ -946,7 +950,7 @@ storiesOf('DebuggerContent', module)
           profilerOutput={profilerOutput}
           profilingInProgress={true}
         />
-      </div>
+      </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ));
 
@@ -954,50 +958,50 @@ storiesOf('Profiler', module)
   .addDecorator(muiDecorator)
   .add('without profiler output', () => (
     <DragDropContextProvider>
-      <div style={{ height: 550, display: 'flex' }}>
+      <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
           onStop={action('stop profiler')}
           profilerOutput={null}
           profilingInProgress={false}
         />
-      </div>
+      </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ))
   .add('without profiler output, while profiling', () => (
     <DragDropContextProvider>
-      <div style={{ height: 550, display: 'flex' }}>
+      <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
           onStop={action('stop profiler')}
           profilerOutput={null}
           profilingInProgress={true}
         />
-      </div>
+      </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ))
   .add('with profiler output', () => (
     <DragDropContextProvider>
-      <div style={{ height: 550, display: 'flex' }}>
+      <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
           onStop={action('stop profiler')}
           profilerOutput={profilerOutput}
           profilingInProgress={false}
         />
-      </div>
+      </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ))
   .add('with profiler output, while profiling', () => (
     <DragDropContextProvider>
-      <div style={{ height: 550, display: 'flex' }}>
+      <FixedHeightFlexContainer height={550}>
         <Profiler
           onStart={action('start profiler')}
           onStop={action('stop profiler')}
           profilerOutput={profilerOutput}
           profilingInProgress={true}
         />
-      </div>
+      </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ));
 
@@ -1037,7 +1041,7 @@ storiesOf('EventsTree', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <DragDropContextProvider>
-      <div className="gd-events-sheet" style={{ height: 500, display: 'flex' }}>
+      <FixedHeightFlexContainer height={500}>
         <EventsTree
           events={testLayout.getEvents()}
           project={project}
@@ -1065,7 +1069,7 @@ storiesOf('EventsTree', module)
           onEventMoved={() => {}}
           showObjectThumbnails={true}
         />
-      </div>
+      </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ));
 
@@ -1073,7 +1077,7 @@ storiesOf('EventsSheet', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
     <DragDropContextProvider>
-      <div className="gd-events-sheet" style={{ height: 500, display: 'flex' }}>
+      <FixedHeightFlexContainer height={500}>
         <EventsSheet
           project={project}
           layout={testLayout}
@@ -1094,13 +1098,14 @@ storiesOf('EventsSheet', module)
           showNetworkPreviewButton={false}
           showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
+          onCreateEventsFunction={action('create events function')}
         />
-      </div>
+      </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ))
   .add('empty (no events)', () => (
     <DragDropContextProvider>
-      <div className="gd-events-sheet" style={{ height: 500, display: 'flex' }}>
+      <FixedHeightFlexContainer height={500}>
         <EventsSheet
           project={project}
           layout={emptyLayout}
@@ -1121,9 +1126,34 @@ storiesOf('EventsSheet', module)
           showNetworkPreviewButton={false}
           showPreviewButton={false}
           openInstructionOrExpression={action('open instruction or expression')}
+          onCreateEventsFunction={action('create events function')}
         />
-      </div>
+      </FixedHeightFlexContainer>
     </DragDropContextProvider>
+  ));
+
+storiesOf('EventsSheet/EventsFunctionExtractorDialog', module)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <EventsFunctionExtractorDialog
+      project={project}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      serializedEvents={testSerializedEvents}
+      onClose={action('close')}
+      onCreate={action('create')}
+    />
+  ))
+  .add('with a lot of parameters', () => (
+    <EventsFunctionExtractorDialog
+      project={project}
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      serializedEvents={testSerializedEventsWithLotsOfObjects}
+      onClose={action('close')}
+      onCreate={action('create')}
+    />
   ));
 
 storiesOf('SearchPanel', module)
@@ -1413,7 +1443,11 @@ storiesOf('ObjectGroupEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <ObjectGroupEditor project={project} layout={testLayout} group={group2} />
+    <ObjectGroupEditor
+      globalObjectsContainer={project}
+      objectsContainer={testLayout}
+      group={group2}
+    />
   ));
 
 storiesOf('ObjectGroupsList', module)
@@ -1423,8 +1457,8 @@ storiesOf('ObjectGroupsList', module)
     <SerializedObjectDisplay object={testLayout}>
       <div style={{ height: 250 }}>
         <ObjectGroupsList
-          project={project}
-          objectsContainer={testLayout}
+          globalObjectGroups={project.getObjectGroups()}
+          objectGroups={testLayout.getObjectGroups()}
           onEditGroup={() => {}}
         />
       </div>
@@ -1783,20 +1817,26 @@ storiesOf('ResourcesList', module)
 storiesOf('EventsFunctionConfigurationEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
-    <div style={{ height: 500, display: 'flex' }}>
+    <FixedHeightFlexContainer height={500}>
       <EventsFunctionConfigurationEditor
         project={project}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        helpPagePath="/events/functions"
         eventsFunction={testEventsFunction}
-        onParametersUpdated={() => {}}
+        onParametersOrGroupsUpdated={action(
+          'Parameters or groups were updated'
+        )}
       />
-    </div>
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('EventsFunctionsList', module)
   .addDecorator(muiDecorator)
   .add('default', () => (
-    <div style={{ height: 500, display: 'flex' }}>
+    <FixedHeightFlexContainer height={500}>
       <EventsFunctionsList
         project={project}
         eventsFunctionsContainer={testEventsFunctionsExtension}
@@ -1808,14 +1848,15 @@ storiesOf('EventsFunctionsList', module)
         onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
         onEditOptions={action('edit options')}
       />
-    </div>
+    </FixedHeightFlexContainer>
   ));
 
 storiesOf('EventsFunctionsExtensionEditor/index', module)
   .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <DragDropContextProvider>
-      <div style={{ height: 500, display: 'flex' }}>
+      <FixedHeightFlexContainer height={500}>
         <EventsFunctionsExtensionEditor
           project={project}
           eventsFunctionsExtension={testEventsFunctionsExtension}
@@ -1827,13 +1868,15 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           resourceExternalEditors={[]}
           openInstructionOrExpression={action('open instruction or expression')}
           initiallyFocusedFunctionName={null}
+          onCreateEventsFunction={action('on create events function')}
         />
-      </div>
+      </FixedHeightFlexContainer>
     </DragDropContextProvider>
   ));
 
 storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
   .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
   .add('default', () => (
     <OptionsEditorDialog
       eventsFunctionsExtension={testEventsFunctionsExtension}

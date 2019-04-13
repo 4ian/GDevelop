@@ -49,6 +49,7 @@ const ThemableImageThumbnail = ({
 }) => {
   return (
     <div
+      title={resourceName}
       style={{
         ...styles.spriteThumbnail,
         borderColor: selected

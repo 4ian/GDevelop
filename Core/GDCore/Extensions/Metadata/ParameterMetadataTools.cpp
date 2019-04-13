@@ -4,8 +4,9 @@
  * reserved. This project is released under the MIT License.
  */
 #include "ParameterMetadataTools.h"
-#include "GDCore/Project/ObjectsContainer.h"
+#include "GDCore/Events/Expression.h"
 #include "GDCore/Project/Object.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/String.h"
 #include "InstructionMetadata.h"
@@ -16,6 +17,8 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
     const std::vector<gd::ParameterMetadata>& parameters,
     gd::ObjectsContainer& outputObjectsContainer) {
   outputObjectsContainer.GetObjects().clear();
+
+  gd::String lastObjectName;
   for (std::size_t i = 0; i < parameters.size(); ++i) {
     const auto& parameter = parameters[i];
     if (parameter.GetName().empty()) continue;
@@ -26,18 +29,22 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
           parameter.GetExtraInfo(),
           parameter.GetName(),
           outputObjectsContainer.GetObjectsCount());
-    } else if (parameter.GetType() == "behavior") {
-      // Convention is that behavior parameter is after an object parameter
-      if (i != 0 &&
-          gd::ParameterMetadata::IsObject(parameters[i - 1].GetType())) {
-        gd::String objectName = parameter.GetName();
-        if (outputObjectsContainer.HasObjectNamed(objectName)) {
+
+      // Memorize the last object name. By convention, parameters that require
+      // an object (mainly, "objectvar" and "behavior") should be placed after
+      // the object in the list of parameters (if possible, just after).
+      // Search "lastObjectName" in the codebase for other place where this
+      // convention is enforced.
+      lastObjectName = parameter.GetName();
+    } else if (gd::ParameterMetadata::IsBehavior(parameter.GetType())) {
+      if (!lastObjectName.empty()) {
+        if (outputObjectsContainer.HasObjectNamed(lastObjectName)) {
           const gd::Object& object =
-              outputObjectsContainer.GetObject(objectName);
+              outputObjectsContainer.GetObject(lastObjectName);
           gd::String behaviorName = parameter.GetName();
 
           if (!object.HasBehaviorNamed(behaviorName)) {
-            outputObjectsContainer.GetObject(objectName)
+            outputObjectsContainer.GetObject(lastObjectName)
                 .AddNewBehavior(
                     project, parameter.GetExtraInfo(), behaviorName);
           }
@@ -46,4 +53,51 @@ void ParameterMetadataTools::ParametersToObjectsContainer(
     }
   }
 }
+
+void ParameterMetadataTools::IterateOverParameters(
+    const std::vector<gd::Expression>& parameters,
+    const std::vector<gd::ParameterMetadata>& parametersMetadata,
+    std::function<void(const gd::ParameterMetadata& parameterMetadata,
+                       const gd::String& parameterValue,
+                       const gd::String& lastObjectName)> fn) {
+  gd::String lastObjectName = "";
+  for (std::size_t pNb = 0; pNb < parametersMetadata.size(); ++pNb) {
+    const gd::ParameterMetadata& parameterMetadata = parametersMetadata[pNb];
+    const gd::String& parameterValue =
+        pNb < parameters.size() ? parameters[pNb].GetPlainString() : "";
+    const gd::String& parameterValueOrDefault =
+        parameterValue.empty() && parameterMetadata.optional
+            ? parameterMetadata.defaultValue
+            : parameterValue;
+
+    fn(parameterMetadata, parameterValueOrDefault, lastObjectName);
+
+    // Memorize the last object name. By convention, parameters that require
+    // an object (mainly, "objectvar" and "behavior") should be placed after
+    // the object in the list of parameters (if possible, just after).
+    // Search "lastObjectName" in the codebase for other place where this
+    // convention is enforced.
+    if (gd::ParameterMetadata::IsObject(parameterMetadata.GetType()))
+      lastObjectName = parameterValueOrDefault;
+  }
+}
+
+size_t ParameterMetadataTools::GetObjectParameterIndexFor(
+    const std::vector<gd::ParameterMetadata>& parametersMetadata,
+    size_t parameterIndex) {
+  // By convention, parameters that require
+  // an object (mainly, "objectvar" and "behavior") should be placed after
+  // the object in the list of parameters (if possible, just after).
+  // Search "lastObjectName" in the codebase for other place where this
+  // convention is enforced.
+  for (std::size_t pNb = parameterIndex - 1; pNb < parametersMetadata.size();
+       pNb--) {
+    if (gd::ParameterMetadata::IsObject(parametersMetadata[pNb].GetType())) {
+      return pNb;
+    }
+  }
+
+  return gd::String::npos;
+}
+
 }  // namespace gd

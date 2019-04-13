@@ -74,7 +74,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
           </Tab>
         </Tabs>
         {this.state.currentTab === 'config' ? (
-          <ScrollView expand>
+          <ScrollView>
             <EventsFunctionPropertiesEditor
               eventsFunction={eventsFunction}
               helpPagePath={helpPagePath}

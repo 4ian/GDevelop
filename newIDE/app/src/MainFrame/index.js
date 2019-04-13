@@ -82,8 +82,6 @@ import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
 import PreferencesContext from './Preferences/PreferencesContext';
-import optionalRequire from '../Utils/OptionalRequire.js';
-const fs = optionalRequire('fs');
 
 const gd = global.gd;
 
@@ -131,11 +129,12 @@ type Props = {
   onChooseProject?: () => Promise<string>,
   saveDialog?: React.Element<*>,
   onSaveProject?: gdProject => Promise<any>,
-  onAutoSaveProject?: (
-    project: gdProject,
-    filepath: string,
-    cb: Function
-  ) => (?string) => void,
+  onAutoSaveProject?: (project: gdProject) => void,
+  shouldOpenAutosave?: (
+    filePath: string,
+    autoSavePath: string,
+    compareLastModified: boolean
+  ) => boolean,
   loading?: boolean,
   requestUpdate?: () => void,
   exportDialog?: React.Element<*>,
@@ -311,21 +310,18 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   openFromPathOrURL = (url: string, cb: Function) => {
-    const { i18n } = this.props;
+    const { i18n, shouldOpenAutosave } = this.props;
 
+    const projectFilePath = url;
     const autoSavePath = url + '.autosave';
-    if (fs.existsSync(autoSavePath)) {
-      const autoSavedTime = fs.statSync(autoSavePath).mtime.getTime();
-      const saveTime = fs.statSync(url).mtime.getTime();
-      if (autoSavedTime > saveTime) {
-        //eslint-disable-next-line
-        const answer = confirm(
-          i18n._(
-            `Autosave newer than the project file exists. Would you like to load it?`
-          )
-        );
-        if (answer) url += '.autosave';
-      }
+    if (shouldOpenAutosave(url, autoSavePath, true)) {
+      //eslint-disable-next-line
+      const answer = confirm(
+        i18n._(
+          `Autosave newer than the project file exists. Would you like to load it?`
+        )
+      );
+      if (answer) url = autoSavePath;
     }
 
     this.props.onReadFromPathOrURL(url).then(
@@ -337,8 +333,9 @@ class MainFrame extends React.Component<Props, State> {
             this.loadFromSerializedProject(serializedProject, () => {
               serializedProject.delete();
 
-              if (this.state.currentProject)
-                this.state.currentProject.setProjectFile(url);
+              if (this.state.currentProject) {
+                this.state.currentProject.setProjectFile(projectFilePath);
+              }
 
               this.setState(
                 {
@@ -351,11 +348,11 @@ class MainFrame extends React.Component<Props, State> {
         );
       },
       err => {
-        if (fs.existsSync(autoSavePath)) {
+        if (shouldOpenAutosave(projectFilePath, autoSavePath, false)) {
           //eslint-disable-next-line
           const answer = confirm(
             i18n._(
-              `The project file appears to be malformed, but an Autosave exists.\nWould you like to try to load it instead?`
+              `The project file appears to be malformed, but an *.autosave exists.\nWould you like to try to load it instead?`
             )
           );
           if (answer) {
@@ -784,7 +781,7 @@ class MainFrame extends React.Component<Props, State> {
       openSceneEditor = true,
     }: { openEventsEditor: boolean, openSceneEditor: boolean } = {}
   ) => {
-    const { i18n } = this.props;
+    const { i18n, onAutoSaveProject } = this.props;
     const sceneEditorOptions = {
       name,
       renderEditor: ({ isActive, editorRef }) => (
@@ -797,7 +794,7 @@ class MainFrame extends React.Component<Props, State> {
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 if (values.autosaveOnPreview) {
-                  this.save(true);
+                  onAutoSaveProject(project);
                 }
               }}
               showPreviewButton={!!this.props.previewLauncher}
@@ -831,7 +828,7 @@ class MainFrame extends React.Component<Props, State> {
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
                 if (values.autosaveOnPreview) {
-                  this.save(true);
+                  onAutoSaveProject(project);
                 }
               }}
               showPreviewButton={!!this.props.previewLauncher}
@@ -922,7 +919,7 @@ class MainFrame extends React.Component<Props, State> {
                   onPreview={(project, layout, options) => {
                     this._launchExternalLayoutPreview(project, layout, options);
                     if (values.autosaveOnPreview) {
-                      this.save(true);
+                      this.props.onAutoSaveProject(project);
                     }
                   }}
                   showPreviewButton={!!this.props.previewLauncher}
@@ -1130,7 +1127,7 @@ class MainFrame extends React.Component<Props, State> {
       .catch(() => {});
   };
 
-  save = (autosave: boolean = false) => {
+  save = () => {
     saveUiSettings(this.state.editorTabs);
 
     const { currentProject } = this.state;
@@ -1139,16 +1136,6 @@ class MainFrame extends React.Component<Props, State> {
 
     if (this.props.saveDialog) {
       this._openSaveDialog();
-    } else if (this.props.onAutoSaveProject && autosave) {
-      this.props.onAutoSaveProject(
-        currentProject,
-        currentProject.getProjectFile() + '.autosave',
-        err => {
-          this._showSnackMessage(
-            err ? i18n._(t`Autosave Failed!`) : i18n._(t`Autosaved!`)
-          );
-        }
-      );
     } else if (this.props.onSaveProject) {
       this.props.onSaveProject(currentProject).then(
         () => {

@@ -3,8 +3,8 @@ import optionalRequire from '../Utils/OptionalRequire.js';
 const fs = optionalRequire('fs');
 
 export default class LocalProjectWriter {
-  static writeProjectJSONFile = (project, filepath, cb) => {
-    if (!fs || !filepath) return cb('Not supported');
+  static _writeProjectJSONFile = (project, filepath, cb) => {
+    if (!fs) return cb('Not supported');
 
     try {
       const content = JSON.stringify(serializeToJSObject(project), null, 2);
@@ -22,7 +22,7 @@ export default class LocalProjectWriter {
         return;
       }
 
-      LocalProjectWriter.writeProjectJSONFile(project, filepath, err => {
+      LocalProjectWriter._writeProjectJSONFile(project, filepath, err => {
         if (err) {
           console.error('Unable to write project', err);
           return reject(err);
@@ -30,6 +30,15 @@ export default class LocalProjectWriter {
 
         resolve();
       });
+    });
+  };
+
+  static autoSaveProject = project => {
+    const autoSavePath = project.getProjectFile() + '.autosave';
+    LocalProjectWriter._writeProjectJSONFile(project, autoSavePath, err => {
+      if (err) {
+        console.error('Unable to write *.autosave', err);
+      }
     });
   };
 }

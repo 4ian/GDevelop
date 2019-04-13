@@ -23,6 +23,7 @@ import AlertMessage from '../../UI/AlertMessage';
 import DismissableAlertMessage from '../../UI/DismissableAlertMessage';
 import EventsFunctionParametersEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionParametersEditor';
 import EventsFunctionPropertiesEditor from '../../EventsFunctionsExtensionEditor/EventsFunctionConfigurationEditor/EventsFunctionPropertiesEditor';
+import HelpButton from '../../UI/HelpButton';
 const gd = global.gd;
 
 type Props = {|
@@ -102,6 +103,7 @@ export default class EventsFunctionExtractorDialog extends React.Component<
     return (
       <Dialog
         title={<Trans>Extract the events in a function</Trans>}
+        secondaryActions={<HelpButton helpPagePath="/events/functions/extract-events" />}
         actions={[
           <FlatButton
             key="cancel"

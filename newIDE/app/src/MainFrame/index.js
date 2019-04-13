@@ -314,7 +314,7 @@ class MainFrame extends React.Component<Props, State> {
 
     const projectFilePath = url;
     const autoSavePath = url + '.autosave';
-    if (shouldOpenAutosave(url, autoSavePath, true)) {
+    if (shouldOpenAutosave && shouldOpenAutosave(url, autoSavePath, true)) {
       //eslint-disable-next-line
       const answer = confirm(
         i18n._(
@@ -348,7 +348,10 @@ class MainFrame extends React.Component<Props, State> {
         );
       },
       err => {
-        if (shouldOpenAutosave(projectFilePath, autoSavePath, false)) {
+        if (
+          shouldOpenAutosave &&
+          shouldOpenAutosave(projectFilePath, autoSavePath, false)
+        ) {
           //eslint-disable-next-line
           const answer = confirm(
             i18n._(
@@ -793,7 +796,7 @@ class MainFrame extends React.Component<Props, State> {
               setToolbar={this.setEditorToolbar}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
-                if (values.autosaveOnPreview) {
+                if (values.autosaveOnPreview && onAutoSaveProject) {
                   onAutoSaveProject(project);
                 }
               }}
@@ -827,7 +830,7 @@ class MainFrame extends React.Component<Props, State> {
               setToolbar={this.setEditorToolbar}
               onPreview={(project, layout, options) => {
                 this._launchLayoutPreview(project, layout, options);
-                if (values.autosaveOnPreview) {
+                if (values.autosaveOnPreview && onAutoSaveProject) {
                   onAutoSaveProject(project);
                 }
               }}
@@ -918,7 +921,10 @@ class MainFrame extends React.Component<Props, State> {
                   setToolbar={this.setEditorToolbar}
                   onPreview={(project, layout, options) => {
                     this._launchExternalLayoutPreview(project, layout, options);
-                    if (values.autosaveOnPreview) {
+                    if (
+                      values.autosaveOnPreview &&
+                      this.props.onAutoSaveProject
+                    ) {
                       this.props.onAutoSaveProject(project);
                     }
                   }}

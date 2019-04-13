@@ -37,7 +37,7 @@ export default class LocalProjectWriter {
     const autoSavePath = project.getProjectFile() + '.autosave';
     LocalProjectWriter._writeProjectJSONFile(project, autoSavePath, err => {
       if (err) {
-        console.error('Unable to write *.autosave', err);
+        console.error(`Unable to write ${autoSavePath}`, err);
       }
     });
   };

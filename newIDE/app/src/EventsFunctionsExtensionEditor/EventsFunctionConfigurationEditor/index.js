@@ -57,10 +57,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
 
     return (
       <Column expand noMargin>
-        <Tabs
-          value={this.state.currentTab}
-          onChange={this._chooseTab}
-        >
+        <Tabs value={this.state.currentTab} onChange={this._chooseTab}>
           <Tab
             label={<Trans>Configuration</Trans>}
             value={('config': TabNames)}

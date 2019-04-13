@@ -166,6 +166,13 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
 
 gd::String EventsCodeGenerator::GenerateEventsFunctionContext(
     const vector<gd::ParameterMetadata>& parameters) {
+  // TODO: Renamed "behavior" parameters (i.e: "behavior" arguments that are
+  // passed with a different name than the parameter) are not working in events
+  // function. This is because the behavior parameters are passed as strings
+  // (see GenerateParameterCodes). Would need a "getBehavior"/"getBehaviorName"
+  // indirection in the generated code :/ Or a code generation that can use the
+  // parameter passed to the function for behaviors.
+
   gd::String objectsGettersMap;
   gd::String objectsCreators;
   gd::String argumentsGetters;

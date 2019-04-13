@@ -24,7 +24,7 @@ export const toEventsContextResult = (
     .toNewVectorString()
     .toJSArray();
   const objectOrGroupNames = eventsContext
-    .getObjectOrGroupNames()
+    .getReferencedObjectOrGroupNames()
     .toNewVectorString()
     .toJSArray();
 

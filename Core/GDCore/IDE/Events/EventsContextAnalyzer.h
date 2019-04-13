@@ -40,8 +40,8 @@ class GD_CORE_API EventsContext {
   /**
    * \brief Get object or group names being referenced in the events.
    */
-  const std::set<gd::String>& GetObjectOrGroupNames() {
-    return objectOrGroupNames;
+  const std::set<gd::String>& GetReferencedObjectOrGroupNames() {
+    return referencedObjectOrGroupNames;
   }
 
   /**
@@ -61,7 +61,7 @@ class GD_CORE_API EventsContext {
  private:
   std::vector<gd::String> ExpandObjectsName(const gd::String& objectOrGroupName);
 
-  std::set<gd::String> objectOrGroupNames;
+  std::set<gd::String> referencedObjectOrGroupNames;
   std::set<gd::String> objectNames;
   std::map<gd::String, std::set<gd::String>> objectOrGroupBehaviorNames;
   gd::ObjectsContainer& project;

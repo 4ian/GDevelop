@@ -140,7 +140,7 @@ void EventsContext::AddObjectName(const gd::String& objectOrGroupName) {
   for (auto& realObjectName : ExpandObjectsName(objectOrGroupName)) {
     objectNames.insert(realObjectName);
   }
-  objectOrGroupNames.insert(objectOrGroupName);
+  referencedObjectOrGroupNames.insert(objectOrGroupName);
 }
 
 void EventsContext::AddBehaviorName(const gd::String& objectOrGroupName,

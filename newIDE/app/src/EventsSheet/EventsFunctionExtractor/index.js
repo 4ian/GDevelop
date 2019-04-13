@@ -43,8 +43,8 @@ export const setupFunctionFromEvents = ({
   const eventsContext = eventsContextAnalyzer.getEventsContext();
 
   // ...to extract objects and groups
-  const objectOrGroupNames: Array<string> = eventsContext //TODO: Rename to referenced objectOrGroupNames
-    .getObjectOrGroupNames()
+  const objectOrGroupNames: Array<string> = eventsContext
+    .getReferencedObjectOrGroupNames()
     .toNewVectorString()
     .toJSArray();
   const objectNames: Array<string> = eventsContext

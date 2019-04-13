@@ -95,9 +95,6 @@ export const setupFunctionFromEvents = ({
     );
     parameters.push_back(newParameter);
 
-    // TODO: Renamed behaviors are not working in events function.
-    // Would need a "getBehavior"/"getBehaviorName" indirection in the generated code :/
-    // We can also forbid renaming behaviors?
     const behaviorNames: Array<string> = eventsContext
       .getBehaviorNamesOfObjectOrGroup(objectName)
       .toNewVectorString()

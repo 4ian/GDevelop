@@ -76,7 +76,7 @@ export default class InstancesSelection {
       highlightRectangle.x -
       this.tooltip.width / 2 +
       highlightRectangle.width / 2;
-    this.tooltip.y = highlightRectangle.y - 60;
+    this.tooltip.y = highlightRectangle.y - 68;
 
     this.tooltipBG.clear();
     this.tooltipBG.beginFill(0x000000, 0.8);

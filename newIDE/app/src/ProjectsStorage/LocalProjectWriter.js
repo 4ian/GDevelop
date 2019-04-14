@@ -32,4 +32,13 @@ export default class LocalProjectWriter {
       });
     });
   };
+
+  static autoSaveProject = project => {
+    const autoSavePath = project.getProjectFile() + '.autosave';
+    LocalProjectWriter._writeProjectJSONFile(project, autoSavePath, err => {
+      if (err) {
+        console.error(`Unable to write ${autoSavePath}`, err);
+      }
+    });
+  };
 }

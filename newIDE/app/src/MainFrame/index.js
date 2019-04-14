@@ -81,6 +81,7 @@ import { getNotNullTranslationFunction } from '../Utils/i18n/getTranslationFunct
 import { type I18n } from '@lingui/core';
 import { t } from '@lingui/macro';
 import LanguageDialog from './Preferences/LanguageDialog';
+import PreferencesContext from './Preferences/PreferencesContext';
 
 const gd = global.gd;
 
@@ -128,6 +129,12 @@ type Props = {
   onChooseProject?: () => Promise<string>,
   saveDialog?: React.Element<*>,
   onSaveProject?: gdProject => Promise<any>,
+  onAutoSaveProject?: (project: gdProject) => void,
+  shouldOpenAutosave?: (
+    filePath: string,
+    autoSavePath: string,
+    compareLastModified: boolean
+  ) => boolean,
   loading?: boolean,
   requestUpdate?: () => void,
   exportDialog?: React.Element<*>,
@@ -303,7 +310,20 @@ class MainFrame extends React.Component<Props, State> {
   };
 
   openFromPathOrURL = (url: string, cb: Function) => {
-    const { i18n } = this.props;
+    const { i18n, shouldOpenAutosave } = this.props;
+
+    const projectFilePath = url;
+    const autoSavePath = url + '.autosave';
+    if (shouldOpenAutosave && shouldOpenAutosave(url, autoSavePath, true)) {
+      //eslint-disable-next-line
+      const answer = confirm(
+        i18n._(
+          t`An autosave file (backup made automatically by GDevelop) that is newer than the project file exists. Would you like to load it instead?`
+        )
+      );
+      if (answer) url = autoSavePath;
+    }
+
     this.props.onReadFromPathOrURL(url).then(
       projectObject => {
         this.setState({ loadingProject: true }, () =>
@@ -313,8 +333,9 @@ class MainFrame extends React.Component<Props, State> {
             this.loadFromSerializedProject(serializedProject, () => {
               serializedProject.delete();
 
-              if (this.state.currentProject)
-                this.state.currentProject.setProjectFile(url);
+              if (this.state.currentProject) {
+                this.state.currentProject.setProjectFile(projectFilePath);
+              }
 
               this.setState(
                 {
@@ -327,13 +348,30 @@ class MainFrame extends React.Component<Props, State> {
         );
       },
       err => {
-        showErrorBox(
-          i18n._(
-            t`Unable to open this project. Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`
-          ),
-          err
-        );
-        return;
+        if (
+          shouldOpenAutosave &&
+          shouldOpenAutosave(projectFilePath, autoSavePath, false)
+        ) {
+          //eslint-disable-next-line
+          const answer = confirm(
+            i18n._(
+              t`The project file appears to be malformed, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`
+            )
+          );
+          if (answer) {
+            this.openFromPathOrURL(autoSavePath, () =>
+              this.openSceneOrProjectManager()
+            );
+          }
+        } else {
+          showErrorBox(
+            i18n._(
+              t`Unable to open this project. Check that the path/URL is correct, that you selected a file that is a game file created with GDevelop and that is was not removed.`
+            ),
+            err
+          );
+          return;
+        }
       }
     );
   };
@@ -747,59 +785,79 @@ class MainFrame extends React.Component<Props, State> {
       openSceneEditor = true,
     }: { openEventsEditor: boolean, openSceneEditor: boolean } = {}
   ) => {
-    const { i18n } = this.props;
+    const { i18n, onAutoSaveProject } = this.props;
     const sceneEditorOptions = {
       name,
       renderEditor: ({ isActive, editorRef }) => (
-        <SceneEditor
-          project={this.state.currentProject}
-          layoutName={name}
-          setToolbar={this.setEditorToolbar}
-          onPreview={this._launchLayoutPreview}
-          showPreviewButton={!!this.props.previewLauncher}
-          showNetworkPreviewButton={
-            this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
-          }
-          onOpenDebugger={this.openDebugger}
-          onEditObject={this.props.onEditObject}
-          showObjectsList={!this.props.integratedEditor}
-          resourceSources={this.props.resourceSources}
-          onChooseResource={this._onChooseResource}
-          resourceExternalEditors={this.props.resourceExternalEditors}
-          isActive={isActive}
-          ref={editorRef}
-        />
+        <PreferencesContext.Consumer>
+          {({ values }) => (
+            <SceneEditor
+              project={this.state.currentProject}
+              layoutName={name}
+              setToolbar={this.setEditorToolbar}
+              onPreview={(project, layout, options) => {
+                this._launchLayoutPreview(project, layout, options);
+                if (values.autosaveOnPreview && onAutoSaveProject) {
+                  onAutoSaveProject(project);
+                }
+              }}
+              showPreviewButton={!!this.props.previewLauncher}
+              showNetworkPreviewButton={
+                this._previewLauncher &&
+                this._previewLauncher.canDoNetworkPreview()
+              }
+              onOpenDebugger={this.openDebugger}
+              onEditObject={this.props.onEditObject}
+              showObjectsList={!this.props.integratedEditor}
+              resourceSources={this.props.resourceSources}
+              onChooseResource={this._onChooseResource}
+              resourceExternalEditors={this.props.resourceExternalEditors}
+              isActive={isActive}
+              ref={editorRef}
+            />
+          )}
+        </PreferencesContext.Consumer>
       ),
       key: 'layout ' + name,
     };
     const eventsEditorOptions = {
       name: name + ' ' + i18n._(t`(Events)`),
       renderEditor: ({ isActive, editorRef }) => (
-        <EventsEditor
-          project={this.state.currentProject}
-          layoutName={name}
-          setToolbar={this.setEditorToolbar}
-          onPreview={this._launchLayoutPreview}
-          showPreviewButton={!!this.props.previewLauncher}
-          showNetworkPreviewButton={
-            this._previewLauncher && this._previewLauncher.canDoNetworkPreview()
-          }
-          onOpenDebugger={this.openDebugger}
-          onOpenExternalEvents={this.openExternalEvents}
-          onOpenLayout={name =>
-            this.openLayout(name, {
-              openEventsEditor: true,
-              openSceneEditor: false,
-            })
-          }
-          resourceSources={this.props.resourceSources}
-          onChooseResource={this._onChooseResource}
-          resourceExternalEditors={this.props.resourceExternalEditors}
-          openInstructionOrExpression={this._openInstructionOrExpression}
-          onCreateEventsFunction={this._onCreateEventsFunction}
-          isActive={isActive}
-          ref={editorRef}
-        />
+        <PreferencesContext.Consumer>
+          {({ values }) => (
+            <EventsEditor
+              project={this.state.currentProject}
+              layoutName={name}
+              setToolbar={this.setEditorToolbar}
+              onPreview={(project, layout, options) => {
+                this._launchLayoutPreview(project, layout, options);
+                if (values.autosaveOnPreview && onAutoSaveProject) {
+                  onAutoSaveProject(project);
+                }
+              }}
+              showPreviewButton={!!this.props.previewLauncher}
+              showNetworkPreviewButton={
+                this._previewLauncher &&
+                this._previewLauncher.canDoNetworkPreview()
+              }
+              onOpenDebugger={this.openDebugger}
+              onOpenExternalEvents={this.openExternalEvents}
+              onOpenLayout={name =>
+                this.openLayout(name, {
+                  openEventsEditor: true,
+                  openSceneEditor: false,
+                })
+              }
+              resourceSources={this.props.resourceSources}
+              onChooseResource={this._onChooseResource}
+              resourceExternalEditors={this.props.resourceExternalEditors}
+              openInstructionOrExpression={this._openInstructionOrExpression}
+              onCreateEventsFunction={this._onCreateEventsFunction}
+              isActive={isActive}
+              ref={editorRef}
+            />
+          )}
+        </PreferencesContext.Consumer>
       ),
       key: 'layout events ' + name,
       dontFocusTab: openSceneEditor,
@@ -858,25 +916,37 @@ class MainFrame extends React.Component<Props, State> {
         editorTabs: openEditorTab(this.state.editorTabs, {
           name,
           renderEditor: ({ isActive, editorRef }) => (
-            <ExternalLayoutEditor
-              project={this.state.currentProject}
-              externalLayoutName={name}
-              setToolbar={this.setEditorToolbar}
-              onPreview={this._launchExternalLayoutPreview}
-              showPreviewButton={!!this.props.previewLauncher}
-              showNetworkPreviewButton={
-                this._previewLauncher &&
-                this._previewLauncher.canDoNetworkPreview()
-              }
-              onOpenDebugger={this.openDebugger}
-              onEditObject={this.props.onEditObject}
-              showObjectsList={!this.props.integratedEditor}
-              resourceSources={this.props.resourceSources}
-              onChooseResource={this._onChooseResource}
-              resourceExternalEditors={this.props.resourceExternalEditors}
-              isActive={isActive}
-              ref={editorRef}
-            />
+            <PreferencesContext.Consumer>
+              {({ values }) => (
+                <ExternalLayoutEditor
+                  project={this.state.currentProject}
+                  externalLayoutName={name}
+                  setToolbar={this.setEditorToolbar}
+                  onPreview={(project, layout, options) => {
+                    this._launchExternalLayoutPreview(project, layout, options);
+                    if (
+                      values.autosaveOnPreview &&
+                      this.props.onAutoSaveProject
+                    ) {
+                      this.props.onAutoSaveProject(project);
+                    }
+                  }}
+                  showPreviewButton={!!this.props.previewLauncher}
+                  showNetworkPreviewButton={
+                    this._previewLauncher &&
+                    this._previewLauncher.canDoNetworkPreview()
+                  }
+                  onOpenDebugger={this.openDebugger}
+                  onEditObject={this.props.onEditObject}
+                  showObjectsList={!this.props.integratedEditor}
+                  resourceSources={this.props.resourceSources}
+                  onChooseResource={this._onChooseResource}
+                  resourceExternalEditors={this.props.resourceExternalEditors}
+                  isActive={isActive}
+                  ref={editorRef}
+                />
+              )}
+            </PreferencesContext.Consumer>
           ),
           key: 'external layout ' + name,
         }),
@@ -1095,13 +1165,15 @@ class MainFrame extends React.Component<Props, State> {
 
   save = () => {
     saveUiSettings(this.state.editorTabs);
-    if (!this.state.currentProject) return;
+
+    const { currentProject } = this.state;
+    if (!currentProject) return;
     const { i18n } = this.props;
 
     if (this.props.saveDialog) {
       this._openSaveDialog();
     } else if (this.props.onSaveProject) {
-      this.props.onSaveProject(this.state.currentProject).then(
+      this.props.onSaveProject(currentProject).then(
         () => {
           this._showSnackMessage(i18n._(t`Project properly saved`));
         },

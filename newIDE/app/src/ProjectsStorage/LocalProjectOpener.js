@@ -4,7 +4,7 @@ const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
 
 export default class LocalProjectOpener {
-  static chooseProjectFile() {
+  static chooseProjectFile = () => {
     return new Promise((resolve, reject) => {
       if (!dialog) return reject('Not supported');
 
@@ -25,9 +25,9 @@ export default class LocalProjectOpener {
         }
       );
     });
-  }
+  };
 
-  static readProjectJSONFile(filepath) {
+  static readProjectJSONFile = filepath => {
     return new Promise((resolve, reject) => {
       if (!fs) return reject('Not supported');
 
@@ -42,5 +42,25 @@ export default class LocalProjectOpener {
         }
       });
     });
-  }
+  };
+
+  static shouldOpenAutosave = (filePath, autoSavePath, compareLastModified) => {
+    if (fs.existsSync(autoSavePath)) {
+      if (!compareLastModified) {
+        return true;
+      }
+      try {
+        const autoSavedTime = fs.statSync(autoSavePath).mtime.getTime();
+        const saveTime = fs.statSync(filePath).mtime.getTime();
+        if (autoSavedTime > saveTime) {
+          return true;
+        }
+      } catch (err) {
+        console.error('Unable to compare *.autosave to project', err);
+        return false;
+      }
+      return false;
+    }
+    return false;
+  };
 }

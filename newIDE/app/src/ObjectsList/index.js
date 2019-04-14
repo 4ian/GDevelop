@@ -142,6 +142,8 @@ type StateType = {|
   renamedObjectWithScope: ?ObjectWithContext,
   variablesEditedObject: any,
   searchText: string,
+  makeNewInstanceOnAdd: boolean,
+  addInstancePosition: Array<number>,
 |};
 
 export default class ObjectsListContainer extends React.Component<
@@ -166,6 +168,8 @@ export default class ObjectsListContainer extends React.Component<
     renamedObjectWithScope: null,
     variablesEditedObject: null,
     searchText: '',
+    makeNewInstanceOnAdd: false,
+    addInstancePosition: [],
   };
 
   shouldComponentUpdate(nextProps: *, nextState: StateType) {
@@ -222,21 +226,29 @@ export default class ObjectsListContainer extends React.Component<
         }
       }
     );
-    
+
     if (this.state.makeNewInstanceOnAdd) {
-      this.props.onAddInstance(this.state.addInstancePosition[0],this.state.addInstancePosition[1],name); 
-      this.setState({ makeNewInstanceOnAdd:false })
+      this.props.onAddInstance(
+        this.state.addInstancePosition[0],
+        this.state.addInstancePosition[1],
+        name
+      );
+      this.setState({ makeNewInstanceOnAdd: false });
     }
-    
-    this.props.onObjectSelected(name)
+
+    this.props.onObjectSelected(name);
   };
 
-  addNewObjectAndInstance = (cursorPosition:Array<number>) => {
-    this.setState({ makeNewInstanceOnAdd:true, newObjectDialogOpen: true, addInstancePosition: cursorPosition })
+  addNewObjectAndInstance = (cursorPosition: Array<number>) => {
+    this.setState({
+      makeNewInstanceOnAdd: true,
+      newObjectDialogOpen: true,
+      addInstancePosition: cursorPosition,
+    });
   };
 
   onAddNewObject = () => {
-    this.setState({ newObjectDialogOpen: true })
+    this.setState({ newObjectDialogOpen: true });
   };
 
   _deleteObject = (objectWithContext: ObjectWithContext) => {
@@ -504,7 +516,12 @@ export default class ObjectsListContainer extends React.Component<
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog
             open={this.state.newObjectDialogOpen}
-            onClose={() => this.setState({ newObjectDialogOpen: false, makeNewInstanceOnAdd: false })}
+            onClose={() =>
+              this.setState({
+                newObjectDialogOpen: false,
+                makeNewInstanceOnAdd: false,
+              })
+            }
             onChoose={this.addObject}
             project={project}
           />

@@ -222,6 +222,21 @@ export default class ObjectsListContainer extends React.Component<
         }
       }
     );
+    
+    if (this.state.makeNewInstanceOnAdd) {
+      this.props.onAddInstance(this.state.addInstancePosition[0],this.state.addInstancePosition[1],name); 
+      this.setState({ makeNewInstanceOnAdd:false })
+    }
+    
+    this.props.onObjectSelected(name)
+  };
+
+  addNewObjectAndInstance = (cursorPosition:Array<number>) => {
+    this.setState({ makeNewInstanceOnAdd:true, newObjectDialogOpen: true, addInstancePosition: cursorPosition })
+  };
+
+  onAddNewObject = () => {
+    this.setState({ newObjectDialogOpen: true })
   };
 
   _deleteObject = (objectWithContext: ObjectWithContext) => {
@@ -461,9 +476,7 @@ export default class ObjectsListContainer extends React.Component<
                 onDuplicateObject={this._duplicateObject}
                 onSetAsGlobalObject={this._setAsGlobalObject}
                 onPasteObject={this._pasteAndRename}
-                onAddNewObject={() =>
-                  this.setState({ newObjectDialogOpen: true })
-                }
+                onAddNewObject={this.onAddNewObject}
                 onEditName={this._editName}
                 onEditVariables={this._editVariables}
                 onDelete={this._deleteObject}
@@ -491,7 +504,7 @@ export default class ObjectsListContainer extends React.Component<
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog
             open={this.state.newObjectDialogOpen}
-            onClose={() => this.setState({ newObjectDialogOpen: false })}
+            onClose={() => this.setState({ newObjectDialogOpen: false, makeNewInstanceOnAdd: false })}
             onChoose={this.addObject}
             project={project}
           />

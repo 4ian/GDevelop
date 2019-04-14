@@ -921,6 +921,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             onStartDraggingObject={this._onStartDraggingObjectFromList}
             onEndDraggingObject={this._onEndDraggingObjectFromList}
             canMoveObjects={!this.state.canDropDraggedObject}
+            onAddInstance={this._addInstance}
             ref={objectsList => (this._objectsList = objectsList)}
           />
         </MosaicWindow>
@@ -1146,6 +1147,14 @@ export default class SceneEditor extends React.Component<Props, State> {
                 : '',
               click: () => this._onAddInstanceUnderCursor(),
               visible: this.state.selectedObjectNames.length > 0,
+            },
+            {
+              label: 'Create a New Object',
+              click: () => {
+                const cursorPosition = this.editor.getLastCursorPosition();
+                this._objectsList.addNewObjectAndInstance(cursorPosition);
+              },
+              visible: this.state.selectedObjectNames.length === 0,
             },
             {
               label: this.state.selectedObjectNames.length

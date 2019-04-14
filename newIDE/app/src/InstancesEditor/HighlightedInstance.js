@@ -68,6 +68,8 @@ export default class InstancesSelection {
       '\n' +
       'Layer: ' +
       this.highlightedInstance.getLayer() +
+      '  Z: ' +
+      this.highlightedInstance.getZOrder() +
       '\n';
     this.tooltip.text = tooltipInfo;
     this.tooltip.x = //alternatively we could draw it at mouse position instead. Would help for big objects

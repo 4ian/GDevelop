@@ -82,15 +82,17 @@ export default class ExpressionParametersEditor extends React.Component<
           if (parameterMetadata.isCodeOnly()) return null;
           return (
             <ParameterComponent
+              expressionMetdata={expressionMetadata}
+              expression={expression}
               parameterMetadata={parameterMetadata}
+              parameterIndex={i}
+              value={parameterValues[i]}
+              onChange={value => this.props.onChangeParameter(i, value)}
               project={project}
               layout={layout}
               globalObjectsContainer={globalObjectsContainer}
               objectsContainer={objectsContainer}
-              value={parameterValues[i]}
-              instructionOrExpression={expression}
               key={i}
-              onChange={value => this.props.onChangeParameter(i, value)}
               parameterRenderingService={parameterRenderingService}
             />
           );

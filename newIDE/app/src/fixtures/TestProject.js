@@ -118,8 +118,12 @@ export const makeTestProject = gd => {
   group2.setName('GroupOfObjects');
   group2.addObject('MySpriteObject');
   group2.addObject('MyTextObject');
+  const group3 = new gd.ObjectGroup();
+  group3.setName('GroupOfSpriteObjectsWithBehaviors');
+  group3.addObject('MySpriteObjectWithBehaviors');
   testLayout.getObjectGroups().insert(group1, 0);
   testLayout.getObjectGroups().insert(group2, 1);
+  testLayout.getObjectGroups().insert(group3, 2);
 
   const testLayoutInstance1 = testLayout
     .getInitialInstances()
@@ -187,7 +191,7 @@ export const makeTestProject = gd => {
     condition.setType('KeyPressed');
     condition.setParametersCount(2);
     condition.setParameter(1, 'Space');
-    return condition;
+    return condition; // This leaks memory if not deleted
   };
 
   const makeDeleteAction = objectToDelete => {
@@ -195,7 +199,7 @@ export const makeTestProject = gd => {
     action.setType('Delete');
     action.setParametersCount(2);
     action.setParameter(0, objectToDelete);
-    return action;
+    return action; // This leaks memory if not deleted
   };
 
   var standardEvt = gd.asStandardEvent(evt);
@@ -329,6 +333,14 @@ export const makeTestProject = gd => {
 
   testEventsFunctionsExtension.insertNewEventsFunction('MyTestFunction2', 1);
 
+  const testSerializedEvents = JSON.parse(
+    `[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoLeft","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","-150","0","1"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoRight","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","150","0","1"],"subInstructions":[]}],"events":[]}]`
+  );
+
+  const testSerializedEventsWithLotsOfObjects = JSON.parse(
+    `[{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoLeft","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","-150","0","1"],"subInstructions":[]}],"events":[]},{"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":false,"value":"CollisionNP"},"parameters":["GoRight","MovingPlatform",""],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Arreter"},"parameters":["MovingPlatform"],"subInstructions":[]},{"type":{"inverted":false,"value":"AddForceXY"},"parameters":["MovingPlatform","150","0","1"],"subInstructions":[]}],"events":[]}, {"disabled":false,"folded":false,"type":"BuiltinCommonInstructions::Standard","conditions":[{"type":{"inverted":true,"value":"SystemInfo::IsMobile"},"parameters":[],"subInstructions":[]}],"actions":[{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls2"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["VirtualControls3"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["HiddenStuff"],"subInstructions":[]},{"type":{"inverted":false,"value":"Cache"},"parameters":["Markers"],"subInstructions":[]}],"events":[]}]`
+  );
+
   return {
     project,
     shapePainterObject,
@@ -347,5 +359,7 @@ export const makeTestProject = gd => {
     emptyLayout,
     testEventsFunction,
     testEventsFunctionsExtension,
+    testSerializedEvents,
+    testSerializedEventsWithLotsOfObjects,
   };
 };

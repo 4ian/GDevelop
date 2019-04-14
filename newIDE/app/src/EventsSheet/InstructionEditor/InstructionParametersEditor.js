@@ -236,14 +236,11 @@ export default class InstructionParametersEditor extends React.Component<
 
                 return (
                   <ParameterComponent
+                    instructionMetadata={instructionMetadata}
+                    instruction={instruction}
                     parameterMetadata={parameterMetadata}
-                    project={project}
-                    layout={layout}
-                    globalObjectsContainer={globalObjectsContainer}
-                    objectsContainer={objectsContainer}
+                    parameterIndex={i}
                     value={instruction.getParameter(i)}
-                    instructionOrExpression={instruction}
-                    key={i}
                     onChange={value => {
                       if (instruction.getParameter(i) !== value) {
                         instruction.setParameter(i, value);
@@ -252,6 +249,11 @@ export default class InstructionParametersEditor extends React.Component<
                         });
                       }
                     }}
+                    project={project}
+                    layout={layout}
+                    globalObjectsContainer={globalObjectsContainer}
+                    objectsContainer={objectsContainer}
+                    key={i}
                     parameterRenderingService={ParameterRenderingService}
                     resourceSources={this.props.resourceSources}
                     onChooseResource={this.props.onChooseResource}

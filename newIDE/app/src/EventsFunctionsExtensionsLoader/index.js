@@ -268,11 +268,23 @@ export const isAnEventFunctionMetadata = (
 };
 
 /**
- * Get back the name a function from its type
+ * Get back the name a function from its type.
+ * See also getEventsFunctionType for the reverse operation.
  */
 export const getFunctionNameFromType = (type: string) => {
   const parts = type.split('::');
   if (!parts.length) return '';
 
   return parts[parts.length - 1];
+};
+
+/**
+ * Get the type of a Events Function.
+ * See also getFunctionNameFromType for the reverse operation.
+ */
+export const getEventsFunctionType = (
+  extensionName: string,
+  eventsFunction: gdEventsFunction
+) => {
+  return extensionName + '::' + eventsFunction.getName();
 };

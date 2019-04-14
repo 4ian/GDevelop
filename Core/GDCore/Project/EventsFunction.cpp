@@ -33,6 +33,8 @@ void EventsFunction::SerializeTo(SerializerElement& element) const {
   for (const auto& parameter : parameters) {
     parameter.SerializeTo(parametersElement.AddChild("parameter"));
   }
+
+  objectGroups.SerializeTo(element.AddChild("objectGroups"));
 }
 
 void EventsFunction::UnserializeFrom(gd::Project& project,
@@ -62,6 +64,8 @@ void EventsFunction::UnserializeFrom(gd::Project& project,
     parameter.UnserializeFrom(parametersElement.GetChild(i));
     parameters.push_back(parameter);
   }
+
+  objectGroups.UnserializeFrom(element.GetChild("objectGroups"));
 }
 
 }  // namespace gd

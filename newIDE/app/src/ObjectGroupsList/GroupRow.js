@@ -4,7 +4,18 @@ import IconMenu from '../UI/Menu/IconMenu';
 import IconButton from 'material-ui/IconButton';
 import TextField from 'material-ui/TextField';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
-import muiThemeable from 'material-ui/styles/muiThemeable';
+import ThemeConsumer from '../UI/Theme/ThemeConsumer';
+
+type Props = {|
+  group: gdObjectGroup,
+  style: Object,
+  onEdit: ?(gdObjectGroup) => void,
+  onEditName: () => void,
+  onDelete: () => void,
+  onRename: string => void,
+  editingName: boolean,
+  isGlobalGroup: boolean,
+|};
 
 const styles = {
   groupName: {
@@ -17,7 +28,7 @@ const styles = {
   },
 };
 
-class ThemableGroupRow extends React.Component {
+export default class ThemableGroupRow extends React.Component<Props, {||}> {
   _renderGroupMenu(group) {
     return (
       <IconMenu
@@ -60,7 +71,7 @@ class ThemableGroupRow extends React.Component {
   };
 
   render() {
-    const { group, style, muiTheme, isGlobalGroup } = this.props;
+    const { group, style, isGlobalGroup } = this.props;
 
     const groupName = group.getName();
     const label = this.props.editingName ? (
@@ -89,23 +100,23 @@ class ThemableGroupRow extends React.Component {
       </div>
     );
 
-    const itemStyle = {
-      borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
-    };
-
     return (
-      <ListItem
-        style={{ ...itemStyle, ...style }}
-        onContextMenu={this._onContextMenu}
-        primaryText={label}
-        rightIconButton={this._renderGroupMenu(group)}
-        onClick={() => {
-          this.props.onEdit(group);
-        }}
-      />
+      <ThemeConsumer>
+        {muiTheme => (
+          <ListItem
+            style={{
+              borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
+              ...style,
+            }}
+            onContextMenu={this._onContextMenu}
+            primaryText={label}
+            rightIconButton={this._renderGroupMenu(group)}
+            onClick={() => {
+              this.props.onEdit(group);
+            }}
+          />
+        )}
+      </ThemeConsumer>
     );
   }
 }
-
-const GroupRow = muiThemeable()(ThemableGroupRow);
-export default GroupRow;

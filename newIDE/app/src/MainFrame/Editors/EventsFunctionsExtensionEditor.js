@@ -69,6 +69,7 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
           onChooseResource={this.props.onChooseResource}
           resourceExternalEditors={this.props.resourceExternalEditors}
           openInstructionOrExpression={this.props.openInstructionOrExpression}
+          onCreateEventsFunction={this.props.onCreateEventsFunction}
           initiallyFocusedFunctionName={this.props.initiallyFocusedFunctionName}
           ref={editor => (this.editor = editor)}
         />

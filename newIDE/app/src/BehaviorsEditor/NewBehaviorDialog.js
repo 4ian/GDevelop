@@ -12,25 +12,17 @@ import Avatar from 'material-ui/Avatar';
 import { List, ListItem } from 'material-ui/List';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
-import { mapFor } from '../Utils/MapFor';
-import flatten from 'lodash/flatten';
 import { Line } from '../UI/Grid';
 import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
+import {
+  type EnumeratedBehaviorMetadata,
+  enumerateBehaviorsMetadata,
+} from './EnumerateBehaviorsMetadata';
 
 const styles = {
   icon: { borderRadius: 0 },
 };
-
-type EnumeratedBehaviorMetadata = {|
-  extension: gdPlatformExtension,
-  behaviorMetadata: gdBehaviorMetadata,
-  type: string,
-  defaultName: string,
-  fullName: string,
-  description: string,
-  iconFilename: string,
-|};
 
 const BehaviorListItem = ({
   behaviorMetadata,
@@ -68,36 +60,12 @@ export default class NewBehaviorDialog extends Component<Props, State> {
   _loadFrom(
     project: gdProject
   ): {| behaviorMetadata: Array<EnumeratedBehaviorMetadata> |} {
-    if (!project || !project.getCurrentPlatform()) {
-      return { behaviorMetadata: [] };
-    }
-
     const platform = project.getCurrentPlatform();
-    const extensionsList = platform.getAllPlatformExtensions();
-
     return {
-      behaviorMetadata: flatten(
-        mapFor(0, extensionsList.size(), i => {
-          const extension = extensionsList.at(i);
-
-          return extension
-            .getBehaviorsTypes()
-            .toJSArray()
-            .map(behaviorType => ({
-              behaviorType,
-              behaviorMetadata: extension.getBehaviorMetadata(behaviorType),
-            }))
-            .map(({ behaviorType, behaviorMetadata }) => ({
-              extension,
-              behaviorMetadata,
-              type: behaviorType,
-              defaultName: behaviorMetadata.getDefaultName(),
-              fullName: behaviorMetadata.getFullName(),
-              description: behaviorMetadata.getDescription(),
-              iconFilename: behaviorMetadata.getIconFilename(),
-            }));
-        })
-      ),
+      behaviorMetadata:
+        project && platform
+          ? enumerateBehaviorsMetadata(platform, project)
+          : [],
     };
   }
 

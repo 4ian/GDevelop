@@ -22,7 +22,6 @@ type Props = {|
   errorText?: ?string,
   openOnFocus?: boolean,
   hintText?: ?React.Node,
-  autoCompleteStyle?: Object,
 |};
 
 type State = {|

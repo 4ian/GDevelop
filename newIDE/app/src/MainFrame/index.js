@@ -318,7 +318,7 @@ class MainFrame extends React.Component<Props, State> {
       //eslint-disable-next-line
       const answer = confirm(
         i18n._(
-          `Autosave newer than the project file exists. Would you like to load it?`
+          t`An autosave file (backup made automatically by GDevelop) that is newer than the project file exists. Would you like to load it instead?`
         )
       );
       if (answer) url = autoSavePath;
@@ -355,12 +355,13 @@ class MainFrame extends React.Component<Props, State> {
           //eslint-disable-next-line
           const answer = confirm(
             i18n._(
-              `The project file appears to be malformed, but an *.autosave exists.\nWould you like to try to load it instead?`
+              t`The project file appears to be malformed, but an autosave file exists (backup made automatically by GDevelop). Would you like to try to load it instead?`
             )
           );
           if (answer) {
-            this.openFromPathOrURL(autoSavePath);
-            this.openProjectManager(true);
+            this.openFromPathOrURL(autoSavePath, () =>
+              this.openSceneOrProjectManager()
+            );
           }
         } else {
           showErrorBox(

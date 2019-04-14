@@ -9,6 +9,15 @@ export default class InstancesSelection {
     this.highlightedInstance = null;
     this.highlightRectangle = new PIXI.Graphics();
     this.highlightRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
+
+    this.tooltipBG = new PIXI.Graphics();
+    this.tooltip = new PIXI.Text('', {
+      fontSize: 17,
+      fill: 0xffffff,
+      align: 'center',
+    });
+    this.highlightRectangle.addChild(this.tooltipBG);
+    this.highlightRectangle.addChild(this.tooltip);
   }
 
   setInstance(instance) {
@@ -47,5 +56,35 @@ export default class InstancesSelection {
       highlightRectangle.height
     );
     this.highlightRectangle.endFill();
+
+    const tooltipInfo =
+      'Object: ' +
+      this.highlightedInstance.getObjectName() +
+      '\n' +
+      'X: ' +
+      parseInt(this.highlightedInstance.getX()) +
+      '  Y: ' +
+      parseInt(this.highlightedInstance.getY()) +
+      '\n' +
+      'Layer: ' +
+      this.highlightedInstance.getLayer() +
+      '\n';
+    this.tooltip.text = tooltipInfo;
+    this.tooltip.x = //alternatively we could draw it at mouse position instead. Would help for big objects
+      highlightRectangle.x -
+      this.tooltip.width / 2 +
+      highlightRectangle.width / 2;
+    this.tooltip.y = highlightRectangle.y - 60;
+
+    this.tooltipBG.clear();
+    this.tooltipBG.beginFill(0x000000, 0.8);
+    this.tooltipBG.drawRoundedRect(
+      this.tooltip.x - 5,
+      this.tooltip.y - 5,
+      this.tooltip.width + 10,
+      this.tooltip.height - 5,
+      16
+    );
+    this.tooltipBG.endFill();
   }
 }

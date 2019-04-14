@@ -177,7 +177,8 @@ class GD_CORE_API ParameterMetadata {
     } else if (type == "string") {
       return parameterType == "string" || parameterType == "layer" ||
              parameterType == "color" || parameterType == "file" ||
-             parameterType == "joyaxis" || parameterType == "stringWithSelector";
+             parameterType == "joyaxis" ||
+             parameterType == "stringWithSelector";
     } else if (type == "variable") {
       return parameterType == "objectvar" || parameterType == "globalvar" ||
              parameterType == "scenevar";
@@ -242,6 +243,9 @@ class GD_CORE_API InstructionMetadata {
     return parameters[i];
   }
   size_t GetParametersCount() const { return parameters.size(); }
+  const std::vector<ParameterMetadata> &GetParameters() const {
+    return parameters;
+  }
 #if !defined(GD_NO_WX_GUI)
   const wxBitmap &GetBitmapIcon() const { return icon; }
   const wxBitmap &GetSmallBitmapIcon() const { return smallicon; }

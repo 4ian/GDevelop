@@ -45,7 +45,10 @@ import {
 } from './SelectionHandler';
 import EmptyEventsPlaceholder from './EmptyEventsPlaceholder';
 import { ensureSingleOnceInstructions } from './OnceInstructionSanitizer';
-import EventsContextAnalyzerDialog from './EventsContextAnalyzerDialog';
+import EventsContextAnalyzerDialog, {
+  type EventsContextResult,
+  toEventsContextResult,
+} from './EventsContextAnalyzerDialog';
 import SearchPanel from './SearchPanel';
 import {
   type ResourceSource,
@@ -62,6 +65,8 @@ import {
   type EventMetadata,
 } from './EnumerateEventsMetadata';
 import PreferencesContext from '../MainFrame/Preferences/PreferencesContext';
+import EventsFunctionExtractorDialog from './EventsFunctionExtractor/EventsFunctionExtractorDialog';
+import { createNewInstructionForEventsFunction } from './EventsFunctionExtractor';
 const gd = global.gd;
 
 const CLIPBOARD_KIND = 'EventsAndInstructions';
@@ -86,6 +91,10 @@ type Props = {|
   openInstructionOrExpression: (
     extension: gdPlatformExtension,
     type: string
+  ) => void,
+  onCreateEventsFunction: (
+    extensionName: string,
+    eventsFunction: gdEventsFunction
   ) => void,
 |};
 type State = {|
@@ -112,9 +121,9 @@ type State = {|
   inlineEditingAnchorEl: ?any,
   inlineEditingChangesMade: boolean,
 
-  eventsContextAnalyzerOpen: boolean,
-  analyzedEventsContextObjectsNames: ?Array<string>,
-  analyzedEventsContextObjectOrGroupNames: ?Array<string>,
+  analyzedEventsContextResult: ?EventsContextResult,
+
+  serializedEventsToExtract: ?Object,
 
   showSearchPanel: boolean,
   searchResults: ?Array<gdBaseEvent>,
@@ -132,67 +141,60 @@ const styles = {
 };
 
 export default class EventsSheet extends React.Component<Props, State> {
-  _keyboardShortcuts: KeyboardShortcuts;
   _eventsTree: ?EventsTree;
   _eventSearcher: ?EventsSearcher;
   _searchPanel: ?SearchPanel;
+  _keyboardShortcuts = new KeyboardShortcuts({
+    onDelete: () => {
+      if (this.state.inlineEditing || this.state.editedInstruction.instruction)
+        return;
+
+      this.deleteSelection();
+    },
+    onCopy: this.copySelection,
+    onCut: this.cutSelection,
+    onPaste: this.pasteEventsOrInstructions,
+    onSearch: this._toggleSearchPanel,
+    onUndo: this.undo,
+    onRedo: this.redo,
+  });
+
   eventContextMenu: ContextMenu;
   instructionContextMenu: ContextMenu;
   instructionsListContextMenu: ContextMenu;
 
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      history: getHistoryInitialState(props.events, { historyMaxSize: 50 }),
+  state = {
+    history: getHistoryInitialState(this.props.events, { historyMaxSize: 50 }),
 
-      editedInstruction: {
-        isCondition: true,
-        instruction: null,
-        instrsList: null,
-        indexInList: 0,
-      },
-      editedParameter: {
-        isCondition: true,
-        instruction: null,
-        instrsList: null,
-        parameterIndex: 0,
-      },
+    editedInstruction: {
+      isCondition: true,
+      instruction: null,
+      instrsList: null,
+      indexInList: 0,
+    },
+    editedParameter: {
+      isCondition: true,
+      instruction: null,
+      instrsList: null,
+      parameterIndex: 0,
+    },
 
-      selection: getInitialSelection(),
+    selection: getInitialSelection(),
 
-      inlineEditing: false,
-      inlineEditingAnchorEl: null,
-      inlineEditingChangesMade: false,
+    inlineEditing: false,
+    inlineEditingAnchorEl: null,
+    inlineEditingChangesMade: false,
 
-      eventsContextAnalyzerOpen: false,
-      analyzedEventsContextObjectsNames: null,
-      analyzedEventsContextObjectOrGroupNames: null,
+    analyzedEventsContextResult: null,
 
-      showSearchPanel: false,
-      searchResults: null,
-      searchFocusOffset: null,
+    serializedEventsToExtract: null,
 
-      allEventsMetadata: [],
-    };
+    showSearchPanel: false,
+    searchResults: null,
+    searchFocusOffset: null,
 
-    this._keyboardShortcuts = new KeyboardShortcuts({
-      onDelete: () => {
-        if (
-          this.state.inlineEditing ||
-          this.state.editedInstruction.instruction
-        )
-          return;
-
-        this.deleteSelection();
-      },
-      onCopy: this.copySelection,
-      onCut: this.cutSelection,
-      onPaste: this.pasteEventsOrInstructions,
-      onSearch: this._toggleSearchPanel,
-      onUndo: this.undo,
-      onRedo: this.redo,
-    });
-  }
+    allEventsMetadata: [],
+  };
 
   componentDidMount() {
     this.setState({ allEventsMetadata: enumerateEventsMetadata() });
@@ -289,7 +291,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  addNewEvent = (type: string, context: ?EventContext) => {
+  addNewEvent = (type: string, context: ?EventContext): Array<gdBaseEvent> => {
     const { project } = this.props;
     const hasEventsSelected = hasEventSelected(this.state.selection);
 
@@ -335,6 +337,8 @@ export default class EventsSheet extends React.Component<Props, State> {
         }
       });
     });
+
+    return newEvents;
   };
 
   openInstructionEditor = (instructionContext: InstructionContext) => {
@@ -408,7 +412,7 @@ export default class EventsSheet extends React.Component<Props, State> {
     );
 
     if (!this._keyboardShortcuts.shouldCloneInstances()) {
-      this.deleteSelection(/*deleteOnlyInstructions=*/ true);
+      this.deleteSelection({ deleteEvents: false });
     } else {
       this._saveChangesToHistory();
     }
@@ -525,17 +529,22 @@ export default class EventsSheet extends React.Component<Props, State> {
     });
   };
 
-  deleteSelection = (deleteOnlyInstructions: boolean = false) => {
+  deleteSelection = ({
+    deleteInstructions = true,
+    deleteEvents = true,
+  }: { deleteInstructions?: boolean, deleteEvents?: boolean } = {}) => {
     const { events } = this.props;
     const eventsRemover = new gd.EventsRemover();
-    if (!deleteOnlyInstructions) {
+    if (deleteEvents) {
       getSelectedEvents(this.state.selection).forEach(event =>
         eventsRemover.addEventToRemove(event)
       );
     }
-    getSelectedInstructions(this.state.selection).forEach(instruction =>
-      eventsRemover.addInstructionToRemove(instruction)
-    );
+    if (deleteInstructions) {
+      getSelectedInstructions(this.state.selection).forEach(instruction =>
+        eventsRemover.addInstructionToRemove(instruction)
+      );
+    }
 
     eventsRemover.launch(events);
 
@@ -730,24 +739,59 @@ export default class EventsSheet extends React.Component<Props, State> {
     eventsContextAnalyzer.launch(eventsList);
     eventsList.delete();
 
-    const eventsContext = eventsContextAnalyzer.getEventsContext();
     this.setState({
-      eventsContextAnalyzerOpen: true,
-      analyzedEventsContextObjectsNames: eventsContext
-        .getObjectNames()
-        .toNewVectorString()
-        .toJSArray(),
-      analyzedEventsContextObjectOrGroupNames: eventsContext
-        .getObjectOrGroupNames()
-        .toNewVectorString()
-        .toJSArray(),
+      analyzedEventsContextResult: toEventsContextResult(
+        eventsContextAnalyzer.getEventsContext()
+      ),
     });
+    eventsContextAnalyzer.delete();
   };
 
   _closeEventsContextAnalyzer = () => {
     this.setState({
-      eventsContextAnalyzerOpen: false,
+      analyzedEventsContextResult: null,
     });
+  };
+
+  extractEventsToFunction = () => {
+    const eventsList = new gd.EventsList();
+
+    getSelectedEvents(this.state.selection).forEach(event =>
+      eventsList.insertEvent(event, eventsList.getEventsCount())
+    );
+
+    this.setState({
+      serializedEventsToExtract: serializeToJSObject(eventsList),
+    });
+
+    eventsList.delete();
+  };
+
+  _replaceSelectionByEventsFunction = (
+    extensionName: string,
+    eventsFunction: gdEventsFunction
+  ) => {
+    const contexts = getSelectedEventContexts(this.state.selection);
+    if (!contexts.length) return;
+
+    const newEvents = this.addNewEvent(
+      'BuiltinCommonInstructions::Standard',
+      contexts[0]
+    );
+    if (!newEvents.length) {
+      console.error('A new event should have been created');
+      return;
+    }
+
+    const action = createNewInstructionForEventsFunction(
+      extensionName,
+      eventsFunction
+    );
+    const standardEvt = gd.asStandardEvent(newEvents[0]);
+    standardEvt.getActions().push_back(action);
+    action.delete();
+
+    this.deleteSelection({ deleteInstructions: false });
   };
 
   _ensureEventUnfolded = (cb: () => ?gdBaseEvent) => {
@@ -846,12 +890,12 @@ export default class EventsSheet extends React.Component<Props, State> {
                   onParameterClick={this.openParameterEditor}
                   onEventClick={this.selectEvent}
                   onEventContextMenu={this.openEventContextMenu}
-                  onAddNewEvent={context =>
+                  onAddNewEvent={context => {
                     this.addNewEvent(
                       'BuiltinCommonInstructions::Standard',
                       context
-                    )
-                  }
+                    );
+                  }}
                   onOpenExternalEvents={onOpenExternalEvents}
                   onOpenLayout={onOpenLayout}
                   searchResults={eventsSearchResultEvents}
@@ -977,7 +1021,11 @@ export default class EventsSheet extends React.Component<Props, State> {
                     },
                     { type: 'separator' },
                     {
-                      label: 'Analyze objects used in this event',
+                      label: 'Extract Events to a Function',
+                      click: () => this.extractEventsToFunction(),
+                    },
+                    {
+                      label: 'Analyze Objects Used in this Event',
                       click: this._openEventsContextAnalyzer,
                     },
                   ]}
@@ -1100,20 +1148,38 @@ export default class EventsSheet extends React.Component<Props, State> {
                     }}
                   />
                 )}
-                {this.state.eventsContextAnalyzerOpen &&
-                  this.state.analyzedEventsContextObjectsNames &&
-                  this.state.analyzedEventsContextObjectOrGroupNames && (
-                    <EventsContextAnalyzerDialog
-                      open={this.state.eventsContextAnalyzerOpen}
-                      onClose={this._closeEventsContextAnalyzer}
-                      objectsNames={
-                        this.state.analyzedEventsContextObjectsNames
-                      }
-                      objectOrGroupNames={
-                        this.state.analyzedEventsContextObjectOrGroupNames
-                      }
-                    />
-                  )}
+                {this.state.analyzedEventsContextResult && (
+                  <EventsContextAnalyzerDialog
+                    onClose={this._closeEventsContextAnalyzer}
+                    eventsContextResult={this.state.analyzedEventsContextResult}
+                  />
+                )}
+                {this.state.serializedEventsToExtract && (
+                  <EventsFunctionExtractorDialog
+                    project={project}
+                    globalObjectsContainer={globalObjectsContainer}
+                    objectsContainer={objectsContainer}
+                    onClose={() =>
+                      this.setState({
+                        serializedEventsToExtract: null,
+                      })
+                    }
+                    serializedEvents={this.state.serializedEventsToExtract}
+                    onCreate={(extensionName, eventsFunction) => {
+                      this.props.onCreateEventsFunction(
+                        extensionName,
+                        eventsFunction
+                      );
+                      this._replaceSelectionByEventsFunction(
+                        extensionName,
+                        eventsFunction
+                      );
+                      this.setState({
+                        serializedEventsToExtract: null,
+                      });
+                    }}
+                  />
+                )}
               </div>
             )}
           </EventsSearcher>

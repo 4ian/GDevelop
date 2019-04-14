@@ -131,6 +131,14 @@ export const filterGroupsList = (
   });
 };
 
+export const enumerateGroups = (
+  objectGroups: gdObjectGroupsContainer
+): Array<gdObjectGroup> => {
+  return mapFor(0, objectGroups.count(), i => {
+    return objectGroups.getAt(i);
+  });
+};
+
 export const enumerateObjectsAndGroups = (
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
@@ -168,12 +176,8 @@ export const enumerateObjectsAndGroups = (
     .map(object => ({ object, global: false }));
 
   const containerGroups = objectsContainer.getObjectGroups();
-  const containerGroupsList: GroupWithContextList = mapFor(
-    0,
-    containerGroups.count(),
-    i => {
-      return containerGroups.getAt(i);
-    }
+  const containerGroupsList: GroupWithContextList = enumerateGroups(
+    containerGroups
   )
     .filter(filterGroup)
     .map(group => ({ group, global: false }));
@@ -191,9 +195,7 @@ export const enumerateObjectsAndGroups = (
   const projectGroupsList: GroupWithContextList =
     globalObjectsContainer === objectsContainer
       ? []
-      : mapFor(0, projectGroups.count(), i => {
-          return projectGroups.getAt(i);
-        })
+      : enumerateGroups(projectGroups)
           .filter(filterGroup)
           .map(group => ({ group, global: true }));
 

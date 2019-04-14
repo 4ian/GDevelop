@@ -9,6 +9,7 @@
 
 #include <vector>
 #include "GDCore/Events/EventsList.h"
+#include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/String.h"
 // TODO: In theory (for separation of concerns between Project and
 // extensions/events), this include should be removed and gd::ParameterMetadata
@@ -141,6 +142,16 @@ class GD_CORE_API EventsFunction {
    */
   std::vector<gd::ParameterMetadata>& GetParameters() { return parameters; };
 
+  /**
+   * \brief Return a reference to the object groups that can be used in the function.
+   */
+  ObjectGroupsContainer& GetObjectGroups() { return objectGroups; }
+
+  /**
+   * \brief Return a const reference to the object groups that can be used in the function.
+   */
+  const ObjectGroupsContainer& GetObjectGroups() const { return objectGroups; }
+
   /** \name Serialization
    */
   ///@{
@@ -164,6 +175,7 @@ class GD_CORE_API EventsFunction {
   gd::EventsList events;
   FunctionType functionType;
   std::vector<gd::ParameterMetadata> parameters;
+  gd::ObjectGroupsContainer objectGroups;
 };
 
 }  // namespace gd

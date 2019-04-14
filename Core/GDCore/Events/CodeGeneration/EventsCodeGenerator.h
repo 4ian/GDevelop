@@ -127,7 +127,7 @@ class GD_CORE_API EventsCodeGenerator {
    *
    */
   std::vector<gd::String> GenerateParametersCodes(
-      std::vector<gd::Expression> parameters,
+      const std::vector<gd::Expression> & parameters,
       const std::vector<gd::ParameterMetadata>& parametersInfo,
       EventsCodeGenerationContext& context,
       std::vector<std::pair<gd::String, gd::String> >*

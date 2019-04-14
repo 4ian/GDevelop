@@ -928,8 +928,8 @@ export default class SceneEditor extends React.Component<Props, State> {
       'object-groups-list': (
         <MosaicWindow title={<Trans>Object Groups</Trans>}>
           <ObjectGroupsList
-            project={project}
-            objectsContainer={layout}
+            globalObjectGroups={project.getObjectGroups()}
+            objectGroups={layout.getObjectGroups()}
             onEditGroup={this.editGroup}
             onDeleteGroup={this._onDeleteGroup}
             onRenameGroup={this._onRenameGroup}
@@ -997,8 +997,8 @@ export default class SceneEditor extends React.Component<Props, State> {
         <ObjectGroupEditorDialog
           open={!!this.state.editedGroup}
           group={this.state.editedGroup}
-          layout={layout}
-          project={project}
+          objectsContainer={layout}
+          globalObjectsContainer={project}
           onCancel={() => this.editGroup(null)}
           onApply={() => this.editGroup(null)}
         />

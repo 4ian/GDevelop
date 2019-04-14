@@ -7,12 +7,13 @@ var shell = require('shelljs');
 var https = require('follow-redirects').https;
 var fs = require('fs');
 var unzipper = require('unzipper');
-var process = require('process')
+var process = require('process');
+var path = require('path');
 
 const editor = process.argv[2];
 const gitRelease = process.argv[3];
 const gitUrl = 'https://github.com/4ian/GDevelop';
-const basePath = '../public/external/' + editor + '/' + editor + '-editor';
+const basePath = path.join('../public/external/', editor, editor + '-editor');
 const zipFilePath = basePath + '.zip';
 
 if (shell.test('-d', basePath)) {
@@ -46,7 +47,7 @@ if (shell.test('-d', basePath)) {
           fs
             .createReadStream(zipFilePath)
             .pipe(unzipper.Extract({
-              path: '../public/external/' + editor
+              path: path.join('../public/external/',editor)
             }))
             .on('close', function () {
               shell.echo(

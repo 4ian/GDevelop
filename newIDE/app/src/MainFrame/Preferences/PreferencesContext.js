@@ -5,7 +5,8 @@ export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
   | 'use-nearest-scale-mode'
   | 'maximum-fps-too-low'
-  | 'minimum-fps-too-low';
+  | 'minimum-fps-too-low'
+  | 'function-extractor-explanation';
 
 export type PreferencesValues = {|
   language: string,

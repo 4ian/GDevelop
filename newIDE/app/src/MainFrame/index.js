@@ -851,6 +851,7 @@ class MainFrame extends React.Component<Props, State> {
               onChooseResource={this._onChooseResource}
               resourceExternalEditors={this.props.resourceExternalEditors}
               openInstructionOrExpression={this._openInstructionOrExpression}
+              onCreateEventsFunction={this._onCreateEventsFunction}
               isActive={isActive}
               ref={editorRef}
             />
@@ -895,6 +896,7 @@ class MainFrame extends React.Component<Props, State> {
               onChooseResource={this._onChooseResource}
               resourceExternalEditors={this.props.resourceExternalEditors}
               openInstructionOrExpression={this._openInstructionOrExpression}
+              onCreateEventsFunction={this._onCreateEventsFunction}
               isActive={isActive}
               ref={editorRef}
             />
@@ -977,6 +979,7 @@ class MainFrame extends React.Component<Props, State> {
               }
               initiallyFocusedFunctionName={initiallyFocusedFunctionName}
               openInstructionOrExpression={this._openInstructionOrExpression}
+              onCreateEventsFunction={this._onCreateEventsFunction}
               ref={editorRef}
             />
           ),
@@ -1110,6 +1113,32 @@ class MainFrame extends React.Component<Props, State> {
         `Extension with name=${extensionName} can not be opened (no editor for this)`
       );
     }
+  };
+
+  _onCreateEventsFunction = (
+    extensionName: string,
+    eventsFunction: gdEventsFunction
+  ) => {
+    const { currentProject } = this.state;
+    if (!currentProject) return;
+
+    // Names are assumed to be already validated
+    const createNewExtension = !currentProject.hasEventsFunctionsExtensionNamed(
+      extensionName
+    );
+    const extension = createNewExtension
+      ? currentProject.insertNewEventsFunctionsExtension(extensionName, 0)
+      : currentProject.getEventsFunctionsExtension(extensionName);
+
+    if (createNewExtension) {
+      extension.setFullName(extensionName);
+      extension.setDescription(
+        'Originally automatically extracted from events of the project'
+      );
+    }
+
+    extension.insertEventsFunction(eventsFunction, 0);
+    this._loadProjectEventsFunctionsExtensions();
   };
 
   openCreateDialog = (open: boolean = true) => {

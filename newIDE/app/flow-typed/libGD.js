@@ -9,7 +9,10 @@ type EmscriptenObject = Object & {
 declare type gdPlatform = EmscriptenObject;
 declare type gdPlatformExtension = EmscriptenObject;
 
+declare type gdObject = EmscriptenObject;
 declare type gdObjectsContainer = EmscriptenObject;
+declare type gdObjectGroup = EmscriptenObject;
+declare type gdObjectGroupsContainer = EmscriptenObject;
 declare type gdProject = gdObjectsContainer & EmscriptenObject;
 declare type gdLayout = gdObjectsContainer & EmscriptenObject;
 declare type gdExternalLayout = EmscriptenObject;
@@ -19,8 +22,6 @@ declare type gdInitialInstance = EmscriptenObject;
 declare type gdInitialInstancesContainer = EmscriptenObject;
 declare type gdBaseEvent = EmscriptenObject;
 declare type gdResource = EmscriptenObject;
-declare type gdObject = EmscriptenObject;
-declare type gdObjectGroup = EmscriptenObject;
 declare type gdResourcesManager = EmscriptenObject;
 declare type gdEventsList = EmscriptenObject;
 declare type gdEventsFunction = EmscriptenObject;
@@ -52,6 +53,8 @@ declare type gdVectorEventsFunction = EmscriptenObject;
 
 declare type gdVectorEventsSearchResult = EmscriptenObject;
 declare type gdMapStringPropertyDescriptor = EmscriptenObject;
+
+declare type gdEventsContext = EmscriptenObject;
 
 //Represents all objects that have serializeTo and unserializeFrom methods.
 declare type gdSerializable = EmscriptenObject;

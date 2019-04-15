@@ -1149,7 +1149,7 @@ export default class SceneEditor extends React.Component<Props, State> {
               visible: this.state.selectedObjectNames.length > 0,
             },
             {
-              label: 'Create a New Object',
+              label: 'Create instance from a New Object',
               click: () => {
                 if (this.editor) {
                   const cursorPosition = this.editor.getLastCursorPosition();

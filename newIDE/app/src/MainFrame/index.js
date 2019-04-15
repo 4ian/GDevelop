@@ -922,8 +922,13 @@ class MainFrame extends React.Component<Props, State> {
                   project={this.state.currentProject}
                   externalLayoutName={name}
                   setToolbar={this.setEditorToolbar}
-                  onPreview={(project, layout, options) => {
-                    this._launchExternalLayoutPreview(project, layout, options);
+                  onPreview={(project, layout, externalLayout, options) => {
+                    this._launchExternalLayoutPreview(
+                      project,
+                      layout,
+                      externalLayout,
+                      options
+                    );
                     if (
                       values.autosaveOnPreview &&
                       this.props.onAutoSaveProject

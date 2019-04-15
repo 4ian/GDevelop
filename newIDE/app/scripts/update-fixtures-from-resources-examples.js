@@ -5,7 +5,7 @@
  */
 const gd = require('../public/libGD.js')();
 const {
-  readProjectJSONFile,
+  readProjectFile,
   loadSerializedProject,
 } = require('./lib/LocalProjectOpener');
 const { writeProjectJSONFile } = require('./lib/LocalProjectWriter');
@@ -48,7 +48,7 @@ extensionsLoader
   .then(exampleNames =>
     Promise.all(
       exampleNames.map(exampleName => {
-        return readProjectJSONFile(
+        return readProjectFile(
           `../resources/examples/${exampleName}/${exampleName}.json`
         )
           .then(projectObject => {

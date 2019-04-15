@@ -7,7 +7,7 @@ const { mapFor, mapVector } = require('./lib/MapFor');
 const makeExtensionsLoader = require('./lib/LocalJsExtensionsLoader');
 const { getExampleNames } = require('./lib/ExamplesLoader');
 const {
-  readProjectJSONFile,
+  readProjectFile,
   loadSerializedProject,
 } = require('./lib/LocalProjectOpener');
 const fs = require('fs');
@@ -182,7 +182,7 @@ extensionsLoader
           });
 
           return Promise.all([
-            readProjectJSONFile(
+            readProjectFile(
               `../resources/examples/${exampleName}/${exampleName}.json`
             )
               .then(projectObject => {

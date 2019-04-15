@@ -126,7 +126,7 @@ type Props = {
   onEditObject?: gdObject => void,
   resourceSources: Array<ResourceSource>,
   resourceExternalEditors: Array<ResourceExternalEditor>,
-  onChooseProject?: () => Promise<string>,
+  onChooseProject?: () => Promise<?string>,
   saveDialog?: React.Element<*>,
   onSaveProject?: gdProject => Promise<any>,
   onAutoSaveProject?: (project: gdProject) => void,

@@ -1,44 +1,90 @@
+// @flow
 import { serializeToJSObject } from '../Utils/Serializer';
 import optionalRequire from '../Utils/OptionalRequire.js';
-const fs = optionalRequire('fs');
+import {
+  split,
+  splitPaths,
+  getSlugifiedUniqueNameFromProperty,
+} from '../Utils/ObjectSplitter';
+const fs = optionalRequire('fs-extra');
+const path = optionalRequire('path');
+
+const writeJSONFile = (object: Object, filepath: string): Promise<void> => {
+  if (!fs) return Promise.reject(new Error('Filesystem is not supported.'));
+
+  try {
+    const content = JSON.stringify(object, null, 2);
+    return fs.ensureDir(path.dirname(filepath)).then(
+      () =>
+        new Promise((resolve, reject) => {
+          fs.writeFile(filepath, content, (err: ?Error) => {
+            if (err) {
+              return reject(err);
+            }
+
+            return resolve();
+          });
+        })
+    );
+  } catch (stringifyException) {
+    return Promise.reject(stringifyException);
+  }
+};
 
 export default class LocalProjectWriter {
-  static _writeProjectJSONFile = (project, filepath, cb) => {
-    if (!fs) return cb('Not supported');
+  static saveProject = (project: gdProject): Promise<void> => {
+    const filepath = project.getProjectFile();
+    const projectPath = path.dirname(project.getProjectFile());
+    if (!filepath) {
+      return Promise.reject('Unimplemented "Save as" feature');
+    }
 
-    try {
-      const content = JSON.stringify(serializeToJSObject(project), null, 2);
-      fs.writeFile(filepath, content, cb);
-    } catch (e) {
-      return cb(e);
+    const serializedProjectObject = serializeToJSObject(project);
+    if (project.isFolderProject()) {
+      const partialObjects = split(serializedProjectObject, {
+        pathSeparator: '/',
+        getArrayItemReferenceName: getSlugifiedUniqueNameFromProperty('name'),
+        shouldSplit: splitPaths(
+          new Set([
+            '/layouts/*',
+            '/externalLayouts/*',
+            '/externalEvents/*',
+            '/layouts/*',
+            '/eventsFunctionsExtensions/*',
+          ])
+        ),
+        isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
+      });
+
+      return Promise.all(
+        partialObjects.map(partialObject => {
+          return writeJSONFile(
+            partialObject.object,
+            path.join(projectPath, partialObject.reference) + '.json'
+          ).catch(err => {
+            console.error('Unable to write a partial file:', err);
+            throw err;
+          });
+        })
+      ).then(() => {
+        return writeJSONFile(serializedProjectObject, filepath).catch(err => {
+          console.error('Unable to write the split project:', err);
+          throw err;
+        });
+      });
+    } else {
+      return writeJSONFile(serializedProjectObject, filepath).catch(err => {
+        console.error('Unable to write the project:', err);
+        throw err;
+      });
     }
   };
 
-  static saveProject = project => {
-    return new Promise((resolve, reject) => {
-      const filepath = project.getProjectFile();
-      if (!filepath) {
-        console.warn('Unimplemented Saveas'); // TODO
-        return;
-      }
-
-      LocalProjectWriter._writeProjectJSONFile(project, filepath, err => {
-        if (err) {
-          console.error('Unable to write project', err);
-          return reject(err);
-        }
-
-        resolve();
-      });
-    });
-  };
-
-  static autoSaveProject = project => {
+  static autoSaveProject = (project: gdProject) => {
     const autoSavePath = project.getProjectFile() + '.autosave';
-    LocalProjectWriter._writeProjectJSONFile(project, autoSavePath, err => {
-      if (err) {
-        console.error(`Unable to write ${autoSavePath}`, err);
-      }
+    writeJSONFile(serializeToJSObject(project), autoSavePath).catch(err => {
+      console.error(`Unable to write ${autoSavePath}:`, err);
+      throw err;
     });
   };
 }

@@ -10,14 +10,14 @@ export default class InstancesSelection {
     this.highlightRectangle = new PIXI.Graphics();
     this.highlightRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
 
-    this.tooltipBG = new PIXI.Graphics();
-    this.tooltip = new PIXI.Text('', {
+    this.tooltipBackground = new PIXI.Graphics();
+    this.tooltipText = new PIXI.Text('', {
       fontSize: 17,
       fill: 0xffffff,
       align: 'center',
     });
-    this.highlightRectangle.addChild(this.tooltipBG);
-    this.highlightRectangle.addChild(this.tooltip);
+    this.highlightRectangle.addChild(this.tooltipBackground);
+    this.highlightRectangle.addChild(this.tooltipText);
   }
 
   setInstance(instance) {
@@ -58,7 +58,6 @@ export default class InstancesSelection {
     this.highlightRectangle.endFill();
 
     const tooltipInfo =
-      'Object: ' +
       this.highlightedInstance.getObjectName() +
       '\n' +
       'X: ' +
@@ -71,22 +70,38 @@ export default class InstancesSelection {
       '  Z: ' +
       this.highlightedInstance.getZOrder() +
       '\n';
-    this.tooltip.text = tooltipInfo;
-    this.tooltip.x = //alternatively we could draw it at mouse position instead. Would help for big objects
-      highlightRectangle.x -
-      this.tooltip.width / 2 +
-      highlightRectangle.width / 2;
-    this.tooltip.y = highlightRectangle.y - 68;
+    this.tooltipText.text = tooltipInfo;
 
-    this.tooltipBG.clear();
-    this.tooltipBG.beginFill(0x000000, 0.8);
-    this.tooltipBG.drawRoundedRect(
-      this.tooltip.x - 5,
-      this.tooltip.y - 5,
-      this.tooltip.width + 10,
-      this.tooltip.height - 5,
-      16
+    this.tooltipText.x =
+      highlightRectangle.x -
+      this.tooltipText.width / 2 +
+      highlightRectangle.width / 2;
+    this.tooltipText.y = highlightRectangle.y - this.tooltipText.height;
+
+    const padding = 5;
+    this.tooltipBackground.clear();
+    this.tooltipBackground.beginFill(0x000000, 0.8);
+    this.tooltipBackground.drawRoundedRect(
+      this.tooltipText.x - padding,
+      this.tooltipText.y - padding,
+      this.tooltipText.width + padding * 2,
+      this.tooltipText.height - padding,
+      4
     );
-    this.tooltipBG.endFill();
+    const pointerWidth = 4,
+      pointerHeight = 2;
+    this.tooltipBackground.moveTo(
+      this.tooltipText.x + this.tooltipText.width / 2 - pointerWidth,
+      this.tooltipText.y + this.tooltipText.height - padding * 2
+    );
+    this.tooltipBackground.lineTo(
+      this.tooltipText.x + this.tooltipText.width / 2 + pointerWidth,
+      this.tooltipText.y + this.tooltipText.height - padding * 2
+    );
+    this.tooltipBackground.lineTo(
+      this.tooltipText.x + this.tooltipText.width / 2,
+      this.tooltipText.y + this.tooltipText.height - padding + pointerHeight
+    );
+    this.tooltipBackground.endFill();
   }
 }

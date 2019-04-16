@@ -56,7 +56,7 @@ export default class InstancesEditorContainer extends Component {
     this.pixiRenderer = PIXI.autoDetectRenderer(
       this.props.width,
       this.props.height,
-      { antialias: true } //fixes jaggy edges on rounded rects
+      { antialias: true } //fixes jaggy edges
     );
     this.canvasArea.appendChild(this.pixiRenderer.view);
     this.pixiRenderer.view.addEventListener('contextmenu', e => {

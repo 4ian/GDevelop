@@ -35,6 +35,7 @@ type State = {|
   showGDevelopSplash: boolean,
   minFPS: number,
   maxFPS: number,
+  isFolderProject: boolean,
 |};
 
 class ProjectPropertiesDialog extends React.Component<Props, State> {
@@ -60,6 +61,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
       minFPS: project.getMinimumFPS(),
       maxFPS: project.getMaximumFPS(),
+      isFolderProject: project.isFolderProject(),
     };
   }
 
@@ -89,6 +91,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       showGDevelopSplash,
       minFPS,
       maxFPS,
+      isFolderProject,
     } = this.state;
     project.setDefaultWidth(windowDefaultWidth);
     project.setDefaultHeight(windowDefaultHeight);
@@ -103,6 +106,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setMinimumFPS(minFPS);
     project.setMaximumFPS(maxFPS);
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
+    project.setFolderProject(isFolderProject);
 
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
 
@@ -137,6 +141,7 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       showGDevelopSplash,
       minFPS,
       maxFPS,
+      isFolderProject,
     } = this.state;
 
     const defaultPackageName = 'com.example.mygame';
@@ -196,6 +201,27 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             value={version}
             onChange={value => this.setState({ version: value })}
           />
+          <SelectField
+            fullWidth
+            floatingLabelText={<Trans>Project file type</Trans>}
+            value={isFolderProject}
+            onChange={(e, i, value) =>
+              this.setState({ isFolderProject: value })
+            }
+          >
+            <MenuItem
+              value={false}
+              primaryText={<Trans>Single file (default)</Trans>}
+            />
+            <MenuItem
+              value={true}
+              primaryText={
+                <Trans>
+                  Multiple files, saved in folder next to the main file
+                </Trans>
+              }
+            />
+          </SelectField>
           <Line noMargin>
             <Column expand noMargin>
               <SemiControlledTextField

@@ -66,6 +66,7 @@ export default class PreferencesDialog extends Component<Props, State> {
             showAlertMessage,
             setAutoDisplayChangelog,
             setEventsSheetShowObjectThumbnails,
+            setAutosaveOnPreview,
           }) => {
             const dismissedAlertMessages = getDismissedAlertMessages(
               values.hiddenAlertMessages
@@ -143,8 +144,16 @@ export default class PreferencesDialog extends Component<Props, State> {
                     toggled={values.eventsSheetShowObjectThumbnails}
                     labelPosition="right"
                     label={
-                      <Trans>Display object thumbnails in Events Sheets.</Trans>
+                      <Trans>Display object thumbnails in Events Sheets</Trans>
                     }
+                  />
+                </Line>
+                <Line>
+                  <Toggle
+                    onToggle={(e, check) => setAutosaveOnPreview(check)}
+                    toggled={values.autosaveOnPreview}
+                    labelPosition="right"
+                    label={<Trans>Auto-save project on Preview</Trans>}
                   />
                 </Line>
                 <Line>

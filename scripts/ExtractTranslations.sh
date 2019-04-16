@@ -9,15 +9,6 @@ find ../Extensions/ -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' | grep -v
 find ../Extensions/ -name '*.js' | grep -v 'box2d.js' >> /tmp/listfile.txt
 find ../Core/GDCore -name '*.cpp' | grep -v '/Dialogs/' >> /tmp/listfile.txt
 find ../Core/GDCore -name '*.h' -o -name "*.hpp" | grep -v '/Dialogs/' >> /tmp/listfile.txt
-# Don't include old IDE (GDevelop 4) anymore in the translations.
-# newIDE translations are generated separately (see newIDE/app/scripts)
-# find ../IDE -name '*.cpp' | grep -v '/wxstedit/' >> /tmp/listfile.txt
-# find ../IDE -name '*.h' -o -name "*.hpp" | grep -v '/wxstedit/' >> /tmp/listfile.txt
-
-# Don't include GDCpp anymore in the translations, as these translations were
-# for the old IDE (GDevelop 4).
-# find ../GDCpp/GDCpp/ -name '*.cpp' >> /tmp/listfile.txt
-# find ../GDCpp/GDCpp/ -name '*.h' -o -name "*.hpp" >> /tmp/listfile.txt
 
 echo "ℹ️ Generating .POT file..."
 if type xgettext 2>/dev/null; then

@@ -53,7 +53,7 @@ install:
 #Compile the tests only
   - mkdir .build-tests
   - cd .build-tests
-  - cmake -DBUILD_GDJS=FALSE -DBUILD_IDE=FALSE -DBUILD_TESTS=TRUE -DNO_GUI=TRUE -DCMAKE_CXX_COMPILER=$(which $CXX) -DCMAKE_C_COMPILER=$(which $CC) ..
+  - cmake -DBUILD_GDJS=FALSE -DBUILD_TESTS=TRUE -DCMAKE_CXX_COMPILER=$(which $CXX) -DCMAKE_C_COMPILER=$(which $CC) ..
   - make -j 4
   - cd ..
 

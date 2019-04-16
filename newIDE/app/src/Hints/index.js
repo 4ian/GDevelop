@@ -9,6 +9,12 @@ export const getDeprecatedBehaviorsInformation = (): {
   },
 });
 
+export const getExperimentalObjects = (): {
+  [string]: boolean,
+} => ({
+  'Video::VideoObject': true,
+});
+
 export const getExtraInstructionInformation = (
   type: string
 ): ?{| warning: string |} => {

@@ -34,6 +34,14 @@ const jsExtensions = [
     name: 'ExampleJsExtension',
     extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/ExampleJsExtension/JsExtension.js'),
   },
+  {
+    name: 'Tween',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/TweenBehavior/JsExtension.js'),
+  },
+  {
+    name: 'Video',
+    extensionModule: require('GDJS-for-web-app-only/Runtime/Extensions/Video/JsExtension.js'),
+  },
 ];
 
 type MakeExtensionsLoaderArguments = {|

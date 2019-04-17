@@ -8,7 +8,10 @@ import Subheader from 'material-ui/Subheader';
 import { List, ListItem } from 'material-ui/List';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
-import { enumerateObjectTypes } from './EnumerateObjects';
+import {
+  enumerateObjectTypes,
+  type EnumeratedObjectMetadata,
+} from './EnumerateObjects';
 import HelpButton from '../UI/HelpButton';
 import { getExperimentalObjects } from '../Hints';
 import { Line } from '../UI/Grid';
@@ -21,7 +24,7 @@ const ObjectListItem = ({
   objectMetadata,
   onClick,
 }: {|
-  objectMetadata: gdObjectMetadata,
+  objectMetadata: EnumeratedObjectMetadata,
   onClick: () => void,
 |}) => {
   if (objectMetadata.name === '') {
@@ -58,7 +61,7 @@ type State = {|
 export default class NewObjectDialog extends Component<Props, State> {
   state = { ...this._loadFrom(this.props.project), showExperimental: false };
 
-  _loadFrom(project) {
+  _loadFrom(project: gdProject) {
     if (!project || !project.getCurrentPlatform()) {
       return { objectMetadata: [] };
     }
@@ -68,12 +71,12 @@ export default class NewObjectDialog extends Component<Props, State> {
     };
   }
 
-  componentWillReceiveProps(newProps) {
+  componentWillReceiveProps(newProps: Props) {
     if (
       (!this.props.open && newProps.open) ||
       (newProps.open && this.props.project !== newProps.project)
     ) {
-      this.setState(this._loadFrom(newProps.layout));
+      this.setState(this._loadFrom(newProps.project));
     }
   }
 

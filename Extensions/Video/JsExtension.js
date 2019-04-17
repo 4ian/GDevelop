@@ -17,7 +17,7 @@ module.exports = {
       .setExtensionInformation(
         "Video",
         "Video",
-        _("Display a video on the scene"),
+        _("Display a video on the scene."),
         "Aurélien Vivet",
         "Open source (MIT License)"
       )
@@ -112,7 +112,7 @@ module.exports = {
       .addObject(
         "VideoObject",
         _("Video"),
-        _("Displays a video"),
+        _("Displays a video."),
         "JsPlatform/Extensions/videoicon32.png",
         videoObject
       )

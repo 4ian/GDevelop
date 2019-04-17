@@ -88,20 +88,6 @@ export default class InstancesSelection {
       this.tooltipText.height - padding,
       4
     );
-    const pointerWidth = 4,
-      pointerHeight = 2;
-    this.tooltipBackground.moveTo(
-      this.tooltipText.x + this.tooltipText.width / 2 - pointerWidth,
-      this.tooltipText.y + this.tooltipText.height - padding * 2
-    );
-    this.tooltipBackground.lineTo(
-      this.tooltipText.x + this.tooltipText.width / 2 + pointerWidth,
-      this.tooltipText.y + this.tooltipText.height - padding * 2
-    );
-    this.tooltipBackground.lineTo(
-      this.tooltipText.x + this.tooltipText.width / 2,
-      this.tooltipText.y + this.tooltipText.height - padding + pointerHeight
-    );
     this.tooltipBackground.endFill();
   }
 }

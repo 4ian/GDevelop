@@ -731,3 +731,16 @@ gdjs.RuntimeScene.prototype.stopProfiler = function() {
 gdjs.RuntimeScene.prototype.getOnceTriggers = function() {
     return this._onceTriggers;
 }
+
+/**
+ * Get a list of all gdjs.RuntimeObject living on the scene.
+ * You should not, normally, need this method at all. It's only to be used
+ * in exceptional use cases where you need to loop through all objects,
+ * and it won't be performant.
+ * 
+ * @returns {gdjs.RuntimeObject[]} The list of all runtime objects on the scnee
+ */
+gdjs.RuntimeScene.prototype.getAdhocListOfAllInstances = function() {
+    this._constructListOfAllInstances();
+    return this._allInstancesList;
+}

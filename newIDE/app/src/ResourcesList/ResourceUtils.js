@@ -25,12 +25,26 @@ export const createOrUpdateResource = (
   resource.delete();
 };
 
+/**
+ * Get the local path of a resource. This works by asking the ResourcesLoader
+ * for the resource URL, then stripping anything that is specific to a URL.
+ */
 export const getLocalResourceFullPath = (
   project: gdProject,
   resourceName: string
 ) => {
-  let resourcePath = ResourcesLoader.getResourceFullUrl(project, resourceName);
-  resourcePath = resourcePath.substring(7, resourcePath.lastIndexOf('?cache='));
+  let resourcePath = ResourcesLoader.getResourceFullUrl(
+    project,
+    resourceName
+  ).substring(7 /* Remove "file://" from the URL to get a local path */);
+
+  if (resourcePath.indexOf('?cache=') !== -1) {
+    // Remove, if needed, the cache bursting argument from the URL.
+    resourcePath = resourcePath.substring(
+      0,
+      resourcePath.lastIndexOf('?cache=')
+    );
+  }
   return resourcePath;
 };
 

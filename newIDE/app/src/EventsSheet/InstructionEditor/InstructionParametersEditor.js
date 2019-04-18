@@ -206,8 +206,8 @@ export default class InstructionParametersEditor extends React.Component<
             </Line>
             {instructionExtraInformation && (
               <Line>
-                <AlertMessage kind="warning">
-                  {i18n._(instructionExtraInformation.warning)}
+                <AlertMessage kind={instructionExtraInformation.kind}>
+                  {i18n._(instructionExtraInformation.message)}
                 </AlertMessage>
               </Line>
             )}

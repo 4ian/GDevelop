@@ -55,19 +55,19 @@ module.exports = {
         "Opacity",
         new gd.PropertyDescriptor(objectContent.opacity.toString())
           .setType("number")
-          .setLabel(_("Video opacity"))
+          .setLabel(_("Video opacity (0-255)"))
       );
       objectProperties.set(
         "Looped",
-        new gd.PropertyDescriptor(
-          objectContent.loop ? "true" : "false"
-        ).setType("boolean")
+        new gd.PropertyDescriptor(objectContent.loop ? "true" : "false")
+          .setType("boolean")
+          .setLabel(_("Loop the video"))
       );
       objectProperties.set(
         "Volume",
         new gd.PropertyDescriptor(objectContent.volume.toString())
           .setType("number")
-          .setLabel(_("Video volume"))
+          .setLabel(_("Video volume (0-100)"))
       );
       objectProperties.set(
         "videoResource",

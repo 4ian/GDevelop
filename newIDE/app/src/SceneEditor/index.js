@@ -106,6 +106,7 @@ type State = {|
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
+  addFirstInstancePosition: Array<number>,
 
   editedGroup: ?gdObjectGroup,
 
@@ -154,7 +155,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       variablesEditedInstance: null,
       variablesEditedObject: null,
       selectedObjectNames: [],
-
+      addFirstInstancePosition: [],
       editedGroup: null,
 
       // State for "drag'n'dropping" from the objects list to the instances editor:
@@ -459,6 +460,17 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  _onCreateNewObjectAndFirstInstanceUnderCursor = () => {
+    if (!this.editor) {
+      return;
+    }
+    this.setState({
+      addFirstInstancePosition: this.editor.getLastCursorPosition(),
+    });
+    if (this._objectsList)
+      this._objectsList.setState({ newObjectDialogOpen: true });
+  };
+
   _onAddInstanceUnderCursor = () => {
     if (!this.state.selectedObjectNames.length || !this.editor) {
       return;
@@ -557,6 +569,19 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
+  };
+
+  _addNewObjectAndInstance = (newObjectName: string) => {
+    if (!this.state.addFirstInstancePosition.length) {
+      return;
+    }
+    const { addFirstInstancePosition } = this.state;
+    this._addInstance(
+      addFirstInstancePosition[0],
+      addFirstInstancePosition[1],
+      newObjectName
+    );
+    this.setState({ addFirstInstancePosition: [] });
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -915,13 +940,13 @@ export default class SceneEditor extends React.Component<Props, State> {
             ) => {
               return this._canObjectUseNewName(objectWithContext, newName);
             }}
+            onObjectCreated={this._addNewObjectAndInstance}
             onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
             onStartDraggingObject={this._onStartDraggingObjectFromList}
             onEndDraggingObject={this._onEndDraggingObjectFromList}
             canMoveObjects={!this.state.canDropDraggedObject}
-            onAddInstance={this._addInstance}
             ref={objectsList => (this._objectsList = objectsList)}
           />
         </MosaicWindow>
@@ -1149,14 +1174,8 @@ export default class SceneEditor extends React.Component<Props, State> {
               visible: this.state.selectedObjectNames.length > 0,
             },
             {
-              label: 'Create instance from a New Object',
-              click: () => {
-                if (this.editor) {
-                  const cursorPosition = this.editor.getLastCursorPosition();
-                  if (this._objectsList)
-                    this._objectsList.addNewObjectAndInstance(cursorPosition);
-                }
-              },
+              label: 'Insert a New Object',
+              click: () => this._onCreateNewObjectAndFirstInstanceUnderCursor(),
               visible: this.state.selectedObjectNames.length === 0,
             },
             {

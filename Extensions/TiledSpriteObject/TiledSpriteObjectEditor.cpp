@@ -13,7 +13,6 @@ This project is released under the MIT License.
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/Localization.h"

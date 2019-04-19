@@ -25,7 +25,6 @@ This project is released under the MIT License.
 #include <limits>
 #include <memory>
 #include <string>
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/Localization.h"

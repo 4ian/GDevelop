@@ -11,7 +11,6 @@
 #include "GDCore/String.h"
 class wxPropertyGrid;
 class wxPropertyGridEvent;
-class TiXmlElement;
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
@@ -510,7 +509,7 @@ class GD_CORE_API Project : public ObjectsContainer {
 
 #if defined(GD_IDE_ONLY)
   /**
-   * \brief Called to serialize the project to a TiXmlElement.
+   * \brief Serialize the project.
    *
    * "Dirty" flag is set to false when serialization is done.
    */
@@ -949,11 +948,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Don't forget to update me if members were changed!
    */
   void Init(const gd::Project& project);
-
-  /**
-   * Helper method for LoadFromXml method.
-   */
-  void LoadProjectInformationFromXml(const TiXmlElement* elem);
 
   gd::String name;            ///< Game name
   gd::String version;         ///< Game version number (used for some exports)

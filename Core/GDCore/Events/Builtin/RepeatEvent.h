@@ -10,17 +10,7 @@
 #include "GDCore/Events/EventsList.h"
 namespace gd {
 class Instruction;
-}
-namespace gd {
 class Project;
-}
-class RuntimeScene;
-class TiXmlElement;
-namespace gd {
-class EventsEditorItemsAreas;
-}
-namespace gd {
-class EventsEditorSelection;
 }
 
 namespace gd {
@@ -64,32 +54,6 @@ class GD_CORE_API RepeatEvent : public gd::BaseEvent {
   virtual void SerializeTo(SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,
                                const SerializerElement& element);
-
-  /**
-   * Called by event editor to draw the event.
-   */
-  virtual void Render(wxDC& dc,
-                      int x,
-                      int y,
-                      unsigned int width,
-                      gd::EventsEditorItemsAreas& areas,
-                      gd::EventsEditorSelection& selection,
-                      const gd::Platform& platform);
-
-  /**
-   * Must return the height of the event when rendered
-   */
-  virtual unsigned int GetRenderedHeight(unsigned int width,
-                                         const gd::Platform& platform) const;
-
-  /**
-   * Called when the user want to edit the event
-   */
-  virtual EditEventReturnType EditEvent(
-      wxWindow* parent_,
-      gd::Project& game_,
-      gd::Layout& scene_,
-      gd::MainFrameWrapper& mainFrameWrapper_);
 
  private:
   gd::Expression repeatNumberExpression;

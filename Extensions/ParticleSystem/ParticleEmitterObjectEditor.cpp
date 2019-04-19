@@ -20,7 +20,6 @@ This project is released under the MIT License.
 #include <wx/msgdlg.h>
 #include "GDCore/Tools/Log.h"
 
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/CommonTools.h"

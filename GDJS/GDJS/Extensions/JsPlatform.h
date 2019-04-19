@@ -9,10 +9,6 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDJS/IDE/HttpServer.h"
-#if !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#endif
 
 namespace gdjs {
 
@@ -48,23 +44,6 @@ class GD_API JsPlatform : public gd::Platform {
     return "CreateGDJSExtension";
   }
 
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * \brief Expose the previewer to the IDE
-   *
-   * Returns a gd::LayoutEditorPreviewer object which export the layout being
-   * edited and then launch the preview in an external browser
-   */
-  virtual std::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(
-      gd::LayoutEditorCanvas& editor) const;
-
-  /**
-   * \brief Expose to the IDE how to export games.
-   */
-  virtual std::vector<std::shared_ptr<gd::ProjectExporter>>
-  GetProjectExporters() const;
-#endif
-
   void AddNewExtension(const gd::PlatformExtension& extension);
 
   /**
@@ -73,11 +52,6 @@ class GD_API JsPlatform : public gd::Platform {
    * of the editor.
    */
   virtual void ReloadBuiltinExtensions();
-
-  /**
-   * \brief When the IDE is ready, start the tiny web server used for preview.
-   */
-  virtual void OnIDEInitialized();
 
   /**
    * Get access to the JsPlatform instance (JsPlatform is a singleton).
@@ -95,10 +69,6 @@ class GD_API JsPlatform : public gd::Platform {
   virtual ~JsPlatform(){};
 
  private:
-#if !defined(GD_NO_WX_GUI)
-  wxBitmap icon;          ///< The platform icon shown to the user in the IDE.
-  HttpServer httpServer;  ///< The server used for the previews.
-#endif
 
   static JsPlatform* singleton;
 };

@@ -14,10 +14,11 @@
 namespace gd {
 
 /**
- * \brief AbstractFileSystem is used to do classical file manipulation
- * in a way that is agnostic of the platform.
+ * \brief An interface to manipulate files in a platform agnostic
+ * way. This allow exporters to work on files without knowing
+ * what is actually being used to manipulate files (Node.js, browser shims,
+ * etc...)
  *
- * \see gd::NativeFileSystem
  * \ingroup IDE
  */
 class GD_CORE_API AbstractFileSystem {
@@ -132,53 +133,6 @@ class GD_CORE_API AbstractFileSystem {
  protected:
   AbstractFileSystem(){};
 };
-
-#if !defined(GD_NO_WX_GUI)
-/**
- * \brief Implementation of AbstractFileSystem using wxWidgets to
- * manipulate files as usual: Most calls are redirected to wxWidgets call.
- *
- * \ingroup IDE
- */
-class GD_CORE_API NativeFileSystem : public AbstractFileSystem {
- public:
-  /**
-   * \brief Get the NativeFileSystem instance.
-   */
-  static NativeFileSystem& Get();
-
-  virtual void MkDir(const gd::String& path);
-  virtual bool DirExists(const gd::String& path);
-  virtual bool FileExists(const gd::String& path);
-  virtual gd::String FileNameFrom(const gd::String& file);
-  virtual gd::String DirNameFrom(const gd::String& file);
-  virtual bool MakeAbsolute(gd::String& filename,
-                            const gd::String& baseDirectory);
-  virtual bool MakeRelative(gd::String& filename,
-                            const gd::String& baseDirectory);
-  virtual bool IsAbsolute(const gd::String& filename);
-  virtual bool CopyFile(const gd::String& file, const gd::String& destination);
-  virtual bool CopyDir(const gd::String& source, const gd::String& destination);
-  virtual bool ClearDir(const gd::String& directory);
-  virtual bool WriteToFile(const gd::String& file, const gd::String& content);
-  virtual gd::String ReadFile(const gd::String& file);
-  virtual gd::String GetTempDir();
-  virtual std::vector<gd::String> ReadDir(const gd::String& path,
-                                          const gd::String& extension = "");
-
-  /**
-   * \brief Destroy the singleton.
-   * \note You do not need usually to call this method.
-   **/
-  static void DestroySingleton();
-
- private:
-  NativeFileSystem(){};
-  virtual ~NativeFileSystem();
-
-  static NativeFileSystem* singleton;
-};
-#endif
 
 }  // namespace gd
 

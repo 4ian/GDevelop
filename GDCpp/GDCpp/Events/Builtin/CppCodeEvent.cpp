@@ -9,10 +9,6 @@
 #include "CppCodeEvent.h"
 #include <fstream>
 #include <iostream>
-#if !defined(GD_NO_WX_GUI)
-#include <wx/dcmemory.h>
-#include <wx/filename.h>
-#endif
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
@@ -106,109 +102,6 @@ gd::String CppCodeEvent::GenerateAssociatedFileCode() const {
       "BAD USE: C++ Code event not supported when wxWidgets support is "
       "disabled");
   return "";
-#endif
-}
-
-/**
- * Render the event in the bitmap
- */
-void CppCodeEvent::Render(wxDC& dc,
-                          int x,
-                          int y,
-                          unsigned int width,
-                          gd::EventsEditorItemsAreas& areas,
-                          gd::EventsEditorSelection& selection,
-                          const gd::Platform& platform) {
-#if !defined(GD_NO_WX_GUI)
-  gd::EventsRenderingHelper* renderingHelper = gd::EventsRenderingHelper::Get();
-  const int titleTextHeight = 20;
-
-  // Draw header rectangle
-  wxRect headerRect(x, y, width, GetRenderedHeight(width, platform));
-  renderingHelper->DrawNiceRectangle(dc, headerRect);
-
-  // Header
-  dc.SetFont(renderingHelper->GetNiceFont().Bold());
-  if (!IsDisabled())
-    dc.SetTextForeground(wxColour(0, 0, 0));
-  else
-    dc.SetTextForeground(wxColour(160, 160, 160));
-  dc.DrawText(
-      (displayedName.empty() ? _("C++ code") : _("C++ code:")) + displayedName,
-      x + 4,
-      y + 3);
-
-  if (codeDisplayedInEditor) {
-    dc.SetFont(renderingHelper->GetFont());
-    dc.SetBrush(renderingHelper->GetActionsRectangleFillBrush());
-    dc.SetPen(renderingHelper->GetActionsRectangleOutlinePen());
-
-    dc.DrawRectangle(
-        wxRect(x + 4,
-               y + 3 + titleTextHeight + 2,
-               width - 8,
-               GetRenderedHeight(width, platform) - (3 + titleTextHeight + 5)));
-    dc.DrawLabel(inlineCode,
-                 wxNullBitmap,
-                 wxRect(x + 4,
-                        y + 3 + titleTextHeight + 4,
-                        width - 2,
-                        GetRenderedHeight(width, platform)));
-  }
-#endif
-}
-
-unsigned int CppCodeEvent::GetRenderedHeight(
-    unsigned int width, const gd::Platform& platform) const {
-#if !defined(GD_NO_WX_GUI)
-  if (eventHeightNeedUpdate) {
-    gd::EventsRenderingHelper* renderingHelper =
-        gd::EventsRenderingHelper::Get();
-    renderedHeight = 20;
-
-    if (codeDisplayedInEditor) {
-      wxMemoryDC fakeDC;
-      fakeDC.SetFont(renderingHelper->GetFont());
-      renderedHeight += fakeDC.GetMultiLineTextExtent(inlineCode).GetHeight();
-      renderedHeight += 15;  // Borders
-    }
-    eventHeightNeedUpdate = false;
-  }
-
-  return renderedHeight;
-#else
-  return 0;
-#endif
-}
-
-gd::BaseEvent::EditEventReturnType CppCodeEvent::EditEvent(
-    wxWindow* parent_,
-    gd::Project& game_,
-    gd::Layout& scene_,
-    gd::MainFrameWrapper& mainFrameWrapper_) {
-#if !defined(GD_NO_WX_GUI)
-  EditCppCodeEvent dialog(parent_, *this, game_, scene_);
-  int returned = dialog.ShowModal();
-
-  if (returned == 0)
-    return Cancelled;
-  else {
-    // Force recreation of the assocaited source file
-    wxFileName outputFile(associatedGDManagedSourceFile);
-    outputFile.MakeAbsolute(
-        wxFileName::FileName(game_.GetProjectFile()).GetPath());
-    if (wxFileExists(outputFile.GetFullPath()))
-      wxRemoveFile(outputFile.GetFullPath());
-
-    EnsureAssociatedSourceFileIsUpToDate(game_);
-
-    if (returned == 2)
-      return ChangesMadeButNoNeedForEventsRecompilation;
-    else
-      return ChangesMade;
-  }
-#else
-  return ChangesMade;
 #endif
 }
 

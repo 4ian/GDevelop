@@ -12,11 +12,6 @@
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Extensions/ExtensionBase.h"
-#include "GDCpp/IDE/AndroidExporter.h"
-#include "GDCpp/IDE/ChangesNotifier.h"
-#include "GDCpp/IDE/CodeCompiler.h"
-#include "GDCpp/IDE/Dialogs/CppLayoutPreviewer.h"
-#include "GDCpp/IDE/Exporter.h"
 #include "GDCpp/Runtime/FontManager.h"
 #include "GDCpp/Runtime/Project/Behavior.h"
 #include "GDCpp/Runtime/Project/Project.h"
@@ -46,46 +41,9 @@
 #include "GDCpp/Runtime/Project/Object.h"
 #include "GDCpp/Runtime/RuntimeObject.h"
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/config.h>
-#include <wx/filename.h>
-#endif
-
 CppPlatform *CppPlatform::singleton = NULL;
 
-#if defined(GD_IDE_ONLY)
-ChangesNotifier CppPlatform::changesNotifier;
-#endif
-
 CppPlatform::CppPlatform() : gd::Platform() {
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  // Events compiler setup
-  cout << "* Setting up events compiler..." << endl;
-  CodeCompiler::Get()->SetBaseDirectory(wxGetCwd());
-  wxString eventsCompilerTempDir;
-  if (wxConfigBase::Get()->Read("/Dossier/EventsCompilerTempDir",
-                                &eventsCompilerTempDir) &&
-      !eventsCompilerTempDir.empty())
-    CodeCompiler::Get()->SetOutputDirectory(eventsCompilerTempDir);
-  else
-    CodeCompiler::Get()->SetOutputDirectory(wxFileName::GetTempDir() +
-                                            "/GDTemporaries");
-  int eventsCompilerMaxThread = 0;
-  if (wxConfigBase::Get()->Read(
-          "/CodeCompiler/MaxThread", &eventsCompilerMaxThread, 0) &&
-      eventsCompilerMaxThread >= 0)
-    CodeCompiler::Get()->AllowMultithread(eventsCompilerMaxThread > 1,
-                                          eventsCompilerMaxThread);
-  else
-    CodeCompiler::Get()->AllowMultithread(false);
-
-  cout << "* Loading events code compiler configuration" << endl;
-  bool deleteTemporaries;
-  if (wxConfigBase::Get()->Read(
-          _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true))
-    CodeCompiler::Get()->SetMustDeleteTemporaries(deleteTemporaries);
-#endif
-
   ReloadBuiltinExtensions();
 }
 
@@ -151,15 +109,6 @@ bool CppPlatform::AddExtension(
     runtimeObjCreationFunctionTable[objectsTypes[i]] =
         extension->GetRuntimeObjectCreationFunctionPtr(objectsTypes[i]);
   }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  // And Add include directories
-  for (std::size_t i = 0;
-       i < extension->GetSupplementaryIncludeDirectories().size();
-       ++i)
-    CodeCompiler::Get()->AddHeaderDirectory(
-        extension->GetSupplementaryIncludeDirectories()[i]);
-#endif
   return true;
 }
 
@@ -185,26 +134,8 @@ gd::String CppPlatform::GetDescription() const {
       "Windows or Linux.");
 }
 
-#if !defined(GD_NO_WX_GUI)
-std::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(
-    gd::LayoutEditorCanvas &editor) const {
-  return std::make_shared<CppLayoutPreviewer>(editor);
-}
-
-std::vector<std::shared_ptr<gd::ProjectExporter>>
-CppPlatform::GetProjectExporters() const {
-  return std::vector<std::shared_ptr<gd::ProjectExporter>>{
-      std::make_shared<Exporter>(),
-      std::make_shared<AndroidExporter>(gd::NativeFileSystem::Get())};
-}
-#endif
 
 void CppPlatform::OnIDEClosed() {
-#if !defined(GD_NO_WX_GUI)
-  if (CodeCompiler::Get()->MustDeleteTemporaries())
-    CodeCompiler::Get()->ClearOutputDirectory();
-#endif
-
   FontManager::Get()->DestroySingleton();
 }
 #endif

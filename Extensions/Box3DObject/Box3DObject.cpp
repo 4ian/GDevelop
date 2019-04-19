@@ -25,7 +25,6 @@ This project is released under the MIT License.
 
 #if defined(GD_IDE_ONLY)
 #include "Box3DObjectEditor.h"
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCpp/Runtime/CommonTools.h"

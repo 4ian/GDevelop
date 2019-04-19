@@ -16,12 +16,8 @@
 #include "GDCore/Extensions/Metadata/MetadataProvider.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
-#include "GDCore/IDE/Dialogs/ProjectUpdateDialog.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "GDCore/IDE/wxTools/SafeYield.h"
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
@@ -1035,9 +1031,6 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // Add project resources
   worker.ExposeResources(&GetResourcesManager());
   platformSpecificAssets.ExposeResources(worker);
-#if !defined(GD_NO_WX_GUI)
-  gd::SafeYield::Do();
-#endif
 
   // Add layouts resources
   for (std::size_t s = 0; s < GetLayoutsCount(); s++) {
@@ -1060,18 +1053,12 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
       LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
     }
   }
-#if !defined(GD_NO_WX_GUI)
-  gd::SafeYield::Do();
-#endif
 
   // Add global objects resources
   for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
     GetObject(j).ExposeResources(worker);
   }
 
-#if !defined(GD_NO_WX_GUI)
-  gd::SafeYield::Do();
-#endif
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {

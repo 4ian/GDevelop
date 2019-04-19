@@ -8,21 +8,11 @@
 #include <sstream>
 #include <streambuf>
 #include <string>
-#if !defined(GD_NO_WX_GUI)
-#include <wx/config.h>
-#include <wx/dir.h>
-#include <wx/filename.h>
-#include <wx/msgdlg.h>
-#include <wx/progdlg.h>
-#include <wx/wfstream.h>
-#include <wx/zipstrm.h>
-#endif
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
 #include "GDCore/IDE/SceneNameMangler.h"
-#include "GDCore/IDE/wxTools/ShowFolder.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
@@ -665,97 +655,35 @@ bool ExporterHelper::ExportExternalSourceFiles(
 }
 
 bool ExporterHelper::ExportIncludesAndLibs(
-    std::vector<gd::String> &includesFiles, gd::String exportDir, bool minify) {
-#if !defined(GD_NO_WX_GUI)
-  // Includes files :
-  if (minify) {
-    gd::String nodeExec = GetNodeExecutablePath();
-    if (nodeExec.empty() || !fs.FileExists(nodeExec)) {
-      std::cout << "Node.js executable not found." << std::endl;
-      gd::LogWarning(
-          _("The exported script could not be minified: Please check that you "
-            "installed Node.js on your system."));
-      minify = false;
+    std::vector<gd::String> &includesFiles, gd::String exportDir, bool /*minify*/) {
+  for (std::vector<gd::String>::iterator include = includesFiles.begin();
+        include != includesFiles.end();
+        ++include) {
+    if (!fs.IsAbsolute(*include)) {
+      gd::String source = gdjsRoot + "/Runtime/" + *include;
+      if (fs.FileExists(source)) {
+        gd::String path = fs.DirNameFrom(exportDir + "/" + *include);
+        if (!fs.DirExists(path)) fs.MkDir(path);
+
+        fs.CopyFile(source, exportDir + "/" + *include);
+
+        gd::String relativeInclude = source;
+        fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
+        *include = relativeInclude;
+      } else {
+        std::cout << "Could not find GDJS include file " << *include
+                  << std::endl;
+      }
     } else {
-      gd::String jsPlatformDir = wxGetCwd() + "/JsPlatform/";
-      gd::String cmd =
-          nodeExec + " \"" + jsPlatformDir + "Tools/uglify-js/bin/uglifyjs\" ";
+      // Note: all the code generated from events are generated in another
+      // folder and fall in this case:
 
-      gd::String allJsFiles;
-      for (std::vector<gd::String>::iterator include = includesFiles.begin();
-           include != includesFiles.end();
-           ++include) {
-        if (!fs.IsAbsolute(*include)) {
-          gd::String source = gdjsRoot + "/Runtime/" + *include;
-          if (fs.FileExists(source)) allJsFiles += "\"" + source + "\" ";
-        } else {
-          if (fs.FileExists(*include)) allJsFiles += "\"" + *include + "\" ";
-        }
-      }
-
-      cmd += allJsFiles;
-      cmd += "-o \"" + exportDir + "/code.js\"";
-
-      wxArrayString output;
-      wxArrayString errors;
-      long res = wxExecute(cmd, output, errors);
-      if (res != 0) {
-        std::cout << "Execution of \"UglifyJS\" failed (Command line : " << cmd
-                  << ")." << std::endl;
-        std::cout << "Output: ";
-        for (size_t i = 0; i < output.size(); ++i)
-          std::cout << output[i] << std::endl;
-        for (size_t i = 0; i < errors.size(); ++i)
-          std::cout << errors[i] << std::endl;
-
-        gd::LogWarning(
-            _("The exported script could not be minified.\n\nMay be an "
-              "extension is triggering this error: Try to contact the "
-              "developer if you think it is the case."));
-        minify = false;
+      if (fs.FileExists(*include)) {
+        fs.CopyFile(*include, exportDir + "/" + fs.FileNameFrom(*include));
+        *include = fs.FileNameFrom(
+            *include);  // Ensure filename is relative to the export dir.
       } else {
-        includesFiles.clear();
-        InsertUnique(includesFiles, "code.js");
-        return true;
-      }
-    }
-  }
-#else
-  minify = false;
-#endif
-
-  // If the closure compiler failed or was not request, simply copy all the
-  // include files.
-  if (!minify) {
-    for (std::vector<gd::String>::iterator include = includesFiles.begin();
-         include != includesFiles.end();
-         ++include) {
-      if (!fs.IsAbsolute(*include)) {
-        gd::String source = gdjsRoot + "/Runtime/" + *include;
-        if (fs.FileExists(source)) {
-          gd::String path = fs.DirNameFrom(exportDir + "/" + *include);
-          if (!fs.DirExists(path)) fs.MkDir(path);
-
-          fs.CopyFile(source, exportDir + "/" + *include);
-
-          gd::String relativeInclude = source;
-          fs.MakeRelative(relativeInclude, gdjsRoot + "/Runtime/");
-          *include = relativeInclude;
-        } else {
-          std::cout << "Could not find GDJS include file " << *include
-                    << std::endl;
-        }
-      } else {
-        // Note: all the code generated from events are generated in another
-        // folder and fall in this case:
-
-        if (fs.FileExists(*include)) {
-          fs.CopyFile(*include, exportDir + "/" + fs.FileNameFrom(*include));
-          *include = fs.FileNameFrom(
-              *include);  // Ensure filename is relative to the export dir.
-        } else {
-          std::cout << "Could not find include file " << *include << std::endl;
-        }
+        std::cout << "Could not find include file " << *include << std::endl;
       }
     }
   }
@@ -770,36 +698,5 @@ void ExporterHelper::ExportResources(gd::AbstractFileSystem &fs,
   gd::ProjectResourcesCopier::CopyAllResourcesTo(
       project, fs, exportDir, true, progressDialog, false, false);
 }
-
-#if !defined(GD_NO_WX_GUI)
-gd::String ExporterHelper::GetNodeExecutablePath() {
-  std::vector<gd::String> guessPaths;
-  wxString userPath;
-  if (wxConfigBase::Get()->Read("Paths/Node", &userPath) && !userPath.empty())
-    guessPaths.push_back(userPath);
-  else {
-// Try some common paths.
-#if defined(WINDOWS)
-    guessPaths.push_back("C:/Program Files/nodejs/node.exe");
-    guessPaths.push_back("C:/Program Files (x86)/nodejs/node.exe");
-#elif defined(LINUX) || defined(MACOS)
-    guessPaths.push_back("/usr/bin/env/nodejs");
-    guessPaths.push_back("/usr/bin/nodejs");
-    guessPaths.push_back("/usr/local/bin/nodejs");
-    guessPaths.push_back("/usr/bin/env/node");
-    guessPaths.push_back("/usr/bin/node");
-    guessPaths.push_back("/usr/local/bin/node");
-#else
-#warning Please complete this so as to return a path to the Node executable.
-#endif
-  }
-
-  for (size_t i = 0; i < guessPaths.size(); ++i) {
-    if (wxFileExists(guessPaths[i])) return guessPaths[i];
-  }
-
-  return "";
-}
-#endif
 
 }  // namespace gdjs

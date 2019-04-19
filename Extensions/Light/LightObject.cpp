@@ -22,7 +22,6 @@ This project is released under the MIT License.
 #include "LightObject.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "LightObjectEditor.h"

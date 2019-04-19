@@ -5,9 +5,6 @@
  */
 #include <fstream>
 #include <iostream>
-#if !defined(GD_NO_WX_GUI)
-#include <wx/dcmemory.h>
-#endif
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/Builtin/GroupEvent.h"
 #include "GDCore/Events/Builtin/LinkEvent.h"
@@ -15,8 +12,6 @@
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
 #include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
-#include "GDCore/IDE/Dialogs/LinkEventEditor.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Object.h"
@@ -159,92 +154,6 @@ void LinkEvent::UnserializeFrom(gd::Project& project,
       SetIncludeStartAndEnd(includeElement.GetIntAttribute("start"),
                             includeElement.GetIntAttribute("end"));
   }
-}
-
-gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(
-    wxWindow* parent_,
-    gd::Project& project,
-    gd::Layout& scene_,
-    gd::MainFrameWrapper& mainFrameWrapper_) {
-#if !defined(GD_NO_WX_GUI)
-  LinkEventEditor dialog(parent_, *this, project);
-  if (dialog.ShowModal() == 0) return Cancelled;
-#endif
-
-  return ChangesMade;
-}
-
-/**
- * Render the event in the bitmap
- */
-void LinkEvent::Render(wxDC& dc,
-                       int x,
-                       int y,
-                       unsigned int width,
-                       gd::EventsEditorItemsAreas& areas,
-                       gd::EventsEditorSelection& selection,
-                       const gd::Platform& platform) {
-#if !defined(GD_NO_WX_GUI)
-  gd::EventsRenderingHelper* renderingHelper = gd::EventsRenderingHelper::Get();
-
-  dc.SetBrush(wxBrush(wxColour(255, 255, 255)));
-  dc.SetPen(wxPen(wxColour(0, 0, 0), 1));
-  wxRect rect(x + 1, y, width - 2, GetRenderedHeight(width, platform) - 2);
-  dc.DrawRectangle(rect);
-
-  dc.DrawBitmap(gd::SkinHelper::GetIcon("events", 24), x + 4, y + 1, true);
-
-  dc.SetTextBackground(wxColour(255, 255, 255));
-  if (!IsDisabled())
-    dc.SetTextForeground(wxColour(0, 0, 0));
-  else
-    dc.SetTextForeground(wxColour(160, 160, 160));
-
-  dc.SetFont(renderingHelper->GetNiceFont());
-  dc.DrawText(_("Link to ") + GetTarget(), x + 32, y + 3);
-
-  if (GetIncludeConfig() == INCLUDE_BY_INDEX) {
-    wxRect textRect = dc.GetTextExtent(_("Link to ") + GetTarget());
-    dc.DrawText(_("Include only events ") +
-                    gd::String::From(GetIncludeStart() + 1) + _(" to ") +
-                    gd::String::From(GetIncludeEnd() + 1),
-                x + textRect.GetWidth() + 32 + 10,
-                y + 5);
-  } else if (GetIncludeConfig() == INCLUDE_EVENTS_GROUP) {
-    wxRect textRect = dc.GetTextExtent(_("Link to ") + GetTarget());
-    dc.DrawText(_("Include only the events group named \"") +
-                    gd::String::From(GetEventsGroupName()) + _("\""),
-                x + textRect.GetWidth() + 32 + 10,
-                y + 5);
-  }
-#endif
-}
-
-/**
- * Precompute height for the link
- */
-unsigned int LinkEvent::GetRenderedHeight(unsigned int width,
-                                          const gd::Platform& platform) const {
-#if !defined(GD_NO_WX_GUI)
-  if (eventHeightNeedUpdate) {
-    gd::EventsRenderingHelper* renderingHelper =
-        gd::EventsRenderingHelper::Get();
-
-    wxMemoryDC dc;
-    wxBitmap fakeBmp(1, 1);
-    dc.SelectObject(fakeBmp);
-
-    dc.SetFont(renderingHelper->GetNiceFont());
-    wxRect lien = dc.GetTextExtent(_("Link to "));
-
-    renderedHeight = lien.GetHeight() + 15;
-    eventHeightNeedUpdate = false;
-  }
-
-  return renderedHeight;
-#else
-  return 0;
-#endif
 }
 
 }  // namespace gd

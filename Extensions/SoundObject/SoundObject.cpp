@@ -21,7 +21,6 @@ This project is released under the MIT License.
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/AbstractFileSystem.h"
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #include "SoundObjectEditor.h"

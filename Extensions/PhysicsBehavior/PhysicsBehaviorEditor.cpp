@@ -20,7 +20,6 @@ This project is released under the MIT License.
 #include <wx/msw/winundef.h>
 #endif
 #include "GDCore/Extensions/Platform.h"
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/Project/Layout.h"

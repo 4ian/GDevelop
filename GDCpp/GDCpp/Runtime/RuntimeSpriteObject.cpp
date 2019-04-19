@@ -23,7 +23,6 @@
 #include "RuntimeSpriteObject.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.h"
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #endif

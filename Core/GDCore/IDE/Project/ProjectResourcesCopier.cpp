@@ -15,7 +15,6 @@
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ResourcesAbsolutePathChecker.h"
 #include "GDCore/IDE/Project/ResourcesMergingHelper.h"
-#include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"

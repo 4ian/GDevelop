@@ -22,7 +22,6 @@ This project is released under the MIT License.
 #include "ShapePainterObject.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "ShapePainterObjectEditor.h"
 #endif

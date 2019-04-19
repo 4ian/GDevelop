@@ -6,7 +6,6 @@
 
 #include "../TextObject.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/HelpFileAccess.h"

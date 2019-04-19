@@ -13,18 +13,7 @@
 #include "GDCore/Events/InstructionsList.h"
 namespace gd {
 class Instruction;
-}
-namespace gd {
 class Project;
-}
-class RuntimeScene;
-class TiXmlElement;
-class EventsCodeGenerationContext;
-namespace gd {
-class EventsEditorItemsAreas;
-}
-namespace gd {
-class EventsEditorSelection;
 }
 
 namespace gd {
@@ -59,23 +48,6 @@ class GD_CORE_API StandardEvent : public gd::BaseEvent {
   virtual void SerializeTo(SerializerElement& element) const;
   virtual void UnserializeFrom(gd::Project& project,
                                const SerializerElement& element);
-
-  /**
-   * Called by event editor to draw the event.
-   */
-  virtual void Render(wxDC& dc,
-                      int x,
-                      int y,
-                      unsigned int width,
-                      gd::EventsEditorItemsAreas& areas,
-                      gd::EventsEditorSelection& selection,
-                      const gd::Platform& platform);
-
-  /**
-   * Must return the height of the event when rendered
-   */
-  virtual unsigned int GetRenderedHeight(unsigned int width,
-                                         const gd::Platform& platform) const;
 
  private:
   gd::InstructionsList conditions;

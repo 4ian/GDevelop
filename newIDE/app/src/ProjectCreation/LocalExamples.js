@@ -34,6 +34,7 @@ export default class LocalExamples extends Component<Props, State> {
 
   componentDidMount() {
     findExamples(examplesPath => {
+      if (!fs) return;
       fs.readdir(examplesPath, (error, exampleNames) => {
         if (error) {
           console.error('Unable to read examples:', error);
@@ -57,7 +58,7 @@ export default class LocalExamples extends Component<Props, State> {
 
   createFromExample = (exampleName: string) => {
     const { outputPath } = this.state;
-    if (!fs || !outputPath) return;
+    if (!fs || !outputPath || !path) return;
 
     findExamples(examplesPath => {
       fs.mkdirsSync(outputPath);

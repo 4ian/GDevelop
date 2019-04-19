@@ -82,10 +82,12 @@ export default class ResourcesList extends React.Component<Props, State> {
   };
 
   _locateResourceFile = (resource: gdResource) => {
+    if (!path) return;
+    
     const resourceFolderPath = path.dirname(
       getLocalResourceFullPath(this.props.project, resource.getName())
     );
-    electron.shell.openItem(resourceFolderPath);
+    if (electron) electron.shell.openItem(resourceFolderPath);
   };
 
   _openResourceFile = (resource: gdResource) => {
@@ -93,7 +95,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       this.props.project,
       resource.getName()
     );
-    electron.shell.openItem(resourceFilePath);
+    if (electron) electron.shell.openItem(resourceFilePath);
   };
 
   _copyResourceFilePath = (resource: gdResource) => {
@@ -101,13 +103,15 @@ export default class ResourcesList extends React.Component<Props, State> {
       this.props.project,
       resource.getName()
     );
-    electron.clipboard.writeText(resourceFilePath);
+    if (electron) electron.clipboard.writeText(resourceFilePath);
   };
 
   _scanForNewResources = (
     extensions: string,
     createResource: () => gdResource
   ) => {
+    if (!path || !glob) return;
+
     const project = this.props.project;
     const resourcesManager = project.getResourcesManager();
     const projectPath = path.dirname(project.getProjectFile());

@@ -22,7 +22,7 @@ export const openJfxr = ({
   resourcePath,
   extraOptions,
 }: ExternalEditorOpenOptions) => {
-  if (!electron || !ipcRenderer) return;
+  if (!electron || !ipcRenderer || !path) return;
   const projectPath = path.dirname(project.getProjectFile());
   const initialResourcePath = getLocalResourceFullPath(
     project,

@@ -30,13 +30,13 @@ gdjs.RuntimeScene = function(runtimeGame)
     this._gameStopRequested = false;
     this._requestedScene = "";
     this._isLoaded = false; // True if loadFromScene was called and the scene is being played.
-    
+
     /** @type gdjs.RuntimeObject[] */
     this._allInstancesList = []; //An array used to create a list of all instance when necessary ( see _constructListOfAllInstances )
-    
+
     /** @type gdjs.RuntimeObject[] */
     this._instancesRemoved = []; //The instances removed from the scene and waiting to be sent to the cache.
-    
+
     /** @type gdjs.Profiler */
     this._profiler = null; // Set to `new gdjs.Profiler()` to have profiling done on the scene.
     this._onProfilerStopped = null; // The callback function to call when the profiler is stopped.
@@ -141,6 +141,30 @@ gdjs.RuntimeScene.prototype.loadFromScene = function(sceneData) {
     this._timeManager.reset();
 };
 
+/**
+ * Called when a scene is "paused", i.e it will be not be rendered again
+ * for some time, until it's resumed or unloaded.
+ */
+gdjs.RuntimeScene.prototype.onPause = function() {
+    for(var i = 0;i < gdjs.callbacksRuntimeScenePaused.length;++i) {
+        gdjs.callbacksRuntimeScenePaused[i](this);
+    }
+}
+
+/**
+ * Called when a scene is "resumed", i.e it will be rendered again
+ * on screen after having being paused.
+ */
+gdjs.RuntimeScene.prototype.onResume = function() {
+    for(var i = 0;i < gdjs.callbacksRuntimeSceneResumed.length;++i) {
+        gdjs.callbacksRuntimeSceneResumed[i](this);
+    }
+}
+
+/**
+ * Called before a scene is removed from the stack of scenes
+ * rendered on the screen.
+ */
 gdjs.RuntimeScene.prototype.unloadScene = function() {
     if ( !this._isLoaded ) return;
 
@@ -220,26 +244,26 @@ gdjs.RuntimeScene.prototype.setEventsFunction = function(func) {
  */
 gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
     if (this._profiler) this._profiler.beginFrame();
-    
+
     this._requestedChange = gdjs.RuntimeScene.CONTINUE;
     this._timeManager.update(elapsedTime, this._runtimeGame.getMinimalFramerate());
-    
+
     if (this._profiler) this._profiler.begin("objects (pre-events)");
     this._updateObjectsPreEvents();
     if (this._profiler) this._profiler.end("objects (pre-events)");
-    
+
     if (this._profiler) this._profiler.begin("events");
     this._eventsFunction(this);
     if (this._profiler) this._profiler.end("events");
-    
+
     if (this._profiler) this._profiler.begin("objects (post-events)");
     this._updateObjectsPostEvents();
     if (this._profiler) this._profiler.end("objects (post-events)");
-    
+
     if (this._profiler) this._profiler.begin("objects (visibility)");
     this._updateObjectsVisibility();
     if (this._profiler) this._profiler.end("objects (visibility)");
-    
+
     if (this._profiler) this._profiler.begin("render");
 
     // Uncomment to enable debug rendering (look for the implementation in the renderer
@@ -250,7 +274,7 @@ gdjs.RuntimeScene.prototype.renderAndStep = function(elapsedTime) {
 
     this.render();
     if (this._profiler) this._profiler.end("render");
-    
+
     if (this._profiler) this._profiler.endFrame();
 
     return !!this.getRequestedChange();
@@ -706,4 +730,17 @@ gdjs.RuntimeScene.prototype.stopProfiler = function() {
  */
 gdjs.RuntimeScene.prototype.getOnceTriggers = function() {
     return this._onceTriggers;
+}
+
+/**
+ * Get a list of all gdjs.RuntimeObject living on the scene.
+ * You should not, normally, need this method at all. It's only to be used
+ * in exceptional use cases where you need to loop through all objects,
+ * and it won't be performant.
+ * 
+ * @returns {gdjs.RuntimeObject[]} The list of all runtime objects on the scnee
+ */
+gdjs.RuntimeScene.prototype.getAdhocListOfAllInstances = function() {
+    this._constructListOfAllInstances();
+    return this._allInstancesList;
 }

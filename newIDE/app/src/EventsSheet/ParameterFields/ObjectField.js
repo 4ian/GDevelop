@@ -76,3 +76,14 @@ export default class ObjectField extends React.Component<
     );
   }
 }
+export const renderObjectWithThumbnail = (
+  value: string,
+  renderObjectThumbnail: string => React.Node
+) => {
+  return (
+    <span title={value}>
+      {renderObjectThumbnail(value)}
+      {value}
+    </span>
+  );
+};

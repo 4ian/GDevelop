@@ -3,7 +3,10 @@ import createReactContext, { type Context } from 'create-react-context';
 
 export type AlertMessageIdentifier =
   | 'use-non-smoothed-textures'
-  | 'use-nearest-scale-mode';
+  | 'use-nearest-scale-mode'
+  | 'maximum-fps-too-low'
+  | 'minimum-fps-too-low'
+  | 'function-extractor-explanation';
 
 export type PreferencesValues = {|
   language: string,
@@ -13,6 +16,8 @@ export type PreferencesValues = {|
   hiddenAlertMessages: { [AlertMessageIdentifier]: boolean },
   autoDisplayChangelog: boolean,
   lastLaunchedVersion: ?string,
+  eventsSheetShowObjectThumbnails: boolean,
+  autosaveOnPreview: boolean,
 |};
 
 export type Preferences = {|
@@ -25,6 +30,8 @@ export type Preferences = {|
   setAutoDisplayChangelog: (enabled: boolean) => void,
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => void,
   verifyIfIsNewVersion: () => boolean,
+  setEventsSheetShowObjectThumbnails: (enabled: boolean) => void,
+  setAutosaveOnPreview: (enabled: boolean) => void,
 |};
 
 export const initialPreferences = {
@@ -36,6 +43,8 @@ export const initialPreferences = {
     hiddenAlertMessages: {},
     autoDisplayChangelog: true,
     lastLaunchedVersion: undefined,
+    eventsSheetShowObjectThumbnails: true,
+    autosaveOnPreview: true,
   },
   setLanguage: () => {},
   setThemeName: () => {},
@@ -45,6 +54,8 @@ export const initialPreferences = {
   setAutoDisplayChangelog: () => {},
   showAlertMessage: (identifier: AlertMessageIdentifier, show: boolean) => {},
   verifyIfIsNewVersion: () => false,
+  setEventsSheetShowObjectThumbnails: () => {},
+  setAutosaveOnPreview: () => {},
 };
 
 const PreferencesContext: Context<Preferences> = createReactContext(

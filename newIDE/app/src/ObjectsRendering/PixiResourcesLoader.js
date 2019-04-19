@@ -1,6 +1,6 @@
 // @flow
 import slugs from 'slugs';
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 import ResourcesLoader from '../ResourcesLoader';
 import { loadFontFace } from '../Utils/FontFaceLoader';
 const gd = global.gd;
@@ -109,6 +109,38 @@ export default class PixiResourcesLoader {
       resource,
       loadedTextures[resourceName]
     );
+    return loadedTextures[resourceName];
+  }
+
+  /**
+   * Return the PIXI video texture represented by the given resource.
+   * If not loaded, it will load it.
+   * @returns The PIXI.Texture to be used. It can be loading, so you
+   * should listen to PIXI.Texture `update` event, and refresh your object
+   * if this event is triggered.
+   */
+  static getPIXIVideoTexture(project: gdProject, resourceName: string) {
+    if (loadedTextures[resourceName]) {
+      return loadedTextures[resourceName];
+    }
+
+    if (!project.getResourcesManager().hasResource(resourceName))
+      return invalidTexture;
+
+    const resource = project.getResourcesManager().getResource(resourceName);
+    if (resource.getKind() !== 'video') return invalidTexture;
+
+    loadedTextures[resourceName] = PIXI.Texture.fromVideo(
+      ResourcesLoader.getResourceFullUrl(
+        project,
+        resourceName,
+        true /* Disable cache bursting for video because it prevent the video to be recognized as such? */
+      ),
+      PIXI.SCALE_MODES.LINEAR,
+      true /* Treats request as cross-origin */,
+      false /* autoplay */
+    );
+
     return loadedTextures[resourceName];
   }
 

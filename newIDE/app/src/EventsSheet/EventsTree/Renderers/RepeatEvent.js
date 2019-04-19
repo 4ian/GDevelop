@@ -97,6 +97,7 @@ export default class RepeatEvent extends React.Component<
             }
             onParameterClick={this.props.onParameterClick}
             disabled={this.props.disabled}
+            renderObjectThumbnail={this.props.renderObjectThumbnail}
           />
           <InstructionsList
             instrsList={repeatEvent.getActions()}
@@ -114,6 +115,7 @@ export default class RepeatEvent extends React.Component<
             }
             onParameterClick={this.props.onParameterClick}
             disabled={this.props.disabled}
+            renderObjectThumbnail={this.props.renderObjectThumbnail}
           />
         </div>
         <InlinePopover

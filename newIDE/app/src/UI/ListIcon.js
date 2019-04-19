@@ -2,6 +2,7 @@
 import React, { PureComponent } from 'react';
 import IconButton from 'material-ui/IconButton';
 import ThemeConsumer from './Theme/ThemeConsumer';
+// No i18n in this file
 
 type Props = {
   src: string,

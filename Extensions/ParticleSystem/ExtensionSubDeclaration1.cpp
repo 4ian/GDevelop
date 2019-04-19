@@ -322,9 +322,9 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
       .SetManipulatedType("number");
 
   obj.AddAction("ParticleGravityX",
-                _("X Gravity"),
+                _("Gravity value on X axis"),
                 _("Change value of the gravity on X axis."),
-                _("Do _PARAM1__PARAM2_ to the direction of gravity on X axis "
+                _("Do _PARAM1__PARAM2_ to the value of gravity on X axis "
                   "of _PARAM0_"),
                 _("Advanced"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
@@ -336,9 +336,9 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleGravityX",
-         _("Direction of gravity on X axis"),
-         _("Direction of the gravity on X axis."),
-         _("Direction of gravity on X axis of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("Gravity value on X axis"),
+         _("Compare value of the gravity on X axis."),
+         _("Value of gravity on X axis of _PARAM0_ is _PARAM1__PARAM2_"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -348,10 +348,10 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
       .SetManipulatedType("number");
 
   obj.AddAction("ParticleGravityY",
-                _("Y Gravity"),
+                _("Gravity value on Y axis"),
                 _("Change value of the gravity on Y axis."),
-                _("Do _PARAM1__PARAM2_ to the direction of gravity on Y axis "
-                  "of_PARAM0_"),
+                _("Do _PARAM1__PARAM2_ to the value of gravity on Y axis "
+                  "of _PARAM0_"),
                 _("Advanced"),
                 "CppPlatform/Extensions/particleSystemicon24.png",
                 "CppPlatform/Extensions/particleSystemicon16.png")
@@ -362,9 +362,9 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
 
   obj.AddCondition(
          "ParticleGravityY",
-         _("Direction of the gravity on Y axis"),
-         _("Test direction of gravity on Y axis"),
-         _("Direction of gravity on Y axis of _PARAM0_ is _PARAM1__PARAM2_"),
+         _("Gravity value on Y axis"),
+         _("Compare value of the gravity on Y axis."),
+         _("Value of gravity on Y axis of _PARAM0_ is _PARAM1__PARAM2_"),
          _("Advanced"),
          "CppPlatform/Extensions/particleSystemicon24.png",
          "CppPlatform/Extensions/particleSystemicon16.png")
@@ -413,7 +413,7 @@ void ExtensionSubDeclaration1(gd::ObjectMetadata& obj) {
 
   obj.AddCondition("ParticleGravityAngle",
                    _("Gravity angle"),
-                   _("Test the gravity angle the emitter"),
+                   _("Test the gravity angle of the emitter"),
                    _("Gravity angle of _PARAM0_ is _PARAM1__PARAM2_"),
                    _("Common"),
                    "CppPlatform/Extensions/particleSystemicon24.png",

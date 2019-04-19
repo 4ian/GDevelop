@@ -15,7 +15,7 @@ import WindowBorder from './WindowBorder';
 import WindowMask from './WindowMask';
 import DropHandler from './DropHandler';
 import BackgroundColor from './BackgroundColor';
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 import FpsLimiter from './FpsLimiter';
 import { startPIXITicker, stopPIXITicker } from '../Utils/PIXITicker';
 
@@ -37,9 +37,26 @@ export default class InstancesEditorContainer extends Component {
   }
 
   componentDidMount() {
+    // Initialize the PIXI renderer, if possible
+    if (this.canvasArea && !this.pixiRenderer) {
+      this._initializeCanvasAndRenderer();
+    }
+  }
+
+  componentDidUpdate() {
+    // Initialize the PIXI renderer, if not already done.
+    // This can happen if canvasArea was not rendered
+    // just after the mount (depends on react-dnd versions?).
+    if (this.canvasArea && !this.pixiRenderer) {
+      this._initializeCanvasAndRenderer();
+    }
+  }
+
+  _initializeCanvasAndRenderer() {
     this.pixiRenderer = PIXI.autoDetectRenderer(
       this.props.width,
-      this.props.height
+      this.props.height,
+      { antialias: true } //fixes jaggy edges
     );
     this.canvasArea.appendChild(this.pixiRenderer.view);
     this.pixiRenderer.view.addEventListener('contextmenu', e => {
@@ -544,7 +561,7 @@ export default class InstancesEditorContainer extends Component {
     );
   };
 
-  getViewPosition = () => {
+  getViewPosition = () /*: ?ViewPosition */ => {
     return this.viewPosition;
   };
 

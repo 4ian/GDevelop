@@ -95,6 +95,7 @@ export default class LocalCocos2dExport extends Component {
         </Line>
         <Line>
           <LocalFolderPicker
+            type="export"
             value={this.state.outputDir}
             defaultPath={project.getLastCompilationDirectory()}
             onChange={value => this.setState({ outputDir: value })}

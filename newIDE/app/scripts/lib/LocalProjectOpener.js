@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 module.exports = {
-  readProjectJSONFile: (filepath) => {
+  readProjectFile: (filepath) => {
     return new Promise((resolve, reject) => {
       if (!fs) return reject('Not supported');
 

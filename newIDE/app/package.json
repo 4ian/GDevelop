@@ -21,7 +21,7 @@
     "react-scripts": "2.1.4",
     "recursive-readdir": "^2.2.2",
     "shelljs": "^0.7.7",
-    "unzip2": "^0.2.5"
+    "unzipper": "^0.9.11"
   },
   "dependencies": {
     "@lingui/react": "git://github.com/4ian/lingui-react.git#master",
@@ -41,8 +41,8 @@
     "material-ui": "0.20",
     "material-ui-search-bar": "0.4.1",
     "node-require-function": "^1.2.0",
-    "pixi-simple-gesture": "0.2.2",
-    "pixi.js": "3.0.11",
+    "pixi-simple-gesture": "git://github.com/4ian/pixi-simple-gesture#v3.0.0",
+    "pixi.js": "4.8.6",
     "prop-types": "^15.5.10",
     "randomcolor": "^0.5.3",
     "raven-js": "^3.19.1",

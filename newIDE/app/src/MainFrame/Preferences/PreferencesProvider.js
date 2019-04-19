@@ -32,6 +32,10 @@ export default class PreferencesProvider extends React.Component<Props, State> {
     setAutoDisplayChangelog: this._setAutoDisplayChangelog.bind(this),
     showAlertMessage: this._showAlertMessage.bind(this),
     verifyIfIsNewVersion: this._verifyIfIsNewVersion.bind(this),
+    setEventsSheetShowObjectThumbnails: this._setEventsSheetShowObjectThumbnails.bind(
+      this
+    ),
+    setAutosaveOnPreview: this._setAutosaveOnPreview.bind(this),
   };
 
   componentDidMount() {
@@ -44,6 +48,32 @@ export default class PreferencesProvider extends React.Component<Props, State> {
         values: {
           ...state.values,
           language,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setEventsSheetShowObjectThumbnails(
+    eventsSheetShowObjectThumbnails: boolean
+  ) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          eventsSheetShowObjectThumbnails,
+        },
+      }),
+      () => this._persistValuesToLocalStorage(this.state)
+    );
+  }
+
+  _setAutosaveOnPreview(autosaveOnPreview: boolean) {
+    this.setState(
+      state => ({
+        values: {
+          ...state.values,
+          autosaveOnPreview,
         },
       }),
       () => this._persistValuesToLocalStorage(this.state)

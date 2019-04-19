@@ -1,3 +1,4 @@
+// @flow
 import { Trans } from '@lingui/macro';
 import React, { Component } from 'react';
 import Divider from 'material-ui/Divider';
@@ -15,19 +16,29 @@ const app = electron ? electron.remote.app : null;
 var fs = optionalRequire('fs-extra');
 const gd = global.gd;
 
-export default class LocalStarters extends Component {
+type Props = {|
+  onOpen: string => void,
+  onCreate: gdProject => void,
+  onShowExamples: () => void,
+|};
+
+type State = {|
+  outputPath: string,
+|};
+
+export default class LocalStarters extends Component<Props, State> {
   state = {
     outputPath: findEmptyPath(
-      path ? path.join(app.getPath('home'), 'GDevelop projects') : ''
+      path && app ? path.join(app.getPath('home'), 'GDevelop projects') : ''
     ),
   };
 
-  _handleChangePath = outputPath =>
+  _handleChangePath = (outputPath: string) =>
     this.setState({
       outputPath,
     });
 
-  createFromExample(exampleName) {
+  createFromExample(exampleName: string) {
     const { outputPath } = this.state;
     if (!fs || !outputPath) return;
 
@@ -103,6 +114,35 @@ export default class LocalStarters extends Component {
                 onClick={() => this.createFromExample('isometric-game')}
               />
               <ListItem
+                primaryText="Downhill Bike Racing"
+                secondaryText={
+                  <p>
+                    <Trans>
+                      An example of a 2D physics based driving game, where
+                      player have to reach the end as fast as possible.
+                    </Trans>
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() =>
+                  this.createFromExample('downhill-bike-physics-demo')
+                }
+              />
+              <ListItem
+                primaryText="Pairs"
+                secondaryText={
+                  <p>
+                    <Trans>
+                      Find all matching pairs of cards in this relaxing game.
+                      Use tweens to create smooth, natural animations with a few
+                      events.
+                    </Trans>
+                  </p>
+                }
+                secondaryTextLines={2}
+                onClick={() => this.createFromExample('pairs')}
+              />
+              <ListItem
                 primaryText={<Trans>Empty game</Trans>}
                 secondaryText={
                   <p>
@@ -128,8 +168,7 @@ export default class LocalStarters extends Component {
               fullWidth
               value={this.state.outputPath}
               onChange={this._handleChangePath}
-              title={<Trans>Folder where to create the game</Trans>}
-              message={<Trans>Choose where to create the game</Trans>}
+              type="create-game"
             />
           </Column>
         </Line>

@@ -1,5 +1,5 @@
 import transformRect from '../Utils/TransformRect';
-import PIXI from 'pixi.js';
+import * as PIXI from 'pixi.js';
 
 export default class InstancesSelection {
   constructor({ instanceMeasurer, toCanvasCoordinates }) {
@@ -9,6 +9,15 @@ export default class InstancesSelection {
     this.highlightedInstance = null;
     this.highlightRectangle = new PIXI.Graphics();
     this.highlightRectangle.hitArea = new PIXI.Rectangle(0, 0, 0, 0);
+
+    this.tooltipBackground = new PIXI.Graphics();
+    this.tooltipText = new PIXI.Text('', {
+      fontSize: 17,
+      fill: 0xffffff,
+      align: 'center',
+    });
+    this.highlightRectangle.addChild(this.tooltipBackground);
+    this.highlightRectangle.addChild(this.tooltipText);
   }
 
   setInstance(instance) {
@@ -47,5 +56,38 @@ export default class InstancesSelection {
       highlightRectangle.height
     );
     this.highlightRectangle.endFill();
+
+    const tooltipInfo =
+      this.highlightedInstance.getObjectName() +
+      '\n' +
+      'X: ' +
+      parseInt(this.highlightedInstance.getX()) +
+      '  Y: ' +
+      parseInt(this.highlightedInstance.getY()) +
+      '\n' +
+      'Layer: ' +
+      this.highlightedInstance.getLayer() +
+      '  Z: ' +
+      this.highlightedInstance.getZOrder() +
+      '\n';
+    this.tooltipText.text = tooltipInfo;
+
+    this.tooltipText.x =
+      highlightRectangle.x -
+      this.tooltipText.width / 2 +
+      highlightRectangle.width / 2;
+    this.tooltipText.y = highlightRectangle.y - this.tooltipText.height;
+
+    const padding = 5;
+    this.tooltipBackground.clear();
+    this.tooltipBackground.beginFill(0x000000, 0.8);
+    this.tooltipBackground.drawRoundedRect(
+      this.tooltipText.x - padding,
+      this.tooltipText.y - padding,
+      this.tooltipText.width + padding * 2,
+      this.tooltipText.height - padding,
+      4
+    );
+    this.tooltipBackground.endFill();
   }
 }

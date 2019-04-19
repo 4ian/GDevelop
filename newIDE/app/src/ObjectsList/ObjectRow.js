@@ -22,6 +22,20 @@ const styles = {
   },
 };
 
+const getPasteLabel = isGlobalObject => {
+  let clipboardObjectName = '';
+  if (Clipboard.has(CLIPBOARD_KIND)) {
+    const clipboardContent = Clipboard.get(CLIPBOARD_KIND);
+    if (clipboardContent) {
+      clipboardObjectName = clipboardContent.name;
+    }
+  }
+
+  return isGlobalObject
+    ? 'Paste ' + clipboardObjectName + ' as a Global Object'
+    : 'Paste ' + clipboardObjectName;
+};
+
 class ThemableObjectRow extends React.Component {
   _renderObjectMenu(object) {
     return (
@@ -74,7 +88,7 @@ class ThemableObjectRow extends React.Component {
             click: () => this.props.onCutObject(),
           },
           {
-            label: 'Paste',
+            label: getPasteLabel(this.props.isGlobalObject),
             enabled: Clipboard.has(CLIPBOARD_KIND),
             click: () => this.props.onPasteObject(),
           },
@@ -131,6 +145,7 @@ class ThemableObjectRow extends React.Component {
           ...styles.objectName,
           color: selected ? muiTheme.listItem.selectedTextColor : undefined,
           fontStyle: isGlobalObject ? 'italic' : undefined,
+          fontWeight: isGlobalObject ? 'bold' : 'normal',
         }}
       >
         {objectName}

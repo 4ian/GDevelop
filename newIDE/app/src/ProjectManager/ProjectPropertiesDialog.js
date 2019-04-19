@@ -11,6 +11,7 @@ import SemiControlledTextField from '../UI/SemiControlledTextField';
 import SubscriptionChecker from '../Profile/SubscriptionChecker';
 import { getErrors, displayProjectErrorsBox } from './ProjectErrorsChecker';
 import DismissableAlertMessage from '../UI/DismissableAlertMessage';
+import { Line, Column } from '../UI/Grid';
 
 type Props = {|
   project: gdProject,
@@ -32,6 +33,9 @@ type State = {|
   scaleMode: 'linear' | 'nearest',
   sizeOnStartupMode: string,
   showGDevelopSplash: boolean,
+  minFPS: number,
+  maxFPS: number,
+  isFolderProject: boolean,
 |};
 
 class ProjectPropertiesDialog extends React.Component<Props, State> {
@@ -55,6 +59,9 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       scaleMode: project.getScaleMode(),
       sizeOnStartupMode: project.getSizeOnStartupMode(),
       showGDevelopSplash: project.getLoadingScreen().isGDevelopSplashShown(),
+      minFPS: project.getMinimumFPS(),
+      maxFPS: project.getMaximumFPS(),
+      isFolderProject: project.isFolderProject(),
     };
   }
 
@@ -82,6 +89,9 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
+      minFPS,
+      maxFPS,
+      isFolderProject,
     } = this.state;
     project.setDefaultWidth(windowDefaultWidth);
     project.setDefaultHeight(windowDefaultHeight);
@@ -93,7 +103,10 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
     project.setAdMobAppId(adMobAppId);
     project.setScaleMode(scaleMode);
     project.setSizeOnStartupMode(sizeOnStartupMode);
+    project.setMinimumFPS(minFPS);
+    project.setMaximumFPS(maxFPS);
     project.getLoadingScreen().showGDevelopSplash(showGDevelopSplash);
+    project.setFolderProject(isFolderProject);
 
     if (!displayProjectErrorsBox(t, getErrors(t, project))) return;
 
@@ -126,6 +139,9 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
       scaleMode,
       sizeOnStartupMode,
       showGDevelopSplash,
+      minFPS,
+      maxFPS,
+      isFolderProject,
     } = this.state;
 
     const defaultPackageName = 'com.example.mygame';
@@ -185,6 +201,84 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
             value={version}
             onChange={value => this.setState({ version: value })}
           />
+          <SelectField
+            fullWidth
+            floatingLabelText={<Trans>Project file type</Trans>}
+            value={isFolderProject}
+            onChange={(e, i, value) =>
+              this.setState({ isFolderProject: value })
+            }
+          >
+            <MenuItem
+              value={false}
+              primaryText={<Trans>Single file (default)</Trans>}
+            />
+            <MenuItem
+              value={true}
+              primaryText={
+                <Trans>
+                  Multiple files, saved in folder next to the main file
+                </Trans>
+              }
+            />
+          </SelectField>
+          <Line noMargin>
+            <Column expand noMargin>
+              <SemiControlledTextField
+                floatingLabelText={<Trans>Minimum FPS</Trans>}
+                fullWidth
+                type="number"
+                value={'' + minFPS}
+                onChange={value =>
+                  this.setState({
+                    minFPS: Math.max(0, parseInt(value, 10)),
+                  })
+                }
+              />
+            </Column>
+            <Column expand noMargin>
+              <SemiControlledTextField
+                floatingLabelText={<Trans>Maximum FPS (0 to disable)</Trans>}
+                fullWidth
+                type="number"
+                value={'' + maxFPS}
+                onChange={value =>
+                  this.setState({
+                    maxFPS: Math.max(0, parseInt(value, 10)),
+                  })
+                }
+              />
+            </Column>
+          </Line>
+          {maxFPS > 0 && maxFPS < 60 && (
+            <DismissableAlertMessage
+              identifier="maximum-fps-too-low"
+              kind="warning"
+            >
+              <Trans>
+                Most monitors have a refresh rate of 60 FPS. Setting a maximum
+                number of FPS under 60 will force the game to skip frames, and
+                the real number of FPS will be way below 60, making the game
+                laggy and impacting the gameplay negatively. Consider putting 60
+                or more for the maximum number or FPS, or disable it by setting
+                0.
+              </Trans>
+            </DismissableAlertMessage>
+          )}
+          {minFPS < 20 && (
+            <DismissableAlertMessage
+              identifier="minimum-fps-too-low"
+              kind="warning"
+            >
+              <Trans>
+                Setting the minimum number of FPS below 20 will increase a lot
+                the time that is allowed between the simulation of two frames of
+                the game. If case of a sudden slowdown, or on slow computers,
+                this can create buggy behaviors like objects passing beyond a
+                wall. Consider setting 20 as the minimum FPS.
+              </Trans>
+            </DismissableAlertMessage>
+          )}
           <SemiControlledTextField
             floatingLabelText={
               <Trans>Package name (for iOS and Android)</Trans>
@@ -244,9 +338,11 @@ class ProjectPropertiesDialog extends React.Component<Props, State> {
               identifier="use-non-smoothed-textures"
               kind="info"
             >
-              To obtain the best pixel-perfect effect possible, go in the
-              resources editor and disable the Smoothing for all images of your
-              game.
+              <Trans>
+                To obtain the best pixel-perfect effect possible, go in the
+                resources editor and disable the Smoothing for all images of
+                your game.
+              </Trans>
             </DismissableAlertMessage>
           )}
           <SelectField

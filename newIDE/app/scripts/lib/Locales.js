@@ -29,6 +29,13 @@ const getLocales = () => {
   });
 };
 
+const getLocaleSourceCatalogFiles = localeName => {
+  if (localeName === 'en') return ['ide-messages.pot'];
+  if (localeName === 'pseudo_LOCALE') return ['ide-messages.pot'];
+
+  return ['ide-messages.po', 'gdcore-gdcpp-gdjs-extensions-messages.po'];
+}
+
 const getLocalePath = localeName => {
   return path.join(localesBasePath, localeName);
 };
@@ -56,6 +63,8 @@ const getLocaleName = langCode => {
     return 'Serbian (Latin)';
   } else if (langCode === 'fil_PH') {
     return 'Filipino';
+  } else if (langCode === 'pseudo_LOCALE') {
+    return 'for development only';
   }
 
   return ISO6391.getName(getShortestCode(langCode));
@@ -71,6 +80,8 @@ const getLocaleNativeName = langCode => {
     return 'srpski';
   } else if (langCode === 'fil_PH') {
     return 'Mga Filipino';
+  } else if (langCode === 'pseudo_LOCALE') {
+    return 'Pseudolocalization';
   }
 
   return ISO6391.getNativeName(getShortestCode(langCode));
@@ -79,6 +90,7 @@ const getLocaleNativeName = langCode => {
 module.exports = {
   getLocales,
   getLocalePath,
+  getLocaleSourceCatalogFiles,
   getLocaleCatalogPath,
   getLocaleCompiledCatalogPath,
   getLocaleMetadataPath,

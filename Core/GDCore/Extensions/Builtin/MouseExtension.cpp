@@ -221,7 +221,7 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsMouseExtension(
       .AddCodeOnlyParameter("currentScene", "")
       .AddParameter("expression", _("Touch identifier"))
       .AddParameter("relationalOperator", _("Sign of the test"))
-      .AddParameter("expression", _("X position"))
+      .AddParameter("expression", _("Y position"))
       .AddParameter("layer", _("Layer (base layer if empty)"), "", true)
       .SetDefaultValue("\"\"")
       .AddParameter("expression", _("Camera number (default : 0)"), "", true)

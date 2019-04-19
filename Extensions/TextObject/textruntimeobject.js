@@ -202,6 +202,13 @@ gdjs.TextRuntimeObject.prototype.setColor = function(str) {
     this._renderer.updateStyle();
 };
 
+/**
+ * Get the text color.
+ * @return {String} The color as a "R;G;B" string, for example: "255;0;0"
+ */
+gdjs.TextRuntimeObject.prototype.getColor = function(str) {
+    return this._color[0] + ";" + this._color[1] + ";" + this._color[2];
+};
 
 /**
  * Return true if word wrapping is enabled for the text.

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react';
 
-export type ResourceKind = 'image' | 'audio' | 'font';
+export type ResourceKind = 'image' | 'audio' | 'font' | 'video';
 
 export type ResourceSource = {
   name: string,

@@ -10,7 +10,6 @@ import ChevronLeft from 'material-ui/svg-icons/navigation/chevron-left';
 import ChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import IconButton from 'material-ui/IconButton';
 import InlineCheckbox from '../UI/InlineCheckbox';
-import { showMessageBox } from '../UI/Messages/MessageBox';
 import {
   type SearchInEventsInputs,
   type ReplaceInEventsInputs,
@@ -25,20 +24,22 @@ type Props = {|
   onGoToNextSearchResult: () => ?gdBaseEvent,
 |};
 type State = {|
-  searchDirty: boolean,
   searchText: string,
   replaceText: string,
   matchCase: boolean,
+  searchInActions: boolean,
+  searchInConditions: boolean,
   searchInSelection: boolean,
 |};
 
 export default class SearchPanel extends PureComponent<Props, State> {
   searchTextField: ?TextField;
   state = {
-    searchDirty: false,
     searchText: '',
     replaceText: '',
     matchCase: false,
+    searchInActions: true,
+    searchInConditions: true,
     searchInSelection: false,
   };
 
@@ -49,41 +50,41 @@ export default class SearchPanel extends PureComponent<Props, State> {
   };
 
   launchSearch = () => {
-    const { searchText, searchInSelection, matchCase } = this.state;
+    const {
+      searchText,
+      searchInSelection,
+      matchCase,
+      searchInActions,
+      searchInConditions,
+    } = this.state;
     this.props.onSearchInEvents({
       searchInSelection,
       searchText,
       matchCase,
-      searchInActions: true,
-      searchInConditions: true,
-    });
-    this.setState({
-      searchDirty: false,
+      searchInActions,
+      searchInConditions,
     });
   };
 
   launchReplace = () => {
     const {
-      searchDirty,
       searchText,
       replaceText,
       searchInSelection,
       matchCase,
+      searchInActions,
+      searchInConditions,
     } = this.state;
-    if (searchDirty) {
-      showMessageBox(
-        'Click on Search first, inspect the results and then click on Replace to do the replacement(s).'
-      );
-      return;
-    }
+
+    this.launchSearch();
 
     this.props.onReplaceInEvents({
       searchInSelection,
       searchText,
       replaceText,
       matchCase,
-      searchInActions: true,
-      searchInConditions: true,
+      searchInActions,
+      searchInConditions,
     });
   };
 
@@ -105,9 +106,7 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 (this.searchTextField = _searchTextField)
               }
               hintText={<Trans>Text to search</Trans>}
-              onChange={(e, searchText) =>
-                this.setState({ searchText, searchDirty: true })
-              }
+              onChange={(e, searchText) => this.setState({ searchText })}
               value={searchText}
               fullWidth
             />
@@ -141,6 +140,23 @@ export default class SearchPanel extends PureComponent<Props, State> {
                 label={<Trans>Case insensitive</Trans>}
                 checked={!this.state.matchCase}
                 onCheck={(e, checked) => this.setState({ matchCase: !checked })}
+              />
+              <p>
+                <Trans>Filter by</Trans>
+              </p>
+              <InlineCheckbox
+                label={<Trans>Conditions</Trans>}
+                checked={this.state.searchInConditions}
+                onCheck={(e, checked) =>
+                  this.setState({ searchInConditions: checked })
+                }
+              />
+              <InlineCheckbox
+                label={<Trans>Actions</Trans>}
+                checked={this.state.searchInActions}
+                onCheck={(e, checked) =>
+                  this.setState({ searchInActions: checked })
+                }
               />
               {/* <InlineCheckbox //TODO: Implement search/replace in selection
                 label={<Trans>Replace in selection</Trans>}

@@ -127,6 +127,7 @@ class LocalCordovaExport extends Component<Props, State> {
         </Line>
         <Line>
           <LocalFolderPicker
+            type="export"
             value={this.state.outputDir}
             defaultPath={project.getLastCompilationDirectory()}
             onChange={value => this.setState({ outputDir: value })}

@@ -15,7 +15,6 @@ import Window from '../../Utils/Window';
 import PreferencesContext, {
   type AlertMessageIdentifier,
 } from './PreferencesContext';
-const gd = global.gd;
 
 type Props = {|
   open: boolean,
@@ -66,6 +65,8 @@ export default class PreferencesDialog extends Component<Props, State> {
             setAutoDownloadUpdates,
             showAlertMessage,
             setAutoDisplayChangelog,
+            setEventsSheetShowObjectThumbnails,
+            setAutosaveOnPreview,
           }) => {
             const dismissedAlertMessages = getDismissedAlertMessages(
               values.hiddenAlertMessages
@@ -137,20 +138,22 @@ export default class PreferencesDialog extends Component<Props, State> {
                 </Line>
                 <Line>
                   <Toggle
-                    onToggle={(e, check) => {
-                      gd.ExpressionCodeGenerator.useOldExpressionParser(!check);
-                      this.forceUpdate();
-                    }}
-                    toggled={
-                      !gd.ExpressionCodeGenerator.isUsingOldExpressionParser()
+                    onToggle={(e, check) =>
+                      setEventsSheetShowObjectThumbnails(check)
                     }
+                    toggled={values.eventsSheetShowObjectThumbnails}
                     labelPosition="right"
                     label={
-                      <Trans>
-                        Use the new expression parser (alpha, please report any
-                        bugs)
-                      </Trans>
+                      <Trans>Display object thumbnails in Events Sheets</Trans>
                     }
+                  />
+                </Line>
+                <Line>
+                  <Toggle
+                    onToggle={(e, check) => setAutosaveOnPreview(check)}
+                    toggled={values.autosaveOnPreview}
+                    labelPosition="right"
+                    label={<Trans>Auto-save project on Preview</Trans>}
                   />
                 </Line>
                 <Line>

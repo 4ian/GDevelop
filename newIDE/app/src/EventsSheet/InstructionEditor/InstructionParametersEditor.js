@@ -1,5 +1,8 @@
 // @flow
 import { Trans } from '@lingui/macro';
+import { t } from '@lingui/macro';
+import { I18n } from '@lingui/react';
+import { type I18n as I18nType } from '@lingui/core';
 
 import * as React from 'react';
 import Divider from 'material-ui/Divider';
@@ -15,7 +18,10 @@ import {
 import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExternalEditor.flow';
 import { Line } from '../../UI/Grid';
 import AlertMessage from '../../UI/AlertMessage';
-import { getDeprecatedInstructionInformation } from '../../Hints';
+import { getExtraInstructionInformation } from '../../Hints';
+import { isAnEventFunctionMetadata } from '../../EventsFunctionsExtensionsLoader';
+import OpenInNew from 'material-ui/svg-icons/action/open-in-new';
+import IconButton from 'material-ui/IconButton';
 const gd = global.gd;
 
 const styles = {
@@ -33,14 +39,11 @@ const styles = {
     flex: 1,
     overflowY: 'auto',
   },
-  instructionHeader: {
-    display: 'flex',
-    alignItems: 'center',
-  },
   icon: {
     width: 24,
     height: 24,
     marginRight: 8,
+    flexShrink: 0,
   },
   invertToggle: {
     marginTop: 8,
@@ -59,14 +62,23 @@ type Props = {|
   onChooseResource: ChooseResourceFunction,
   resourceExternalEditors: Array<ResourceExternalEditor>,
   style?: Object,
+  openInstructionOrExpression: (
+    extension: gdPlatformExtension,
+    type: string
+  ) => void,
 |};
-type State = {||};
+type State = {|
+  isDirty: boolean,
+|};
 
 export default class InstructionParametersEditor extends React.Component<
   Props,
   State
 > {
   _firstVisibleField: ?any = {};
+  state = {
+    isDirty: false,
+  };
 
   componentDidMount() {
     if (this.props.focusOnMount) {
@@ -114,6 +126,34 @@ export default class InstructionParametersEditor extends React.Component<
         );
   };
 
+  _openExtension = (i18n: I18nType) => {
+    if (this.state.isDirty) {
+      //eslint-disable-next-line
+      const answer = confirm(
+        i18n._(
+          t`You've made some changes here. Are you sure you want to discard them and open the function?`
+        )
+      );
+      if (!answer) return;
+    }
+
+    const { instruction, isCondition, project } = this.props;
+    const type = instruction.getType();
+    if (!type) return null;
+
+    const extension = isCondition
+      ? gd.MetadataProvider.getExtensionAndConditionMetadata(
+          project.getCurrentPlatform(),
+          type
+        ).getExtension()
+      : gd.MetadataProvider.getExtensionAndActionMetadata(
+          project.getCurrentPlatform(),
+          type
+        ).getExtension();
+
+    this.props.openInstructionOrExpression(extension, type);
+  };
+
   _renderEmpty() {
     return (
       <div style={{ ...styles.emptyContainer, ...this.props.style }}>
@@ -141,112 +181,127 @@ export default class InstructionParametersEditor extends React.Component<
 
     const helpPage = instructionMetadata.getHelpPath();
 
-    const deprecatedInstructionInformation = getDeprecatedInstructionInformation(
-      _ => _,
-      type
-    );
+    const instructionExtraInformation = getExtraInstructionInformation(type);
 
     //TODO?
     instruction.setParametersCount(instructionMetadata.getParametersCount());
 
     let parameterFieldIndex = 0;
     return (
-      <div style={styles.container}>
-        <div style={styles.instructionHeader}>
-          <img
-            src={instructionMetadata.getIconFilename()}
-            alt=""
-            style={styles.icon}
-          />
-          <p>{instructionMetadata.getDescription()}</p>
-        </div>
-        {deprecatedInstructionInformation && (
-          <Line>
-            <AlertMessage kind="warning">
-              {deprecatedInstructionInformation.warning}
-            </AlertMessage>
-          </Line>
-        )}
-        <Divider />
-        <div key={type} style={styles.parametersContainer}>
-          {mapFor(0, instructionMetadata.getParametersCount(), i => {
-            const parameterMetadata = instructionMetadata.getParameter(i);
-            const parameterMetadataType = parameterMetadata.getType();
-            const ParameterComponent = ParameterRenderingService.getParameterComponent(
-              parameterMetadataType
-            );
-
-            if (parameterMetadata.isCodeOnly()) return null;
-            if (!ParameterComponent) {
-              console.warn(
-                'Missing parameter component for',
-                parameterMetadataType
-              );
-              return null;
-            }
-
-            // Track the field count on screen, to affect the ref to the
-            // first visible field.
-            const isFirstVisibleParameterField = parameterFieldIndex === 0;
-            parameterFieldIndex++;
-
-            return (
-              <ParameterComponent
-                parameterMetadata={parameterMetadata}
-                project={project}
-                layout={layout}
-                globalObjectsContainer={globalObjectsContainer}
-                objectsContainer={objectsContainer}
-                value={instruction.getParameter(i)}
-                instructionOrExpression={instruction}
-                key={i}
-                onChange={value => {
-                  instruction.setParameter(i, value);
-                  this.forceUpdate();
-                }}
-                parameterRenderingService={ParameterRenderingService}
-                resourceSources={this.props.resourceSources}
-                onChooseResource={this.props.onChooseResource}
-                resourceExternalEditors={this.props.resourceExternalEditors}
-                ref={field => {
-                  if (isFirstVisibleParameterField) {
-                    this._firstVisibleField = field;
-                  }
-                }}
+      <I18n>
+        {({ i18n }) => (
+          <div style={styles.container}>
+            <Line alignItems="center">
+              <img
+                src={instructionMetadata.getIconFilename()}
+                alt=""
+                style={styles.icon}
               />
-            );
-          })}
-          {this._getNonCodeOnlyParametersCount(instructionMetadata) === 0 && (
-            <EmptyMessage>
-              <Trans>There is nothing to configure.</Trans>
-            </EmptyMessage>
-          )}
-          {this.props.isCondition && (
-            <Toggle
-              label={<Trans>Invert condition</Trans>}
-              labelPosition="right"
-              toggled={instruction.isInverted()}
-              style={styles.invertToggle}
-              onToggle={(e, enabled) => {
-                instruction.setInverted(enabled);
-                this.forceUpdate();
-              }}
-            />
-          )}
-        </div>
-        <Line>
-          {helpPage && (
-            <HelpButton
-              helpPagePath={instructionMetadata.getHelpPath()}
-              label={
-                this.props.isCondition
-                  ? 'Help for this condition'
-                  : 'Help for this action'
-              }
-            />
-          )}
-        </Line>
-      </div>
+              <p>{instructionMetadata.getDescription()}</p>
+              {isAnEventFunctionMetadata(instructionMetadata) && (
+                <IconButton onClick={() => this._openExtension(i18n)}>
+                  <OpenInNew />
+                </IconButton>
+              )}
+            </Line>
+            {instructionExtraInformation && (
+              <Line>
+                <AlertMessage kind={instructionExtraInformation.kind}>
+                  {i18n._(instructionExtraInformation.message)}
+                </AlertMessage>
+              </Line>
+            )}
+            <Divider />
+            <div key={type} style={styles.parametersContainer}>
+              {mapFor(0, instructionMetadata.getParametersCount(), i => {
+                const parameterMetadata = instructionMetadata.getParameter(i);
+                const parameterMetadataType = parameterMetadata.getType();
+                const ParameterComponent = ParameterRenderingService.getParameterComponent(
+                  parameterMetadataType
+                );
+
+                if (parameterMetadata.isCodeOnly()) return null;
+                if (!ParameterComponent) {
+                  console.warn(
+                    'Missing parameter component for',
+                    parameterMetadataType
+                  );
+                  return null;
+                }
+
+                // Track the field count on screen, to affect the ref to the
+                // first visible field.
+                const isFirstVisibleParameterField = parameterFieldIndex === 0;
+                parameterFieldIndex++;
+
+                return (
+                  <ParameterComponent
+                    instructionMetadata={instructionMetadata}
+                    instruction={instruction}
+                    parameterMetadata={parameterMetadata}
+                    parameterIndex={i}
+                    value={instruction.getParameter(i)}
+                    onChange={value => {
+                      if (instruction.getParameter(i) !== value) {
+                        instruction.setParameter(i, value);
+                        this.setState({
+                          isDirty: true,
+                        });
+                      }
+                    }}
+                    project={project}
+                    layout={layout}
+                    globalObjectsContainer={globalObjectsContainer}
+                    objectsContainer={objectsContainer}
+                    key={i}
+                    parameterRenderingService={ParameterRenderingService}
+                    resourceSources={this.props.resourceSources}
+                    onChooseResource={this.props.onChooseResource}
+                    resourceExternalEditors={this.props.resourceExternalEditors}
+                    ref={field => {
+                      if (isFirstVisibleParameterField) {
+                        this._firstVisibleField = field;
+                      }
+                    }}
+                  />
+                );
+              })}
+              {this._getNonCodeOnlyParametersCount(instructionMetadata) ===
+                0 && (
+                <EmptyMessage>
+                  <Trans>There is nothing to configure.</Trans>
+                </EmptyMessage>
+              )}
+              {this.props.isCondition && (
+                <Toggle
+                  label={<Trans>Invert condition</Trans>}
+                  labelPosition="right"
+                  toggled={instruction.isInverted()}
+                  style={styles.invertToggle}
+                  onToggle={(e, enabled) => {
+                    instruction.setInverted(enabled);
+                    this.forceUpdate();
+                  }}
+                />
+              )}
+            </div>
+            <Line>
+              {helpPage && (
+                <HelpButton
+                  helpPagePath={instructionMetadata.getHelpPath()}
+                  label={
+                    this.props.isCondition ? (
+                      <Trans>Help for this condition</Trans>
+                    ) : (
+                      <Trans>Help for this action</Trans>
+                    )
+                  }
+                />
+              )}
+            </Line>
+          </div>
+        )}
+      </I18n>
     );
   }
 }

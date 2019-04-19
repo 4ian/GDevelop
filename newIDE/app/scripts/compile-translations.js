@@ -4,6 +4,7 @@ const fs = require('fs');
 const {
   getLocales,
   getLocalePath,
+  getLocaleSourceCatalogFiles,
   getLocaleCatalogPath,
   getLocaleCompiledCatalogPath,
   getLocaleMetadataPath,
@@ -78,10 +79,6 @@ const sanitizeMessagePo = path => {
       let forbiddenStringsFound = [];
       let forbiddenStrings = [
         {
-          str: 'n \\',
-          regex: /n \\/g,
-        },
-        {
           str: 'n\\\\',
           regex: /n\\\\/g,
         },
@@ -133,17 +130,32 @@ getLocales()
         locales.map(locale => {
           return new Promise(resolve => {
             // Concatenate all message catalogs into a single one for lingui-js.
-            // For "en", don't concatenate with gdcore-gdcpp-gdjs-extensions-messages.po
-            // as it's the source language.
-            const files =
-              locale === 'en'
-                ? 'ide-messages.pot'
-                : 'ide-messages.po gdcore-gdcpp-gdjs-extensions-messages.po';
+            const files = getLocaleSourceCatalogFiles(locale);
+
+            if (files.length === 1) {
+              // For languages with a single source ("en", "pseudo_LOCALE"),
+              // don't concatenate anything.
+              const cpResult = shell.cp(
+                path.join(getLocalePath(locale), files[0]),
+                path.join(getLocalePath(locale), 'messages.po')
+              );
+
+              return resolve({
+                locale,
+                shellOutput: {
+                  code: cpResult.code,
+                  stdout: cpResult.stdout,
+                  stderr: cpResult.stderr,
+                },
+              });
+            }
 
             // Run msgcat. Use --no-wrap to allow to sanitize the catalog with
             // regex/string replace.
+            // Use --use-first to avoid merging multiple translations for the same
+            // string.
             shell.exec(
-              msgcat + ` --no-wrap ${files} -o messages.po`,
+              msgcat + ` --no-wrap --use-first ${files.join(' ')} -o messages.po`,
               {
                 cwd: getLocalePath(locale),
                 silent: true,
@@ -170,6 +182,7 @@ getLocales()
     }
   )
   .then(results => {
+    //Display success and errors while concatenating translation catalogs for each locale.
     const successes = results.filter(
       ({ shellOutput }) => shellOutput.code === 0
     );

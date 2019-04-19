@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react';
-import VariableField from './VariableField';
+import VariableField, { renderVariableWithIcon } from './VariableField';
 import VariablesEditorDialog from '../../VariablesList/VariablesEditorDialog';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import { getLastObjectParameterValue } from './ParameterMetadataTools';
 
 type State = {|
   editorOpen: boolean,
@@ -22,14 +23,26 @@ export default class ObjectVariableField extends React.Component<
   }
 
   render() {
-    const { project, layout, instructionOrExpression } = this.props;
+    const {
+      project,
+      layout,
+      instructionMetadata,
+      instruction,
+      expressionMetadata,
+      expression,
+      parameterIndex,
+    } = this.props;
+
+    const objectName = getLastObjectParameterValue({
+      instructionMetadata,
+      instruction,
+      expressionMetadata,
+      expression,
+      parameterIndex,
+    });
 
     let variablesContainer = null;
-    if (
-      instructionOrExpression &&
-      instructionOrExpression.getParametersCount() > 0
-    ) {
-      const objectName = instructionOrExpression.getParameter(0);
+    if (objectName) {
       if (layout && layout.hasObjectNamed(objectName)) {
         variablesContainer = layout.getObject(objectName).getVariables();
       } else if (project && project.hasObjectNamed(objectName)) {
@@ -65,3 +78,11 @@ export default class ObjectVariableField extends React.Component<
     );
   }
 }
+
+export const renderObjectVariable = (value: string) => {
+  return renderVariableWithIcon(
+    value,
+    'res/types/objectvar.png',
+    'object variable'
+  );
+};

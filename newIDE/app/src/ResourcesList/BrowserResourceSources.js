@@ -95,12 +95,15 @@ const publicFontUrls = [
   'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/kenvector_future.ttf',
 ];
 
+const publicVideoUrls = [];
+
 const nameFromUrl = (url: string): string => {
   const urlParts = url.split('/');
   return urlParts[urlParts.length - 1]
     .replace('.png', '')
     .replace('.wav', '')
-    .replace('.ogg', '');
+    .replace('.ogg', '')
+    .replace('.mp4', '');
 };
 
 class GenericResourcesChooser extends Component {
@@ -122,7 +125,11 @@ class GenericResourcesChooser extends Component {
           key={url}
           primaryText={nameFromUrl(url)}
           leftAvatar={
-            props.urlsAreImages && <ListIcon iconSize={32} src={url} />
+            props.urlsAreImages ? (
+              <ListIcon iconSize={32} src={url} />
+            ) : (
+              undefined
+            )
           }
         />
       );
@@ -276,6 +283,28 @@ export default [
             urlsAreImages={false}
             createNewResource={() => new gd.FontResource()}
             title={<Trans>Choose a font from the library</Trans>}
+            ref={chooser => (this._chooser = chooser)}
+          />
+        );
+      }
+    },
+  },
+  {
+    name: 'publicVideoUrlChooser',
+    displayName: 'Choose a video from library',
+    kind: 'video',
+    component: class VideoResourceChooser extends React.Component {
+      chooseResources = () => {
+        if (this._chooser) return this._chooser.chooseResources();
+      };
+      render() {
+        return (
+          <GenericResourcesChooser
+            {...this.props}
+            urls={publicVideoUrls}
+            urlsAreImages={false}
+            createNewResource={() => new gd.VideoResource()}
+            title={<Trans>Choose a video from the library</Trans>}
             ref={chooser => (this._chooser = chooser)}
           />
         );

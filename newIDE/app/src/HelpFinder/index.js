@@ -63,7 +63,7 @@ export default class HelpFinder extends React.PureComponent<Props, State> {
             key="forum"
             primary={false}
             onClick={() => {
-              Window.openExternalURL('http://forum.compilgames.net');
+              Window.openExternalURL('https://forum.gdevelop-app.com');
             }}
             label={<Trans>Community forum</Trans>}
           />,

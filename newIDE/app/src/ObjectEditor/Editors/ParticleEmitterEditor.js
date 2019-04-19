@@ -203,7 +203,7 @@ export default class ParticleEmitterEditor extends React.Component<
             }}
           />
           <SemiControlledTextField
-            floatingLabelText={<Trans>Start end (0-255)</Trans>}
+            floatingLabelText={<Trans>End opacity (0-255)</Trans>}
             fullWidth
             type="number"
             value={particleEmitterObject.getParticleAlpha2()}
@@ -438,7 +438,7 @@ export default class ParticleEmitterEditor extends React.Component<
           <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText={
-                <Trans>Particle minimum rotation speed (degreed/second)</Trans>
+                <Trans>Particle minimum rotation speed (degrees/second)</Trans>
               }
               fullWidth
               type="number"
@@ -452,7 +452,7 @@ export default class ParticleEmitterEditor extends React.Component<
           <Column expand noMargin>
             <SemiControlledTextField
               floatingLabelText={
-                <Trans>Particle maximum rotation speed (degreed/second)</Trans>
+                <Trans>Particle maximum rotation speed (degrees/second)</Trans>
               }
               fullWidth
               type="number"

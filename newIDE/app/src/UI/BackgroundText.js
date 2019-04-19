@@ -1,5 +1,6 @@
 import * as React from 'react';
 import ThemeConsumer from './Theme/ThemeConsumer';
+// No i18n in this file
 
 const styles = {
   messageStyle: {

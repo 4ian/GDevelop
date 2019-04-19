@@ -31,8 +31,8 @@ type Props = {|
 |};
 
 type State = {|
-  isValid: boolean,
   parameterMetadata: ?gdParameterMetadata,
+  instructionMetadata: ?gdInstructionMetadata,
   ParameterComponent: ?any,
 |};
 
@@ -41,8 +41,8 @@ export default class InlineParameterEditor extends React.Component<
   State
 > {
   state = {
-    isValid: false,
     parameterMetadata: null,
+    instructionMetadata: null,
     ParameterComponent: null,
   };
 
@@ -61,6 +61,7 @@ export default class InlineParameterEditor extends React.Component<
     this.setState({
       ParameterComponent: null,
       parameterMetadata: null,
+      instructionMetadata: null,
     });
   }
 
@@ -90,6 +91,7 @@ export default class InlineParameterEditor extends React.Component<
       {
         ParameterComponent,
         parameterMetadata,
+        instructionMetadata,
       },
       () => {
         if (this._field && this._field.focus) this._field.focus();
@@ -111,15 +113,17 @@ export default class InlineParameterEditor extends React.Component<
         onRequestClose={this.props.onRequestClose}
       >
         <ParameterComponent
+          instruction={instruction}
+          instructionMetadata={this.state.instructionMetadata}
           parameterMetadata={this.state.parameterMetadata}
+          parameterIndex={this.props.parameterIndex}
+          value={instruction.getParameter(this.props.parameterIndex)}
+          onChange={this.props.onChange}
           project={this.props.project}
           layout={this.props.layout}
           globalObjectsContainer={this.props.globalObjectsContainer}
           objectsContainer={this.props.objectsContainer}
-          value={instruction.getParameter(this.props.parameterIndex)}
-          instructionOrExpression={instruction}
           key={instruction.ptr}
-          onChange={this.props.onChange}
           ref={field => (this._field = field)}
           parameterRenderingService={ParameterRenderingService}
           isInline

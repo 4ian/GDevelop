@@ -3,6 +3,7 @@ import * as React from 'react';
 import AutoComplete from 'material-ui/AutoComplete';
 import { defaultAutocompleteProps } from '../../UI/AutocompleteProps';
 import { type ParameterFieldProps } from './ParameterFieldProps.flow';
+import { getLastObjectParameterValue } from './ParameterMetadataTools';
 const gd = global.gd;
 
 type State = {|
@@ -35,14 +36,23 @@ export default class BehaviorField extends React.Component<
   }
 
   _updateBehaviorsList() {
-    const { instructionOrExpression } = this.props;
-    if (
-      !instructionOrExpression ||
-      instructionOrExpression.getParametersCount() === 0
-    )
-      return;
+    const {
+      instructionMetadata,
+      instruction,
+      expressionMetadata,
+      expression,
+      parameterIndex,
+    } = this.props;
 
-    const objectName = instructionOrExpression.getParameter(0);
+    const objectName = getLastObjectParameterValue({
+      instructionMetadata,
+      instruction,
+      expressionMetadata,
+      expression,
+      parameterIndex,
+    });
+    if (!objectName) return;
+
     this._behaviorNames = gd
       .getBehaviorsOfObject(
         this.props.globalObjectsContainer,
@@ -84,13 +94,6 @@ export default class BehaviorField extends React.Component<
   };
 
   componentDidUpdate() {
-    const { instructionOrExpression } = this.props;
-    if (
-      !instructionOrExpression ||
-      instructionOrExpression.getParametersCount() === 0
-    )
-      return;
-
     // This is a bit hacky:
     // force the behavior selection if there is only one selectable behavior
     if (this._behaviorNames.length === 1) {

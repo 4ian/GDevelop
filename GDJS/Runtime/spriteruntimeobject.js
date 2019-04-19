@@ -85,7 +85,7 @@ gdjs.SpriteAnimationFrame = function(imageManager, frameData)
  * @return The requested point.
  */
 gdjs.SpriteAnimationFrame.prototype.getPoint = function(name) {
-	if ( name == "Centre" ) return this.center;
+	if ( name == "Centre" || name == "Center") return this.center;
 	else if ( name == "Origin" ) return this.origin;
 
 	return this.points.containsKey(name) ? this.points.get(name) : this.origin;
@@ -725,6 +725,15 @@ gdjs.SpriteRuntimeObject.prototype.hide = function(enable) {
  */
 gdjs.SpriteRuntimeObject.prototype.setColor = function(rgbColor) {
     this._renderer.setColor(rgbColor);
+};
+
+/**
+ * Get the tint of the sprite object.
+ *
+ * @returns {string} rgbColor The color, in RGB format ("128;200;255").
+ */
+gdjs.SpriteRuntimeObject.prototype.getColor = function() {
+    return this._renderer.getColor();
 };
 
 gdjs.SpriteRuntimeObject.prototype.flipX = function(enable) {

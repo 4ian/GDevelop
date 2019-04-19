@@ -52,6 +52,8 @@ export const resourceHasValidPath = (
   project: gdProject,
   resourceName: string
 ) => {
+  if (!fs) return true;
+
   const resourcePath = getLocalResourceFullPath(project, resourceName);
   return fs.existsSync(resourcePath);
 };

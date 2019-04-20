@@ -3537,6 +3537,67 @@ module.exports = {
       }
     ]
   },
+  "video-player": {
+    "description": "An example of a complete video player with controls to play/pause, change the volume, jump to a position in the video...",
+    "usedExtensions": [
+      {
+        "fullName": "Video",
+        "name": "Video"
+      },
+      {
+        "fullName": "Sprite",
+        "name": "Sprite"
+      },
+      {
+        "fullName": "Text object",
+        "name": "TextObject"
+      },
+      {
+        "fullName": "Tween animation",
+        "name": "Tween"
+      },
+      {
+        "fullName": "Mouse features",
+        "name": "BuiltinMouse"
+      },
+      {
+        "fullName": "Standard events",
+        "name": "BuiltinCommonInstructions"
+      },
+      {
+        "fullName": "Scene management features",
+        "name": "BuiltinScene"
+      },
+      {
+        "fullName": "Keyboard features",
+        "name": "BuiltinKeyboard"
+      },
+      {
+        "fullName": "Time",
+        "name": "BuiltinTime"
+      },
+      {
+        "fullName": "Advanced control features",
+        "name": "BuiltinAdvanced"
+      },
+      {
+        "fullName": "Base object",
+        "name": "BuiltinObject"
+      },
+      {
+        "fullName": "Variable features",
+        "name": "BuiltinVariables"
+      },
+      {
+        "fullName": "",
+        "name": ""
+      },
+      {
+        "fullName": "Window features",
+        "name": "BuiltinWindow"
+      }
+    ]
+  },
   "z-depth": {
     "description": "Example where the player can move a character on a map, and the character is displayed behind or in front of other objects according to its position.",
     "usedExtensions": [

@@ -95,7 +95,10 @@ const publicFontUrls = [
   'https://df5lqcdudryde.cloudfront.net/examples/space-shooter/kenvector_future.ttf',
 ];
 
-const publicVideoUrls = [];
+const publicVideoUrls = [
+  // Video Player example video
+  'https://df5lqcdudryde.cloudfront.net/examples/video-player/The-Daily-Dweebs-By-Blender-Foundation-Short.mp4',
+];
 
 const nameFromUrl = (url: string): string => {
   const urlParts = url.split('/');

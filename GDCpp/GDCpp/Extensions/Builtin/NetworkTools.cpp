@@ -12,67 +12,8 @@
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/Project/Variable.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
-#include "GDCpp/Runtime/Tools/md5.h"
 
 using namespace std;
-
-/**
- * Send data to a php web page.
- * To prevent sending hacked data ( like a modified hi score )
- * a md5 checksum is applied on the data+a password defined by the developer
- * Php web page has to known the same password, and will applied md5 ont on the
- * data+the password to be sure data were not modified.
- */
-void GD_API SendDataToPhpWebPage(const gd::String& webpageurl,
-                                 const gd::String& password,
-                                 const gd::String& data1,
-                                 const gd::String& data2,
-                                 const gd::String& data3,
-                                 const gd::String& data4,
-                                 const gd::String& data5,
-                                 const gd::String& data6) {
-  gd::String data1md5 = md5(data1 + password);  // On leur ajoute le mot de
-                                                // passe
-  gd::String data2md5 =
-      md5(data2 + password);  // Et on effectue la somme de contr�le
-  gd::String data3md5 = md5(data3 + password);
-  gd::String data4md5 = md5(data4 + password);
-  gd::String data5md5 = md5(data5 + password);
-  gd::String data6md5 = md5(data6 + password);
-
-#ifdef WINDOWS
-  // Cr�ation de l'adresse internet � lancer
-  gd::String call =
-      "start \"\" \"" + webpageurl + "?data1=" + data1 + "&check1=" + data1md5 +
-      "&data2=" + data2 + "&check2=" + data2md5 + "&data3=" + data3 +
-      "&check3=" + data3md5 + "&data4=" + data4 + "&check4=" + data4md5 +
-      "&data5=" + data5 + "&check5=" + data5md5 + "&data6=" + data6 +
-      "&check6=" + data6md5 + "\"";
-
-  system(call.ToLocale().c_str());
-#elif defined(LINUX)
-  // N�cessite le paquet xdg-utils
-  gd::String call =
-      "xdg-open \"" + webpageurl + "?data1=" + data1 + "&check1=" + data1md5 +
-      "&data2=" + data2 + "&check2=" + data2md5 + "&data3=" + data3 +
-      "&check3=" + data3md5 + "&data4=" + data4 + "&check4=" + data4md5 +
-      "&data5=" + data5 + "&check5=" + data5md5 + "&data6=" + data6 +
-      "&check6=" + data6md5 + "\"";
-
-  system(call.ToLocale().c_str());
-#elif defined(MACOS)
-  gd::String call =
-      "open \"" + webpageurl + "?data1=" + data1 + "&check1=" + data1md5 +
-      "&data2=" + data2 + "&check2=" + data2md5 + "&data3=" + data3 +
-      "&check3=" + data3md5 + "&data4=" + data4 + "&check4=" + data4md5 +
-      "&data5=" + data5 + "&check5=" + data5md5 + "&data6=" + data6 +
-      "&check6=" + data6md5 + "\"";
-
-  system(call.ToLocale().c_str());
-#endif
-
-  return;
-}
 
 void GD_API SendHttpRequest(const gd::String& host,
                             const gd::String& uri,

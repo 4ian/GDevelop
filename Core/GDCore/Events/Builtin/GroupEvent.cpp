@@ -5,10 +5,6 @@
  */
 
 #include "GroupEvent.h"
-#if !defined(GD_NO_WX_GUI)
-#include <wx/dcmemory.h>
-#include <wx/renderer.h>
-#endif
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"

@@ -14,7 +14,6 @@
 #if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
-#include "GDCore/Tools/Locale/LocaleManager.h"
 #endif
 
 // Compiler specific include, for listing files of directory ( see below )
@@ -221,12 +220,6 @@ void ExtensionsLoader::LoadExtension(const gd::String &fullpath,
     CloseLibrary(extensionHdl);
     return;
   }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  gd::LocaleManager::Get()->AddCatalog(
-      wxFileName(fullpath).GetName());  // In editor, load catalog associated
-                                        // with extension, if any.
-#endif
 
   gd::PlatformExtension *extensionPtr = create_extension();
   gd::String error;

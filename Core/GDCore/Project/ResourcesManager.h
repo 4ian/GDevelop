@@ -97,15 +97,6 @@ class GD_CORE_API Resource {
    */
   virtual const gd::String& GetMetadata() const { return metadata; }
 
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * \brief Called when the resource must be rendered in a preview panel.
-   */
-  virtual void RenderPreview(wxPaintDC& dc,
-                             wxPanel& previewPanel,
-                             gd::Project& game){};
-#endif
-
 #if defined(GD_IDE_ONLY)
   /** \name Resources properties
    * Reading and updating resources properties
@@ -191,15 +182,6 @@ class GD_CORE_API ImageResource : public Resource {
 
 #if defined(GD_IDE_ONLY)
   virtual bool UseFile() override { return true; }
-
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * Called when the resource must be rendered in a preview panel.
-   */
-  virtual void RenderPreview(wxPaintDC& dc,
-                             wxPanel& previewPanel,
-                             gd::Project& game) override;
-#endif
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties(
       gd::Project& project) const override;

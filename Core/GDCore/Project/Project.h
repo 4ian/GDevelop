@@ -398,42 +398,10 @@ class GD_CORE_API Project : public ObjectsContainer {
   ///@}
 #endif
 
-#if !defined(GD_NO_WX_GUI)
-  /** \name GUI property grid management
-   * Members functions related to managing the wxWidgets property grid used to
-   * display the properties of the project.
-   */
-  ///@{
-  /**
-   * IDE calls this function so as to let the project populate a wxPropertyGrid
-   * with its properties.
-   */
-  void PopulatePropertyGrid(wxPropertyGrid* grid);
-
-  /**
-   * IDE calls this function so that the project update its properties from the
-   * values stored in the wxPropertyGrid.
-   */
-  void UpdateFromPropertyGrid(wxPropertyGrid* grid);
-
-  /**
-   * IDE calls this function when a property is selected in the property grid.
-   */
-  void OnSelectionInPropertyGrid(wxPropertyGrid* grid,
-                                 wxPropertyGridEvent& event);
-
-  /**
-   * IDE calls this function when a property was changed in the property grid.
-   */
-  void OnChangeInPropertyGrid(wxPropertyGrid* grid, wxPropertyGridEvent& event);
-  ///@}
-#endif
-
   /** \name Layouts management
    * Members functions related to layout management.
    */
   ///@{
-
   /**
    * \brief Return true if layout called "name" exists.
    */

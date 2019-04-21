@@ -26,10 +26,6 @@ void DeclarePrimitiveDrawingExtension(gd::PlatformExtension& extension) {
       "CppPlatform/Extensions/primitivedrawingicon.png");
 
 #if defined(GD_IDE_ONLY)
-#if !defined(GD_NO_WX_GUI)
-  ShapePainterObject::LoadEdittimeIcon();
-#endif
-
   obj.SetIncludeFile("PrimitiveDrawing/ShapePainterObject.h");
 
   obj.AddAction("Rectangle",

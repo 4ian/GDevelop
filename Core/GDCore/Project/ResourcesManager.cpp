@@ -6,14 +6,6 @@
 
 #include <iostream>
 #include <map>
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/dcclient.h>
-#include <wx/file.h>
-#include <wx/filedlg.h>
-#include <wx/filename.h>
-#include <wx/panel.h>
-#include "GDCore/IDE/wxTools/CommonBitmapProvider.h"
-#endif
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/Project/Project.h"
@@ -167,49 +159,6 @@ std::vector<gd::String> ResourceFolder::GetAllResourceNames() {
 
   return allResources;
 }
-
-#if !defined(GD_NO_WX_GUI)
-void ImageResource::RenderPreview(wxPaintDC& dc,
-                                  wxPanel& previewPanel,
-                                  gd::Project& project) {
-  wxLogNull noLog;  // We take care of errors.
-
-  wxSize size = previewPanel.GetSize();
-
-  // Checkerboard background
-  dc.SetBrush(gd::CommonBitmapProvider::Get()->transparentBg);
-  dc.DrawRectangle(0, 0, size.GetWidth(), size.GetHeight());
-
-  wxString fullFilename = GetAbsoluteFile(project);
-
-  if (!wxFile::Exists(fullFilename)) return;
-
-  wxBitmap bmp(fullFilename, wxBITMAP_TYPE_ANY);
-  if (bmp.GetWidth() != 0 && bmp.GetHeight() != 0 &&
-      (bmp.GetWidth() > previewPanel.GetSize().x ||
-       bmp.GetHeight() > previewPanel.GetSize().y)) {
-    // Rescale to fit in previewPanel
-    float xFactor = static_cast<float>(previewPanel.GetSize().x) /
-                    static_cast<float>(bmp.GetWidth());
-    float yFactor = static_cast<float>(previewPanel.GetSize().y) /
-                    static_cast<float>(bmp.GetHeight());
-    float factor = std::min(xFactor, yFactor);
-
-    wxImage image = bmp.ConvertToImage();
-    if (bmp.GetWidth() * factor >= 5 && bmp.GetHeight() * factor >= 5)
-      bmp = wxBitmap(
-          image.Scale(bmp.GetWidth() * factor, bmp.GetHeight() * factor));
-  }
-
-  // Display image in the center
-  if (bmp.IsOk())
-    dc.DrawBitmap(bmp,
-                  (size.GetWidth() - bmp.GetWidth()) / 2,
-                  (size.GetHeight() - bmp.GetHeight()) / 2,
-                  true /* use mask */);
-}
-
-#endif
 
 Resource& ResourceFolder::GetResource(const gd::String& name) {
   for (std::size_t i = 0; i < resources.size(); ++i) {

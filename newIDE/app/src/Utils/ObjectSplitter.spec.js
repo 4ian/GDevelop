@@ -290,6 +290,89 @@ describe('unsplit', () => {
     });
   });
 
+  it('can unsplit with a maximum depth', () => {
+    const originalObject = {
+      myArray: [
+        { name: 'A', aa: '1', ab: '2', innerObject: { hello: 'world' } },
+        { name: 'B', ba: '3', bb: '4', innerObject: { hello: 'world2' } },
+      ],
+    };
+    const splitObject = {
+      myArray: [
+        { __REFERENCE_TO_SPLIT_OBJECT: true, referenceTo: '/myArray/A' },
+        { __REFERENCE_TO_SPLIT_OBJECT: true, referenceTo: '/myArray/B' },
+      ],
+    };
+    const partialObjects = [
+      {
+        reference: '/myArray/A',
+        object: {
+          name: 'A',
+          aa: '1',
+          ab: '2',
+          innerObject: {
+            __REFERENCE_TO_SPLIT_OBJECT: true,
+            referenceTo: '/myArray/A/innerObject',
+          },
+        },
+      },
+      {
+        reference: '/myArray/A/innerObject',
+        object: { hello: 'world' },
+      },
+      {
+        reference: '/myArray/B',
+        object: {
+          name: 'B',
+          ba: '3',
+          bb: '4',
+          innerObject: {
+            __REFERENCE_TO_SPLIT_OBJECT: true,
+            referenceTo: '/myArray/B/innerObject',
+          },
+        },
+      },
+      {
+        reference: '/myArray/B/innerObject',
+        object: { hello: 'world2' },
+      },
+    ];
+
+    expect.assertions(1);
+    return unsplit(splitObject, {
+      isReferenceMagicPropertyName: '__REFERENCE_TO_SPLIT_OBJECT',
+      getReferencePartialObject: getReferencePartialObjectInArray(
+        partialObjects
+      ),
+      maxUnsplitDepth: 2,
+    }).then(() => {
+      expect(splitObject).toEqual({
+        myArray: [
+          {
+            name: 'A',
+            aa: '1',
+            ab: '2',
+            innerObject: {
+              // Maximum depth has stopped processing on this object
+              __REFERENCE_TO_SPLIT_OBJECT: true,
+              referenceTo: '/myArray/A/innerObject',
+            },
+          },
+          {
+            name: 'B',
+            ba: '3',
+            bb: '4',
+            innerObject: {
+              // Maximum depth has stopped processing on this object
+              __REFERENCE_TO_SPLIT_OBJECT: true,
+              referenceTo: '/myArray/B/innerObject',
+            },
+          },
+        ],
+      });
+    });
+  });
+
   it('can report error while unsplitting', () => {
     const splitObject = {
       myArray: [

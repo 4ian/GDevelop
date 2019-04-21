@@ -106,7 +106,7 @@ type State = {|
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
-  addFirstInstancePosition: Array<number>,
+  addFirstInstancePosition: ?[number, number],
 
   editedGroup: ?gdObjectGroup,
 
@@ -155,7 +155,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       variablesEditedInstance: null,
       variablesEditedObject: null,
       selectedObjectNames: [],
-      addFirstInstancePosition: [],
+      addFirstInstancePosition: null,
       editedGroup: null,
 
       // State for "drag'n'dropping" from the objects list to the instances editor:
@@ -572,7 +572,7 @@ export default class SceneEditor extends React.Component<Props, State> {
   };
 
   _addNewObjectAndInstance = (newObjectName: string) => {
-    if (!this.state.addFirstInstancePosition.length) {
+    if (!this.state.addFirstInstancePosition) {
       return;
     }
     const { addFirstInstancePosition } = this.state;
@@ -581,7 +581,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       addFirstInstancePosition[1],
       newObjectName
     );
-    this.setState({ addFirstInstancePosition: [] });
+    this.setState({ addFirstInstancePosition: null });
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {

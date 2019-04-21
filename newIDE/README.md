@@ -106,7 +106,7 @@ Any text editor is fine, but it's a good idea to have one with *Prettier* (code 
 
 ### Desktop version
 
-First, update version number which is read in `newIDE/electron-app/app/package.json`.
+First, update version number in `newIDE/electron-app/app/package.json`.
 
 ```bash
 cd newIDE/electron-app

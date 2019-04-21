@@ -100,6 +100,8 @@ class GD_API CppPlatform : public gd::Platform {
       runtimeObjCreationFunctionTable;  ///< The C++ Platform also need to store
                                         ///< functions to create runtime
                                         ///< objects.
+
+  static CppPlatform* singleton;
 };
 
 #endif  // PLATFORM_H

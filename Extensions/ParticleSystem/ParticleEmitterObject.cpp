@@ -623,6 +623,17 @@ void ParticleEmitterObject::ExposeResources(
   SetParticleTexture(texture);
 }
 
+void RuntimeParticleEmitterObject::GetPropertyForDebugger(
+    std::size_t propertyNb, gd::String& name, gd::String& value) const {
+  if (!GetParticleSystem() || !GetParticleSystem()->particleSystem) return;
+
+  if (propertyNb == 0) {
+    name = _("Particles number");
+    value =
+        gd::String::From(GetParticleSystem()->particleSystem->getNbParticles());
+  }
+}
+
 bool RuntimeParticleEmitterObject::ChangeProperty(std::size_t propertyNb,
                                                   gd::String newValue) {
   if (propertyNb == 0) {

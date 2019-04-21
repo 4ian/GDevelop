@@ -6,10 +6,6 @@
 #include "ExpressionMetadata.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/String.h"
-#if !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#include <wx/file.h>
-#endif
 
 namespace gd {
 
@@ -25,13 +21,6 @@ ExpressionMetadata::ExpressionMetadata(const gd::String& extensionNamespace_,
       shown(true),
       smallIconFilename(smallicon_),
       extensionNamespace(extensionNamespace_) {
-#if !defined(GD_NO_WX_GUI)
-  if (wxFile::Exists(smallicon_)) {
-    smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY);
-  } else {
-    smallicon = wxBitmap(16, 16);
-  }
-#endif
 }
 
 ExpressionMetadata& ExpressionMetadata::SetHidden() {

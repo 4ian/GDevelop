@@ -58,7 +58,6 @@ class CppCodeEvent : public gd::BaseEvent {
 
   const gd::String& GetAssociatedGDManagedSourceFile(
       gd::Project& parentGame) const {
-    EnsureAssociatedSourceFileIsUpToDate(parentGame);
     return associatedGDManagedSourceFile;
   };
 
@@ -95,7 +94,6 @@ class CppCodeEvent : public gd::BaseEvent {
   bool IsCodeDisplayedInEditor() const { return codeDisplayedInEditor; };
   void EnableCodeDisplayedInEditor(bool enable) {
     codeDisplayedInEditor = enable;
-    eventHeightNeedUpdate = true;
   };
 
   const gd::String& GetDisplayedName() const { return displayedName; };
@@ -109,7 +107,6 @@ class CppCodeEvent : public gd::BaseEvent {
 
  private:
   void Init(const CppCodeEvent& event);
-  gd::String GenerateAssociatedFileCode() const;
   void AutogenerateFunctionName() const;
 
   std::vector<gd::String> includeFiles;

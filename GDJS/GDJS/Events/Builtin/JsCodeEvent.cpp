@@ -6,19 +6,12 @@
 #include "JsCodeEvent.h"
 #include <fstream>
 #include <iostream>
-#if !defined(GD_NO_WX_GUI)
-#include <wx/dcmemory.h>
-#include <wx/filename.h>
-#endif
 #include "GDCore/CommonTools.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerationContext.h"
 #include "GDCore/Events/CodeGeneration/EventsCodeGenerator.h"
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"

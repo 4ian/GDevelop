@@ -5,12 +5,6 @@
  */
 #include "ProjectResourcesCopier.h"
 #include <map>
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/filename.h>
-#include <wx/msgdlg.h>
-#include <wx/progdlg.h>
-#include <wx/utils.h>
-#endif
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ResourcesAbsolutePathChecker.h"
@@ -35,18 +29,6 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
   gd::ResourcesAbsolutePathChecker absolutePathChecker(fs);
   originalProject.ExposeResources(absolutePathChecker);
   bool copyAlsoResourcesWithAbsolutePath = !askAboutAbsoluteFilenames;
-
-#if !defined(GD_NO_WX_GUI)
-  if (!copyAlsoResourcesWithAbsolutePath) {
-    copyAlsoResourcesWithAbsolutePath =
-        absolutePathChecker.HasResourceWithAbsoluteFilenames() &&
-        wxMessageBox(_("Some resources are using absolute filenames.\nDo you "
-                       "want them to be copied in the new folder of the "
-                       "project? If you choose No, they won't be modified."),
-                     _("Some resources are using absolute filenames."),
-                     wxYES_NO | wxICON_QUESTION) == wxYES;
-  }
-#endif
 
   auto projectDirectory = fs.DirNameFrom(originalProject.GetProjectFile());
   std::cout << "Copying all ressources from " << projectDirectory << " to "
@@ -76,15 +58,6 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(
        it != resourcesNewFilename.end();
        ++it) {
     if (!it->first.empty()) {
-#if !defined(GD_NO_WX_GUI)
-      if (optionalProgressDialog) {
-        if (!optionalProgressDialog->Update(
-                i / static_cast<float>(resourcesNewFilename.size()) * 100.0f,
-                _("Exporting ") + it->second))
-          return false;  // User choose to abort.
-      }
-#endif
-
       // Create the destination filename
       gd::String destinationFile = it->second;
       fs.MakeAbsolute(destinationFile, destinationDirectory);

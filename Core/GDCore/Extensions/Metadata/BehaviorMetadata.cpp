@@ -10,11 +10,6 @@
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#include <wx/file.h>
-#include "GDCore/IDE/wxTools/SkinHelper.h"
-#endif
 
 namespace gd {
 
@@ -39,18 +34,6 @@ BehaviorMetadata::BehaviorMetadata(
   SetGroup(group_);
   className = className_;
   iconFilename = icon24x24;
-#if !defined(GD_NO_WX_GUI)
-  if (gd::SkinHelper::IconExists(iconFilename, 24))
-    SetBitmapIcon(gd::SkinHelper::GetIcon(iconFilename, 24));
-  else if (wxFile::Exists(iconFilename))
-    SetBitmapIcon(wxBitmap(iconFilename, wxBITMAP_TYPE_ANY));
-  else {
-    std::cout << "Warning: The icon file for behavior \"" << name_
-              << " was not found in the current skin icons"
-              << " and the specified name is not an existing filename.";
-    SetBitmapIcon(wxBitmap(24, 24));
-  }
-#endif
 #endif
 
   if (instance) instance->SetTypeName(name_);
@@ -158,12 +141,6 @@ BehaviorMetadata& BehaviorMetadata::SetDescription(
 BehaviorMetadata& BehaviorMetadata::SetGroup(const gd::String& group_) {
 #if defined(GD_IDE_ONLY)
   group = group_;
-#endif
-  return *this;
-}
-BehaviorMetadata& BehaviorMetadata::SetBitmapIcon(const wxBitmap& bitmap_) {
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  icon = bitmap_;
 #endif
   return *this;
 }

@@ -21,8 +21,6 @@ class Layout;
 class EventsCodeGenerator;
 class EventsCodeGenerationContext;
 class Platform;
-class EventsEditorItemsAreas;
-class EventsEditorSelection;
 class SerializerElement;
 class Instruction;
 }

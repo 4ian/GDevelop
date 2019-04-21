@@ -23,7 +23,7 @@ class GD_EXTENSION_API SkeletonObject : public gd::Object {
  public:
   SkeletonObject(gd::String name_);
   virtual ~SkeletonObject(){};
-  virtual std::unique_ptr<gd::Object> Clone() const {
+  virtual std::unique_ptr<gd::Object> Clone() const override {
     return gd::make_unique<SkeletonObject>(*this);
   }
 

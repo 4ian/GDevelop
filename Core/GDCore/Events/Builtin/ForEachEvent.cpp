@@ -11,9 +11,6 @@
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/TinyXml/tinyxml.h"
 

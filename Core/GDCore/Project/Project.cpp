@@ -38,15 +38,6 @@
 #include "GDCore/Tools/PolymorphicClone.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Utf8/utf8.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/filename.h>
-// clang-format off
-#include <wx/propgrid/propgrid.h>
-#include <wx/propgrid/advprops.h>
-// clang-format on
-#include <wx/settings.h>
-#include <wx/utils.h>
-#endif
 
 using namespace std;
 
@@ -532,45 +523,6 @@ void Project::RemoveEventsFunctionsExtension(const gd::String& name) {
 }
 #endif
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-// Compatibility with GD2.x
-class SpriteObjectsPositionUpdater : public gd::InitialInstanceFunctor {
- public:
-  SpriteObjectsPositionUpdater(gd::Project& project_, gd::Layout& layout_)
-      : project(project_), layout(layout_){};
-  virtual ~SpriteObjectsPositionUpdater(){};
-
-  virtual void operator()(gd::InitialInstance& instance) {
-    gd::Object* object = NULL;
-    if (layout.HasObjectNamed(instance.GetObjectName()))
-      object = &layout.GetObject(instance.GetObjectName());
-    else if (project.HasObjectNamed(instance.GetObjectName()))
-      object = &project.GetObject(instance.GetObjectName());
-    else
-      return;
-
-    if (object->GetType() != "Sprite") return;
-    if (!instance.HasCustomSize()) return;
-
-    wxSetWorkingDirectory(
-        wxFileName::FileName(project.GetProjectFile()).GetPath());
-    object->LoadResources(project, layout);
-
-    sf::Vector2f size =
-        object->GetInitialInstanceDefaultSize(instance, project, layout);
-
-    instance.SetX(instance.GetX() + size.x / 2 - instance.GetCustomWidth() / 2);
-    instance.SetY(instance.GetY() + size.y / 2 -
-                  instance.GetCustomHeight() / 2);
-  }
-
- private:
-  gd::Project& project;
-  gd::Layout& layout;
-};
-// End of compatibility code
-#endif
-
 void Project::UnserializeFrom(const SerializerElement& element) {
 // Checking version
 #if defined(GD_IDE_ONLY)
@@ -824,16 +776,6 @@ void Project::UnserializeFrom(const SerializerElement& element) {
     gd::Layout& layout = InsertNewLayout(
         layoutElement.GetStringAttribute("name", "", "nom"), -1);
     layout.UnserializeFrom(*this, layoutElement);
-
-// Compatibility code with GD 2.x
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    if (gdMajorVersion <= 2) {
-      SpriteObjectsPositionUpdater updater(*this, layout);
-      gd::InitialInstancesContainer& instances = layout.GetInitialInstances();
-      instances.IterateOverInstances(updater);
-    }
-#endif
-    // End of compatibility code
   }
 
 #if defined(GD_IDE_ONLY)

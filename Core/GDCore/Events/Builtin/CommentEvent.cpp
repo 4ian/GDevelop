@@ -6,9 +6,6 @@
 
 #include "CommentEvent.h"
 #include "GDCore/CommonTools.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDCore/Serialization/SerializerElement.h"
 
 using namespace std;

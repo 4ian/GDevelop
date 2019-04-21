@@ -9,16 +9,12 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#endif
 namespace gd {
 class Behavior;
 class BehaviorsSharedData;
 class InstructionMetadata;
 class ExpressionMetadata;
 }  // namespace gd
-class wxBitmap;
 
 namespace gd {
 
@@ -90,7 +86,6 @@ class GD_CORE_API BehaviorMetadata {
   BehaviorMetadata& SetDefaultName(const gd::String& defaultName_);
   BehaviorMetadata& SetDescription(const gd::String& description_);
   BehaviorMetadata& SetGroup(const gd::String& group_);
-  BehaviorMetadata& SetBitmapIcon(const wxBitmap& bitmap_);
 
   /**
    * \brief Erase any existing include file and add the specified include.
@@ -126,9 +121,6 @@ class GD_CORE_API BehaviorMetadata {
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetGroup() const { return group; }
   const gd::String& GetIconFilename() const { return iconFilename; }
-#if !defined(GD_NO_WX_GUI)
-  const wxBitmap& GetBitmapIcon() const { return icon; }
-#endif
 #endif
   std::shared_ptr<gd::Behavior> Get() const { return instance; }
   std::shared_ptr<gd::BehaviorsSharedData> GetSharedDataInstance() const {
@@ -153,9 +145,6 @@ class GD_CORE_API BehaviorMetadata {
   gd::String description;
   gd::String group;
   gd::String iconFilename;
-#if !defined(GD_NO_WX_GUI)
-  wxBitmap icon;
-#endif
 #endif
 
   std::shared_ptr<gd::Behavior> instance;

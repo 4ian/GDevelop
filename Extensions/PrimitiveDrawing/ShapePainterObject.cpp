@@ -5,9 +5,6 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/wx.h>  //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
-#endif
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/CommonTools.h"
@@ -23,11 +20,6 @@ This project is released under the MIT License.
 
 #if defined(GD_IDE_ONLY)
 #include "GDCpp/Runtime/CommonTools.h"
-#endif
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-sf::Texture ShapePainterObject::edittimeIconImage;
-sf::Sprite ShapePainterObject::edittimeIcon;
 #endif
 
 using namespace std;

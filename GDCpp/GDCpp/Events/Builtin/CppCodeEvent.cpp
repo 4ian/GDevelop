@@ -5,7 +5,6 @@
  */
 
 #if defined(GD_IDE_ONLY)
-
 #include "CppCodeEvent.h"
 #include <fstream>
 #include <iostream>
@@ -14,9 +13,6 @@
 #include "GDCore/Events/CodeGeneration/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/Tools/EventsCodeNameMangler.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorItemsAreas.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsEditorSelection.h"
-#include "GDCore/IDE/Dialogs/EventsEditor/EventsRenderingHelper.h"
 #include "GDCore/Project/Layout.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Project/SourceFile.h"
@@ -24,86 +20,10 @@
 #include "GDCore/Tools/FileStream.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
-#include "GDCpp/IDE/CodeCompiler.h"
-#include "GDCpp/IDE/Dialogs/EditCppCodeEvent.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
-#include "GDCpp/Runtime/TinyXml/tinyxml.h"
 
 using namespace std;
-
-void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(
-    gd::Project& project) const {
-#if !defined(GD_NO_WX_GUI)
-  gd::String outputFile(CodeCompiler::Get()->GetOutputDirectory() + "GD" +
-                        gd::String::From(this) + "SourceFile.cpp");
-
-  gd::SourceFile* sourceFile;
-  // First check if the associated source file exists in the GD project.
-  if (project.HasSourceFile(associatedGDManagedSourceFile, "C++"))
-    sourceFile = &project.GetSourceFile(associatedGDManagedSourceFile);
-  else {
-    // If there is no associated source file existing, then create a new one
-    sourceFile = &project.InsertNewSourceFile(outputFile, "C++");
-    sourceFile->SetGDManaged(true);
-  }
-
-  // Then check if the associated source file is up to date
-  associatedGDManagedSourceFile = outputFile;
-  if (sourceFile->GetFileName() != outputFile) {
-    sourceFile->SetFileName(outputFile);
-  } else if (wxFileExists(outputFile)) {
-    wxFileName sourceFileInfo(outputFile);
-    if (sourceFileInfo.GetModificationTime().GetTicks() >= lastChangeTimeStamp)
-      return;
-  }
-
-  // The associated source file is non existing or not up to date: Regenerate
-  // it. It will be compiled ( see CodeCompilationHelpers ) as it will be
-  // detected ( by DependenciesAnalyzer ) as a SourceFile dependency which is
-  // not up to date.
-  gd::FileStream file;
-  file.open(outputFile, std::ios_base::out);
-  file << GenerateAssociatedFileCode();
-  file.close();
-#else
-  gd::LogError(
-      "BAD USE: C++ Code event not supported when wxWidgets support is "
-      "disabled");
-#endif
-}
-
-gd::String CppCodeEvent::GenerateAssociatedFileCode() const {
-#if !defined(GD_NO_WX_GUI)
-  gd::String functionPrototype =
-      "void " + GetFunctionToCall() + "(" +
-      (passSceneAsParameter ? "RuntimeScene & scene" : "") +
-      ((passSceneAsParameter && passObjectListAsParameter) ? ", " : "") +
-      (passObjectListAsParameter ? "std::vector<RuntimeObject*> objectsList"
-                                 : "") +
-      ")";
-  gd::String output;
-  if (passSceneAsParameter)
-    output += "#include \"GDCpp/Runtime/RuntimeScene.h\"\n";
-  if (passObjectListAsParameter)
-    output += "#include \"GDCpp/Runtime/Project/Object.h\"\n";
-  for (const auto& includeFile : includeFiles) {
-    if (!includeFile.empty()) output += "#include " + includeFile + "\n";
-  }
-
-  output += functionPrototype + "\n";
-  output += "{\n";
-  output += inlineCode;
-  output += "}\n";
-
-  return output;
-#else
-  gd::LogError(
-      "BAD USE: C++ Code event not supported when wxWidgets support is "
-      "disabled");
-  return "";
-#endif
-}
 
 void CppCodeEvent::SerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("functionToCall", functionToCall);

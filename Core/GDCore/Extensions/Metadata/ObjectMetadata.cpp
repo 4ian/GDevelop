@@ -9,11 +9,6 @@
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Project/Object.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#include <wx/file.h>
-#include "GDCore/IDE/wxTools/SkinHelper.h"
-#endif
 
 namespace gd {
 
@@ -30,20 +25,6 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
   iconFilename = icon24x24;
-#if !defined(GD_NO_WX_GUI)
-  if (!iconFilename.empty()) {
-    if (gd::SkinHelper::IconExists(icon24x24, 24))
-      SetBitmapIcon(gd::SkinHelper::GetIcon(icon24x24, 24));
-    else if (wxFile::Exists(icon24x24))
-      SetBitmapIcon(wxBitmap(icon24x24, wxBITMAP_TYPE_ANY));
-    else {
-      std::cout << "Warning: The icon file for object \"" << name_
-                << " was not found in the current skin icons"
-                << " and the specified name is not an existing filename.";
-      SetBitmapIcon(wxBitmap(24, 24));
-    }
-  }
-#endif
 #endif
   createFunPtr =
       [blueprintObject_](gd::String name) -> std::unique_ptr<gd::Object> {
@@ -73,20 +54,6 @@ ObjectMetadata::ObjectMetadata(const gd::String& extensionNamespace_,
   SetFullName(gd::String(fullname_));
   SetDescription(gd::String(description_));
   iconFilename = icon24x24;
-#if !defined(GD_NO_WX_GUI)
-  if (!iconFilename.empty()) {
-    if (gd::SkinHelper::IconExists(icon24x24, 24))
-      SetBitmapIcon(gd::SkinHelper::GetIcon(icon24x24, 24));
-    else if (wxFile::Exists(icon24x24))
-      SetBitmapIcon(wxBitmap(icon24x24, wxBITMAP_TYPE_ANY));
-    else {
-      std::cout << "Warning: The icon file for object \"" << name_
-                << " was not found in the current skin icons"
-                << " and the specified name is not an existing filename.";
-      SetBitmapIcon(wxBitmap(24, 24));
-    }
-  }
-#endif
 #endif
   createFunPtr = createFunPtrP;
 }
@@ -186,13 +153,6 @@ ObjectMetadata& ObjectMetadata::SetHelpUrl(const gd::String& helpUrl_) {
 ObjectMetadata& ObjectMetadata::SetDescription(const gd::String& description_) {
 #if defined(GD_IDE_ONLY)
   description = description_;
-#endif
-  return *this;
-}
-
-ObjectMetadata& ObjectMetadata::SetBitmapIcon(const wxBitmap& bitmap_) {
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  icon = bitmap_;
 #endif
   return *this;
 }

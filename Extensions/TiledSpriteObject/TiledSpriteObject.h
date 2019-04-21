@@ -5,7 +5,6 @@ Copyright (c) 2012-2016 Victor Levasseur (victorlevasseur01@orange.fr)
 Copyright (c) 2013-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
-
 #ifndef TILEDSPRITEOBJECT_H
 #define TILEDSPRITEOBJECT_H
 #include <memory>
@@ -14,20 +13,12 @@ This project is released under the MIT License.
 class SFMLTextureWrapper;
 class RuntimeScene;
 namespace gd {
-class ImageManager;
-}
-namespace gd {
 class InitialInstance;
 }
 #if defined(GD_IDE_ONLY)
 namespace gd {
 class Project;
 }
-namespace gd {
-class MainFrameWrapper;
-}
-class wxBitmap;
-class wxWindow;
 #endif
 
 /**
@@ -42,22 +33,7 @@ class GD_EXTENSION_API TiledSpriteObject : public gd::Object {
   }
 
 #if defined(GD_IDE_ONLY)
-  virtual bool GenerateThumbnail(const gd::Project &project,
-                                 wxBitmap &thumbnail) const;
   virtual void ExposeResources(gd::ArbitraryResourceWorker &worker);
-
-  virtual void EditObject(wxWindow *parent,
-                          gd::Project &game_,
-                          gd::MainFrameWrapper &mainFrameWrapper_);
-  virtual void LoadResources(gd::Project &project, gd::Layout &layout);
-  virtual void DrawInitialInstance(gd::InitialInstance &instance,
-                                   sf::RenderTarget &renderTarget,
-                                   gd::Project &project,
-                                   gd::Layout &layout);
-  virtual sf::Vector2f GetInitialInstanceDefaultSize(
-      gd::InitialInstance &instance,
-      gd::Project &project,
-      gd::Layout &layout) const;
 #endif
 
   virtual float GetWidth() const { return width; };

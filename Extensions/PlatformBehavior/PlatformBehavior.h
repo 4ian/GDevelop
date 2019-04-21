@@ -20,11 +20,7 @@ class SerializerElement;
 #include <map>
 namespace gd {
 class PropertyDescriptor;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
 }
 #endif

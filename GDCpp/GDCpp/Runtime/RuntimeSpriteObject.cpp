@@ -4,9 +4,6 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/wx.h>  //Must be placed first, otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
-#endif
 #include <SFML/Graphics.hpp>
 #include "GDCore/Extensions/Builtin/SpriteExtension/Animation.h"
 #include "GDCore/Extensions/Builtin/SpriteExtension/Direction.h"
@@ -22,7 +19,6 @@
 #include "GDCpp/Runtime/TinyXml/tinyxml.h"
 #include "RuntimeSpriteObject.h"
 #if defined(GD_IDE_ONLY)
-#include "GDCore/Extensions/Builtin/SpriteExtension/Dialogs/SpriteObjectEditor.h"
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
 #endif

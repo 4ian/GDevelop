@@ -12,17 +12,12 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/String.h"
 namespace gd {
 class InitialInstance;
-}
-namespace gd {
 class Project;
 }
 namespace sf {
 class Texture;
-}
-namespace sf {
 class Sprite;
 }
-class wxBitmap;
 
 class GD_EXTENSION_API SkeletonObject : public gd::Object {
  public:
@@ -33,25 +28,6 @@ class GD_EXTENSION_API SkeletonObject : public gd::Object {
   }
 
 #if defined(GD_IDE_ONLY)
-  static void LoadEdittimeIcon();
-
-#if !defined(GD_NO_WX_GUI)
-  bool GenerateThumbnail(const gd::Project& project,
-                         wxBitmap& thumbnail) const override;
-#endif
-
-  void DrawInitialInstance(gd::InitialInstance& instance,
-                           sf::RenderTarget& renderTarget,
-                           gd::Project& project,
-                           gd::Layout& layout) override;
-  sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance& instance,
-                                        gd::Project& project,
-                                        gd::Layout& layout) const override;
-
-#if !defined(GD_NO_WX_GUI)
-  void UpdateSize(gd::Project& project);
-#endif
-
   std::map<gd::String, gd::PropertyDescriptor> GetProperties(
       gd::Project& project) const override;
   bool UpdateProperty(const gd::String& name,
@@ -74,8 +50,6 @@ class GD_EXTENSION_API SkeletonObject : public gd::Object {
   bool debugPolygons;
 
 #if defined(GD_IDE_ONLY)
-  static sf::Texture edittimeIconImage;
-  static sf::Sprite edittimeIcon;
   sf::Vector2f originalSize;
   sf::Vector2f originOffset;
   bool sizeDirty;

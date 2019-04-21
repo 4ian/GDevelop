@@ -12,21 +12,12 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/Project/Object.h"
 #include "GDCpp/Runtime/RuntimeObject.h"
 #include "GDCpp/Runtime/String.h"
-class ImageManager;
 class RuntimeScene;
 namespace gd {
 class Project;
 class Object;
-class ImageManager;
 class InitialInstance;
 }
-#if defined(GD_IDE_ONLY)
-class wxBitmap;
-class wxWindow;
-namespace gd {
-class MainFrameWrapper;
-}
-#endif
 
 /**
  * Text Object
@@ -40,21 +31,7 @@ class GD_EXTENSION_API TextObject : public gd::Object {
   }
 
 #if defined(GD_IDE_ONLY)
-  virtual void DrawInitialInstance(gd::InitialInstance& instance,
-                                   sf::RenderTarget& renderTarget,
-                                   gd::Project& project,
-                                   gd::Layout& layout);
-  virtual sf::Vector2f GetInitialInstanceDefaultSize(
-      gd::InitialInstance& instance,
-      gd::Project& project,
-      gd::Layout& layout) const;
   virtual void ExposeResources(gd::ArbitraryResourceWorker& worker);
-  virtual bool GenerateThumbnail(const gd::Project& project,
-                                 wxBitmap& thumbnail) const;
-  virtual void EditObject(wxWindow* parent,
-                          gd::Project& game_,
-                          gd::MainFrameWrapper& mainFrameWrapper_);
-  virtual void LoadResources(gd::Project& project, gd::Layout& layout);
 #endif
 
   /** \brief Change the text.
@@ -115,11 +92,6 @@ class GD_EXTENSION_API TextObject : public gd::Object {
   unsigned int colorR;
   unsigned int colorG;
   unsigned int colorB;
-#if defined(GD_IDE_ONLY)
-  const sf::Font*
-      font;  ///< The font used to render the object in the IDE. This is just a
-             ///< pointer to a font stored in the FontManager.
-#endif
 };
 
 class GD_EXTENSION_API RuntimeTextObject : public RuntimeObject {

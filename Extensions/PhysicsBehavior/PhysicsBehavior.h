@@ -17,16 +17,11 @@ This project is released under the MIT License.
 #include "SFML/System/Vector2.hpp"
 namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class SerializerElement;
 }
 class RuntimeScene;
 class b2Body;
-class PhysicsBehaviorEditor;
 class RuntimeScenePhysicsDatas;
 
 namespace sf {
@@ -34,8 +29,6 @@ class Clock;
 }
 
 class GD_EXTENSION_API PhysicsBehavior : public Behavior {
-  friend class PhysicsBehaviorEditor;
-
  public:
   PhysicsBehavior();
   virtual ~PhysicsBehavior();
@@ -56,14 +49,6 @@ class GD_EXTENSION_API PhysicsBehavior : public Behavior {
   virtual void UnserializeFrom(const gd::SerializerElement &element);
 
 #if defined(GD_IDE_ONLY)
-  /**
-   * Called when user wants to edit the behavior.
-   */
-  virtual void EditBehavior(wxWindow *parent,
-                            gd::Project &project_,
-                            gd::Layout *layout_,
-                            gd::MainFrameWrapper &mainFrameWrapper_);
-
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
       gd::Project &project) const;
   virtual bool UpdateProperty(const gd::String &name,

@@ -5,9 +5,6 @@ Copyright (c) 2011-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#endif
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "GDCore/Tools/Localization.h"
@@ -25,11 +22,6 @@ This project is released under the MIT License.
 #endif
 
 using namespace std;
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-sf::Texture TextEntryObject::edittimeIconImage;
-sf::Sprite TextEntryObject::edittimeIcon;
-#endif
 
 TextEntryObject::TextEntryObject(gd::String name_) : Object(name_) {}
 
@@ -57,29 +49,6 @@ void RuntimeTextEntryObject::Update(const RuntimeScene& scene) {
     }
   }
 }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-void TextEntryObject::DrawInitialInstance(gd::InitialInstance& instance,
-                                          sf::RenderTarget& renderTarget,
-                                          gd::Project& project,
-                                          gd::Layout& layout) {
-  edittimeIcon.setPosition(instance.GetX(), instance.GetY());
-  renderTarget.draw(edittimeIcon);
-}
-
-void TextEntryObject::LoadEdittimeIcon() {
-  edittimeIconImage.loadFromFile("CppPlatform/Extensions/textentry.png");
-  edittimeIcon.setTexture(edittimeIconImage);
-}
-
-bool TextEntryObject::GenerateThumbnail(const gd::Project& project,
-                                        wxBitmap& thumbnail) const {
-  thumbnail =
-      wxBitmap("CppPlatform/Extensions/textentry.png", wxBITMAP_TYPE_ANY);
-
-  return true;
-}
-#endif
 
 #if defined(GD_IDE_ONLY)
 void RuntimeTextEntryObject::GetPropertyForDebugger(std::size_t propertyNb,

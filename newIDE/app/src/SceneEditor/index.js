@@ -106,7 +106,7 @@ type State = {|
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
-  addFirstInstancePosition: ?[number, number],
+  newObjectInstancePosition: ?[number, number],
 
   editedGroup: ?gdObjectGroup,
 
@@ -155,7 +155,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       variablesEditedInstance: null,
       variablesEditedObject: null,
       selectedObjectNames: [],
-      addFirstInstancePosition: null,
+      newObjectInstancePosition: null,
       editedGroup: null,
 
       // State for "drag'n'dropping" from the objects list to the instances editor:
@@ -460,13 +460,16 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
-  _onCreateNewObjectAndFirstInstanceUnderCursor = () => {
+  _createNewObjectAndInstanceUnderCursor = () => {
     if (!this.editor) {
       return;
     }
+
+    // Remember where to create the instance, when the object will be created
     this.setState({
-      addFirstInstancePosition: this.editor.getLastCursorPosition(),
+      newObjectInstancePosition: this.editor.getLastCursorPosition(),
     });
+
     if (this._objectsList)
       this._objectsList.setState({ newObjectDialogOpen: true });
   };
@@ -571,17 +574,22 @@ export default class SceneEditor extends React.Component<Props, State> {
     this.updateToolbar();
   };
 
-  _addNewObjectAndInstance = (newObjectName: string) => {
-    if (!this.state.addFirstInstancePosition) {
+  /**
+   * Create an instance of the given object, at the position
+   * previously chosen (see `newObjectInstancePosition`).
+   */
+  _addNewObjectInstance = (newObjectName: string) => {
+    const { newObjectInstancePosition } = this.state;
+    if (!newObjectInstancePosition) {
       return;
     }
-    const { addFirstInstancePosition } = this.state;
+    
     this._addInstance(
-      addFirstInstancePosition[0],
-      addFirstInstancePosition[1],
+      newObjectInstancePosition[0],
+      newObjectInstancePosition[1],
       newObjectName
     );
-    this.setState({ addFirstInstancePosition: null });
+    this.setState({ newObjectInstancePosition: null });
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -940,7 +948,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             ) => {
               return this._canObjectUseNewName(objectWithContext, newName);
             }}
-            onObjectCreated={this._addNewObjectAndInstance}
+            onObjectCreated={this._addNewObjectInstance}
             onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
@@ -1175,7 +1183,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             },
             {
               label: 'Insert a New Object',
-              click: () => this._onCreateNewObjectAndFirstInstanceUnderCursor(),
+              click: () => this._createNewObjectAndInstanceUnderCursor(),
               visible: this.state.selectedObjectNames.length === 0,
             },
             {

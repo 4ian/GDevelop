@@ -583,7 +583,7 @@ export default class SceneEditor extends React.Component<Props, State> {
     if (!newObjectInstancePosition) {
       return;
     }
-    
+
     this._addInstance(
       newObjectInstancePosition[0],
       newObjectInstancePosition[1],

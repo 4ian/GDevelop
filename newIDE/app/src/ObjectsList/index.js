@@ -197,7 +197,13 @@ export default class ObjectsListContainer extends React.Component<
   }
 
   addObject = (objectType: string) => {
-    const { project, objectsContainer } = this.props;
+    const {
+      project,
+      objectsContainer,
+      onEditObject,
+      onObjectCreated,
+      onObjectSelected,
+    } = this.props;
 
     const name = newNameGenerator(
       'NewObject',
@@ -217,11 +223,17 @@ export default class ObjectsListContainer extends React.Component<
         newObjectDialogOpen: false,
       },
       () => {
-        if (this.props.onEditObject) {
-          this.props.onEditObject(object);
+        if (onEditObject) {
+          onEditObject(object);
+          onObjectCreated(name);
+          onObjectSelected(name);
         }
       }
     );
+  };
+
+  onAddNewObject = () => {
+    this.setState({ newObjectDialogOpen: true });
   };
 
   _deleteObject = (objectWithContext: ObjectWithContext) => {
@@ -461,9 +473,7 @@ export default class ObjectsListContainer extends React.Component<
                 onDuplicateObject={this._duplicateObject}
                 onSetAsGlobalObject={this._setAsGlobalObject}
                 onPasteObject={this._pasteAndRename}
-                onAddNewObject={() =>
-                  this.setState({ newObjectDialogOpen: true })
-                }
+                onAddNewObject={this.onAddNewObject}
                 onEditName={this._editName}
                 onEditVariables={this._editVariables}
                 onDelete={this._deleteObject}
@@ -491,7 +501,11 @@ export default class ObjectsListContainer extends React.Component<
         {this.state.newObjectDialogOpen && (
           <NewObjectDialog
             open={this.state.newObjectDialogOpen}
-            onClose={() => this.setState({ newObjectDialogOpen: false })}
+            onClose={() =>
+              this.setState({
+                newObjectDialogOpen: false,
+              })
+            }
             onChoose={this.addObject}
             project={project}
           />

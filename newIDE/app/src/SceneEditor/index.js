@@ -106,6 +106,7 @@ type State = {|
   variablesEditedInstance: ?gdInitialInstance,
   variablesEditedObject: ?gdObject,
   selectedObjectNames: Array<string>,
+  newObjectInstancePosition: ?[number, number],
 
   editedGroup: ?gdObjectGroup,
 
@@ -154,7 +155,7 @@ export default class SceneEditor extends React.Component<Props, State> {
       variablesEditedInstance: null,
       variablesEditedObject: null,
       selectedObjectNames: [],
-
+      newObjectInstancePosition: null,
       editedGroup: null,
 
       // State for "drag'n'dropping" from the objects list to the instances editor:
@@ -459,6 +460,20 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
   };
 
+  _createNewObjectAndInstanceUnderCursor = () => {
+    if (!this.editor) {
+      return;
+    }
+
+    // Remember where to create the instance, when the object will be created
+    this.setState({
+      newObjectInstancePosition: this.editor.getLastCursorPosition(),
+    });
+
+    if (this._objectsList)
+      this._objectsList.setState({ newObjectDialogOpen: true });
+  };
+
   _onAddInstanceUnderCursor = () => {
     if (!this.state.selectedObjectNames.length || !this.editor) {
       return;
@@ -557,6 +572,24 @@ export default class SceneEditor extends React.Component<Props, State> {
     }
     this.forceUpdatePropertiesEditor();
     this.updateToolbar();
+  };
+
+  /**
+   * Create an instance of the given object, at the position
+   * previously chosen (see `newObjectInstancePosition`).
+   */
+  _addNewObjectInstance = (newObjectName: string) => {
+    const { newObjectInstancePosition } = this.state;
+    if (!newObjectInstancePosition) {
+      return;
+    }
+
+    this._addInstance(
+      newObjectInstancePosition[0],
+      newObjectInstancePosition[1],
+      newObjectName
+    );
+    this.setState({ newObjectInstancePosition: null });
   };
 
   _onRemoveLayer = (layerName: string, done: boolean => void) => {
@@ -915,6 +948,7 @@ export default class SceneEditor extends React.Component<Props, State> {
             ) => {
               return this._canObjectUseNewName(objectWithContext, newName);
             }}
+            onObjectCreated={this._addNewObjectInstance}
             onObjectSelected={this._onObjectSelected}
             onRenameObject={this._onRenameObject}
             onObjectPasted={() => this.updateBehaviorsSharedData()}
@@ -1146,6 +1180,11 @@ export default class SceneEditor extends React.Component<Props, State> {
                 : '',
               click: () => this._onAddInstanceUnderCursor(),
               visible: this.state.selectedObjectNames.length > 0,
+            },
+            {
+              label: 'Insert a New Object',
+              click: () => this._createNewObjectAndInstanceUnderCursor(),
+              visible: this.state.selectedObjectNames.length === 0,
             },
             {
               label: this.state.selectedObjectNames.length

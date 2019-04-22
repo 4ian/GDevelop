@@ -215,21 +215,6 @@ bool MoveResourceDownInList(std::vector<std::shared_ptr<Resource> >& resources,
 
 }  // namespace
 
-gd::String Resource::GetAbsoluteFile(const gd::Project& project) const {
-#if !defined(GD_NO_WX_GUI)
-  wxString projectDir =
-      wxFileName::FileName(project.GetProjectFile()).GetPath();
-  wxFileName filename = wxFileName::FileName(GetFile());
-  filename.MakeAbsolute(projectDir);
-  return filename.GetFullPath();
-#else
-  gd::LogWarning(
-      "BAD USE: Resource::GetAbsoluteFile called when compiled with no support "
-      "for wxWidgets");
-  return GetFile();
-#endif
-}
-
 bool ResourceFolder::MoveResourceUpInList(const gd::String& name) {
   return gd::MoveResourceUpInList(resources, name);
 }

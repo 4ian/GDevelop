@@ -80,12 +80,6 @@ class GD_CORE_API Resource {
   virtual void SetFile(const gd::String& newFile){};
 
   /**
-   * \brief Return, if applicable, a String containing the absolute filename of
-   * the resource.
-   */
-  gd::String GetAbsoluteFile(const gd::Project& game) const;
-
-  /**
    * \brief Set the metadata (any string) associated to the resource.
    * \note Can be used by external editors to store extra information, for
    * example the configuration used to produce a sound.

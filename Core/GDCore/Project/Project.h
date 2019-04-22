@@ -9,8 +9,6 @@
 #include <memory>
 #include <vector>
 #include "GDCore/String.h"
-class wxPropertyGrid;
-class wxPropertyGridEvent;
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"

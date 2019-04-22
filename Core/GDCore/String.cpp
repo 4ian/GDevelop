@@ -10,11 +10,6 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Utf8/utf8proc.h"
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/string.h>
-#include <wx/variant.h>
-#endif
-
 namespace gd
 {
 
@@ -39,15 +34,6 @@ String::String(const std::u32string &string) : m_string()
 {
     *this = string;
 }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-String::String(const wxString &string) : m_string()
-{
-    *this = string;
-}
-
-#endif
 
 String& String::operator=(const char *characters)
 {
@@ -94,17 +80,6 @@ String& String::operator=(const std::u32string &string)
 
     return *this;
 }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-String& String::operator=(const wxString &string)
-{
-    m_string =  std::string(string.ToUTF8().data());
-
-    return *this;
-}
-
-#endif
 
 String::size_type String::size() const
 {
@@ -245,25 +220,6 @@ std::wstring String::ToWide() const
     return wstr;
 }
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-String String::FromWxString( const wxString &wxStr)
-{
-    return String(wxStr);
-}
-
-wxString String::ToWxString() const
-{
-    return wxString::FromUTF8(m_string.c_str());
-}
-
-String::operator wxString() const
-{
-    return ToWxString();
-}
-
-#endif
-
 bool String::IsValid() const
 {
     return ::utf8::is_valid(m_string.begin(), m_string.end());
@@ -303,16 +259,6 @@ String& String::operator+=( value_type character )
     push_back(character);
     return *this;
 }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-String& String::operator+=( const wxString &other )
-{
-    *this += gd::String(other);
-    return *this;
-}
-
-#endif
 
 void String::push_back( String::value_type character )
 {
@@ -721,23 +667,6 @@ String GD_CORE_API operator+(const char *lhs, const String &rhs)
     return str;
 }
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-String GD_CORE_API operator+(String lhs, const wxString &rhs)
-{
-    lhs += String::FromWxString(rhs);
-    return lhs;
-}
-
-String GD_CORE_API operator+(const wxString &lhs, const String &rhs)
-{
-    String str(lhs);
-    str += rhs;
-    return str;
-}
-
-#endif
-
 bool GD_CORE_API operator==( const String &lhs, const String &rhs )
 {
     return (lhs.compare(rhs) == 0);
@@ -753,18 +682,6 @@ bool GD_CORE_API operator==( const char *lhs, const gd::String &rhs )
     return (String(lhs) == rhs);
 }
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-bool GD_CORE_API operator==( const String &lhs, const wxString &rhs)
-{
-    return (lhs == String(rhs));
-}
-
-bool GD_CORE_API operator==( const wxString &lhs, const String &rhs)
-{
-    return (String(lhs) == rhs);
-}
-#endif
-
 bool GD_CORE_API operator!=( const String &lhs, const String &rhs )
 {
     return !(lhs == rhs);
@@ -779,18 +696,6 @@ bool GD_CORE_API operator!=( const char *lhs, const String &rhs )
 {
     return !(lhs == rhs);
 }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-bool GD_CORE_API operator!=( const String &lhs, const wxString &rhs)
-{
-    return !(lhs == rhs);
-}
-
-bool GD_CORE_API operator!=( const wxString &lhs, const String &rhs)
-{
-    return !(lhs == rhs);
-}
-#endif
 
 bool GD_CORE_API operator<( const String &lhs, const String &rhs )
 {

@@ -78,7 +78,6 @@
  * The installation is fairly simple :<br>
  * <br>
  * - Launch the installer.<br>
- * - Uncheck "Check for updated files on the TDM-GCC server" (otherwise you won't get TDM-GCC 4.9.2 but a more recent version that won't be compatible with wxWidgets pre-compiled binaries)
  * - Choose Create.<br>
 
  \image html compilerInstall1.png
@@ -157,9 +156,6 @@
  * Binaries are created into *Binaries/Output/Release_{OS}* folder.
  *
  * To launch GDevelop in Windows, double click on **GDIDE**. For Linux, launch **StartGDevelop.sh**.
- *
- * If the build failed, check that you've properly installed wxWidgets and that you have installed any required
- * development library.
  */
 
 /**
@@ -192,18 +188,6 @@ sudo apt-get install curl
 sudo apt-get install devscripts
 \endcode
  *
- * \subsection wxWidgets Install wxWidgets development libraries
- *
- * Most distributions have wxWidgets 3 development libraries available: install them using your package manager. On Ubuntu:
-\code
-sudo apt-get install libwxgtk3.0-dev
-\endcode
-
-You should also have GTK+ development libraries installed. For GTK+2:
-\code
-sudo apt-get install libgtk2.0-dev
-\endcode
-
  *
  * \subsection installcmake Install CMake
  * You'll need CMake to build GDevelop: See more on \subpage installAndUseCMake.
@@ -222,7 +206,6 @@ sudo apt-get install libgtk2.0-dev
 brew install cmake
 brew install p7zip
 brew install pkgconfig
-brew install wxwidgets
 brew install freetype
 \endcode
  * If you want to generate the documentation and translations, install Doxygen and Gettext:
@@ -247,44 +230,6 @@ make -j4
 
 /**
  * \page recommendedToolsAndConventions Recommended tools and advices to work with GD
- *
- * \section texteditor Text editor
- *
- * GDevelop is compiled thanks to CMake which can generate *Makefiles* or a project file for most popular IDE available.<br>
- *
- * [Sublime Text](http://www.sublimetext.com/) is a very nice text editor for programmers:
- * *"You'll love the slick user interface, extraordinary features and amazing performance."*. <br>
- * It has nice features like shortcut to search for a file at an amazing speed (just type a few letters of the file name you're searching for),
- * multiple selection, plugins for better C++ and Javascript support.
- *
- * Take a look at it if you're unsure about which IDE to use. If you're more familiar with another IDE,
- * ask CMake to generate a project file for it.
- *
- * ------
- *
- * \section designers Visual designers for IDE or GDCore dialogs
- *
- * \subsection newDesigner "New" dialogs created with wxCrafter
- *
- * New dialogs are designed using [wxCrafter](http://wxcrafter.codelite.org/). Download and launch it.
- *
- * All dialogs of GDCore, GDCpp, GDJS or the IDE created using wxCrafter are stored into a single .wxcp file in
- * the wxsmith folder, next to files of dialogs created with wxSmith.<br>
- * For example, open *GDJS/wxsmith/GDJS.wxcp*.
- *
- * You can edit and add new dialogs. Do not forget to click on "Generate code" if you made any change.
- *
- * wxCrafter creates base classes for dialog (their names start by *Base*), and any code must be inserted into
- * a derived class. See examples in *GDJS*.
- *
- * \subsection oldDesigner "Old" dialogs created with wxSmith
- * If you want to edit a dialog, first search if there is a file called *filename*.wxs in the folder *wxsmith* (in GDCore,
- * GDCpp or IDE). If it is present, the dialog was made using the wxSmith visual designer integrated into the Code::Blocks IDE:
- *  - Download [Code::Blocks](http://www.codeblocks.org/) and launch it.
- *  - Open the .cbp in GDCore, GDCpp or IDE folder.
- *  - In the tab "Resources", locate the dialog to edit.
- *
- * ------
  *
  * \section git Git and GitHub
  *
@@ -413,8 +358,6 @@ double twopointfive = twopointfive.To<double>();
 //twopointfive == 2.5
  \endcode
  *
- * gd::String can also be implicitly constructed from a wxString or a sf::String, so that it is easy to use when you're dealing
- * with wxWidgets GUI dialogs/editors or SFML objects.
  *
  * For more information, see the complete reference of the class. Tests cases have also been made for most functions.
  */

@@ -28,4 +28,3 @@ External libraries used by GDevelop Core
 --------------------------------------------
 
 * SFML is distributed under the zlib/png license
-* wxWidgets is distributed under wxWindows License (similar to GNU LGPL)

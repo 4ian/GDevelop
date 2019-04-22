@@ -14,8 +14,6 @@ class ResourceFolder;
 class SerializerElement;
 class PropertyDescriptor;
 }
-class wxPaintDC;
-class wxPanel;
 
 namespace gd {
 

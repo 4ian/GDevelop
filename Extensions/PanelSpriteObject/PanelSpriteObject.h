@@ -11,29 +11,12 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/Project/Object.h"
 #include "GDCpp/Runtime/RuntimeObject.h"
 class SFMLTextureWrapper;
-namespace gd {
-class ImageManager;
-}
 class RuntimeScene;
 namespace gd {
 class Object;
-}
-namespace gd {
-class ImageManager;
-}
-namespace gd {
 class InitialInstance;
-}
-#if defined(GD_IDE_ONLY)
-class wxBitmap;
-namespace gd {
 class Project;
 }
-class wxWindow;
-namespace gd {
-class MainFrameWrapper;
-}
-#endif
 
 /**
  * PanelSprite Object

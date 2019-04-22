@@ -7,14 +7,6 @@ macro(gd_add_extension_includes)
 	include_directories(${sfml_include_dir})
 	include_directories(${GDCORE_include_dir})
 	include_directories(${GDCpp_include_dir})
-	IF(WIN32) #Special case for wxWidgets on Windows
-		include_directories(${wxwidgets_include_dir})
-	ELSEIF (NOT EMSCRIPTEN AND NOT NO_GUI)
-		find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
-		include( "${wxWidgets_USE_FILE}" )
-		include_directories(${GTK_INCLUDE_DIRS})
-		link_directories(${GTK_LIBRARY_DIRS})
-	ENDIF(WIN32)
 endmacro()
 
 #Add common defines for a target that will be a GD extension
@@ -28,10 +20,6 @@ function(gd_add_extension_definitions target_name)
 	ENDIF()
 
 	set(${target_name}_extra_definitions "${${target_name}_extra_definitions} GD_IDE_ONLY=1;" PARENT_SCOPE)
-
-	IF (NO_GUI) #Are we compiling without any GUI feature?
-		add_definitions( -DGD_NO_WX_GUI )
-	ENDIF()
 
 	#Defne used in GD to identify the environment
 	IF (EMSCRIPTEN)
@@ -48,17 +36,12 @@ function(gd_add_extension_definitions target_name)
 		add_definitions( "-DGD_CORE_API=__declspec(dllimport)" )
 		add_definitions( "-DGD_API=__declspec(dllimport)" )
 		add_definitions( "-DGD_EXTENSION_API=__declspec(dllexport)" )
-
-		add_definitions( -D__GNUWIN32__ ) #wxWidgets Windows specific defines
-		add_definitions( -D__WXMSW__ )
-		add_definitions( -DwxUSE_UNICODE=1 )
-		add_definitions( -DWXUSINGDLL )
+		add_definitions( -D__GNUWIN32__ )
 	ELSE()
 
 		add_definitions( -DGD_API= )
 		add_definitions( -DGD_CORE_API= )
 		add_definitions( -DGD_EXTENSION_API= )
-		add_definitions(${GTK_CFLAGS_OTHER})
 	ENDIF(WIN32)
 endfunction()
 
@@ -121,8 +104,6 @@ function(gd_extension_link_libraries target_name)
 		target_link_libraries(${target_name} GDCore)
 		target_link_libraries(${target_name} GDCpp)
 		target_link_libraries(${target_name} ${sfml_LIBRARIES})
-		target_link_libraries(${target_name} ${wxWidgets_LIBRARIES}) #Add wxWidgets libraries if needed.
-		target_link_libraries(${target_name} ${GTK_LIBRARIES}) #Add GTK libraries if needed (Linux only).
 	ENDIF()
 endfunction()
 

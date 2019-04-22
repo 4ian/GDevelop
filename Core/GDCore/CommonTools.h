@@ -21,8 +21,6 @@
     #define GD_DEPRECATED
 #endif
 
-class wxString;
-
 namespace gd
 {
 

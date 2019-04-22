@@ -33,7 +33,7 @@ gd::String GetTranslation(const char* str);
 #define _(s) gd::GetTranslation(u8##s)
 
 #else
-// When compiling without Emscripten or wxWidgets (typically for GDC++ Runtime),
+// When compiling without Emscripten (typically for GDC++ Runtime),
 // just return an untranslated gd::String.
 
 // Create a new macro to return UTF8 gd::String from a translation

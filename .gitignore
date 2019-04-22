@@ -3,8 +3,6 @@
 /docs/GDJS Documentation
 /docs/GDCpp Documentation
 /docs/GDCore Documentation
-/ExtLibs/wxwidgets
-/ExtLibs/wxWidgets
 /ExtLibs/SFML
 /ExtLibs/*.7z
 /scripts/Repository keys
@@ -20,13 +18,6 @@
 /Binaries/Releases/**/*.tar.lzma
 /Binaries/Releases/**/*.zip
 /Binaries/Releases/**/*.deb
-Binaries/Packaging/debian-source-package/gdevelop/
-Binaries/Packaging/opensuse-build-service/gdevelop/
-Binaries/Packaging/opensuse-build-service/final/
-Binaries/Packaging/GDevelop.app
-Binaries/Packaging/GDevelop.zip
-Binaries/Packaging/GDevelop.pkg
-Binaries/Packaging/logs
 /GDevelop.js
 *.depend
 *.layout

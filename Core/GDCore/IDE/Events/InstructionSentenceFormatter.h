@@ -52,8 +52,7 @@ class GD_CORE_API InstructionSentenceFormatter {
   gd::String LabelFromType(const gd::String &type);
 
   /**
-   * \brief Load the configuration from the default configuration,
-   * or saved configuration if one was saved with wxWidgets.
+   * \brief Load the configuration from the default configuration.
    */
   void LoadTypesFormattingFromConfig();
 

@@ -4,7 +4,7 @@
  * reserved. This project is released under the MIT License.
  */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
+#if defined(GD_IDE_ONLY) && !defined(EMSCRIPTEN)
 
 #ifndef PROFILEEVENT_H
 #define PROFILEEVENT_H

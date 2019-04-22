@@ -24,8 +24,6 @@ class Platform;
 class SerializerElement;
 class Instruction;
 }
-class wxWindow;
-class wxDC;
 
 namespace gd {
 

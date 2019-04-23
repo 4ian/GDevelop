@@ -9,9 +9,6 @@ cache:
   directories:
     - $HOME/.npm
 
-git:
-  depth: 999999
-
 env:
   global:
     - GCC_VERSION="4.8"

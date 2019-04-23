@@ -48,7 +48,7 @@ if (shell.test('-f', sourceFile)) {
       if (response.statusCode === 403) {
         if (alreadyHasLibGdJs) {
           shell.echo(
-            `ℹ️ Can't download libGD.js (forbidden access for hash=${hash}).`
+            `ℹ️ Can't download libGD.js (can't find hash=${hash}).`
           );
           shell.echo(
             `ℹ️ As you have already a version of libGD.js, assuming you can go ahead with the existing one (this is normal if you're working on the editor only and made some commits).`
@@ -59,7 +59,7 @@ if (shell.test('-f', sourceFile)) {
         }
 
         shell.echo(
-          `❌ Can't download libGD.js (forbidden access for hash=${hash}).`
+          `❌ Can't download libGD.js (can't find hash=${hash}).`
         );
         shell.echo(
           `ℹ️ Maybe libGD.js was not automatically built yet, try again in a few minutes.`

@@ -52,12 +52,6 @@ before_install:
   - sudo dpkg --force-all -i libstdc++6
 
 install:
-#Install newIDE tests dependencies
-  - cd newIDE/app && npm install
-  - cd ../..
-#Install GDJS tests dependencies
-  - cd GDJS/tests && npm install
-  - cd ../..
 #Get the correct version of gcc/g++
   - if [ "$CXX" = "g++" ]; then export CXX="g++-${GCC_VERSION}" CC="gcc-${GCC_VERSION}"; fi
 #Compile the tests only for GDCore and GDCpp
@@ -73,12 +67,18 @@ install:
   - ./emsdk activate sdk-1.37.37-64bit
   - source ./emsdk_env.sh
   - cd ..
-# Install GDevelop.js dependencies
+# Install GDevelop.js dependencies and compile it
   - cd GDevelop.js
   - npm install -g grunt-cli
   - npm install
   - npm run build
   - cd ..
+#Install newIDE tests dependencies
+  - cd newIDE/app && npm install
+  - cd ../..
+#Install GDJS tests dependencies
+  - cd GDJS/tests && npm install
+  - cd ../..
 
 script:
 # GDCore and GDCpp game engine tests:

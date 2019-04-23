@@ -17,8 +17,7 @@ std::vector<gd::String> BaseEvent::emptyDependencies;
 gd::String BaseEvent::emptySourceFile;
 
 BaseEvent::BaseEvent()
-    : eventHeightNeedUpdate(true),
-      totalTimeDuringLastSession(0),
+    : totalTimeDuringLastSession(0),
       percentDuringLastSession(0),
       disabled(false),
       folded(false) {}

@@ -6,27 +6,15 @@ project(GDJS)
 ###
 include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
-IF(WIN32) #Special case for wxWidgets on Windows
-	include_directories(${wxwidgets_include_dir})
-ELSEIF (NOT EMSCRIPTEN AND NOT NO_GUI)
-	find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
-	include( "${wxWidgets_USE_FILE}" )
-	include_directories(${GTK_INCLUDE_DIRS})
-	link_directories(${GTK_LIBRARY_DIRS})
-ENDIF(WIN32)
 
 #Defines
 ###
 add_definitions( -DGD_IDE_ONLY )
-IF (EMSCRIPTEN) #When compiling for the web, we do not want any GUI related feature.
-	add_definitions( -DGD_NO_WX_GUI )
+IF (EMSCRIPTEN)
 	add_definitions( -DEMSCRIPTEN )
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
 	add_definitions( -DDEBUG )
-	IF(WIN32)
-		add_definitions( -D__WXDEBUG__ )
-	ENDIF(WIN32)
 ELSE()
 	add_definitions( -DRELEASE )
 ENDIF()
@@ -35,11 +23,7 @@ IF(WIN32)
 	add_definitions( -DWINDOWS )
 	add_definitions( "-DGD_API=__declspec(dllexport)" )
 	add_definitions( "-DGD_CORE_API=__declspec( dllimport )" )
-
 	add_definitions( -D__GNUWIN32__ )
-	add_definitions( -D__WXMSW__ )
-	add_definitions( -DwxUSE_UNICODE=1 )
-	add_definitions( -DWXUSINGDLL )
 ELSE()
     IF(APPLE)
     add_definitions( -DMACOS )
@@ -48,7 +32,6 @@ ELSE()
 	ENDIF()
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
-	add_definitions(${GTK_CFLAGS_OTHER})
 ENDIF(WIN32)
 
 #The target
@@ -91,8 +74,6 @@ IF(EMSCRIPTEN)
 ELSE()
 	target_link_libraries(GDJS GDCore)
 	target_link_libraries(GDJS ${sfml_LIBRARIES})
-	target_link_libraries(GDJS ${wxWidgets_LIBRARIES}) #Add wxWidgets libraries if needed.
-	target_link_libraries(GDJS ${GTK_LIBRARIES}) #Add GTK libraries if needed (Linux only).
 ENDIF()
 
 #Post build tasks

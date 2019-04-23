@@ -25,10 +25,6 @@ void DeclareSkeletonObjectExtension(gd::PlatformExtension& extension) {
       _("Object animated through bones"),
       "JsPlatform/Extensions/skeletonicon.png");
 
-#if !defined(GD_NO_WX_GUI)
-  SkeletonObject::LoadEdittimeIcon();
-#endif
-
   // Object instructions
   obj.AddCondition("ScaleX",
                    _("Scale X"),

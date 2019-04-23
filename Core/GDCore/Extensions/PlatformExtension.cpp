@@ -15,9 +15,6 @@
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/Project/Behavior.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#endif
 
 namespace gd {
 

@@ -12,32 +12,14 @@
 #include "GDCore/Project/Object.h"
 namespace gd {
 class InitialInstance;
-}
-namespace gd {
 class Object;
-}
-namespace gd {
 class Layout;
-}
-namespace gd {
 class Sprite;
-}
-namespace gd {
 class Animation;
-}
-namespace gd {
 class MainFrameWrapper;
-}
-namespace gd {
 class SerializerElement;
-}
-namespace gd {
 class PropertyDescriptor;
-}
-#if defined(GD_IDE_ONLY)
-class wxBitmap;
-class wxWindow;
-#endif
+}  // namespace gd
 
 namespace gd {
 
@@ -64,8 +46,6 @@ class GD_CORE_API SpriteObject : public gd::Object {
   }
 
 #if defined(GD_IDE_ONLY)
-  bool GenerateThumbnail(const gd::Project& project,
-                         wxBitmap& thumbnail) const override;
   void ExposeResources(gd::ArbitraryResourceWorker& worker) override;
 
   std::map<gd::String, gd::PropertyDescriptor> GetProperties(
@@ -83,24 +63,6 @@ class GD_CORE_API SpriteObject : public gd::Object {
                                      const gd::String& value,
                                      gd::Project& project,
                                      gd::Layout& scene) override;
-  void EditObject(wxWindow* parent,
-                  gd::Project& project,
-                  gd::MainFrameWrapper& mainFrameWrapper_) override;
-#if !defined(EMSCRIPTEN)
-  void DrawInitialInstance(gd::InitialInstance& instance,
-                           sf::RenderTarget& renderTarget,
-                           gd::Project& project,
-                           gd::Layout& layout) override;
-  sf::Vector2f GetInitialInstanceDefaultSize(gd::InitialInstance& instance,
-                                             gd::Project& project,
-                                             gd::Layout& layout) const override;
-  sf::Vector2f GetInitialInstanceOrigin(gd::InitialInstance& instance,
-                                        gd::Project& project,
-                                        gd::Layout& layout) const override;
-  void LoadResources(gd::Project& project, gd::Layout& layout) override;
-#endif
-
-  bool SupportShaders() override { return true; };
 #endif
 
   /** \name Animations
@@ -168,10 +130,6 @@ class GD_CORE_API SpriteObject : public gd::Object {
   void DoSerializeTo(gd::SerializerElement& element) const override;
 #endif
 
-  const Sprite* GetInitialInstanceSprite(gd::InitialInstance& instance,
-                                         gd::Project& project,
-                                         gd::Layout& layout,
-                                         bool* shouldNotRotate = NULL) const;
   mutable std::vector<Animation> animations;
   bool updateIfNotVisible;  ///< If set to true, ask the game engine to play
                             ///< object animation even if hidden or far from the

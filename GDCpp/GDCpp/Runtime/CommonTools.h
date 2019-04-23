@@ -10,9 +10,6 @@
 #include <string>
 #include <vector>
 #include "GDCpp/Runtime/String.h"
-#if defined(GD_IDE_ONLY)
-class wxString;
-#endif
 
 /**
  * \brief Functor testing if a gd::String is empty

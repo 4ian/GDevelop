@@ -7,16 +7,9 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/ExtensionsLoader.h"
 #include "GDCore/Project/Project.h"
 #include "GDCore/Tools/Log.h"
-#include "GDJS/IDE/Exporter.h"
-#if !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#include <wx/filename.h>
-#include <wx/time.h>
-#endif
 
 // Built-in extensions
 #include "GDJS/Extensions/Builtin/AdvancedExtension.h"
@@ -42,86 +35,6 @@
 namespace gdjs {
 
 JsPlatform *JsPlatform::singleton = NULL;
-
-#if !defined(GD_NO_WX_GUI)
-/**
- * \brief Allow the platform to launch preview in a browser.
- *
- * This class inherits from gd::LayoutEditorPreviewer and is provided
- * to the IDE thanks to the JsPlatform::GetLayoutPreviewer method.
- *
- * \see JsPlatform
- * \see gd::LayoutEditorPreviewer
- */
-class Previewer : public gd::LayoutEditorPreviewer {
- public:
-  Previewer(gd::Project &project_,
-            gd::Layout &layout_,
-            gd::ExternalLayout *externalLayout_ = NULL)
-      : project(project_), layout(layout_), externalLayout(externalLayout_) {}
-
-  virtual bool LaunchPreview() {
-    gd::String exportDir =
-        wxFileName::GetTempDir() + "/GDTemporaries/JSPreview/";
-
-    Exporter exporter(gd::NativeFileSystem::Get());
-    bool exportSuccessed =
-        externalLayout
-            ? exporter.ExportExternalLayoutForPixiPreview(
-                  project, layout, *externalLayout, exportDir)
-            : exporter.ExportLayoutForPixiPreview(project, layout, exportDir);
-
-    if (!exportSuccessed) {
-      gd::LogError(_("An error occurred when launching the preview:\n\n") +
-                   exporter.GetLastError() +
-                   _("\n\nPlease report this error on the GDevelop website, or "
-                     "contact the extension developer if it seems related to a "
-                     "third party extension."));
-    }
-
-    // Without "http://", the function fails (on Windows at least).
-    // The timestamp is here to prevent browsers caching contents.
-    if (!wxLaunchDefaultBrowser("http://localhost:2828?" +
-                                gd::String::From(wxGetLocalTime()))) {
-      gd::LogError(
-          _("Unable to launch your browser :(\nManually open your browser and "
-            "type \"localhost:2828\" in\nthe address bar (without the quotes) "
-            "to launch the preview!"));
-    }
-
-    return false;
-  }
-
- private:
-  gd::Project &project;
-  gd::Layout &layout;
-  gd::ExternalLayout *externalLayout;
-};
-#endif
-
-void JsPlatform::OnIDEInitialized() {
-// Initializing the tiny web server used to preview the games
-#if !defined(GD_NO_WX_GUI)
-  std::cout << " * Starting web server..." << std::endl;
-  gd::String exportDir = wxFileName::GetTempDir() + "/GDTemporaries/JSPreview/";
-  httpServer.Run(exportDir);
-#endif
-}
-
-#if !defined(GD_NO_WX_GUI)
-std::shared_ptr<gd::LayoutEditorPreviewer> JsPlatform::GetLayoutPreviewer(
-    gd::LayoutEditorCanvas &editor) const {
-  return std::shared_ptr<gd::LayoutEditorPreviewer>(new Previewer(
-      editor.GetProject(), editor.GetLayout(), editor.GetExternalLayout()));
-}
-
-std::vector<std::shared_ptr<gd::ProjectExporter>>
-JsPlatform::GetProjectExporters() const {
-  return std::vector<std::shared_ptr<gd::ProjectExporter>>{
-      std::shared_ptr<gd::ProjectExporter>(
-          new Exporter(gd::NativeFileSystem::Get()))};
-}
-#endif
 
 // When compiling with emscripten, extensions exposes specific functions to
 // create them.

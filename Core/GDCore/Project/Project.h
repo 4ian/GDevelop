@@ -9,9 +9,6 @@
 #include <memory>
 #include <vector>
 #include "GDCore/String.h"
-class wxPropertyGrid;
-class wxPropertyGridEvent;
-class TiXmlElement;
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
@@ -399,42 +396,10 @@ class GD_CORE_API Project : public ObjectsContainer {
   ///@}
 #endif
 
-#if !defined(GD_NO_WX_GUI)
-  /** \name GUI property grid management
-   * Members functions related to managing the wxWidgets property grid used to
-   * display the properties of the project.
-   */
-  ///@{
-  /**
-   * IDE calls this function so as to let the project populate a wxPropertyGrid
-   * with its properties.
-   */
-  void PopulatePropertyGrid(wxPropertyGrid* grid);
-
-  /**
-   * IDE calls this function so that the project update its properties from the
-   * values stored in the wxPropertyGrid.
-   */
-  void UpdateFromPropertyGrid(wxPropertyGrid* grid);
-
-  /**
-   * IDE calls this function when a property is selected in the property grid.
-   */
-  void OnSelectionInPropertyGrid(wxPropertyGrid* grid,
-                                 wxPropertyGridEvent& event);
-
-  /**
-   * IDE calls this function when a property was changed in the property grid.
-   */
-  void OnChangeInPropertyGrid(wxPropertyGrid* grid, wxPropertyGridEvent& event);
-  ///@}
-#endif
-
   /** \name Layouts management
    * Members functions related to layout management.
    */
   ///@{
-
   /**
    * \brief Return true if layout called "name" exists.
    */
@@ -510,7 +475,7 @@ class GD_CORE_API Project : public ObjectsContainer {
 
 #if defined(GD_IDE_ONLY)
   /**
-   * \brief Called to serialize the project to a TiXmlElement.
+   * \brief Serialize the project.
    *
    * "Dirty" flag is set to false when serialization is done.
    */
@@ -949,11 +914,6 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Don't forget to update me if members were changed!
    */
   void Init(const gd::Project& project);
-
-  /**
-   * Helper method for LoadFromXml method.
-   */
-  void LoadProjectInformationFromXml(const TiXmlElement* elem);
 
   gd::String name;            ///< Game name
   gd::String version;         ///< Game version number (used for some exports)

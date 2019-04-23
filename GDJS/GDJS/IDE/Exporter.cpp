@@ -8,20 +8,10 @@
 #include <sstream>
 #include <streambuf>
 #include <string>
-#if !defined(GD_NO_WX_GUI)
-#include <wx/config.h>
-#include <wx/dir.h>
-#include <wx/filename.h>
-#include <wx/msgdlg.h>
-#include <wx/progdlg.h>
-#include <wx/wfstream.h>
-#include <wx/zipstrm.h>
-#endif
 #include "GDCore/CommonTools.h"
 #include "GDCore/IDE/AbstractFileSystem.h"
 #include "GDCore/IDE/Project/ProjectResourcesCopier.h"
 #include "GDCore/IDE/ProjectStripper.h"
-#include "GDCore/IDE/wxTools/ShowFolder.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/Layout.h"
@@ -32,9 +22,6 @@
 #include "GDCore/Tools/Localization.h"
 #include "GDCore/Tools/Log.h"
 #include "GDJS/Events/CodeGeneration/EventsCodeGenerator.h"
-#include "GDJS/IDE/Dialogs/CocoonJSUploadDialog.h"
-#include "GDJS/IDE/Dialogs/CordovaPackageDialog.h"
-#include "GDJS/IDE/Dialogs/ProjectExportDialog.h"
 #include "GDJS/IDE/Exporter.h"
 #include "GDJS/IDE/ExporterHelper.h"
 #undef CopyFile  // Disable an annoying macro
@@ -68,27 +55,6 @@ bool Exporter::ExportExternalLayoutForPixiPreview(
       project, layout, exportDir, gd::Serializer::ToJSON(options));
 }
 
-void Exporter::ShowProjectExportDialog(gd::Project& project) {
-#if !defined(GD_NO_WX_GUI)
-  ProjectExportDialog dialog(NULL, project);
-  if (dialog.ShowModal() != 1) return;
-
-  if (dialog.GetExportType() == ProjectExportDialog::Cocos2d) {
-    ExportWholeCocos2dProject(
-        project, dialog.IsDebugMode(), dialog.GetExportDir());
-  } else {
-    std::map<gd::String, bool> exportOptions;
-    exportOptions["exportForCordova"] =
-        dialog.GetExportType() == ProjectExportDialog::PixiCordova;
-    exportOptions["minify"] = dialog.RequestMinify();
-    ExportWholePixiProject(project, dialog.GetExportDir(), exportOptions);
-  }
-
-#else
-  gd::LogError("BAD USE: Exporter::ShowProjectExportDialog is not available.");
-#endif
-}
-
 bool Exporter::ExportWholePixiProject(
     gd::Project& project,
     gd::String exportDir,
@@ -108,11 +74,6 @@ bool Exporter::ExportWholePixiProject(
       exportedProject.GetLoadingScreen().ShowGDevelopSplash(false);
 
     wxProgressDialog* progressDialogPtr = NULL;
-#if !defined(GD_NO_WX_GUI)
-    wxProgressDialog progressDialog(_("Export in progress (1/2)"),
-                                    _("Exporting the project..."));
-    progressDialogPtr = &progressDialog;
-#endif
 
     // Prepare the export directory
     fs.MkDir(exportDir);
@@ -121,11 +82,6 @@ bool Exporter::ExportWholePixiProject(
     // Export the resources (before generating events as some resources
     // filenames may be updated)
     helper.ExportResources(fs, exportedProject, exportDir, progressDialogPtr);
-
-#if !defined(GD_NO_WX_GUI)
-    progressDialog.SetTitle(_("Export in progress ( 2/2 )"));
-    progressDialog.Update(50, _("Exporting events..."));
-#endif
 
     // Export engine libraries
     helper.AddLibsInclude(true, false, false, includesFiles);
@@ -155,12 +111,6 @@ bool Exporter::ExportWholePixiProject(
     helper.ExportToJSON(
         fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
     includesFiles.push_back(codeOutputDir + "/data.js");
-
-#if !defined(GD_NO_WX_GUI)
-    progressDialog.Update(80,
-                          minify ? _("Exporting files and minifying them...")
-                                 : _("Exporting files..."));
-#endif
 
     // Copy all dependencies and the index (or metadata) file.
     helper.RemoveIncludes(false, true, includesFiles);
@@ -204,21 +154,6 @@ bool Exporter::ExportWholePixiProject(
     if (!exportProject(exportDir)) return false;
   }
 
-// Finished!
-#if !defined(GD_NO_WX_GUI)
-  if (exportOptions["exportForCordova"]) {
-    CordovaPackageDialog packageDialog(NULL, exportDir);
-    packageDialog.ShowModal();
-  } else {
-    if (wxMessageBox(_("Compilation achieved. Do you want to open the folder "
-                       "where the project has been compiled\?"),
-                     _("Compilation finished"),
-                     wxYES_NO) == wxYES) {
-      gd::ShowFolder(exportDir);
-    }
-  }
-#endif
-
   return true;
 }
 
@@ -228,11 +163,6 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   ExporterHelper helper(fs, gdjsRoot, codeOutputDir);
 
   wxProgressDialog* progressDialogPtr = NULL;
-#if !defined(GD_NO_WX_GUI)
-  wxProgressDialog progressDialog(_("Export in progress (1/2)"),
-                                  _("Exporting the project..."));
-  progressDialogPtr = &progressDialog;
-#endif
 
   // Prepare the export directory
   fs.MkDir(exportDir);
@@ -244,11 +174,6 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
   // may be updated)
   helper.ExportResources(
       fs, exportedProject, exportDir + "/res", progressDialogPtr);
-
-#if !defined(GD_NO_WX_GUI)
-  progressDialog.SetTitle(_("Export in progress ( 2/2 )"));
-  progressDialog.Update(50, _("Exporting events..."));
-#endif
 
   // Export engine libraries
   helper.AddLibsInclude(false, true, false, includesFiles);
@@ -278,10 +203,6 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
       fs, exportedProject, codeOutputDir + "/data.js", "gdjs.projectData");
   includesFiles.push_back(codeOutputDir + "/data.js");
 
-#if !defined(GD_NO_WX_GUI)
-  progressDialog.Update(80, _("Exporting files..."));
-#endif
-
   // Copy all dependencies and the index (or metadata) file.
   helper.RemoveIncludes(true, false, includesFiles);
   helper.ExportIncludesAndLibs(includesFiles, exportDir + "/src", false);
@@ -292,22 +213,7 @@ bool Exporter::ExportWholeCocos2dProject(gd::Project& project,
     return false;
   }
 
-// Finished!
-#if !defined(GD_NO_WX_GUI)
-  // TODO: Factor/update message?
-  if (wxMessageBox(_("Compilation achieved. Do you want to open the folder "
-                     "where the project has been compiled\?"),
-                   _("Compilation finished"),
-                   wxYES_NO) == wxYES) {
-    gd::ShowFolder(exportDir);
-  }
-#endif
-
   return true;
-}
-
-gd::String Exporter::GetProjectExportButtonLabel() {
-  return _("Export to the web");
 }
 
 }  // namespace gdjs

@@ -22,17 +22,6 @@ This project is released under the MIT License.
 
 #include <iostream>
 
-#if defined(GD_IDE_ONLY)
-
-#if !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#include <wx/filename.h>
-#endif
-
-sf::Texture SkeletonObject::edittimeIconImage;
-sf::Sprite SkeletonObject::edittimeIcon;
-#endif
-
 SkeletonObject::SkeletonObject(gd::String name_) : Object(name_) {
 #if defined(GD_IDE_ONLY)
   originalSize = sf::Vector2f(32.0f, 32.0f),
@@ -94,58 +83,6 @@ bool SkeletonObject::UpdateProperty(const gd::String& name,
 
   return true;
 }
-
-void SkeletonObject::LoadEdittimeIcon() {
-  edittimeIconImage.loadFromFile("JsPlatform/Extensions/skeletonicon.png");
-  edittimeIcon.setTexture(edittimeIconImage);
-}
-
-#if !defined(GD_NO_WX_GUI)
-bool SkeletonObject::GenerateThumbnail(const gd::Project& project,
-                                       wxBitmap& thumbnail) const {
-  thumbnail =
-      wxBitmap("JsPlatform/Extensions/skeletonicon24.png", wxBITMAP_TYPE_ANY);
-
-  return true;
-}
-#endif
-
-void SkeletonObject::DrawInitialInstance(gd::InitialInstance& instance,
-                                         sf::RenderTarget& renderTarget,
-                                         gd::Project& project,
-                                         gd::Layout& layout) {
-#if !defined(GD_NO_WX_GUI)
-  if (sizeDirty) UpdateSize(project);
-#endif
-
-  edittimeIcon.setPosition(instance.GetX() - originalSize.x / 2.0f,
-                           instance.GetY() - originalSize.y / 2.0f);
-  renderTarget.draw(edittimeIcon);
-}
-
-sf::Vector2f SkeletonObject::GetInitialInstanceOrigin(
-    gd::InitialInstance& instance,
-    gd::Project& project,
-    gd::Layout& layout) const {
-  return originOffset;
-}
-
-#if !defined(GD_NO_WX_GUI)
-void SkeletonObject::UpdateSize(gd::Project& project) {
-  sizeDirty = false;
-
-  // Force the path as relative
-  wxString projectDir =
-      wxFileName::FileName(project.GetProjectFile()).GetPath();
-  wxFileName fileName(skeletalDataFilename.ToWxString());
-  fileName.SetPath(projectDir);
-
-  // Can't unserialize from JSON's with empty arrays/objects ?
-  // gd::String fileContent =
-  // gd::ResourcesLoader::Get()->LoadPlainText(gd::String::FromWxString(fileName.GetFullPath()));
-  // gd::SerializerElement element = gd::Serializer::FromJSON(fileContent);
-}
-#endif
 #endif
 
 gd::Object* CreateSkeletonObject(gd::String name) {

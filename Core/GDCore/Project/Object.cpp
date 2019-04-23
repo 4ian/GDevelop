@@ -12,9 +12,6 @@
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
 #endif
-#if !defined(GD_NO_WX_GUI)
-#include <SFML/Graphics.hpp>
-#endif
 
 namespace gd {
 
@@ -102,43 +99,12 @@ gd::Behavior* Object::AddNewBehavior(gd::Project& project,
   }
 }
 
-sf::Vector2f Object::GetInitialInstanceDefaultSize(
-    gd::InitialInstance& instance,
-    gd::Project& project,
-    gd::Layout& layout) const {
-  return sf::Vector2f(32, 32);
-}
-
-sf::Vector2f Object::GetInitialInstanceOrigin(gd::InitialInstance& instance,
-                                              gd::Project& project,
-                                              gd::Layout& layout) const {
-  return sf::Vector2f(0, 0);
-}
-
 std::map<gd::String, gd::PropertyDescriptor>
 Object::GetInitialInstanceProperties(const gd::InitialInstance& instance,
                                      gd::Project& project,
                                      gd::Layout& layout) {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
-}
-
-void Object::DrawInitialInstance(gd::InitialInstance& instance,
-                                 sf::RenderTarget& renderTarget,
-                                 gd::Project& project,
-                                 gd::Layout& layout) {
-#if !defined(GD_NO_WX_GUI)
-  sf::RectangleShape mask(
-      instance.HasCustomSize()
-          ? sf::Vector2f(instance.GetCustomWidth(), instance.GetCustomHeight())
-          : GetInitialInstanceDefaultSize(instance, project, layout));
-  mask.setPosition(instance.GetX(), instance.GetY());
-  mask.setRotation(instance.GetAngle());
-  mask.setFillColor(sf::Color(147, 151, 255));
-  mask.setOutlineThickness(1);
-  mask.setOutlineColor(sf::Color(255, 48, 69));
-  renderTarget.draw(mask);
-#endif
 }
 #endif
 

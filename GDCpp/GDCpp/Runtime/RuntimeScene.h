@@ -14,23 +14,17 @@
 #include "GDCpp/Runtime/BehaviorsRuntimeSharedDataHolder.h"
 #include "GDCpp/Runtime/InputManager.h"
 #include "GDCpp/Runtime/ObjInstancesHolder.h"
-#include "GDCpp/Runtime/Project/Layout.h"  //This include must be placed first
+#include "GDCpp/Runtime/Project/Layout.h"
 #include "GDCpp/Runtime/RuntimeLayer.h"
 #include "GDCpp/Runtime/RuntimeVariablesContainer.h"
 #include "GDCpp/Runtime/TimeManager.h"
 namespace sf {
 class RenderWindow;
-}
-namespace sf {
 class Event;
 }
 namespace gd {
 class Project;
-}
-namespace gd {
 class Object;
-}
-namespace gd {
 class ImageManager;
 }
 class RuntimeLayer;

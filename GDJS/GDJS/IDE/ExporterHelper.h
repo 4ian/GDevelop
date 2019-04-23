@@ -8,7 +8,6 @@
 #include <set>
 #include <string>
 #include <vector>
-#include "GDCore/IDE/ProjectExporter.h"
 namespace gd {
 class Project;
 class Layout;
@@ -34,15 +33,6 @@ class ExporterHelper {
    * \brief Return the error that occurred during the last export.
    */
   const gd::String &GetLastError() const { return lastError; };
-
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * \brief Try to locate the Node.js executable. (Node must be installed in a
-   * standard folder). \return An empty string if not found, a full path to the
-   * node executable otherwise.
-   */
-  static gd::String GetNodeExecutablePath();
-#endif
 
   /**
    * \brief Export a project to JSON

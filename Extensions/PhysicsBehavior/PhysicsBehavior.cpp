@@ -15,7 +15,6 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/RuntimeObject.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
 #include "GDCpp/Runtime/Serialization/SerializerElement.h"
-#include "PhysicsBehaviorEditor.h"
 #include "RuntimeScenePhysicsDatas.h"
 #include "Triangulation/triangulate.h"
 #if defined(GD_IDE_ONLY)
@@ -50,19 +49,6 @@ PhysicsBehavior::~PhysicsBehavior() {
   if (runtimeScenesPhysicsDatas != NULL && body)
     runtimeScenesPhysicsDatas->world->DestroyBody(body);
 }
-
-#if defined(GD_IDE_ONLY)
-void PhysicsBehavior::EditBehavior(wxWindow *parent,
-                                   gd::Project &project_,
-                                   gd::Layout *layout_,
-                                   gd::MainFrameWrapper &mainFrameWrapper_) {
-#if !defined(GD_NO_WX_GUI)
-  PhysicsBehaviorEditor editor(
-      parent, project_, layout_, *this, mainFrameWrapper_);
-  editor.ShowModal();
-#endif
-}
-#endif
 
 /**
  * Called at each frame before events :

@@ -11,10 +11,6 @@
 #include <memory>
 #include <vector>
 #include "GDCore/String.h"
-#if !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#endif
-class wxBitmap;
 namespace gd {
 class EventsList;
 class BaseEvent;
@@ -81,16 +77,10 @@ class GD_CORE_API EventMetadata {
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetGroup() const { return group; }
-#if !defined(GD_NO_WX_GUI)
-  const wxBitmap& GetBitmapIcon() const { return smallicon; }
-#endif
 
   gd::String fullname;
   gd::String description;
   gd::String group;
-#if !defined(GD_NO_WX_GUI)
-  wxBitmap smallicon;
-#endif
 
   std::shared_ptr<gd::BaseEvent> instance;
   bool hasCustomCodeGenerator;

@@ -12,29 +12,15 @@ set(GDCpp_Runtime_lib_dir ${GD_base_dir}/Binaries/Output/${CMAKE_BUILD_TYPE}_${C
 ###
 include_directories(${sfml_include_dir})
 include_directories(${GDCORE_include_dir})
-IF(WIN32) #Special case for wxWidgets on Windows
-	include_directories(${wxwidgets_include_dir})
-ELSEIF (NOT EMSCRIPTEN AND NOT NO_GUI)
-	find_package(wxWidgets COMPONENTS core base adv net ribbon stc aui propgrid richtext html xrc REQUIRED)
-	include( "${wxWidgets_USE_FILE}" )
-	include_directories(${GTK_INCLUDE_DIRS})
-	link_directories(${GTK_LIBRARY_DIRS})
-ENDIF(WIN32)
 
 #Defines
 ###
 set(GDCpp_extra_definitions "${GDCpp_extra_definitions} GD_IDE_ONLY=1;")
-IF (EMSCRIPTEN) #When compiling for the web, we do not want any GUI related feature.
+IF (EMSCRIPTEN)
 	add_definitions( -DEMSCRIPTEN )
-ENDIF()
-IF (NO_GUI)
-	add_definitions( -DGD_NO_WX_GUI )
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
 	add_definitions( -DDEBUG )
-	IF(WIN32)
-		add_definitions( -D__WXDEBUG__ )
-	ENDIF(WIN32)
 ELSE()
 	add_definitions( -DRELEASE )
 ENDIF()
@@ -49,9 +35,6 @@ IF(WIN32)
 	set(GDCpp_Runtime_exe_extra_definitions "${GDCpp_Runtime_exe_extra_definitions} GD_API=__declspec(dllimport);")
 
 	add_definitions( -D__GNUWIN32__ )
-	add_definitions( -D__WXMSW__ )
-	add_definitions( -DwxUSE_UNICODE=1 )
-	add_definitions( -DWXUSINGDLL )
 ELSE()
     IF(APPLE)
     add_definitions( -DMACOS )
@@ -60,9 +43,6 @@ ELSE()
 	ENDIF()
 	add_definitions( -DGD_API= )
 	add_definitions( -DGD_CORE_API= )
-	IF (NOT NO_GUI)
-		add_definitions(${GTK_CFLAGS_OTHER})
-	ENDIF()
 ENDIF(WIN32)
 
 
@@ -78,9 +58,6 @@ file(GLOB_RECURSE source_gdcpp_runtime GDCpp/Runtime/*)
 
 set(source_files ${source_gdcpp_builtin} ${source_gdcpp_runtime})
 set(ide_source_files ${source_files} ${source_gdcpp_events} ${source_gdcpp_ide})
-IF (NOT NO_GUI)
-	list(APPEND ide_source_files ${source_gdcpp_ide_dialogs})
-ENDIF()
 
 file(GLOB_RECURSE formatted_gdcpp_source_files tests/*.cpp GDCpp/Events/* GDCpp/Extensions/* GDCpp/IDE/*.cpp)
 list(REMOVE_ITEM formatted_gdcpp_source_files "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs.h" "${CMAKE_CURRENT_SOURCE_DIR}/GDCpp/IDE/Dialogs/GDCppDialogs_dialogs_bitmaps.cpp")
@@ -129,8 +106,6 @@ IF(EMSCRIPTEN)
 ELSE()
 	target_link_libraries(GDCpp GDCore)
 	target_link_libraries(GDCpp ${sfml_LIBRARIES})
-	target_link_libraries(GDCpp ${wxWidgets_LIBRARIES})
-	target_link_libraries(GDCpp ${GTK_LIBRARIES})
 ENDIF()
 
 #Linker files for Runtime

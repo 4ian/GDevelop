@@ -3,10 +3,6 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#include <wx/file.h>
-#endif
 #include <algorithm>
 #include "GDCore/CommonTools.h"
 #include "GDCore/Serialization/SerializerElement.h"
@@ -42,18 +38,6 @@ InstructionMetadata::InstructionMetadata(const gd::String& extensionNamespace_,
       extensionNamespace(extensionNamespace_),
       hidden(false),
       usageComplexity(5) {
-#if !defined(GD_NO_WX_GUI)
-  if (wxFile::Exists(icon_)) {
-    icon = wxBitmap(icon_, wxBITMAP_TYPE_ANY);
-  } else {
-    icon = wxBitmap(24, 24);
-  }
-  if (wxFile::Exists(smallIcon_)) {
-    smallicon = wxBitmap(smallIcon_, wxBITMAP_TYPE_ANY);
-  } else {
-    smallicon = wxBitmap(16, 16);
-  }
-#endif
 }
 
 ParameterMetadata::ParameterMetadata() : optional(false), codeOnly(false) {}

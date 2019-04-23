@@ -14,14 +14,6 @@ namespace gd {
 class Variable;
 }
 
-void GD_API SendDataToPhpWebPage(const gd::String& webpageurl,
-                                 const gd::String& password,
-                                 const gd::String& data1,
-                                 const gd::String& data2,
-                                 const gd::String& data3,
-                                 const gd::String& data4,
-                                 const gd::String& data5,
-                                 const gd::String& data6);
 void GD_API SendHttpRequest(const gd::String& host,
                             const gd::String& uri,
                             const gd::String& body,

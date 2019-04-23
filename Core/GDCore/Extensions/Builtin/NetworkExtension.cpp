@@ -23,30 +23,6 @@ void GD_CORE_API BuiltinExtensionsImplementer::ImplementsNetworkExtension(
 #if defined(GD_IDE_ONLY)
   extension
       .AddAction(
-          "EnvoiDataNet",
-          _("Send data to a website"),
-          _("Send data to a specified web site.\nYou need to set up a .php "
-            "page on your web site to receive this data.\nEnter a password "
-            "here, and enter the same password in the configuration of your "
-            ".php page.\nRead the help file to get more information."),
-          _("Send to _PARAM0_ the following data : _PARAM2_, "
-            "_PARAM3_,_PARAM4_,_PARAM5_,_PARAM6_,_PARAM7_"),
-          _("Network"),
-          "res/actions/net24.png",
-          "res/actions/net.png")
-      .AddParameter("string",
-                    _(".php page URL (don't forget the protocol http://)"))
-      .AddParameter("password", _("Password"))
-      .AddParameter("string", _("Data 1"))
-      .AddParameter("string", _("Data 2"), "", true)
-      .AddParameter("string", _("Data 3"), "", true)
-      .AddParameter("string", _("Data 4"), "", true)
-      .AddParameter("string", _("Data 5"), "", true)
-      .AddParameter("string", _("Data 6"), "", true)
-      .SetHidden();
-
-  extension
-      .AddAction(
           "SendRequest",
           _("Send a request to a web page"),
           _("Send a request to the specified web page.\n\nPlease note that for "

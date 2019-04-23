@@ -3,9 +3,6 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/msgdlg.h>  //Must be placed first
-#endif
 #include <iostream>
 #include <vector>
 #include "GDCore/Tools/Log.h"
@@ -454,30 +451,3 @@ unsigned int GD_API GetScreenColorDepth() {
 void GD_API DisableInputWhenFocusIsLost(RuntimeScene &scene, bool disable) {
   scene.DisableInputWhenFocusIsLost(disable);
 }
-
-#if defined(GD_IDE_ONLY)
-bool GD_API WarnAboutInfiniteLoop(RuntimeScene &scene) {
-#if !defined(GD_NO_WX_GUI)
-  if (wxMessageBox(_("A \"While\" event was repeated 100000 times: You may "
-                     "have created an infinite loop, which is repeating itself "
-                     "indefinitely and which is going to freeze the software.\n"
-                     "\n"
-                     "If you want to stop the preview to correct the issue, "
-                     "click on Yes.\n"
-                     "If you want to continue the preview, click on No.\n"
-                     "You can deactivate this warning by double clicking on "
-                     "While events.\n"
-                     "\n"
-                     "Stop the preview?"),
-                   _("Infinite loop"),
-                   wxYES_NO | wxICON_EXCLAMATION) == wxYES) {
-    scene.RequestChange(RuntimeScene::SceneChange::STOP_GAME);
-    return true;
-  }
-#else
-  gd::LogWarning("While event repeated 100000 times!");
-#endif
-
-  return false;
-}
-#endif

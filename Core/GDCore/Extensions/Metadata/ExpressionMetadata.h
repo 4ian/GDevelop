@@ -11,10 +11,6 @@
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/String.h"
-#if !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#endif
-class wxBitmap;
 namespace gd {
 class Layout;
 }
@@ -200,9 +196,6 @@ class GD_CORE_API ExpressionMetadata {
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetGroup() const { return group; }
   const gd::String& GetSmallIconFilename() const { return smallIconFilename; }
-#if !defined(GD_NO_WX_GUI)
-  const wxBitmap& GetBitmapIcon() const { return smallicon; }
-#endif
   const gd::ParameterMetadata& GetParameter(std::size_t id) const {
     return parameters[id];
   };
@@ -220,9 +213,6 @@ class GD_CORE_API ExpressionMetadata {
   gd::String group;
   bool shown;
 
-#if !defined(GD_NO_WX_GUI)
-  wxBitmap smallicon;
-#endif
   gd::String smallIconFilename;
   gd::String extensionNamespace;
 };

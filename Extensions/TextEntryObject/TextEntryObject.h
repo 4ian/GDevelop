@@ -7,27 +7,9 @@ This project is released under the MIT License.
 
 #ifndef TEXTENTRYOBJECT_H
 #define TEXTENTRYOBJECT_H
-
 #include "GDCpp/Runtime/Project/Object.h"
 #include "GDCpp/Runtime/RuntimeObject.h"
 class RuntimeScene;
-class ImageManager;
-namespace gd {
-class InitialInstance;
-}
-namespace gd {
-class ImageManager;
-}
-#if defined(GD_IDE_ONLY)
-namespace sf {
-class Texture;
-class Sprite;
-};  // namespace sf
-namespace gd {
-class Project;
-}
-class wxBitmap;
-#endif
 
 /**
  * \brief Simple object which stores user keyboard input.
@@ -40,21 +22,7 @@ class GD_EXTENSION_API TextEntryObject : public gd::Object {
     return gd::make_unique<TextEntryObject>(*this);
   }
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  virtual void DrawInitialInstance(gd::InitialInstance& instance,
-                                   sf::RenderTarget& renderTarget,
-                                   gd::Project& project,
-                                   gd::Layout& layout);
-  virtual bool GenerateThumbnail(const gd::Project& project,
-                                 wxBitmap& thumbnail) const;
-  static void LoadEdittimeIcon();
-#endif
-
  private:
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  static sf::Texture edittimeIconImage;
-  static sf::Sprite edittimeIcon;
-#endif
 };
 
 class GD_EXTENSION_API RuntimeTextEntryObject : public RuntimeObject {

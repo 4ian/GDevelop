@@ -5,7 +5,6 @@
  */
 #include "Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/IDE/ProjectExporter.h"
 #include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/String.h"
@@ -15,10 +14,6 @@ using namespace std;
 #undef CreateEvent
 
 namespace gd {
-
-#if defined(GD_IDE_ONLY)
-gd::ChangesNotifier Platform::defaultEmptyChangesNotifier;
-#endif
 
 Platform::Platform() {}
 
@@ -138,20 +133,6 @@ std::shared_ptr<gd::BaseEvent> Platform::CreateEvent(
 
   return std::shared_ptr<gd::BaseEvent>();
 }
-
-#if !defined(GD_NO_WX_GUI)
-std::shared_ptr<gd::LayoutEditorPreviewer> Platform::GetLayoutPreviewer(
-    gd::LayoutEditorCanvas& editor) const {
-  return std::make_shared<gd::LayoutEditorPreviewer>();
-}
-
-std::vector<std::shared_ptr<gd::ProjectExporter>>
-Platform::GetProjectExporters() const {
-  return std::vector<std::shared_ptr<gd::ProjectExporter>>{
-      std::make_shared<gd::ProjectExporter>()};
-}
-#endif
-
 #endif
 
 }  // namespace gd

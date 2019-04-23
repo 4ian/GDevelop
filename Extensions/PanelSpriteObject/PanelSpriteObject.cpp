@@ -5,10 +5,6 @@ Copyright (c) 2012-2016 Victor Levasseur (victorlevasseur01@orange.fr)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>  //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
-#include <wx/panel.h>
-#endif
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/CommonTools.h"
@@ -24,9 +20,7 @@ This project is released under the MIT License.
 #include "PanelSpriteObject.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "PanelSpriteObjectEditor.h"
 #endif
 
 using namespace std;
@@ -65,11 +59,6 @@ void PanelSpriteObject::DoSerializeTo(gd::SerializerElement& element) const {
   element.SetAttribute("rightMargin", rightMargin);
   element.SetAttribute("bottomMargin", bottomMargin);
   element.SetAttribute("tiled", tiled);
-}
-
-void PanelSpriteObject::LoadResources(gd::Project& project,
-                                      gd::Layout& layout) {
-  texture = project.GetImageManager()->GetSFMLTexture(textureName);
 }
 #endif
 
@@ -205,157 +194,8 @@ bool RuntimePanelSpriteObject::Draw(sf::RenderTarget& window) {
 }
 
 #if defined(GD_IDE_ONLY)
-sf::Vector2f PanelSpriteObject::GetInitialInstanceDefaultSize(
-    gd::InitialInstance& instance,
-    gd::Project& project,
-    gd::Layout& layout) const {
-  return sf::Vector2f(width, height);
-}
-
-/**
- * Render object at edittime
- */
-void PanelSpriteObject::DrawInitialInstance(gd::InitialInstance& instance,
-                                            sf::RenderTarget& renderTarget,
-                                            gd::Project& project,
-                                            gd::Layout& layout) {
-  if (!texture) return;
-
-  float imageWidth = texture->texture.getSize().x;
-  float imageHeight = texture->texture.getSize().y;
-  float width =
-      instance.HasCustomSize()
-          ? instance.GetCustomWidth()
-          : GetInitialInstanceDefaultSize(instance, project, layout).x;
-  float height =
-      instance.HasCustomSize()
-          ? instance.GetCustomHeight()
-          : GetInitialInstanceDefaultSize(instance, project, layout).y;
-
-  sf::Vertex centerVertices[] = {
-      sf::Vertex(sf::Vector2f(-width / 2 + leftMargin, -height / 2 + topMargin),
-                 sf::Vector2f(leftMargin, topMargin)),
-      sf::Vertex(
-          sf::Vector2f(+width / 2 - rightMargin, -height / 2 + topMargin),
-          sf::Vector2f(imageWidth - rightMargin, topMargin)),
-      sf::Vertex(
-          sf::Vector2f(-width / 2 + leftMargin, +height / 2 - bottomMargin),
-          sf::Vector2f(leftMargin, imageHeight - bottomMargin)),
-      sf::Vertex(
-          sf::Vector2f(+width / 2 - rightMargin, +height / 2 - bottomMargin),
-          sf::Vector2f(imageWidth - rightMargin, imageHeight - bottomMargin)),
-  };
-
-  sf::Vertex topVertices[] = {
-      // Top-left
-      sf::Vertex(sf::Vector2f(-width / 2, -height / 2), sf::Vector2f(0, 0)),
-      sf::Vertex(sf::Vector2f(-width / 2, -height / 2 + topMargin),
-                 sf::Vector2f(0, topMargin)),
-      sf::Vertex(sf::Vector2f(-width / 2 + leftMargin, -height / 2),
-                 sf::Vector2f(leftMargin, 0)),
-      sf::Vertex(sf::Vector2f(-width / 2 + leftMargin, -height / 2 + topMargin),
-                 sf::Vector2f(leftMargin, topMargin)),
-
-      // Top
-      sf::Vertex(sf::Vector2f(+width / 2 - rightMargin, -height / 2),
-                 sf::Vector2f(imageWidth - rightMargin, 0)),
-      sf::Vertex(
-          sf::Vector2f(+width / 2 - rightMargin, -height / 2 + topMargin),
-          sf::Vector2f(imageWidth - rightMargin, topMargin)),
-
-      // Top-right
-      sf::Vertex(sf::Vector2f(+width / 2, -height / 2),
-                 sf::Vector2f(imageWidth, 0)),
-      sf::Vertex(sf::Vector2f(+width / 2, -height / 2 + topMargin),
-                 sf::Vector2f(imageWidth, topMargin)),
-  };
-
-  sf::Vertex rightVertices[] = {
-      sf::Vertex(
-          sf::Vector2f(+width / 2 - rightMargin, -height / 2 + topMargin),
-          sf::Vector2f(imageWidth - rightMargin, topMargin)),
-      sf::Vertex(sf::Vector2f(+width / 2, -height / 2 + topMargin),
-                 sf::Vector2f(imageWidth, topMargin)),
-      sf::Vertex(
-          sf::Vector2f(+width / 2 - rightMargin, +height / 2 - bottomMargin),
-          sf::Vector2f(imageWidth - rightMargin, imageHeight - bottomMargin)),
-      sf::Vertex(sf::Vector2f(+width / 2, +height / 2 - bottomMargin),
-                 sf::Vector2f(imageWidth, imageHeight - bottomMargin))};
-
-  sf::Vertex bottomVertices[] = {
-      // Bottom-left
-      sf::Vertex(sf::Vector2f(-width / 2, +height / 2 - bottomMargin),
-                 sf::Vector2f(0, imageHeight - bottomMargin)),
-      sf::Vertex(sf::Vector2f(-width / 2, +height / 2),
-                 sf::Vector2f(0, imageHeight)),
-      sf::Vertex(
-          sf::Vector2f(-width / 2 + leftMargin, +height / 2 - bottomMargin),
-          sf::Vector2f(leftMargin, imageHeight - bottomMargin)),
-      sf::Vertex(sf::Vector2f(-width / 2 + leftMargin, +height / 2),
-                 sf::Vector2f(leftMargin, imageHeight)),
-
-      // Bottom
-      sf::Vertex(
-          sf::Vector2f(+width / 2 - rightMargin, +height / 2 - bottomMargin),
-          sf::Vector2f(imageWidth - rightMargin, imageHeight - bottomMargin)),
-      sf::Vertex(sf::Vector2f(+width / 2 - rightMargin, +height / 2),
-                 sf::Vector2f(imageWidth - rightMargin, imageHeight)),
-
-      // Bottom-right
-      sf::Vertex(sf::Vector2f(+width / 2, +height / 2 - bottomMargin),
-                 sf::Vector2f(imageWidth, imageHeight - bottomMargin)),
-      sf::Vertex(sf::Vector2f(+width / 2, +height / 2),
-                 sf::Vector2f(imageWidth, imageHeight))};
-
-  sf::Vertex leftVertices[] = {
-      sf::Vertex(sf::Vector2f(-width / 2, -height / 2 + topMargin),
-                 sf::Vector2f(0, topMargin)),
-      sf::Vertex(sf::Vector2f(-width / 2 + leftMargin, -height / 2 + topMargin),
-                 sf::Vector2f(leftMargin, topMargin)),
-      sf::Vertex(sf::Vector2f(-width / 2, +height / 2 - bottomMargin),
-                 sf::Vector2f(0, imageHeight - bottomMargin)),
-      sf::Vertex(
-          sf::Vector2f(-width / 2 + leftMargin, +height / 2 - bottomMargin),
-          sf::Vector2f(leftMargin, imageHeight - bottomMargin))};
-
-  sf::Transform matrix;
-  sf::Vector2f centerPosition =
-      sf::Vector2f(instance.GetX() + width / 2, instance.GetY() + height / 2);
-  matrix.translate(centerPosition);
-  matrix.rotate(instance.GetAngle());
-
-  sf::RenderStates states;
-  states.transform = matrix;
-  states.texture = &texture->texture;
-
-  renderTarget.draw(centerVertices, 4, sf::TrianglesStrip, states);
-  renderTarget.draw(leftVertices, 4, sf::TrianglesStrip, states);
-  renderTarget.draw(rightVertices, 4, sf::TrianglesStrip, states);
-  renderTarget.draw(topVertices, 8, sf::TrianglesStrip, states);
-  renderTarget.draw(bottomVertices, 8, sf::TrianglesStrip, states);
-}
-
 void PanelSpriteObject::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   worker.ExposeImage(textureName);
-}
-
-bool PanelSpriteObject::GenerateThumbnail(const gd::Project& project,
-                                          wxBitmap& thumbnail) const {
-#if !defined(GD_NO_WX_GUI)
-  thumbnail = wxBitmap("CppPlatform/Extensions/PanelSpriteIcon24.png",
-                       wxBITMAP_TYPE_ANY);
-#endif
-
-  return true;
-}
-
-void PanelSpriteObject::EditObject(wxWindow* parent,
-                                   gd::Project& game,
-                                   gd::MainFrameWrapper& mainFrameWrapper) {
-#if !defined(GD_NO_WX_GUI)
-  PanelSpriteObjectEditor dialog(parent, game, *this, mainFrameWrapper);
-  dialog.ShowModal();
-#endif
 }
 
 void RuntimePanelSpriteObject::GetPropertyForDebugger(std::size_t propertyNb,

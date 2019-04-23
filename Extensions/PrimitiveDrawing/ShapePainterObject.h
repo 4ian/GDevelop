@@ -19,23 +19,13 @@ class Texture;
 }  // namespace sf
 class RuntimeScene;
 namespace gd {
-class ImageManager;
-}
-namespace gd {
 class Object;
-}
-namespace gd {
 class InitialInstance;
-}
+}  // namespace gd
 #if defined(GD_IDE_ONLY)
-namespace gd {
-class MainFrameWrapper;
-}
 namespace gd {
 class Project;
 }
-class wxBitmap;
-class wxWindow;
 #endif
 
 /**
@@ -126,35 +116,12 @@ class GD_EXTENSION_API ShapePainterObject : public gd::Object,
     return gd::make_unique<ShapePainterObject>(*this);
   }
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  virtual void DrawInitialInstance(gd::InitialInstance& instance,
-                                   sf::RenderTarget& renderTarget,
-                                   gd::Project& project,
-                                   gd::Layout& layout);
-  virtual sf::Vector2f GetInitialInstanceDefaultSize(
-      gd::InitialInstance& instance,
-      gd::Project& project,
-      gd::Layout& layout) const {
-    return sf::Vector2f(32, 32);
-  };
-  virtual bool GenerateThumbnail(const gd::Project& project,
-                                 wxBitmap& thumbnail) const;
-  static void LoadEdittimeIcon();
-  virtual void EditObject(wxWindow* parent,
-                          gd::Project& game_,
-                          gd::MainFrameWrapper& mainFrameWrapper_);
-#endif
-
  private:
   virtual void DoUnserializeFrom(gd::Project& project,
                                  const gd::SerializerElement& element);
 #if defined(GD_IDE_ONLY)
   virtual void DoSerializeTo(gd::SerializerElement& element) const;
 
-#if !defined(GD_NO_WX_GUI)
-  static sf::Texture edittimeIconImage;
-  static sf::Sprite edittimeIcon;
-#endif
 #endif
 };
 

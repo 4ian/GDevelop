@@ -12,11 +12,6 @@
 #include <memory>
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/String.h"
-#if !defined(GD_NO_WX_GUI)
-#include <wx/bitmap.h>
-#endif
-#include "GDCore/String.h"
-class wxBitmap;
 namespace gd {
 class Project;
 class Layout;
@@ -246,10 +241,6 @@ class GD_CORE_API InstructionMetadata {
   const std::vector<ParameterMetadata> &GetParameters() const {
     return parameters;
   }
-#if !defined(GD_NO_WX_GUI)
-  const wxBitmap &GetBitmapIcon() const { return icon; }
-  const wxBitmap &GetSmallBitmapIcon() const { return smallicon; }
-#endif
   const gd::String &GetIconFilename() const { return iconFilename; }
   const gd::String &GetSmallIconFilename() const { return smallIconFilename; }
   bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
@@ -536,10 +527,6 @@ class GD_CORE_API InstructionMetadata {
   gd::String helpPath;
   gd::String sentence;
   gd::String group;
-#if !defined(GD_NO_WX_GUI)
-  wxBitmap icon;
-  wxBitmap smallicon;
-#endif
   gd::String iconFilename;
   gd::String smallIconFilename;
   bool canHaveSubInstructions;

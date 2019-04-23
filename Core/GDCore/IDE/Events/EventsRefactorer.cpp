@@ -280,9 +280,6 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
     for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
       bool somethingModified = RenameObjectInConditions(
           platform, project, layout, *conditionsVectors[j], oldName, newName);
-#if defined(GD_IDE_ONLY)
-      if (somethingModified) events[i].eventHeightNeedUpdate = true;
-#endif
     }
 
     vector<gd::InstructionsList*> actionsVectors =
@@ -290,9 +287,6 @@ void EventsRefactorer::RenameObjectInEvents(const gd::Platform& platform,
     for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
       bool somethingModified = RenameObjectInActions(
           platform, project, layout, *actionsVectors[j], oldName, newName);
-#if defined(GD_IDE_ONLY)
-      if (somethingModified) events[i].eventHeightNeedUpdate = true;
-#endif
     }
 
     if (events[i].CanHaveSubEvents())
@@ -437,9 +431,6 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
     for (std::size_t j = 0; j < conditionsVectors.size(); ++j) {
       bool conditionsModified = RemoveObjectInConditions(
           platform, project, layout, *conditionsVectors[j], name);
-#if defined(GD_IDE_ONLY)
-      if (conditionsModified) events[i].eventHeightNeedUpdate = true;
-#endif
     }
 
     vector<gd::InstructionsList*> actionsVectors =
@@ -447,9 +438,6 @@ void EventsRefactorer::RemoveObjectInEvents(const gd::Platform& platform,
     for (std::size_t j = 0; j < actionsVectors.size(); ++j) {
       bool actionsModified = RemoveObjectInActions(
           platform, project, layout, *actionsVectors[j], name);
-#if defined(GD_IDE_ONLY)
-      if (actionsModified) events[i].eventHeightNeedUpdate = true;
-#endif
     }
 
     if (events[i].CanHaveSubEvents())
@@ -478,9 +466,6 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
                                       toReplace,
                                       newString,
                                       matchCase);
-#if defined(GD_IDE_ONLY)
-        if (conditionsModified) events[i].eventHeightNeedUpdate = true;
-#endif
       }
     }
 
@@ -494,9 +479,6 @@ void EventsRefactorer::ReplaceStringInEvents(gd::ObjectsContainer& project,
                                                       toReplace,
                                                       newString,
                                                       matchCase);
-#if defined(GD_IDE_ONLY)
-        if (actionsModified) events[i].eventHeightNeedUpdate = true;
-#endif
       }
     }
 
@@ -551,9 +533,6 @@ bool EventsRefactorer::ReplaceStringInActions(gd::ObjectsContainer& project,
       if (newParameter != actions[aId].GetParameter(pNb).GetPlainString()) {
         actions[aId].SetParameter(pNb, gd::Expression(newParameter));
         somethingModified = true;
-#if defined(GD_IDE_ONLY)
-        actions[aId].renderedHeightNeedUpdate = true;
-#endif
       }
     }
 
@@ -594,9 +573,6 @@ bool EventsRefactorer::ReplaceStringInConditions(
       if (newParameter != conditions[cId].GetParameter(pNb).GetPlainString()) {
         conditions[cId].SetParameter(pNb, gd::Expression(newParameter));
         somethingModified = true;
-#if defined(GD_IDE_ONLY)
-        conditions[cId].renderedHeightNeedUpdate = true;
-#endif
       }
     }
 

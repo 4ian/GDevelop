@@ -612,52 +612,15 @@ EventsCodeGenerator::~EventsCodeGenerator() {}
 void EventsCodeGenerator::PreprocessEventList(gd::EventsList& eventsList) {
   if (!HasProjectAndLayout()) return;
 
-#if !defined( \
-    GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
-  std::shared_ptr<ProfileEvent> previousProfileEvent;
-#endif
-
   for (std::size_t i = 0; i < eventsList.size(); ++i) {
     eventsList[i].Preprocess(*this, eventsList, i);
     if (i < eventsList.size()) {  // Be sure that that there is still an event!
                                   // ( Preprocess can remove it. )
       if (eventsList[i].CanHaveSubEvents())
         PreprocessEventList(eventsList[i].GetSubEvents());
-
-#if !defined( \
-    GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
-      if (GetLayout().GetProfiler() &&
-          GetLayout().GetProfiler()->profilingActivated &&
-          eventsList[i].IsExecutable()) {
-        // Define a new profile event
-        std::shared_ptr<ProfileEvent> profileEvent =
-            std::make_shared<ProfileEvent>();
-        profileEvent->originalEvent = eventsList[i].originalEvent;
-        profileEvent->SetPreviousProfileEvent(previousProfileEvent);
-
-        // Add it before the event to profile
-        eventsList.InsertEvent(profileEvent, i);
-
-        previousProfileEvent = profileEvent;
-        ++i;  // Don't preprocess the newly added profile event
-      }
-#endif
     }
   }
 
-#if !defined( \
-    GD_NO_WX_GUI)  // No support for profiling when wxWidgets is disabled.
-  if (!eventsList.IsEmpty() && GetLayout().GetProfiler() &&
-      GetLayout().GetProfiler()->profilingActivated) {
-    // Define a new profile events
-    std::shared_ptr<ProfileEvent> profileEvent =
-        std::make_shared<ProfileEvent>();
-    profileEvent->SetPreviousProfileEvent(previousProfileEvent);
-
-    // Add it at the end of the events list
-    eventsList.InsertEvent(profileEvent, eventsList.GetEventsCount());
-  }
-#endif
 }
 
 #endif

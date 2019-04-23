@@ -11,20 +11,12 @@
 namespace gd {
 class PropertyDescriptor;
 }
-namespace gd {
-class MainFrameWrapper;
-}
 #endif
 namespace gd {
 class SerializerElement;
-}
-namespace gd {
 class Project;
-}
-namespace gd {
 class Layout;
 }
-class wxWindow;
 class RuntimeObject;  // TODO : C++ Platform specific code below
 class RuntimeScene;
 
@@ -66,14 +58,6 @@ class GD_CORE_API Behavior {
   virtual void SetTypeName(const gd::String& type_) { type = type_; };
 
 #if defined(GD_IDE_ONLY)
-  /**
-   * \brief Called when user wants to edit the behavior.
-   */
-  virtual void EditBehavior(wxWindow* parent,
-                            gd::Project& project,
-                            gd::Layout* optionalLayout,
-                            gd::MainFrameWrapper& mainFrameWrapper_){};
-
   /**
    * \brief Called when the IDE wants to know about the custom properties of the
    behavior.

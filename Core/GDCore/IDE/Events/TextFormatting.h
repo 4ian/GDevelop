@@ -6,9 +6,6 @@
 
 #ifndef TEXTFORMATTING_H
 #define TEXTFORMATTING_H
-#if !defined(GD_NO_WX_GUI)
-#include <wx/colour.h>
-#endif
 #include "GDCore/String.h"
 
 namespace gd {
@@ -83,24 +80,6 @@ class GD_CORE_API TextFormatting {
     italic = enable;
     return *this;
   }
-
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * \brief Return the color of the text in a wxWidgets "wxColor" object.
-   * \note Shortcut for GetColor* methods.
-   */
-  wxColor GetWxColor() const {
-    return wxColor(colorRed, colorGreen, colorBlue);
-  }
-
-  /**
-   * \brief Change the color of the text using a wxWidgets color.
-   * \note Shortcut for SetColor(color.Red(), color.Green(), color.Blue())
-   */
-  TextFormatting& SetColor(wxColor color) {
-    return SetColor(color.Red(), color.Green(), color.Blue());
-  }
-#endif
 
   /**
    * Return the data (an integer) associated with the text formatting.

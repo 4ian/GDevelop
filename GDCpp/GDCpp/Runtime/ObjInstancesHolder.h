@@ -9,9 +9,6 @@
 #include <vector>
 #include "GDCpp/Runtime/RuntimeObject.h"
 #include "GDCpp/Runtime/String.h"
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include "GDCpp/IDE/BaseDebugger.h"
-#endif
 
 class RuntimeObject;
 
@@ -94,11 +91,6 @@ class GD_API ObjInstancesHolder {
    * \endcode
    */
   inline void RemoveObject(RuntimeObject* object) {
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    if (!debugger.expired())
-      debugger.lock()->OnRuntimeObjectAboutToBeRemoved(object);
-#endif
-
     for (auto it = objectsInstances.begin(); it != objectsInstances.end();
          ++it) {
       RuntimeObjList& associatedList = it->second;
@@ -125,12 +117,6 @@ class GD_API ObjInstancesHolder {
    * \brief Remove an entire list of object with a given name
    */
   inline void RemoveObjects(const gd::String& name) {
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    if (!debugger.expired()) {
-      for (auto& objectPtr : objectsInstances[name])
-        debugger.lock()->OnRuntimeObjectAboutToBeRemoved(objectPtr.get());
-    }
-#endif
     objectsInstances[name].clear();
     objectsInstancesRefs[name].clear();
   }
@@ -145,19 +131,9 @@ class GD_API ObjInstancesHolder {
    * \note All objects contained inside are destroyed.
    */
   inline void Clear() {
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-    if (!debugger.expired()) debugger.lock()->OnRuntimeObjectListFullRefresh();
-#endif
     objectsInstances.clear();
     objectsInstancesRefs.clear();
   }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  void SetDebugger(std::shared_ptr<BaseDebugger> newDebugger) {
-    debugger = newDebugger;
-    if (newDebugger) newDebugger->OnRuntimeObjectListFullRefresh();
-  }
-#endif
 
  private:
   void Init(const ObjInstancesHolder& other);
@@ -167,10 +143,6 @@ class GD_API ObjInstancesHolder {
   std::unordered_map<gd::String, RuntimeObjNonOwningPtrList>
       objectsInstancesRefs;  ///< Clones of the objectsInstances lists, but with
                              ///< references instead.
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-  std::weak_ptr<BaseDebugger> debugger;
-#endif
 };
 
 #endif  // OBJINSTANCESHOLDER_H

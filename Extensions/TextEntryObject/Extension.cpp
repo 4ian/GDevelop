@@ -26,9 +26,6 @@ void DeclareTextEntryObjectExtension(gd::PlatformExtension& extension) {
       "CppPlatform/Extensions/textentry.png");
 
 #if defined(GD_IDE_ONLY)
-#if !defined(GD_NO_WX_GUI)
-  TextEntryObject::LoadEdittimeIcon();
-#endif
   obj.SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
   obj.AddAction("String",

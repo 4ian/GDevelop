@@ -9,7 +9,6 @@
 #include "GDCore/Extensions/Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Tools/Localization.h"
-#include "GDCpp/IDE/ChangesNotifier.h"
 #include "GDCpp/Runtime/CommonTools.h"
 namespace gd {
 class Behavior;
@@ -67,29 +66,6 @@ class GD_API CppPlatform : public gd::Platform {
   virtual gd::String GetIcon() const { return "CppPlatform/icon32.png"; }
 
   /**
-   * \brief We provide a specific ChangesNotifier to ensure that compilation
-   * jobs are done properly.
-   */
-  virtual ChangesNotifier& GetChangesNotifier() const {
-    return changesNotifier;
-  };
-
-#if !defined(GD_NO_WX_GUI)
-  /**
-   * \brief Preview can be done directly inside the editor thanks to
-   * CppLayoutPreviewer
-   */
-  virtual std::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(
-      gd::LayoutEditorCanvas& editor) const;
-
-  /**
-   * \brief Expose to the IDE how to export games.
-   */
-  virtual std::vector<std::shared_ptr<gd::ProjectExporter>>
-  GetProjectExporters() const;
-#endif
-
-  /**
    * \brief When destroyed, our platform need to do ensure the destruction of
    * some singletons.
    */
@@ -124,12 +100,6 @@ class GD_API CppPlatform : public gd::Platform {
       runtimeObjCreationFunctionTable;  ///< The C++ Platform also need to store
                                         ///< functions to create runtime
                                         ///< objects.
-#if defined(GD_IDE_ONLY)
-  static ChangesNotifier changesNotifier;
-#if !defined(GD_NO_WX_GUI)
-  wxBitmap icon32;
-#endif
-#endif
 
   static CppPlatform* singleton;
 };

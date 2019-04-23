@@ -5,9 +5,6 @@ Copyright (c) 2008-2016 Florian Rival (Florian.Rival@gmail.com)
 This project is released under the MIT License.
 */
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-#include <wx/wx.h>  //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
-#endif
 #include <SFML/Graphics.hpp>
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Runtime/CommonTools.h"
@@ -22,14 +19,7 @@ This project is released under the MIT License.
 #include "ShapePainterObject.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCpp/Runtime/CommonTools.h"
-#include "ShapePainterObjectEditor.h"
-#endif
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-sf::Texture ShapePainterObject::edittimeIconImage;
-sf::Sprite ShapePainterObject::edittimeIcon;
 #endif
 
 using namespace std;
@@ -130,40 +120,6 @@ bool RuntimeShapePainterObject::Draw(sf::RenderTarget& renderTarget) {
 
   return true;
 }
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-/**
- * Render object at edittime
- */
-void ShapePainterObject::DrawInitialInstance(gd::InitialInstance& instance,
-                                             sf::RenderTarget& renderTarget,
-                                             gd::Project& project,
-                                             gd::Layout& layout) {
-  edittimeIcon.setPosition(instance.GetX(), instance.GetY());
-  renderTarget.draw(edittimeIcon);
-}
-
-void ShapePainterObject::LoadEdittimeIcon() {
-  edittimeIconImage.loadFromFile(
-      "CppPlatform/Extensions/primitivedrawingicon.png");
-  edittimeIcon.setTexture(edittimeIconImage);
-}
-
-bool ShapePainterObject::GenerateThumbnail(const gd::Project& project,
-                                           wxBitmap& thumbnail) const {
-  thumbnail = wxBitmap("CppPlatform/Extensions/primitivedrawingicon24.png",
-                       wxBITMAP_TYPE_ANY);
-
-  return true;
-}
-
-void ShapePainterObject::EditObject(wxWindow* parent,
-                                    gd::Project& game,
-                                    gd::MainFrameWrapper& mainFrameWrapper) {
-  ShapePainterObjectEditor dialog(parent, game, *this);
-  dialog.ShowModal();
-}
-#endif
 
 #if defined(GD_IDE_ONLY)
 void RuntimeShapePainterObject::GetPropertyForDebugger(

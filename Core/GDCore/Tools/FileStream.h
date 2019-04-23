@@ -8,9 +8,7 @@
 
 #include "GDCore/String.h"
 
-#define FSTREAM_WINDOWS_MINGW defined(WINDOWS) && __GLIBCXX__
-
-#if FSTREAM_WINDOWS_MINGW
+#if defined(WINDOWS) && __GLIBCXX__
 #include <ext/stdio_filebuf.h>
 #else
 #include <fstream>  //for std::filebuf
@@ -25,7 +23,7 @@ namespace gd {
  */
 class GD_CORE_API FileStream : public std::iostream {
  public:
-#if FSTREAM_WINDOWS_MINGW
+#if defined(WINDOWS) && __GLIBCXX__
   using InternalBufferType = __gnu_cxx::stdio_filebuf<char>;
 #else
   using InternalBufferType = std::filebuf;

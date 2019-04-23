@@ -18,10 +18,6 @@
 #include "GDCore/Utf8/utf8.h"
 
 namespace sf {class String;};
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-class wxString;
-class wxVariant;
-#endif
 
 namespace gd
 {
@@ -130,15 +126,6 @@ public:
      */
     String(const sf::String &string);
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-    /**
-     * Constructs a string from a wxString.
-     */
-    String(const wxString &string);
-
-#endif
-
 /**
  * \}
  */
@@ -162,12 +149,6 @@ public:
     String& operator=(const sf::String &string);
 
     String& operator=(const std::u32string &string);
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-    String& operator=(const wxString &string);
-
-#endif
 
 /**
  * \}
@@ -247,9 +228,6 @@ public:
     {
         static_assert(!std::is_same<T, std::string>::value, "Can't use gd::String::From with std::string.");
         static_assert(!std::is_same<T, sf::String>::value, "Can't use gd::String::From with sf::String.");
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-        static_assert(!std::is_same<T, wxString>::value, "Can't use gd::String::From with wxString.");
-#endif
 
         std::ostringstream oss;
         oss << value;
@@ -265,9 +243,6 @@ public:
     {
         static_assert(!std::is_same<T, std::string>::value, "Can't use gd::String::To with std::string.");
         static_assert(!std::is_same<T, sf::String>::value, "Can't use gd::String::To with sf::String.");
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-        static_assert(!std::is_same<T, wxString>::value, "Can't use gd::String::To with wxString.");
-#endif
 
         T value;
         std::istringstream oss(m_string);
@@ -314,17 +289,6 @@ public:
      */
     static String FromWide( const std::wstring &wstr );
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-    /**
-     * \return a String created from a wxString.
-     *
-     * See \ref Conversions1 for more information.
-     */
-    static String FromWxString( const wxString &wxStr);
-
-#endif
-
 /**
  * \}
  */
@@ -370,24 +334,6 @@ public:
      * \note On Windows, this is possibly a lossy conversion.
      */
     std::wstring ToWide() const;
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-    /**
-     * \return a wxString from the current string.
-     *
-     * See \ref Conversions1 for more information.
-     */
-    wxString ToWxString() const;
-
-    /**
-     * Implicit conversion operator to wxString.
-     *
-     * See \ref Conversions1 for more information.
-     */
-    operator wxString() const;
-
-#endif
 
 /**
  * \}
@@ -455,12 +401,6 @@ public:
     String& operator+=( const char *other );
 
     String& operator+=( value_type character );
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-    String& operator+=( const wxString &other );
-
-#endif
 
     /**
      * \brief Add a character (from its codepoint) at the end of the String.
@@ -722,24 +662,6 @@ String GD_CORE_API operator+(String lhs, const char *rhs);
  */
 String GD_CORE_API operator+(const char *lhs, const String &rhs);
 
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-
-/**
- * \relates String
- * \return a String containing the concatenation of lhs and rhs (rhs is
- * converted to String).
- */
-String GD_CORE_API operator+(String lhs, const wxString &rhs);
-
-/**
- * \relates String
- * \return a String containing the concatenation of lhs and rhs (rhs is
- * converted to String).
- */
-String GD_CORE_API operator+(const wxString &lhs, const String &rhs);
-
-#endif
-
 /**
  * \}
  */
@@ -755,12 +677,6 @@ bool GD_CORE_API operator==( const String &lhs, const String &rhs );
 bool GD_CORE_API operator==( const String &lhs, const char *rhs );
 ///\relates String
 bool GD_CORE_API operator==( const char *lhs, const String &rhs );
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-///\relates String
-bool GD_CORE_API operator==( const String &lhs, const wxString &rhs);
-///\relates String
-bool GD_CORE_API operator==( const wxString &lhs, const String &rhs);
-#endif
 
 ///\relates String
 bool GD_CORE_API operator!=( const String &lhs, const String &rhs );
@@ -768,13 +684,6 @@ bool GD_CORE_API operator!=( const String &lhs, const String &rhs );
 bool GD_CORE_API operator!=( const String &lhs, const char *rhs );
 ///\relates String
 bool GD_CORE_API operator!=( const char *lhs, const String &rhs );
-
-#if defined(GD_IDE_ONLY) && !defined(GD_NO_WX_GUI)
-///\relates String
-bool GD_CORE_API operator!=( const String &lhs, const wxString &rhs);
-///\relates String
-bool GD_CORE_API operator!=( const wxString &lhs, const String &rhs);
-#endif
 
 ///\relates String
 bool GD_CORE_API operator<( const String &lhs, const String &rhs );
@@ -906,7 +815,7 @@ namespace std
  * on the string size and so is the operator[]().
  *
  * \section Conversion Conversions from/to other string types
- * The String handles implicit conversion with sf::String and wxString (implicit constructor and implicit conversion
+ * The String handles implicit conversion with sf::String (implicit constructor and implicit conversion
  * operator).
  *
  * **However, this is not the case with std::string** as this conversion is not often lossless (mostly on Windows).
@@ -915,18 +824,11 @@ namespace std
  * directly use the operator=() or the constructor as they are supporting const char* as argument (it assumes the string
  * literal is encoded in UTF8, so you'll need to put the u8 prefix).
  *
- * \subsection Conversions1 Implicit conversion from/to wxString and sf::String
+ * \subsection Conversions1 Implicit conversion from/to sf::String
  * \code
  * //Get a String from sf::String
  * sf::String sfmlStr("This is a test ! ");
  * gd::String str1(sfmlStr); //Now contains "This is a test ! " encoded in UTF8
- *
- * //Get a String from wxString
- * wxString wxStr("Another test ! ");
- * str = wxStr; //Now contains "Another test ! " encoded in UTF8
- *
- * //Get a wxString from String
- * wxString anotherWxStr = str; //anotherWxStr contains "Another test ! " correctly encoded
  *
  * //Get a sf::String from String
  * sf::String anotherSfmlString = str; //anotherSfmlString now contains "Another test ! "

@@ -11,16 +11,11 @@ This project is released under the MIT License.
 #include <vector>
 #include "GDCpp/Runtime/Project/Behavior.h"
 #include "GDCpp/Runtime/Project/Object.h"
+class RuntimeScene;
 namespace gd {
 class Layout;
-}
-class RuntimeScene;
-class PlatformBehavior;
-class ScenePathfindingObstaclesManager;
-namespace gd {
 class SerializerElement;
 }
-class RuntimeScenePlatformData;
 
 /**
  * \brief Allow to move an object in 4 or 8 directions.

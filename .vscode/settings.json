@@ -96,10 +96,9 @@
         "newIDE/app/resources/GDJS": true,
         "newIDE/electron-app/app/www": true
     },
-    // Support for Flowtype:
+    // Support for Flowtype (for newIDE):
     "javascript.validate.enable": false,
     "flow.useNPMPackagedFlow": true,
-    "flow.useLSP": false, // As we are in a monorepo, see https://github.com/flowtype/flow-for-vscode/issues/301
 
     // Clang format styling (duplicated in scripts/CMakeClangUtils.txt)
     "C_Cpp.clang_format_style": "{BasedOnStyle: Google, BinPackParameters: false, BinPackArguments: false}"

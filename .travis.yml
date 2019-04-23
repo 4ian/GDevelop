@@ -19,6 +19,8 @@ env:
 addons:
   artifacts:
     s3_region: "us-east-1"
+    target_paths:
+    - /$(git rev-parse HEAD)
     paths:
     - Binaries/Output/libGD.js/Release
   apt:

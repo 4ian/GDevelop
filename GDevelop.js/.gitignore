@@ -1,0 +1,11 @@
+/node_modules
+Bindings/parser.out
+Bindings/WebIDLGrammar.pkl
+Bindings/glue.cpp
+Bindings/glue.js
+parser.out
+WebIDLGrammar.pkl
+.cpp.old
+examples/demo-generated-code.js
+examples/demo-generated-game.json
+**/.DS_Store

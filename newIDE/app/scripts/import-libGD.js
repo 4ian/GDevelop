@@ -22,27 +22,44 @@ if (shell.test('-f', sourceFile)) {
       '❌ Error while copying libGD.js from Binaries/Output/libGD.js/Release'
     );
   }
-} else if (
-  shell.test('-f', '../public/libGD.js') &&
-  shell.test('-f', destinationTestDirectory + '/index.js')
-) {
-  //Nothing to do
-
-  shell.echo(
-    '✅ libGD.js already existing in public folder - skipping download'
-  );
 } else {
   shell.echo(
-    '🌐 Unable to find libGD.js, downloading it from github.com/4ian/GDevelop.js (be patient)...'
+    '🌐 Downloading pre-built libGD.js from https://s3.amazonaws.com/gdevelop-gdevelop.js (be patient)...'
   );
+
+  var hashShellString = shell.exec('git rev-parse HEAD', {silent: true});
+  if (hashShellString.stderr || hashShellString.code) {
+    shell.echo(
+      `❌ Can't find the hash of the current commit. Are you using git to work on GDevelop?`
+    );
+    shell.echo(
+      `ℹ️ Full error is: ${hashShellString.stderr}`
+    );
+    shell.exit(1);
+    return;
+  }
+  var hash = (hashShellString.stdout || 'Unknown-hash').trim();
 
   var file = fs.createWriteStream('../public/libGD.js');
   https.get(
-    'https://github.com/4ian/GDevelop.js/releases/download/5.0.0-beta66/libGD.js',
+    `https://s3.amazonaws.com/gdevelop-gdevelop.js/${hash}/libGD.js`,
     function(response) {
+      if (response.statusCode === 403) {
+        shell.echo(
+          `❌ Can't download libGD.js (forbidden access for hash=${hash}).`
+        );
+        shell.echo(
+          `ℹ️ Maybe libGD.js was not automatically built yet, try again in a few minutes.`
+        );
+
+        shell.exit(1);
+        return;
+      }
       if (response.statusCode !== 200) {
         shell.echo(
-          `❌ Can't download libGD.js (${response.statusMessage}), please check your internet connection`
+          `❌ Can't download libGD.js (${
+            response.statusMessage
+          }), please check your internet connection`
         );
         shell.exit(1);
         return;
@@ -52,7 +69,10 @@ if (shell.test('-f', sourceFile)) {
         shell.echo('✅ libGD.js downloaded and stored in public/libGD.js');
 
         if (
-          !shell.cp('../public/libGD.js', destinationTestDirectory + '/index.js').stderr
+          !shell.cp(
+            '../public/libGD.js',
+            destinationTestDirectory + '/index.js'
+          ).stderr
         ) {
           shell.echo('✅ Copied libGD.js to node_modules folder');
         } else {

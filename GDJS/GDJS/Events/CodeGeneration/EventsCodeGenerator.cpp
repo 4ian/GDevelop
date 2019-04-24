@@ -651,7 +651,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
     declarationsCode += objectListDeclaration + "\n";
   }
-  for (auto object : context.GetObjectsListsToBeDeclaredEmpty()) {
+  for (auto object : context.GetObjectsListsToBeDeclaredWithoutPicking()) {
     gd::String objectListDeclaration = "";
     if (!context.ObjectAlreadyDeclared(object)) {
       objectListDeclaration =
@@ -826,7 +826,7 @@ gd::String EventsCodeGenerator::GenerateObject(
     std::vector<gd::String> realObjects =
         ExpandObjectsName(objectName, context);
     for (auto& objectName : realObjects)
-      context.EmptyObjectsListNeeded(objectName);
+      context.ObjectsListWithoutPickingNeeded(objectName);
 
     gd::String objectsMapName = declareMapOfObjects(realObjects, context);
     output = objectsMapName;

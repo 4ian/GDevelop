@@ -24,8 +24,8 @@ void EventsCodeGenerationContext::InheritsFrom(
             parent_.objectsListsToBeDeclared.end(),
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
-  std::copy(parent_.emptyObjectsListsToBeDeclared.begin(),
-            parent_.emptyObjectsListsToBeDeclared.end(),
+  std::copy(parent_.objectsListsWithoutPickingToBeDeclared.begin(),
+            parent_.objectsListsWithoutPickingToBeDeclared.end(),
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
 
@@ -47,17 +47,18 @@ void EventsCodeGenerationContext::Reuse(
 
 void EventsCodeGenerationContext::ObjectsListNeeded(
     const gd::String& objectName) {
-  if (emptyObjectsListsToBeDeclared.find(objectName) ==
-      emptyObjectsListsToBeDeclared.end())
+  if (objectsListsWithoutPickingToBeDeclared.find(objectName) ==
+      objectsListsWithoutPickingToBeDeclared.end())
     objectsListsToBeDeclared.insert(objectName);
 
   depthOfLastUse[objectName] = GetContextDepth();
 }
-void EventsCodeGenerationContext::EmptyObjectsListNeeded(
+
+void EventsCodeGenerationContext::ObjectsListWithoutPickingNeeded(
     const gd::String& objectName) {
   if (objectsListsToBeDeclared.find(objectName) ==
       objectsListsToBeDeclared.end())
-    emptyObjectsListsToBeDeclared.insert(objectName);
+    objectsListsWithoutPickingToBeDeclared.insert(objectName);
 
   depthOfLastUse[objectName] = GetContextDepth();
 }
@@ -66,8 +67,8 @@ std::set<gd::String> EventsCodeGenerationContext::GetAllObjectsToBeDeclared()
     const {
   std::set<gd::String> allObjectListsToBeDeclared(
       objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());
-  allObjectListsToBeDeclared.insert(emptyObjectsListsToBeDeclared.begin(),
-                                    emptyObjectsListsToBeDeclared.end());
+  allObjectListsToBeDeclared.insert(objectsListsWithoutPickingToBeDeclared.begin(),
+                                    objectsListsWithoutPickingToBeDeclared.end());
 
   return allObjectListsToBeDeclared;
 }

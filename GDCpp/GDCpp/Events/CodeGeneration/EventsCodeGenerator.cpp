@@ -390,7 +390,7 @@ gd::String EventsCodeGenerator::GenerateObject(
 
     output += "runtimeContext->ClearObjectListsMap()";
     for (std::size_t i = 0; i < realObjects.size(); ++i) {
-      context.EmptyObjectsListNeeded(realObjects[i]);
+      context.ObjectsListWithoutPickingNeeded(realObjects[i]);
       output += ".AddObjectListToMap(\"" + ConvertToString(realObjects[i]) +
                 "\", " + ManObjListName(realObjects[i]) + ")";
     }

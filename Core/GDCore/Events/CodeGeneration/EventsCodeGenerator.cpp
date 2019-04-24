@@ -740,7 +740,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
     declarationsCode += objectListDeclaration + "\n";
   }
-  for (auto object : context.GetObjectsListsToBeDeclaredEmpty()) {
+  for (auto object : context.GetObjectsListsToBeDeclaredWithoutPicking()) {
     gd::String objectListDeclaration = "";
     if (!context.ObjectAlreadyDeclared(object)) {
       objectListDeclaration = "std::vector<RuntimeObject*> " +

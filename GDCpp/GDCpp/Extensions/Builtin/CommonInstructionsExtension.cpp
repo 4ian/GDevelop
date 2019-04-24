@@ -116,7 +116,7 @@ CommonInstructionsExtension::CommonInstructionsExtension() {
               //"OR" condition must declare objects list, but without getting
               // the objects from the scene. Lists are either empty or come from
               // a parent event.
-              parentContext.EmptyObjectsListNeeded(*it);
+              parentContext.ObjectsListWithoutPickingNeeded(*it);
               // We need to duplicate the object lists : The "final" ones will
               // be filled with objects by conditions, but they will have no
               // incidence on further conditions, as conditions use "normal"

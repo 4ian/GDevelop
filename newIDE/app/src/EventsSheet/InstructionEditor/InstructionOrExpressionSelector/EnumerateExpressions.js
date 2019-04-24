@@ -1,7 +1,9 @@
 // @flow
-import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
-const gd = global.gd;
+// Note: this file does not use export/imports and use Flow comments to allow its usage from Node.js
 
+/*flow-include
+import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+*/
 const GROUP_DELIMITER = '/';
 
 const enumerateExtensionExpressions = (
@@ -9,7 +11,7 @@ const enumerateExtensionExpressions = (
   expressions,
   objectMetadata,
   behaviorMetadata
-): Array<InstructionOrExpressionInformation> => {
+) /*: Array<InstructionOrExpressionInformation>*/ => {
   const allExpressions = [];
 
   //Get the map containing the metadata of the expression provided by the extension...
@@ -53,7 +55,7 @@ const enumerateExtensionExpressions = (
   return allExpressions;
 };
 
-export const enumerateExpressions = (type: string) => {
+const enumerateExpressions = (gd /*: libGD */, type /*: string*/) => {
   const freeExpressions = [];
   const objectsExpressions = [];
   const behaviorsExpressions = [];
@@ -139,10 +141,10 @@ export const enumerateExpressions = (type: string) => {
   };
 };
 
-export const filterExpressions = (
-  list: Array<InstructionOrExpressionInformation>,
-  searchText: string
-): Array<InstructionOrExpressionInformation> => {
+const filterExpressions = (
+  list /*: Array<InstructionOrExpressionInformation>*/,
+  searchText /*: string*/
+) /*: Array<InstructionOrExpressionInformation>*/ => {
   if (!searchText) return list;
   const lowercaseSearchText = searchText.toLowerCase();
 
@@ -153,3 +155,5 @@ export const filterExpressions = (
     );
   });
 };
+
+module.exports = { enumerateExpressions, filterExpressions };

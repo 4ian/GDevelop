@@ -4,13 +4,14 @@ import {
   enumerateExpressions,
   filterExpressions,
 } from '../../InstructionEditor/InstructionOrExpressionSelector/EnumerateExpressions';
+const gd = global.gd;
 
 describe('HelpButton', () => {
   const {
     freeExpressions,
     objectsExpressions,
     behaviorsExpressions,
-  } = enumerateExpressions('number');
+  } = enumerateExpressions(gd, 'number');
 
   it('properly format a free function, with one or more arguments', () => {
     const countExpression = filterExpressions(freeExpressions, 'Count')[0];

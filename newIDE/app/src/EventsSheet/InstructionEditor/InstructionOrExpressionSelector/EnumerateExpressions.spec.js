@@ -4,10 +4,12 @@ import {
 } from './EnumerateExpressions';
 import { createTree } from './CreateTree';
 import isObject from 'lodash/isObject';
+const gd = global.gd;
 
 describe('EnumerateObjects', () => {
   it('can enumerate and filter expressions', () => {
     const { freeExpressions, objectsExpressions } = enumerateExpressions(
+      gd,
       'number'
     );
 
@@ -42,7 +44,7 @@ describe('EnumerateObjects', () => {
       return obj;
     };
 
-    const { objectsExpressions } = enumerateExpressions('number');
+    const { objectsExpressions } = enumerateExpressions(gd, 'number');
     expect(stripMetadata(createTree(objectsExpressions))).toMatchObject({
       'Common expressions for all objects': {
         Angle: {

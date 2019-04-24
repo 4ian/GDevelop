@@ -1,4 +1,5 @@
-// Note: this file don't use export/imports nor Flow to allow its usage from Node.js
+// @flow
+// Note: this file does not use export/imports and use Flow comments to allow its usage from Node.js
 
 const optionalRequire = require('../../Utils/OptionalRequire.js');
 const electron = optionalRequire('electron');

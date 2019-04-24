@@ -4,6 +4,7 @@ import { enumerateExpressions } from './EnumerateExpressions';
 import InstructionOrExpressionSelector from './index';
 import { createTree, type InstructionOrExpressionTreeNode } from './CreateTree';
 import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+const gd = global.gd;
 
 export default class ExpressionSelector extends Component<*, {||}> {
   instructionsInfo: Array<InstructionOrExpressionInformation> = [];
@@ -14,7 +15,7 @@ export default class ExpressionSelector extends Component<*, {||}> {
   };
 
   componentWillMount() {
-    const { allExpressions } = enumerateExpressions(this.props.expressionType);
+    const { allExpressions } = enumerateExpressions(gd, this.props.expressionType);
     this.instructionsInfo = allExpressions;
     this.instructionsInfoTree = createTree(allExpressions);
   }

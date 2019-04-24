@@ -1,9 +1,10 @@
 import { createTree } from './CreateTree';
 import { enumerateInstructions } from './EnumerateInstructions';
+const gd = global.gd;
 
 describe('EnumerateInstructions', () => {
   it('can enumerate instructions being conditions', () => {
-    const instructions = enumerateInstructions(true);
+    const instructions = enumerateInstructions(gd, true);
 
     // Test for the proper presence of a few conditions
     expect(instructions).toEqual(
@@ -28,7 +29,7 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can enumerate instructions being actions', () => {
-    const instructions = enumerateInstructions(false);
+    const instructions = enumerateInstructions(gd, false);
 
     // Test for the proper presence of a few actions
     expect(instructions).toEqual(
@@ -48,7 +49,7 @@ describe('EnumerateInstructions', () => {
   });
 
   it('can create the tree of instructions', () => {
-    const instructions = enumerateInstructions('number');
+    const instructions = enumerateInstructions(gd, 'number');
     expect(createTree(instructions)).toMatchObject({
       Advanced: {
         'Trigger once while true': {

@@ -1,13 +1,15 @@
 // @flow
-import { type InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
-const gd = global.gd;
+// Note: this file does not use export/imports and use Flow comments to allow its usage from Node.js
 
+/*flow-include
+import type { InstructionOrExpressionInformation } from './InstructionOrExpressionInformation.flow.js';
+*/
 const GROUP_DELIMITER = '/';
 
 const enumerateExtensionInstructions = (
-  groupPrefix: string,
-  extensionInstructions
-): Array<InstructionOrExpressionInformation> => {
+  groupPrefix /*: string*/,
+  extensionInstructions /*: gdMapStringInstructionMetadata */
+) /*: Array<InstructionOrExpressionInformation>*/ => {
   //Get the map containing the metadata of the instructions provided by the extension...
   var instructionsTypes = extensionInstructions.keys();
   const allInstructions = [];
@@ -34,9 +36,10 @@ const enumerateExtensionInstructions = (
   return allInstructions;
 };
 
-export const enumerateInstructions = (
-  isCondition: boolean
-): Array<InstructionOrExpressionInformation> => {
+const enumerateInstructions = (
+  gd /*: libGD */,
+  isCondition /*: boolean*/
+) /*: Array<InstructionOrExpressionInformation>*/ => {
   let allInstructions = [];
 
   const allExtensions = gd
@@ -96,3 +99,5 @@ export const enumerateInstructions = (
 
   return allInstructions;
 };
+
+module.exports = { enumerateInstructions };

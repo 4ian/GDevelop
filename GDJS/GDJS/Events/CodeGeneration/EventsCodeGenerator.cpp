@@ -644,7 +644,7 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
     if (!context.ObjectAlreadyDeclared(object)) {
       objectListDeclaration += GetObjectListName(object, context) +
                                ".createFrom(" +
-                               GenerateAllInstancesGetter(object) + ");";
+                               GenerateAllInstancesGetterCode(object) + ");";
       context.SetObjectDeclared(object);
     } else
       objectListDeclaration = declareObjectList(object, context);
@@ -662,11 +662,23 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
     declarationsCode += objectListDeclaration + "\n";
   }
+  for (auto object : context.GetObjectsListsToBeDeclaredEmpty()) {
+    gd::String objectListDeclaration = "";
+    if (!context.ObjectAlreadyDeclared(object)) {
+      objectListDeclaration =
+          GetObjectListName(object, context) + ".length = 0;\n";
+      context.SetObjectDeclared(object);
+    } else
+      objectListDeclaration =
+          GetObjectListName(object, context) + ".length = 0;\n";
+
+    declarationsCode += objectListDeclaration + "\n";
+  }
 
   return declarationsCode;
 }
 
-gd::String EventsCodeGenerator::GenerateAllInstancesGetter(
+gd::String EventsCodeGenerator::GenerateAllInstancesGetterCode(
     gd::String& objectName) {
   if (HasProjectAndLayout()) {
     return "runtimeScene.getObjects(" + ConvertToStringExplicit(objectName) +

@@ -751,6 +751,18 @@ gd::String EventsCodeGenerator::GenerateObjectsDeclarationCode(
 
     declarationsCode += objectListDeclaration + "\n";
   }
+  for (auto object : context.GetObjectsListsToBeDeclaredEmpty()) {
+    gd::String objectListDeclaration = "";
+    if (!context.ObjectAlreadyDeclared(object)) {
+      objectListDeclaration = "std::vector<RuntimeObject*> " +
+                              GetObjectListName(object, context) + ";\n";
+      context.SetObjectDeclared(object);
+    } else
+      objectListDeclaration = "std::vector<RuntimeObject*> " +
+                              GetObjectListName(object, context) + ";\n";
+
+    declarationsCode += objectListDeclaration + "\n";
+  }
 
   return declarationsCode;
 }

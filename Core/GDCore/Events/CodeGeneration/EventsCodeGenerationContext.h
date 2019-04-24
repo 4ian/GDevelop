@@ -117,11 +117,21 @@ class GD_CORE_API EventsCodeGenerationContext {
    * Call this when an instruction in the event needs an empty objects list
    * or the one already declared, if any.
    *
-   * An empty objects list will be declared, without filling it with objects from
-   * the scene. If there is already an objects list with this name, no new list
-   * will be declared again.
+   * An empty objects list will be declared, without filling it with objects
+   * from the scene. If there is already an objects list with this name, no new
+   * list will be declared again.
    */
   void ObjectsListWithoutPickingNeeded(const gd::String& objectName);
+
+  /**
+   * Call this when an instruction in the event needs an empty object list,
+   * even if one is already declared.
+   *
+   * An empty objects list will be declared, without filling it with objects
+   * from the scene. If there is already an object list with this name, it won't
+   * be used to initialize the new list, which will remain empty.
+   */
+  void EmptyObjectsListNeeded(const gd::String& objectName);
 
   /**
    * Return true if an object list has already been declared (or is going to be
@@ -159,6 +169,15 @@ class GD_CORE_API EventsCodeGenerationContext {
   const std::set<gd::String>& GetObjectsListsToBeDeclaredWithoutPicking()
       const {
     return objectsListsWithoutPickingToBeDeclared;
+  };
+
+  /**
+   * Return the objects lists which will be will be declared empty, without
+   * filling them with objects from the scene and without copying any previously
+   * declared objects list.
+   */
+  const std::set<gd::String>& GetObjectsListsToBeDeclaredEmpty() const {
+    return emptyObjectsListsToBeDeclared;
   };
 
   /**
@@ -209,6 +228,21 @@ class GD_CORE_API EventsCodeGenerationContext {
   size_t GetCurrentConditionDepth() const { return customConditionDepth; }
 
  private:
+  /**
+   * \brief Returns true if the given object is already going to be declared
+   * (either as a traditional objects list, or one without picking, or one
+   * empty).
+   *
+   */
+  bool IsToBeDeclared(const gd::String& objectName) {
+    return objectsListsToBeDeclared.find(objectName) !=
+               objectsListsToBeDeclared.end() ||
+           objectsListsWithoutPickingToBeDeclared.find(objectName) !=
+               objectsListsWithoutPickingToBeDeclared.end() ||
+           emptyObjectsListsToBeDeclared.find(objectName) !=
+               emptyObjectsListsToBeDeclared.end();
+  };
+
   std::set<gd::String>
       alreadyDeclaredObjectsLists;  ///< Objects lists already needed in a
                                     ///< parent context.
@@ -220,6 +254,12 @@ class GD_CORE_API EventsCodeGenerationContext {
                                                ///< declared in this context,
                                                ///< but not filled with scene's
                                                ///< objects.
+  std::set<gd::String>
+      emptyObjectsListsToBeDeclared;  ///< Objects lists that will be
+                                      ///< declared in this context,
+                                      ///< but not filled with scene's
+                                      ///< objects and not filled with any
+                                      ///< previously existing objects list.
   std::map<gd::String, unsigned int>
       depthOfLastUse;  ///< The context depth when an object was last used.
   gd::String

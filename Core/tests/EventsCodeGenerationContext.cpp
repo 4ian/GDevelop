@@ -18,13 +18,13 @@
 TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
   /**
    * Generate a tree of contexts with declared objects as below:
-   *                   c1 -> c1.object1, c1.object2, c1.noPicking1 (empty list
+   *                   c1 -> c1.object1, c1.object2, c1.noPicking1 (no picking
    * request)
    *                  /  \
    *  c2.object1 <- c2   c3 -> c3.object1, c1.object2
    *               /  \
-   *              c4  c5 -> c5.object1, c5.noPicking1 (empty list request),
-   * c1.object2
+   *              c4  c5 -> c5.object1, c5.noPicking1 (no picking request),
+   * c1.object2, c5.empty1
    */
 
   unsigned int maxDepth = 0;
@@ -50,6 +50,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
   c5.ObjectsListWithoutPickingNeeded("c5.noPicking1");
   c5.ObjectsListNeeded("c5.object1");
   c5.ObjectsListNeeded("c1.object2");
+  c5.EmptyObjectsListNeeded("c5.empty1");
 
   SECTION("Parenting") {
     REQUIRE(c2.GetParentContext() == &c1);
@@ -100,8 +101,10 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
             std::set<gd::String>({"c5.object1", "c1.object2"}));
     REQUIRE(c5.GetObjectsListsToBeDeclaredWithoutPicking() ==
             std::set<gd::String>({"c5.noPicking1"}));
+    REQUIRE(c5.GetObjectsListsToBeDeclaredEmpty() ==
+            std::set<gd::String>({"c5.empty1"}));
     REQUIRE(c5.GetAllObjectsToBeDeclared() ==
-            std::set<gd::String>({"c5.object1", "c5.noPicking1", "c1.object2"}));
+            std::set<gd::String>({"c5.object1", "c5.noPicking1", "c1.object2", "c5.empty1"}));
   }
 
   SECTION("ObjectAlreadyDeclared") {
@@ -130,6 +133,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     REQUIRE(c5.GetLastDepthObjectListWasNeeded("c1.object2") == 2);
     REQUIRE(c5.GetLastDepthObjectListWasNeeded("c2.object1") == 1);
     REQUIRE(c5.GetLastDepthObjectListWasNeeded("c5.object1") == 2);
+    REQUIRE(c5.GetLastDepthObjectListWasNeeded("c5.empty1") == 2);
   }
 
   SECTION("SetCurrentObject") {
@@ -145,12 +149,12 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
      * Generate a tree of contexts with declared objects as below:
      *                  ...
      *                   \
-     *                   c5 -> c5.object1, c5.noPicking1 (empty list request),
+     *                   c5 -> c5.object1, c5.noPicking1 (no picking request),
      * c1.object2
      *                  /
      *                c6  (reuse c5) -> c5.object1, c6.object3
      *               /
-     *              c7 -> c5.object1
+     *              c7 -> c5.object1, c5.empty1 (empty list request)
      */
     gd::EventsCodeGenerationContext c6;
     c6.Reuse(c5);
@@ -161,6 +165,7 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     c7.InheritsFrom(c6);
     c7.ObjectsListNeeded("c5.object1");
     c7.ObjectsListNeeded("c6.object3");
+    c7.EmptyObjectsListNeeded("c5.empty1");
 
     // c6 is reusing c5 context so it has the same depth:
     REQUIRE(c6.GetParentContext() == &c5);
@@ -179,5 +184,6 @@ TEST_CASE("EventsCodeGenerationContext", "[common][events]") {
     REQUIRE(c7.GetContextDepth() == 3);
     REQUIRE(c7.IsSameObjectsList("c5.object1", c6) == false);
     REQUIRE(c7.IsSameObjectsList("c6.object3", c6) == false);
+    REQUIRE(c7.IsSameObjectsList("c5.empty1", c5) == false);
   }
 }

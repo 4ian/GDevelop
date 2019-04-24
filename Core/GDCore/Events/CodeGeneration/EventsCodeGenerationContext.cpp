@@ -28,6 +28,10 @@ void EventsCodeGenerationContext::InheritsFrom(
             parent_.objectsListsWithoutPickingToBeDeclared.end(),
             std::inserter(alreadyDeclaredObjectsLists,
                           alreadyDeclaredObjectsLists.begin()));
+  std::copy(parent_.emptyObjectsListsToBeDeclared.begin(),
+            parent_.emptyObjectsListsToBeDeclared.end(),
+            std::inserter(alreadyDeclaredObjectsLists,
+                          alreadyDeclaredObjectsLists.begin()));
 
   depthOfLastUse = parent_.depthOfLastUse;
   customConditionDepth = parent_.customConditionDepth;
@@ -47,8 +51,7 @@ void EventsCodeGenerationContext::Reuse(
 
 void EventsCodeGenerationContext::ObjectsListNeeded(
     const gd::String& objectName) {
-  if (objectsListsWithoutPickingToBeDeclared.find(objectName) ==
-      objectsListsWithoutPickingToBeDeclared.end())
+  if (!IsToBeDeclared(objectName))
     objectsListsToBeDeclared.insert(objectName);
 
   depthOfLastUse[objectName] = GetContextDepth();
@@ -56,9 +59,16 @@ void EventsCodeGenerationContext::ObjectsListNeeded(
 
 void EventsCodeGenerationContext::ObjectsListWithoutPickingNeeded(
     const gd::String& objectName) {
-  if (objectsListsToBeDeclared.find(objectName) ==
-      objectsListsToBeDeclared.end())
+  if (!IsToBeDeclared(objectName))
     objectsListsWithoutPickingToBeDeclared.insert(objectName);
+
+  depthOfLastUse[objectName] = GetContextDepth();
+}
+
+void EventsCodeGenerationContext::EmptyObjectsListNeeded(
+    const gd::String& objectName) {
+  if (!IsToBeDeclared(objectName))
+    emptyObjectsListsToBeDeclared.insert(objectName);
 
   depthOfLastUse[objectName] = GetContextDepth();
 }
@@ -69,6 +79,8 @@ std::set<gd::String> EventsCodeGenerationContext::GetAllObjectsToBeDeclared()
       objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());
   allObjectListsToBeDeclared.insert(objectsListsWithoutPickingToBeDeclared.begin(),
                                     objectsListsWithoutPickingToBeDeclared.end());
+  allObjectListsToBeDeclared.insert(emptyObjectsListsToBeDeclared.begin(),
+                                    emptyObjectsListsToBeDeclared.end());
 
   return allObjectListsToBeDeclared;
 }

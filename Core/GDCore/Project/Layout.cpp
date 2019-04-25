@@ -52,9 +52,7 @@ Layout::Layout()
       disableInputWhenNotFocused(true)
 #if defined(GD_IDE_ONLY)
       ,
-      profiler(NULL),
-      refreshNeeded(false),
-      compilationNeeded(true)
+      profiler(NULL)
 #endif
 {
   gd::Layer layer;
@@ -416,10 +414,7 @@ void Layout::Init(const Layout& other) {
   associatedSettings = other.associatedSettings;
   objectGroups = other.objectGroups;
 
-  compiledEventsFile = other.compiledEventsFile;
   profiler = other.profiler;
-  SetCompilationNeeded();  // Force recompilation/refreshing
-  SetRefreshNeeded();
 #endif
 }
 

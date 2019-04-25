@@ -5,6 +5,7 @@
  */
 #if defined(GD_IDE_ONLY)
 #include "EventsFunctionsExtension.h"
+#include "EventsBasedBehavior.h"
 #include "EventsFunction.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "GDCore/Tools/MakeUnique.h"
@@ -32,6 +33,7 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   name = other.name;
   fullName = other.fullName;
   EventsFunctionsContainer::Init(other);
+  eventsBasedBehaviors = other.eventsBasedBehaviors;
 }
 
 void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
@@ -41,9 +43,9 @@ void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
 
-  gd::SerializerElement& eventsFunctionsElement =
-      element.AddChild("eventsFunctions");
-  SerializeEventsFunctionsTo(eventsFunctionsElement);
+  SerializeEventsFunctionsTo(element.AddChild("eventsFunctions"));
+  eventsBasedBehaviors.SerializeElementsTo(
+      "eventsBasedBehavior", element.AddChild("eventsBasedBehaviors"));
 }
 
 void EventsFunctionsExtension::UnserializeFrom(
@@ -54,9 +56,9 @@ void EventsFunctionsExtension::UnserializeFrom(
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
 
-  const gd::SerializerElement& eventsFunctionsElement =
-      element.GetChild("eventsFunctions");
-  UnserializeEventsFunctionsFrom(project, eventsFunctionsElement);
+  UnserializeEventsFunctionsFrom(project, element.GetChild("eventsFunctions"));
+  eventsBasedBehaviors.UnserializeElementsFrom(
+      "eventsBasedBehavior", project, element.GetChild("eventsBasedBehaviors"));
 }
 
 }  // namespace gd

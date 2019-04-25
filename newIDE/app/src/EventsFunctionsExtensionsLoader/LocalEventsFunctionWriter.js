@@ -37,5 +37,16 @@ export const makeLocalEventsFunctionWriter = (): EventsFunctionWriter => {
         });
       });
     },
+    writeBehaviorCode: (behaviorName: string, code: string): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        // TODO: distinguish files?
+        const filepath = getPathFor(behaviorName);
+        fs.writeFile(filepath, code, err => {
+          if (err) return reject(err);
+
+          resolve();
+        });
+      });
+    },
   };
 };

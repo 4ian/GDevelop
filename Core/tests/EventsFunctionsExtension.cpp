@@ -3,8 +3,8 @@
  * Copyright 2008-2016 Florian Rival (Florian.Rival@gmail.com). All rights
  * reserved. This project is released under the MIT License.
  */
-#include "GDCore/Project/Project.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/Project.h"
 #include "GDCore/Serialization/SerializerElement.h"
 #include "catch.hpp"
 
@@ -14,6 +14,10 @@ TEST_CASE("EventsFunctionsExtension", "[common]") {
     eventsFunctionExtension.InsertNewEventsFunction("Function1", 0);
     eventsFunctionExtension.InsertNewEventsFunction("Function2", 1);
     eventsFunctionExtension.InsertNewEventsFunction("Function3", 2);
+    eventsFunctionExtension.GetEventsBasedBehaviors().InsertNew("MyBehavior",
+                                                                0);
+    eventsFunctionExtension.GetEventsBasedBehaviors().InsertNew("MyBehavior2",
+                                                                1);
 
     // Check that copy operator is working
     gd::EventsFunctionsExtension eventsFunctionExtension2 =
@@ -25,6 +29,13 @@ TEST_CASE("EventsFunctionsExtension", "[common]") {
             "Function2");
     REQUIRE(eventsFunctionExtension2.GetEventsFunction(2).GetName() ==
             "Function3");
+    REQUIRE(eventsFunctionExtension2.GetEventsBasedBehaviors().GetCount() == 2);
+    REQUIRE(
+        eventsFunctionExtension2.GetEventsBasedBehaviors().Get(0).GetName() ==
+        "MyBehavior");
+    REQUIRE(
+        eventsFunctionExtension2.GetEventsBasedBehaviors().Get(1).GetName() ==
+        "MyBehavior2");
 
     // Check that the copy has not somehow shared the same pointers
     // to the events functions.

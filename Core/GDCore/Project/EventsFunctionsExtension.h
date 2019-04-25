@@ -9,7 +9,9 @@
 
 #include <vector>
 #include "GDCore/Project/EventsFunctionsContainer.h"
+#include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/String.h"
+#include "GDCore/Tools/SerializableWithNameList.h"
 namespace gd {
 class SerializerElement;
 class Project;
@@ -18,12 +20,14 @@ class Project;
 namespace gd {
 
 /**
- * \brief Hold a list of Events Functions (gd::EventsFunction).
+ * \brief Hold a list of Events Functions (gd::EventsFunction) and Events Based
+ * Behaviors.
  *
  * Events functions can be generated as stand-alone functions, and
  * converted to actions/conditions/expressions.
- * Similarly, a gd::EventsFunctionsExtension can be converted to
- * an extension.
+ * Events behaviors can be generated to a runtime behavior, with functions
+ * converted to behavior actions/conditions/expressions. Similarly, a
+ * gd::EventsFunctionsExtension can be converted to an extension.
  *
  * \ingroup PlatformDefinition
  */
@@ -72,6 +76,21 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
+  /**
+   * \brief Return a reference to the list of the events based behaviors.
+   */
+  SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors() {
+    return eventsBasedBehaviors;
+  }
+
+  /**
+   * \brief Return a const reference to the list of the events based behaviors.
+   */
+  const SerializableWithNameList<EventsBasedBehavior>& GetEventsBasedBehaviors()
+      const {
+    return eventsBasedBehaviors;
+  }
+
   /** \name Serialization
    */
   ///@{
@@ -99,6 +118,7 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String description;
   gd::String name;
   gd::String fullName;
+  SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
 };
 
 }  // namespace gd

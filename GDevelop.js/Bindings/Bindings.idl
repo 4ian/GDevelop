@@ -1622,14 +1622,45 @@ interface EventsFunction {
     void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
-interface VectorEventsFunction {
-    void VectorEventsFunction();
+interface EventsFunctionsContainer {
+    [Ref] EventsFunction InsertNewEventsFunction([Const] DOMString name, unsigned long pos);
+    [Ref] EventsFunction InsertEventsFunction([Const, Ref] EventsFunction eventsFunction, unsigned long pos);
+    boolean HasEventsFunctionNamed([Const] DOMString name);
+    [Ref] EventsFunction GetEventsFunction([Const] DOMString name);
+    [Ref] EventsFunction GetEventsFunctionAt(unsigned long pos);
+    void RemoveEventsFunction([Const] DOMString name);
+    void MoveEventsFunction(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetEventsFunctionsCount();
+};
 
-    void push_back([Const, Ref] EventsFunction eventsFunction);
+interface EventsBasedBehavior {
+    void EventsBasedBehavior();
+
+    [Ref] EventsBasedBehavior SetDescription([Const] DOMString description);
+    [Const, Ref] DOMString GetDescription();
+    [Ref] EventsBasedBehavior SetName([Const] DOMString name);
+    [Const, Ref] DOMString GetName();
+    [Ref] EventsBasedBehavior SetFullName([Const] DOMString fullName);
+    [Const, Ref] DOMString GetFullName();
+
+    [Ref] EventsFunctionsContainer GetEventsFunctions();
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+};
+
+interface EventsBasedBehaviorsList {
+    [Ref] EventsBasedBehavior InsertNew([Const] DOMString name, unsigned long pos);
+    [Ref] EventsBasedBehavior Insert([Const, Ref] EventsBasedBehavior eventsFunction, unsigned long pos);
+    boolean Has([Const] DOMString name);
+    [Ref] EventsBasedBehavior Get([Const] DOMString name);
+    [Ref] EventsBasedBehavior GetAt(unsigned long pos);
+    void Remove([Const] DOMString name);
+    void Move(unsigned long oldIndex, unsigned long newIndex);
+    unsigned long GetCount();
+
     unsigned long size();
-    [Ref] EventsFunction at(unsigned long index);
-    void WRAPPED_set(unsigned long index, [Const, Ref] EventsFunction eventsFunction);
-    void clear();
+    [Ref] EventsBasedBehavior at(unsigned long index);
 };
 
 interface EventsFunctionsExtension {
@@ -1646,6 +1677,12 @@ interface EventsFunctionsExtension {
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
 
+    [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
+
+    void SerializeTo([Ref] SerializerElement element);
+    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
+
+    // Inherited from EventsFunctionsContainer:
     [Ref] EventsFunction InsertNewEventsFunction([Const] DOMString name, unsigned long pos);
     [Ref] EventsFunction InsertEventsFunction([Const, Ref] EventsFunction eventsFunction, unsigned long pos);
     boolean HasEventsFunctionNamed([Const] DOMString name);
@@ -1654,9 +1691,6 @@ interface EventsFunctionsExtension {
     void RemoveEventsFunction([Const] DOMString name);
     void MoveEventsFunction(unsigned long oldIndex, unsigned long newIndex);
     unsigned long GetEventsFunctionsCount();
-
-    void SerializeTo([Ref] SerializerElement element);
-    void UnserializeFrom([Ref] Project project, [Const, Ref] SerializerElement element);
 };
 
 interface AbstractFileSystem {
@@ -2276,6 +2310,12 @@ interface ParticleEmitterObject {
 interface EventsCodeGenerator {
     [Const, Value] DOMString STATIC_GenerateSceneEventsCompleteCode([Ref] Project project, [Ref] Layout layout, [Ref] EventsList events, [Ref] SetString includes, boolean compilationForRuntime);
     [Const, Value] DOMString STATIC_GenerateEventsFunctionCode([Ref] Project project, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespace, [Ref] SetString includes, boolean compilationForRuntime);
+};
+
+[NoDelete, Prefix="gdjs::"]
+interface BehaviorCodeGenerator {
+    void BehaviorCodeGenerator([Const, Ref] Project project);
+    [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace);
 };
 
 [Prefix="gdjs::"]

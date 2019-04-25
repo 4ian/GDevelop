@@ -75,7 +75,7 @@ T& SerializableWithNameList<T>::Get(const gd::String& name) {
   return *(
       *find_if(elements.begin(),
                elements.end(),
-               [&name](const std::unique_ptr<gd::EventsFunction>& function) {
+               [&name](const std::unique_ptr<T>& function) {
                  return function->GetName() == name;
                }));
 }
@@ -85,7 +85,7 @@ const T& SerializableWithNameList<T>::Get(const gd::String& name) const {
   return *(
       *find_if(elements.begin(),
                elements.end(),
-               [&name](const std::unique_ptr<gd::EventsFunction>& function) {
+               [&name](const std::unique_ptr<T>& function) {
                  return function->GetName() == name;
                }));
 }

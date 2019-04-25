@@ -14,6 +14,7 @@
 #include <GDCore/Project/Object.h>
 #include <GDCore/Project/Project.h>
 #include <GDCore/Project/Variable.h>
+#include <GDCore/Project/EventsBasedBehavior.h>
 #include <GDCore/Project/VariablesContainer.h>
 #include <GDCore/Serialization/Serializer.h>
 #include <GDCore/Serialization/SerializerElement.h>
@@ -70,6 +71,7 @@
 
 #include <GDJS/Events/Builtin/JsCodeEvent.h>
 #include <GDJS/Events/CodeGeneration/EventsCodeGenerator.h>
+#include <GDJS/Events/CodeGeneration/BehaviorCodeGenerator.h>
 #include <GDJS/IDE/Exporter.h>
 
 #include <emscripten.h>
@@ -390,6 +392,7 @@ typedef EventsFunction::FunctionType EventsFunction_FunctionType;
 typedef std::unique_ptr<gd::Object> UniquePtrObject;
 typedef std::unique_ptr<ExpressionNode> UniquePtrExpressionNode;
 typedef std::vector<gd::ExpressionParserDiagnostic*> VectorExpressionParserDiagnostic;
+typedef gd::SerializableWithNameList<gd::EventsBasedBehavior> EventsBasedBehaviorsList;
 
 typedef ExtensionAndMetadata<BehaviorMetadata> ExtensionAndBehaviorMetadata;
 typedef ExtensionAndMetadata<ObjectMetadata> ExtensionAndObjectMetadata;

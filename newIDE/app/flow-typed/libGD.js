@@ -48,8 +48,10 @@ declare type gdDirection = EmscriptenObject;
 declare type gdAnimation = EmscriptenObject;
 declare type gdPoint = EmscriptenObject;
 
-declare type gdEventsFunctionsExtension = EmscriptenObject;
-declare type gdVectorEventsFunction = EmscriptenObject;
+declare type gdEventsBasedBehaviorsList = EmscriptenObject;
+declare type gdEventsBasedBehavior = EmscriptenObject;
+declare type gdEventsFunctionContainer = EmscriptenObject;
+declare type gdEventsFunctionsExtension = gdEventsFunctionContainer & EmscriptenObject;
 
 declare type gdVectorEventsSearchResult = EmscriptenObject;
 declare type gdMapStringPropertyDescriptor = EmscriptenObject;

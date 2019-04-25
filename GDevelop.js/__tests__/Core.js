@@ -2593,5 +2593,54 @@ describe('libGD.js', function() {
 
       eventsFunctionsExtension.delete();
     });
+    it('can have events based behaviors', function() {
+      const eventsFunctionsExtension = new gd.EventsFunctionsExtension();
+      expect(
+        eventsFunctionsExtension.getEventsBasedBehaviors().getCount()
+      ).toBe(0);
+
+      eventsFunctionsExtension
+        .getEventsBasedBehaviors()
+        .insertNew('MyBehavior1', 0);
+      eventsFunctionsExtension
+        .getEventsBasedBehaviors()
+        .insertNew('MyBehavior2', 1);
+      expect(
+        eventsFunctionsExtension.getEventsBasedBehaviors().getCount()
+      ).toBe(2);
+
+      expect(
+        eventsFunctionsExtension.getEventsBasedBehaviors().has('MyBehavior1')
+      ).toBe(true);
+      expect(
+        eventsFunctionsExtension.getEventsBasedBehaviors().has('MyBehavior2')
+      ).toBe(true);
+      expect(
+        eventsFunctionsExtension.getEventsBasedBehaviors().has('MyBehavior3')
+      ).toBe(false);
+      expect(
+        eventsFunctionsExtension
+          .getEventsBasedBehaviors()
+          .getAt(1)
+          .getName()
+      ).toBe('MyBehavior2');
+      expect(
+        eventsFunctionsExtension
+          .getEventsBasedBehaviors()
+          .get('MyBehavior1')
+          .getName()
+      ).toBe('MyBehavior1');
+    });
+  });
+  describe('gd.EventsBasedBehavior', () => {
+    it('can have a name, fullname, description', function() {
+      const eventsBasedBehavior = new gd.EventsBasedBehavior();
+      eventsBasedBehavior.setName('My name');
+      eventsBasedBehavior.setFullName('My descriptive name');
+      eventsBasedBehavior.setDescription('My description');
+      expect(eventsBasedBehavior.getName()).toBe('My name');
+      expect(eventsBasedBehavior.getFullName()).toBe('My descriptive name');
+      expect(eventsBasedBehavior.getDescription()).toBe('My description');
+    });
   });
 });

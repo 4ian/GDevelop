@@ -8,14 +8,13 @@
 #define GDCORE_PROJECT_H
 #include <memory>
 #include <vector>
-#include "GDCore/String.h"
-#include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/LoadingScreen.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
 #include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/PlatformSpecificAssets.h"
 #include "GDCore/Project/ResourcesManager.h"
 #include "GDCore/Project/VariablesContainer.h"
+#include "GDCore/String.h"
 namespace gd {
 class Platform;
 class Layout;
@@ -38,7 +37,8 @@ class SerializerElement;
 
 namespace gd {
 /**
- * \brief Base class used to represent a project of a platform
+ * \brief Base class representing a project (game), including all resources,
+ * scenes, objects, extensions...
  *
  * \ingroup PlatformDefinition
  */
@@ -503,7 +503,7 @@ class GD_CORE_API Project : public ObjectsContainer {
    * Get the minor version of GDevelop used to save the project.
    */
   unsigned int GetLastSaveGDMinorVersion() { return gdMinorVersion; };
-  
+
   /**
    * Get the minor version of GDevelop used to save the project.
    */

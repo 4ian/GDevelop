@@ -5,7 +5,6 @@
  */
 #include "Platform.h"
 #include "GDCore/Extensions/PlatformExtension.h"
-#include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/Object.h"
 #include "GDCore/String.h"
 

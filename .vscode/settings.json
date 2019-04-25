@@ -79,7 +79,8 @@
         "mutex": "cpp",
         "__hash": "cpp",
         "__debug": "cpp",
-        "__threading_support": "cpp"
+        "__threading_support": "cpp",
+        "any": "cpp"
     },
     "files.exclude": {
         "Binaries/*build*": true,

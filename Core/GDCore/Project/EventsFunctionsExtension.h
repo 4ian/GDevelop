@@ -8,7 +8,7 @@
 #define GDCORE_EVENTSFUNCTIONEXTENSION_H
 
 #include <vector>
-#include "GDCore/Project/EventsFunction.h"
+#include "GDCore/Project/EventsFunctionsContainer.h"
 #include "GDCore/String.h"
 namespace gd {
 class SerializerElement;
@@ -27,7 +27,7 @@ namespace gd {
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API EventsFunctionsExtension {
+class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
  public:
   EventsFunctionsExtension();
   EventsFunctionsExtension(const EventsFunctionsExtension&);
@@ -72,70 +72,6 @@ class GD_CORE_API EventsFunctionsExtension {
     return *this;
   }
 
-  /**
-   * \brief Check if the function with the specified name exists.
-   */
-  bool HasEventsFunctionNamed(const gd::String& name) const;
-
-  /**
-   * \brief Get the function with the specified name.
-   *
-   * \warning Trying to access to a not existing function will result in
-   * undefined behavior.
-   */
-  gd::EventsFunction& GetEventsFunction(const gd::String& name);
-
-  /**
-   * \brief Get the function with the specified name.
-   *
-   * \warning Trying to access to a not existing function will result in
-   * undefined behavior.
-   */
-  const gd::EventsFunction& GetEventsFunction(const gd::String& name) const;
-
-  /**
-   * \brief Get the function at the specified index in the list.
-   *
-   * \warning Trying to access to a not existing function will result in
-   * undefined behavior.
-   */
-  gd::EventsFunction& GetEventsFunction(std::size_t index);
-
-  /**
-   * \brief Get the function at the specified index in the list.
-   *
-   * \warning Trying to access to a not existing function will result in
-   * undefined behavior.
-   */
-  const gd::EventsFunction& GetEventsFunction(std::size_t index) const;
-
-  /**
-   * \brief Return the number of functions.
-   */
-  std::size_t GetEventsFunctionsCount() const;
-
-  gd::EventsFunction& InsertNewEventsFunction(const gd::String& name,
-                                              std::size_t position);
-  gd::EventsFunction& InsertEventsFunction(const gd::EventsFunction& object,
-                                           std::size_t position);
-  void RemoveEventsFunction(const gd::String& name);
-  void MoveEventsFunction(std::size_t oldIndex, std::size_t newIndex);
-
-  /**
-   * \brief Provide a raw access to the vector containing the functions.
-   */
-  const std::vector<std::unique_ptr<gd::EventsFunction>>& GetEventsFunctions()
-      const {
-    return eventsFunctions;
-  };
-
-  /**
-   * \brief Provide a raw access to the vector containing the functions.
-   */
-  std::vector<std::unique_ptr<gd::EventsFunction>>& GetEventsFunctions() {
-    return eventsFunctions;
-  };
-
   /** \name Serialization
    */
   ///@{
@@ -163,7 +99,6 @@ class GD_CORE_API EventsFunctionsExtension {
   gd::String description;
   gd::String name;
   gd::String fullName;
-  std::vector<std::unique_ptr<gd::EventsFunction>> eventsFunctions;
 };
 
 }  // namespace gd

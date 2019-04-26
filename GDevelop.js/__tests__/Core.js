@@ -37,6 +37,10 @@ describe('libGD.js', function() {
       expect(project.getMaximumFPS()).toBe(15);
       project.setMinimumFPS(15);
       expect(project.getMinimumFPS()).toBe(15);
+      project.setFolderProject(true);
+      expect(project.isFolderProject()).toBe(true);
+      project.setFolderProject(false);
+      expect(project.isFolderProject()).toBe(false);
     });
 
     it('can store loading screen setup', function() {

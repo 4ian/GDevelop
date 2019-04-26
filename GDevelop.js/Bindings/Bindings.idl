@@ -289,6 +289,8 @@ interface Project {
     void SetMaximumFPS(long fps);
     long GetMinimumFPS();
     void SetMinimumFPS(long fps);
+    void SetFolderProject(boolean enable);
+    boolean IsFolderProject();
 
     void SetLastCompilationDirectory([Const] DOMString path);
     [Const, Ref] DOMString GetLastCompilationDirectory();

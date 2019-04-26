@@ -102,15 +102,16 @@ const generateEventsFunctionExtension = (
           eventsBasedBehavior
         );
 
+        const codeNamespace =
+          codeNamespacePrefix +
+          '__' +
+          mangleName(eventsBasedBehavior.getName());
+
         // Can this go inside generateBehavior? Or make a "generateBehaviorCode" and "addBehaviorDeclaration"
         return Promise.resolve()
           .then(() => {
             // Generate behavior code
             if (!options.skipCodeGeneration) {
-              const codeNamespace =
-                codeNamespacePrefix +
-                '__' +
-                mangleName(eventsBasedBehavior.getName());
 
               const code = gd.BehaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
                 eventsFunctionsExtension.getName(),
@@ -141,7 +142,7 @@ const generateEventsFunctionExtension = (
                   eventsFunction,
                   {
                     ...options,
-                    codeNamespacePrefix,
+                    codeNamespacePrefix: codeNamespace,
                   }
                 );
               })

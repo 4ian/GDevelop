@@ -1642,6 +1642,8 @@ interface EventsBasedBehavior {
     [Const, Ref] DOMString GetName();
     [Ref] EventsBasedBehavior SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
+    [Ref] EventsBasedBehavior SetObjectType([Const] DOMString fullName);
+    [Const, Ref] DOMString GetObjectType();
 
     [Ref] EventsFunctionsContainer GetEventsFunctions();
 

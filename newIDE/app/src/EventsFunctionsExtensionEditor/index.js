@@ -10,6 +10,7 @@ import EditorMosaic, { MosaicWindow } from '../UI/EditorMosaic';
 import EmptyMessage from '../UI/EmptyMessage';
 import EventsFunctionConfigurationEditor from './EventsFunctionConfigurationEditor';
 import EventsFunctionsList from '../EventsFunctionsList';
+import EventsBasedBehaviorsList from '../EventsBasedBehaviorsList';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
 import { showWarningBox } from '../UI/Messages/MessageBox';
@@ -40,6 +41,7 @@ type Props = {|
 
 type State = {|
   selectedEventsFunction: ?gdEventsFunction,
+  selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
   editOptionsDialogOpen: boolean,
 |};
 
@@ -49,6 +51,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 > {
   state = {
     selectedEventsFunction: null,
+    selectedEventsBasedBehavior: null,
     editOptionsDialogOpen: false,
   };
   editor: ?EventsSheet;
@@ -57,6 +60,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   _objectsContainer: ?gdObjectsContainer;
 
   componentDidMount() {
+    // TODO: Adapt for events based behaviors
     if (this.props.initiallyFocusedFunctionName) {
       this.selectEventsFunctionByName(this.props.initiallyFocusedFunctionName);
     }
@@ -114,6 +118,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.setState(
         {
           selectedEventsFunction: null,
+          selectedEventsBasedBehavior: null,
         },
         () => this.updateToolbar()
       );
@@ -124,6 +129,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     this.setState(
       {
         selectedEventsFunction,
+        selectedEventsBasedBehavior: null,
       },
       () => this.updateToolbar()
     );
@@ -168,6 +174,47 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     cb(true);
   };
 
+  _selectEventsBasedBehavior = (selectedEventsBasedBehavior: ?gdEventsBasedBehavior) => {
+    this.setState(
+      {
+        selectedEventsBasedBehavior,
+        selectedEventsFunction: null,
+      },
+      () => this.updateToolbar()
+    );
+  };
+
+  _makeRenameEventsBasedBehavior = (i18n: I18nType) => (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    newName: string,
+    done: boolean => void
+  ) => {
+    if (!gd.Project.validateObjectName(newName)) {
+      showWarningBox(
+        i18n._(
+          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
+        )
+      );
+      return;
+    }
+
+    done(true);
+  };
+
+  _onDeleteEventsBasedBehavior = (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    cb: boolean => void
+  ) => {
+    if (
+      this.state.selectedEventsBasedBehavior &&
+      gd.compare(eventsBasedBehavior, this.state.selectedEventsBasedBehavior)
+    ) {
+      this._selectEventsBasedBehavior(null);
+    }
+
+    cb(true);
+  };
+
   _editOptions = (open: boolean = true) => {
     this.setState({
       editOptionsDialogOpen: open,
@@ -176,7 +223,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   render() {
     const { project, eventsFunctionsExtension } = this.props;
-    const { selectedEventsFunction, editOptionsDialogOpen } = this.state;
+    const {
+      selectedEventsFunction,
+      selectedEventsBasedBehavior,
+      editOptionsDialogOpen,
+    } = this.state;
 
     return (
       <I18n>
@@ -218,8 +269,8 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       ) : (
                         <EmptyMessage>
                           <Trans>
-                            Choose a function to set the parameters that it
-                            accepts.
+                            Choose a function, or a function of a behavior, to
+                            set the parameters that it accepts.
                           </Trans>
                         </EmptyMessage>
                       )}
@@ -258,13 +309,16 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   ) : (
                     <Background>
                       <EmptyMessage>
-                        <Trans>Choose a function to edit its events.</Trans>
+                        <Trans>
+                          Choose a function, or a function of a behavior, to
+                          edit its events.
+                        </Trans>
                       </EmptyMessage>
                     </Background>
                   ),
-                'functions-list': (
+                'free-functions-list': (
                   <MosaicWindow
-                    title={<Trans>Functions list</Trans>}
+                    title={<Trans>Functions</Trans>}
                     toolbarControls={[]}
                     selectedEventsFunction={selectedEventsFunction}
                   >
@@ -281,17 +335,44 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     />
                   </MosaicWindow>
                 ),
+                'behaviors-list': (
+                  <MosaicWindow
+                    title={<Trans>Behaviors</Trans>}
+                    toolbarControls={[]}
+                    selectedEventsBasedBehavior={selectedEventsBasedBehavior}
+                  >
+                    <EventsBasedBehaviorsList
+                      project={project}
+                      eventsBasedBehaviorsList={eventsFunctionsExtension.getEventsBasedBehaviors()}
+                      selectedEventsBasedBehavior={selectedEventsBasedBehavior}
+                      onSelectEventsBasedBehavior={
+                        this._selectEventsBasedBehavior
+                      }
+                      onDeleteEventsBasedBehavior={
+                        this._onDeleteEventsBasedBehavior
+                      }
+                      onRenameEventsBasedBehavior={this._makeRenameEventsBasedBehavior(
+                        i18n
+                      )}
+                    />
+                  </MosaicWindow>
+                ),
               }}
               initialNodes={{
                 direction: 'row',
                 first: {
                   direction: 'column',
+                  first: 'free-functions-list',
+                  second: 'behaviors-list',
+                  splitPercentage: 50,
+                },
+                second: {
+                  direction: 'column',
                   first: 'parameters',
                   second: 'events-sheet',
                   splitPercentage: 25,
                 },
-                second: 'functions-list',
-                splitPercentage: 66,
+                splitPercentage: 25,
               }}
             />
             {editOptionsDialogOpen && (

@@ -29,7 +29,7 @@ type State = {|
 
 type Props = {|
   project: gdProject,
-  eventsFunctionsContainer: gdEventsFunctionsExtension,
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
   selectedEventsFunction: ?gdEventsFunction,
   onSelectEventsFunction: (eventsFunction: ?gdEventsFunction) => void,
   onDeleteEventsFunction: (

@@ -97,16 +97,16 @@ class GD_CORE_API EventsFunctionsContainer
   /**
    * \brief Provide a raw access to the vector containing the functions.
    */
-  const std::vector<std::unique_ptr<gd::EventsFunction>>& GetEventsFunctions()
+  const std::vector<std::unique_ptr<gd::EventsFunction>>& GetInternalVector()
       const {
-    return GetInternalVector();
+    return elements;
   };
 
   /**
    * \brief Provide a raw access to the vector containing the functions.
    */
-  std::vector<std::unique_ptr<gd::EventsFunction>>& GetEventsFunctions() {
-    return GetInternalVector();
+  std::vector<std::unique_ptr<gd::EventsFunction>>& GetInternalVector() {
+    return elements;
   };
   ///@}
 

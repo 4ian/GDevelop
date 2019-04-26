@@ -1,6 +1,12 @@
 // @flow
 import { mapVector, mapFor } from '../Utils/MapFor';
 import slugs from 'slugs';
+import {
+  declareInstructionOrExpressionMetadata,
+  declareEventsFunctionParameters,
+  declareBehaviorMetadata,
+  declareExtension,
+} from './MetadataDeclarationHelpers';
 
 const gd = global.gd;
 
@@ -71,7 +77,7 @@ const loadProjectEventsFunctionsExtension = (
 };
 
 /**
- * Generate the code for the given events functions
+ * Generate the code for the events based extension
  */
 const generateEventsFunctionExtension = (
   project: gdProject,
@@ -79,75 +85,26 @@ const generateEventsFunctionExtension = (
   options: Options
 ): Promise<gdEventsFunctionsExtension> => {
   const extension = new gd.PlatformExtension();
-
-  extension.setExtensionInformation(
-    eventsFunctionsExtension.getName(),
-    eventsFunctionsExtension.getFullName() ||
-      eventsFunctionsExtension.getName(),
-    eventsFunctionsExtension.getDescription(),
-    '',
-    ''
-  );
+  declareExtension(extension, eventsFunctionsExtension);
 
   const codeNamespacePrefix =
-    'gdjs.eventsExtension__' + mangleName(eventsFunctionsExtension.getName());
+    'gdjs.evtsExt__' + mangleName(eventsFunctionsExtension.getName());
 
   return Promise.all(
     // Generate all behaviors and their functions
     mapVector(
       eventsFunctionsExtension.getEventsBasedBehaviors(),
       eventsBasedBehavior => {
-        const behaviorMetadata = generateBehavior(
+        return generateBehavior(
+          project,
           extension,
-          eventsBasedBehavior
+          eventsFunctionsExtension,
+          eventsBasedBehavior,
+          {
+            ...options,
+            codeNamespacePrefix,
+          }
         );
-
-        const codeNamespace =
-          codeNamespacePrefix +
-          '__' +
-          mangleName(eventsBasedBehavior.getName());
-
-        // Can this go inside generateBehavior? Or make a "generateBehaviorCode" and "addBehaviorDeclaration"
-        return Promise.resolve()
-          .then(() => {
-            // Generate behavior code
-            if (!options.skipCodeGeneration) {
-
-              const code = gd.BehaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
-                eventsFunctionsExtension.getName(),
-                eventsBasedBehavior,
-                codeNamespace
-              );
-
-              return options.eventsFunctionWriter.writeBehaviorCode(
-                eventsBasedBehavior.getName(),
-                code
-              );
-            } else {
-              // Skip code generation
-              return Promise.resolve();
-            }
-          })
-          .then(() =>
-            // Generate all behavior's functions code
-            Promise.all(
-              mapFor(0, eventsBasedBehavior.getEventsFunctionsCount(), i => {
-                const eventsFunction = eventsBasedBehavior.getEventsFunctionAt(
-                  i
-                );
-                generateFunction(
-                  project,
-                  behaviorMetadata,
-                  eventsBasedBehavior,
-                  eventsFunction,
-                  {
-                    ...options,
-                    codeNamespacePrefix: codeNamespace,
-                  }
-                );
-              })
-            )
-          );
       }
     )
   )
@@ -174,60 +131,6 @@ const generateEventsFunctionExtension = (
     .then(() => extension);
 };
 
-/**
- * Unload all extensions providing events functions of a project
- */
-export const unloadProjectEventsFunctionsExtensions = (
-  project: gdProject
-): Promise<Array<void>> => {
-  return Promise.all(
-    mapFor(0, project.getEventsFunctionsExtensionsCount(), i => {
-      gd.JsPlatform.get().removeExtension(
-        project.getEventsFunctionsExtensionAt(i).getName()
-      );
-    })
-  );
-};
-
-/**
- * Declare the behavior for the given
- * events based behavior.
- */
-const generateBehavior = (
-  extension: gdPlatformExtension,
-  eventsBasedBehavior: gdEventsBasedBehavior
-): gdBehaviorMetadata => {
-  const generatedBehavior = new gd.BehaviorJsImplementation();
-
-  // For now, behavior is empty
-  generatedBehavior.updateProperty = function(
-    behaviorContent,
-    propertyName,
-    newValue
-  ) {
-    return false;
-  };
-
-  generatedBehavior.getProperties = function(behaviorContent) {
-    var behaviorProperties = new gd.MapStringPropertyDescriptor();
-    return behaviorProperties;
-  };
-
-  generatedBehavior.setRawJSONContent(JSON.stringify({}));
-
-  return extension.addBehavior(
-    eventsBasedBehavior.getName(),
-    eventsBasedBehavior.getFullName(),
-    eventsBasedBehavior.getName(), // Default name is the name
-    eventsBasedBehavior.getDescription(),
-    '',
-    'defaulticon.png', // TODO
-    eventsBasedBehavior.getName(), // Class name is the name, actually unused
-    generatedBehavior,
-    new gd.BehaviorsSharedData()
-  );
-};
-
 const generateFunction = (
   project: gdProject,
   extensionOrBehaviorMetadata: gdPlatformExtension | gdBehaviorMetadata,
@@ -241,12 +144,12 @@ const generateFunction = (
     codeNamespacePrefix,
   }: {| ...Options, codeNamespacePrefix: string |}
 ) => {
-  const instructionOrExpression = generateInstructionOrExpression(
+  const instructionOrExpression = declareInstructionOrExpressionMetadata(
     extensionOrBehaviorMetadata,
-    eventsFunction,
-    eventsFunctionsExtensionOrEventsBasedBehavior
+    eventsFunctionsExtensionOrEventsBasedBehavior,
+    eventsFunction
   );
-  addEventsFunctionParameters(eventsFunction, instructionOrExpression);
+  declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
 
   const codeNamespace =
     codeNamespacePrefix + '__' + mangleName(eventsFunction.getName());
@@ -291,98 +194,106 @@ const generateFunction = (
   }
 };
 
-/**
- * Declare the instruction (action/condition) or expression for the given
- * events function.
- */
-const generateInstructionOrExpression = (
-  extensionOrBehaviorMetadata: gdPlatformExtension | gdBehaviorMetadata,
-  eventsFunction: gdEventsFunction,
-  eventsFunctionsExtension: gdEventsFunctionsExtension
-): gdInstructionMetadata | gdExpressionMetadata => {
-  const functionType = eventsFunction.getFunctionType();
-  if (functionType === gd.EventsFunction.Expression) {
-    return extensionOrBehaviorMetadata.addExpression(
-      eventsFunction.getName(),
-      eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription(),
-      eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
-      'res/function.png'
-    );
-  } else if (functionType === gd.EventsFunction.StringExpression) {
-    return extensionOrBehaviorMetadata.addStrExpression(
-      eventsFunction.getName(),
-      eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription(),
-      eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
-      'res/function.png'
-    );
-  } else if (functionType === gd.EventsFunction.Condition) {
-    return extensionOrBehaviorMetadata.addCondition(
-      eventsFunction.getName(),
-      eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription(),
-      eventsFunction.getSentence(),
-      eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
-      'res/function.png',
-      'res/function24.png'
-    );
-  } else {
-    return extensionOrBehaviorMetadata.addAction(
-      eventsFunction.getName(),
-      eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription(),
-      eventsFunction.getSentence(),
-      eventsFunctionsExtension.getFullName() ||
-        eventsFunctionsExtension.getName(),
-      'res/function.png',
-      'res/function24.png'
-    );
-  }
-};
-
-/**
- * Add to the instruction (action/condition) or expression the parameters
- * expected by the events function.
- */
-const addEventsFunctionParameters = (
-  eventsFunction: gdEventsFunction,
-  instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
-) => {
-  // By convention, first parameter is always the Runtime Scene.
-  instructionOrExpression.addCodeOnlyParameter('currentScene', '');
-
-  mapVector(
-    eventsFunction.getParameters(),
-    (parameter: gdParameterMetadata) => {
-      if (!parameter.isCodeOnly()) {
-        instructionOrExpression.addParameter(
-          parameter.getType(),
-          parameter.getDescription(),
-          '', // See below for adding the extra information
-          parameter.isOptional()
-        );
-      } else {
-        instructionOrExpression.addCodeOnlyParameter(
-          parameter.getType(),
-          '' // See below for adding the extra information
-        );
-      }
-      // Manually add the "extra info" without relying on addParameter (or addCodeOnlyParameter)
-      // as these methods are prefixing the value passed with the extension namespace (this
-      // was done to ease extension declarations when dealing with object).
-      instructionOrExpression
-        .getParameter(instructionOrExpression.getParametersCount() - 1)
-        .setExtraInfo(parameter.getExtraInfo());
-    }
+function generateBehavior(
+  project: gdProject,
+  extension: gdPlatformExtension,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
+  eventsBasedBehavior: gdEventsBasedBehavior,
+  options: {| ...Options, codeNamespacePrefix: string |}
+) {
+  const behaviorMetadata = declareBehaviorMetadata(
+    extension,
+    eventsBasedBehavior
   );
 
-  // By convention, latest parameter is always the eventsFunctionContext of the calling function
-  // (if any).
-  instructionOrExpression.addCodeOnlyParameter('eventsFunctionContext', '');
+  const eventsFunctionsContainer = eventsBasedBehavior.getEventsFunctions();
+  const codeNamespace =
+    options.codeNamespacePrefix +
+    '__' +
+    mangleName(eventsBasedBehavior.getName());
+
+  behaviorMetadata.setIncludeFile(
+    options.eventsFunctionWriter.getIncludeFileFor(codeNamespace)
+  );
+
+  return Promise.resolve()
+    .then(() => {
+      // Generate behavior code
+      if (!options.skipCodeGeneration) {
+        const functionMangledNames = new gd.MapStringString(); //TODO: Rename to behaviorMethodNames?
+        const internalFunctionMangledNames = new gd.MapStringString();
+
+        mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {
+          const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(
+            i
+            );
+
+          const behaviorFunctionName = mangleName(eventsFunction.getName());
+            // TODO: Move this to a helper as this is duplicated with functions
+          const functionCodeNamespace =
+            codeNamespace +
+            '__' +
+            mangleName(eventsFunction.getName());
+          const functionName = functionCodeNamespace + '.func';
+
+          functionMangledNames.set(eventsFunction.getName(), behaviorFunctionName);
+          internalFunctionMangledNames.set(eventsFunction.getName(), functionName);
+        });
+
+        const behaviorCodeGenerator = new gd.BehaviorCodeGenerator(project);
+        const code = behaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
+          eventsFunctionsExtension.getName(),
+          eventsBasedBehavior,
+          codeNamespace,
+          functionMangledNames,
+          internalFunctionMangledNames
+        );
+        behaviorCodeGenerator.delete();
+        functionMangledNames.delete();
+        return options.eventsFunctionWriter.writeBehaviorCode(
+          codeNamespace,
+          code
+        );
+      } else {
+        // Skip code generation
+        return Promise.resolve();
+      }
+    })
+    .then(() =>
+      // Generate all behavior's functions code
+      Promise.all(
+        mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {
+          const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(
+            i
+          );
+          generateFunction(
+            project,
+            behaviorMetadata,
+            eventsBasedBehavior,
+            eventsFunction,
+            {
+              ...options,
+              codeNamespacePrefix: codeNamespace,
+            }
+          );
+        })
+      )
+    );
+}
+
+/**
+ * Unload all extensions providing events functions of a project
+ */
+export const unloadProjectEventsFunctionsExtensions = (
+  project: gdProject
+): Promise<Array<void>> => {
+  return Promise.all(
+    mapFor(0, project.getEventsFunctionsExtensionsCount(), i => {
+      gd.JsPlatform.get().removeExtension(
+        project.getEventsFunctionsExtensionAt(i).getName()
+      );
+    })
+  );
 };
 
 /**

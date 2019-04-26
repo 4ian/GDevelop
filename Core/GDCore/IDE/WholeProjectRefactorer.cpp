@@ -38,7 +38,7 @@ void WholeProjectRefactorer::ExposeProjectEvents(
   for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
        e++) {
     auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
+    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
       worker.Launch(eventsFunction->GetEvents());
     }
   }
@@ -72,14 +72,14 @@ void WholeProjectRefactorer::RenameEventsFunctionsExtension(
   // Order is important: we first rename the expressions then the instructions,
   // to avoid being unable to fetch the metadata (the types of parameters) of
   // instructions after they are renamed.
-  for (auto&& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
+  for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
     if (eventsFunction->GetFunctionType() == gd::EventsFunction::Expression ||
         eventsFunction->GetFunctionType() ==
             gd::EventsFunction::StringExpression) {
       renameEventsFunction(*eventsFunction);
     }
   }
-  for (auto&& eventsFunction : eventsFunctionsExtension.GetEventsFunctions()) {
+  for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
     if (eventsFunction->GetFunctionType() == gd::EventsFunction::Action ||
         eventsFunction->GetFunctionType() == gd::EventsFunction::Condition) {
       renameEventsFunction(*eventsFunction);

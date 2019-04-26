@@ -978,7 +978,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
     auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
     for (auto&& eventsFunction :
-         eventsFunctionsExtension.GetEventsFunctions()) {
+         eventsFunctionsExtension.GetInternalVector()) {
       LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
     }
   }

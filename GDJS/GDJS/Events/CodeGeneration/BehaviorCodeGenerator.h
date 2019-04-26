@@ -5,6 +5,7 @@
  */
 #ifndef GDJS_BEHAVIORCODEGENERATOR_H
 #define GDJS_BEHAVIORCODEGENERATOR_H
+#include <map>
 #include <set>
 #include <string>
 #include <vector>
@@ -29,9 +30,12 @@ class BehaviorCodeGenerator {
   gd::String GenerateRuntimeBehaviorCompleteCode(
       const gd::String& extensionName,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
-      const gd::String& codeNamespace);
+      const gd::String& codeNamespace,
+      const std::map<gd::String, gd::String>& functionMangledNames,
+      const std::map<gd::String, gd::String>& internalFunctionMangledNames);
 
  private:
+  gd::String GetRuntimeBehaviorMethodTemplateCode();
   gd::String GetRuntimeBehaviorTemplateCode();
 
   const gd::Project& project;

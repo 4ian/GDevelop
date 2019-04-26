@@ -35,6 +35,8 @@ interface VectorPlatformExtension {
 };
 
 interface MapStringString {
+    void MapStringString();
+
     [Const, Ref] DOMString MAP_get([Const] DOMString name);
     void MAP_set([Const] DOMString name, [Const] DOMString str);
     boolean MAP_has([Const] DOMString name);
@@ -2314,10 +2316,10 @@ interface EventsCodeGenerator {
     [Const, Value] DOMString STATIC_GenerateEventsFunctionCode([Ref] Project project, [Const, Ref] EventsFunction eventsFunction, [Const] DOMString codeNamespace, [Ref] SetString includes, boolean compilationForRuntime);
 };
 
-[NoDelete, Prefix="gdjs::"]
+[Prefix="gdjs::"]
 interface BehaviorCodeGenerator {
     void BehaviorCodeGenerator([Const, Ref] Project project);
-    [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace);
+    [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace, [Const, Ref] MapStringString functionMangledNames, [Const, Ref] MapStringString internalFunctionMangledNames);
 };
 
 [Prefix="gdjs::"]

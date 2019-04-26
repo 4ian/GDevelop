@@ -105,15 +105,20 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   }
 
   selectEventsFunctionByName = (name: string) => {
+    // TODO: Adapt for events based behaviors
     const { eventsFunctionsExtension } = this.props;
     if (eventsFunctionsExtension.hasEventsFunctionNamed(name)) {
       this._selectEventsFunction(
-        eventsFunctionsExtension.getEventsFunction(name)
+        eventsFunctionsExtension.getEventsFunction(name),
+        null
       );
     }
   };
 
-  _selectEventsFunction = (selectedEventsFunction: ?gdEventsFunction) => {
+  _selectEventsFunction = (
+    selectedEventsFunction: ?gdEventsFunction,
+    selectedEventsBasedBehavior: ?gdEventsBasedBehavior
+  ) => {
     if (!selectedEventsFunction) {
       this.setState(
         {
@@ -129,7 +134,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     this.setState(
       {
         selectedEventsFunction,
-        selectedEventsBasedBehavior: null,
+        selectedEventsBasedBehavior,
       },
       () => this.updateToolbar()
     );
@@ -168,19 +173,27 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.state.selectedEventsFunction &&
       gd.compare(eventsFunction, this.state.selectedEventsFunction)
     ) {
-      this._selectEventsFunction(null);
+      this._selectEventsFunction(null, null);
     }
 
     cb(true);
   };
 
-  _selectEventsBasedBehavior = (selectedEventsBasedBehavior: ?gdEventsBasedBehavior) => {
+  _selectEventsBasedBehavior = (
+    selectedEventsBasedBehavior: ?gdEventsBasedBehavior
+  ) => {
     this.setState(
       {
         selectedEventsBasedBehavior,
         selectedEventsFunction: null,
       },
-      () => this.updateToolbar()
+      () => {
+        this.updateToolbar();
+        if (selectedEventsBasedBehavior) {
+          if (this._editors)
+            this._editors.openEditor('behavior-functions-list');
+        }
+      }
     );
   };
 
@@ -305,6 +318,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       setToolbar={this.props.setToolbar}
                       onOpenDebugger={() => {}}
                       onCreateEventsFunction={this.props.onCreateEventsFunction}
+                      onOpenSettings={this._editOptions} //TODO: Move this extra toolbar outside of EventsSheet toolbar
                     />
                   ) : (
                     <Background>
@@ -326,7 +340,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       project={project}
                       eventsFunctionsContainer={eventsFunctionsExtension}
                       selectedEventsFunction={selectedEventsFunction}
-                      onSelectEventsFunction={this._selectEventsFunction}
+                      onSelectEventsFunction={selectedEventsFunction =>
+                        this._selectEventsFunction(selectedEventsFunction, null)
+                      }
                       onDeleteEventsFunction={this._onDeleteEventsFunction}
                       onRenameEventsFunction={this._makeRenameEventsFunction(
                         i18n
@@ -335,6 +351,41 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                     />
                   </MosaicWindow>
                 ),
+                'behavior-functions-list': selectedEventsBasedBehavior ? (
+                  <MosaicWindow
+                    title={<Trans>Behavior functions</Trans>}
+                    toolbarControls={[]}
+                    selectedEventsBasedBehavior={selectedEventsBasedBehavior}
+                    selectedEventsFunction={selectedEventsFunction}
+                  >
+                    <EventsFunctionsList
+                      project={project}
+                      eventsFunctionsContainer={selectedEventsBasedBehavior.getEventsFunctions()}
+                      selectedEventsFunction={selectedEventsFunction}
+                      onSelectEventsFunction={selectedEventsFunction =>
+                        this._selectEventsFunction(
+                          selectedEventsFunction,
+                          selectedEventsBasedBehavior
+                        )
+                      }
+                      onDeleteEventsFunction={this._onDeleteEventsFunction}
+                      onRenameEventsFunction={this._makeRenameEventsFunction(
+                        i18n
+                      )}
+                      onEditOptions={this._editOptions}
+                    />
+                  </MosaicWindow>
+                ) : (
+                  <Background>
+                    <EmptyMessage>
+                      <Trans>
+                        Select a behavior to display the functions inside this
+                        behavior.
+                      </Trans>
+                    </EmptyMessage>
+                  </Background>
+                ),
+
                 'behaviors-list': (
                   <MosaicWindow
                     title={<Trans>Behaviors</Trans>}

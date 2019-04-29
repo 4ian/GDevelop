@@ -37,8 +37,7 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * \param project Project used
    * \param scene Scene used
    * \param events events of the scene
-   * \param includeFiles A reference to a set of strings where needed
-   * includes files will be stored.
+   * \param includeFiles Will be filled with the necessary include files.
    * \param compilationForRuntime Set this to true if the code is generated for
    * runtime.
    *
@@ -52,12 +51,14 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       bool compilationForRuntime = false);
 
   /**
-   * Generate JavaScript for executing events in a function
+   * Generate JavaScript for executing events of an events based function.
    *
-   * \param project Project used
-   * \param parameters The parameters of the function (objects will be deduced
-   * from these). \param events events of the scene \param compilationForRuntime
-   * Set this to true if the code is generated for runtime.
+   * \param project Project used.
+   * \param eventsFunction The events function to be compiled.
+   * \param codeNamespace Where to store the context used by the function.
+   * \param includeFiles Will be filled with the necessary include files.
+   * \param compilationForRuntime Set this to true if the code is generated for
+   * runtime.
    *
    * \return JavaScript code
    */
@@ -65,6 +66,27 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
       gd::Project& project,
       const gd::EventsFunction& eventsFunction,
       const gd::String& codeNamespace,
+      std::set<gd::String>& includeFiles,
+      bool compilationForRuntime = false);
+
+  /**
+   * Generate JavaScript for executing events of a events based behavior
+   * function.
+   *
+   * \param project Project used.
+   * \param eventsFunction The events function to be compiled.
+   * \param codeNamespace Where to store the context used by the function.
+   * \param includeFiles Will be filled with the necessary include files.
+   * \param compilationForRuntime Set this to true if the code is generated for
+   * runtime.
+   *
+   * \return JavaScript code
+   */
+  static gd::String GenerateBehaviorEventsFunctionCode(
+      gd::Project& project,
+      const gd::EventsFunction& eventsFunction,
+      const gd::String& codeNamespace,
+      const gd::String& fullyQualifiedFunctionName,
       std::set<gd::String>& includeFiles,
       bool compilationForRuntime = false);
 
@@ -255,6 +277,15 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
   virtual gd::String GenerateProfilerSectionEnd(const gd::String& section);
 
  private:
+  static gd::String GenerateEventsListCompleteFunctionCode(
+      gd::Project& project,
+      gdjs::EventsCodeGenerator& codeGenerator,
+      gd::String fullyQualifiedFunctionName,
+      gd::String functionArgumentsCode,
+      gd::String functionPreEventsCode,
+      const gd::EventsList& events,
+      gd::String functionReturnCode);
+
   /**
    * \brief Generate the declarations of all the booleans required to run
    * events.
@@ -286,7 +317,8 @@ class EventsCodeGenerator : public gd::EventsCodeGenerator {
    * parentEventsFunctionContext as the last parameter.
    */
   gd::String GenerateEventsFunctionParameterDeclarationsList(
-      const std::vector<gd::ParameterMetadata>& parameters);
+      const std::vector<gd::ParameterMetadata>& parameters,
+      bool isBehaviorEventsFunction);
 
   /**
    * \brief Generate the "eventsFunctionContext" object that allow a function

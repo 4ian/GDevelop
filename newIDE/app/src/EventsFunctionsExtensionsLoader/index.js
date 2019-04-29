@@ -1,6 +1,6 @@
 // @flow
 import { mapVector, mapFor } from '../Utils/MapFor';
-import slugs from 'slugs';
+import {caseSensitiveSlug} from '../Utils/CaseSensitiveSlug';
 import {
   declareInstructionOrExpressionMetadata,
   declareEventsFunctionParameters,
@@ -22,7 +22,7 @@ type Options = {|
 |};
 
 const mangleName = (name: string) => {
-  return slugs(name, '_', []);
+  return caseSensitiveSlug(name, '_', []);
 };
 
 /**
@@ -115,7 +115,7 @@ const generateEventsFunctionExtension = (
           const eventsFunction = eventsFunctionsExtension.getEventsFunctionAt(
             i
           );
-          generateFunction(
+          generateFreeFunction(
             project,
             extension,
             eventsFunctionsExtension,
@@ -131,7 +131,7 @@ const generateEventsFunctionExtension = (
     .then(() => extension);
 };
 
-const generateFunction = (
+const generateFreeFunction = (
   project: gdProject,
   extensionOrBehaviorMetadata: gdPlatformExtension | gdBehaviorMetadata,
   eventsFunctionsExtensionOrEventsBasedBehavior:
@@ -149,6 +149,8 @@ const generateFunction = (
     eventsFunctionsExtensionOrEventsBasedBehavior,
     eventsFunction
   );
+  // By convention, first parameter is always the Runtime Scene.
+  instructionOrExpression.addCodeOnlyParameter('currentScene', '');
   declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
 
   const codeNamespace =
@@ -216,69 +218,78 @@ function generateBehavior(
     options.eventsFunctionWriter.getIncludeFileFor(codeNamespace)
   );
 
-  return Promise.resolve()
-    .then(() => {
-      // Generate behavior code
-      if (!options.skipCodeGeneration) {
-        const functionMangledNames = new gd.MapStringString(); //TODO: Rename to behaviorMethodNames?
-        const internalFunctionMangledNames = new gd.MapStringString();
+  return Promise.resolve().then(() => {
+    // Generate behavior code
+    if (!options.skipCodeGeneration) {
+      const functionMangledNames = new gd.MapStringString(); //TODO: Rename to behaviorMethodNames?
+      const includeFiles = new gd.SetString();
 
-        mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {
-          const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(
-            i
-            );
+      mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {
+        const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(i);
 
-          const behaviorFunctionName = mangleName(eventsFunction.getName());
-            // TODO: Move this to a helper as this is duplicated with functions
-          const functionCodeNamespace =
-            codeNamespace +
-            '__' +
-            mangleName(eventsFunction.getName());
-          const functionName = functionCodeNamespace + '.func';
+        const eventsFunctionMangledName = mangleName(eventsFunction.getName());
+        functionMangledNames.set(
+          eventsFunction.getName(),
+          eventsFunctionMangledName
+        );
 
-          functionMangledNames.set(eventsFunction.getName(), behaviorFunctionName);
-          internalFunctionMangledNames.set(eventsFunction.getName(), functionName);
+        const instructionOrExpression = declareInstructionOrExpressionMetadata(
+          behaviorMetadata,
+          eventsBasedBehavior,
+          eventsFunction
+        );
+        declareEventsFunctionParameters(
+          eventsFunction,
+          instructionOrExpression
+        );
+
+        const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
+        codeExtraInformation
+          .setIncludeFile(
+            options.eventsFunctionWriter.getIncludeFileFor(
+              eventsFunctionMangledName
+            )
+          )
+          .setFunctionName(eventsFunctionMangledName);
+      });
+
+      const behaviorCodeGenerator = new gd.BehaviorCodeGenerator(project);
+      const code = behaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
+        eventsFunctionsExtension.getName(),
+        eventsBasedBehavior,
+        codeNamespace,
+        functionMangledNames,
+        includeFiles,
+
+        // For now, always generate functions for runtime (this disables
+        // generation of profiling for groups (see EventsCodeGenerator))
+        // as extensions generated can be used either for preview or export.
+        true
+      );
+      behaviorCodeGenerator.delete();
+      functionMangledNames.delete();
+
+      // Add any include file required by the functions to the list
+      // of include files for this behavior (so that when used, the "dependencies"
+      // are transitively included).
+      includeFiles
+        .toNewVectorString()
+        .toJSArray()
+        .forEach((includeFile: string) => {
+          behaviorMetadata.addIncludeFile(includeFile);
         });
 
-        const behaviorCodeGenerator = new gd.BehaviorCodeGenerator(project);
-        const code = behaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
-          eventsFunctionsExtension.getName(),
-          eventsBasedBehavior,
-          codeNamespace,
-          functionMangledNames,
-          internalFunctionMangledNames
-        );
-        behaviorCodeGenerator.delete();
-        functionMangledNames.delete();
-        return options.eventsFunctionWriter.writeBehaviorCode(
-          codeNamespace,
-          code
-        );
-      } else {
-        // Skip code generation
-        return Promise.resolve();
-      }
-    })
-    .then(() =>
-      // Generate all behavior's functions code
-      Promise.all(
-        mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {
-          const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(
-            i
-          );
-          generateFunction(
-            project,
-            behaviorMetadata,
-            eventsBasedBehavior,
-            eventsFunction,
-            {
-              ...options,
-              codeNamespacePrefix: codeNamespace,
-            }
-          );
-        })
-      )
-    );
+      includeFiles.delete();
+
+      return options.eventsFunctionWriter.writeBehaviorCode(
+        codeNamespace,
+        code
+      );
+    } else {
+      // Skip code generation
+      return Promise.resolve();
+    }
+  });
 }
 
 /**

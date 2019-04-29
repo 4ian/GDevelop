@@ -126,9 +126,6 @@ export const declareEventsFunctionParameters = (
   eventsFunction: gdEventsFunction,
   instructionOrExpression: gdInstructionMetadata | gdExpressionMetadata
 ) => {
-  // By convention, first parameter is always the Runtime Scene.
-  instructionOrExpression.addCodeOnlyParameter('currentScene', '');
-
   mapVector(
     eventsFunction.getParameters(),
     (parameter: gdParameterMetadata) => {

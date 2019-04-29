@@ -21,7 +21,7 @@ namespace gdjs {
  */
 class BehaviorCodeGenerator {
  public:
-  BehaviorCodeGenerator(const gd::Project& project_) : project(project_){};
+  BehaviorCodeGenerator(gd::Project& project_) : project(project_){};
 
   /**
    * \brief Generate the complete JS class (`gdjs.RuntimeBehavior`) for the
@@ -32,13 +32,13 @@ class BehaviorCodeGenerator {
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::String& codeNamespace,
       const std::map<gd::String, gd::String>& functionMangledNames,
-      const std::map<gd::String, gd::String>& internalFunctionMangledNames);
+      std::set<gd::String>& includeFiles,
+      bool compilationForRuntime = false);
 
  private:
-  gd::String GetRuntimeBehaviorMethodTemplateCode();
   gd::String GetRuntimeBehaviorTemplateCode();
 
-  const gd::Project& project;
+  gd::Project& project;
 };
 
 }  // namespace gdjs

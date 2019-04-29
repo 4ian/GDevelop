@@ -74,7 +74,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
       codeGenerator.GetCodeNamespaceAccessor() +
       "func = function(runtimeScene) {\n" +
       "runtimeScene.getOnceTriggers().startNewFrame();\n" +
-      globalObjectListsReset + "\n" + codeGenerator.GetCustomCodeInMain() +
+      globalObjectListsReset + "\n" +
       wholeEventsCode + "\n" + "return;\n" + "}\n";
 
   // Export the symbols to avoid them being stripped by the Closure Compiler:
@@ -144,7 +144,7 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
       codeGenerator.GenerateEventsFunctionContext(
           eventsFunction.GetParameters()) +
       "\n" + globalObjectListsReset + "\n" +
-      codeGenerator.GetCustomCodeInMain() + wholeEventsCode + "\n" +
+      wholeEventsCode + "\n" +
       codeGenerator.GenerateEventsFunctionReturn(eventsFunction) + "\n" + "}\n";
 
   includeFiles.insert(codeGenerator.GetIncludeFiles().begin(),

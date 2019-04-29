@@ -532,7 +532,7 @@ gd::String EventsCodeGenerator::GenerateSceneEventsCompleteCode(
             "(RuntimeContext * runtimeContext)\n"
             "{\n" +
             "runtimeContext->StartNewFrame();\n" +
-            codeGenerator.GetCustomCodeInMain() + wholeEventsCode +
+            wholeEventsCode +
             "return 0;\n"
             "}\n";
 
@@ -596,7 +596,7 @@ gd::String EventsCodeGenerator::GenerateExternalEventsCompleteCode(
                 events.GetName()) +
             "(RuntimeContext * runtimeContext)\n"
             "{\n" +
-            codeGenerator.GetCustomCodeInMain() + wholeEventsCode +
+            wholeEventsCode +
             "return;\n"
             "}\n";
 

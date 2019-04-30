@@ -11,10 +11,10 @@
 #include <vector>
 #include "GDCore/Events/EventsList.h"
 #include "GDCore/Project/BehaviorsSharedData.h"
-#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
 #include "GDCore/Project/Layer.h"
 #include "GDCore/Project/ObjectGroupsContainer.h"
+#include "GDCore/Project/ObjectsContainer.h"
 #include "GDCore/Project/VariablesContainer.h"
 #include "GDCore/String.h"
 #if defined(GD_IDE_ONLY)
@@ -24,8 +24,9 @@ namespace gd {
 class BaseEvent;
 class Object;
 class Project;
+class BehaviorContent;
 class InitialInstancesContainer;
-}
+}  // namespace gd
 class TiXmlElement;
 class BaseProfiler;
 #undef GetObject  // Disable an annoying macro
@@ -273,26 +274,19 @@ class GD_CORE_API Layout : public ObjectsContainer {
   /**
    * \brief Get the shared data stored for a behavior
    */
-  const gd::BehaviorsSharedData& GetBehaviorSharedData(
+  const gd::BehaviorContent& GetBehaviorSharedData(
       const gd::String& behaviorName) const;
 
   /**
    * \brief Get the shared data stored for a behavior
    */
-  gd::BehaviorsSharedData& GetBehaviorSharedData(
-      const gd::String& behaviorName);
+  gd::BehaviorContent& GetBehaviorSharedData(const gd::String& behaviorName);
 
   /**
    * \brief Get a map of all shared data stored for behaviors
    */
-  const std::map<gd::String, std::shared_ptr<gd::BehaviorsSharedData> >&
+  const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>&
   GetAllBehaviorSharedData() const;
-
-  /**
-   * \brief Get the (smart pointer to the) shared data stored for a behavior.
-   */
-  std::shared_ptr<gd::BehaviorsSharedData> GetBehaviorSharedDataSmartPtr(
-      const gd::String& behaviorName);
 
 #if defined(GD_IDE_ONLY)
   /**
@@ -423,8 +417,8 @@ class GD_CORE_API Layout : public ObjectsContainer {
   gd::VariablesContainer variables;  ///< Variables list
   gd::InitialInstancesContainer initialInstances;  ///< Initial instances
   std::vector<gd::Layer> initialLayers;            ///< Initial layers
-  std::map<gd::String, std::shared_ptr<gd::BehaviorsSharedData> >
-      behaviorsInitialSharedDatas;  ///< Initial shared datas of behaviors
+  std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>
+      behaviorsSharedData;   ///< Initial shared datas of behaviors
   bool stopSoundsOnStartup;  ///< True to make the scene stop all sounds at
                              ///< startup.
   bool standardSortMethod;   ///< True to sort objects using standard sort.
@@ -436,10 +430,10 @@ class GD_CORE_API Layout : public ObjectsContainer {
                                     /// focus.
   static gd::Layer badLayer;  ///< Null object, returned when GetLayer can not
                               ///< find an appropriate layer.
-  static gd::BehaviorsSharedData
-      badBehaviorSharedData;  ///< Null object, returned when
-                              ///< GetBehaviorSharedData can not find the
-                              ///< specified behavior shared data.
+  static gd::BehaviorContent
+      badBehaviorContent;  ///< Null object, returned when
+                           ///< GetBehaviorSharedData can not find the
+                           ///< specified behavior shared data.
 #if defined(GD_IDE_ONLY)
   EventsList events;  ///< Scene events
   gd::LayoutEditorCanvasOptions associatedSettings;

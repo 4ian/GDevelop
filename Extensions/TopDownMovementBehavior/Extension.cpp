@@ -7,8 +7,8 @@ This project is released under the MIT License.
 
 #include "GDCpp/Extensions/ExtensionBase.h"
 #include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
-
 #include "TopDownMovementBehavior.h"
+#include "TopDownMovementRuntimeBehavior.h"
 
 void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
   extension.SetExtensionInformation(
@@ -33,7 +33,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
 
 #if defined(GD_IDE_ONLY)
 
-  aut.SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+  aut.SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("SimulateLeftKey",
                 _("Simulate left key press"),
@@ -46,7 +46,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .MarkAsAdvanced()
       .SetFunctionName("SimulateLeftKey")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("SimulateRightKey",
                 _("Simulate right key press"),
@@ -59,7 +59,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .MarkAsAdvanced()
       .SetFunctionName("SimulateRightKey")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("SimulateUpKey",
                 _("Simulate up key press"),
@@ -72,7 +72,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .MarkAsAdvanced()
       .SetFunctionName("SimulateUpKey")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("SimulateDownKey",
                 _("Simulate down key press"),
@@ -85,7 +85,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .MarkAsAdvanced()
       .SetFunctionName("SimulateDownKey")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction(
          "SimulateControl",
@@ -100,7 +100,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("string", _("Key"))
       .MarkAsAdvanced()
       .SetFunctionName("SimulateControl")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("IgnoreDefaultControls",
                 _("Ignore default controls"),
@@ -115,7 +115,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("yesorno", _("Ignore controls"))
       .MarkAsAdvanced()
       .SetFunctionName("IgnoreDefaultControls")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("IsMoving",
                    _("Is moving"),
@@ -127,7 +127,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("IsMoving")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("Acceleration",
                 _("Acceleration"),
@@ -144,7 +144,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetAcceleration")
       .SetGetter("GetAcceleration")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("Acceleration",
                    _("Acceleration"),
@@ -160,7 +160,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetAcceleration")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("Deceleration",
                 _("Deceleration"),
@@ -177,7 +177,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetDeceleration")
       .SetGetter("GetDeceleration")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("Deceleration",
                    _("Deceleration"),
@@ -193,7 +193,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetDeceleration")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("MaxSpeed",
                 _("Maximum speed"),
@@ -209,7 +209,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetMaxSpeed")
       .SetGetter("GetMaxSpeed")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("MaxSpeed",
                    _("Maximum speed"),
@@ -225,7 +225,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetMaxSpeed")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("Speed",
                    _("Speed"),
@@ -240,7 +240,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("expression", _("Value"))
       .SetFunctionName("GetSpeed")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("AngularMaxSpeed",
                 _("Angular maximum speed"),
@@ -257,7 +257,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetAngularMaxSpeed")
       .SetGetter("GetAngularMaxSpeed")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("AngularMaxSpeed",
                    _("Angular maximum speed"),
@@ -273,7 +273,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetAngularMaxSpeed")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("AngleOffset",
                 _("Rotation offset"),
@@ -290,7 +290,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .SetFunctionName("SetAngleOffset")
       .SetGetter("GetAngleOffset")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition(
          "AngleOffset",
@@ -307,7 +307,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetAngleOffset")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition(
          "Angle",
@@ -324,7 +324,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetAngle")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition(
          "XVelocity",
@@ -341,7 +341,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetXVelocity")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition(
          "YVelocity",
@@ -358,7 +358,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .MarkAsAdvanced()
       .SetFunctionName("GetYVelocity")
       .SetManipulatedType("number")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("AllowDiagonals",
                 _("Diagonal movement"),
@@ -371,7 +371,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .AddParameter("yesorno", _("Allow?"))
       .SetFunctionName("SetAllowDiagonals")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition("DiagonalsAllowed",
                    _("Diagonal movement"),
@@ -384,7 +384,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .MarkAsAdvanced()
       .SetFunctionName("DiagonalsAllowed")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddAction("RotateObject",
                 _("Rotate the object"),
@@ -398,7 +398,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("yesorno", _("Rotate object?"))
       .MarkAsAdvanced()
       .SetFunctionName("SetRotateObject")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddCondition(
          "ObjectRotated",
@@ -412,7 +412,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .MarkAsAdvanced()
       .SetFunctionName("IsObjectRotated")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddExpression("Acceleration",
                     _("Acceleration"),
@@ -422,7 +422,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("GetAcceleration")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddExpression("Deceleration",
                     _("Deceleration"),
@@ -432,7 +432,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("GetDeceleration")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddExpression("MaxSpeed",
                     _("Maximum speed"),
@@ -442,7 +442,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("GetMaxSpeed")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddExpression("Speed",
                     _("Speed"),
@@ -452,7 +452,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("GetSpeed")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddExpression("AngularMaxSpeed",
                     _("Angular maximum speed"),
@@ -462,7 +462,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("GetAngularMaxSpeed")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddExpression("AngleOffset",
                     _("Rotation offset"),
@@ -472,7 +472,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("GetAngleOffset")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddExpression("Angle",
                     _("Angle of the movement"),
@@ -482,7 +482,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("GetAngle")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddExpression("XVelocity",
                     _("Speed on the X axis"),
@@ -492,7 +492,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("GetXVelocity")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 
   aut.AddExpression("YVelocity",
                     _("Speed on the Y axis"),
@@ -502,7 +502,7 @@ void DeclareTopDownMovementBehaviorExtension(gd::PlatformExtension& extension) {
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "TopDownMovementBehavior")
       .SetFunctionName("GetYVelocity")
-      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementBehavior.h");
+      .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
 #endif
 }
 
@@ -517,6 +517,12 @@ class TopDownMovementBehaviorCppExtension : public ExtensionBase {
    */
   TopDownMovementBehaviorCppExtension() {
     DeclareTopDownMovementBehaviorExtension(*this);
+    AddRuntimeBehavior<TopDownMovementRuntimeBehavior>(
+        GetBehaviorMetadata("TopDownMovementBehavior::TopDownMovementBehavior"),
+        "TopDownMovementRuntimeBehavior");
+    GetBehaviorMetadata("TopDownMovementBehavior::TopDownMovementBehavior")
+        .SetIncludeFile("TopDownMovementBehavior/TopDownMovementRuntimeBehavior.h");
+
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };

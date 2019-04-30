@@ -48,7 +48,7 @@ export const declareBehaviorMetadata = (
     return behaviorProperties;
   };
 
-  generatedBehavior.setRawJSONContent(JSON.stringify({}));
+  generatedBehavior.initializeContent = function(behaviorContent) {};
 
   return extension.addBehavior(
     eventsBasedBehavior.getName(),

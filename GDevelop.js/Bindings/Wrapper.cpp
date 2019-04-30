@@ -447,8 +447,6 @@ typedef ExtensionAndMetadata<ExpressionMetadata> ExtensionAndExpressionMetadata;
             icon24x24,                                                      \
             std::shared_ptr<gd::Object>(instance))
 
-#define WRAPPED_Get() Get().get()
-#define WRAPPED_GetSharedDataInstance() GetSharedDataInstance().get()
 #define WRAPPED_at(a) at(a).get()
 
 #define MAP_get(a) find(a)->second

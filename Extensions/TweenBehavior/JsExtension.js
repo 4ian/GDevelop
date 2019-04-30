@@ -38,9 +38,7 @@ module.exports = {
       return behaviorProperties;
     };
 
-    tweenBehavior.setRawJSONContent(
-      JSON.stringify({})
-    );
+    tweenBehavior.initializeContent = function(behaviorContent) {};
 
     const behavior = extension
       .addBehavior(

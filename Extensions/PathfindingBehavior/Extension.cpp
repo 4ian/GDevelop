@@ -9,6 +9,8 @@ This project is released under the MIT License.
 #include "GDCpp/Runtime/Project/BehaviorsSharedData.h"
 #include "PathfindingBehavior.h"
 #include "PathfindingObstacleBehavior.h"
+#include "PathfindingRuntimeBehavior.h"
+#include "PathfindingObstacleRuntimeBehavior.h"
 
 void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
   extension.SetExtensionInformation(
@@ -34,7 +36,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
 
 #if defined(GD_IDE_ONLY)
 
-    aut.SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+    aut.SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction("SetDestination",
                   _("Move to a position"),
@@ -50,7 +52,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Destination X position"))
         .AddParameter("expression", _("Destination Y position"))
         .SetFunctionName("MoveTo")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("PathFound",
                      _("Path found"),
@@ -63,7 +65,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("PathFound")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("DestinationReached",
                      _("Destination reached"),
@@ -76,7 +78,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("DestinationReached")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction("CellWidth",
                   _("Width of the cells"),
@@ -94,7 +96,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetCellWidth")
         .SetGetter("GetCellWidth")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition(
            "CellWidth",
@@ -111,7 +113,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Width (pixels)"))
         .SetFunctionName("GetCellWidth")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction("CellHeight",
                   _("Height of the cells"),
@@ -129,7 +131,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetCellHeight")
         .SetGetter("GetCellHeight")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition(
            "CellHeight",
@@ -146,7 +148,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Height (pixels)"))
         .SetFunctionName("GetCellHeight")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction(
            "Acceleration",
@@ -164,7 +166,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetAcceleration")
         .SetGetter("GetAcceleration")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("Acceleration",
                      _("Acceleration"),
@@ -180,7 +182,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Value"))
         .SetFunctionName("GetAcceleration")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction(
            "MaxSpeed",
@@ -198,7 +200,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetMaxSpeed")
         .SetGetter("GetMaxSpeed")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("MaxSpeed",
                      _("Maximum speed"),
@@ -214,7 +216,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Value"))
         .SetFunctionName("GetMaxSpeed")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction("Speed",
                   _("Speed"),
@@ -231,7 +233,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetSpeed")
         .SetGetter("GetSpeed")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("Speed",
                      _("Speed"),
@@ -247,7 +249,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Value"))
         .SetFunctionName("GetSpeed")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction("AngularMaxSpeed",
                   _("Angular maximum speed"),
@@ -265,7 +267,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetAngularMaxSpeed")
         .SetGetter("GetAngularMaxSpeed")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition(
            "AngularMaxSpeed",
@@ -282,7 +284,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Value"))
         .SetFunctionName("GetAngularMaxSpeed")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction(
            "AngleOffset",
@@ -301,7 +303,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetAngleOffset")
         .SetGetter("GetAngleOffset")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("AngleOffset",
                      _("Rotation offset"),
@@ -317,7 +319,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Value"))
         .SetFunctionName("GetAngleOffset")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction(
            "ExtraBorder",
@@ -336,7 +338,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetExtraBorder")
         .SetGetter("GetExtraBorder")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("ExtraBorder",
                      _("Extra border"),
@@ -354,7 +356,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Value (in pixels)"))
         .SetFunctionName("GetExtraBorder")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction(
            "AllowDiagonals",
@@ -369,7 +371,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .AddParameter("yesorno", _("Allow?"))
         .SetFunctionName("SetAllowDiagonals")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("DiagonalsAllowed",
                      _("Diagonal movement"),
@@ -383,7 +385,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("DiagonalsAllowed")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddAction("RotateObject",
                   _("Rotate the object"),
@@ -397,7 +399,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .AddParameter("yesorno", _("Rotate object?"))
         .SetFunctionName("SetRotateObject")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddCondition("ObjectRotated",
                      _("Object rotated"),
@@ -411,7 +413,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("IsObjectRotated")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("GetNodeX",
                       _("Get a waypoint X position"),
@@ -422,7 +424,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .AddParameter("expression", _("Node index (start at 0!)"))
         .SetFunctionName("GetNodeX")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("GetNodeY",
                       _("Get a waypoint Y position"),
@@ -433,7 +435,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .AddParameter("expression", _("Node index (start at 0!)"))
         .SetFunctionName("GetNodeY")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("NextNodeIndex",
                       _("Index of the next waypoint"),
@@ -443,7 +445,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetNextNodeIndex")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("NodeCount",
                       _("Waypoint count"),
@@ -453,7 +455,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetNodeCount")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("NextNodeX",
                       _("Get next waypoint X position"),
@@ -463,7 +465,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetNextNodeX")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("NextNodeY",
                       _("Get next waypoint Y position"),
@@ -473,7 +475,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetNextNodeY")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("LastNodeX",
                       _("Last waypoint X position"),
@@ -483,7 +485,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetLastNodeX")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("LastNodeY",
                       _("Last waypoint Y position"),
@@ -493,7 +495,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetLastNodeY")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("DestinationX",
                       _("Destination X position"),
@@ -503,7 +505,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetDestinationX")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("DestinationY",
                       _("Destination Y position"),
@@ -513,7 +515,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetDestinationY")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("Acceleration",
                       _("Acceleration"),
@@ -523,7 +525,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetAcceleration")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("MaxSpeed",
                       _("Maximum speed"),
@@ -533,7 +535,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetMaxSpeed")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("Speed",
                       _("Speed"),
@@ -543,7 +545,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetSpeed")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("AngularMaxSpeed",
                       _("Angular maximum speed"),
@@ -553,7 +555,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetAngularMaxSpeed")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("AngleOffset",
                       _("Rotation offset"),
@@ -563,7 +565,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetAngleOffset")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("ExtraBorder",
                       _("Extra border size"),
@@ -573,7 +575,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetExtraBorder")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("CellWidth",
                       _("Width of a cell"),
@@ -583,7 +585,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetCellWidth")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
     aut.AddExpression("CellHeight",
                       _("Height of a cell"),
@@ -593,7 +595,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingBehavior")
         .SetFunctionName("GetCellHeight")
-        .SetIncludeFile("PathfindingBehavior/PathfindingBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
 
 #endif
   }
@@ -610,7 +612,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         std::make_shared<gd::BehaviorsSharedData>());
 
 #if defined(GD_IDE_ONLY)
-    aut.SetIncludeFile("PathfindingBehavior/PathfindingObstacleBehavior.h");
+    aut.SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddAction("Cost",
                   _("Cost"),
@@ -627,7 +629,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .SetFunctionName("SetCost")
         .SetGetter("GetCost")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddCondition("Cost",
                      _("Cost"),
@@ -643,7 +645,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("expression", _("Difficulty"))
         .SetFunctionName("GetCost")
         .SetManipulatedType("number")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddAction("SetImpassable",
                   _("Should object be impassable?"),
@@ -657,7 +659,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
         .AddParameter("yesorno", _("Impassable?"))
         .SetFunctionName("SetImpassable")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddCondition("IsImpassable",
                      _("Is object impassable?"),
@@ -670,7 +672,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
         .SetFunctionName("IsImpassable")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     aut.AddExpression("Cost",
                       _("Cost"),
@@ -680,7 +682,7 @@ void DeclarePathfindingBehaviorExtension(gd::PlatformExtension& extension) {
         .AddParameter("object", _("Object"))
         .AddParameter("behavior", _("Behavior"), "PathfindingObstacleBehavior")
         .SetFunctionName("GetCost")
-        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleBehavior.h");
+        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
 #endif
   }
@@ -697,6 +699,17 @@ class PathfindingBehaviorCppExtension : public ExtensionBase {
    */
   PathfindingBehaviorCppExtension() {
     DeclarePathfindingBehaviorExtension(*this);
+    AddRuntimeBehavior<PathfindingRuntimeBehavior>(
+        GetBehaviorMetadata("PathfindingBehavior::Pathfinding"),
+        "PathfindingRuntimeBehavior");
+    GetBehaviorMetadata("PathfindingBehavior::Pathfinding")
+        .SetIncludeFile("PathfindingBehavior/PathfindingRuntimeBehavior.h");
+
+    AddRuntimeBehavior<PathfindingObstacleRuntimeBehavior>(
+        GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacle"),
+        "PathfindingObstacleRuntimeBehavior");
+    GetBehaviorMetadata("PathfindingBehavior::PathfindingObstacle")
+        .SetIncludeFile("PathfindingBehavior/PathfindingObstacleRuntimeBehavior.h");
 
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };

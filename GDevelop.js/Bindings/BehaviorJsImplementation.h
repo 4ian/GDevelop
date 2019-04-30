@@ -8,31 +8,26 @@
 using namespace gd;
 
 /**
- * \brief A gd::Behavior that stores its content in JSON and forward the properties related
- * functions to Javascript with Emscripten.
+ * \brief An adapter to implement a gd::Behavior in JavaScript.
+ *
+ * This is the class to be used to define a new behavior in JsExtension.js
  */
-class BehaviorJsImplementation : public Behavior {
+class BehaviorJsImplementation : public gd::Behavior {
  public:
-  BehaviorJsImplementation() : Behavior(), jsonContent("{}") {}
+  BehaviorJsImplementation(){};
   virtual BehaviorJsImplementation* Clone() const override;
 
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
+      const gd::SerializerElement& behaviorContent,
       gd::Project& project) const override;
-  virtual bool UpdateProperty(const gd::String& name,
+  virtual bool UpdateProperty(gd::SerializerElement& behaviorContent,
+                              const gd::String& name,
                               const gd::String& value,
                               gd::Project& project) override;
+  virtual void InitializeContent(
+      gd::SerializerElement& behaviorContent) override;
 
   void __destroy__();
 
-  virtual void SerializeTo(SerializerElement& arg0) const override;
-  virtual void UnserializeFrom(const SerializerElement& arg1) override;
-
-  const gd::String& GetRawJSONContent() const { return jsonContent; };
-  BehaviorJsImplementation& SetRawJSONContent(const gd::String& newContent) {
-    jsonContent = newContent;
-    return *this;
-  };
-
  private:
-  gd::String jsonContent;
 };

@@ -7,7 +7,9 @@ This project is released under the MIT License.
 
 #ifndef RUNTIMESCENEPHYSICSDATAS_H
 #define RUNTIMESCENEPHYSICSDATAS_H
-
+namespace gd {
+class SerializerElement;
+}
 class b2World;
 class b2Body;
 #include "GDCpp/Runtime/BehaviorsRuntimeSharedData.h"
@@ -19,7 +21,8 @@ class ContactListener;
  */
 class RuntimeScenePhysicsDatas : public BehaviorsRuntimeSharedData {
  public:
-  RuntimeScenePhysicsDatas(const ScenePhysicsDatas& behaviorSharedDatas);
+  RuntimeScenePhysicsDatas(
+      const gd::SerializerElement& behaviorSharedDataContent);
   virtual ~RuntimeScenePhysicsDatas();
   virtual std::shared_ptr<BehaviorsRuntimeSharedData> Clone() const {
     return std::shared_ptr<BehaviorsRuntimeSharedData>(

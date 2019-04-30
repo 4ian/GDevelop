@@ -347,35 +347,34 @@ class GD_CORE_API Project : public ObjectsContainer {
                                            const gd::String& platformName = "");
 
   /**
-   * Create a behavior of the given type.
+   * Get the behavior of the given type.
    *
    * \note A project can use more than one platform. In this case, the first
    * platform supporting the behavior is used, unless \a platformName argument
-   * is not empty.<br> It is assumed that each platform provides an equivalent
+   * is not empty.
+   * It is assumed that each platform provides an equivalent
    * behavior.
    *
-   * \param project The project for which the object must be created.
    * \param type The type of the behavior
    * \param platformName The name of the platform to be used. If empty, the
    * first platform supporting the object is used.
    */
-  std::unique_ptr<gd::Behavior> CreateBehavior(
-      const gd::String& type, const gd::String& platformName = "");
+  gd::Behavior* GetBehavior(const gd::String& type,
+                            const gd::String& platformName = "");
 
   /**
-   * Create behavior shared data of the given type.
+   * Get the behavior shared data of the given type.
    *
    * \note A project can use more than one platform. In this case, the first
    * platform supporting the behavior shared data is used, unless \a
-   * platformName argument is not empty.<br> It is assumed that each platform
-   * provides equivalent behavior shared data.
+   * platformName argument is not empty.
+   * It is assumed that each platform provides equivalent behavior shared data.
    *
-   * \param project The project for which the behavior shared data must be
-   * created. \param type The type of behavior shared data \param platformName
-   * The name of the platform to be used. If empty, the first platform
-   * supporting the object is used.
+   * \param type The type of behavior
+   * \param platformName The name of the platform to be used. If empty, the
+   * first platform supporting the object is used.
    */
-  std::shared_ptr<gd::BehaviorsSharedData> CreateBehaviorSharedDatas(
+  gd::BehaviorsSharedData* GetBehaviorSharedDatas(
       const gd::String& type, const gd::String& platformName = "");
 
 #if defined(GD_IDE_ONLY)

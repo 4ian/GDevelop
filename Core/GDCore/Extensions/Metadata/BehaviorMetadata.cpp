@@ -162,4 +162,8 @@ BehaviorMetadata& BehaviorMetadata::AddIncludeFile(
   return *this;
 }
 
+const gd::String& BehaviorMetadata::GetName() const {
+  return instance->GetTypeName();
+}
+
 }  // namespace gd

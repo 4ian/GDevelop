@@ -18,7 +18,12 @@ class Project;
 namespace gd {
 
 /**
- * \brief TODO
+ * \brief Represents a behavior that is implemented with events.
+ *
+ * It's the responsibility of the IDE to run the logic to transform this into a
+ * real behavior, by declaring an extension and running code generation.
+ * See `EventsFunctionsExtensionsLoader`.
+ *
  * \ingroup PlatformDefinition
  */
 class GD_CORE_API EventsBasedBehavior {

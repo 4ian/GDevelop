@@ -846,25 +846,21 @@ describe('libGD.js', function() {
   });
 
   describe('gd.Behavior', function() {
-    var project = null;
-    var behavior = null;
-    beforeAll(() => {
-      project = gd.ProjectHelper.createNewGDJSProject();
-      behavior = new gd.Behavior();
-    });
-
-    it('properties and initial values', function() {
-      behavior.setName('MyBehavior');
-      expect(behavior.getName()).toBe('MyBehavior');
-      expect(behavior.getTypeName()).toBe('');
-    });
     it('update a not existing property', function() {
-      expect(
-        behavior.updateProperty('PropertyThatDoesNotExist', 'MyValue', project)
-      ).toBe(false);
-    });
+      const project = gd.ProjectHelper.createNewGDJSProject();
+      const behavior = new gd.Behavior();
+      const serializerElement = new gd.SerializerElement();
 
-    afterAll(function() {
+      expect(
+        behavior.updateProperty(
+          serializerElement,
+          'PropertyThatDoesNotExist',
+          'MyValue',
+          project
+        )
+      ).toBe(false);
+
+      serializerElement.delete();
       behavior.delete();
       project.delete();
     });
@@ -878,7 +874,7 @@ describe('libGD.js', function() {
 
       layout.updateBehaviorsSharedData(project);
       expect(layout.hasBehaviorSharedData('Physics')).toBe(false);
-      var behavior = object.addNewBehavior(
+      var behaviorContent = object.addNewBehavior(
         project,
         'PhysicsBehavior::PhysicsBehavior',
         'Physics'
@@ -898,40 +894,44 @@ describe('libGD.js', function() {
   describe('gd.BehaviorSharedDataJsImplementation', function() {
     it('can declare a gd.BehaviorSharedDataJsImplementation and pass sanity checks', function() {
       var mySharedData = new gd.BehaviorSharedDataJsImplementation();
-      mySharedData.updateProperty = function(content, propertyName, newValue) {
+      mySharedData.updateProperty = function(
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
         if (propertyName === 'My first property') {
-          content.property1 = newValue;
+          behaviorContent.setStringAttribute('property1', newValue);
           return true;
         }
         if (propertyName === 'My other property') {
-          content.property2 = newValue === '1';
+          behaviorContent.setBoolAttribute('property2', newValue === '1');
           return true;
         }
 
         return false;
       };
-      mySharedData.getProperties = function(content) {
+      mySharedData.getProperties = function(behaviorContent) {
         var properties = new gd.MapStringPropertyDescriptor();
 
         properties.set(
           'My first property',
-          new gd.PropertyDescriptor(content.property1)
+          new gd.PropertyDescriptor(
+            behaviorContent.getStringAttribute('property1')
+          )
         );
         properties.set(
           'My other property',
-          new gd.PropertyDescriptor(content.property2 ? '1' : '0').setType(
-            'Boolean'
-          )
+          new gd.PropertyDescriptor(
+            behaviorContent.getBoolAttribute('property2') ? '1' : '0'
+          ).setType('Boolean')
         );
 
         return properties;
       };
-      mySharedData.setRawJSONContent(
-        JSON.stringify({
-          property1: 'Initial value 1',
-          property2: true,
-        })
-      );
+      mySharedData.initializeContent = function(behaviorContent) {
+        behaviorContent.setStringAttribute('property1', 'Initial value 1');
+        behaviorContent.setBoolAttribute('property2', true);
+      };
 
       try {
         expect(
@@ -1010,40 +1010,45 @@ describe('libGD.js', function() {
   describe('gd.BehaviorJsImplementation', function() {
     it('can declare a gd.BehaviorJsImplementation and pass sanity checks', function() {
       var myBehavior = new gd.BehaviorJsImplementation();
-      myBehavior.updateProperty = function(content, propertyName, newValue) {
+      myBehavior.updateProperty = function(
+        behaviorContent,
+        propertyName,
+        newValue
+      ) {
+        // TODO: Switch to attributes
         if (propertyName === 'My first property') {
-          content.property1 = newValue;
+          behaviorContent.setStringAttribute('property1', newValue);
           return true;
         }
         if (propertyName === 'My other property') {
-          content.property2 = newValue === '1';
+          behaviorContent.setBoolAttribute('property2', newValue === '1');
           return true;
         }
 
         return false;
       };
-      myBehavior.getProperties = function(content) {
+      myBehavior.getProperties = function(behaviorContent) {
         var properties = new gd.MapStringPropertyDescriptor();
 
         properties.set(
           'My first property',
-          new gd.PropertyDescriptor(content.property1)
+          new gd.PropertyDescriptor(
+            behaviorContent.getStringAttribute('property1')
+          )
         );
         properties.set(
           'My other property',
-          new gd.PropertyDescriptor(content.property2 ? '1' : '0').setType(
-            'Boolean'
-          )
+          new gd.PropertyDescriptor(
+            behaviorContent.getBoolAttribute('property2') ? '1' : '0'
+          ).setType('Boolean')
         );
 
         return properties;
       };
-      myBehavior.setRawJSONContent(
-        JSON.stringify({
-          property1: 'Initial value 1',
-          property2: true,
-        })
-      );
+      myBehavior.initializeContent = function(behaviorContent) {
+        behaviorContent.setStringAttribute('property1', 'Initial value 1');
+        behaviorContent.setBoolAttribute('property2', true);
+      };
 
       try {
         expect(
@@ -1116,7 +1121,7 @@ describe('libGD.js', function() {
       expect(behaviors.get(0)).toBe('Draggable');
     });
 
-    it('can be un/serialized', function() {
+    it('can be un/serialized (basic)', function() {
       var serializerElement = new gd.SerializerElement();
       object.serializeTo(serializerElement);
       object2.unserializeFrom(project, serializerElement);
@@ -1128,6 +1133,37 @@ describe('libGD.js', function() {
       var behaviors = object2.getAllBehaviorNames();
       expect(behaviors.size()).toBe(1);
       expect(behaviors.at(0)).toBe('Draggable');
+    });
+
+    it('can be un/serialized (with behavior content)', function() {
+      const behaviorContent = object.getBehavior('Draggable');
+      behaviorContent.getContent().addChild('Child1');
+      behaviorContent
+        .getContent()
+        .addChild('Child2')
+        .setStringValue('Child2Value');
+
+      var serializerElement = new gd.SerializerElement();
+      object.serializeTo(serializerElement);
+      object2.unserializeFrom(project, serializerElement);
+      object2.unserializeFrom(project, serializerElement); // Also check that multiple
+      object2.unserializeFrom(project, serializerElement); // unserialization is idempotent
+      serializerElement.delete();
+
+      //Check that behaviors were persisted and restored
+      var behaviors = object2.getAllBehaviorNames();
+      expect(behaviors.size()).toBe(1);
+      expect(behaviors.at(0)).toBe('Draggable');
+
+      const behaviorContent2 = object2.getBehavior('Draggable');
+      expect(behaviorContent2.getContent().hasChild('Child1')).toBe(true);
+      expect(behaviorContent2.getContent().hasChild('Child2')).toBe(true);
+      expect(
+        behaviorContent2
+          .getContent()
+          .getChild('Child2')
+          .getStringValue()
+      ).toBe('Child2Value');
     });
 
     afterAll(function() {

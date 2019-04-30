@@ -21,12 +21,39 @@
 
 using namespace gd;
 
+TEST_CASE("SerializerElement", "[common]") {
+  SECTION("Basics and copying") {
+    SerializerElement element;
+    element.AddChild("child1").SetStringValue("value123");
+    element.AddChild("child2").SetDoubleValue(45.6);
+    element.SetStringAttribute("attr1", "attr123");
+
+    SerializerElement copiedElement = element;
+    REQUIRE(element.GetChild("child1").GetStringValue() == "value123");
+    REQUIRE(element.GetChild("child2").GetDoubleValue() == 45.6);
+    REQUIRE(element.GetStringAttribute("attr1") == "attr123");
+    REQUIRE(copiedElement.GetChild("child1").GetStringValue() == "value123");
+    REQUIRE(copiedElement.GetChild("child2").GetDoubleValue() == 45.6);
+    REQUIRE(copiedElement.GetStringAttribute("attr1") == "attr123");
+
+    element.GetChild("child1").SetStringValue("value123 modified");
+    copiedElement.GetChild("child2").SetDoubleValue(45.678);
+    copiedElement.SetStringAttribute("attr1", "attr123 modified");
+    REQUIRE(element.GetChild("child1").GetStringValue() == "value123 modified");
+    REQUIRE(element.GetChild("child2").GetDoubleValue() == 45.6);
+    REQUIRE(element.GetStringAttribute("attr1") == "attr123");
+    REQUIRE(copiedElement.GetChild("child1").GetStringValue() == "value123");
+    REQUIRE(copiedElement.GetChild("child2").GetDoubleValue() == 45.678);
+    REQUIRE(copiedElement.GetStringAttribute("attr1") == "attr123 modified");
+  }
+}
+
 TEST_CASE("Serializer", "[common]") {
   SECTION("JSON basics") {
     gd::String originalJSON = "{\"ok\": true,\"hello\": \"world\"}";
     SerializerElement element = Serializer::FromJSON(originalJSON);
-    REQUIRE(element.GetChild("ok").GetValue().GetBool() == true);
-    REQUIRE(element.GetChild("hello").GetValue().GetString() == "world");
+    REQUIRE(element.GetChild("ok").GetBoolValue() == true);
+    REQUIRE(element.GetChild("hello").GetStringValue() == "world");
 
     gd::String json = Serializer::ToJSON(element);
     REQUIRE(json == originalJSON);
@@ -37,10 +64,10 @@ TEST_CASE("Serializer", "[common]") {
         "{\"\\\"hello\\\"\": \" \\\"quote\\\" \",\"caret-prop\": "
         "1,\"special-\\b\\f\\n\\r\\t\\\"\": \"\\b\\f\\n\\r\\t\"}";
     SerializerElement element = Serializer::FromJSON(originalJSON);
-    REQUIRE(element.GetChild("caret-prop").GetValue().GetBool() == true);
-    REQUIRE(element.GetChild("\"hello\"").GetValue().GetString() ==
+    REQUIRE(element.GetChild("caret-prop").GetBoolValue() == true);
+    REQUIRE(element.GetChild("\"hello\"").GetStringValue() ==
             " \"quote\" ");
-    REQUIRE(element.GetChild("special-\b\f\n\r\t\"").GetValue().GetString() ==
+    REQUIRE(element.GetChild("special-\b\f\n\r\t\"").GetStringValue() ==
             "\b\f\n\r\t");
 
     gd::String json = Serializer::ToJSON(element);
@@ -53,11 +80,11 @@ TEST_CASE("Serializer", "[common]") {
         u8"1,\"Hello 官话 world\": \"官话\"}";
     SerializerElement element = Serializer::FromJSON(originalJSON);
     REQUIRE(
-        element.GetChild(u8"Bonjour à tout le monde").GetValue().GetBool() ==
+        element.GetChild(u8"Bonjour à tout le monde").GetBoolValue() ==
         true);
-    REQUIRE(element.GetChild(u8"Ich heiße GDevelop").GetValue().GetString() ==
+    REQUIRE(element.GetChild(u8"Ich heiße GDevelop").GetStringValue() ==
             "Gut!");
-    REQUIRE(element.GetChild(u8"Hello 官话 world").GetValue().GetString() ==
+    REQUIRE(element.GetChild(u8"Hello 官话 world").GetStringValue() ==
             u8"官话");
 
     gd::String json = Serializer::ToJSON(element);

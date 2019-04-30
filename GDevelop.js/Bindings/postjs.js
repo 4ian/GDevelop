@@ -125,11 +125,11 @@
         // JSON with gd.Serializer.fromJSON.
         gd.Serializer._fromJSObject = function(object, element) {
             if (typeof object === 'number') {
-                element.setDouble(object);
+                element.setDoubleValue(object);
             } else if (typeof object === 'string') {
-                element.setString(object);
+                element.setStringValue(object);
             } else if (typeof object === 'boolean') {
-                element.setBool(object);
+                element.setBoolValue(object);
             } else if (Array.isArray(object)) {
                 element.considerAsArray();
                 for(var i = 0;i<object.length;++i) {

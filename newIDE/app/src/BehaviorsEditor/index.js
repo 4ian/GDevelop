@@ -11,6 +11,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
 import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 import BehaviorsEditorService from './BehaviorsEditorService';
+const gd = global.gd;
 
 const styles = {
   addBehaviorLine: {
@@ -102,7 +103,7 @@ export default class BehaviorsEditor extends Component {
     );
   };
 
-  _onChangeBehaviorName = (behavior, newName) => {
+  _onChangeBehaviorName = (behaviorContent, newName) => {
     // TODO: This is disabled for now as there is no proper refactoring
     // of events after a behavior renaming. Once refactoring is available,
     // the text field can be enabled again and refactoring calls added here
@@ -112,8 +113,7 @@ export default class BehaviorsEditor extends Component {
     const { object } = this.props;
     if (object.hasBehaviorNamed(newName)) return;
 
-    object.renameBehavior(behavior.getName(), newName);
-    behavior.setName(newName);
+    object.renameBehavior(behaviorContent.getName(), newName);
     this.forceUpdate();
   };
 
@@ -139,9 +139,13 @@ export default class BehaviorsEditor extends Component {
       <div>
         {allBehaviorNames
           .map((behaviorName, index) => {
-            const behavior = object.getBehavior(behaviorName);
+            // TODO: Rename to getBehaviorContent?
+            const behaviorContent = object.getBehavior(behaviorName);
+            const behavior = gd.JsPlatform.get().getBehavior(
+              behaviorContent.getTypeName()
+            );
             const BehaviorComponent = BehaviorsEditorService.getEditor(
-              behavior.getTypeName()
+              behaviorContent.getTypeName()
             );
 
             return (
@@ -154,7 +158,7 @@ export default class BehaviorsEditor extends Component {
                       hintText={<Trans>Behavior name</Trans>}
                       disabled
                       onChange={(e, text) =>
-                        this._onChangeBehaviorName(behavior, text)
+                        this._onChangeBehaviorName(behaviorContent, text)
                       }
                     />
                   </span>
@@ -171,6 +175,7 @@ export default class BehaviorsEditor extends Component {
                 </MiniToolbar>
                 <BehaviorComponent
                   behavior={behavior}
+                  behaviorContent={behaviorContent}
                   project={project}
                   resourceSources={this.props.resourceSources}
                   onChooseResource={this.props.onChooseResource}

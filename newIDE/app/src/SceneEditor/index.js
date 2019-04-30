@@ -1152,15 +1152,17 @@ export default class SceneEditor extends React.Component<Props, State> {
           layerRemoved={this.state.layerRemoved}
           onClose={this.state.onCloseLayerRemoveDialog}
         />
-        <ScenePropertiesDialog
-          open={!!this.state.scenePropertiesDialogOpen}
-          project={project}
-          layout={layout}
-          onClose={() => this.openSceneProperties(false)}
-          onApply={() => this.openSceneProperties(false)}
-          onEditVariables={() => this.editLayoutVariables(true)}
-          onOpenMoreSettings={this.props.onOpenMoreSettings}
-        />
+        {this.state.scenePropertiesDialogOpen && (
+          <ScenePropertiesDialog
+            open
+            project={project}
+            layout={layout}
+            onClose={() => this.openSceneProperties(false)}
+            onApply={() => this.openSceneProperties(false)}
+            onEditVariables={() => this.editLayoutVariables(true)}
+            onOpenMoreSettings={this.props.onOpenMoreSettings}
+          />
+        )}
         <VariablesEditorDialog
           open={!!this.state.layoutVariablesDialogOpen}
           variablesContainer={layout.getVariables()}

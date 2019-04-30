@@ -1,6 +1,6 @@
 // @flow
 import { mapVector, mapFor } from '../Utils/MapFor';
-import {caseSensitiveSlug} from '../Utils/CaseSensitiveSlug';
+import { caseSensitiveSlug } from '../Utils/CaseSensitiveSlug';
 import {
   declareInstructionOrExpressionMetadata,
   declareEventsFunctionParameters,

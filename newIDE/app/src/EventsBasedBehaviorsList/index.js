@@ -28,7 +28,9 @@ type Props = {|
   project: gdProject,
   eventsBasedBehaviorsList: gdEventsBasedBehaviorsList,
   selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
-  onSelectEventsBasedBehavior: (eventsBasedBehavior: ?gdEventsBasedBehavior) => void,
+  onSelectEventsBasedBehavior: (
+    eventsBasedBehavior: ?gdEventsBasedBehavior
+  ) => void,
   onDeleteEventsBasedBehavior: (
     eventsBasedBehavior: gdEventsBasedBehavior,
     cb: (boolean) => void
@@ -40,7 +42,10 @@ type Props = {|
   ) => void,
 |};
 
-export default class EventsBasedBehaviorsList extends React.Component<Props, State> {
+export default class EventsBasedBehaviorsList extends React.Component<
+  Props,
+  State
+> {
   static defaultProps = {
     onDeleteEventsBasedBehavior: (
       eventsBasedBehavior: gdEventsBasedBehavior,
@@ -98,11 +103,15 @@ export default class EventsBasedBehaviorsList extends React.Component<Props, Sta
       return;
     }
 
-    this.props.onRenameEventsBasedBehavior(eventsBasedBehavior, newName, doRename => {
-      if (!doRename) return;
-      eventsBasedBehavior.setName(newName);
-      this.forceUpdate();
-    });
+    this.props.onRenameEventsBasedBehavior(
+      eventsBasedBehavior,
+      newName,
+      doRename => {
+        if (!doRename) return;
+        eventsBasedBehavior.setName(newName);
+        this.forceUpdate();
+      }
+    );
   };
 
   _move = (oldIndex: number, newIndex: number) => {
@@ -117,7 +126,9 @@ export default class EventsBasedBehaviorsList extends React.Component<Props, Sta
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
-  _renderEventsBasedBehaviorMenuTemplate = (resource: gdEventsBasedBehavior) => {
+  _renderEventsBasedBehaviorMenuTemplate = (
+    resource: gdEventsBasedBehavior
+  ) => {
     return [
       {
         label: 'Rename',

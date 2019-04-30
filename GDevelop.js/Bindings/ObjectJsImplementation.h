@@ -13,7 +13,11 @@ using namespace gd;
  */
 class ObjectJsImplementation : public gd::Object {
  public:
-  ObjectJsImplementation(gd::String name_) : Object(name_), jsonContent("{}") {}
+  ObjectJsImplementation()
+      :  // Name is not important as this object is just a "blueprint"
+         // that is copied (see calls to AddObject).
+        Object("ObjectJsImplementation"),
+        jsonContent("{}") {}
   virtual std::unique_ptr<gd::Object> Clone() const override;
 
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(

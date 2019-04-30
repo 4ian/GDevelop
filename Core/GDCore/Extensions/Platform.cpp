@@ -54,12 +54,13 @@ void Platform::RemoveExtension(const gd::String& name) {
     }
   }
 
-  extensionsLoaded.erase(remove_if(extensionsLoaded.begin(),
-                                   extensionsLoaded.end(),
-                                   [&name](std::shared_ptr<PlatformExtension> extension) {
-                                     return extension->GetName() == name;
-                                   }),
-                         extensionsLoaded.end());
+  extensionsLoaded.erase(
+      remove_if(extensionsLoaded.begin(),
+                extensionsLoaded.end(),
+                [&name](std::shared_ptr<PlatformExtension> extension) {
+                  return extension->GetName() == name;
+                }),
+      extensionsLoaded.end());
 }
 
 bool Platform::IsExtensionLoaded(const gd::String& name) const {
@@ -99,26 +100,24 @@ std::unique_ptr<gd::Object> Platform::CreateObject(
   return std::unique_ptr<gd::Object>(std::move(object));
 }
 
-std::unique_ptr<gd::Behavior> Platform::CreateBehavior(
-    const gd::String& behaviorType) const {
+gd::Behavior* Platform::GetBehavior(const gd::String& behaviorType) const {
   for (std::size_t i = 0; i < extensionsLoaded.size(); ++i) {
-    std::unique_ptr<gd::Behavior> behavior =
-        extensionsLoaded[i]->CreateBehavior(behaviorType);
+    gd::Behavior* behavior = extensionsLoaded[i]->GetBehavior(behaviorType);
     if (behavior) return behavior;
   }
 
   return nullptr;
 }
 
-std::shared_ptr<gd::BehaviorsSharedData> Platform::CreateBehaviorSharedDatas(
+gd::BehaviorsSharedData* Platform::GetBehaviorSharedDatas(
     const gd::String& behaviorType) const {
   for (std::size_t i = 0; i < extensionsLoaded.size(); ++i) {
-    std::shared_ptr<gd::BehaviorsSharedData> behavior =
-        extensionsLoaded[i]->CreateBehaviorSharedDatas(behaviorType);
-    if (behavior != std::shared_ptr<gd::BehaviorsSharedData>()) return behavior;
+    gd::BehaviorsSharedData* behaviorSharedData =
+        extensionsLoaded[i]->GetBehaviorSharedDatas(behaviorType);
+    if (behaviorSharedData) return behaviorSharedData;
   }
 
-  return std::shared_ptr<gd::BehaviorsSharedData>();
+  return nullptr;
 }
 
 #if defined(GD_IDE_ONLY)

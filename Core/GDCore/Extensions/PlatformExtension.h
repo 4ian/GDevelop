@@ -291,18 +291,19 @@ class GD_CORE_API PlatformExtension {
    */
   std::shared_ptr<gd::BaseEvent> CreateEvent(gd::String eventType) const;
   /**
-   * \brief Create a behavior
+   * \brief Get the gd::Behavior handling the given behavior type.
    *
-   * Return NULL if \a behaviorType is not provided by the extension.
+   * Return nullptr if \a behaviorType is not provided by the extension.
    */
-  std::unique_ptr<gd::Behavior> CreateBehavior(gd::String behaviorType) const;
+  gd::Behavior* GetBehavior(gd::String behaviorType) const;
 
   /**
-   * \brief Create shared data for a behavior
+   * \brief Get the gd::BehaviorsSharedData handling the given behavior shared
+   * data.
    *
-   * Return NULL if \a behaviorType is not provided by the extension.
+   * Return nullptr if \a behaviorType is not provided by the extension.
    */
-  std::shared_ptr<gd::BehaviorsSharedData> CreateBehaviorSharedDatas(
+  gd::BehaviorsSharedData* GetBehaviorSharedDatas(
       gd::String behaviorType) const;
 
   /**

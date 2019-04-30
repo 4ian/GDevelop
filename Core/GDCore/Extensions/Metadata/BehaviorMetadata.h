@@ -19,11 +19,7 @@ class ExpressionMetadata;
 namespace gd {
 
 /**
- * \brief Contains user-friendly information about a behavior type
- *
- * Implementations may derive from this class so as to provide more complete
- * metadata if needed. ( For example, GDevelop C++ Platform is shared pointers
- * to objects that will be cloned so as to create the behaviors... )
+ * \brief Contains user-friendly information about a behavior type.
  *
  * \ingroup Events
  */
@@ -102,19 +98,20 @@ class GD_CORE_API BehaviorMetadata {
   /**
    * Get the help path of the behavior, relative to the documentation root.
    */
-  const gd::String &GetHelpPath() const { return helpPath; }
+  const gd::String& GetHelpPath() const { return helpPath; }
 
   /**
    * Set the help path of the behavior, relative to the documentation root.
-   * 
+   *
    * The behavior instructions will have this help path set by
    * default, unless you call SetHelpPath on them.
    */
-  BehaviorMetadata &SetHelpPath(const gd::String &path) {
+  BehaviorMetadata& SetHelpPath(const gd::String& path) {
     helpPath = path;
     return *this;
   }
 
+  const gd::String& GetName() const;
 #if defined(GD_IDE_ONLY)
   const gd::String& GetFullName() const { return fullname; }
   const gd::String& GetDefaultName() const { return defaultName; }
@@ -122,9 +119,18 @@ class GD_CORE_API BehaviorMetadata {
   const gd::String& GetGroup() const { return group; }
   const gd::String& GetIconFilename() const { return iconFilename; }
 #endif
-  std::shared_ptr<gd::Behavior> Get() const { return instance; }
-  std::shared_ptr<gd::BehaviorsSharedData> GetSharedDataInstance() const {
-    return sharedDatasInstance;
+
+  /**
+   * \brief Return the associated gd::Behavior, handling behavior contents.
+   */
+  gd::Behavior& Get() const { return *instance; }
+
+  /**
+   * \brief Return the associated gd::BehaviorsSharedData, handling behavior
+   * shared data, if any (nullptr if none).
+   */
+  gd::BehaviorsSharedData* GetSharedDataInstance() const {
+    return sharedDatasInstance.get();
   }
 
 #if defined(GD_IDE_ONLY)
@@ -147,6 +153,7 @@ class GD_CORE_API BehaviorMetadata {
   gd::String iconFilename;
 #endif
 
+  // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.
   std::shared_ptr<gd::Behavior> instance;
   std::shared_ptr<gd::BehaviorsSharedData> sharedDatasInstance;
 };

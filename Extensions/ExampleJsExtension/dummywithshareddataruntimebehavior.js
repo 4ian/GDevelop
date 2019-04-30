@@ -8,12 +8,12 @@ gdjs.DummyWithSharedDataRuntimeBehavior = function(runtimeScene, behaviorData, o
     gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
 
     // Here you can access to the behavior data (JSON declared in JsExtension.js)
-    // using behaviorData.content:
-    this._textToSet = behaviorData.content.property1;
+    // using behaviorData:
+    this._textToSet = behaviorData.property1;
 
     // You can also access to the shared data:
     var sharedData = runtimeScene.getInitialSharedDataForBehavior(behaviorData.name);
-    this._textToSet = sharedData.content.sharedProperty1;
+    this._textToSet = sharedData.sharedProperty1;
 
     // You can also run arbitrary code at the creation of the behavior:
     console.log("DummyWithSharedDataRuntimeBehavior was created for object:", owner);

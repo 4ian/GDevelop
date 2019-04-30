@@ -113,11 +113,11 @@ gdjs.registerObjects = function() {
 
 /**
  * Register the runtime behaviors that can be used bt runtimeObject.
- * 
+ *
  * Behavior must be a property on gdjs (or on a inner object, but not on any object nested below)
  * and have a property "thisIsARuntimeBehaviorConstructor" defined and set
  * to the type of the behavior to be recognized.
- * 
+ *
  * The type of the behavior must be complete, with the namespace of the extension. For
  * example, if you are providing a Draggable behavior in the DraggableBehavior extension,
  * the full name of the type of the behavior is "DraggableBehavior::Draggable".
@@ -136,13 +136,16 @@ gdjs.registerBehaviors = function() {
         );
       } else if (
         Object.prototype.toString.call(innerObject) !== '[object Array]' &&
-        typeof innerObject === 'object'
+        typeof innerObject === 'object' &&
+        innerObject !== null
       ) {
         // Also search inside objects contained in gdjs.
         for (var innerObjectProperty in innerObject) {
           if (innerObject.hasOwnProperty(innerObjectProperty)) {
             var innerInnerObject = innerObject[innerObjectProperty];
             if (
+              typeof innerInnerObject === 'object' &&
+              innerInnerObject !== null &&
               innerInnerObject.thisIsARuntimeBehaviorConstructor != undefined
             ) {
               gdjs.behaviorsTypes.put(

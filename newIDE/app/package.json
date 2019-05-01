@@ -15,6 +15,7 @@
     "babel-loader": "8.0.5",
     "flow-bin": "^0.92.0",
     "flow-coverage-report": "^0.4.0",
+    "folder-hash": "^3.0.0",
     "follow-redirects": "^1.2.3",
     "iso-639-1": "^2.0.3",
     "prettier": "1.15.3",
@@ -69,7 +70,7 @@
   },
   "scripts": {
     "postinstall": "npm run import-resources",
-    "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-editor.js piskel 5.0.0-beta56 && node import-zipped-editor.js jfxr 5.0.0-beta55",
+    "import-resources": "cd scripts && node import-libGD.js && node import-res-folder.js && node import-GDJS-Runtime.js && node import-monaco-editor.js && node import-zipped-editor.js piskel 5.0.0-beta56 a2c36775109a1c1181d0b9ab9b7c903365c4ecb340118f1237b66236f23e20dd && node import-zipped-editor.js jfxr 5.0.0-beta55 8ac12b557c2ddba958c6f0d3e0c5df8cf3369a65262dcb90cf5c8a7a7d20bdf6",
     "start": "npm run import-resources && react-scripts start",
     "build": "npm run import-resources && react-scripts build",
     "format": "prettier --write \"src/!(locales)/**/*.js\"",

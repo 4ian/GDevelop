@@ -120,6 +120,8 @@ import ChangelogRenderer from '../MainFrame/Changelog/ChangelogRenderer';
 import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
 import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import FixedHeightFlexContainer from './FixedHeightFlexContainer';
+import EventsBasedBehaviorEditor from '../EventsBasedBehaviorEditor';
+import { EventsBasedBehaviorEditorDialog } from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
 
 // No i18n in this file
 
@@ -141,6 +143,10 @@ const {
   testEventsFunctionsExtension,
   testSerializedEvents,
   testSerializedEventsWithLotsOfObjects,
+  testEventsBasedBehavior,
+  testEmptyEventsBasedBehavior,
+  testBehaviorEventsFunction,
+  testBehaviorLifecycleEventsFunction,
 } = makeTestProject(gd);
 
 const Placeholder = () => <div>Placeholder component</div>;
@@ -1818,7 +1824,7 @@ storiesOf('EventsFunctionConfigurationEditor', module)
   .addDecorator(paperDecorator)
   .addDecorator(muiDecorator)
   .addDecorator(i18nProviderDecorator)
-  .add('default', () => (
+  .add('default, for a free function (i.e: no behavior)', () => (
     <FixedHeightFlexContainer height={500}>
       <EventsFunctionConfigurationEditor
         project={project}
@@ -1826,6 +1832,37 @@ storiesOf('EventsFunctionConfigurationEditor', module)
         objectsContainer={testLayout}
         helpPagePath="/events/functions"
         eventsFunction={testEventsFunction}
+        eventsBasedBehavior={null}
+        onParametersOrGroupsUpdated={action(
+          'Parameters or groups were updated'
+        )}
+      />
+    </FixedHeightFlexContainer>
+  ))
+  .add('default, for an events based behavior function', () => (
+    <FixedHeightFlexContainer height={500}>
+      <EventsFunctionConfigurationEditor
+        project={project}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        helpPagePath="/events/functions"
+        eventsFunction={testBehaviorEventsFunction}
+        eventsBasedBehavior={testEventsBasedBehavior}
+        onParametersOrGroupsUpdated={action(
+          'Parameters or groups were updated'
+        )}
+      />
+    </FixedHeightFlexContainer>
+  ))
+  .add('default, for an events based behavior lifecycle function', () => (
+    <FixedHeightFlexContainer height={500}>
+      <EventsFunctionConfigurationEditor
+        project={project}
+        globalObjectsContainer={project}
+        objectsContainer={testLayout}
+        helpPagePath="/events/functions"
+        eventsFunction={testBehaviorLifecycleEventsFunction}
+        eventsBasedBehavior={testEventsBasedBehavior}
         onParametersOrGroupsUpdated={action(
           'Parameters or groups were updated'
         )}
@@ -1845,6 +1882,8 @@ storiesOf('EventsFunctionsList', module)
         )}
         onSelectEventsFunction={action('select')}
         onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
+        onAddEventsFunction={(cb) => cb(true, null)}
+        onEventsFunctionAdded={() => {}}
         onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
         onEditOptions={action('edit options')}
       />
@@ -1882,6 +1921,43 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
       eventsFunctionsExtension={testEventsFunctionsExtension}
       open
       onClose={action('close')}
+    />
+  ));
+
+storiesOf('EventsBasedBehaviorEditor', module)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <EventsBasedBehaviorEditor
+      project={project}
+      eventsBasedBehavior={testEventsBasedBehavior}
+    />
+  ))
+  .add('events based behavior without functions', () => (
+    <EventsBasedBehaviorEditor
+      project={project}
+      eventsBasedBehavior={testEmptyEventsBasedBehavior}
+    />
+  ));
+
+storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <EventsBasedBehaviorEditorDialog
+      project={project}
+      eventsBasedBehavior={testEventsBasedBehavior}
+      onCancel={action('cancel')}
+      onApply={action('apply')}
+    />
+  ))
+  .add('events based behavior without functions', () => (
+    <EventsBasedBehaviorEditorDialog
+      project={project}
+      eventsBasedBehavior={testEmptyEventsBasedBehavior}
+      onCancel={action('cancel')}
+      onApply={action('apply')}
     />
   ));
 

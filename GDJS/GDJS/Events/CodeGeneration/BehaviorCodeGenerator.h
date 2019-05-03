@@ -31,7 +31,7 @@ class BehaviorCodeGenerator {
       const gd::String& extensionName,
       const gd::EventsBasedBehavior& eventsBasedBehavior,
       const gd::String& codeNamespace,
-      const std::map<gd::String, gd::String>& functionMangledNames,
+      const std::map<gd::String, gd::String>& behaviorMethodMangledNames,
       std::set<gd::String>& includeFiles,
       bool compilationForRuntime = false);
 

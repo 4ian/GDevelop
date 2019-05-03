@@ -12,9 +12,9 @@ describe('EnumerateObjects', () => {
       allObjectsList,
     } = enumerateObjects(project, testLayout);
 
-    expect(containerObjectsList).toHaveLength(6);
+    expect(containerObjectsList).toHaveLength(12);
     expect(projectObjectsList).toHaveLength(2);
-    expect(allObjectsList).toHaveLength(8);
+    expect(allObjectsList).toHaveLength(14);
   });
 
   it('can do a case-insensitive search in the lists of objects', () => {

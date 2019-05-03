@@ -41,6 +41,8 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onAddEventsFunction: ((doAdd: boolean, name: ?string) => void) => void,
+  onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
   onEditOptions: () => void,
 |};
 
@@ -137,14 +139,24 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   _addNewEventsFunction = () => {
     const { eventsFunctionsContainer } = this.props;
 
-    const name = newNameGenerator('Function', name =>
-      eventsFunctionsContainer.hasEventsFunctionNamed(name)
-    );
-    eventsFunctionsContainer.insertNewEventsFunction(
-      name,
-      eventsFunctionsContainer.getEventsFunctionsCount()
-    );
-    this.forceUpdate();
+    this.props.onAddEventsFunction((doAdd: boolean, name: ?string) => {
+      if (!doAdd) {
+        return;
+      }
+
+      const eventsFunctionName =
+        name ||
+        newNameGenerator('Function', name =>
+          eventsFunctionsContainer.hasEventsFunctionNamed(name)
+        );
+
+      const eventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
+        eventsFunctionName,
+        eventsFunctionsContainer.getEventsFunctionsCount()
+      );
+      this.props.onEventsFunctionAdded(eventsFunction);
+      this.forceUpdate();
+    });
   };
 
   render() {

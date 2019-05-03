@@ -64,6 +64,23 @@ export const declareBehaviorMetadata = (
 };
 
 /**
+ * Check if the name of the function is the name of a lifecycle function,
+ * that will be called automatically by the game engine.
+ */
+export const isBehaviorLifecycleFunction = (functionName: string) => {
+  return (
+    [
+      'onCreated',
+      'onActivate',
+      'onDeActivate',
+      'doStepPreEvents',
+      'doStepPostEvents',
+      'ownerRemovedFromScene', // TODO: Rename to onOwnerRemovedFromScene
+    ].indexOf(functionName) !== -1
+  );
+};
+
+/**
  * Declare the instruction (action/condition) or expression for the given
  * events function.
  */
@@ -79,7 +96,7 @@ export const declareInstructionOrExpressionMetadata = (
     return extensionOrBehaviorMetadata.addExpression(
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunctionsExtensionOrEventsBasedBehavior.getFullName() ||
         eventsFunctionsExtensionOrEventsBasedBehavior.getName(),
       'res/function.png'
@@ -88,7 +105,7 @@ export const declareInstructionOrExpressionMetadata = (
     return extensionOrBehaviorMetadata.addStrExpression(
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunctionsExtensionOrEventsBasedBehavior.getFullName() ||
         eventsFunctionsExtensionOrEventsBasedBehavior.getName(),
       'res/function.png'
@@ -97,7 +114,7 @@ export const declareInstructionOrExpressionMetadata = (
     return extensionOrBehaviorMetadata.addCondition(
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
       eventsFunctionsExtensionOrEventsBasedBehavior.getFullName() ||
         eventsFunctionsExtensionOrEventsBasedBehavior.getName(),
@@ -108,7 +125,7 @@ export const declareInstructionOrExpressionMetadata = (
     return extensionOrBehaviorMetadata.addAction(
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
-      eventsFunction.getDescription(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
       eventsFunctionsExtensionOrEventsBasedBehavior.getFullName() ||
         eventsFunctionsExtensionOrEventsBasedBehavior.getName(),

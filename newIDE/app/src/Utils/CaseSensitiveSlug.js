@@ -29,6 +29,6 @@ export const caseSensitiveSlug = (
     .replace(/-{2,}/g, ' ') //  remove duplicate spaces
     .replace(/^\s\s*/, '')
     .replace(/\s\s*$/, '') //  trim both sides of string
-    .replace(/[^\w\ ]/gi, '') //  replaces all non-alphanumeric with empty string
-    .replace(/[\ ]/gi, s); //  Convert spaces to dashes
+    .replace(/[^\w ]/gi, '') //  replaces all non-alphanumeric with empty string
+    .replace(/[ ]/gi, s); //  Convert spaces to dashes
 };

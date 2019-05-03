@@ -477,7 +477,7 @@ class MainFrame extends React.Component<Props, State> {
     const { currentProject } = this.state;
     if (!currentProject) return;
 
-    const name = newNameGenerator('NewEventsFunctionsExtension', name =>
+    const name = newNameGenerator('NewExtension', name =>
       currentProject.hasEventsFunctionsExtensionNamed(name)
     );
     currentProject.insertNewEventsFunctionsExtension(

@@ -11,6 +11,7 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
 import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 import BehaviorsEditorService from './BehaviorsEditorService';
+import { isNullPtr } from '../Utils/IsNullPtr';
 const gd = global.gd;
 
 const styles = {
@@ -144,6 +145,31 @@ export default class BehaviorsEditor extends Component {
             const behavior = gd.JsPlatform.get().getBehavior(
               behaviorContent.getTypeName()
             );
+            if (isNullPtr(gd, behavior)) {
+              return (
+                <div key={index}>
+                  <MiniToolbar>
+                    <span style={styles.behaviorTitle}>
+                      <Trans>Unknown behavior</Trans>{' '}
+                      <TextField value={behaviorName} disabled />
+                    </span>
+                    <span style={styles.behaviorTools}>
+                      <IconButton
+                        onClick={() => this._onRemoveBehavior(behaviorName)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </span>
+                  </MiniToolbar>
+                  <EmptyMessage>
+                    This behavior is unknown. It might be a behavior that was
+                    defined in an extension and that was later removed. You
+                    should delete it.
+                  </EmptyMessage>
+                </div>
+              );
+            }
+
             const BehaviorComponent = BehaviorsEditorService.getEditor(
               behaviorContent.getTypeName()
             );
@@ -152,7 +178,7 @@ export default class BehaviorsEditor extends Component {
               <div key={index}>
                 <MiniToolbar>
                   <span style={styles.behaviorTitle}>
-                    Behavior{' '}
+                    <Trans>Behavior</Trans>{' '}
                     <TextField
                       value={behaviorName}
                       hintText={<Trans>Behavior name</Trans>}

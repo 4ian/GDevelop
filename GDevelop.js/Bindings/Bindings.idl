@@ -2339,7 +2339,7 @@ interface EventsCodeGenerator {
 [Prefix="gdjs::"]
 interface BehaviorCodeGenerator {
     void BehaviorCodeGenerator([Ref] Project project);
-    [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace, [Const, Ref] MapStringString functionMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
+    [Const, Value] DOMString GenerateRuntimeBehaviorCompleteCode([Const] DOMString extensionName, [Const, Ref] EventsBasedBehavior eventsBasedBehavior, [Const] DOMString codeNamespace, [Const, Ref] MapStringString behaviorMethodMangledNames, [Ref] SetString includes, boolean compilationForRuntime);
 };
 
 [Prefix="gdjs::"]

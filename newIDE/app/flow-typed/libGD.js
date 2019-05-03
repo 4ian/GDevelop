@@ -1,64 +1,66 @@
 // @flow
 
+declare type libGDevelop = Object;
+
 //TODO: These types could be generated from GDevelop.js instead of being
 //manually written here.
-type EmscriptenObject = Object & {
+declare type gdEmscriptenObject = Object & {
     ptr: Number
 };
 
-declare type gdPlatform = EmscriptenObject;
-declare type gdPlatformExtension = EmscriptenObject;
+declare type gdPlatform = gdEmscriptenObject;
+declare type gdPlatformExtension = gdEmscriptenObject;
 
-declare type gdBehavior = EmscriptenObject;
-declare type gdBehaviorContent = EmscriptenObject;
-declare type gdObject = EmscriptenObject;
-declare type gdObjectsContainer = EmscriptenObject;
-declare type gdObjectGroup = EmscriptenObject;
-declare type gdObjectGroupsContainer = EmscriptenObject;
-declare type gdProject = gdObjectsContainer & EmscriptenObject;
-declare type gdLayout = gdObjectsContainer & EmscriptenObject;
-declare type gdExternalLayout = EmscriptenObject;
-declare type gdExternalEvents = EmscriptenObject;
-declare type gdSerializerElement = EmscriptenObject;
-declare type gdInitialInstance = EmscriptenObject;
-declare type gdInitialInstancesContainer = EmscriptenObject;
-declare type gdBaseEvent = EmscriptenObject;
-declare type gdResource = EmscriptenObject;
-declare type gdResourcesManager = EmscriptenObject;
-declare type gdEventsList = EmscriptenObject;
-declare type gdEventsFunction = EmscriptenObject;
+declare type gdBehavior = gdEmscriptenObject;
+declare type gdBehaviorContent = gdEmscriptenObject;
+declare type gdObject = gdEmscriptenObject;
+declare type gdObjectsContainer = gdEmscriptenObject;
+declare type gdObjectGroup = gdEmscriptenObject;
+declare type gdObjectGroupsContainer = gdEmscriptenObject;
+declare type gdProject = gdObjectsContainer & gdEmscriptenObject;
+declare type gdLayout = gdObjectsContainer & gdEmscriptenObject;
+declare type gdExternalLayout = gdEmscriptenObject;
+declare type gdExternalEvents = gdEmscriptenObject;
+declare type gdSerializerElement = gdEmscriptenObject;
+declare type gdInitialInstance = gdEmscriptenObject;
+declare type gdInitialInstancesContainer = gdEmscriptenObject;
+declare type gdBaseEvent = gdEmscriptenObject;
+declare type gdResource = gdEmscriptenObject;
+declare type gdResourcesManager = gdEmscriptenObject;
+declare type gdEventsList = gdEmscriptenObject;
+declare type gdEventsFunction = gdEmscriptenObject;
 
-declare type gdInstruction = EmscriptenObject;
-declare type gdInstructionMetadata = EmscriptenObject;
-declare type gdInstructionsList = EmscriptenObject;
-declare type gdParameterMetadata = EmscriptenObject;
-declare type gdExpression = EmscriptenObject;
-declare type gdExpressionMetadata = EmscriptenObject;
-declare type gdObjectMetadata = EmscriptenObject;
-declare type gdBehaviorMetadata = EmscriptenObject;
+declare type gdInstruction = gdEmscriptenObject;
+declare type gdInstructionMetadata = gdEmscriptenObject;
+declare type gdInstructionsList = gdEmscriptenObject;
+declare type gdParameterMetadata = gdEmscriptenObject;
+declare type gdExpression = gdEmscriptenObject;
+declare type gdExpressionMetadata = gdEmscriptenObject;
+declare type gdObjectMetadata = gdEmscriptenObject;
+declare type gdBehaviorMetadata = gdEmscriptenObject;
 
-declare type gdVariable = EmscriptenObject;
-declare type gdVariablesContainer = EmscriptenObject;
+declare type gdVariable = gdEmscriptenObject;
+declare type gdVariablesContainer = gdEmscriptenObject;
 
-declare type gdVectorPolygon2d = EmscriptenObject;
+declare type gdVectorPolygon2d = gdEmscriptenObject;
 
-declare type gdVector2f = EmscriptenObject;
+declare type gdVector2f = gdEmscriptenObject;
 
-declare type gdSpriteObject = EmscriptenObject;
-declare type gdSprite = EmscriptenObject;
-declare type gdDirection = EmscriptenObject;
-declare type gdAnimation = EmscriptenObject;
-declare type gdPoint = EmscriptenObject;
+declare type gdSpriteObject = gdEmscriptenObject;
+declare type gdSprite = gdEmscriptenObject;
+declare type gdDirection = gdEmscriptenObject;
+declare type gdAnimation = gdEmscriptenObject;
+declare type gdPoint = gdEmscriptenObject;
 
-declare type gdEventsBasedBehaviorsList = EmscriptenObject;
-declare type gdEventsBasedBehavior = EmscriptenObject;
-declare type gdEventsFunctionsContainer = EmscriptenObject;
-declare type gdEventsFunctionsExtension = gdEventsFunctionsContainer & EmscriptenObject;
+declare type gdEventsBasedBehaviorsList = gdEmscriptenObject;
+declare type gdEventsBasedBehavior = gdEmscriptenObject;
+declare type gdEventsFunctionsContainer = gdEmscriptenObject;
+declare type gdEventsFunctionsExtension = gdEventsFunctionsContainer & gdEmscriptenObject;
 
-declare type gdVectorEventsSearchResult = EmscriptenObject;
-declare type gdMapStringPropertyDescriptor = EmscriptenObject;
+declare type gdVectorEventsSearchResult = gdEmscriptenObject;
+declare type gdMapStringPropertyDescriptor = gdEmscriptenObject;
 
-declare type gdEventsContext = EmscriptenObject;
+declare type gdEventsContext = gdEmscriptenObject;
 
 //Represents all objects that have serializeTo and unserializeFrom methods.
-declare type gdSerializable = EmscriptenObject;
+declare type gdSerializable = gdEmscriptenObject;

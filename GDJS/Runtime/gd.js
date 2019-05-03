@@ -144,8 +144,8 @@ gdjs.registerBehaviors = function() {
           if (innerObject.hasOwnProperty(innerObjectProperty)) {
             var innerInnerObject = innerObject[innerObjectProperty];
             if (
-              typeof innerInnerObject === 'object' &&
               innerInnerObject !== null &&
+              typeof innerInnerObject === 'function' &&
               innerInnerObject.thisIsARuntimeBehaviorConstructor != undefined
             ) {
               gdjs.behaviorsTypes.put(

@@ -7,7 +7,7 @@ type State = {
   text: ?string,
 };
 
-type Props = {
+type Props = {|
   onChange: string => void,
   value: string,
   commitOnBlur?: boolean,
@@ -22,7 +22,25 @@ type Props = {
       value: string,
     },
   }) => void,
-};
+
+  // Some TextField props that can be reused:
+  disabled?: boolean,
+  errorText?: React.Node,
+  floatingLabelFixed?: boolean,
+  floatingLabelText?: React.Node,
+  fullWidth?: boolean,
+  hintText?: React.Node,
+  id?: string,
+  inputStyle?: Object,
+  max?: number,
+  min?: number,
+  multiLine?: boolean,
+  name?: string,
+  step?: number,
+  style?: Object,
+  type?: string,
+  rows?: number,
+|};
 
 /**
  * This component works like a material-ui TextField, except that

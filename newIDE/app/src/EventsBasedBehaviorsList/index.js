@@ -12,6 +12,7 @@ import {
   enumerateEventsBasedBehaviors,
   filterEventsBasedBehaviorsList,
 } from './EnumerateEventsBasedBehaviors';
+import { EventsBasedBehaviorEditorDialog } from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
 
 const styles = {
   listContainer: {
@@ -21,6 +22,7 @@ const styles = {
 
 type State = {|
   renamedEventsBasedBehavior: ?gdEventsBasedBehavior,
+  editedEventsBasedBehavior: ?gdEventsBasedBehavior,
   searchText: string,
 |};
 
@@ -61,6 +63,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
   sortableList: any;
   state: State = {
     renamedEventsBasedBehavior: null,
+    editedEventsBasedBehavior: null,
     searchText: '',
   };
 
@@ -81,10 +84,10 @@ export default class EventsBasedBehaviorsList extends React.Component<
     });
   };
 
-  _editName = (resource: ?gdEventsBasedBehavior) => {
+  _editName = (renamedEventsBasedBehavior: ?gdEventsBasedBehavior) => {
     this.setState(
       {
-        renamedEventsBasedBehavior: resource,
+        renamedEventsBasedBehavior,
       },
       () => this.sortableList.getWrappedInstance().forceUpdateGrid()
     );
@@ -127,16 +130,23 @@ export default class EventsBasedBehaviorsList extends React.Component<
   };
 
   _renderEventsBasedBehaviorMenuTemplate = (
-    resource: gdEventsBasedBehavior
+    eventsBasedBehavior: gdEventsBasedBehavior
   ) => {
     return [
       {
+        label: 'Properties',
+        click: () => this._editProperties(eventsBasedBehavior),
+      },
+      {
+        type: 'separator',
+      },
+      {
         label: 'Rename',
-        click: () => this._editName(resource),
+        click: () => this._editName(eventsBasedBehavior),
       },
       {
         label: 'Remove',
-        click: () => this._deleteEventsBasedBehavior(resource),
+        click: () => this._deleteEventsBasedBehavior(eventsBasedBehavior),
       },
     ];
   };
@@ -154,6 +164,11 @@ export default class EventsBasedBehaviorsList extends React.Component<
     this.forceUpdate();
   };
 
+  _editProperties = (editedEventsBasedBehavior: ?gdEventsBasedBehavior) =>
+    this.setState({
+      editedEventsBasedBehavior,
+    });
+
   render() {
     const {
       project,
@@ -161,7 +176,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
       selectedEventsBasedBehavior,
       onSelectEventsBasedBehavior,
     } = this.props;
-    const { searchText } = this.state;
+    const { searchText, editedEventsBasedBehavior } = this.state;
 
     const list = [
       ...filterEventsBasedBehaviorsList(
@@ -214,6 +229,14 @@ export default class EventsBasedBehaviorsList extends React.Component<
             })
           }
         />
+        {editedEventsBasedBehavior && (
+          <EventsBasedBehaviorEditorDialog
+            project={project}
+            eventsBasedBehavior={editedEventsBasedBehavior}
+            onCancel={() => this._editProperties(null)}
+            onApply={() => this._editProperties(null)}
+          />
+        )}
       </Background>
     );
   }

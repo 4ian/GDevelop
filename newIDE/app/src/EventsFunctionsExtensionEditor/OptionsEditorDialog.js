@@ -23,6 +23,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
         primary={true}
         keyboardFocused={true}
         onClick={() => this.props.onClose()}
+        key={'close'}
       />,
     ];
 

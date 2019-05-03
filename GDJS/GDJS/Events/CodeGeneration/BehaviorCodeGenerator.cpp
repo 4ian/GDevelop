@@ -11,7 +11,7 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
     const gd::String& extensionName,
     const gd::EventsBasedBehavior& eventsBasedBehavior,
     const gd::String& codeNamespace,
-    const std::map<gd::String, gd::String>& functionMangledNames,
+    const std::map<gd::String, gd::String>& behaviorMethodMangledNames,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
   gd::String runtimeBehaviorCode =
@@ -28,10 +28,10 @@ gd::String BehaviorCodeGenerator::GenerateRuntimeBehaviorCompleteCode(
   for (auto& eventsFunction :
        eventsBasedBehavior.GetEventsFunctions().GetInternalVector()) {
     const gd::String& functionName =
-        functionMangledNames.find(eventsFunction->GetName()) !=
-                functionMangledNames.end()
-            ? functionMangledNames.find(eventsFunction->GetName())->second
-            : "UNKNOWN_FUNCTION_fix_functionMangledNames_please";
+        behaviorMethodMangledNames.find(eventsFunction->GetName()) !=
+                behaviorMethodMangledNames.end()
+            ? behaviorMethodMangledNames.find(eventsFunction->GetName())->second
+            : "UNKNOWN_FUNCTION_fix_behaviorMethodMangledNames_please";
     gd::String methodCodeNamespace = codeNamespace + "." +
                                      eventsBasedBehavior.GetName() +
                                      ".prototype." + functionName + "Context";
@@ -65,6 +65,8 @@ CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME = function(runtimeScene, behaviorData,
 {
     gdjs.RuntimeBehavior.call(this, runtimeScene, behaviorData, owner);
     this._runtimeScene = runtimeScene;
+
+    if (this.onCreated) { this.onCreated(); }
 };
 
 CODE_NAMESPACE.RUNTIME_BEHAVIOR_CLASSNAME.prototype = Object.create( gdjs.RuntimeBehavior.prototype );

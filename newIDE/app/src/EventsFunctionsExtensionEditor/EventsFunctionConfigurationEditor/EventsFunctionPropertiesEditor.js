@@ -11,11 +11,14 @@ import MenuItem from 'material-ui/MenuItem';
 import { mapVector } from '../../Utils/MapFor';
 import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
+import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import EmptyMessage from '../../UI/EmptyMessage';
 
 const gd = global.gd;
 
 type Props = {|
   eventsFunction: gdEventsFunction,
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
   helpPagePath?: string,
   onConfigurationUpdated?: () => void,
   renderConfigurationHeader?: () => React.Node,
@@ -77,9 +80,20 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
       onConfigurationUpdated,
       helpPagePath,
       renderConfigurationHeader,
+      eventsBasedBehavior,
     } = this.props;
 
     const type = eventsFunction.getFunctionType();
+    const isABehaviorLifecycleFunction =
+      !!eventsBasedBehavior && isBehaviorLifecycleFunction(eventsFunction.getName());
+    if (isABehaviorLifecycleFunction) {
+      return (
+        <EmptyMessage>
+          This is a "lifecycle method". It will be called automatically by the
+          game engine.
+        </EmptyMessage>
+      );
+    }
 
     return (
       <I18n>

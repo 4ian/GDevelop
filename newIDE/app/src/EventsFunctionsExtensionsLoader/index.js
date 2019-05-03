@@ -6,6 +6,7 @@ import {
   declareEventsFunctionParameters,
   declareBehaviorMetadata,
   declareExtension,
+  isBehaviorLifecycleFunction,
 } from './MetadataDeclarationHelpers';
 
 const gd = global.gd;
@@ -221,14 +222,15 @@ function generateBehavior(
   return Promise.resolve().then(() => {
     // Generate behavior code
     if (!options.skipCodeGeneration) {
-      const functionMangledNames = new gd.MapStringString(); //TODO: Rename to behaviorMethodNames?
+      const behaviorMethodMangledNames = new gd.MapStringString();
       const includeFiles = new gd.SetString();
 
+      // Declare all the behavior functions
       mapFor(0, eventsFunctionsContainer.getEventsFunctionsCount(), i => {
         const eventsFunction = eventsFunctionsContainer.getEventsFunctionAt(i);
 
         const eventsFunctionMangledName = mangleName(eventsFunction.getName());
-        functionMangledNames.set(
+        behaviorMethodMangledNames.set(
           eventsFunction.getName(),
           eventsFunctionMangledName
         );
@@ -243,6 +245,12 @@ function generateBehavior(
           instructionOrExpression
         );
 
+        // Hide "lifecycle" methods as they are called automatically by
+        // the game engine.
+        if (isBehaviorLifecycleFunction(eventsFunction.getName())) {
+          instructionOrExpression.setHidden();
+        }
+
         const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
         codeExtraInformation
           .setIncludeFile(
@@ -253,12 +261,13 @@ function generateBehavior(
           .setFunctionName(eventsFunctionMangledName);
       });
 
+      // Generate code for the behavior and its methods
       const behaviorCodeGenerator = new gd.BehaviorCodeGenerator(project);
       const code = behaviorCodeGenerator.generateRuntimeBehaviorCompleteCode(
         eventsFunctionsExtension.getName(),
         eventsBasedBehavior,
         codeNamespace,
-        functionMangledNames,
+        behaviorMethodMangledNames,
         includeFiles,
 
         // For now, always generate functions for runtime (this disables
@@ -267,7 +276,7 @@ function generateBehavior(
         true
       );
       behaviorCodeGenerator.delete();
-      functionMangledNames.delete();
+      behaviorMethodMangledNames.delete();
 
       // Add any include file required by the functions to the list
       // of include files for this behavior (so that when used, the "dependencies"

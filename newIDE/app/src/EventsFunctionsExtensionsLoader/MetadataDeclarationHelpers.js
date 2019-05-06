@@ -75,7 +75,7 @@ export const isBehaviorLifecycleFunction = (functionName: string) => {
       'onDeActivate',
       'doStepPreEvents',
       'doStepPostEvents',
-      'ownerRemovedFromScene', // TODO: Rename to onOwnerRemovedFromScene
+      'onOwnerRemovedFromScene',
     ].indexOf(functionName) !== -1
   );
 };

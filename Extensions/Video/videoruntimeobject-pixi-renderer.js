@@ -49,7 +49,7 @@ gdjs.VideoRuntimeObjectPixiRenderer.prototype.getRendererObject = function() {
 /**
  * To be called when the object is removed from the scene: will pause the video.
  */
-gdjs.VideoRuntimeObjectPixiRenderer.prototype.ownerRemovedFromScene = function() {
+gdjs.VideoRuntimeObjectPixiRenderer.prototype.onOwnerRemovedFromScene = function() {
   this.pause();
 };
 

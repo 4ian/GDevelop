@@ -108,7 +108,7 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
           />
           <MethodListItem
             icon={<Destroy style={styles.icon} />}
-            name={'onOwnerRemovedFromScene' /* TODO */}
+            name={'onOwnerRemovedFromScene'}
             disabled={eventsFunctions.hasEventsFunctionNamed(
               'onOwnerRemovedFromScene'
             )}

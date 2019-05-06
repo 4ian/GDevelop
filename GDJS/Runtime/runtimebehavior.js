@@ -128,7 +128,7 @@ gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
  * Behaviors writers: This method is called when the owner of the behavior
  * was removed from its scene and is about to be destroyed/reused later.
  */
-gdjs.RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
+gdjs.RuntimeBehavior.prototype.onOwnerRemovedFromScene = function() {
 
 }
 

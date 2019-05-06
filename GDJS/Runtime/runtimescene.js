@@ -567,7 +567,7 @@ gdjs.RuntimeScene.prototype.markObjectForDeletion = function(obj) {
     //Notify the object it was removed from the scene
     obj.onDeletedFromScene(this);
     for(var j = 0, lenj = obj._behaviors.length;j<lenj;++j) {
-        obj._behaviors[j].ownerRemovedFromScene();
+        obj._behaviors[j].onOwnerRemovedFromScene();
     }
 
     //Call global callback

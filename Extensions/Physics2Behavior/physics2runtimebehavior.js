@@ -268,7 +268,7 @@ gdjs.Physics2RuntimeBehavior.prototype.onDeActivate = function() {
   }
 };
 
-gdjs.Physics2RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
+gdjs.Physics2RuntimeBehavior.prototype.onOwnerRemovedFromScene = function() {
   this.onDeActivate();
 };
 

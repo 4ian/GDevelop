@@ -12,9 +12,6 @@ import {
   enumerateEventsFunctions,
   filterEventFunctionsList,
 } from './EnumerateEventsFunctions';
-import FlatButton from 'material-ui/FlatButton';
-import { Line } from '../UI/Grid';
-import Divider from 'material-ui/Divider';
 
 const styles = {
   listContainer: {
@@ -36,6 +33,7 @@ type Props = {|
     eventsFunction: gdEventsFunction,
     cb: (boolean) => void
   ) => void,
+  canRename: (eventsFunction: gdEventsFunction) => boolean,
   onRenameEventsFunction: (
     eventsFunction: gdEventsFunction,
     newName: string,
@@ -43,7 +41,7 @@ type Props = {|
   ) => void,
   onAddEventsFunction: ((doAdd: boolean, name: ?string) => void) => void,
   onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
-  onEditOptions: () => void,
+  renderHeader?: () => React.Node,
 |};
 
 export default class EventsFunctionsList extends React.Component<Props, State> {
@@ -82,10 +80,10 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     });
   };
 
-  _editName = (resource: ?gdEventsFunction) => {
+  _editName = (eventsFunction: ?gdEventsFunction) => {
     this.setState(
       {
-        renamedEventsFunction: resource,
+        renamedEventsFunction: eventsFunction,
       },
       () => this.sortableList.getWrappedInstance().forceUpdateGrid()
     );
@@ -123,15 +121,16 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
-  _renderEventsFunctionMenuTemplate = (resource: gdEventsFunction) => {
+  _renderEventsFunctionMenuTemplate = (eventsFunction: gdEventsFunction) => {
     return [
       {
         label: 'Rename',
-        click: () => this._editName(resource),
+        click: () => this._editName(eventsFunction),
+        enabled: this.props.canRename(eventsFunction),
       },
       {
         label: 'Remove',
-        click: () => this._deleteEventsFunction(resource),
+        click: () => this._deleteEventsFunction(eventsFunction),
       },
     ];
   };
@@ -165,6 +164,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       eventsFunctionsContainer,
       selectedEventsFunction,
       onSelectEventsFunction,
+      renderHeader,
     } = this.props;
     const { searchText } = this.state;
 
@@ -185,14 +185,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
     return (
       <Background>
-        <Line justifyContent="center">
-          <FlatButton
-            label={<Trans>Edit extension options</Trans>}
-            primary
-            onClick={() => this.props.onEditOptions()}
-          />
-        </Line>
-        <Divider />
+        {renderHeader ? renderHeader() : null}
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (

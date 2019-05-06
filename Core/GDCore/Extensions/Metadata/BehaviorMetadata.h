@@ -118,6 +118,21 @@ class GD_CORE_API BehaviorMetadata {
   const gd::String& GetDescription() const { return description; }
   const gd::String& GetGroup() const { return group; }
   const gd::String& GetIconFilename() const { return iconFilename; }
+
+  /**
+   * \brief Set the type of the object that this behavior can be used on.
+   */
+  BehaviorMetadata& SetObjectType(const gd::String& objectType_) {
+    objectType = objectType_;
+    return *this;
+  }
+
+  /**
+   * \brief Get the type of the object that this behavior can be used on.
+   *
+   * \note An empty string means the base object, so any object.
+   */
+  const gd::String& GetObjectType() const { return objectType; }
 #endif
 
   /**
@@ -151,6 +166,7 @@ class GD_CORE_API BehaviorMetadata {
   gd::String description;
   gd::String group;
   gd::String iconFilename;
+  gd::String objectType;
 #endif
 
   // TODO: Nitpicking: convert these to std::unique_ptr to clarify ownership.

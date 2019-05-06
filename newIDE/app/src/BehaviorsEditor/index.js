@@ -219,6 +219,7 @@ export default class BehaviorsEditor extends Component {
         {this.state.newBehaviorDialogOpen && (
           <NewBehaviorDialog
             open={this.state.newBehaviorDialogOpen}
+            objectType={object.getType()}
             onClose={() => this.setState({ newBehaviorDialogOpen: false })}
             onChoose={this.addBehavior}
             project={project}

@@ -82,7 +82,7 @@ class GD_CORE_API Behavior {
    * \brief Called to initialize the content with the default properties
    * for the behavior.
    */
-  virtual void InitializeContent(gd::SerializerElement& behaviorContent) {};
+  virtual void InitializeContent(gd::SerializerElement& behaviorContent){};
 
  private:
   gd::String type;

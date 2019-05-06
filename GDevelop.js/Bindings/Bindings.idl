@@ -1112,6 +1112,9 @@ interface BehaviorMetadata {
     [Ref] BehaviorMetadata SetIncludeFile([Const] DOMString includeFile);
     [Ref] BehaviorMetadata AddIncludeFile([Const] DOMString includeFile);
 
+    [Ref] BehaviorMetadata SetObjectType([Const] DOMString objectType);
+    [Const, Ref] DOMString GetObjectType();
+
     [Ref] Behavior Get();
     BehaviorsSharedData GetSharedDataInstance();
 };

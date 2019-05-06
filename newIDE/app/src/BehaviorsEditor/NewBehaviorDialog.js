@@ -22,14 +22,17 @@ import {
 
 const styles = {
   icon: { borderRadius: 0 },
+  disabledItem: { opacity: 0.6 },
 };
 
 const BehaviorListItem = ({
   behaviorMetadata,
   onClick,
+  disabled,
 }: {|
   behaviorMetadata: EnumeratedBehaviorMetadata,
   onClick: () => void,
+  disabled: boolean,
 |}) => (
   <ListItem
     leftAvatar={
@@ -40,11 +43,14 @@ const BehaviorListItem = ({
     secondaryText={<p>{behaviorMetadata.description}</p>}
     secondaryTextLines={2}
     onClick={onClick}
+    style={disabled ? styles.disabledItem : undefined}
+    disabled={disabled}
   />
 );
 
 type Props = {|
   project: gdProject,
+  objectType: string,
   open: boolean,
   onClose: () => void,
   onChoose: (type: string, defaultName: string) => void,
@@ -85,7 +91,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
   };
 
   render() {
-    const { project, open, onClose } = this.props;
+    const { project, open, onClose, objectType } = this.props;
     const { showDeprecated, behaviorMetadata } = this.state;
     if (!open || !project) return null;
 
@@ -118,6 +124,16 @@ export default class NewBehaviorDialog extends Component<Props, State> {
       return this.props.onChoose(type, defaultName);
     };
 
+    const canBehaviorBeUsed = (
+      behaviorMetadata: EnumeratedBehaviorMetadata
+    ) => {
+      // An empty object type means the base object, i.e: any object.
+      return (
+        behaviorMetadata.objectType === '' ||
+        behaviorMetadata.objectType === objectType
+      );
+    };
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -135,6 +151,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
                   key={index}
                   behaviorMetadata={behaviorMetadata}
                   onClick={() => chooseBehavior(i18n, behaviorMetadata)}
+                  disabled={!canBehaviorBeUsed(behaviorMetadata)}
                 />
               ))}
               {showDeprecated && (
@@ -148,6 +165,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
                     key={index}
                     behaviorMetadata={behaviorMetadata}
                     onClick={() => chooseBehavior(i18n, behaviorMetadata)}
+                    disabled={!canBehaviorBeUsed(behaviorMetadata)}
                   />
                 ))}
             </List>

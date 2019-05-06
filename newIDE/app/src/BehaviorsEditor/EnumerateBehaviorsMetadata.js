@@ -6,6 +6,7 @@ export type EnumeratedBehaviorMetadata = {|
   extension: gdPlatformExtension,
   behaviorMetadata: gdBehaviorMetadata,
   type: string,
+  objectType: string,
   defaultName: string,
   fullName: string,
   description: string,
@@ -37,6 +38,7 @@ export const enumerateBehaviorsMetadata = (
           fullName: behaviorMetadata.getFullName(),
           description: behaviorMetadata.getDescription(),
           iconFilename: behaviorMetadata.getIconFilename(),
+          objectType: behaviorMetadata.getObjectType(),
         }));
     })
   );

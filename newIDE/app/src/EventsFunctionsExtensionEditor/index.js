@@ -21,6 +21,10 @@ import {
 } from '../ResourcesList/ResourceSource.flow';
 import { type ResourceExternalEditor } from '../ResourcesList/ResourceExternalEditor.flow';
 import BehaviorMethodSelectorDialog from './BehaviorMethodSelectorDialog';
+import { isBehaviorLifecycleFunction } from '../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import FlatButton from 'material-ui/FlatButton';
+import { Line } from '../UI/Grid';
+import Divider from 'material-ui/Divider';
 const gd = global.gd;
 
 type Props = {|
@@ -71,8 +75,8 @@ const setDefaultBehaviorEventsFunctionParameters = (
     .at(0)
     .setType('object')
     .setName('Object')
-    .setDescription('Object');
-  // firstParameter.setExtraInfo() // TODO: object type according to the behavior
+    .setDescription('Object')
+    .setExtraInfo(eventsBasedBehavior.getObjectType());
   parameters
     .at(1)
     .setType('behavior')
@@ -174,7 +178,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.setState(
         {
           selectedEventsFunction: null,
-          selectedEventsBasedBehavior: null,
+          selectedEventsBasedBehavior,
         },
         () => this.updateToolbar()
       );
@@ -435,12 +439,24 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         this._selectEventsFunction(selectedEventsFunction, null)
                       }
                       onDeleteEventsFunction={this._onDeleteEventsFunction}
+                      canRename={() => true}
                       onRenameEventsFunction={this._makeRenameEventsFunction(
                         i18n
                       )}
                       onAddEventsFunction={this._onAddFreeEventsFunction}
                       onEventsFunctionAdded={() => {}}
-                      onEditOptions={this._editOptions}
+                      renderHeader={() => (
+                        <React.Fragment>
+                          <Line justifyContent="center">
+                            <FlatButton
+                              label={<Trans>Edit extension options</Trans>}
+                              primary
+                              onClick={() => this._editOptions()}
+                            />
+                          </Line>
+                          <Divider />
+                        </React.Fragment>
+                      )}
                     />
                   </MosaicWindow>
                 ),
@@ -461,10 +477,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                         )
                       }
                       onDeleteEventsFunction={this._onDeleteEventsFunction}
+                      canRename={(eventsFunction: gdEventsFunction) => {
+                        return !isBehaviorLifecycleFunction(
+                          eventsFunction.getName()
+                        );
+                      }}
                       onRenameEventsFunction={this._makeRenameEventsFunction(
                         i18n
                       )}
-                      onEditOptions={this._editOptions}
                       onAddEventsFunction={this._onAddBehaviorEventsFunction}
                       onEventsFunctionAdded={eventsFunction =>
                         this._onBehaviorEventsFunctionAdded(
@@ -536,10 +556,9 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
               selectedEventsBasedBehavior && (
                 <BehaviorMethodSelectorDialog
                   eventsBasedBehavior={selectedEventsBasedBehavior}
-                  onCancel={() => this._onCloseBehaviorMethodSelectorDialog(
-                    false,
-                    null
-                  )}
+                  onCancel={() =>
+                    this._onCloseBehaviorMethodSelectorDialog(false, null)
+                  }
                   onChoose={name =>
                     this._onCloseBehaviorMethodSelectorDialog(true, name)
                   }

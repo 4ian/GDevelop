@@ -1885,7 +1885,7 @@ storiesOf('EventsFunctionsList', module)
         onAddEventsFunction={(cb) => cb(true, null)}
         onEventsFunctionAdded={() => {}}
         onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
-        onEditOptions={action('edit options')}
+        canRename={() => true}
       />
     </FixedHeightFlexContainer>
   ));

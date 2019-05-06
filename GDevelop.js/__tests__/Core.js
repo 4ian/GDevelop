@@ -1970,6 +1970,7 @@ describe('libGD.js', function() {
         expect(autoMetadata.getDescription).not.toBe(undefined);
         expect(autoMetadata.getGroup).not.toBe(undefined);
         expect(autoMetadata.getIconFilename).not.toBe(undefined);
+        expect(autoMetadata.getObjectType).not.toBe(undefined);
       });
     });
   });

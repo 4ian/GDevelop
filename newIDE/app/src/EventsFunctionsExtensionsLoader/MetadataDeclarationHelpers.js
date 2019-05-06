@@ -50,17 +50,19 @@ export const declareBehaviorMetadata = (
 
   generatedBehavior.initializeContent = function(behaviorContent) {};
 
-  return extension.addBehavior(
-    eventsBasedBehavior.getName(),
-    eventsBasedBehavior.getFullName(),
-    eventsBasedBehavior.getName(), // Default name is the name
-    eventsBasedBehavior.getDescription(),
-    '',
-    'res/function24.png',
-    eventsBasedBehavior.getName(), // Class name is the name, actually unused
-    generatedBehavior,
-    new gd.BehaviorsSharedData()
-  );
+  return extension
+    .addBehavior(
+      eventsBasedBehavior.getName(),
+      eventsBasedBehavior.getFullName(),
+      eventsBasedBehavior.getName(), // Default name is the name
+      eventsBasedBehavior.getDescription(),
+      '',
+      'res/function24.png',
+      eventsBasedBehavior.getName(), // Class name is the name, actually unused
+      generatedBehavior,
+      new gd.BehaviorsSharedData()
+    )
+    .setObjectType(eventsBasedBehavior.getObjectType());
 };
 
 /**

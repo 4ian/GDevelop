@@ -99,7 +99,9 @@ Object::GetInitialInstanceProperties(const gd::InitialInstance& instance,
 
 void Object::UnserializeFrom(gd::Project& project,
                              const SerializerElement& element) {
-  // Name and type are already loaded.
+  type = element.GetStringAttribute("type");
+  name = element.GetStringAttribute("name", name, "nom");
+
   objectVariables.UnserializeFrom(
       element.GetChild("variables", 0, "Variables"));
   behaviors.clear();

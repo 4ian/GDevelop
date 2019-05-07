@@ -58,7 +58,7 @@ Project::Project()
       windowWidth(800),
       windowHeight(600),
       maxFPS(60),
-      minFPS(10),
+      minFPS(20),
       verticalSync(false),
       scaleMode("linear"),
       sizeOnStartupMode("adaptWidth"),

@@ -734,14 +734,15 @@ class GD_CORE_API Project : public ObjectsContainer {
       const gd::String& name, std::size_t position);
 
   /**
-   * \brief Adds a new events functions extension constructed from the layout
-   * passed as parameter.
+   * \brief Adds an events functions extension to the list.
    *
-   * \note No pointer or reference must be kept on the extension passed as
-   * parameter.
+   * \note A copy of it is stored in the project (and returned).
+   * \return The newly stored events functions extension (a copy of the one
+   * passed as parameter).
    */
   gd::EventsFunctionsExtension& InsertEventsFunctionsExtension(
-      const EventsFunctionsExtension& externalLayout, std::size_t position);
+      const EventsFunctionsExtension& eventsFunctionExtension,
+      std::size_t position);
 
   /**
    * Must delete the events functions extension named "name".

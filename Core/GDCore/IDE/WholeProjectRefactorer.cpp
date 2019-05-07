@@ -26,15 +26,15 @@ void WholeProjectRefactorer::ExposeProjectEvents(
   // See also gd::Project::ExposeResources for a method that traverse the whole
   // project (this time for resources).
 
-  // Add layouts resources
+  // Add layouts events
   for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
     worker.Launch(project.GetLayout(s).GetEvents());
   }
-  // Add external events resources
+  // Add external events events
   for (std::size_t s = 0; s < project.GetExternalEventsCount(); s++) {
     worker.Launch(project.GetExternalEvents(s).GetEvents());
   }
-  // Add events functions extensions resources
+  // Add events functions extensions events
   for (std::size_t e = 0; e < project.GetEventsFunctionsExtensionsCount();
        e++) {
     auto& eventsFunctionsExtension = project.GetEventsFunctionsExtension(e);

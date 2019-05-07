@@ -837,7 +837,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               )}
           />
           <ProjectStructureItem
-            primaryText={<Trans>Functions/Extensions</Trans>}
+            primaryText={<Trans>Functions/Behaviors</Trans>}
             error={eventsFunctionsExtensionsError}
             onRefresh={onReloadEventsFunctionsExtensions}
             leftIcon={
@@ -911,7 +911,7 @@ export default class ProjectManager extends React.Component<Props, State> {
               .concat(
                 <AddItem
                   key={'add-events-functions-extension'}
-                  primaryText={<Trans>Click to add functions</Trans>}
+                  primaryText={<Trans>Click to add functions and behaviors</Trans>}
                   onClick={this.props.onAddEventsFunctionsExtension}
                 />
               )}

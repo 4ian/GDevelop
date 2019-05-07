@@ -342,6 +342,7 @@ interface Project {
     void SwapEventsFunctionsExtensions(unsigned long first, unsigned long second);
     unsigned long GetEventsFunctionsExtensionsCount();
     [Ref] EventsFunctionsExtension InsertNewEventsFunctionsExtension([Const] DOMString name, unsigned long position);
+    [Ref] EventsFunctionsExtension InsertEventsFunctionsExtension([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, unsigned long position);
     void RemoveEventsFunctionsExtension([Const] DOMString name);
 
     [Ref] VariablesContainer GetVariables();

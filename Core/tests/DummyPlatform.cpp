@@ -24,6 +24,16 @@ void SetupProjectWithDummyPlatform(gd::Project &project,
       std::shared_ptr<gd::PlatformExtension>(new gd::PlatformExtension);
   extension->SetExtensionInformation(
       "MyExtension", "My testing extension", "", "", "");
+  extension
+      ->AddAction("DoSomething",
+                  "Do something",
+                  "This does something",
+                  "Do something please",
+                  "",
+                  "",
+                  "")
+      .AddParameter("expression", "Parameter 1 (a number)")
+      .SetFunctionName("doSomething");
   extension->AddExpression("GetNumber", "Get me a number", "", "", "")
       .SetFunctionName("getNumber");
   extension
@@ -31,9 +41,7 @@ void SetupProjectWithDummyPlatform(gd::Project &project,
           "GetVariableAsNumber", "Get me a variable value", "", "", "")
       .AddParameter("scenevar", "Scene variable")
       .SetFunctionName("returnVariable");
-  extension
-      ->AddStrExpression(
-          "ToString", "ToString", "", "", "")
+  extension->AddStrExpression("ToString", "ToString", "", "", "")
       .AddParameter("expression", "Number to convert to string")
       .SetFunctionName("toString");
   extension

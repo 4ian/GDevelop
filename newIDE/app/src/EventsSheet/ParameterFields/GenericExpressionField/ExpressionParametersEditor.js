@@ -82,7 +82,7 @@ export default class ExpressionParametersEditor extends React.Component<
           if (parameterMetadata.isCodeOnly()) return null;
           return (
             <ParameterComponent
-              expressionMetdata={expressionMetadata}
+              expressionMetadata={expressionMetadata}
               expression={expression}
               parameterMetadata={parameterMetadata}
               parameterIndex={i}

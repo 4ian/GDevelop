@@ -122,6 +122,8 @@ import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtracto
 import FixedHeightFlexContainer from './FixedHeightFlexContainer';
 import EventsBasedBehaviorEditor from '../EventsBasedBehaviorEditor';
 import { EventsBasedBehaviorEditorDialog } from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
+import BehaviorTypeSelector from '../BehaviorTypeSelector';
+import ObjectTypeSelector from '../ObjectTypeSelector';
 
 // No i18n in this file
 
@@ -1882,7 +1884,7 @@ storiesOf('EventsFunctionsList', module)
         )}
         onSelectEventsFunction={action('select')}
         onDeleteEventsFunction={(eventsFunction, cb) => cb(true)}
-        onAddEventsFunction={(cb) => cb(true, null)}
+        onAddEventsFunction={cb => cb(true, null)}
         onEventsFunctionAdded={() => {}}
         onRenameEventsFunction={(eventsFunction, newName, cb) => cb(true)}
         canRename={() => true}
@@ -2037,5 +2039,44 @@ storiesOf('ProjectManager', module)
         'onReloadEventsFunctionsExtensions'
       )}
       freezeUpdate={false}
+    />
+  ));
+
+storiesOf('BehaviorTypeSelector', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <BehaviorTypeSelector
+      project={project}
+      value={''}
+      onChange={action('change')}
+    />
+  ))
+  .add('with a non existing behavior selected', () => (
+    <BehaviorTypeSelector
+      project={project}
+      value={'MyCustomExtension::BehaviorThatIsNotYetLoaded'}
+      onChange={action('change')}
+    />
+  ));
+
+storiesOf('ObjectTypeSelector', module)
+  .addDecorator(paperDecorator)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default (Sprite selected)', () => (
+    <ObjectTypeSelector
+      project={project}
+      value={'Sprite'}
+      onChange={action('change')}
+    />
+  ))
+  .add('custom label (Sprite selected)', () => (
+    <ObjectTypeSelector
+      project={project}
+      value={'Sprite'}
+      floatingLabelText="Choose the object type to use"
+      onChange={action('change')}
     />
   ));

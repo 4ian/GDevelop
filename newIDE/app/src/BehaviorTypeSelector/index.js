@@ -33,6 +33,11 @@ export default class BehaviorTypeSelector extends React.Component<
     const { disabled, value, onChange } = this.props;
     const { behaviorMetadata } = this.state;
 
+    // If the behavior type is not in the list, we'll still
+    // add a menu item for it so that the value is displayed
+    // on screen.
+    const valueIsListed = !!behaviorMetadata.find(({ type }) => type === value);
+
     return (
       <SelectField
         floatingLabelText={<Trans>Behavior type</Trans>}
@@ -51,6 +56,9 @@ export default class BehaviorTypeSelector extends React.Component<
             primaryText={metadata.fullName}
           />
         ))}
+        {!valueIsListed && value && (
+          <MenuItem value={value} primaryText={value} />
+        )}
       </SelectField>
     );
   }

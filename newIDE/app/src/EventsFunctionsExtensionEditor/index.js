@@ -195,7 +195,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     );
   };
 
-  _makeRenameEventsFunction = (i18n: I18nType) => (
+  _makeRenameFreeEventsFunction = (i18n: I18nType) => (
     eventsFunction: gdEventsFunction,
     newName: string,
     done: boolean => void
@@ -213,6 +213,33 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     gd.WholeProjectRefactorer.renameEventsFunction(
       project,
       eventsFunctionsExtension,
+      eventsFunction.getName(),
+      newName
+    );
+
+    done(true);
+  };
+
+  _makeRenameBehaviorEventsFunction = (i18n: I18nType) => (
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    eventsFunction: gdEventsFunction,
+    newName: string,
+    done: boolean => void
+  ) => {
+    if (!gd.Project.validateObjectName(newName)) {
+      showWarningBox(
+        i18n._(
+          t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
+        )
+      );
+      return;
+    }
+
+    const { project, eventsFunctionsExtension } = this.props;
+    gd.WholeProjectRefactorer.renameBehaviorEventsFunction(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior,
       eventsFunction.getName(),
       newName
     );
@@ -265,6 +292,14 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       );
       return;
     }
+
+    const { project, eventsFunctionsExtension } = this.props;
+    gd.WholeProjectRefactorer.renameEventsBasedBehavior(
+      project,
+      eventsFunctionsExtension,
+      eventsBasedBehavior.getName(),
+      newName
+    );
 
     done(true);
   };
@@ -440,7 +475,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       }
                       onDeleteEventsFunction={this._onDeleteEventsFunction}
                       canRename={() => true}
-                      onRenameEventsFunction={this._makeRenameEventsFunction(
+                      onRenameEventsFunction={this._makeRenameFreeEventsFunction(
                         i18n
                       )}
                       onAddEventsFunction={this._onAddFreeEventsFunction}
@@ -482,9 +517,18 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                           eventsFunction.getName()
                         );
                       }}
-                      onRenameEventsFunction={this._makeRenameEventsFunction(
-                        i18n
-                      )}
+                      onRenameEventsFunction={(
+                        eventsFunction: gdEventsFunction,
+                        newName: string,
+                        done: boolean => void
+                      ) =>
+                        this._makeRenameBehaviorEventsFunction(i18n)(
+                          selectedEventsBasedBehavior,
+                          eventsFunction,
+                          newName,
+                          done
+                        )
+                      }
                       onAddEventsFunction={this._onAddBehaviorEventsFunction}
                       onEventsFunctionAdded={eventsFunction =>
                         this._onBehaviorEventsFunctionAdded(

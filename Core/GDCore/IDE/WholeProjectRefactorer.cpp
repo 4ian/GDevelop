@@ -11,6 +11,7 @@
 #include "GDCore/IDE/Events/ExpressionsRenamer.h"
 #include "GDCore/IDE/Events/InstructionsTypeRenamer.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
+#include "GDCore/Project/EventsBasedBehavior.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
 #include "GDCore/Project/InitialInstancesContainer.h"
@@ -118,6 +119,23 @@ void WholeProjectRefactorer::RenameEventsFunction(
         gd::ExpressionsRenamer(project.GetCurrentPlatform(), oldType, newType);
     ExposeProjectEvents(project, renamer);
   }
+}
+
+void WholeProjectRefactorer::RenameBehaviorEventsFunction(
+    gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsBasedBehavior& eventsBasedBehavior,
+    const gd::String& oldFunctionName,
+    const gd::String& newFunctionName) {
+  // TODO
+}
+
+void WholeProjectRefactorer::RenameEventsBasedBehavior(
+    gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::String& oldBehaviorName,
+    const gd::String& newBehaviorName) {
+  // TODO
 }
 
 void WholeProjectRefactorer::ObjectRemovedInLayout(gd::Project& project,

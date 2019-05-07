@@ -12,6 +12,7 @@ class Layout;
 class String;
 class EventsFunctionsExtension;
 class ArbitraryEventsWorker;
+class EventsBasedBehavior;
 }  // namespace gd
 
 namespace gd {
@@ -52,6 +53,25 @@ class GD_CORE_API WholeProjectRefactorer {
       const gd::EventsFunctionsExtension& eventsFunctionsExtension,
       const gd::String& oldFunctionName,
       const gd::String& newFunctionName);
+
+  /**
+   * \brief Refactor the project after an events function of a behavior is renamed.
+   */
+  static void RenameBehaviorEventsFunction(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::EventsBasedBehavior& eventsBasedBehavior,
+      const gd::String& oldFunctionName,
+      const gd::String& newFunctionName);
+
+  /**
+   * \brief Refactor the project after a behavior is renamed.
+   */
+  static void RenameEventsBasedBehavior(
+      gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::String& oldBehaviorName,
+      const gd::String& newBehaviorName);
 
   /**
    * \brief Refactor the project after an object is renamed in a layout

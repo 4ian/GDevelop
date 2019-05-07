@@ -37,6 +37,7 @@ const styles = {
 
 const getSentenceErrorText = (
   i18n: I18nType,
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
   eventsFunction: gdEventsFunction
 ) => {
   const sentence = eventsFunction.getSentence();
@@ -45,6 +46,11 @@ const getSentenceErrorText = (
       t`Enter the sentence that will be displayed in the events sheet`
     );
 
+  // TODO: Factor the logic that is duplicated in EventsFunctionParametersEditor.js?
+  const parametersIndexOffset = eventsBasedBehavior
+    ? 0 /*In the case of a behavior events function, the first two parameters are by convention the "Object" and "Behavior" */
+    : 1; /*In the case of a free events function (i.e: not tied to a behavior), the first parameter is by convention the current scene and is not shown.*/
+
   const missingParameters = mapVector(
     eventsFunction.getParameters(),
     (parameter, index) => {
@@ -52,7 +58,7 @@ const getSentenceErrorText = (
         return null; // Behaviors are usually not shown in sentences.
       }
 
-      const expectedString = `_PARAM${index + 1}_`;
+      const expectedString = `_PARAM${index + parametersIndexOffset}_`;
       if (sentence.indexOf(expectedString) === -1) return expectedString;
 
       return null;
@@ -85,7 +91,8 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
 
     const type = eventsFunction.getFunctionType();
     const isABehaviorLifecycleFunction =
-      !!eventsBasedBehavior && isBehaviorLifecycleFunction(eventsFunction.getName());
+      !!eventsBasedBehavior &&
+      isBehaviorLifecycleFunction(eventsFunction.getName());
     if (isABehaviorLifecycleFunction) {
       return (
         <EmptyMessage>
@@ -177,7 +184,11 @@ export default class EventsFunctionPropertiesEditor extends React.Component<
                     if (onConfigurationUpdated) onConfigurationUpdated();
                     this.forceUpdate();
                   }}
-                  errorText={getSentenceErrorText(i18n, eventsFunction)}
+                  errorText={getSentenceErrorText(
+                    i18n,
+                    eventsBasedBehavior,
+                    eventsFunction
+                  )}
                 />
               ) : null}
             </Line>

@@ -1492,6 +1492,17 @@ interface WholeProjectRefactorer {
       [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
       [Const] DOMString oldName,
       [Const] DOMString newName);
+    void STATIC_RenameBehaviorEventsFunction(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const, Ref] EventsBasedBehavior eventsBasedBehavior,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
+    void STATIC_RenameEventsBasedBehavior(
+      [Ref] Project project,
+      [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension,
+      [Const] DOMString oldName,
+      [Const] DOMString newName);
     void STATIC_ObjectRenamedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString oldName, [Const] DOMString newName);
     void STATIC_ObjectRemovedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString objectName, boolean removeEventsAndGroups);
     void STATIC_GlobalObjectRenamed([Ref] Project project, [Const] DOMString oldName, [Const] DOMString newName);

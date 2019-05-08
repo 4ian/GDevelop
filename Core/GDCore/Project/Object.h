@@ -217,6 +217,13 @@ class GD_CORE_API Object {
    */
   bool RenameBehavior(const gd::String& name, const gd::String& newName);
 
+  /**
+   * \brief Add the specified behavior content to the object
+   *
+   * \return A reference to the newly added behavior content.
+   */
+  gd::BehaviorContent& AddBehavior(const gd::BehaviorContent& behavior);
+
 #if defined(GD_IDE_ONLY)
   /**
    * \brief Add the behavior of the specified \a type with the specified \a
@@ -224,18 +231,20 @@ class GD_CORE_API Object {
    *
    * The project's current platform is used to initialize the content.
    *
-   * \return A pointer to the newly added behavior content. NULL if the creation failed.
+   * \return A pointer to the newly added behavior content. NULL if the creation
+   * failed.
    */
   gd::BehaviorContent* AddNewBehavior(gd::Project& project,
-                               const gd::String& type,
-                               const gd::String& name);
+                                      const gd::String& type,
+                                      const gd::String& name);
 #endif
 
   /**
-   * \brief Get a read-only access to the map containing the behaviors with their properties.
+   * \brief Get a read-only access to the map containing the behaviors with
+   * their properties.
    */
-  const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>& GetAllBehaviorContents()
-      const {
+  const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>&
+  GetAllBehaviorContents() const {
     return behaviors;
   };
   ///@}

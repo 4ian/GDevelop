@@ -66,6 +66,15 @@ bool Object::HasBehaviorNamed(const gd::String& name) const {
   return behaviors.find(name) != behaviors.end();
 }
 
+gd::BehaviorContent& Object::AddBehavior(
+    const gd::BehaviorContent& behaviorContent) {
+  const gd::String& behaviorName = behaviorContent.GetName();
+  auto newBehaviorContent =
+      gd::make_unique<gd::BehaviorContent>(behaviorContent);
+  behaviors[behaviorName] = std::move(newBehaviorContent);
+  return *behaviors[behaviorName];
+}
+
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> Object::GetProperties(
     gd::Project& project) const {
@@ -178,6 +187,9 @@ void Object::SerializeTo(SerializerElement& element) const {
     SerializerElement& behaviorElement = behaviorsElement.AddChild("behavior");
 
     behaviorContent.SerializeTo(behaviorElement);
+    behaviorElement.RemoveChild("type");  // The content can contain type or
+                                          // name properties, remove them.
+    behaviorElement.RemoveChild("name");
     behaviorElement.SetAttribute("type", behaviorContent.GetTypeName());
     behaviorElement.SetAttribute("name", behaviorContent.GetName());
   }

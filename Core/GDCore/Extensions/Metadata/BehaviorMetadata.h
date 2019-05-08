@@ -40,7 +40,8 @@ class GD_CORE_API BehaviorMetadata {
   virtual ~BehaviorMetadata(){};
 
   /**
-   * Declare a new condition as being part of the extension.
+   * Declare a new condition as being part of the behavior.
+   * \deprecated Prefer using `AddScopedCondition`.
    */
   gd::InstructionMetadata& AddCondition(const gd::String& name_,
                                         const gd::String& fullname_,
@@ -51,9 +52,32 @@ class GD_CORE_API BehaviorMetadata {
                                         const gd::String& smallicon_);
 
   /**
-   * Declare a new action as being part of the extension.
+   * Declare a new action as being part of the behavior.
+   * \deprecated Prefer using `AddScopedAction`.
    */
   gd::InstructionMetadata& AddAction(const gd::String& name_,
+                                     const gd::String& fullname_,
+                                     const gd::String& description_,
+                                     const gd::String& sentence_,
+                                     const gd::String& group_,
+                                     const gd::String& icon_,
+                                     const gd::String& smallicon_);
+
+  /**
+   * Declare a new condition as being part of the behavior.
+   */
+  gd::InstructionMetadata& AddScopedCondition(const gd::String& name_,
+                                        const gd::String& fullname_,
+                                        const gd::String& description_,
+                                        const gd::String& sentence_,
+                                        const gd::String& group_,
+                                        const gd::String& icon_,
+                                        const gd::String& smallicon_);
+
+  /**
+   * Declare a new action as being part of the behavior.
+   */
+  gd::InstructionMetadata& AddScopedAction(const gd::String& name_,
                                      const gd::String& fullname_,
                                      const gd::String& description_,
                                      const gd::String& sentence_,

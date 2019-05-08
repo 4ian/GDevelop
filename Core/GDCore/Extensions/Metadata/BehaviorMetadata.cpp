@@ -4,8 +4,8 @@
  * reserved. This project is released under the MIT License.
  */
 #include "BehaviorMetadata.h"
-#include <algorithm>
 #include <iostream>
+#include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/Extensions/Metadata/ExpressionMetadata.h"
 #include "GDCore/Extensions/Metadata/InstructionMetadata.h"
 #include "GDCore/Project/Behavior.h"
@@ -75,6 +75,52 @@ gd::InstructionMetadata& BehaviorMetadata::AddAction(
 #if defined(GD_IDE_ONLY)
   gd::String nameWithNamespace =
       extensionNamespace.empty() ? name : extensionNamespace + name;
+  actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
+                                                        nameWithNamespace,
+                                                        fullname,
+                                                        description,
+                                                        sentence,
+                                                        group,
+                                                        icon,
+                                                        smallicon)
+                                        .SetHelpPath(GetHelpPath());
+  return actionsInfos[nameWithNamespace];
+#endif
+}
+
+gd::InstructionMetadata& BehaviorMetadata::AddScopedCondition(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentence,
+    const gd::String& group,
+    const gd::String& icon,
+    const gd::String& smallicon) {
+#if defined(GD_IDE_ONLY)
+  gd::String nameWithNamespace = GetName() +gd::PlatformExtension::GetNamespaceSeparator() +  name;
+  conditionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
+                                                           nameWithNamespace,
+                                                           fullname,
+                                                           description,
+                                                           sentence,
+                                                           group,
+                                                           icon,
+                                                           smallicon)
+                                           .SetHelpPath(GetHelpPath());
+  return conditionsInfos[nameWithNamespace];
+#endif
+}
+
+gd::InstructionMetadata& BehaviorMetadata::AddScopedAction(
+    const gd::String& name,
+    const gd::String& fullname,
+    const gd::String& description,
+    const gd::String& sentence,
+    const gd::String& group,
+    const gd::String& icon,
+    const gd::String& smallicon) {
+#if defined(GD_IDE_ONLY)
+  gd::String nameWithNamespace = GetName() + gd::PlatformExtension::GetNamespaceSeparator() + name;
   actionsInfos[nameWithNamespace] = InstructionMetadata(extensionNamespace,
                                                         nameWithNamespace,
                                                         fullname,

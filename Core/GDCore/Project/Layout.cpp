@@ -283,6 +283,9 @@ void Layout::SerializeTo(SerializerElement& element) const {
         behaviorDatasElement.AddChild("behaviorSharedData");
 
     it.second->SerializeTo(dataElement);
+    dataElement.RemoveChild("type");  // The content can contain type or name
+                                      // properties, remove them.
+    dataElement.RemoveChild("name");
     dataElement.SetAttribute("type", it.second->GetTypeName());
     dataElement.SetAttribute("name", it.second->GetName());
   }

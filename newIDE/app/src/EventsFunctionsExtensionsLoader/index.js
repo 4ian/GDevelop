@@ -3,6 +3,7 @@ import { mapVector, mapFor } from '../Utils/MapFor';
 import { caseSensitiveSlug } from '../Utils/CaseSensitiveSlug';
 import {
   declareInstructionOrExpressionMetadata,
+  declareBehaviorInstructionOrExpressionMetadata,
   declareEventsFunctionParameters,
   declareBehaviorMetadata,
   declareExtension,
@@ -235,7 +236,7 @@ function generateBehavior(
           eventsFunctionMangledName
         );
 
-        const instructionOrExpression = declareInstructionOrExpressionMetadata(
+        const instructionOrExpression = declareBehaviorInstructionOrExpressionMetadata(
           behaviorMetadata,
           eventsBasedBehavior,
           eventsFunction

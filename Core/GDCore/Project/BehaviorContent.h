@@ -51,6 +51,11 @@ class GD_CORE_API BehaviorContent {
    */
   virtual const gd::String& GetTypeName() const { return type; }
 
+  /**
+   * \brief Change the type of the behavior
+   */
+  virtual void SetTypeName(const gd::String& type_) { type = type_; }
+
 #if defined(GD_IDE_ONLY)
   /**
    * \brief Serialize the behavior content.

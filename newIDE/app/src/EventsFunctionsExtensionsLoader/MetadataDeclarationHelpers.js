@@ -84,53 +84,106 @@ export const isBehaviorLifecycleFunction = (functionName: string) => {
 
 /**
  * Declare the instruction (action/condition) or expression for the given
- * events function.
+ * (free) events function.
  */
 export const declareInstructionOrExpressionMetadata = (
-  extensionOrBehaviorMetadata: gdPlatformExtension | gdBehaviorMetadata,
-  eventsFunctionsExtensionOrEventsBasedBehavior:
-    | gdEventsFunctionsExtension
-    | gdEventsBasedBehavior,
+  extension: gdPlatformExtension,
+  eventsFunctionsExtension: gdEventsFunctionsExtension,
   eventsFunction: gdEventsFunction
 ): gdInstructionMetadata | gdExpressionMetadata => {
   const functionType = eventsFunction.getFunctionType();
   if (functionType === gd.EventsFunction.Expression) {
-    return extensionOrBehaviorMetadata.addExpression(
+    return extension.addExpression(
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
-      eventsFunctionsExtensionOrEventsBasedBehavior.getFullName() ||
-        eventsFunctionsExtensionOrEventsBasedBehavior.getName(),
+      eventsFunctionsExtension.getFullName() ||
+        eventsFunctionsExtension.getName(),
       'res/function.png'
     );
   } else if (functionType === gd.EventsFunction.StringExpression) {
-    return extensionOrBehaviorMetadata.addStrExpression(
+    return extension.addStrExpression(
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
-      eventsFunctionsExtensionOrEventsBasedBehavior.getFullName() ||
-        eventsFunctionsExtensionOrEventsBasedBehavior.getName(),
+      eventsFunctionsExtension.getFullName() ||
+        eventsFunctionsExtension.getName(),
       'res/function.png'
     );
   } else if (functionType === gd.EventsFunction.Condition) {
-    return extensionOrBehaviorMetadata.addCondition(
+    return extension.addCondition(
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
-      eventsFunctionsExtensionOrEventsBasedBehavior.getFullName() ||
-        eventsFunctionsExtensionOrEventsBasedBehavior.getName(),
+      eventsFunctionsExtension.getFullName() ||
+        eventsFunctionsExtension.getName(),
       'res/function.png',
       'res/function24.png'
     );
   } else {
-    return extensionOrBehaviorMetadata.addAction(
+    return extension.addAction(
       eventsFunction.getName(),
       eventsFunction.getFullName() || eventsFunction.getName(),
       eventsFunction.getDescription() || eventsFunction.getFullName(),
       eventsFunction.getSentence(),
-      eventsFunctionsExtensionOrEventsBasedBehavior.getFullName() ||
-        eventsFunctionsExtensionOrEventsBasedBehavior.getName(),
+      eventsFunctionsExtension.getFullName() ||
+        eventsFunctionsExtension.getName(),
+      'res/function.png',
+      'res/function24.png'
+    );
+  }
+};
+
+/**
+ * Declare the instruction (action/condition) or expression for the given
+ * behavior events function.
+ */
+export const declareBehaviorInstructionOrExpressionMetadata = (
+  behaviorMetadata: gdBehaviorMetadata,
+  eventsBasedBehavior: gdEventsBasedBehavior,
+  eventsFunction: gdEventsFunction
+): gdInstructionMetadata | gdExpressionMetadata => {
+  const functionType = eventsFunction.getFunctionType();
+  if (functionType === gd.EventsFunction.Expression) {
+    return behaviorMetadata.addExpression(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+      'res/function.png'
+    );
+  } else if (functionType === gd.EventsFunction.StringExpression) {
+    return behaviorMetadata.addStrExpression(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+      'res/function.png'
+    );
+  } else if (functionType === gd.EventsFunction.Condition) {
+    // Use the new "scoped" way to declare an instruction, because
+    // we want to prevent any conflict between free functions and
+    // behaviors (that can totally have functions with the same name).
+    return behaviorMetadata.addScopedCondition(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsFunction.getSentence(),
+      eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
+      'res/function.png',
+      'res/function24.png'
+    );
+  } else {
+    // Use the new "scoped" way to declare an instruction, because
+    // we want to prevent any conflict between free functions and
+    // behaviors (that can totally have functions with the same name).
+    return behaviorMetadata.addScopedAction(
+      eventsFunction.getName(),
+      eventsFunction.getFullName() || eventsFunction.getName(),
+      eventsFunction.getDescription() || eventsFunction.getFullName(),
+      eventsFunction.getSentence(),
+      eventsBasedBehavior.getFullName() || eventsBasedBehavior.getName(),
       'res/function.png',
       'res/function24.png'
     );

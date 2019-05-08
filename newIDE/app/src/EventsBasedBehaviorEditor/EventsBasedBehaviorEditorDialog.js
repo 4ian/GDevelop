@@ -11,12 +11,7 @@ const gd = global.gd;
 // TODO: Function component?
 export class EventsBasedBehaviorEditorDialog extends Component {
   render() {
-    const {
-      onCancel,
-      onApply,
-      eventsBasedBehavior,
-      project,
-    } = this.props;
+    const { onCancel, onApply, eventsBasedBehavior, project } = this.props;
     const actions = [
       <FlatButton
         label={<Trans>Cancel</Trans>}

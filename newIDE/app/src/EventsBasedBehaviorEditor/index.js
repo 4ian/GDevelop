@@ -83,7 +83,8 @@ export default class EventsBasedBehaviorEditor extends React.Component<
             kind="info"
           >
             Once you're done, close this dialog and start adding some functions
-            to the behavior. Then, test the behavior by adding it to an object in a scene.
+            to the behavior. Then, test the behavior by adding it to an object
+            in a scene.
           </DismissableAlertMessage>
         )}
         <Spacer />

@@ -101,8 +101,8 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
             description={
               <Trans>
                 Events that will be run at every frame (roughly 60 times per
-                second), for every object that have the behavior attached,
-                before the events from the events sheet are launched.
+                second), for every object that has the behavior attached, before
+                the events from the events sheet are launched.
               </Trans>
             }
           />
@@ -156,7 +156,7 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
             description={
               <Trans>
                 Events that will be run at every frame (roughly 60 times per
-                second), for every object that have the behavior attached, after
+                second), for every object that has the behavior attached, after
                 the events from the events sheet.
               </Trans>
             }

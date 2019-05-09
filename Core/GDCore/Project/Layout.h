@@ -478,18 +478,18 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout);
  *
  * @return Type of the object/group.
  */
-gd::String GD_CORE_API GetTypeOfObject(const ObjectsContainer& game,
+const gd::String& GD_CORE_API GetTypeOfObject(const ObjectsContainer& game,
                                        const ObjectsContainer& layout,
-                                       gd::String objectName,
+                                       const gd::String& objectName,
                                        bool searchInGroups = true);
 
 /**
  * \brief Get a type from a behavior name
  * @return Type of the behavior.
  */
-gd::String GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
+const gd::String& GD_CORE_API GetTypeOfBehavior(const ObjectsContainer& game,
                                          const ObjectsContainer& layout,
-                                         gd::String behaviorName,
+                                         const gd::String& behaviorName,
                                          bool searchInGroups = true);
 
 /**

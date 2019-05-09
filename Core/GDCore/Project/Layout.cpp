@@ -422,17 +422,18 @@ std::vector<gd::String> GetHiddenLayers(const Layout& layout) {
 }
 
 #if defined(GD_IDE_ONLY)
-gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
+const gd::String& GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
                                        const gd::ObjectsContainer& layout,
-                                       gd::String name,
+                                       const gd::String& name,
                                        bool searchInGroups) {
-  gd::String type;
+  static gd::String empty; //TODO
+  const gd::String* type;
 
   // Search in objects
   if (layout.HasObjectNamed(name))
-    type = layout.GetObject(name).GetType();
+    type = &layout.GetObject(name).GetType();
   else if (project.HasObjectNamed(name))
-    type = project.GetObject(name).GetType();
+    type = &project.GetObject(name).GetType();
 
   // Search in groups
   if (searchInGroups) {
@@ -443,22 +444,22 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
 
         vector<gd::String> groupsObjects =
             layout.GetObjectGroups()[i].GetAllObjectsNames();
-        gd::String previousType =
+        const gd::String& previousType =
             groupsObjects.empty()
-                ? ""
+                ? empty
                 : GetTypeOfObject(project, layout, groupsObjects[0], false);
 
         for (std::size_t j = 0; j < groupsObjects.size(); ++j) {
           if (GetTypeOfObject(project, layout, groupsObjects[j], false) !=
               previousType)
-            return "";  // The group has more than one type.
+            return empty;  // The group has more than one type.
         }
 
-        if (!type.empty() && previousType != type)
-          return "";  // The group has objects of different type, so the group
-                      // has not any type.
+        if (!type->empty() && previousType != *type)
+          return empty;  // The group has objects of different type, so the group
+                         // has not any type.
 
-        type = previousType;
+        type = &previousType;
       }
     }
     for (std::size_t i = 0; i < project.GetObjectGroups().size(); ++i) {
@@ -468,33 +469,34 @@ gd::String GD_CORE_API GetTypeOfObject(const gd::ObjectsContainer& project,
 
         vector<gd::String> groupsObjects =
             project.GetObjectGroups()[i].GetAllObjectsNames();
-        gd::String previousType =
+        const gd::String& previousType =
             groupsObjects.empty()
-                ? ""
+                ? empty
                 : GetTypeOfObject(project, layout, groupsObjects[0], false);
 
         for (std::size_t j = 0; j < groupsObjects.size(); ++j) {
           if (GetTypeOfObject(project, layout, groupsObjects[j], false) !=
               previousType)
-            return "";  // The group has more than one type.
+            return empty;  // The group has more than one type.
         }
 
-        if (!type.empty() && previousType != type)
-          return "";  // The group has objects of different type, so the group
+        if (!type->empty() && previousType != *type)
+          return empty;  // The group has objects of different type, so the group
                       // has not any type.
 
-        type = previousType;
+        type = &previousType;
       }
     }
   }
 
-  return type;
+  return *type;
 }
 
-gd::String GD_CORE_API GetTypeOfBehavior(const gd::ObjectsContainer& project,
+const gd::String& GD_CORE_API GetTypeOfBehavior(const gd::ObjectsContainer& project,
                                          const gd::ObjectsContainer& layout,
-                                         gd::String name,
+                                         const gd::String& name,
                                          bool searchInGroups) {
+  static gd::String empty; //TODO
   for (std::size_t i = 0; i < layout.GetObjectsCount(); ++i) {
     vector<gd::String> behaviors = layout.GetObject(i).GetAllBehaviorNames();
     for (std::size_t j = 0; j < behaviors.size(); ++j) {
@@ -511,7 +513,7 @@ gd::String GD_CORE_API GetTypeOfBehavior(const gd::ObjectsContainer& project,
     }
   }
 
-  return "";
+  return empty;
 }
 
 vector<gd::String> GD_CORE_API

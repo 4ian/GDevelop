@@ -330,10 +330,10 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
   }
 
   // Generate object condition if available
-  gd::String objectName = condition.GetParameters().empty()
+  const gd::String& objectName = condition.GetParameters().empty()
                               ? ""
                               : condition.GetParameter(0).GetPlainString();
-  gd::String objectType = gd::GetTypeOfObject(
+  const gd::String& objectType = gd::GetTypeOfObject(
       GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (!objectName.empty() &&
       MetadataProvider::HasObjectCondition(
@@ -365,7 +365,7 @@ gd::String EventsCodeGenerator::GenerateConditionCode(
   }
 
   // Generate behavior condition if available
-  gd::String behaviorType =
+  const gd::String& behaviorType =
       gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
                             GetObjectsAndGroups(),
                             condition.GetParameters().size() < 2
@@ -502,10 +502,10 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   }
 
   // Call object function if available
-  gd::String objectName = action.GetParameters().empty()
+  const gd::String& objectName = action.GetParameters().empty()
                               ? ""
                               : action.GetParameter(0).GetPlainString();
-  gd::String objectType = gd::GetTypeOfObject(
+  const gd::String& objectType = gd::GetTypeOfObject(
       GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
   if (MetadataProvider::HasObjectAction(
           platform, objectType, action.GetType()) &&
@@ -531,7 +531,7 @@ gd::String EventsCodeGenerator::GenerateActionCode(
   }
 
   // Assign to a behavior member function if found
-  gd::String behaviorType =
+  const gd::String& behaviorType =
       gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
                             GetObjectsAndGroups(),
                             action.GetParameters().size() < 2

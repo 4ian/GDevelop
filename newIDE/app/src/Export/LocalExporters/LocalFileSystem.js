@@ -79,12 +79,14 @@ export default {
     if (this._isExternalURL(source)) return true;
 
     source = this._translateURL(source);
-    try {
-      if (source !== dest) fs.copySync(source, dest);
-    } catch (e) {
-      console.log('copyFile(' + source + ', ' + dest + ') failed: ' + e);
-      return false;
+    if (source !== dest) {
+      fs.copy(source, dest, err => {
+        if (err) {
+          console.log('copyFile(' + source + ', ' + dest + ') failed: ' + err);
+        }
+      });
     }
+
     return true;
   },
   copyDir: function(source, dest) {
@@ -104,12 +106,12 @@ export default {
     // return true;
   },
   writeToFile: function(file, contents) {
-    try {
-      fs.outputFileSync(file, contents);
-    } catch (e) {
-      console.log('writeToFile(' + file + ', ...) failed: ' + e);
-      return false;
-    }
+    fs.outputFile(file, contents, err => {
+      if (err) {
+        console.error('writeToFile(' + file + ', ...) failed: ' + err);
+      }
+    });
+
     return true;
   },
   readFile: function(file) {

@@ -383,8 +383,41 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
                 .GetPlainString() ==
             "1 + MyRenamedExtension::MyEventsFunctionExpression(123)");
 
-    // TODO: Check if events based behaviors have been renamed
-    // TODO: Check if events based behaviors functions have been renamed
+    // Check that the type of the behavior was changed in the behaviors of
+    // objects. Name is *not* changed.
+    REQUIRE(project.GetLayout("LayoutWithBehaviorFunctions")
+                .GetObject("ObjectWithMyBehavior")
+                .GetBehavior("MyBehavior")
+                .GetTypeName() == "MyRenamedExtension::MyEventsBasedBehavior");
+    REQUIRE(project.GetObject("GlobalObjectWithMyBehavior")
+                .GetBehavior("MyBehavior")
+                .GetTypeName() == "MyRenamedExtension::MyEventsBasedBehavior");
+
+    // Check if events based behaviors functions have been renamed in
+    // instructions
+    REQUIRE(static_cast<gd::StandardEvent &>(
+                project.GetLayout("LayoutWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(0))
+                .GetActions()
+                .Get(0)
+                .GetType() ==
+            "MyRenamedExtension::MyEventsBasedBehavior::"
+            "MyBehaviorEventsFunction");
+
+    // Check events based behaviors functions have *not* been renamed in
+    // expressions
+    REQUIRE(static_cast<gd::StandardEvent &>(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(0))
+                .GetActions()
+                .Get(0)
+                .GetParameter(0)
+                .GetPlainString() ==
+            "1 + "
+            "ObjectWithMyBehavior::MyBehavior."
+            "MyBehaviorEventsFunctionExpression(123)");
   }
   SECTION("(Free) events function renamed") {
     gd::Project project;

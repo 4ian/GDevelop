@@ -963,7 +963,8 @@ class MainFrame extends React.Component<Props, State> {
 
   openEventsFunctionsExtension = (
     name: string,
-    initiallyFocusedFunctionName?: string
+    initiallyFocusedFunctionName?: string,
+    initiallyFocusedBehaviorName?: ?string
   ) => {
     if (!this.props.eventsFunctionWriter) return;
 
@@ -984,6 +985,7 @@ class MainFrame extends React.Component<Props, State> {
                 this._loadProjectEventsFunctionsExtensions
               }
               initiallyFocusedFunctionName={initiallyFocusedFunctionName}
+              initiallyFocusedBehaviorName={initiallyFocusedBehaviorName}
               openInstructionOrExpression={this._openInstructionOrExpression}
               onCreateEventsFunction={this._onCreateEventsFunction}
               ref={editorRef}
@@ -1105,13 +1107,20 @@ class MainFrame extends React.Component<Props, State> {
       );
       if (foundTab) {
         // Open the given function and focus the tab
-        foundTab.editor.selectEventsFunctionByName(functionName);
+        foundTab.editor.selectEventsFunctionByName(
+          functionName.name,
+          functionName.behaviorName
+        );
         this.setState(state => ({
           editorTabs: changeCurrentTab(state.editorTabs, foundTab.tabIndex),
         }));
       } else {
         // Open a new editor for the extension and the given function
-        this.openEventsFunctionsExtension(extensionName, functionName);
+        this.openEventsFunctionsExtension(
+          extensionName,
+          functionName.name,
+          functionName.behaviorName
+        );
       }
     } else {
       // It's not an events functions extension, we should not be here.

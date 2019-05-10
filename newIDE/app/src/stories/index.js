@@ -1909,6 +1909,7 @@ storiesOf('EventsFunctionsExtensionEditor/index', module)
           resourceExternalEditors={[]}
           openInstructionOrExpression={action('open instruction or expression')}
           initiallyFocusedFunctionName={null}
+          initiallyFocusedBehaviorName={null}
           onCreateEventsFunction={action('on create events function')}
         />
       </FixedHeightFlexContainer>

@@ -43,6 +43,7 @@ type Props = {|
     eventsFunction: gdEventsFunction
   ) => void,
   initiallyFocusedFunctionName: ?string,
+  initiallyFocusedBehaviorName: ?string,
 |};
 
 type State = {|
@@ -105,7 +106,10 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
 
   componentDidMount() {
     if (this.props.initiallyFocusedFunctionName) {
-      this.selectEventsFunctionByName(this.props.initiallyFocusedFunctionName);
+      this.selectEventsFunctionByName(
+        this.props.initiallyFocusedFunctionName,
+        this.props.initiallyFocusedBehaviorName
+      );
     }
   }
 
@@ -148,26 +152,33 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     }
   }
 
-  selectEventsFunctionByName = (name: string) => {
+  selectEventsFunctionByName = (
+    functionName: string,
+    behaviorName: ?string
+  ) => {
     const { eventsFunctionsExtension } = this.props;
-    if (eventsFunctionsExtension.hasEventsFunctionNamed(name)) {
-      this._selectEventsFunction(
-        eventsFunctionsExtension.getEventsFunction(name),
-        null
-      );
-    } else {
-      mapVector(
-        eventsFunctionsExtension.getEventsBasedBehaviors(),
-        eventsBasedBehavior => {
-          const behaviorEventsFunctions = eventsBasedBehavior.getEventsFunctions();
-          if (behaviorEventsFunctions.hasEventsFunctionNamed(name)) {
-            this._selectEventsFunction(
-              behaviorEventsFunctions.getEventsFunction(name),
-              eventsBasedBehavior
-            );
-          }
+
+    if (behaviorName) {
+      // Behavior function
+      const eventsBasedBehaviors = eventsFunctionsExtension.getEventsBasedBehaviors();
+      if (eventsBasedBehaviors.has(behaviorName)) {
+        const eventsBasedBehavior = eventsBasedBehaviors.get(behaviorName);
+        const behaviorEventsFunctions = eventsBasedBehavior.getEventsFunctions();
+        if (behaviorEventsFunctions.hasEventsFunctionNamed(functionName)) {
+          this._selectEventsFunction(
+            behaviorEventsFunctions.getEventsFunction(functionName),
+            eventsBasedBehavior
+          );
         }
-      );
+      }
+    } else {
+      // Free function
+      if (eventsFunctionsExtension.hasEventsFunctionNamed(functionName)) {
+        this._selectEventsFunction(
+          eventsFunctionsExtension.getEventsFunction(functionName),
+          null
+        );
+      }
     }
   };
 
@@ -233,7 +244,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
           t`This name contains forbidden characters: please only use alphanumeric characters (0-9, a-z) and underscores in your function name.`
         )
       );
-      return;
+      return done(false);
+    }
+    if (isBehaviorLifecycleFunction(newName)) {
+      showWarningBox(
+        i18n._(
+          t`This name is reserved for a lifecycle method of the behavior. Choose another name for your custom function.`
+        )
+      );
+      return done(false);
     }
 
     const { project, eventsFunctionsExtension } = this.props;

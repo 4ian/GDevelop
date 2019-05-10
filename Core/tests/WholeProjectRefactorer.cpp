@@ -39,6 +39,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
     auto &layout = project.InsertNewLayout("LayoutWithFreeFunctions", 0);
     auto &externalEvents =
         project.InsertNewExternalEvents("ExternalEventsWithFreeFunctions", 0);
+    externalEvents.SetAssociatedLayout("LayoutWithFreeFunctions");
 
     // Create an event in the layout referring to
     // MyEventsExtension::MyEventsFunction
@@ -87,6 +88,7 @@ gd::EventsFunctionsExtension &SetupProjectWithEventsFunctionExtension(
     auto &layout = project.InsertNewLayout("LayoutWithBehaviorFunctions", 0);
     auto &externalEvents = project.InsertNewExternalEvents(
         "ExternalEventsWithBehaviorFunctions", 0);
+    externalEvents.SetAssociatedLayout("LayoutWithBehaviorFunctions");
 
     auto &object = layout.InsertNewObject(
         project, "MyExtension::Sprite", "ObjectWithMyBehavior", 0);
@@ -458,8 +460,19 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyEventsExtension::MyRenamedEventsBasedBehavior::"
             "MyBehaviorEventsFunction");
 
-    // TODO: Check if events based behaviors functions have been renamed in
+    // Check events based behaviors functions have *not* been renamed in
     // expressions
+    REQUIRE(static_cast<gd::StandardEvent &>(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(0))
+                .GetActions()
+                .Get(0)
+                .GetParameter(0)
+                .GetPlainString() ==
+            "1 + "
+            "ObjectWithMyBehavior::MyBehavior."
+            "MyBehaviorEventsFunctionExpression(123)");
   }
   SECTION("(Events based Behavior) events function renamed") {
     gd::Project project;
@@ -475,6 +488,12 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
         eventsBasedBehavior,
         "MyBehaviorEventsFunction",
         "MyRenamedBehaviorEventsFunction");
+    gd::WholeProjectRefactorer::RenameBehaviorEventsFunction(
+        project,
+        eventsExtension,
+        eventsBasedBehavior,
+        "MyBehaviorEventsFunctionExpression",
+        "MyRenamedBehaviorEventsFunctionExpression");
 
     // Check if events based behaviors functions have been renamed in
     // instructions
@@ -488,7 +507,18 @@ TEST_CASE("WholeProjectRefactorer", "[common]") {
             "MyEventsExtension::MyEventsBasedBehavior::"
             "MyRenamedBehaviorEventsFunction");
 
-    // TODO: Check if events based behaviors functions have been renamed in
+    // Check events based behaviors functions have been renamed in
     // expressions
+    REQUIRE(static_cast<gd::StandardEvent &>(
+                project.GetExternalEvents("ExternalEventsWithBehaviorFunctions")
+                    .GetEvents()
+                    .GetEvent(0))
+                .GetActions()
+                .Get(0)
+                .GetParameter(0)
+                .GetPlainString() ==
+            "1 + "
+            "ObjectWithMyBehavior::MyBehavior."
+            "MyRenamedBehaviorEventsFunctionExpression(123)");
   }
 }

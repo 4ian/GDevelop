@@ -14,6 +14,7 @@ class EventsFunctionsExtension;
 class EventsFunction;
 class EventsBasedBehavior;
 class ArbitraryEventsWorker;
+class ArbitraryEventsWorkerWithContext;
 }  // namespace gd
 
 namespace gd {
@@ -36,6 +37,15 @@ class GD_CORE_API WholeProjectRefactorer {
    */
   static void ExposeProjectEvents(gd::Project& project,
                                   gd::ArbitraryEventsWorker& worker);
+
+  /**
+   * \brief Call the specified worker on all events of the project (layout,
+   * external events, events functions...)
+   *
+   * This should be the preferred way to traverse all the events of a project.
+   */
+  static void ExposeProjectEvents(gd::Project& project,
+                                  gd::ArbitraryEventsWorkerWithContext& worker);
 
   /**
    * \brief Refactor the project after an events function extension is renamed
@@ -125,8 +135,8 @@ class GD_CORE_API WholeProjectRefactorer {
 
   static void DoRenameEventsFunction(gd::Project& project,
                                      const gd::EventsFunction& eventsFunction,
-                                     const gd::String& oldType,
-                                     const gd::String& newType);
+                                     const gd::String& oldFullType,
+                                     const gd::String& newFullType);
 
   static void DoRenameBehavior(gd::Project& project,
                                      const gd::String& oldBehaviorType,

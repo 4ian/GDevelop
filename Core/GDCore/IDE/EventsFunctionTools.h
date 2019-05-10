@@ -33,6 +33,7 @@ class GD_CORE_API EventsFunctionTools {
   static void EventsFunctionToObjectsContainer(
       gd::Project& project,
       const gd::EventsFunction& eventsFunction,
+      gd::ObjectsContainer& outputGlobalObjectsContainer,
       gd::ObjectsContainer& outputObjectsContainer);
 };
 }  // namespace gd

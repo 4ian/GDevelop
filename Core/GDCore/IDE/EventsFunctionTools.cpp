@@ -16,10 +16,16 @@ namespace gd {
 void EventsFunctionTools::EventsFunctionToObjectsContainer(
     gd::Project& project,
     const gd::EventsFunction& eventsFunction,
+    gd::ObjectsContainer& outputGlobalObjectsContainer,
     gd::ObjectsContainer& outputObjectsContainer) {
+  // Functions don't have access to objects from the "outer" scope.
+  outputGlobalObjectsContainer.GetObjects().clear();
+  outputGlobalObjectsContainer.GetObjectGroups().Clear();
+
+  // Functions scope for objects is defined according
+  // to parameters
   outputObjectsContainer.GetObjects().clear();
   outputObjectsContainer.GetObjectGroups().Clear();
-
   gd::ParameterMetadataTools::ParametersToObjectsContainer(
       project, eventsFunction.GetParameters(), outputObjectsContainer);
   outputObjectsContainer.GetObjectGroups() = eventsFunction.GetObjectGroups();

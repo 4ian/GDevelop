@@ -111,14 +111,12 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionCode(
     const gd::String& codeNamespace,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
+  gd::ObjectsContainer globalObjectsAndGroups;
   gd::ObjectsContainer objectsAndGroups;
-  gd::ObjectsContainer
-      emptyObjectsAndGroups;  // As opposed to layout events, we don't have
-                              // objects in the "outer" scope.
   gd::EventsFunctionTools::EventsFunctionToObjectsContainer(
-      project, eventsFunction, objectsAndGroups);
+      project, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
 
-  EventsCodeGenerator codeGenerator(emptyObjectsAndGroups, objectsAndGroups);
+  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
@@ -145,14 +143,12 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
     const gd::String& fullyQualifiedFunctionName,
     std::set<gd::String>& includeFiles,
     bool compilationForRuntime) {
+  gd::ObjectsContainer globalObjectsAndGroups;
   gd::ObjectsContainer objectsAndGroups;
-  gd::ObjectsContainer
-      emptyObjectsAndGroups;  // As opposed to layout events, we don't have
-                              // objects in the "outer" scope.
   gd::EventsFunctionTools::EventsFunctionToObjectsContainer(
-      project, eventsFunction, objectsAndGroups);
+      project, eventsFunction, globalObjectsAndGroups, objectsAndGroups);
 
-  EventsCodeGenerator codeGenerator(emptyObjectsAndGroups, objectsAndGroups);
+  EventsCodeGenerator codeGenerator(globalObjectsAndGroups, objectsAndGroups);
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 

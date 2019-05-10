@@ -13,7 +13,7 @@
     "macExecutableFilename": "",
     "orientation": "landscape",
     "packageName": "com.example.gamename",
-    "projectFile": "/Users/florian/GDevelop projects/My project797/game.json",
+    "projectFile": "/Users/florian/Projects/F/GD/GDJS/tests/games/events-based-behaviors/Basic EventsBasedBehavior test.json",
     "scaleMode": "linear",
     "sizeOnStartupMode": "adaptWidth",
     "useExternalSourceFiles": false,
@@ -224,12 +224,12 @@
             {
               "type": {
                 "inverted": false,
-                "value": "NewEventsFunctionsExtension::Function"
+                "value": "NewEventsFunctionsExtension::MyBehavior::Function"
               },
               "parameters": [
                 "NewObject",
                 "MyBehavior",
-                "\"Hello world\"",
+                "\"Hello World \" + ToString(NewObject.MyBehavior::Expression(NewObject.MyBehavior::Expression(40)))",
                 ""
               ],
               "subInstructions": []
@@ -279,7 +279,7 @@
           "description": "",
           "fullName": "My Behavior",
           "name": "MyBehavior",
-          "objectType": "",
+          "objectType": "TextObject::Text",
           "eventsFunctions": [
             {
               "description": "",
@@ -438,6 +438,64 @@
                   "optional": false,
                   "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
                   "type": "behavior"
+                }
+              ],
+              "objectGroups": []
+            },
+            {
+              "description": "This is a test Expression",
+              "fullName": "Test Expression",
+              "functionType": "Expression",
+              "name": "Expression",
+              "sentence": "",
+              "events": [
+                {
+                  "disabled": false,
+                  "folded": false,
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "conditions": [],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetReturnNumber"
+                      },
+                      "parameters": [
+                        "GetArgumentAsNumber(\"Value\") + 1"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ],
+              "parameters": [
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Object",
+                  "name": "Object",
+                  "optional": false,
+                  "supplementaryInformation": "TextObject::Text",
+                  "type": "object"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "Behavior",
+                  "name": "Behavior",
+                  "optional": false,
+                  "supplementaryInformation": "NewEventsFunctionsExtension::MyBehavior",
+                  "type": "behavior"
+                },
+                {
+                  "codeOnly": false,
+                  "defaultValue": "",
+                  "description": "A number",
+                  "name": "Value",
+                  "optional": false,
+                  "supplementaryInformation": "",
+                  "type": "expression"
                 }
               ],
               "objectGroups": []

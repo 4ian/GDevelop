@@ -71,4 +71,6 @@ bool ArbitraryEventsWorker::VisitInstruction(gd::Instruction& instruction,
   return DoVisitInstruction(instruction, isCondition);
 }
 
+ArbitraryEventsWorkerWithContext::~ArbitraryEventsWorkerWithContext() {}
+
 }  // namespace gd

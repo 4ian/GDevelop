@@ -135,6 +135,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     gd.EventsFunctionTools.eventsFunctionToObjectsContainer(
       project,
       eventsFunction,
+      this._globalObjectsContainer,
       this._objectsContainer
     );
   };
@@ -255,7 +256,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       this.state.selectedEventsFunction &&
       gd.compare(eventsFunction, this.state.selectedEventsFunction)
     ) {
-      this._selectEventsFunction(null, null);
+      this._selectEventsFunction(null, this.state.selectedEventsBasedBehavior);
     }
 
     cb(true);

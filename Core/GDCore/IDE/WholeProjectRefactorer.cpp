@@ -138,6 +138,60 @@ void WholeProjectRefactorer::ExposeProjectEvents(
   }
 }
 
+std::set<gd::String>
+WholeProjectRefactorer::GetAllObjectTypesUsingEventsBasedBehavior(
+    const gd::Project& project,
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsBasedBehavior& eventsBasedBehavior) {
+  std::set<gd::String> allTypes;
+  const gd::String behaviorType = GetBehaviorFullType(
+      eventsFunctionsExtension.GetName(), eventsBasedBehavior.GetName());
+
+  auto addTypesOfObjectsIn =
+      [&allTypes, &behaviorType](const gd::ObjectsContainer& objectsContainer) {
+        for (auto& object : objectsContainer.GetObjects()) {
+          for (auto& behaviorContent : object->GetAllBehaviorContents()) {
+            if (behaviorContent.second->GetTypeName() == behaviorType) {
+              allTypes.insert(object->GetType());
+            }
+          }
+        }
+      };
+
+  addTypesOfObjectsIn(project);
+  for (std::size_t s = 0; s < project.GetLayoutsCount(); s++) {
+    auto& layout = project.GetLayout(s);
+    addTypesOfObjectsIn(layout);
+  }
+
+  return allTypes;
+}
+
+void WholeProjectRefactorer::EnsureBehaviorEventsFunctionsProperParameters(
+    const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+    const gd::EventsBasedBehavior& eventsBasedBehavior) {
+  for (auto& eventsFunction :
+       eventsBasedBehavior.GetEventsFunctions().GetInternalVector()) {
+    auto& parameters = eventsFunction->GetParameters();
+    while (parameters.size() < 2) {
+      gd::ParameterMetadata newParameter;
+      parameters.push_back(newParameter);
+    }
+
+    parameters[0]
+        .SetType("object")
+        .SetName("Object")
+        .SetDescription("Object")
+        .SetExtraInfo(eventsBasedBehavior.GetObjectType());
+    parameters[1]
+        .SetType("behavior")
+        .SetName("Behavior")
+        .SetDescription("Behavior")
+        .SetExtraInfo(GetBehaviorFullType(eventsFunctionsExtension.GetName(),
+                                          eventsBasedBehavior.GetName()));
+  }
+}
+
 void WholeProjectRefactorer::RenameEventsFunctionsExtension(
     gd::Project& project,
     const gd::EventsFunctionsExtension& eventsFunctionsExtension,

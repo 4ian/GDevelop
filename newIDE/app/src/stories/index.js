@@ -121,7 +121,7 @@ import ChangelogDialog from '../MainFrame/Changelog/ChangelogDialog';
 import EventsFunctionExtractorDialog from '../EventsSheet/EventsFunctionExtractor/EventsFunctionExtractorDialog';
 import FixedHeightFlexContainer from './FixedHeightFlexContainer';
 import EventsBasedBehaviorEditor from '../EventsBasedBehaviorEditor';
-import { EventsBasedBehaviorEditorDialog } from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
+import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
 
@@ -1933,12 +1933,14 @@ storiesOf('EventsBasedBehaviorEditor', module)
   .add('default', () => (
     <EventsBasedBehaviorEditor
       project={project}
+      eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEventsBasedBehavior}
     />
   ))
   .add('events based behavior without functions', () => (
     <EventsBasedBehaviorEditor
       project={project}
+      eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEmptyEventsBasedBehavior}
     />
   ));
@@ -1950,6 +1952,7 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
   .add('default', () => (
     <EventsBasedBehaviorEditorDialog
       project={project}
+      eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEventsBasedBehavior}
       onCancel={action('cancel')}
       onApply={action('apply')}
@@ -1958,6 +1961,7 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
   .add('events based behavior without functions', () => (
     <EventsBasedBehaviorEditorDialog
       project={project}
+      eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEmptyEventsBasedBehavior}
       onCancel={action('cancel')}
       onApply={action('apply')}

@@ -15,6 +15,7 @@ type Props = {|
   value: string,
   onChange: string => void,
   disabled?: boolean,
+  allowedObjectTypes?: ?Array<string>,
 |};
 type State = {|
   objectMetadata: Array<EnumeratedObjectMetadata>,
@@ -26,8 +27,20 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
   };
 
   render() {
-    const { disabled, value, onChange, floatingLabelText } = this.props;
+    const {
+      disabled,
+      value,
+      onChange,
+      floatingLabelText,
+      allowedObjectTypes,
+    } = this.props;
     const { objectMetadata } = this.state;
+
+    const isDisabled = (type: string) => {
+      if (!allowedObjectTypes) return false;
+
+      return allowedObjectTypes.indexOf(type) === -1;
+    };
 
     return (
       <SelectField
@@ -40,7 +53,11 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
         disabled={disabled}
         fullWidth
       >
-        <MenuItem value="" primaryText={<Trans>Any object</Trans>} />
+        <MenuItem
+          value=""
+          primaryText={<Trans>Any object</Trans>}
+          disabled={isDisabled('')}
+        />
         {objectMetadata.map((metadata: EnumeratedObjectMetadata) => {
           if (metadata.name === '') {
             // Base object is an "abstract" object
@@ -52,6 +69,7 @@ export default class ObjectTypeSelector extends React.Component<Props, State> {
               key={metadata.name}
               value={metadata.name}
               primaryText={metadata.fullName}
+              disabled={isDisabled(metadata.name)}
             />
           );
         })}

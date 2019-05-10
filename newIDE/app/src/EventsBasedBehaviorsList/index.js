@@ -12,7 +12,6 @@ import {
   enumerateEventsBasedBehaviors,
   filterEventsBasedBehaviorsList,
 } from './EnumerateEventsBasedBehaviors';
-import { EventsBasedBehaviorEditorDialog } from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
 
 const styles = {
   listContainer: {
@@ -22,7 +21,6 @@ const styles = {
 
 type State = {|
   renamedEventsBasedBehavior: ?gdEventsBasedBehavior,
-  editedEventsBasedBehavior: ?gdEventsBasedBehavior,
   searchText: string,
 |};
 
@@ -42,6 +40,7 @@ type Props = {|
     newName: string,
     cb: (boolean) => void
   ) => void,
+  onEditProperties: (eventsBasedBehavior: gdEventsBasedBehavior) => void,
 |};
 
 export default class EventsBasedBehaviorsList extends React.Component<
@@ -63,7 +62,6 @@ export default class EventsBasedBehaviorsList extends React.Component<
   sortableList: any;
   state: State = {
     renamedEventsBasedBehavior: null,
-    editedEventsBasedBehavior: null,
     searchText: '',
   };
 
@@ -135,7 +133,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
     return [
       {
         label: 'Properties',
-        click: () => this._editProperties(eventsBasedBehavior),
+        click: () => this.props.onEditProperties(eventsBasedBehavior),
       },
       {
         type: 'separator',
@@ -164,11 +162,6 @@ export default class EventsBasedBehaviorsList extends React.Component<
     this.forceUpdate();
   };
 
-  _editProperties = (editedEventsBasedBehavior: ?gdEventsBasedBehavior) =>
-    this.setState({
-      editedEventsBasedBehavior,
-    });
-
   render() {
     const {
       project,
@@ -176,7 +169,7 @@ export default class EventsBasedBehaviorsList extends React.Component<
       selectedEventsBasedBehavior,
       onSelectEventsBasedBehavior,
     } = this.props;
-    const { searchText, editedEventsBasedBehavior } = this.state;
+    const { searchText } = this.state;
 
     const list = [
       ...filterEventsBasedBehaviorsList(
@@ -229,14 +222,6 @@ export default class EventsBasedBehaviorsList extends React.Component<
             })
           }
         />
-        {editedEventsBasedBehavior && (
-          <EventsBasedBehaviorEditorDialog
-            project={project}
-            eventsBasedBehavior={editedEventsBasedBehavior}
-            onCancel={() => this._editProperties(null)}
-            onApply={() => this._editProperties(null)}
-          />
-        )}
       </Background>
     );
   }

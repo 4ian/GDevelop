@@ -2132,6 +2132,7 @@ describe('libGD.js', function() {
         false
       );
     });
+    // See other tests in WholeProjectRefactorer.cpp
   });
 
   describe('gd.ExpressionParser and gd.CallbacksForExpressionCorrectnessTesting', function() {

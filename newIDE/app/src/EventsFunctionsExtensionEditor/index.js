@@ -14,7 +14,7 @@ import EventsBasedBehaviorsList from '../EventsBasedBehaviorsList';
 import Background from '../UI/Background';
 import OptionsEditorDialog from './OptionsEditorDialog';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import { mapVector } from '../Utils/MapFor';
+import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
 import {
   type ResourceSource,
   type ChooseResourceFunction,
@@ -49,44 +49,11 @@ type Props = {|
 type State = {|
   selectedEventsFunction: ?gdEventsFunction,
   selectedEventsBasedBehavior: ?gdEventsBasedBehavior,
+  editedEventsBasedBehavior: ?gdEventsBasedBehavior,
   editOptionsDialogOpen: boolean,
   behaviorMethodSelectorDialogOpen: boolean,
   onAddEventsFunctionCb: ?(doAdd: boolean, name: ?string) => void,
 |};
-
-// TODO: Move this to the loader file?
-const setDefaultBehaviorEventsFunctionParameters = (
-  eventsFunctionsExtension: gdEventsFunctionsExtension,
-  eventsBasedBehavior: gdEventsBasedBehavior,
-  eventsFunction: gdEventsFunction
-) => {
-  const parameters = eventsFunction.getParameters();
-  if (parameters.size() < 1) {
-    const newParameter = new gd.ParameterMetadata();
-    parameters.push_back(newParameter);
-    newParameter.delete();
-  }
-  if (parameters.size() < 2) {
-    const newParameter = new gd.ParameterMetadata();
-    parameters.push_back(newParameter);
-    newParameter.delete();
-  }
-
-  parameters
-    .at(0)
-    .setType('object')
-    .setName('Object')
-    .setDescription('Object')
-    .setExtraInfo(eventsBasedBehavior.getObjectType());
-  parameters
-    .at(1)
-    .setType('behavior')
-    .setName('Behavior')
-    .setDescription('Behavior')
-    .setExtraInfo(
-      eventsFunctionsExtension.getName() + '::' + eventsBasedBehavior.getName()
-    );
-};
 
 export default class EventsFunctionsExtensionEditor extends React.Component<
   Props,
@@ -95,6 +62,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
   state = {
     selectedEventsFunction: null,
     selectedEventsBasedBehavior: null,
+    editedEventsBasedBehavior: null,
     editOptionsDialogOpen: false,
     behaviorMethodSelectorDialogOpen: false,
     onAddEventsFunctionCb: null,
@@ -368,16 +336,36 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
     eventsBasedBehavior: gdEventsBasedBehavior,
     eventsFunction: gdEventsFunction
   ) => {
-    setDefaultBehaviorEventsFunctionParameters(
+    // This will create the mandatory parameters for the newly added function.
+    gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
       this.props.eventsFunctionsExtension,
-      eventsBasedBehavior,
-      eventsFunction
+      eventsBasedBehavior
     );
   };
 
   _editOptions = (open: boolean = true) => {
     this.setState({
       editOptionsDialogOpen: open,
+    });
+  };
+
+  _editBehaviorProperties = (
+    editedEventsBasedBehavior: ?gdEventsBasedBehavior
+  ) => {
+    this.setState(state => {
+      // If we're closing the properties of a behavior, ensure parameters
+      // are up-to-date in all event functions of the behavior (the object
+      // type might have changed).
+      if (state.editedEventsBasedBehavior && !editedEventsBasedBehavior) {
+        gd.WholeProjectRefactorer.ensureBehaviorEventsFunctionsProperParameters(
+          this.props.eventsFunctionsExtension,
+          state.editedEventsBasedBehavior
+        );
+      }
+
+      return {
+        editedEventsBasedBehavior,
+      };
     });
   };
 
@@ -388,6 +376,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
       selectedEventsBasedBehavior,
       editOptionsDialogOpen,
       behaviorMethodSelectorDialogOpen,
+      editedEventsBasedBehavior,
     } = this.state;
 
     return (
@@ -556,6 +545,22 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                           eventsFunction
                         )
                       }
+                      renderHeader={() => (
+                        <React.Fragment>
+                          <Line justifyContent="center">
+                            <FlatButton
+                              label={<Trans>Edit behavior properties</Trans>}
+                              primary
+                              onClick={() =>
+                                this._editBehaviorProperties(
+                                  selectedEventsBasedBehavior
+                                )
+                              }
+                            />
+                          </Line>
+                          <Divider />
+                        </React.Fragment>
+                      )}
                     />
                   </MosaicWindow>
                 ) : (
@@ -588,6 +593,7 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                       onRenameEventsBasedBehavior={this._makeRenameEventsBasedBehavior(
                         i18n
                       )}
+                      onEditProperties={this._editBehaviorProperties}
                     />
                   </MosaicWindow>
                 ),
@@ -628,6 +634,15 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                   }
                 />
               )}
+            {editedEventsBasedBehavior && (
+              <EventsBasedBehaviorEditorDialog
+                project={project}
+                eventsFunctionsExtension={eventsFunctionsExtension}
+                eventsBasedBehavior={editedEventsBasedBehavior}
+                onCancel={() => this._editBehaviorProperties(null)}
+                onApply={() => this._editBehaviorProperties(null)}
+              />
+            )}
           </React.Fragment>
         )}
       </I18n>

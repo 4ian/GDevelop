@@ -1526,6 +1526,8 @@ interface WholeProjectRefactorer {
     void STATIC_ObjectRemovedInLayout([Ref] Project project, [Ref] Layout layout, [Const] DOMString objectName, boolean removeEventsAndGroups);
     void STATIC_GlobalObjectRenamed([Ref] Project project, [Const] DOMString oldName, [Const] DOMString newName);
     void STATIC_GlobalObjectRemoved([Ref] Project project, [Const] DOMString objectName, boolean removeEventsAndGroups);
+    [Value] SetString STATIC_GetAllObjectTypesUsingEventsBasedBehavior([Const, Ref] Project project, [Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
+    void STATIC_EnsureBehaviorEventsFunctionsProperParameters([Const, Ref] EventsFunctionsExtension eventsFunctionsExtension, [Const, Ref] EventsBasedBehavior eventsBasedBehavior);
 };
 
 interface ExtensionAndBehaviorMetadata {

@@ -5,6 +5,7 @@
  */
 #ifndef GDCORE_WHOLEPROJECTREFACTORER_H
 #define GDCORE_WHOLEPROJECTREFACTORER_H
+#include <set>
 #include <vector>
 namespace gd {
 class Project;
@@ -127,6 +128,24 @@ class GD_CORE_API WholeProjectRefactorer {
                                   const gd::String& objectName,
                                   bool removeEventsAndGroups = true);
 
+  /**
+   * \brief Return the set of all the types of the objects that are using the
+   * given behavior.
+   */
+  static std::set<gd::String> GetAllObjectTypesUsingEventsBasedBehavior(
+      const gd::Project& project,
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::EventsBasedBehavior& eventsBasedBehavior);
+
+  /**
+   * \brief Ensure (adding if necessary) that the functions of the given
+   * behavior have the proper mandatory parameters (the "Object" and
+   * "Behavior").
+   */
+  static void EnsureBehaviorEventsFunctionsProperParameters(
+      const gd::EventsFunctionsExtension& eventsFunctionsExtension,
+      const gd::EventsBasedBehavior& eventsBasedBehavior);
+
   virtual ~WholeProjectRefactorer(){};
 
  private:
@@ -139,8 +158,8 @@ class GD_CORE_API WholeProjectRefactorer {
                                      const gd::String& newFullType);
 
   static void DoRenameBehavior(gd::Project& project,
-                                     const gd::String& oldBehaviorType,
-                                     const gd::String& newBehaviorType);
+                               const gd::String& oldBehaviorType,
+                               const gd::String& newBehaviorType);
 
   WholeProjectRefactorer(){};
 };

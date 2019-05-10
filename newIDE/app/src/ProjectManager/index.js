@@ -459,26 +459,26 @@ export default class ProjectManager extends React.Component<Props, State> {
   };
 
   _copyEventsFunctionsExtension = (
-    externalLayout: gdEventsFunctionsExtension
+    eventsFunctionsExtension: gdEventsFunctionsExtension
   ) => {
     Clipboard.set(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND, {
-      externalLayout: serializeToJSObject(externalLayout),
-      name: externalLayout.getName(),
+      eventsFunctionsExtension: serializeToJSObject(eventsFunctionsExtension),
+      name: eventsFunctionsExtension.getName(),
     });
   };
 
   _cutEventsFunctionsExtension = (
-    externalLayout: gdEventsFunctionsExtension
+    eventsFunctionsExtension: gdEventsFunctionsExtension
   ) => {
-    this._copyEventsFunctionsExtension(externalLayout);
-    this.props.onDeleteEventsFunctionsExtension(externalLayout);
+    this._copyEventsFunctionsExtension(eventsFunctionsExtension);
+    this.props.onDeleteEventsFunctionsExtension(eventsFunctionsExtension);
   };
 
   _pasteEventsFunctionsExtension = (index: number) => {
     if (!Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)) return;
 
     const {
-      externalLayout: copiedEventsFunctionsExtension,
+      eventsFunctionsExtension: copiedEventsFunctionsExtension,
       name,
     } = Clipboard.get(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND);
     const { project } = this.props;
@@ -494,7 +494,9 @@ export default class ProjectManager extends React.Component<Props, State> {
 
     unserializeFromJSObject(
       newEventsFunctionsExtension,
-      copiedEventsFunctionsExtension
+      copiedEventsFunctionsExtension,
+      'unserializeFrom',
+      project
     );
     newEventsFunctionsExtension.setName(newName);
 
@@ -897,7 +899,7 @@ export default class ProjectManager extends React.Component<Props, State> {
                     }
                     onPaste={() => this._pasteEventsFunctionsExtension(i)}
                     canPaste={() =>
-                      Clipboard.has(EXTERNAL_LAYOUT_CLIPBOARD_KIND)
+                      Clipboard.has(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND)
                     }
                     canMoveUp={i !== 0}
                     onMoveUp={() => this._moveUpEventsFunctionsExtension(i)}

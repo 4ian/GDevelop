@@ -323,7 +323,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     const { layout: copiedLayout, name } = Clipboard.get(LAYOUT_CLIPBOARD_KIND);
     const { project } = this.props;
 
-    const newName = newNameGenerator('CopyOf' + name, name =>
+    const newName = newNameGenerator(name, name =>
       project.hasLayoutNamed(name)
     );
 
@@ -377,7 +377,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     const { project } = this.props;
 
-    const newName = newNameGenerator('CopyOf' + name, name =>
+    const newName = newNameGenerator(name, name =>
       project.hasExternalEventsNamed(name)
     );
 
@@ -430,7 +430,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     );
     const { project } = this.props;
 
-    const newName = newNameGenerator('CopyOf' + name, name =>
+    const newName = newNameGenerator(name, name =>
       project.hasExternalLayoutNamed(name)
     );
 
@@ -483,7 +483,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     } = Clipboard.get(EVENTS_FUNCTIONS_EXTENSION_CLIPBOARD_KIND);
     const { project } = this.props;
 
-    const newName = newNameGenerator('CopyOf' + name, name =>
+    const newName = newNameGenerator(name, name =>
       project.hasEventsFunctionsExtensionNamed(name)
     );
 

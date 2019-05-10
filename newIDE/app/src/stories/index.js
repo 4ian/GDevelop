@@ -1954,7 +1954,6 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
       project={project}
       eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEventsBasedBehavior}
-      onCancel={action('cancel')}
       onApply={action('apply')}
     />
   ))
@@ -1963,7 +1962,6 @@ storiesOf('EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog', module)
       project={project}
       eventsFunctionsExtension={testEventsFunctionsExtension}
       eventsBasedBehavior={testEmptyEventsBasedBehavior}
-      onCancel={action('cancel')}
       onApply={action('apply')}
     />
   ));

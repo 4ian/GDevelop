@@ -639,7 +639,6 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                 project={project}
                 eventsFunctionsExtension={eventsFunctionsExtension}
                 eventsBasedBehavior={editedEventsBasedBehavior}
-                onCancel={() => this._editBehaviorProperties(null)}
                 onApply={() => this._editBehaviorProperties(null)}
               />
             )}

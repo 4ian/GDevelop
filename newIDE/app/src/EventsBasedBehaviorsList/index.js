@@ -128,7 +128,8 @@ export default class EventsBasedBehaviorsList extends React.Component<
   };
 
   _renderEventsBasedBehaviorMenuTemplate = (
-    eventsBasedBehavior: gdEventsBasedBehavior
+    eventsBasedBehavior: gdEventsBasedBehavior,
+    _index: number
   ) => {
     return [
       {

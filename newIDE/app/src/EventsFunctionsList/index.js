@@ -12,6 +12,13 @@ import {
   enumerateEventsFunctions,
   filterEventFunctionsList,
 } from './EnumerateEventsFunctions';
+import Clipboard from '../Utils/Clipboard';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+
+const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 
 const styles = {
   listContainer: {
@@ -63,14 +70,19 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     searchText: '',
   };
 
-  _deleteEventsFunction = (eventsFunction: gdEventsFunction) => {
+  _deleteEventsFunction = (
+    eventsFunction: gdEventsFunction,
+    { askForConfirmation }: {| askForConfirmation: boolean |}
+  ) => {
     const { eventsFunctionsContainer } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
-      "Are you sure you want to remove this function? This can't be undone."
-    );
-    if (!answer) return;
+    if (askForConfirmation) {
+      //eslint-disable-next-line
+      const answer = confirm(
+        "Are you sure you want to remove this function? This can't be undone."
+      );
+      if (!answer) return;
+    }
 
     this.props.onDeleteEventsFunction(eventsFunction, doRemove => {
       if (!doRemove) return;
@@ -121,7 +133,51 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
-  _renderEventsFunctionMenuTemplate = (eventsFunction: gdEventsFunction) => {
+  _copyEventsFunction = (eventsFunction: gdEventsFunction) => {
+    Clipboard.set(EVENTS_FUNCTION_CLIPBOARD_KIND, {
+      eventsFunction: serializeToJSObject(eventsFunction),
+      name: eventsFunction.getName(),
+    });
+  };
+
+  _cutEventsFunction = (eventsFunction: gdEventsFunction) => {
+    this._copyEventsFunction(eventsFunction);
+    this._deleteEventsFunction(eventsFunction, { askForConfirmation: false });
+  };
+
+  _pasteEventsFunction = (index: number) => {
+    if (!Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND)) return;
+
+    const { eventsFunction: copiedEventsFunction, name } = Clipboard.get(
+      EVENTS_FUNCTION_CLIPBOARD_KIND
+    );
+    const { project, eventsFunctionsContainer } = this.props;
+
+    const newName = newNameGenerator(name, name =>
+      eventsFunctionsContainer.hasEventsFunctionNamed(name)
+    );
+
+    const newEventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
+      newName,
+      index
+    );
+
+    unserializeFromJSObject(
+      newEventsFunction,
+      copiedEventsFunction,
+      'unserializeFrom',
+      project
+    );
+    newEventsFunction.setName(newName);
+    this.props.onEventsFunctionAdded(newEventsFunction);
+
+    this.forceUpdate();
+  };
+
+  _renderEventsFunctionMenuTemplate = (
+    eventsFunction: gdEventsFunction,
+    index: number
+  ) => {
     return [
       {
         label: 'Rename',
@@ -130,7 +186,26 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       },
       {
         label: 'Remove',
-        click: () => this._deleteEventsFunction(eventsFunction),
+        click: () =>
+          this._deleteEventsFunction(eventsFunction, {
+            askForConfirmation: true,
+          }),
+      },
+      {
+        type: 'separator',
+      },
+      {
+        label: 'Copy',
+        click: () => this._copyEventsFunction(eventsFunction),
+      },
+      {
+        label: 'Cut',
+        click: () => this._cutEventsFunction(eventsFunction),
+      },
+      {
+        label: 'Paste',
+        enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
+        click: () => this._pasteEventsFunction(index),
       },
     ];
   };

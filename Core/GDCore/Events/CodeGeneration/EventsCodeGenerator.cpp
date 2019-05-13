@@ -448,33 +448,21 @@ gd::String EventsCodeGenerator::GenerateConditionsListCode(
   return outputCode;
 }
 
-/**
- * Generate code for an action.
- */
-gd::String EventsCodeGenerator::GenerateActionCode(
-    gd::Instruction& action, EventsCodeGenerationContext& context) {
-  gd::String actionCode;
-
-  gd::InstructionMetadata instrInfos =
-      MetadataProvider::GetActionMetadata(platform, action.GetType());
-
-  AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
-
-  if (instrInfos.codeExtraInformation.HasCustomCodeGenerator()) {
-    return instrInfos.codeExtraInformation.customCodeGenerator(
-        action, *this, context);
-  }
-
+// TODO: Could be moved to a EventsValidator
+void EventsCodeGenerator::ValidateAction(
+    gd::InstructionMetadata& instructionMetadata, gd::Instruction& action) {
   // Be sure there is no lack of parameter.
-  while (action.GetParameters().size() < instrInfos.parameters.size()) {
+  while (action.GetParameters().size() <
+         instructionMetadata.parameters.size()) {
     vector<gd::Expression> parameters = action.GetParameters();
     parameters.push_back(gd::Expression(""));
     action.SetParameters(parameters);
   }
 
   // Verify that there are not mismatch between object type in parameters
-  for (std::size_t pNb = 0; pNb < instrInfos.parameters.size(); ++pNb) {
-    if (ParameterMetadata::IsObject(instrInfos.parameters[pNb].type)) {
+  for (std::size_t pNb = 0; pNb < instructionMetadata.parameters.size();
+       ++pNb) {
+    if (ParameterMetadata::IsObject(instructionMetadata.parameters[pNb].type)) {
       gd::String objectInParameter = action.GetParameter(pNb).GetPlainString();
       if (!GetObjectsAndGroups().HasObjectNamed(objectInParameter) &&
           !GetGlobalObjectsAndGroups().HasObjectNamed(objectInParameter) &&
@@ -483,89 +471,18 @@ gd::String EventsCodeGenerator::GenerateActionCode(
               objectInParameter)) {
         action.SetParameter(pNb, gd::Expression(""));
         action.SetType("");
-      } else if (!instrInfos.parameters[pNb].supplementaryInformation.empty() &&
+      } else if (!instructionMetadata.parameters[pNb]
+                      .supplementaryInformation.empty() &&
                  gd::GetTypeOfObject(GetGlobalObjectsAndGroups(),
                                      GetObjectsAndGroups(),
                                      objectInParameter) !=
-                     instrInfos.parameters[pNb].supplementaryInformation) {
+                     instructionMetadata.parameters[pNb]
+                         .supplementaryInformation) {
         action.SetParameter(pNb, gd::Expression(""));
         action.SetType("");
       }
     }
   }
-
-  // Call free function first if available
-  if (MetadataProvider::HasAction(platform, action.GetType())) {
-    vector<gd::String> arguments = GenerateParametersCodes(
-        action.GetParameters(), instrInfos.parameters, context);
-    actionCode += GenerateFreeAction(arguments, instrInfos, context);
-  }
-
-  // Call object function if available
-  gd::String objectName = action.GetParameters().empty()
-                              ? ""
-                              : action.GetParameter(0).GetPlainString();
-  gd::String objectType = gd::GetTypeOfObject(
-      GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
-  if (MetadataProvider::HasObjectAction(
-          platform, objectType, action.GetType()) &&
-      !instrInfos.parameters.empty()) {
-    std::vector<gd::String> realObjects =
-        ExpandObjectsName(objectName, context);
-    for (std::size_t i = 0; i < realObjects.size(); ++i) {
-      // Setup context
-      const ObjectMetadata& objInfo =
-          MetadataProvider::GetObjectMetadata(platform, objectType);
-      AddIncludeFiles(objInfo.includeFiles);
-      context.SetCurrentObject(realObjects[i]);
-      context.ObjectsListNeeded(realObjects[i]);
-
-      // Prepare arguments and generate the whole action code
-      vector<gd::String> arguments = GenerateParametersCodes(
-          action.GetParameters(), instrInfos.parameters, context);
-      actionCode += GenerateObjectAction(
-          realObjects[i], objInfo, arguments, instrInfos, context);
-
-      context.SetNoCurrentObject();
-    }
-  }
-
-  // Assign to a behavior member function if found
-  gd::String behaviorType =
-      gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
-                            GetObjectsAndGroups(),
-                            action.GetParameters().size() < 2
-                                ? ""
-                                : action.GetParameter(1).GetPlainString());
-  if (MetadataProvider::HasBehaviorAction(
-          platform, behaviorType, action.GetType()) &&
-      instrInfos.parameters.size() >= 2) {
-    std::vector<gd::String> realObjects =
-        ExpandObjectsName(objectName, context);
-    for (std::size_t i = 0; i < realObjects.size(); ++i) {
-      // Setup context
-      const BehaviorMetadata& autoInfo =
-          MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
-      AddIncludeFiles(autoInfo.includeFiles);
-      context.SetCurrentObject(realObjects[i]);
-      context.ObjectsListNeeded(realObjects[i]);
-
-      // Prepare arguments and generate the whole action code
-      vector<gd::String> arguments = GenerateParametersCodes(
-          action.GetParameters(), instrInfos.parameters, context);
-      actionCode +=
-          GenerateBehaviorAction(realObjects[i],
-                                 action.GetParameter(1).GetPlainString(),
-                                 autoInfo,
-                                 arguments,
-                                 instrInfos,
-                                 context);
-
-      context.SetNoCurrentObject();
-    }
-  }
-
-  return actionCode;
 }
 
 /**
@@ -574,16 +491,168 @@ gd::String EventsCodeGenerator::GenerateActionCode(
 gd::String EventsCodeGenerator::GenerateActionsListCode(
     gd::InstructionsList& actions, EventsCodeGenerationContext& context) {
   gd::String outputCode;
+
+  // Generation of actions related to a same object (or same group)
+  // is batched, so that we only iterate once on the objects, and not
+  // one time for every action.
+  gd::String batchedObjectName;
+  gd::String batchedObjectType;
+  std::vector<gd::Instruction*> batchedActions;
+  auto generateBatchedObjectActionsCode = [&]() {
+    if (batchedActions.empty()) {
+      return gd::String("");
+    }
+
+    gd::String batchedActionsCode;
+
+    std::vector<gd::String> realObjects =
+        ExpandObjectsName(batchedObjectName, context);
+    for (std::size_t i = 0; i < realObjects.size(); ++i) {
+      // Setup context
+      context.SetCurrentObject(realObjects[i]);
+      context.ObjectsListNeeded(realObjects[i]);
+
+      gd::String actionsCode =
+          batchedActions.size() > 1
+              ? "/*Batching for " + batchedObjectName + "*/\n"
+              : "/*No batching for " + batchedObjectName + "*/\n";
+
+      for (auto& actionPtr : batchedActions) {
+        auto& action = *actionPtr;
+        gd::InstructionMetadata instrInfos =
+            MetadataProvider::GetActionMetadata(platform, action.GetType());
+
+        if (MetadataProvider::HasObjectAction(
+                platform, batchedObjectType, action.GetType()) &&
+            !instrInfos.parameters.empty()) {
+          const ObjectMetadata& objInfo =
+              MetadataProvider::GetObjectMetadata(platform, batchedObjectType);
+          AddIncludeFiles(objInfo.includeFiles);
+
+          // Prepare arguments and generate the whole action code
+          vector<gd::String> arguments = GenerateParametersCodes(
+              action.GetParameters(),
+              instrInfos.parameters,
+              context);  // TODO: FACTOR or move into Generate function?
+          actionsCode += GenerateObjectAction(
+              realObjects[i], objInfo, arguments, instrInfos, context);
+        } else {
+          gd::String behaviorType = gd::GetTypeOfBehavior(
+              GetGlobalObjectsAndGroups(),
+              GetObjectsAndGroups(),
+              action.GetParameters().size() < 2
+                  ? ""
+                  : action.GetParameter(1).GetPlainString());
+          if (MetadataProvider::HasBehaviorAction(
+                  platform, behaviorType, action.GetType()) &&
+              instrInfos.parameters.size() >= 2) {
+            // Setup context
+            const BehaviorMetadata& autoInfo =
+                MetadataProvider::GetBehaviorMetadata(platform, behaviorType);
+            AddIncludeFiles(autoInfo.includeFiles);
+
+            // Prepare arguments and generate the whole action code
+            vector<gd::String> arguments = GenerateParametersCodes(
+                action.GetParameters(),
+                instrInfos.parameters,
+                context);  // TODO: FACTOR or move into Generate function?
+            actionsCode +=
+                GenerateBehaviorAction(realObjects[i],
+                                       action.GetParameter(1).GetPlainString(),
+                                       autoInfo,
+                                       arguments,
+                                       instrInfos,
+                                       context);
+          }
+        }
+      }
+      batchedActionsCode +=
+          GenerateObjectLoop(realObjects[i], context, actionsCode); //TODO: use for conditions too
+      context.SetNoCurrentObject();
+    }
+
+    batchedObjectName = "";
+    batchedObjectType = "";
+    batchedActions.clear();
+
+    return batchedActionsCode;
+  };
+
+  // Defer the generation of the object (or behavior) action.
+  auto batchObjectAction = [&](const gd::String& objectName,
+                               const gd::String& objectType,
+                               gd::Instruction& action) {
+    gd::String outputCode;
+    if (objectName != batchedObjectName || objectType != batchedObjectType) {
+      // Dump any batched action for a different object before.
+      outputCode += generateBatchedObjectActionsCode();
+      batchedObjectName = objectName;
+      batchedObjectType = objectType;
+    }
+
+    batchedActions.push_back(&action);
+
+    return outputCode;
+  };
+
   for (std::size_t aId = 0; aId < actions.size(); ++aId) {
+    gd::Instruction& action = actions[aId];
     gd::InstructionMetadata instrInfos =
         MetadataProvider::GetActionMetadata(platform, actions[aId].GetType());
 
-    gd::String actionCode = GenerateActionCode(actions[aId], context);
+    AddIncludeFiles(instrInfos.codeExtraInformation.GetIncludeFiles());
 
-    outputCode += "{";
-    if (!actions[aId].GetType().empty()) outputCode += actionCode;
-    outputCode += "}";
+    // Generate custom code if needed
+    if (instrInfos.codeExtraInformation.HasCustomCodeGenerator()) {
+      outputCode += generateBatchedObjectActionsCode();  // Dump any batched
+                                                         // action before.
+      outputCode += instrInfos.codeExtraInformation.customCodeGenerator(
+          action, *this, context);
+    } else {
+      // No custom code
+      ValidateAction(instrInfos, action);
+
+      // Call free function first if available
+      if (MetadataProvider::HasAction(platform, action.GetType())) {
+        outputCode += generateBatchedObjectActionsCode();  // Dump any batched
+                                                           // action before.
+
+        vector<gd::String> arguments = GenerateParametersCodes(
+            action.GetParameters(),
+            instrInfos.parameters,
+            context);  // TODO: FACTOR or move into Generate function?
+        outputCode += GenerateFreeAction(arguments, instrInfos, context);
+      }
+
+      // Call object function if available
+      gd::String objectName = action.GetParameters().empty()
+                                  ? ""
+                                  : action.GetParameter(0).GetPlainString();
+      gd::String objectType = gd::GetTypeOfObject(
+          GetGlobalObjectsAndGroups(), GetObjectsAndGroups(), objectName);
+      if (MetadataProvider::HasObjectAction(
+              platform, objectType, action.GetType()) &&
+          !instrInfos.parameters.empty()) {
+        outputCode += batchObjectAction(objectName, objectType, action);
+      }
+
+      // Assign to a behavior member function if found
+      gd::String behaviorType =
+          gd::GetTypeOfBehavior(GetGlobalObjectsAndGroups(),
+                                GetObjectsAndGroups(),
+                                action.GetParameters().size() < 2
+                                    ? ""
+                                    : action.GetParameter(1).GetPlainString());
+      if (MetadataProvider::HasBehaviorAction(
+              platform, behaviorType, action.GetType()) &&
+          instrInfos.parameters.size() >= 2) {
+        outputCode += batchObjectAction(objectName, objectType, action);
+      }
+    }
   }
+
+  // Dump any remaining batched actions.
+  outputCode += generateBatchedObjectActionsCode();
 
   return outputCode;
 }
@@ -1031,6 +1100,18 @@ gd::String EventsCodeGenerator::GenerateFreeAction(
   return call + ";\n";
 }
 
+gd::String EventsCodeGenerator::GenerateObjectLoop(
+    const gd::String& objectName,
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& innerLoopCode) {
+  gd::String loopCode; //TODO: For GDCpp
+  loopCode += "foreach("+objectName+") {\n";
+  loopCode += "    " + innerLoopCode + ";\n";
+  loopCode += "}\n";
+
+  return loopCode;
+}
+
 gd::String EventsCodeGenerator::GenerateObjectAction(
     const gd::String& objectName,
     const gd::ObjectMetadata& objInfo,
@@ -1056,14 +1137,13 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
           instrInfos.codeExtraInformation.functionCallName,
           2);
 
-    return "For each picked object \"" + objectName + "\", call " + call +
-           ".\n";
+    return "For object \"" + objectName + "\", call " + call + ".\n";
   } else {
     gd::String argumentsStr = GenerateArgumentsList(arguments, 1);
 
     call = instrInfos.codeExtraInformation.functionCallName + "(" +
            argumentsStr + ")";
-    return "For each picked object \"" + objectName + "\", call " + call + "(" +
+    return "For object \"" + objectName + "\", call " + call + "(" +
            argumentsStr + ").\n";
   }
 }
@@ -1093,14 +1173,14 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
           arguments,
           instrInfos.codeExtraInformation.functionCallName,
           2);
-    return "For each picked object \"" + objectName + "\", call " + call +
+    return "For object \"" + objectName + "\", call " + call +
            " for behavior \"" + behaviorName + "\".\n";
   } else {
     gd::String argumentsStr = GenerateArgumentsList(arguments, 2);
 
     call = instrInfos.codeExtraInformation.functionCallName + "(" +
            argumentsStr + ")";
-    return "For each picked object \"" + objectName + "\", call " + call + "(" +
+    return "For object \"" + objectName + "\", call " + call + "(" +
            argumentsStr + ")" + " for behavior \"" + behaviorName + "\".\n";
   }
 }

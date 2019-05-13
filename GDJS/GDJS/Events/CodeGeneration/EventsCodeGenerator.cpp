@@ -501,18 +501,16 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context) {
-  gd::String actionCode;
-
   // Prepare call
   gd::String objectPart = GetObjectListName(objectName, context) + "[i].";
 
   // Create call
-  gd::String call;
+  gd::String callCode;
   if (instrInfos.codeExtraInformation.type == "number" ||
       instrInfos.codeExtraInformation.type == "string") {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
-      call = GenerateOperatorCall(
+      callCode = GenerateOperatorCall(
           instrInfos,
           arguments,
           objectPart + instrInfos.codeExtraInformation.functionCallName,
@@ -521,29 +519,23 @@ gd::String EventsCodeGenerator::GenerateObjectAction(
           1);
     else if (instrInfos.codeExtraInformation.accessType ==
              gd::InstructionMetadata::ExtraInformation::Mutators)
-      call = GenerateMutatorCall(
+      callCode = GenerateMutatorCall(
           instrInfos,
           arguments,
           objectPart + instrInfos.codeExtraInformation.functionCallName,
           1);
     else
-      call = GenerateCompoundOperatorCall(
+      callCode = GenerateCompoundOperatorCall(
           instrInfos,
           arguments,
           objectPart + instrInfos.codeExtraInformation.functionCallName,
           1);
   } else {
-    call = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
-           GenerateArgumentsList(arguments, 1) + ")";
+    callCode = objectPart + instrInfos.codeExtraInformation.functionCallName +
+               "(" + GenerateArgumentsList(arguments, 1) + ")";
   }
 
-  actionCode +=
-      "for(var i = 0, len = " + GetObjectListName(objectName, context) +
-      ".length ;i < len;++i) {\n";
-  actionCode += "    " + call + ";\n";
-  actionCode += "}\n";
-
-  return actionCode;
+  return callCode + ";\n";
 }
 
 gd::String EventsCodeGenerator::GenerateBehaviorAction(
@@ -553,20 +545,17 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     const std::vector<gd::String>& arguments,
     const gd::InstructionMetadata& instrInfos,
     gd::EventsCodeGenerationContext& context) {
-  gd::String actionCode;
-
   // Prepare call
-  // Add a static_cast if necessary
   gd::String objectPart = GetObjectListName(objectName, context) +
                           "[i].getBehavior(\"" + behaviorName + "\").";
 
   // Create call
-  gd::String call;
+  gd::String callCode;
   if ((instrInfos.codeExtraInformation.type == "number" ||
        instrInfos.codeExtraInformation.type == "string")) {
     if (instrInfos.codeExtraInformation.accessType ==
         gd::InstructionMetadata::ExtraInformation::MutatorAndOrAccessor)
-      call = GenerateOperatorCall(
+      callCode = GenerateOperatorCall(
           instrInfos,
           arguments,
           objectPart + instrInfos.codeExtraInformation.functionCallName,
@@ -575,19 +564,19 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
           2);
     else if (instrInfos.codeExtraInformation.accessType ==
              gd::InstructionMetadata::ExtraInformation::Mutators)
-      call = GenerateMutatorCall(
+      callCode = GenerateMutatorCall(
           instrInfos,
           arguments,
           objectPart + instrInfos.codeExtraInformation.functionCallName,
           2);
     else
-      call = GenerateCompoundOperatorCall(
+      callCode = GenerateCompoundOperatorCall(
           instrInfos,
           arguments,
           objectPart + instrInfos.codeExtraInformation.functionCallName,
           2);
   } else {
-    call = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
+    callCode = objectPart + instrInfos.codeExtraInformation.functionCallName + "(" +
            GenerateArgumentsList(arguments, 2) + ")";
   }
 
@@ -599,15 +588,23 @@ gd::String EventsCodeGenerator::GenerateBehaviorAction(
     cout << "Error: bad behavior \"" << behaviorName
          << "\" requested for object \'" << objectName
          << "\" (action: " << instrInfos.GetFullName() << ")." << endl;
-  } else {
-    actionCode +=
-        "for(var i = 0, len = " + GetObjectListName(objectName, context) +
-        ".length ;i < len;++i) {\n";
-    actionCode += "    " + call + ";\n";
-    actionCode += "}\n";
+    return "";
   }
 
-  return actionCode;
+  return callCode + ";\n";
+}
+
+gd::String EventsCodeGenerator::GenerateObjectLoop(
+    const gd::String& objectName,
+    gd::EventsCodeGenerationContext& context,
+    const gd::String& innerLoopCode) {
+  gd::String loopCode;
+  loopCode += "for(var i = 0, len = " + GetObjectListName(objectName, context) +
+              ".length ;i < len;++i) {\n";
+  loopCode += "    " + innerLoopCode + "\n";
+  loopCode += "}\n";
+
+  return loopCode;
 }
 
 gd::String EventsCodeGenerator::GetObjectListName(

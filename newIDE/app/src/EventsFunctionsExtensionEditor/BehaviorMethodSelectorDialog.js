@@ -85,7 +85,9 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
         autoScrollBodyContent={true}
       >
         <List>
-          <Subheader>Main lifecycle methods</Subheader>
+          <Subheader>
+            <Trans>Main lifecycle methods</Trans>
+          </Subheader>
           <MethodListItem
             icon={<Create style={styles.icon} />}
             name={'onCreated'}
@@ -125,7 +127,9 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
               </Trans>
             }
           />
-          <Subheader>Other lifecycle methods</Subheader>
+          <Subheader>
+            <Trans>Other lifecycle methods</Trans>
+          </Subheader>
           <MethodListItem
             icon={<Deactivate style={styles.icon} />}
             name={'onDeActivate'}
@@ -166,7 +170,9 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
               </Trans>
             }
           />
-          <Subheader>Custom</Subheader>
+          <Subheader>
+            <Trans>Custom</Trans>
+          </Subheader>
           <ListItem
             leftIcon={<Function style={styles.icon} />}
             primaryText={

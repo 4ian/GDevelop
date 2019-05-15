@@ -71,7 +71,12 @@ export default class BehaviorMethodSelectorDialog extends React.Component<
 
     return (
       <Dialog
-        secondaryActions={<HelpButton helpPagePath="/events/functions" />}
+        secondaryActions={[
+          <HelpButton
+            key="help"
+            helpPagePath="/behaviors/events-based-behaviors"
+          />,
+        ]}
         actions={actions}
         open
         noMargin

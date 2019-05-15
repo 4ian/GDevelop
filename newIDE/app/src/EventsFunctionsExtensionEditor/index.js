@@ -409,7 +409,11 @@ export default class EventsFunctionsExtensionEditor extends React.Component<
                           eventsBasedBehavior={selectedEventsBasedBehavior}
                           globalObjectsContainer={this._globalObjectsContainer}
                           objectsContainer={this._objectsContainer}
-                          helpPagePath="/events/functions"
+                          helpPagePath={
+                            !!selectedEventsBasedBehavior
+                              ? '/behaviors/events-based-behaviors'
+                              : '/events/functions'
+                          }
                           onParametersOrGroupsUpdated={() => {
                             this._loadEventsFunctionFrom(
                               project,

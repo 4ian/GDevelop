@@ -4,6 +4,7 @@ import React from 'react';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from '../UI/Dialog';
 import EventsBasedBehaviorEditor from './index';
+import HelpButton from '../UI/HelpButton';
 
 type Props = {|
   onApply: () => void,
@@ -18,20 +19,24 @@ export default function EventsBasedBehaviorEditorDialog({
   eventsFunctionsExtension,
   project,
 }: Props) {
-  const actions = [
-    <FlatButton
-      label={<Trans>Apply</Trans>}
-      primary
-      keyboardFocused
-      onClick={onApply}
-      key={'Apply'}
-    />,
-  ];
-
   return (
     <Dialog
       noMargin
-      actions={actions}
+      secondaryActions={[
+        <HelpButton
+          key="help"
+          helpPagePath="/behaviors/events-based-behaviors"
+        />,
+      ]}
+      actions={[
+        <FlatButton
+          label={<Trans>Apply</Trans>}
+          primary
+          keyboardFocused
+          onClick={onApply}
+          key={'Apply'}
+        />,
+      ]}
       modal
       open
       onRequestClose={onApply}

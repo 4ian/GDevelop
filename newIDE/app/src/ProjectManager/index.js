@@ -501,6 +501,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     newEventsFunctionsExtension.setName(newName);
 
     this.forceUpdate();
+    this.props.onReloadEventsFunctionsExtensions();
   };
 
   _moveUpEventsFunctionsExtension = (index: number) => {

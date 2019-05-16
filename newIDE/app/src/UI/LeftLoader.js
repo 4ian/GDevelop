@@ -2,6 +2,10 @@
 import * as React from 'react';
 import CircularProgress from 'material-ui/CircularProgress';
 
+const styles = {
+  progress: { marginRight: 8, verticalAlign: 'middle' },
+};
+
 export default ({
   children,
   isLoading,
@@ -9,8 +13,8 @@ export default ({
   children: React.Node,
   isLoading: ?boolean,
 }) => (
-  <div style={{ display: 'flex', alignItems: 'center' }}>
-    {isLoading && <CircularProgress size={20} style={{ marginRight: 5 }} />}
+  <span>
+    {isLoading && <CircularProgress size={20} style={styles.progress} />}
     {children}
-  </div>
+  </span>
 );

@@ -43,3 +43,23 @@ export const enumerateBehaviorsMetadata = (
     })
   );
 };
+
+export const filterEnumeratedBehaviorMetadata = (
+  list: Array<EnumeratedBehaviorMetadata>,
+  searchText: string
+): Array<EnumeratedBehaviorMetadata> => {
+  if (!searchText) return list;
+
+  const lowercaseSearchText = searchText.toLowerCase();
+
+  return list.filter(enumerateBehaviorsMetadata => {
+    return (
+      enumerateBehaviorsMetadata.fullName
+        .toLowerCase()
+        .indexOf(lowercaseSearchText) !== -1 ||
+      enumerateBehaviorsMetadata.description
+        .toLowerCase()
+        .indexOf(lowercaseSearchText) !== -1
+    );
+  });
+};

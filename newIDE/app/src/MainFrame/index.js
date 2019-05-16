@@ -283,6 +283,7 @@ class MainFrame extends React.Component<Props, State> {
     });
   };
 
+  // TODO: Move this to a provider, take currentProject as parameter
   _loadProjectEventsFunctionsExtensions = () => {
     const { i18n } = this.props;
     if (this.props.eventsFunctionWriter && this.state.currentProject) {

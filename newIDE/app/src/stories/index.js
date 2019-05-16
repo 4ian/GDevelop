@@ -124,6 +124,7 @@ import EventsBasedBehaviorEditor from '../EventsBasedBehaviorEditor';
 import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/EventsBasedBehaviorEditorDialog';
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
+import NewBehaviorDialog from '../BehaviorsEditor/NewBehaviorDialog';
 
 // No i18n in this file
 
@@ -2081,5 +2082,18 @@ storiesOf('ObjectTypeSelector', module)
       value={'Sprite'}
       floatingLabelText="Choose the object type to use"
       onChange={action('change')}
+    />
+  ));
+
+storiesOf('NewBehaviorDialog', module)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default, for a Sprite object', () => (
+    <NewBehaviorDialog
+      open
+      project={project}
+      objectType={'Sprite'}
+      onClose={action('on close')}
+      onChoose={action('on choose')}
     />
   ));

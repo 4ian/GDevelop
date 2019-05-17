@@ -4,7 +4,6 @@
             "name": "Mac",
             "includePath": [
                 "${workspaceRoot}",
-                "${workspaceRoot}/IDE",
                 "${workspaceRoot}/GDCpp",
                 "${workspaceRoot}/GDJS",
                 "${workspaceRoot}/Extensions",
@@ -12,7 +11,6 @@
                 "${workspaceRoot}/ExtLibs/SFML/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
                 "/usr/local/include",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/9.0.0/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                 "/usr/include",
                 "${workspaceRoot}"

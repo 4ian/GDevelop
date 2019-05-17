@@ -53,6 +53,8 @@ const BehaviorListItem = ({
   />
 );
 
+type TabName = 'installed' | 'search';
+
 type Props = {|
   project: gdProject,
   objectType: string,
@@ -64,6 +66,7 @@ type State = {|
   behaviorMetadata: Array<EnumeratedBehaviorMetadata>,
   showDeprecated: boolean,
   searchText: string,
+  currentTab: TabName,
 |};
 
 export default class NewBehaviorDialog extends Component<Props, State> {
@@ -71,6 +74,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
     ...this._loadFrom(this.props.project),
     showDeprecated: false,
     searchText: '',
+    currentTab: 'installed',
   };
   _searchBar = React.createRef<SearchBar>();
 
@@ -109,15 +113,24 @@ export default class NewBehaviorDialog extends Component<Props, State> {
 
   _onNewExtensionInstalled = () => {
     // Reload behaviors
-    this.setState(this._loadFrom(this.props.project));
-
-    // TODO: Go back to the first tab.
-    // TODO: Display snackbar?
+    this.setState(this._loadFrom(this.props.project), () => {
+      this._changeTab('installed');
+    });
   };
+
+  _changeTab = (newTab: TabName) =>
+    this.setState({
+      currentTab: newTab,
+    });
 
   render() {
     const { project, open, onClose, objectType } = this.props;
-    const { showDeprecated, behaviorMetadata, searchText } = this.state;
+    const {
+      showDeprecated,
+      behaviorMetadata,
+      searchText,
+      currentTab,
+    } = this.state;
     if (!open || !project) return null;
 
     const deprecatedBehaviorsInformation = getDeprecatedBehaviorsInformation();
@@ -175,7 +188,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
             noMargin
             autoScrollBodyContent
           >
-            <Tabs>
+            <Tabs value={currentTab} onChange={this._changeTab}>
               <Tab label={<Trans>Installed Behaviors</Trans>} value="installed">
                 <SearchBar
                   value={searchText}

@@ -18,6 +18,10 @@ import PlaceholderLoader from '../UI/PlaceholderLoader';
 import ExtensionInstallDialog from './ExtensionInstallDialog';
 import { unserializeFromJSObject } from '../Utils/Serializer';
 import { showErrorBox } from '../UI/Messages/MessageBox';
+import EventsFunctionsExtensionsContext, {
+  type EventsFunctionsExtensionsState,
+} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import PlaceholderError from '../UI/PlaceholderError';
 
 type Props = {|
   project: gdProject,
@@ -28,6 +32,7 @@ type State = {|
   selectedExtensionShortHeader: ?ExtensionShortHeader,
   searchText: string,
   extensionsRegistry: ?ExtensionsRegistry,
+  error: ?Error,
 |};
 
 // TODO: Factor this?
@@ -51,7 +56,6 @@ const addSerializedExtensionToProject = (
     'unserializeFrom',
     project
   );
-  // TODO: Refresh project extensions
 };
 
 export default class ExtensionsSearch extends Component<Props, State> {
@@ -60,10 +64,18 @@ export default class ExtensionsSearch extends Component<Props, State> {
     extensionsRegistry: null,
     selectedExtensionShortHeader: null,
     searchText: '',
+    error: null,
   };
   _searchBar = React.createRef<SearchBar>();
 
   componentDidMount() {
+    this._loadExtensionsRegistry();
+  }
+
+  _loadExtensionsRegistry = () => {
+    this.setState({
+      error: null,
+    });
     getExtensionsRegistry().then(
       extensionsRegistry => {
         this.setState({
@@ -71,17 +83,18 @@ export default class ExtensionsSearch extends Component<Props, State> {
         });
       },
       error => {
-        // handle error
+        this.setState({
+          error,
+        });
       }
     );
+  };
 
-    // TODO: move this to componentDidUpdate
-    setTimeout(() => {
-      if (this._searchBar.current) this._searchBar.current.focus();
-    }, 20 /* Be sure that the search bar is shown */);
-  }
-
-  _install = (i18n: I18nType, extensionShortHeader: ExtensionShortHeader) => {
+  _install = (
+    i18n: I18nType,
+    eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+    extensionShortHeader: ExtensionShortHeader
+  ) => {
     const { project } = this.props;
 
     this.setState({
@@ -94,15 +107,17 @@ export default class ExtensionsSearch extends Component<Props, State> {
           this.setState({
             selectedExtensionShortHeader: null,
           });
-          // TODO: Display newly added behaviors
-          // Use context to get functions to reload extensions.
-          this.props.onNewExtensionInstalled();
+
+          eventsFunctionsExtensionsState
+            .loadProjectEventsFunctionsExtensions(project)
+            .then(() => {
+              this.props.onNewExtensionInstalled();
+            });
         },
         err => {
-          // handle error
           showErrorBox(
             i18n._(
-              t`Unable to load the extension. Verify that your internet connection is up, and try again later.`
+              t`Unable to download and install the extension. Verify that your internet connection is working or try again later.`
             ),
             err
           );
@@ -122,78 +137,95 @@ export default class ExtensionsSearch extends Component<Props, State> {
       extensionsRegistry,
       searchText,
       isInstalling,
+      error,
     } = this.state;
 
     return (
       <I18n>
         {({ i18n }) => (
-          <React.Fragment>
-            <SearchBar
-              value={searchText}
-              onRequestSearch={() => {
-                //TODO: filtering
-              }}
-              onChange={searchText =>
-                this.setState({
-                  searchText,
-                })
-              }
-              ref={this._searchBar}
-            />
-            <List>
-              {!extensionsRegistry && <PlaceholderLoader />}
-              {!!extensionsRegistry &&
-                extensionsRegistry.extensionShortHeaders.map(
-                  extensionShortHeader => {
-                    const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
-                      extensionShortHeader.name
-                    );
-                    const disabled = alreadyInstalled;
-
-                    return (
-                      <ListItem
-                        key={extensionShortHeader.name}
-                        primaryText={
-                          <span>
-                            {extensionShortHeader.fullName}{' '}
-                            {alreadyInstalled && (
-                              <Trans> (already installed)</Trans>
-                            )}
-                          </span>
-                        }
-                        secondaryText={
-                          <p>{extensionShortHeader.shortDescription}</p>
-                        }
-                        secondaryTextLines={2}
-                        onClick={() =>
-                          this.setState({
-                            selectedExtensionShortHeader: extensionShortHeader,
-                          })
-                        }
-                        style={disabled ? styles.disabledItem : undefined}
-                        disabled={disabled}
-                      />
-                    );
+          <EventsFunctionsExtensionsContext.Consumer>
+            {eventsFunctionsExtensionsState => (
+              <React.Fragment>
+                <SearchBar
+                  value={searchText}
+                  onRequestSearch={() => {
+                    //TODO: filtering
+                  }}
+                  onChange={searchText =>
+                    this.setState({
+                      searchText,
+                    })
                   }
-                )
-              //TODO: Button to create a new extension
-              }
-            </List>
-            {!!selectedExtensionShortHeader && (
-              <ExtensionInstallDialog
-                isInstalling={isInstalling}
-                extensionShortHeader={selectedExtensionShortHeader}
-                onInstall={() =>
-                  this._install(i18n, selectedExtensionShortHeader)
-                }
-                onClose={() =>
-                  this.setState({
-                    selectedExtensionShortHeader: null,
-                  })
-                }
-              />
+                  ref={this._searchBar}
+                />
+                <List>
+                  {!extensionsRegistry && !error && <PlaceholderLoader />}
+                  {!!extensionsRegistry &&
+                    extensionsRegistry.extensionShortHeaders.map(
+                      extensionShortHeader => {
+                        const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
+                          extensionShortHeader.name
+                        );
+                        const disabled = alreadyInstalled;
+
+                        return (
+                          <ListItem
+                            key={extensionShortHeader.name}
+                            primaryText={
+                              <span>
+                                {extensionShortHeader.fullName}{' '}
+                                {alreadyInstalled && (
+                                  <Trans> (already installed)</Trans>
+                                )}
+                              </span>
+                            }
+                            secondaryText={
+                              <p>{extensionShortHeader.shortDescription}</p>
+                            }
+                            secondaryTextLines={2}
+                            onClick={() =>
+                              this.setState({
+                                selectedExtensionShortHeader: extensionShortHeader,
+                              })
+                            }
+                            style={disabled ? styles.disabledItem : undefined}
+                            disabled={disabled}
+                          />
+                        );
+                      }
+                    )
+                  //TODO: Button to create a new extension
+                  }
+                  {error && (
+                    <PlaceholderError onRetry={this._loadExtensionsRegistry}>
+                      <Trans>
+                        Can't load the extension registry. Verify your internet
+                        connection or try again later.
+                      </Trans>
+                    </PlaceholderError>
+                  )}
+                </List>
+                {!!selectedExtensionShortHeader && (
+                  <ExtensionInstallDialog
+                    isInstalling={isInstalling}
+                    extensionShortHeader={selectedExtensionShortHeader}
+                    onInstall={() =>
+                      this._install(
+                        i18n,
+                        eventsFunctionsExtensionsState,
+                        selectedExtensionShortHeader
+                      )
+                    }
+                    onClose={() =>
+                      this.setState({
+                        selectedExtensionShortHeader: null,
+                      })
+                    }
+                  />
+                )}
+              </React.Fragment>
             )}
-          </React.Fragment>
+          </EventsFunctionsExtensionsContext.Consumer>
         )}
       </I18n>
     );

@@ -140,7 +140,6 @@ export default class BehaviorsEditor extends Component {
       <div>
         {allBehaviorNames
           .map((behaviorName, index) => {
-            // TODO: Rename to getBehaviorContent?
             const behaviorContent = object.getBehavior(behaviorName);
             const behavior = gd.JsPlatform.get().getBehavior(
               behaviorContent.getTypeName()

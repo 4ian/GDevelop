@@ -13,6 +13,7 @@ import HelpButton from '../../UI/HelpButton';
 import SemiControlledTextField from '../../UI/SemiControlledTextField';
 import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
 import EmptyMessage from '../../UI/EmptyMessage';
+import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 
 const gd = global.gd;
 
@@ -46,10 +47,7 @@ const getSentenceErrorText = (
       t`Enter the sentence that will be displayed in the events sheet`
     );
 
-  // TODO: Factor the logic that is duplicated in EventsFunctionParametersEditor.js?
-  const parametersIndexOffset = eventsBasedBehavior
-    ? 0 /*In the case of a behavior events function, the first two parameters are by convention the "Object" and "Behavior" */
-    : 1; /*In the case of a free events function (i.e: not tied to a behavior), the first parameter is by convention the current scene and is not shown.*/
+  const parametersIndexOffset = getParametersIndexOffset(!!eventsBasedBehavior);
 
   const missingParameters = mapVector(
     eventsFunction.getParameters(),

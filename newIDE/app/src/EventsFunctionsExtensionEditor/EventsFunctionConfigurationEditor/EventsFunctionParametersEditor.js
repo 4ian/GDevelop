@@ -20,6 +20,7 @@ import { showWarningBox } from '../../UI/Messages/MessageBox';
 import ObjectTypeSelector from '../../ObjectTypeSelector';
 import BehaviorTypeSelector from '../../BehaviorTypeSelector';
 import { isBehaviorLifecycleFunction } from '../../EventsFunctionsExtensionsLoader/MetadataDeclarationHelpers';
+import { getParametersIndexOffset } from '../../EventsFunctionsExtensionsLoader';
 
 const gd = global.gd;
 
@@ -107,9 +108,7 @@ export default class EventsFunctionParametersEditor extends React.Component<
       // so we even hide their description and type to avoid cluttering the interface.
       return !eventsBasedBehavior || index >= 2;
     };
-    const parametersIndexOffset = eventsBasedBehavior
-      ? 0 /*In the case of a behavior events function, the first two parameters are by convention the "Object" and "Behavior" */
-      : 1; /*In the case of a free events function (i.e: not tied to a behavior), the first parameter is by convention the current scene and is not shown.*/
+    const parametersIndexOffset = getParametersIndexOffset(!!eventsBasedBehavior);
 
     return (
       <I18n>

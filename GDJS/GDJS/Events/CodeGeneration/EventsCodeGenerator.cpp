@@ -184,9 +184,6 @@ gd::String EventsCodeGenerator::GenerateEventsFunctionParameterDeclarationsList(
       // By convention, the first two arguments of a behavior events function
       // are the object and the behavior, which are not passed to the called
       // function in the generated JS code.
-      // TODO: Decide if we keep this convention, or if we remove extra
-      // parameters from the events function parameters and only insert them
-      // where needed.
       continue;
     }
 

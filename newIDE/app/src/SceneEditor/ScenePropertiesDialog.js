@@ -12,6 +12,7 @@ import PropertiesEditor from '../PropertiesEditor';
 import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import some from 'lodash/some';
 import Checkbox from 'material-ui/Checkbox';
+import { isNullPtr } from '../Utils/IsNullPtr';
 const gd = global.gd;
 
 type Props = {|
@@ -108,7 +109,7 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
         const behaviorSharedData = gd.JsPlatform.get().getBehaviorSharedDatas(
           type
         );
-        if (behaviorSharedData.ptr === 0) return null; //TODO
+        if (isNullPtr(gd, behaviorSharedData)) return null;
 
         const properties = behaviorSharedData.getProperties(
           sharedDataContent.getContent(),

@@ -1015,7 +1015,6 @@ describe('libGD.js', function() {
         propertyName,
         newValue
       ) {
-        // TODO: Switch to attributes
         if (propertyName === 'My first property') {
           behaviorContent.setStringAttribute('property1', newValue);
           return true;

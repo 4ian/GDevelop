@@ -22,17 +22,23 @@ import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import PlaceholderError from '../UI/PlaceholderError';
+import EmptyMessage from '../UI/EmptyMessage';
 
 type Props = {|
   project: gdProject,
   onNewExtensionInstalled: () => void,
 |};
+
 type State = {|
   isInstalling: boolean,
   selectedExtensionShortHeader: ?ExtensionShortHeader,
   searchText: string,
   extensionsRegistry: ?ExtensionsRegistry,
   error: ?Error,
+|};
+
+type FilteringOptions = {|
+  searchText: string,
 |};
 
 // TODO: Factor this?
@@ -57,6 +63,21 @@ const addSerializedExtensionToProject = (
     project
   );
 };
+
+const filterExtensionShortHeaders = (
+  extensionShortHeaders: Array<ExtensionShortHeader>,
+  { searchText }: FilteringOptions
+): Array<ExtensionShortHeader> => {
+  if (!searchText) return extensionShortHeaders;
+
+  return extensionShortHeaders.filter(
+    ({ name, shortDescription }) =>
+      name.indexOf(searchText) !== -1 ||
+      shortDescription.indexOf(searchText) !== -1
+  );
+};
+
+const MAX_DISPLAYED_RESULTS = 20;
 
 export default class ExtensionsSearch extends Component<Props, State> {
   state = {
@@ -140,6 +161,12 @@ export default class ExtensionsSearch extends Component<Props, State> {
       error,
     } = this.state;
 
+    const extensionShortHeaders = extensionsRegistry
+      ? filterExtensionShortHeaders(extensionsRegistry.extensionShortHeaders, {
+          searchText,
+        })
+      : [];
+
     return (
       <I18n>
         {({ i18n }) => (
@@ -149,7 +176,11 @@ export default class ExtensionsSearch extends Component<Props, State> {
                 <SearchBar
                   value={searchText}
                   onRequestSearch={() => {
-                    //TODO: filtering
+                    if (extensionShortHeaders.length) {
+                      this.setState({
+                        selectedExtensionShortHeader: extensionShortHeaders[0],
+                      });
+                    }
                   }}
                   onChange={searchText =>
                     this.setState({
@@ -161,8 +192,9 @@ export default class ExtensionsSearch extends Component<Props, State> {
                 <List>
                   {!extensionsRegistry && !error && <PlaceholderLoader />}
                   {!!extensionsRegistry &&
-                    extensionsRegistry.extensionShortHeaders.map(
-                      extensionShortHeader => {
+                    extensionShortHeaders
+                      .slice(0, MAX_DISPLAYED_RESULTS)
+                      .map(extensionShortHeader => {
                         const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
                           extensionShortHeader.name
                         );
@@ -192,11 +224,17 @@ export default class ExtensionsSearch extends Component<Props, State> {
                             disabled={disabled}
                           />
                         );
-                      }
-                    )
-                  //TODO: Button to create a new extension
-                  }
-                  {error && (
+                      })}
+                  {!!extensionsRegistry &&
+                    extensionShortHeaders.length > MAX_DISPLAYED_RESULTS && (
+                      <EmptyMessage>
+                        <Trans>
+                          There are other results not displayed. Enter more
+                          precise search criteria to find other extensions.
+                        </Trans>
+                      </EmptyMessage>
+                    )}
+                  {!extensionsRegistry && error && (
                     <PlaceholderError onRetry={this._loadExtensionsRegistry}>
                       <Trans>
                         Can't load the extension registry. Verify your internet

@@ -33,10 +33,12 @@ export const create = (authentification: Authentification) => {
     <Providers
       authentification={authentification}
       disableCheckForUpdates={!!appArguments['disable-update-check']}
+      eventsFunctionWriter={makeBrowserS3EventsFunctionWriter()}
     >
-      {({ i18n }) => (
+      {({ i18n, eventsFunctionsExtensionsState }) => (
         <MainFrame
           i18n={i18n}
+          eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
           previewLauncher={<BrowserS3PreviewLauncher />}
           exportDialog={<ExportDialog exporters={getBrowserExporters()} />}
           createDialog={
@@ -57,7 +59,6 @@ export const create = (authentification: Authentification) => {
             filterExamples: !Window.isDev(),
           })}
           initialPathsOrURLsToOpen={appArguments['_']}
-          eventsFunctionWriter={makeBrowserS3EventsFunctionWriter()}
         />
       )}
     </Providers>

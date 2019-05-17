@@ -36,8 +36,9 @@ export const create = (authentification: Authentification) => {
       <Providers
         authentification={authentification}
         disableCheckForUpdates={!!appArguments['disable-update-check']}
+        eventsFunctionWriter={null}
       >
-        {({ i18n }) => (
+        {({ i18n, eventsFunctionsExtensionsState }) => (
           <ExternalEditor
             serverPort={appArguments['server-port']}
             isIntegrated={appArguments['mode'] === 'integrated'}
@@ -46,6 +47,7 @@ export const create = (authentification: Authentification) => {
           >
             <MainFrame
               i18n={i18n}
+              eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
               resourceSources={localResourceSources}
               authentification={authentification}
               onReadFromPathOrURL={() =>
@@ -63,11 +65,13 @@ export const create = (authentification: Authentification) => {
       <Providers
         authentification={authentification}
         disableCheckForUpdates={!!appArguments['disable-update-check']}
+        eventsFunctionWriter={makeLocalEventsFunctionWriter()}
       >
-        {({ i18n }) => (
+        {({ i18n, eventsFunctionsExtensionsState }) => (
           <ElectronMainMenu i18n={i18n}>
             <MainFrame
               i18n={i18n}
+              eventsFunctionsExtensionsState={eventsFunctionsExtensionsState}
               previewLauncher={<LocalPreviewLauncher />}
               exportDialog={<ExportDialog exporters={getLocalExporters()} />}
               createDialog={
@@ -91,7 +95,6 @@ export const create = (authentification: Authentification) => {
                 filterExamples: !Window.isDev(),
               })}
               initialPathsOrURLsToOpen={appArguments['_']}
-              eventsFunctionWriter={makeLocalEventsFunctionWriter()}
             />
           </ElectronMainMenu>
         )}

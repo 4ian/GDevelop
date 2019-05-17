@@ -29,7 +29,7 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
 
   componentDidUpdate(prevProps: *) {
     if (prevProps.isActive && !this.props.isActive) {
-      this.props.onReloadEventsFunctionsExtensions();
+      this.props.onLoadEventsFunctionsExtensions();
     }
   }
 

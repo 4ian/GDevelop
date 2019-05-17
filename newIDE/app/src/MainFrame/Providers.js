@@ -10,11 +10,20 @@ import PreferencesContext from './Preferences/PreferencesContext';
 import GDI18nProvider from '../Utils/i18n/GDI18nProvider';
 import { I18n } from '@lingui/react';
 import { type I18n as I18nType } from '@lingui/core';
+import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
+import EventsFunctionsExtensionsContext, {
+  type EventsFunctionsExtensionsState,
+} from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
+import { type EventsFunctionWriter } from '../EventsFunctionsExtensionsLoader';
 
 type Props = {|
   authentification: Authentification,
-  children: ({ i18n: I18nType }) => React.Node,
   disableCheckForUpdates: boolean,
+  eventsFunctionWriter: ?EventsFunctionWriter,
+  children: ({
+    i18n: I18nType,
+    eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  }) => React.Node,
 |};
 
 /**
@@ -23,7 +32,12 @@ type Props = {|
  */
 export default class Providers extends React.Component<Props, {||}> {
   render() {
-    const { disableCheckForUpdates, authentification, children } = this.props;
+    const {
+      disableCheckForUpdates,
+      authentification,
+      children,
+      eventsFunctionWriter,
+    } = this.props;
     return (
       <DragDropContextProvider>
         <PreferencesProvider disableCheckForUpdates={disableCheckForUpdates}>
@@ -32,7 +46,20 @@ export default class Providers extends React.Component<Props, {||}> {
               <GDI18nProvider language={values.language}>
                 <MuiThemeProvider muiTheme={getTheme(values.themeName)}>
                   <UserProfileProvider authentification={authentification}>
-                    <I18n update>{({ i18n }) => children({ i18n })}</I18n>
+                    <I18n update>
+                      {({ i18n }) => (
+                        <EventsFunctionsExtensionsProvider
+                          i18n={i18n}
+                          eventsFunctionWriter={eventsFunctionWriter}
+                        >
+                          <EventsFunctionsExtensionsContext.Consumer>
+                            {eventsFunctionsExtensionsState =>
+                              children({ i18n, eventsFunctionsExtensionsState })
+                            }
+                          </EventsFunctionsExtensionsContext.Consumer>
+                        </EventsFunctionsExtensionsProvider>
+                      )}
+                    </I18n>
                   </UserProfileProvider>
                 </MuiThemeProvider>
               </GDI18nProvider>

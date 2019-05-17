@@ -38,9 +38,7 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
     ),
   };
 
-  _loadProjectEventsFunctionsExtensions(
-    project: ?gdProject
-  ): Promise<void> {
+  _loadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {
     const { i18n, eventsFunctionWriter } = this.props;
     if (!project || !eventsFunctionWriter) return Promise.resolve();
 
@@ -61,18 +59,18 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
           eventsFunctionsExtensionsError
         );
       });
-  };
+  }
 
   _unloadProjectEventsFunctionsExtensions(project: gdProject) {
     unloadProjectEventsFunctionsExtensions(project);
-  };
+  }
 
   _reloadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {
     if (project) {
       this._unloadProjectEventsFunctionsExtensions(project);
     }
     return this._loadProjectEventsFunctionsExtensions(project);
-  };
+  }
 
   render() {
     return (

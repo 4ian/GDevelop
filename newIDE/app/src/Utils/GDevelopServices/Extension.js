@@ -18,7 +18,7 @@ export type ExtensionHeader = {|
 
 export type SerializedExtension = {
   ...ExtensionHeader,
-}
+};
 
 export type ExtensionsRegistry = {
   version: string,
@@ -32,14 +32,18 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
     .then(response => response.data);
 };
 
-export const getExtensionHeader = (extensionShortHeader: ExtensionShortHeader): Promise<ExtensionHeader> => {
+export const getExtensionHeader = (
+  extensionShortHeader: ExtensionShortHeader
+): Promise<ExtensionHeader> => {
   // TODO: Handle absolute urls?
   return axios
     .get(`${GDevelopExtensionApi.baseUrl}/${extensionShortHeader.headerUrl}`)
     .then(response => response.data);
 };
 
-export const getExtension = (extensionHeader: ExtensionShortHeader | ExtensionHeader): Promise<SerializedExtension> => {
+export const getExtension = (
+  extensionHeader: ExtensionShortHeader | ExtensionHeader
+): Promise<SerializedExtension> => {
   // TODO: Handle absolute urls?
   return axios
     .get(`${GDevelopExtensionApi.baseUrl}/${extensionHeader.url}`)

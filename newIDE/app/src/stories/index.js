@@ -125,6 +125,7 @@ import EventsBasedBehaviorEditorDialog from '../EventsBasedBehaviorEditor/Events
 import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
 import NewBehaviorDialog from '../BehaviorsEditor/NewBehaviorDialog';
+import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
 
 // No i18n in this file
 
@@ -2096,4 +2097,11 @@ storiesOf('NewBehaviorDialog', module)
       onClose={action('on close')}
       onChoose={action('on choose')}
     />
+  ));
+
+storiesOf('ExtensionsSearchDialog', module)
+  .addDecorator(muiDecorator)
+  .addDecorator(i18nProviderDecorator)
+  .add('default', () => (
+    <ExtensionsSearchDialog project={project} onClose={action('on close')} />
   ));

@@ -5,7 +5,9 @@ export type EventsFunctionsExtensionsState = {|
   eventsFunctionsExtensionsError: ?Error,
   loadProjectEventsFunctionsExtensions: (project: ?gdProject) => Promise<void>,
   unloadProjectEventsFunctionsExtensions: (project: gdProject) => void,
-  reloadProjectEventsFunctionsExtensions: (project: ?gdProject) => Promise<void>,
+  reloadProjectEventsFunctionsExtensions: (
+    project: ?gdProject
+  ) => Promise<void>,
 |};
 
 const defaultState = {
@@ -13,7 +15,8 @@ const defaultState = {
   loadProjectEventsFunctionsExtensions: () =>
     Promise.reject(new Error('Use a provider')),
   unloadProjectEventsFunctionsExtensions: () => {},
-  reloadProjectEventsFunctionsExtensions: () => Promise.reject(new Error('Use a provider')),
+  reloadProjectEventsFunctionsExtensions: () =>
+    Promise.reject(new Error('Use a provider')),
 };
 
 const EventsFunctionsExtensionsContext: Context<EventsFunctionsExtensionsState> = createReactContext(

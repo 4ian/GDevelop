@@ -3,7 +3,7 @@ import * as React from 'react';
 import { List } from 'react-virtualized';
 import { ListItem } from 'material-ui/List';
 import ItemRow from './ItemRow';
-import { makeAddItem } from '../ListAddItem';
+import { makeAddItem } from '../ListCommonItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
 const listItemHeight = 48; // TODO: Move this into theme?

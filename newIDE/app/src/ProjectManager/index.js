@@ -10,7 +10,7 @@ import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
 import WarningIcon from 'material-ui/svg-icons/alert/warning';
 import IconButton from 'material-ui/IconButton';
 import ListIcon from '../UI/ListIcon';
-import { makeAddItem } from '../UI/ListAddItem';
+import { makeAddItem, makeSearchItem } from '../UI/ListCommonItem';
 import Window from '../Utils/Window';
 import IconMenu from '../UI/Menu/IconMenu';
 import VariablesEditorDialog from '../VariablesList/VariablesEditorDialog';
@@ -29,6 +29,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import ThemeConsumer from '../UI/Theme/ThemeConsumer';
+import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
 
 const LAYOUT_CLIPBOARD_KIND = 'Layout';
 const EXTERNAL_LAYOUT_CLIPBOARD_KIND = 'External layout';
@@ -233,6 +234,7 @@ class Item extends React.Component<ItemProps, {||}> {
 }
 
 const AddItem = makeAddItem(ListItem);
+const SearchItem = makeSearchItem(ListItem);
 
 type Props = {|
   project: gdProject,
@@ -270,6 +272,7 @@ type State = {|
   searchText: string,
   projectPropertiesDialogOpen: boolean,
   variablesEditorOpen: boolean,
+  extensionsSearchDialogOpen: boolean,
 |};
 
 export default class ProjectManager extends React.Component<Props, State> {
@@ -281,6 +284,7 @@ export default class ProjectManager extends React.Component<Props, State> {
     searchText: '',
     projectPropertiesDialogOpen: false,
     variablesEditorOpen: false,
+    extensionsSearchDialogOpen: false,
   };
 
   shouldComponentUpdate(nextProps: Props) {
@@ -919,6 +923,15 @@ export default class ProjectManager extends React.Component<Props, State> {
                   }
                   onClick={this.props.onAddEventsFunctionsExtension}
                 />
+              )
+              .concat(
+                <SearchItem
+                  key={'extensions-search'}
+                  primaryText={<Trans>Search for new extensions</Trans>}
+                  onClick={() =>
+                    this.setState({ extensionsSearchDialogOpen: true })
+                  }
+                />
               )}
           />
         </List>
@@ -953,6 +966,12 @@ export default class ProjectManager extends React.Component<Props, State> {
               this.setState({ projectPropertiesDialogOpen: false })
             }
             onChangeSubscription={this.props.onChangeSubscription}
+          />
+        )}
+        {this.state.extensionsSearchDialogOpen && (
+          <ExtensionsSearchDialog
+            project={project}
+            onClose={() => this.setState({ extensionsSearchDialogOpen: false })}
           />
         )}
       </div>

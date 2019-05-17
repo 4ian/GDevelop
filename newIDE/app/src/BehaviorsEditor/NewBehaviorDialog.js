@@ -13,9 +13,11 @@ import { Tabs, Tab } from 'material-ui/Tabs';
 import { List, ListItem } from 'material-ui/List';
 import Visibility from 'material-ui/svg-icons/action/visibility';
 import VisibilityOff from 'material-ui/svg-icons/action/visibility-off';
+import Create from 'material-ui/svg-icons/content/create';
 import { Line } from '../UI/Grid';
 import { showMessageBox } from '../UI/Messages/MessageBox';
 import { getDeprecatedBehaviorsInformation } from '../Hints';
+import { getHelpLink } from '../Utils/HelpLink';
 import {
   type EnumeratedBehaviorMetadata,
   enumerateBehaviorsMetadata,
@@ -24,6 +26,7 @@ import {
 import SearchBar from 'material-ui-search-bar';
 import EmptyMessage from '../UI/EmptyMessage';
 import ExtensionsSearch from '../ExtensionsSearch';
+import Window from '../Utils/Window';
 
 const styles = {
   icon: { borderRadius: 0 },
@@ -258,6 +261,18 @@ export default class NewBehaviorDialog extends Component<Props, State> {
                       label={<Trans>Show deprecated (old) behaviors</Trans>}
                     />
                   )}
+                </Line>
+                <Line justifyContent="center" alignItems="center">
+                  <FlatButton
+                    icon={<Create />}
+                    primary={false}
+                    onClick={() =>
+                      Window.openExternalURL(
+                        getHelpLink('/behaviors/events-based-behaviors')
+                      )
+                    }
+                    label={<Trans>Create your own behavior</Trans>}
+                  />
                 </Line>
               </Tab>
               <Tab label={<Trans>Search New Behaviors</Trans>} value="search">

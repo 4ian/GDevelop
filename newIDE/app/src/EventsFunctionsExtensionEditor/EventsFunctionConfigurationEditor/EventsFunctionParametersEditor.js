@@ -108,7 +108,9 @@ export default class EventsFunctionParametersEditor extends React.Component<
       // so we even hide their description and type to avoid cluttering the interface.
       return !eventsBasedBehavior || index >= 2;
     };
-    const parametersIndexOffset = getParametersIndexOffset(!!eventsBasedBehavior);
+    const parametersIndexOffset = getParametersIndexOffset(
+      !!eventsBasedBehavior
+    );
 
     return (
       <I18n>

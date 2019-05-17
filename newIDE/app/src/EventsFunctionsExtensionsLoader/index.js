@@ -369,8 +369,10 @@ export const getFreeEventsFunctionType = (
  * * 0 for a behavior "method",
  * * 1 for a free function (as the first parameter is by convention the runtimeScene).
  */
-export const getParametersIndexOffset = (isEventsBasedBehaviorMethod: boolean) => {
+export const getParametersIndexOffset = (
+  isEventsBasedBehaviorMethod: boolean
+) => {
   return isEventsBasedBehaviorMethod
     ? 0 /*In the case of a behavior events function, the first two parameters are by convention the "Object" and "Behavior" */
     : 1; /*In the case of a free events function (i.e: not tied to a behavior), the first parameter is by convention the current scene and is not shown.*/
-}
+};

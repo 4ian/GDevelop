@@ -23,6 +23,7 @@ export type SerializedExtension = {
 
 export type ExtensionsRegistry = {
   version: string,
+  allTags: Array<string>,
   extensionShortHeaders: Array<ExtensionShortHeader>,
 };
 

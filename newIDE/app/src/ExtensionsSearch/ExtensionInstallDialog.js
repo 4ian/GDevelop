@@ -19,6 +19,7 @@ type Props = {|
   isInstalling: boolean,
   onClose: () => void,
   onInstall: (type: string, defaultName: string) => void,
+  alreadyInstalled: boolean,
 |};
 type State = {|
   extensionHeader: ?ExtensionHeader,
@@ -59,6 +60,7 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
       extensionShortHeader,
       onClose,
       onInstall,
+      alreadyInstalled,
     } = this.props;
     const { extensionHeader, error } = this.state;
 
@@ -82,7 +84,13 @@ export default class ExtensionInstallDialog extends Component<Props, State> {
               <LeftLoader isLoading={isInstalling}>
                 <FlatButton
                   key="install"
-                  label={<Trans>Install in project</Trans>}
+                  label={
+                    alreadyInstalled ? (
+                      <Trans>Re-install/update</Trans>
+                    ) : (
+                      <Trans>Install in project</Trans>
+                    )
+                  }
                   primary
                   onClick={onInstall}
                   disabled={isInstalling}

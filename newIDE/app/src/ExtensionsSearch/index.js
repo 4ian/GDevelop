@@ -23,6 +23,7 @@ import EventsFunctionsExtensionsContext, {
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
 import PlaceholderError from '../UI/PlaceholderError';
 import EmptyMessage from '../UI/EmptyMessage';
+import SearchbarWithChips from '../UI/SearchbarWithChips';
 
 /**
  * Add a serialized (JS object) events function extension to the project,
@@ -64,31 +65,29 @@ type State = {|
   isInstalling: boolean,
   selectedExtensionShortHeader: ?ExtensionShortHeader,
   searchText: string,
+  chosenTag: string,
   extensionsRegistry: ?ExtensionsRegistry,
   error: ?Error,
 |};
 
 type FilteringOptions = {|
   searchText: string,
+  chosenTag: string,
 |};
-
-// TODO: Factor this?
-const styles = {
-  icon: { width: 40, height: 40 },
-  disabledItem: { opacity: 0.6 },
-};
 
 const filterExtensionShortHeaders = (
   extensionShortHeaders: Array<ExtensionShortHeader>,
-  { searchText }: FilteringOptions
+  { searchText, chosenTag }: FilteringOptions
 ): Array<ExtensionShortHeader> => {
   if (!searchText) return extensionShortHeaders;
 
-  return extensionShortHeaders.filter(
-    ({ name, shortDescription }) =>
-      name.indexOf(searchText) !== -1 ||
-      shortDescription.indexOf(searchText) !== -1
-  );
+  return extensionShortHeaders
+    .filter(({ tags }) => chosenTag && tags.indexOf(chosenTag) !== -1)
+    .filter(
+      ({ name, shortDescription }) =>
+        name.indexOf(searchText) !== -1 ||
+        shortDescription.indexOf(searchText) !== -1
+    );
 };
 
 const MAX_DISPLAYED_RESULTS = 20;
@@ -104,6 +103,7 @@ export default class ExtensionsSearch extends Component<Props, State> {
     selectedExtensionShortHeader: null,
     searchText: '',
     error: null,
+    chosenTag: '',
   };
   _searchBar = React.createRef<SearchBar>();
 
@@ -179,11 +179,13 @@ export default class ExtensionsSearch extends Component<Props, State> {
       searchText,
       isInstalling,
       error,
+      chosenTag,
     } = this.state;
 
     const extensionShortHeaders = extensionsRegistry
       ? filterExtensionShortHeaders(extensionsRegistry.extensionShortHeaders, {
           searchText,
+          chosenTag,
         })
       : [];
 
@@ -193,7 +195,7 @@ export default class ExtensionsSearch extends Component<Props, State> {
           <EventsFunctionsExtensionsContext.Consumer>
             {eventsFunctionsExtensionsState => (
               <React.Fragment>
-                <SearchBar
+                <SearchbarWithChips
                   value={searchText}
                   onRequestSearch={() => {
                     if (extensionShortHeaders.length) {
@@ -207,6 +209,20 @@ export default class ExtensionsSearch extends Component<Props, State> {
                       searchText,
                     })
                   }
+                  chips={
+                    !!extensionsRegistry
+                      ? extensionsRegistry.allTags.map(tag => ({
+                          text: tag,
+                          value: tag,
+                        }))
+                      : null
+                  }
+                  chosenChip={chosenTag}
+                  onChooseChip={chosenTag =>
+                    this.setState({
+                      chosenTag,
+                    })
+                  }
                   ref={this._searchBar}
                 />
                 <List>
@@ -218,7 +234,6 @@ export default class ExtensionsSearch extends Component<Props, State> {
                         const alreadyInstalled = project.hasEventsFunctionsExtensionNamed(
                           extensionShortHeader.name
                         );
-                        const disabled = alreadyInstalled;
 
                         return (
                           <ListItem
@@ -240,8 +255,6 @@ export default class ExtensionsSearch extends Component<Props, State> {
                                 selectedExtensionShortHeader: extensionShortHeader,
                               })
                             }
-                            style={disabled ? styles.disabledItem : undefined}
-                            disabled={disabled}
                           />
                         );
                       })}
@@ -267,6 +280,9 @@ export default class ExtensionsSearch extends Component<Props, State> {
                   <ExtensionInstallDialog
                     isInstalling={isInstalling}
                     extensionShortHeader={selectedExtensionShortHeader}
+                    alreadyInstalled={project.hasEventsFunctionsExtensionNamed(
+                      selectedExtensionShortHeader.name
+                    )}
                     onInstall={() =>
                       this._install(
                         i18n,

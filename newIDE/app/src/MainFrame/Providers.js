@@ -14,12 +14,18 @@ import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoade
 import EventsFunctionsExtensionsContext, {
   type EventsFunctionsExtensionsState,
 } from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsContext';
-import { type EventsFunctionWriter } from '../EventsFunctionsExtensionsLoader';
+import { type EventsFunctionCodeWriter } from '../EventsFunctionsExtensionsLoader';
+import {
+  type EventsFunctionsExtensionWriter,
+  type EventsFunctionsExtensionOpener,
+} from '../EventsFunctionsExtensionsLoader/Storage';
 
 type Props = {|
   authentification: Authentification,
   disableCheckForUpdates: boolean,
-  eventsFunctionWriter: ?EventsFunctionWriter,
+  eventsFunctionCodeWriter: ?EventsFunctionCodeWriter,
+  eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
+  eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
   children: ({
     i18n: I18nType,
     eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
@@ -36,7 +42,9 @@ export default class Providers extends React.Component<Props, {||}> {
       disableCheckForUpdates,
       authentification,
       children,
-      eventsFunctionWriter,
+      eventsFunctionCodeWriter,
+      eventsFunctionsExtensionWriter,
+      eventsFunctionsExtensionOpener,
     } = this.props;
     return (
       <DragDropContextProvider>
@@ -50,7 +58,13 @@ export default class Providers extends React.Component<Props, {||}> {
                       {({ i18n }) => (
                         <EventsFunctionsExtensionsProvider
                           i18n={i18n}
-                          eventsFunctionWriter={eventsFunctionWriter}
+                          eventsFunctionCodeWriter={eventsFunctionCodeWriter}
+                          eventsFunctionsExtensionWriter={
+                            eventsFunctionsExtensionWriter
+                          }
+                          eventsFunctionsExtensionOpener={
+                            eventsFunctionsExtensionOpener
+                          }
                         >
                           <EventsFunctionsExtensionsContext.Consumer>
                             {eventsFunctionsExtensionsState =>

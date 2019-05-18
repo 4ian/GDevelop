@@ -6,9 +6,13 @@ import EventsFunctionsExtensionsContext, {
 } from './EventsFunctionsExtensionsContext';
 import {
   loadProjectEventsFunctionsExtensions,
-  type EventsFunctionWriter,
+  type EventsFunctionCodeWriter,
   unloadProjectEventsFunctionsExtensions,
 } from '.';
+import {
+  type EventsFunctionsExtensionWriter,
+  type EventsFunctionsExtensionOpener,
+} from './Storage';
 import { showErrorBox } from '../UI/Messages/MessageBox';
 import { t } from '@lingui/macro';
 import { type I18n as I18nType } from '@lingui/core';
@@ -16,11 +20,19 @@ import { type I18n as I18nType } from '@lingui/core';
 type Props = {|
   children: React.Node,
   i18n: I18nType,
-  eventsFunctionWriter: ?EventsFunctionWriter,
+  eventsFunctionCodeWriter: ?EventsFunctionCodeWriter,
+  eventsFunctionsExtensionWriter: ?EventsFunctionsExtensionWriter,
+  eventsFunctionsExtensionOpener: ?EventsFunctionsExtensionOpener,
 |};
 
 type State = EventsFunctionsExtensionsState;
 
+/**
+ * Allow children components to request the loading (or unloading) of
+ * the events functions extensions of the project.
+ * Useful when dealing with events functions extensions (new extension created,
+ * removed, pasted, installed, etc...).
+ */
 export default class EventsFunctionsExtensionsProvider extends React.Component<
   Props,
   State
@@ -36,13 +48,20 @@ export default class EventsFunctionsExtensionsProvider extends React.Component<
     reloadProjectEventsFunctionsExtensions: this._reloadProjectEventsFunctionsExtensions.bind(
       this
     ),
+    getEventsFunctionsExtensionWriter: () =>
+      this.props.eventsFunctionsExtensionWriter,
+    getEventsFunctionsExtensionOpener: () =>
+      this.props.eventsFunctionsExtensionOpener,
   };
 
   _loadProjectEventsFunctionsExtensions(project: ?gdProject): Promise<void> {
-    const { i18n, eventsFunctionWriter } = this.props;
-    if (!project || !eventsFunctionWriter) return Promise.resolve();
+    const { i18n, eventsFunctionCodeWriter } = this.props;
+    if (!project || !eventsFunctionCodeWriter) return Promise.resolve();
 
-    return loadProjectEventsFunctionsExtensions(project, eventsFunctionWriter)
+    return loadProjectEventsFunctionsExtensions(
+      project,
+      eventsFunctionCodeWriter
+    )
       .then(() =>
         this.setState({
           eventsFunctionsExtensionsError: null,

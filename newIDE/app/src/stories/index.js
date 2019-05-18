@@ -5,6 +5,7 @@ import { storiesOf } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { linkTo } from '@storybook/addon-links';
 
+import { I18n } from '@lingui/react';
 import Welcome from './Welcome';
 import HelpButton from '../UI/HelpButton';
 import HelpIcon from '../UI/HelpIcon';
@@ -126,6 +127,7 @@ import BehaviorTypeSelector from '../BehaviorTypeSelector';
 import ObjectTypeSelector from '../ObjectTypeSelector';
 import NewBehaviorDialog from '../BehaviorsEditor/NewBehaviorDialog';
 import ExtensionsSearchDialog from '../ExtensionsSearch/ExtensionsSearchDialog';
+import EventsFunctionsExtensionsProvider from '../EventsFunctionsExtensionsLoader/EventsFunctionsExtensionsProvider';
 
 // No i18n in this file
 
@@ -1922,11 +1924,22 @@ storiesOf('EventsFunctionsExtensionEditor/OptionsEditorDialog', module)
   .addDecorator(muiDecorator)
   .addDecorator(i18nProviderDecorator)
   .add('default', () => (
-    <OptionsEditorDialog
-      eventsFunctionsExtension={testEventsFunctionsExtension}
-      open
-      onClose={action('close')}
-    />
+    <I18n>
+      {({ i18n }) => (
+        <EventsFunctionsExtensionsProvider
+          i18n={i18n}
+          eventsFunctionCodeWriter={null}
+          eventsFunctionsExtensionWriter={null}
+          eventsFunctionsExtensionOpener={null}
+        >
+          <OptionsEditorDialog
+            eventsFunctionsExtension={testEventsFunctionsExtension}
+            open
+            onClose={action('close')}
+          />
+        </EventsFunctionsExtensionsProvider>
+      )}
+    </I18n>
   ));
 
 storiesOf('EventsBasedBehaviorEditor', module)
@@ -2103,5 +2116,19 @@ storiesOf('ExtensionsSearchDialog', module)
   .addDecorator(muiDecorator)
   .addDecorator(i18nProviderDecorator)
   .add('default', () => (
-    <ExtensionsSearchDialog project={project} onClose={action('on close')} />
+    <I18n>
+      {({ i18n }) => (
+        <EventsFunctionsExtensionsProvider
+          i18n={i18n}
+          eventsFunctionCodeWriter={null}
+          eventsFunctionsExtensionWriter={null}
+          eventsFunctionsExtensionOpener={null}
+        >
+          <ExtensionsSearchDialog
+            project={project}
+            onClose={action('on close')}
+          />
+        </EventsFunctionsExtensionsProvider>
+      )}
+    </I18n>
   ));

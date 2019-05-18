@@ -24,6 +24,32 @@ import EventsFunctionsExtensionsContext, {
 import PlaceholderError from '../UI/PlaceholderError';
 import EmptyMessage from '../UI/EmptyMessage';
 
+/**
+ * Add a serialized (JS object) events function extension to the project,
+ * triggering reload of extensions.
+ */
+export const addSerializedExtensionToProject = (
+  eventsFunctionsExtensionsState: EventsFunctionsExtensionsState,
+  project: gdProject,
+  serializedExtension: SerializedExtension
+): Promise<void> => {
+  const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
+    serializedExtension.name,
+    0
+  );
+
+  unserializeFromJSObject(
+    newEventsFunctionsExtension,
+    serializedExtension,
+    'unserializeFrom',
+    project
+  );
+
+  return eventsFunctionsExtensionsState.loadProjectEventsFunctionsExtensions(
+    project
+  );
+};
+
 type Props = {|
   project: gdProject,
   onNewExtensionInstalled: () => void,
@@ -47,23 +73,6 @@ const styles = {
   disabledItem: { opacity: 0.6 },
 };
 
-const addSerializedExtensionToProject = (
-  project: gdProject,
-  serializedExtension: SerializedExtension
-) => {
-  const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
-    serializedExtension.name,
-    0
-  );
-
-  unserializeFromJSObject(
-    newEventsFunctionsExtension,
-    serializedExtension,
-    'unserializeFrom',
-    project
-  );
-};
-
 const filterExtensionShortHeaders = (
   extensionShortHeaders: Array<ExtensionShortHeader>,
   { searchText }: FilteringOptions
@@ -79,6 +88,10 @@ const filterExtensionShortHeaders = (
 
 const MAX_DISPLAYED_RESULTS = 20;
 
+/**
+ * Display a list of extensions that the user can search in.
+ * Can be used as is, or in a dialog (see ExtensionsSearchDialog).
+ */
 export default class ExtensionsSearch extends Component<Props, State> {
   state = {
     isInstalling: false,
@@ -124,16 +137,15 @@ export default class ExtensionsSearch extends Component<Props, State> {
     getExtension(extensionShortHeader)
       .then(
         serializedExtension => {
-          addSerializedExtensionToProject(project, serializedExtension);
-          this.setState({
-            selectedExtensionShortHeader: null,
+          return addSerializedExtensionToProject(
+            eventsFunctionsExtensionsState,
+            project,
+            serializedExtension
+          ).then(() => {
+            this.setState({
+              selectedExtensionShortHeader: null,
+            }, () => this.props.onNewExtensionInstalled());
           });
-
-          eventsFunctionsExtensionsState
-            .loadProjectEventsFunctionsExtensions(project)
-            .then(() => {
-              this.props.onNewExtensionInstalled();
-            });
         },
         err => {
           showErrorBox(

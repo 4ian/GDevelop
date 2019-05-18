@@ -19,10 +19,12 @@ import LocalPreviewLauncher from './Export/LocalExporters/LocalPreviewLauncher';
 import { getLocalExporters } from './Export/LocalExporters';
 import ElectronMainMenu from './MainFrame/ElectronMainMenu';
 import makeExtensionsLoader from './JsExtensionsLoader/LocalJsExtensionsLoader';
-import { makeLocalEventsFunctionWriter } from './EventsFunctionsExtensionsLoader/LocalEventsFunctionWriter';
+import { makeLocalEventsFunctionCodeWriter } from './EventsFunctionsExtensionsLoader/CodeWriters/LocalEventsFunctionCodeWriter';
 import ObjectsEditorService from './ObjectEditor/ObjectsEditorService';
 import ObjectsRenderingService from './ObjectsRendering/ObjectsRenderingService';
 import Providers from './MainFrame/Providers';
+import LocalEventsFunctionsExtensionWriter from './EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionWriter';
+import LocalEventsFunctionsExtensionOpener from './EventsFunctionsExtensionsLoader/Storage/LocalEventsFunctionsExtensionOpener';
 const gd = global.gd;
 
 export const create = (authentification: Authentification) => {
@@ -36,7 +38,9 @@ export const create = (authentification: Authentification) => {
       <Providers
         authentification={authentification}
         disableCheckForUpdates={!!appArguments['disable-update-check']}
-        eventsFunctionWriter={null}
+        eventsFunctionCodeWriter={null}
+        eventsFunctionsExtensionWriter={null}
+        eventsFunctionsExtensionOpener={null}
       >
         {({ i18n, eventsFunctionsExtensionsState }) => (
           <ExternalEditor
@@ -65,7 +69,9 @@ export const create = (authentification: Authentification) => {
       <Providers
         authentification={authentification}
         disableCheckForUpdates={!!appArguments['disable-update-check']}
-        eventsFunctionWriter={makeLocalEventsFunctionWriter()}
+        eventsFunctionCodeWriter={makeLocalEventsFunctionCodeWriter()}
+        eventsFunctionsExtensionWriter={LocalEventsFunctionsExtensionWriter}
+        eventsFunctionsExtensionOpener={LocalEventsFunctionsExtensionOpener}
       >
         {({ i18n, eventsFunctionsExtensionsState }) => (
           <ElectronMainMenu i18n={i18n}>

@@ -12,7 +12,7 @@ import {
 
 const gd = global.gd;
 
-export type EventsFunctionWriter = {|
+export type EventsFunctionCodeWriter = {|
   getIncludeFileFor: (functionName: string) => string,
   writeFunctionCode: (functionName: string, code: string) => Promise<void>,
   writeBehaviorCode: (behaviorName: string, code: string) => Promise<void>,
@@ -20,7 +20,7 @@ export type EventsFunctionWriter = {|
 
 type Options = {|
   skipCodeGeneration?: boolean,
-  eventsFunctionWriter: EventsFunctionWriter,
+  eventsFunctionCodeWriter: EventsFunctionCodeWriter,
 |};
 
 const mangleName = (name: string) => {
@@ -32,7 +32,7 @@ const mangleName = (name: string) => {
  */
 export const loadProjectEventsFunctionsExtensions = (
   project: gdProject,
-  eventsFunctionWriter: EventsFunctionWriter
+  eventsFunctionCodeWriter: EventsFunctionCodeWriter
 ): Promise<Array<void>> => {
   return Promise.all(
     // First pass: generate extensions from the events functions extensions,
@@ -43,7 +43,7 @@ export const loadProjectEventsFunctionsExtensions = (
       return loadProjectEventsFunctionsExtension(
         project,
         project.getEventsFunctionsExtensionAt(i),
-        { skipCodeGeneration: true, eventsFunctionWriter }
+        { skipCodeGeneration: true, eventsFunctionCodeWriter }
       );
     })
   ).then(() =>
@@ -55,7 +55,7 @@ export const loadProjectEventsFunctionsExtensions = (
           project.getEventsFunctionsExtensionAt(i),
           {
             skipCodeGeneration: false,
-            eventsFunctionWriter,
+            eventsFunctionCodeWriter,
           }
         );
       })
@@ -142,7 +142,7 @@ const generateFreeFunction = (
   eventsFunction: gdEventsFunction,
   {
     skipCodeGeneration,
-    eventsFunctionWriter,
+    eventsFunctionCodeWriter,
     codeNamespacePrefix,
   }: {| ...Options, codeNamespacePrefix: string |}
 ) => {
@@ -161,7 +161,7 @@ const generateFreeFunction = (
 
   const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
   codeExtraInformation
-    .setIncludeFile(eventsFunctionWriter.getIncludeFileFor(functionName))
+    .setIncludeFile(eventsFunctionCodeWriter.getIncludeFileFor(functionName))
     .setFunctionName(functionName);
 
   if (!skipCodeGeneration) {
@@ -189,7 +189,7 @@ const generateFreeFunction = (
 
     includeFiles.delete();
 
-    return eventsFunctionWriter.writeFunctionCode(functionName, code);
+    return eventsFunctionCodeWriter.writeFunctionCode(functionName, code);
   } else {
     // Skip code generation if no events function writer is provided.
     // This is the case during the "first pass", where all events functions extensions
@@ -217,7 +217,7 @@ function generateBehavior(
     mangleName(eventsBasedBehavior.getName());
 
   behaviorMetadata.setIncludeFile(
-    options.eventsFunctionWriter.getIncludeFileFor(codeNamespace)
+    options.eventsFunctionCodeWriter.getIncludeFileFor(codeNamespace)
   );
 
   return Promise.resolve().then(() => {
@@ -255,7 +255,7 @@ function generateBehavior(
         const codeExtraInformation = instructionOrExpression.getCodeExtraInformation();
         codeExtraInformation
           .setIncludeFile(
-            options.eventsFunctionWriter.getIncludeFileFor(
+            options.eventsFunctionCodeWriter.getIncludeFileFor(
               eventsFunctionMangledName
             )
           )
@@ -291,7 +291,7 @@ function generateBehavior(
 
       includeFiles.delete();
 
-      return options.eventsFunctionWriter.writeBehaviorCode(
+      return options.eventsFunctionCodeWriter.writeBehaviorCode(
         codeNamespace,
         code
       );

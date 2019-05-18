@@ -28,7 +28,7 @@ export const makeBrowserS3EventsFunctionWriter = (): EventsFunctionWriter => {
     },
     writeBehaviorCode: (behaviorName: string, code: string): Promise<void> => {
       const key = getPathFor(behaviorName); //TODO: Use different filename?
-      console.log(`Uploading function generated code to ${key}...`);
+      console.log(`Uploading behavior generated code to ${key}...`);
       return uploadObject({
         Key: getPathFor(behaviorName),
         Body: code,

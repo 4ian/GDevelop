@@ -29,9 +29,11 @@ EventsFunctionsExtension& EventsFunctionsExtension::operator=(
 void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
   version = other.version;
   extensionNamespace = other.extensionNamespace;
+  shortDescription = other.shortDescription;
   description = other.description;
   name = other.name;
   fullName = other.fullName;
+  tags = other.tags;
   EventsFunctionsContainer::Init(other);
   eventsBasedBehaviors = other.eventsBasedBehaviors;
 }
@@ -39,9 +41,11 @@ void EventsFunctionsExtension::Init(const gd::EventsFunctionsExtension& other) {
 void EventsFunctionsExtension::SerializeTo(SerializerElement& element) const {
   element.SetAttribute("version", version);
   element.SetAttribute("extensionNamespace", extensionNamespace);
+  element.SetAttribute("shortDescription", shortDescription);
   element.SetAttribute("description", description);
   element.SetAttribute("name", name);
   element.SetAttribute("fullName", fullName);
+  element.SetAttribute("tags", tags);
 
   SerializeEventsFunctionsTo(element.AddChild("eventsFunctions"));
   eventsBasedBehaviors.SerializeElementsTo(
@@ -52,9 +56,11 @@ void EventsFunctionsExtension::UnserializeFrom(
     gd::Project& project, const SerializerElement& element) {
   version = element.GetStringAttribute("version");
   extensionNamespace = element.GetStringAttribute("extensionNamespace");
+  shortDescription = element.GetStringAttribute("shortDescription");
   description = element.GetStringAttribute("description");
   name = element.GetStringAttribute("name");
   fullName = element.GetStringAttribute("fullName");
+  tags = element.GetStringAttribute("tags");
 
   UnserializeEventsFunctionsFrom(project, element.GetChild("eventsFunctions"));
   eventsBasedBehaviors.UnserializeElementsFrom(

@@ -58,6 +58,12 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
+  const gd::String& GetShortDescription() const { return shortDescription; };
+  EventsFunctionsExtension& SetShortDescription(const gd::String& shortDescription_) {
+    shortDescription = shortDescription_;
+    return *this;
+  }
+
   const gd::String& GetDescription() const { return description; };
   EventsFunctionsExtension& SetDescription(const gd::String& description_) {
     description = description_;
@@ -73,6 +79,12 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   const gd::String& GetFullName() const { return fullName; };
   EventsFunctionsExtension& SetFullName(const gd::String& fullName_) {
     fullName = fullName_;
+    return *this;
+  }
+
+  const gd::String& GetTags() const { return tags; };
+  EventsFunctionsExtension& SetTags(const gd::String& tags_) {
+    tags = tags_;
     return *this;
   }
 
@@ -115,9 +127,11 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
 
   gd::String version;
   gd::String extensionNamespace;
+  gd::String shortDescription;
   gd::String description;
   gd::String name;
   gd::String fullName;
+  gd::String tags;
   SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
 };
 

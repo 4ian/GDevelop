@@ -55,7 +55,17 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
             fullWidth
           />
           <TextField
-            floatingLabelText={<Trans>Description</Trans>}
+            floatingLabelText={<Trans>Short description</Trans>}
+            value={eventsFunctionsExtension.getShortDescription()}
+            onChange={(e, text) => {
+              eventsFunctionsExtension.setShortDescription(text);
+              this.forceUpdate();
+            }}
+            multiLine
+            fullWidth
+          />
+          <TextField
+            floatingLabelText={<Trans>Description (markdown supported)</Trans>}
             value={eventsFunctionsExtension.getDescription()}
             onChange={(e, text) => {
               eventsFunctionsExtension.setDescription(text);
@@ -69,6 +79,15 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
             value={eventsFunctionsExtension.getVersion()}
             onChange={(e, text) => {
               eventsFunctionsExtension.setVersion(text);
+              this.forceUpdate();
+            }}
+            fullWidth
+          />
+          <TextField
+            floatingLabelText={<Trans>Tags (comma separated)</Trans>}
+            value={eventsFunctionsExtension.getTags()}
+            onChange={(e, text) => {
+              eventsFunctionsExtension.setTags(text);
               this.forceUpdate();
             }}
             fullWidth

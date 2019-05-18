@@ -1730,12 +1730,16 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetNamespace();
     [Ref] EventsFunctionsExtension SetVersion([Const] DOMString version);
     [Const, Ref] DOMString GetVersion();
+    [Ref] EventsFunctionsExtension SetShortDescription([Const] DOMString shortDescription);
+    [Const, Ref] DOMString GetShortDescription();
     [Ref] EventsFunctionsExtension SetDescription([Const] DOMString description);
     [Const, Ref] DOMString GetDescription();
     [Ref] EventsFunctionsExtension SetName([Const] DOMString name);
     [Const, Ref] DOMString GetName();
     [Ref] EventsFunctionsExtension SetFullName([Const] DOMString fullName);
     [Const, Ref] DOMString GetFullName();
+    [Ref] EventsFunctionsExtension SetTags([Const] DOMString tags);
+    [Const, Ref] DOMString GetTags();
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
 

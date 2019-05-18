@@ -10,6 +10,7 @@ export type ExtensionShortHeader = {|
   version: string,
   url: string,
   headerUrl: string,
+  tags: string,
 |};
 export type ExtensionHeader = {|
   ...ExtensionShortHeader,
@@ -25,8 +26,18 @@ export type ExtensionsRegistry = {
   extensionShortHeaders: Array<ExtensionShortHeader>,
 };
 
+// Handle urls to extension header or file. If the URL is not absolute and HTTPS,
+// it is assumed to be relative to the registry base url.
+const resolveExtensionUrl = (url: string): string => {
+  const trimmedUrl = url.trim();
+  if (trimmedUrl.indexOf('https://') === 0) {
+    return trimmedUrl;
+  }
+
+  return `${GDevelopExtensionApi.baseUrl}/${trimmedUrl}`;
+};
+
 export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
-  // TODO: Caching for a few minutes/hours?
   return axios
     .get(`${GDevelopExtensionApi.baseUrl}/extensions-registry.json`)
     .then(response => response.data);
@@ -35,17 +46,15 @@ export const getExtensionsRegistry = (): Promise<ExtensionsRegistry> => {
 export const getExtensionHeader = (
   extensionShortHeader: ExtensionShortHeader
 ): Promise<ExtensionHeader> => {
-  // TODO: Handle absolute urls?
   return axios
-    .get(`${GDevelopExtensionApi.baseUrl}/${extensionShortHeader.headerUrl}`)
+    .get(resolveExtensionUrl(extensionShortHeader.headerUrl))
     .then(response => response.data);
 };
 
 export const getExtension = (
   extensionHeader: ExtensionShortHeader | ExtensionHeader
 ): Promise<SerializedExtension> => {
-  // TODO: Handle absolute urls?
   return axios
-    .get(`${GDevelopExtensionApi.baseUrl}/${extensionHeader.url}`)
+    .get(resolveExtensionUrl(extensionHeader.url))
     .then(response => response.data);
 };

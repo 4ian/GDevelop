@@ -216,9 +216,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
                       search for new behaviors to install.
                     </Trans>
                   </EmptyMessage>
-                )
-                // TODO: Button to search behaviors
-                }
+                )}
                 <List>
                   {behaviors.map((behaviorMetadata, index) => (
                     <BehaviorListItem

@@ -152,7 +152,6 @@ gd::String EventsCodeGenerator::GenerateBehaviorEventsFunctionCode(
   codeGenerator.SetCodeNamespace(codeNamespace);
   codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
-  // TODO: Refactor this?
   gd::String output = GenerateEventsListCompleteFunctionCode(
       project,
       codeGenerator,

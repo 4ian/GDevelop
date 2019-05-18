@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { userWantsToUseExternalPath } from './ResourceUtils.js';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const electron = optionalRequire('electron');
 const dialog = electron ? electron.remote.dialog : null;
@@ -164,6 +165,8 @@ const selectLocalResourcePath = (
       },
       paths => {
         if (!paths) return resolve([]);
+        if (!userWantsToUseExternalPath(project, paths[0])) return resolve([]);
+
         return resolve(paths);
       }
     );

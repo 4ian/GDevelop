@@ -2,6 +2,7 @@
 import ResourcesLoader from '../ResourcesLoader';
 import optionalRequire from '../Utils/OptionalRequire.js';
 const fs = optionalRequire('fs');
+const path = optionalRequire('path');
 
 export const RESOURCE_EXTENSIONS = {
   image: 'png,jpg,jpeg,PNG,JPG,JPEG',
@@ -48,12 +49,42 @@ export const getLocalResourceFullPath = (
   return resourcePath;
 };
 
-export const resourceHasValidPath = (
+export const isResourcePathinProjectFolder = (
+  project: gdProject,
+  resourcePath: string
+) => {
+  const projectPath = path.dirname(project.getProjectFile());
+  return resourcePath.includes(projectPath);
+};
+
+export const userWantsToUseExternalPath = (
+  project: gdProject,
+  resourcePath: string
+) => {
+  if (!isResourcePathinProjectFolder(project, resourcePath)) {
+    // eslint-disable-next-line
+    const answer = confirm(
+      resourcePath +
+        '\n\nIs residing outside of the project folder and may no longer be found if the project folder is moved!\nAre you sure you want to proceed?'
+    );
+    return answer;
+  }
+  return true;
+};
+
+export const getResourceFilePathStatus = (
   project: gdProject,
   resourceName: string
 ) => {
-  if (!fs) return true;
+  if (!fs) return 0;
+  const resourcePath = path.normalize(
+    getLocalResourceFullPath(project, resourceName)
+  );
 
-  const resourcePath = getLocalResourceFullPath(project, resourceName);
-  return fs.existsSync(resourcePath);
+  // the resource path is outside of the project folder
+  if (!isResourcePathinProjectFolder(project, resourcePath)) return 1;
+  // the resource path doesnt exist
+  if (!fs.existsSync(resourcePath)) return 2;
+  // the resource path seems ok
+  return 0;
 };

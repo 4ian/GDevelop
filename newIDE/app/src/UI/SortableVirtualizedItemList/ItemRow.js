@@ -28,7 +28,7 @@ type Props = {
   selected: true,
   onItemSelected: () => void,
   buildMenuTemplate: Item => any,
-  hasErrors: boolean,
+  errorStatus: 0 | 1 | 2,
 };
 
 class ThemableItemRow extends React.Component<Props, *> {
@@ -64,7 +64,7 @@ class ThemableItemRow extends React.Component<Props, *> {
       selected,
       style,
       getThumbnail,
-      hasErrors,
+      errorStatus,
       muiTheme,
     } = this.props;
 
@@ -98,11 +98,18 @@ class ThemableItemRow extends React.Component<Props, *> {
     const itemStyle = {
       borderBottom: `1px solid ${muiTheme.listItem.separatorColor}`,
       backgroundColor: selected
-        ? hasErrors
+        ? errorStatus < 1
+          ? muiTheme.listItem.selectedBackgroundColor
+          : errorStatus > 1
           ? muiTheme.listItem.selectedErrorBackgroundColor
-          : muiTheme.listItem.selectedBackgroundColor
+          : muiTheme.listItem.selectedWarningBackgroundColor
         : undefined,
-      color: hasErrors ? muiTheme.listItem.errorTextColor : undefined,
+      color:
+        errorStatus < 1
+          ? undefined
+          : errorStatus > 1
+          ? muiTheme.listItem.errorTextColor
+          : muiTheme.listItem.warningTextColor,
     };
 
     return (

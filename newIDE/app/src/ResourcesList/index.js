@@ -10,7 +10,7 @@ import optionalRequire from '../Utils/OptionalRequire.js';
 import {
   createOrUpdateResource,
   getLocalResourceFullPath,
-  resourceHasValidPath,
+  getResourceFilePathStatus,
   RESOURCE_EXTENSIONS,
 } from './ResourceUtils.js';
 import { type ResourceKind } from './ResourceSource.flow';
@@ -31,7 +31,7 @@ const styles = {
 type State = {|
   renamedResource: ?gdResource,
   searchText: string,
-  resourcesWithMissingPath: { [string]: boolean },
+  resourcesWithErrors: { [string]: 0 | 1 | 2 },
 |};
 
 type Props = {|
@@ -51,7 +51,7 @@ export default class ResourcesList extends React.Component<Props, State> {
   state: State = {
     renamedResource: null,
     searchText: '',
-    resourcesWithMissingPath: {},
+    resourcesWithErrors: {},
   };
 
   shouldComponentUpdate(nextProps: Props, nextState: State) {
@@ -151,7 +151,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       .getAllResourceNames()
       .toJSArray()
       .forEach(resourceName => {
-        if (!resourceHasValidPath(project, resourceName)) {
+        if (getResourceFilePathStatus(project, resourceName) === 2) {
           resourcesManager.removeResource(resourceName);
           console.info('Removed due to invalid path: ' + resourceName);
         }
@@ -306,14 +306,14 @@ export default class ResourcesList extends React.Component<Props, State> {
     const { project } = this.props;
     const resourcesManager = project.getResourcesManager();
     const resourceNames = resourcesManager.getAllResourceNames().toJSArray();
-    const resourcesWithMissingPath = {};
+    const resourcesWithErrors = {};
     resourceNames.forEach(resourceName => {
-      resourcesWithMissingPath[resourceName] = !resourceHasValidPath(
+      resourcesWithErrors[resourceName] = getResourceFilePathStatus(
         project,
         resourceName
       );
     });
-    this.setState({ resourcesWithMissingPath });
+    this.setState({ resourcesWithErrors });
     this.forceUpdateList();
   };
 
@@ -358,7 +358,7 @@ export default class ResourcesList extends React.Component<Props, State> {
                 buildMenuTemplate={this._renderResourceMenuTemplate}
                 helperClass="sortable-helper"
                 distance={20}
-                erroredItems={this.state.resourcesWithMissingPath}
+                erroredItems={this.state.resourcesWithErrors}
               />
             )}
           </AutoSizer>

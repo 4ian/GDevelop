@@ -49,7 +49,9 @@ export default class LocalEventsFunctionsExtensionOpener {
     });
   };
 
-  static readEventsFunctionExtensionFile = (filepath: string): Promise<Object> => {
+  static readEventsFunctionExtensionFile = (
+    filepath: string
+  ): Promise<Object> => {
     return readJSONFile(filepath);
   };
 }

@@ -33,10 +33,15 @@ export const addSerializedExtensionToProject = (
   project: gdProject,
   serializedExtension: SerializedExtension
 ): Promise<void> => {
-  const newEventsFunctionsExtension = project.insertNewEventsFunctionsExtension(
-    serializedExtension.name,
-    0
-  );
+  const { name } = serializedExtension;
+  if (!name)
+    return Promise.reject(new Error('Malformed extension (missing name).'));
+
+  const newEventsFunctionsExtension = project.hasEventsFunctionsExtensionNamed(
+    name
+  )
+    ? project.getEventsFunctionsExtension(name)
+    : project.insertNewEventsFunctionsExtension(name, 0);
 
   unserializeFromJSObject(
     newEventsFunctionsExtension,
@@ -142,9 +147,12 @@ export default class ExtensionsSearch extends Component<Props, State> {
             project,
             serializedExtension
           ).then(() => {
-            this.setState({
-              selectedExtensionShortHeader: null,
-            }, () => this.props.onNewExtensionInstalled());
+            this.setState(
+              {
+                selectedExtensionShortHeader: null,
+              },
+              () => this.props.onNewExtensionInstalled()
+            );
           });
         },
         err => {

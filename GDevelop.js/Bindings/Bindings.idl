@@ -1740,6 +1740,8 @@ interface EventsFunctionsExtension {
     [Const, Ref] DOMString GetFullName();
     [Ref] EventsFunctionsExtension SetTags([Const] DOMString tags);
     [Const, Ref] DOMString GetTags();
+    [Ref] EventsFunctionsExtension SetAuthor([Const] DOMString author);
+    [Const, Ref] DOMString GetAuthor();
 
     [Ref] EventsBasedBehaviorsList GetEventsBasedBehaviors();
 

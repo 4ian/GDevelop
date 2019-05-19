@@ -88,6 +88,12 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
     return *this;
   }
 
+  const gd::String& GetAuthor() const { return author; };
+  EventsFunctionsExtension& SetAuthor(const gd::String& author_) {
+    author = author_;
+    return *this;
+  }
+
   /**
    * \brief Return a reference to the list of the events based behaviors.
    */
@@ -132,6 +138,7 @@ class GD_CORE_API EventsFunctionsExtension : public EventsFunctionsContainer {
   gd::String name;
   gd::String fullName;
   gd::String tags;
+  gd::String author;
   SerializableWithNameList<EventsBasedBehavior> eventsBasedBehaviors;
 };
 

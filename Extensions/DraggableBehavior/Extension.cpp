@@ -6,8 +6,8 @@ This project is released under the MIT License.
 */
 
 #include "GDCpp/Extensions/ExtensionBase.h"
-
 #include "DraggableBehavior.h"
+#include "DraggableRuntimeBehavior.h"
 
 void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
   extension.SetExtensionInformation(
@@ -30,8 +30,6 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
                             std::shared_ptr<gd::BehaviorsSharedData>());
 
 #if defined(GD_IDE_ONLY)
-  aut.SetIncludeFile("DraggableBehavior/DraggableBehavior.h");
-
   aut.AddCondition("Dragged",
                    _("Being dragged"),
                    _("Check if the object is being dragged"),
@@ -42,9 +40,7 @@ void DeclareDraggableBehaviorExtension(gd::PlatformExtension& extension) {
 
       .AddParameter("object", _("Object"))
       .AddParameter("behavior", _("Behavior"), "Draggable")
-
-      .SetFunctionName("IsDragged")
-      .SetIncludeFile("DraggableBehavior/DraggableBehavior.h");
+      .SetFunctionName("IsDragged");
 #endif
 }
 
@@ -59,6 +55,11 @@ class Extension : public ExtensionBase {
    */
   Extension() {
     DeclareDraggableBehaviorExtension(*this);
+    AddRuntimeBehavior<DraggableRuntimeBehavior>(
+        GetBehaviorMetadata("DraggableBehavior::Draggable"),
+        "DraggableRuntimeBehavior");
+    GetBehaviorMetadata("DraggableBehavior::Draggable")
+        .SetIncludeFile("DraggableBehavior/DraggableRuntimeBehavior.h");
     GD_COMPLETE_EXTENSION_COMPILATION_INFORMATION();
   };
 };

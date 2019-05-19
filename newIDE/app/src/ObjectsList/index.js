@@ -16,7 +16,7 @@ import {
   unserializeFromJSObject,
 } from '../Utils/Serializer';
 import { showWarningBox } from '../UI/Messages/MessageBox';
-import { makeAddItem } from '../UI/ListAddItem';
+import { makeAddItem } from '../UI/ListCommonItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 import { enumerateObjects, filterObjectsList } from './EnumerateObjects';
 import type {

@@ -8,31 +8,27 @@
 using namespace gd;
 
 /**
- * \brief A gd::BehaviorsSharedData that stores its content in JSON and forward the properties related
- * functions to Javascript with Emscripten.
+ * \brief An adapter to implement a gd::BehaviorsSharedData in JavaScript.
+ *
+ * This is the class to be used to define shared data for a BEHAVIOR in
+ * JsExtension.js
  */
-class BehaviorSharedDataJsImplementation : public BehaviorsSharedData {
+class BehaviorSharedDataJsImplementation : public gd::BehaviorsSharedData {
  public:
-  BehaviorSharedDataJsImplementation() : BehaviorsSharedData(), jsonContent("{}") {}
-  virtual std::shared_ptr<gd::BehaviorsSharedData> Clone() const override;
+  BehaviorSharedDataJsImplementation(){};
+  virtual BehaviorSharedDataJsImplementation* Clone() const override;
 
   virtual std::map<gd::String, gd::PropertyDescriptor> GetProperties(
+      const gd::SerializerElement& behaviorSharedDataContent,
       gd::Project& project) const override;
-  virtual bool UpdateProperty(const gd::String& name,
+  virtual bool UpdateProperty(gd::SerializerElement& behaviorSharedDataContent,
+                              const gd::String& name,
                               const gd::String& value,
                               gd::Project& project) override;
+  virtual void InitializeContent(
+      gd::SerializerElement& behaviorSharedDataContent) override;
 
   void __destroy__();
 
-  virtual void SerializeTo(SerializerElement& arg0) const override;
-  virtual void UnserializeFrom(const SerializerElement& arg1) override;
-
-  const gd::String& GetRawJSONContent() const { return jsonContent; };
-  BehaviorSharedDataJsImplementation& SetRawJSONContent(const gd::String& newContent) {
-    jsonContent = newContent;
-    return *this;
-  };
-
  private:
-  gd::String jsonContent;
 };

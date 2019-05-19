@@ -15,19 +15,6 @@ namespace gd {
 /**
  * \brief The class used to save/load projects and GDCore classes
  * from/to XML or JSON.
- *
- * Usage example, with TinyXML:
- \code
-    //Unserialize from a XML string:
-    TiXmlDocument doc;
-    if ( !doc.Parse(xmlString.c_str()) )
-        return false; //Error in XML file!
-
-    TiXmlHandle hdl(&doc);
-    gd::SerializerElement rootElement;
-    gd::Serializer::FromXML(rootElement, hdl.FirstChildElement().Element());
-    game.UnserializeFrom(rootElement);
- \endcode
  */
 class GD_CORE_API Serializer {
  public:

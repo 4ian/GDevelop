@@ -12,9 +12,13 @@ import {
   enumerateEventsFunctions,
   filterEventFunctionsList,
 } from './EnumerateEventsFunctions';
-import FlatButton from 'material-ui/FlatButton';
-import { Line } from '../UI/Grid';
-import Divider from 'material-ui/Divider';
+import Clipboard from '../Utils/Clipboard';
+import {
+  serializeToJSObject,
+  unserializeFromJSObject,
+} from '../Utils/Serializer';
+
+const EVENTS_FUNCTION_CLIPBOARD_KIND = 'Events Function';
 
 const styles = {
   listContainer: {
@@ -29,19 +33,22 @@ type State = {|
 
 type Props = {|
   project: gdProject,
-  eventsFunctionsContainer: gdEventsFunctionsExtension,
+  eventsFunctionsContainer: gdEventsFunctionsContainer,
   selectedEventsFunction: ?gdEventsFunction,
   onSelectEventsFunction: (eventsFunction: ?gdEventsFunction) => void,
   onDeleteEventsFunction: (
     eventsFunction: gdEventsFunction,
     cb: (boolean) => void
   ) => void,
+  canRename: (eventsFunction: gdEventsFunction) => boolean,
   onRenameEventsFunction: (
     eventsFunction: gdEventsFunction,
     newName: string,
     cb: (boolean) => void
   ) => void,
-  onEditOptions: () => void,
+  onAddEventsFunction: ((doAdd: boolean, name: ?string) => void) => void,
+  onEventsFunctionAdded: (eventsFunction: gdEventsFunction) => void,
+  renderHeader?: () => React.Node,
 |};
 
 export default class EventsFunctionsList extends React.Component<Props, State> {
@@ -63,14 +70,19 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     searchText: '',
   };
 
-  _deleteEventsFunction = (eventsFunction: gdEventsFunction) => {
+  _deleteEventsFunction = (
+    eventsFunction: gdEventsFunction,
+    { askForConfirmation }: {| askForConfirmation: boolean |}
+  ) => {
     const { eventsFunctionsContainer } = this.props;
 
-    //eslint-disable-next-line
-    const answer = confirm(
-      "Are you sure you want to remove this function? This can't be undone."
-    );
-    if (!answer) return;
+    if (askForConfirmation) {
+      //eslint-disable-next-line
+      const answer = confirm(
+        "Are you sure you want to remove this function? This can't be undone."
+      );
+      if (!answer) return;
+    }
 
     this.props.onDeleteEventsFunction(eventsFunction, doRemove => {
       if (!doRemove) return;
@@ -80,10 +92,10 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     });
   };
 
-  _editName = (resource: ?gdEventsFunction) => {
+  _editName = (eventsFunction: ?gdEventsFunction) => {
     this.setState(
       {
-        renamedEventsFunction: resource,
+        renamedEventsFunction: eventsFunction,
       },
       () => this.sortableList.getWrappedInstance().forceUpdateGrid()
     );
@@ -121,15 +133,79 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
     this.sortableList.getWrappedInstance().forceUpdateGrid();
   };
 
-  _renderEventsFunctionMenuTemplate = (resource: gdEventsFunction) => {
+  _copyEventsFunction = (eventsFunction: gdEventsFunction) => {
+    Clipboard.set(EVENTS_FUNCTION_CLIPBOARD_KIND, {
+      eventsFunction: serializeToJSObject(eventsFunction),
+      name: eventsFunction.getName(),
+    });
+  };
+
+  _cutEventsFunction = (eventsFunction: gdEventsFunction) => {
+    this._copyEventsFunction(eventsFunction);
+    this._deleteEventsFunction(eventsFunction, { askForConfirmation: false });
+  };
+
+  _pasteEventsFunction = (index: number) => {
+    if (!Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND)) return;
+
+    const { eventsFunction: copiedEventsFunction, name } = Clipboard.get(
+      EVENTS_FUNCTION_CLIPBOARD_KIND
+    );
+    const { project, eventsFunctionsContainer } = this.props;
+
+    const newName = newNameGenerator(name, name =>
+      eventsFunctionsContainer.hasEventsFunctionNamed(name)
+    );
+
+    const newEventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
+      newName,
+      index
+    );
+
+    unserializeFromJSObject(
+      newEventsFunction,
+      copiedEventsFunction,
+      'unserializeFrom',
+      project
+    );
+    newEventsFunction.setName(newName);
+    this.props.onEventsFunctionAdded(newEventsFunction);
+
+    this.forceUpdate();
+  };
+
+  _renderEventsFunctionMenuTemplate = (
+    eventsFunction: gdEventsFunction,
+    index: number
+  ) => {
     return [
       {
         label: 'Rename',
-        click: () => this._editName(resource),
+        click: () => this._editName(eventsFunction),
+        enabled: this.props.canRename(eventsFunction),
       },
       {
         label: 'Remove',
-        click: () => this._deleteEventsFunction(resource),
+        click: () =>
+          this._deleteEventsFunction(eventsFunction, {
+            askForConfirmation: true,
+          }),
+      },
+      {
+        type: 'separator',
+      },
+      {
+        label: 'Copy',
+        click: () => this._copyEventsFunction(eventsFunction),
+      },
+      {
+        label: 'Cut',
+        click: () => this._cutEventsFunction(eventsFunction),
+      },
+      {
+        label: 'Paste',
+        enabled: Clipboard.has(EVENTS_FUNCTION_CLIPBOARD_KIND),
+        click: () => this._pasteEventsFunction(index),
       },
     ];
   };
@@ -137,14 +213,24 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
   _addNewEventsFunction = () => {
     const { eventsFunctionsContainer } = this.props;
 
-    const name = newNameGenerator('Function', name =>
-      eventsFunctionsContainer.hasEventsFunctionNamed(name)
-    );
-    eventsFunctionsContainer.insertNewEventsFunction(
-      name,
-      eventsFunctionsContainer.getEventsFunctionsCount()
-    );
-    this.forceUpdate();
+    this.props.onAddEventsFunction((doAdd: boolean, name: ?string) => {
+      if (!doAdd) {
+        return;
+      }
+
+      const eventsFunctionName =
+        name ||
+        newNameGenerator('Function', name =>
+          eventsFunctionsContainer.hasEventsFunctionNamed(name)
+        );
+
+      const eventsFunction = eventsFunctionsContainer.insertNewEventsFunction(
+        eventsFunctionName,
+        eventsFunctionsContainer.getEventsFunctionsCount()
+      );
+      this.props.onEventsFunctionAdded(eventsFunction);
+      this.forceUpdate();
+    });
   };
 
   render() {
@@ -153,6 +239,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
       eventsFunctionsContainer,
       selectedEventsFunction,
       onSelectEventsFunction,
+      renderHeader,
     } = this.props;
     const { searchText } = this.state;
 
@@ -173,14 +260,7 @@ export default class EventsFunctionsList extends React.Component<Props, State> {
 
     return (
       <Background>
-        <Line justifyContent="center">
-          <FlatButton
-            label={<Trans>Edit extension options</Trans>}
-            primary
-            onClick={() => this.props.onEditOptions()}
-          />
-        </Line>
-        <Divider />
+        {renderHeader ? renderHeader() : null}
         <div style={styles.listContainer}>
           <AutoSizer>
             {({ height, width }) => (

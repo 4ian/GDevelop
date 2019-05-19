@@ -9,8 +9,8 @@
 
 using namespace gd;
 
-std::shared_ptr<gd::BehaviorsSharedData>
-BehaviorSharedDataJsImplementation::Clone() const {
+BehaviorSharedDataJsImplementation* BehaviorSharedDataJsImplementation::Clone()
+    const {
   BehaviorSharedDataJsImplementation* clone =
       new BehaviorSharedDataJsImplementation(*this);
 
@@ -25,14 +25,17 @@ BehaviorSharedDataJsImplementation::Clone() const {
 
         clone['getProperties'] = self['getProperties'];
         clone['updateProperty'] = self['updateProperty'];
+        clone['initializeContent'] = self['initializeContent'];
       },
       (int)clone,
       (int)this);
 
-  return std::shared_ptr<gd::BehaviorsSharedData>(clone);
+  return clone;
 }
 std::map<gd::String, gd::PropertyDescriptor>
-BehaviorSharedDataJsImplementation::GetProperties(gd::Project&) const {
+BehaviorSharedDataJsImplementation::GetProperties(
+    const gd::SerializerElement& behaviorSharedDataContent,
+    gd::Project&) const {
   std::map<gd::String, gd::PropertyDescriptor>* jsCreatedProperties = nullptr;
   std::map<gd::String, gd::PropertyDescriptor> copiedProperties;
 
@@ -43,49 +46,56 @@ BehaviorSharedDataJsImplementation::GetProperties(gd::Project&) const {
         if (!self.hasOwnProperty('getProperties'))
           throw 'getProperties is not defined on a BehaviorSharedDataJsImplementation.';
 
-        var objectContent = JSON.parse(Pointer_stringify($1));
-        var newProperties = self['getProperties'](objectContent);
+        var newProperties =
+            self['getProperties'](wrapPointer($1, Module['SerializerElement']));
         if (!newProperties)
           throw 'getProperties returned nothing in a gd::BehaviorSharedDataJsImplementation.';
 
         return getPointer(newProperties);
       },
       (int)this,
-      jsonContent.c_str());
+      (int)&behaviorSharedDataContent);
 
   copiedProperties = *jsCreatedProperties;
   delete jsCreatedProperties;
   return copiedProperties;
 }
-bool BehaviorSharedDataJsImplementation::UpdateProperty(const gd::String& arg0,
-                                                        const gd::String& arg1,
-                                                        Project&) {
-  jsonContent = (const char*)EM_ASM_INT(
+bool BehaviorSharedDataJsImplementation::UpdateProperty(
+    gd::SerializerElement& behaviorSharedDataContent,
+    const gd::String& arg0,
+    const gd::String& arg1,
+    Project&) {
+  EM_ASM_INT(
       {
         var self = Module['getCache'](
             Module['BehaviorSharedDataJsImplementation'])[$0];
         if (!self.hasOwnProperty('updateProperty'))
           throw 'updateProperty is not defined on a BehaviorSharedDataJsImplementation.';
-        var objectContent = JSON.parse(Pointer_stringify($1));
-        self['updateProperty'](
-            objectContent, Pointer_stringify($2), Pointer_stringify($3));
-        return ensureString(JSON.stringify(objectContent));
+
+        self['updateProperty'](wrapPointer($1, Module['SerializerElement']),
+                               Pointer_stringify($2),
+                               Pointer_stringify($3));
       },
       (int)this,
-      jsonContent.c_str(),
+      (int)&behaviorSharedDataContent,
       arg0.c_str(),
       arg1.c_str());
 
   return true;
 }
+void BehaviorSharedDataJsImplementation::InitializeContent(
+    gd::SerializerElement& behaviorSharedDataContent) {
+  EM_ASM_INT(
+      {
+        var self = Module['getCache'](
+            Module['BehaviorSharedDataJsImplementation'])[$0];
+        if (!self.hasOwnProperty('initializeContent'))
+          throw 'initializeContent is not defined on a BehaviorSharedDataJsImplementation.';
 
-void BehaviorSharedDataJsImplementation::SerializeTo(
-    SerializerElement& arg0) const {
-  arg0.AddChild("content") = gd::Serializer::FromJSON(jsonContent);
-}
-void BehaviorSharedDataJsImplementation::UnserializeFrom(
-    const SerializerElement& arg1) {
-  jsonContent = gd::Serializer::ToJSON(arg1.GetChild("content"));
+        self['initializeContent'](wrapPointer($1, Module['SerializerElement']));
+      },
+      (int)this,
+      (int)&behaviorSharedDataContent);
 }
 
 void BehaviorSharedDataJsImplementation::__destroy__() {  // Useless?

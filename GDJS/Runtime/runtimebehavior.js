@@ -46,7 +46,7 @@ gdjs.RuntimeBehavior.prototype.stepPreEvents = function(runtimeScene) {
 	if ( this._activated ) {
 		var profiler = runtimeScene.getProfiler();
 		if (profiler) profiler.begin(this.name);
-		
+
 		this.doStepPreEvents(runtimeScene);
 
 		if (profiler) profiler.end(this.name);
@@ -62,7 +62,7 @@ gdjs.RuntimeBehavior.prototype.stepPostEvents = function(runtimeScene) {
 	if ( this._activated ) {
 		var profiler = runtimeScene.getProfiler();
 		if (profiler) profiler.begin(this.name);
-		
+
 		this.doStepPostEvents(runtimeScene);
 
 		if (profiler) profiler.end(this.name);
@@ -126,9 +126,9 @@ gdjs.RuntimeBehavior.prototype.doStepPostEvents = function(runtimeScene) {
 
 /**
  * Behaviors writers: This method is called when the owner of the behavior
- * is removed from its scene.
+ * was removed from its scene and is about to be destroyed/reused later.
  */
-gdjs.RuntimeBehavior.prototype.ownerRemovedFromScene = function() {
+gdjs.RuntimeBehavior.prototype.onOwnerRemovedFromScene = function() {
 
 }
 

@@ -9,10 +9,13 @@ This project is released under the MIT License.
 #include <map>
 #include <set>
 #include "GDCpp/Runtime/RuntimeScene.h"
-class PlatformBehavior;
+class PlatformRuntimeBehavior;
 
 /**
  * \brief Contains lists of all platform related objects of a scene.
+ *
+ * \note Could be drastically improved by using spatial hashing (see JS
+ * implementation).
  */
 class ScenePlatformObjectsManager {
  public:
@@ -29,21 +32,23 @@ class ScenePlatformObjectsManager {
    * \brief Notify the manager that there is a new platform on the scene.
    * \param platform The new platform
    */
-  void AddPlatform(PlatformBehavior* platform);
+  void AddPlatform(PlatformRuntimeBehavior* platform);
 
   /**
    * \brief Notify the manager that a platform was removed from the scene.
    * \param platform The removed platform
    */
-  void RemovePlatform(PlatformBehavior* platform);
+  void RemovePlatform(PlatformRuntimeBehavior* platform);
 
   /**
    * \brief Get a read only access to the list of all platforms
    */
-  const std::set<PlatformBehavior*>& GetAllPlatforms() { return allPlatforms; }
+  const std::set<PlatformRuntimeBehavior*>& GetAllPlatforms() {
+    return allPlatforms;
+  }
 
  private:
-  std::set<PlatformBehavior*>
+  std::set<PlatformRuntimeBehavior*>
       allPlatforms;  ///< The list of all platforms of the scene.
 };
 

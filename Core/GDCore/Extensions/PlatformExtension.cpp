@@ -225,7 +225,6 @@ gd::BehaviorMetadata& PlatformExtension::GetBehaviorMetadata(
   return badBehaviorMetadata;
 }
 
-#if defined(GD_IDE_ONLY)
 std::vector<gd::String> PlatformExtension::GetBehaviorsTypes() const {
   std::vector<gd::String> behaviors;
 
@@ -236,6 +235,7 @@ std::vector<gd::String> PlatformExtension::GetBehaviorsTypes() const {
   return behaviors;
 }
 
+#if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::InstructionMetadata>&
 PlatformExtension::GetAllActions() {
   return actionsInfos;
@@ -349,22 +349,21 @@ CreateFunPtr PlatformExtension::GetObjectCreationFunctionPtr(
   return NULL;
 }
 
-std::unique_ptr<gd::Behavior> PlatformExtension::CreateBehavior(
+gd::Behavior* PlatformExtension::GetBehavior(
     gd::String type) const {
   if (behaviorsInfo.find(type) != behaviorsInfo.end())
-    return std::unique_ptr<gd::Behavior>(
-        behaviorsInfo.find(type)->second.Get()->Clone());
+    return &behaviorsInfo.find(type)->second.Get();
 
   return nullptr;
 }
 
-std::shared_ptr<gd::BehaviorsSharedData>
-PlatformExtension::CreateBehaviorSharedDatas(gd::String type) const {
+gd::BehaviorsSharedData*
+PlatformExtension::GetBehaviorSharedDatas(gd::String type) const {
   if (behaviorsInfo.find(type) != behaviorsInfo.end() &&
       behaviorsInfo.find(type)->second.GetSharedDataInstance())
-    return behaviorsInfo.find(type)->second.GetSharedDataInstance()->Clone();
+    return behaviorsInfo.find(type)->second.GetSharedDataInstance();
 
-  return std::shared_ptr<gd::BehaviorsSharedData>();
+  return nullptr;
 }
 
 void PlatformExtension::SetNameSpace(gd::String nameSpace_) {

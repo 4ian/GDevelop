@@ -9,10 +9,13 @@ This project is released under the MIT License.
 #include <map>
 #include <set>
 #include "GDCpp/Runtime/RuntimeScene.h"
-class PathfindingObstacleBehavior;
+class PathfindingObstacleRuntimeBehavior;
 
 /**
  * \brief Contains lists of all obstacle related objects of a scene.
+ *
+ * \note Could be drastically improved by using spatial hashing (see JS
+ * implementation).
  */
 class ScenePathfindingObstaclesManager {
  public:
@@ -29,23 +32,23 @@ class ScenePathfindingObstaclesManager {
    * \brief Notify the manager that there is a new obstacle on the scene.
    * \param obstacle The new obstacle
    */
-  void AddObstacle(PathfindingObstacleBehavior* obstacle);
+  void AddObstacle(PathfindingObstacleRuntimeBehavior* obstacle);
 
   /**
    * \brief Notify the manager that a obstacle was removed from the scene.
    * \param obstacle The removed obstacle
    */
-  void RemoveObstacle(PathfindingObstacleBehavior* obstacle);
+  void RemoveObstacle(PathfindingObstacleRuntimeBehavior* obstacle);
 
   /**
    * \brief Get a read only access to the list of all obstacles
    */
-  const std::set<PathfindingObstacleBehavior*>& GetAllObstacles() const {
+  const std::set<PathfindingObstacleRuntimeBehavior*>& GetAllObstacles() const {
     return allObstacles;
   }
 
  private:
-  std::set<PathfindingObstacleBehavior*>
+  std::set<PathfindingObstacleRuntimeBehavior*>
       allObstacles;  ///< The list of all obstacles of the scene.
 };
 

@@ -12,6 +12,8 @@ import PropertiesEditor from '../PropertiesEditor';
 import propertiesMapToSchema from '../PropertiesEditor/PropertiesMapToSchema';
 import some from 'lodash/some';
 import Checkbox from 'material-ui/Checkbox';
+import { isNullPtr } from '../Utils/IsNullPtr';
+const gd = global.gd;
 
 type Props = {|
   open: boolean,
@@ -99,27 +101,47 @@ export default class ScenePropertiesDialog extends Component<Props, State> {
       .getAllBehaviorSharedDataNames()
       .toJSArray();
 
-    const propertiesEditors = allBehaviorSharedDataNames.map(name => {
-      const sharedData = layout.getBehaviorSharedData(name);
+    const propertiesEditors = allBehaviorSharedDataNames
+      .map(name => {
+        const sharedDataContent = layout.getBehaviorSharedData(name);
+        const type = sharedDataContent.getTypeName();
 
-      const properties = sharedData.getProperties(project);
-      const propertiesSchema = propertiesMapToSchema(
-        properties,
-        sharedData => sharedData.getProperties(project),
-        (sharedData, name, value) =>
-          sharedData.updateProperty(name, value, project)
-      );
+        const behaviorSharedData = gd.JsPlatform.get().getBehaviorSharedDatas(
+          type
+        );
+        if (isNullPtr(gd, behaviorSharedData)) return null;
 
-      return (
-        !!propertiesSchema.length && (
-          <PropertiesEditor
-            key={name}
-            schema={propertiesSchema}
-            instances={[sharedData]}
-          />
-        )
-      );
-    });
+        const properties = behaviorSharedData.getProperties(
+          sharedDataContent.getContent(),
+          project
+        );
+        const propertiesSchema = propertiesMapToSchema(
+          properties,
+          sharedDataContent =>
+            behaviorSharedData.getProperties(
+              sharedDataContent.getContent(),
+              project
+            ),
+          (sharedDataContent, name, value) =>
+            behaviorSharedData.updateProperty(
+              sharedDataContent.getContent(),
+              name,
+              value,
+              project
+            )
+        );
+
+        return (
+          !!propertiesSchema.length && (
+            <PropertiesEditor
+              key={name}
+              schema={propertiesSchema}
+              instances={[sharedDataContent]}
+            />
+          )
+        );
+      })
+      .filter(Boolean);
 
     return (
       <Dialog

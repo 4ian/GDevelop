@@ -103,8 +103,9 @@ class SPtrList {
   bool Contains(const T& elementToSearch) const;
   ///@}
 
-  /** \name std::vector API compatibility
-   * These functions ensure that the class can be used just like a std::vector.
+  /** \name std::vector-like API
+   * These functions ensure that the class can be used just like a std::vector
+   * for iterations.
    */
   ///@{
 

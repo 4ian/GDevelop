@@ -25,18 +25,15 @@ void Object::Init(const gd::Object& object) {
   objectVariables = object.objectVariables;
 
   behaviors.clear();
-  for (auto it = object.behaviors.cbegin(); it != object.behaviors.cend(); ++it)
-    behaviors[it->first] = std::unique_ptr<Behavior>(it->second->Clone());
+  for (auto& it : object.behaviors) {
+    behaviors[it.first] = gd::make_unique<gd::BehaviorContent>(*it.second);
+  }
 }
 
 std::vector<gd::String> Object::GetAllBehaviorNames() const {
   std::vector<gd::String> allNameIdentifiers;
 
-  for (std::map<gd::String, std::unique_ptr<gd::Behavior> >::const_iterator it =
-           behaviors.begin();
-       it != behaviors.end();
-       ++it)
-    allNameIdentifiers.push_back(it->first);
+  for (auto& it : behaviors) allNameIdentifiers.push_back(it.first);
 
   return allNameIdentifiers;
 }
@@ -48,7 +45,8 @@ bool Object::RenameBehavior(const gd::String& name, const gd::String& newName) {
       behaviors.find(newName) != behaviors.end())
     return false;
 
-  std::unique_ptr<Behavior> aut = std::move(behaviors.find(name)->second);
+  std::unique_ptr<BehaviorContent> aut =
+      std::move(behaviors.find(name)->second);
   behaviors.erase(name);
   behaviors[newName] = std::move(aut);
   behaviors[newName]->SetName(newName);
@@ -56,11 +54,11 @@ bool Object::RenameBehavior(const gd::String& name, const gd::String& newName) {
   return true;
 }
 
-gd::Behavior& Object::GetBehavior(const gd::String& name) {
+gd::BehaviorContent& Object::GetBehavior(const gd::String& name) {
   return *behaviors.find(name)->second;
 }
 
-const gd::Behavior& Object::GetBehavior(const gd::String& name) const {
+const gd::BehaviorContent& Object::GetBehavior(const gd::String& name) const {
   return *behaviors.find(name)->second;
 }
 
@@ -68,13 +66,13 @@ bool Object::HasBehaviorNamed(const gd::String& name) const {
   return behaviors.find(name) != behaviors.end();
 }
 
-bool Object::AddBehavior(Behavior* behavior) {
-  if (behavior && !HasBehaviorNamed(behavior->GetName())) {
-    behaviors[behavior->GetName()] = std::unique_ptr<Behavior>(behavior);
-    return true;
-  }
-
-  return false;
+gd::BehaviorContent& Object::AddBehavior(
+    const gd::BehaviorContent& behaviorContent) {
+  const gd::String& behaviorName = behaviorContent.GetName();
+  auto newBehaviorContent =
+      gd::make_unique<gd::BehaviorContent>(behaviorContent);
+  behaviors[behaviorName] = std::move(newBehaviorContent);
+  return *behaviors[behaviorName];
 }
 
 #if defined(GD_IDE_ONLY)
@@ -84,15 +82,15 @@ std::map<gd::String, gd::PropertyDescriptor> Object::GetProperties(
   return nothing;
 }
 
-gd::Behavior* Object::AddNewBehavior(gd::Project& project,
-                                     const gd::String& type,
-                                     const gd::String& name) {
-  std::unique_ptr<gd::Behavior> behavior =
-      project.GetCurrentPlatform().CreateBehavior(type);
+gd::BehaviorContent* Object::AddNewBehavior(gd::Project& project,
+                                            const gd::String& type,
+                                            const gd::String& name) {
+  gd::Behavior* behavior = project.GetCurrentPlatform().GetBehavior(type);
 
   if (behavior) {
-    behavior->SetName(name);
-    behaviors[name] = std::move(behavior);
+    auto behaviorContent = gd::make_unique<gd::BehaviorContent>(name, type);
+    behavior->InitializeContent(behaviorContent->GetContent());
+    behaviors[name] = std::move(behaviorContent);
     return behaviors[name].get();
   } else {
     return nullptr;
@@ -110,7 +108,9 @@ Object::GetInitialInstanceProperties(const gd::InitialInstance& instance,
 
 void Object::UnserializeFrom(gd::Project& project,
                              const SerializerElement& element) {
-  // Name and type are already loaded.
+  type = element.GetStringAttribute("type");
+  name = element.GetStringAttribute("name", name, "nom");
+
   objectVariables.UnserializeFrom(
       element.GetChild("variables", 0, "Variables"));
   behaviors.clear();
@@ -120,19 +120,13 @@ void Object::UnserializeFrom(gd::Project& project,
     for (std::size_t i = 0; i < element.GetChildrenCount("Automatism"); ++i) {
       SerializerElement& behaviorElement = element.GetChild("Automatism", i);
 
-      gd::String autoType =
-          behaviorElement.GetStringAttribute("type", "", "Type")
-              .FindAndReplace("Automatism", "Behavior");
-      gd::String autoName =
-          behaviorElement.GetStringAttribute("name", "", "Name");
+      gd::String type = behaviorElement.GetStringAttribute("type", "", "Type")
+                            .FindAndReplace("Automatism", "Behavior");
+      gd::String name = behaviorElement.GetStringAttribute("name", "", "Name");
 
-      std::unique_ptr<Behavior> behavior = project.CreateBehavior(autoType);
-      if (behavior) {
-        behavior->SetName(autoName);
-        behavior->UnserializeFrom(behaviorElement);
-        behaviors[autoName] = std::move(behavior);
-      } else
-        std::cout << "WARNING: Unknown behavior " << autoType << std::endl;
+      auto behaviorContent = gd::make_unique<gd::BehaviorContent>(name, type);
+      behaviorContent->UnserializeFrom(behaviorElement);
+      behaviors[name] = std::move(behaviorContent);
     }
   }
   // End of compatibility code
@@ -143,18 +137,36 @@ void Object::UnserializeFrom(gd::Project& project,
     for (std::size_t i = 0; i < behaviorsElement.GetChildrenCount(); ++i) {
       SerializerElement& behaviorElement = behaviorsElement.GetChild(i);
 
-      gd::String autoType =
+      gd::String type =
           behaviorElement.GetStringAttribute("type").FindAndReplace(
               "Automatism", "Behavior");  // Compatibility with GD <= 4
-      gd::String autoName = behaviorElement.GetStringAttribute("name");
+      gd::String name = behaviorElement.GetStringAttribute("name");
 
-      std::unique_ptr<Behavior> behavior = project.CreateBehavior(autoType);
-      if (behavior) {
-        behavior->SetName(autoName);
-        behavior->UnserializeFrom(behaviorElement);
-        behaviors[autoName] = std::move(behavior);
-      } else
-        std::cout << "WARNING: Unknown behavior " << autoType << std::endl;
+      auto behaviorContent = gd::make_unique<gd::BehaviorContent>(name, type);
+      // Compatibility with GD <= 4.0.98
+      // If there is only one child called "content" (in addition to "type" and
+      // "name"), it's the content of a JavaScript behavior. Move the content
+      // out of the "content" object (to put it directly at the root of the
+      // behavior element).
+      if (behaviorElement.HasChild("content") &&
+          behaviorElement.GetAllChildren().size() == 3) {
+        SerializerElement& contentElement = behaviorElement.GetChild("content");
+
+        // Physics2 Behavior was using "type" for the type of the body. The name
+        // conflicts with the behavior "type". Rename it.
+        if (contentElement.HasChild("type")) {
+          contentElement.AddChild("bodyType")
+              .SetValue(contentElement.GetChild("type").GetStringValue());
+          contentElement.RemoveChild("type");
+        }
+
+        behaviorContent->UnserializeFrom(contentElement);
+      }
+      // end of compatibility code
+      else {
+        behaviorContent->UnserializeFrom(behaviorElement);
+      }
+      behaviors[name] = std::move(behaviorContent);
     }
   }
 
@@ -171,13 +183,15 @@ void Object::SerializeTo(SerializerElement& element) const {
   behaviorsElement.ConsiderAsArrayOf("behavior");
   std::vector<gd::String> allBehaviors = GetAllBehaviorNames();
   for (std::size_t i = 0; i < allBehaviors.size(); ++i) {
+    const gd::BehaviorContent& behaviorContent = GetBehavior(allBehaviors[i]);
     SerializerElement& behaviorElement = behaviorsElement.AddChild("behavior");
 
-    behaviorElement.SetAttribute("type",
-                                 GetBehavior(allBehaviors[i]).GetTypeName());
-    behaviorElement.SetAttribute("name",
-                                 GetBehavior(allBehaviors[i]).GetName());
-    GetBehavior(allBehaviors[i]).SerializeTo(behaviorElement);
+    behaviorContent.SerializeTo(behaviorElement);
+    behaviorElement.RemoveChild("type");  // The content can contain type or
+                                          // name properties, remove them.
+    behaviorElement.RemoveChild("name");
+    behaviorElement.SetAttribute("type", behaviorContent.GetTypeName());
+    behaviorElement.SetAttribute("name", behaviorContent.GetName());
   }
 
   DoSerializeTo(element);

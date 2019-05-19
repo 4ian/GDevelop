@@ -29,7 +29,7 @@ gdjs.DraggableRuntimeBehavior.prototype.onDeActivate = function() {
     this._endDrag();
 };
 
-gdjs.DraggableRuntimeBehavior.prototype.ownerRemovedFromScene = function() {
+gdjs.DraggableRuntimeBehavior.prototype.onOwnerRemovedFromScene = function() {
     this.onDeActivate();
 };
 

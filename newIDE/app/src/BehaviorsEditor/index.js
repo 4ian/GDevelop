@@ -11,6 +11,8 @@ import newNameGenerator from '../Utils/NewNameGenerator';
 import NewBehaviorDialog from './NewBehaviorDialog';
 import { getBehaviorHelpPagePath } from './BehaviorsHelpPagePaths';
 import BehaviorsEditorService from './BehaviorsEditorService';
+import { isNullPtr } from '../Utils/IsNullPtr';
+const gd = global.gd;
 
 const styles = {
   addBehaviorLine: {
@@ -102,7 +104,7 @@ export default class BehaviorsEditor extends Component {
     );
   };
 
-  _onChangeBehaviorName = (behavior, newName) => {
+  _onChangeBehaviorName = (behaviorContent, newName) => {
     // TODO: This is disabled for now as there is no proper refactoring
     // of events after a behavior renaming. Once refactoring is available,
     // the text field can be enabled again and refactoring calls added here
@@ -112,8 +114,7 @@ export default class BehaviorsEditor extends Component {
     const { object } = this.props;
     if (object.hasBehaviorNamed(newName)) return;
 
-    object.renameBehavior(behavior.getName(), newName);
-    behavior.setName(newName);
+    object.renameBehavior(behaviorContent.getName(), newName);
     this.forceUpdate();
   };
 
@@ -139,22 +140,50 @@ export default class BehaviorsEditor extends Component {
       <div>
         {allBehaviorNames
           .map((behaviorName, index) => {
-            const behavior = object.getBehavior(behaviorName);
+            const behaviorContent = object.getBehavior(behaviorName);
+            const behavior = gd.JsPlatform.get().getBehavior(
+              behaviorContent.getTypeName()
+            );
+            if (isNullPtr(gd, behavior)) {
+              return (
+                <div key={index}>
+                  <MiniToolbar>
+                    <span style={styles.behaviorTitle}>
+                      <Trans>Unknown behavior</Trans>{' '}
+                      <TextField value={behaviorName} disabled />
+                    </span>
+                    <span style={styles.behaviorTools}>
+                      <IconButton
+                        onClick={() => this._onRemoveBehavior(behaviorName)}
+                      >
+                        <Delete />
+                      </IconButton>
+                    </span>
+                  </MiniToolbar>
+                  <EmptyMessage>
+                    This behavior is unknown. It might be a behavior that was
+                    defined in an extension and that was later removed. You
+                    should delete it.
+                  </EmptyMessage>
+                </div>
+              );
+            }
+
             const BehaviorComponent = BehaviorsEditorService.getEditor(
-              behavior.getTypeName()
+              behaviorContent.getTypeName()
             );
 
             return (
               <div key={index}>
                 <MiniToolbar>
                   <span style={styles.behaviorTitle}>
-                    Behavior{' '}
+                    <Trans>Behavior</Trans>{' '}
                     <TextField
                       value={behaviorName}
                       hintText={<Trans>Behavior name</Trans>}
                       disabled
                       onChange={(e, text) =>
-                        this._onChangeBehaviorName(behavior, text)
+                        this._onChangeBehaviorName(behaviorContent, text)
                       }
                     />
                   </span>
@@ -171,6 +200,7 @@ export default class BehaviorsEditor extends Component {
                 </MiniToolbar>
                 <BehaviorComponent
                   behavior={behavior}
+                  behaviorContent={behaviorContent}
                   project={project}
                   resourceSources={this.props.resourceSources}
                   onChooseResource={this.props.onChooseResource}
@@ -188,6 +218,7 @@ export default class BehaviorsEditor extends Component {
         {this.state.newBehaviorDialogOpen && (
           <NewBehaviorDialog
             open={this.state.newBehaviorDialogOpen}
+            objectType={object.getType()}
             onClose={() => this.setState({ newBehaviorDialogOpen: false })}
             onChoose={this.addBehavior}
             project={project}

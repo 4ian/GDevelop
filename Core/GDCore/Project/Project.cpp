@@ -18,7 +18,6 @@
 #include "GDCore/Extensions/PlatformExtension.h"
 #include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/IDE/Project/ArbitraryResourceWorker.h"
-#include "GDCore/Project/ChangesNotifier.h"
 #include "GDCore/Project/EventsFunctionsExtension.h"
 #include "GDCore/Project/ExternalEvents.h"
 #include "GDCore/Project/ExternalLayout.h"
@@ -30,7 +29,6 @@
 #include "GDCore/Project/SourceFile.h"
 #include "GDCore/Serialization/Serializer.h"
 #include "GDCore/Serialization/SerializerElement.h"
-#include "GDCore/Serialization/Splitter.h"
 #include "GDCore/String.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/Localization.h"
@@ -123,31 +121,31 @@ std::unique_ptr<gd::Object> Project::CreateObject(
   return nullptr;
 }
 
-std::unique_ptr<gd::Behavior> Project::CreateBehavior(
-    const gd::String& type, const gd::String& platformName) {
+gd::Behavior* Project::GetBehavior(const gd::String& type,
+                                   const gd::String& platformName) {
   for (std::size_t i = 0; i < platforms.size(); ++i) {
     if (!platformName.empty() && platforms[i]->GetName() != platformName)
       continue;
 
-    std::unique_ptr<gd::Behavior> behavior = platforms[i]->CreateBehavior(type);
+    gd::Behavior* behavior = platforms[i]->GetBehavior(type);
     if (behavior) return behavior;
   }
 
   return nullptr;
 }
 
-std::shared_ptr<gd::BehaviorsSharedData> Project::CreateBehaviorSharedDatas(
+gd::BehaviorsSharedData* Project::GetBehaviorSharedDatas(
     const gd::String& type, const gd::String& platformName) {
   for (std::size_t i = 0; i < platforms.size(); ++i) {
     if (!platformName.empty() && platforms[i]->GetName() != platformName)
       continue;
 
-    std::shared_ptr<gd::BehaviorsSharedData> behavior =
-        platforms[i]->CreateBehaviorSharedDatas(type);
-    if (behavior) return behavior;
+    gd::BehaviorsSharedData* behaviorSharedData =
+        platforms[i]->GetBehaviorSharedDatas(type);
+    if (behaviorSharedData) return behaviorSharedData;
   }
 
-  return std::shared_ptr<gd::BehaviorsSharedData>();
+  return nullptr;
 }
 
 #if defined(GD_IDE_ONLY)
@@ -979,8 +977,7 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   // Add events functions extensions resources
   for (std::size_t e = 0; e < GetEventsFunctionsExtensionsCount(); e++) {
     auto& eventsFunctionsExtension = GetEventsFunctionsExtension(e);
-    for (auto&& eventsFunction :
-         eventsFunctionsExtension.GetEventsFunctions()) {
+    for (auto&& eventsFunction : eventsFunctionsExtension.GetInternalVector()) {
       LaunchResourceWorkerOnEvents(*this, eventsFunction->GetEvents(), worker);
     }
   }
@@ -989,7 +986,6 @@ void Project::ExposeResources(gd::ArbitraryResourceWorker& worker) {
   for (std::size_t j = 0; j < GetObjectsCount(); ++j) {
     GetObject(j).ExposeResources(worker);
   }
-
 }
 
 bool Project::HasSourceFile(gd::String name, gd::String language) const {

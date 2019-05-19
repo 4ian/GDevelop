@@ -102,10 +102,10 @@ export default class LocalExamples extends React.Component<Props, State> {
 
   _submitExample() {
     const body = `Hi!
-  
+
   I'd like to submit a new example to be added to GDevelop.
   Here is the link to download it: **INSERT the link to your game here, or add it as an attachment**.
-  
+
   I confirm that any assets can be used freely by anybody, including for commercial usage.
   `;
     Window.openExternalURL(
@@ -122,14 +122,12 @@ export default class LocalExamples extends React.Component<Props, State> {
     return (
       <Column noMargin>
         <Line noMargin>
-          <Column expand>
-            <ExamplesSearchbar
-              value={searchText}
-              onChange={this.changeSearchText}
-              chosenExtensionName={chosenExtensionName}
-              onExtensionNameChosen={this.chooseExtensionName}
-            />
-          </Column>
+          <ExamplesSearchbar
+            value={searchText}
+            onChange={this.changeSearchText}
+            chosenExtensionName={chosenExtensionName}
+            onExtensionNameChosen={this.chooseExtensionName}
+          />
         </Line>
         <Line noMargin>
           <Column expand noMargin>

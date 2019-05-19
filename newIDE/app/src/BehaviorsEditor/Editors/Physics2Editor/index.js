@@ -97,9 +97,12 @@ export default class Physics2Editor extends React.Component<Props, State> {
   }
 
   render() {
-    const { behavior, project } = this.props;
+    const { behavior, behaviorContent, project } = this.props;
 
-    const properties = behavior.getProperties(project);
+    const properties = behavior.getProperties(
+      behaviorContent.getContent(),
+      project
+    );
     const bits = Array(16).fill(null);
     const shape = properties.get('shape').getValue();
     const layersValues = parseInt(properties.get('layers').getValue(), 10);
@@ -109,12 +112,17 @@ export default class Physics2Editor extends React.Component<Props, State> {
       <Column>
         <Line>
           <SelectField
-            key={'type'}
-            floatingLabelText={properties.get('type').getLabel()}
+            key={'bodyType'}
+            floatingLabelText={properties.get('bodyType').getLabel()}
             floatingLabelFixed
-            value={properties.get('type').getValue()}
+            value={properties.get('bodyType').getValue()}
             onChange={(e, index, newValue) => {
-              behavior.updateProperty('type', newValue, project);
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'bodyType',
+                newValue,
+                project
+              );
               this.forceUpdate();
             }}
           >
@@ -143,7 +151,12 @@ export default class Physics2Editor extends React.Component<Props, State> {
               label={properties.get('bullet').getLabel()}
               checked={properties.get('bullet').getValue() === 'true'}
               onCheck={(e, checked) => {
-                behavior.updateProperty('bullet', checked ? '1' : '0', project);
+                behavior.updateProperty(
+                  behaviorContent.getContent(),
+                  'bullet',
+                  checked ? '1' : '0',
+                  project
+                );
                 this.forceUpdate();
               }}
             />
@@ -154,6 +167,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               checked={properties.get('fixedRotation').getValue() === 'true'}
               onCheck={(e, checked) => {
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   'fixedRotation',
                   checked ? '1' : '0',
                   project
@@ -168,6 +182,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               checked={properties.get('canSleep').getValue() === 'true'}
               onCheck={(e, checked) => {
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   'canSleep',
                   checked ? '1' : '0',
                   project
@@ -183,7 +198,12 @@ export default class Physics2Editor extends React.Component<Props, State> {
             floatingLabelFixed
             value={properties.get('shape').getValue()}
             onChange={(e, index, newValue) => {
-              behavior.updateProperty('shape', newValue, project);
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'shape',
+                newValue,
+                project
+              );
               this.forceUpdate();
             }}
           >
@@ -227,6 +247,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               min={0}
               onChange={newValue => {
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   shape === 'Polygon' ? 'PolygonOriginX' : 'shapeDimensionA',
                   newValue,
                   project
@@ -247,6 +268,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               min={shape === 'Edge' ? undefined : 0}
               onChange={newValue => {
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   shape === 'Polygon' ? 'PolygonOriginY' : 'shapeDimensionB',
                   newValue,
                   project
@@ -262,7 +284,12 @@ export default class Physics2Editor extends React.Component<Props, State> {
               floatingLabelFixed
               value={properties.get('polygonOrigin').getValue()}
               onChange={(e, index, newValue) => {
-                behavior.updateProperty('polygonOrigin', newValue, project);
+                behavior.updateProperty(
+                  behaviorContent.getContent(),
+                  'polygonOrigin',
+                  newValue,
+                  project
+                );
                 this.forceUpdate();
               }}
             >
@@ -290,7 +317,12 @@ export default class Physics2Editor extends React.Component<Props, State> {
             propertyName={'shapeOffsetX'}
             step={1}
             onUpdate={newValue => {
-              behavior.updateProperty('shapeOffsetX', newValue, project);
+              behavior.updateProperty(
+                behaviorContent.getContent(),
+                'shapeOffsetX',
+                newValue,
+                project
+              );
               this.forceUpdate();
             }}
           />
@@ -300,6 +332,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
             step={1}
             onUpdate={newValue => {
               this.props.behavior.updateProperty(
+                behaviorContent.getContent(),
                 'shapeOffsetY',
                 newValue,
                 this.props.project
@@ -342,6 +375,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                     vertices[index].x = newX;
                     vertices[index].y = newY;
                     behavior.updateProperty(
+                      behaviorContent.getContent(),
                       'vertices',
                       JSON.stringify(vertices),
                       project
@@ -377,6 +411,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 );
                 vertices[index].x = newValue;
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   'vertices',
                   JSON.stringify(vertices),
                   project
@@ -389,6 +424,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 );
                 vertices[index].y = newValue;
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   'vertices',
                   JSON.stringify(vertices),
                   project
@@ -402,6 +438,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 if (vertices.length >= 8) return;
                 vertices.push({ x: 0, y: 0 });
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   'vertices',
                   JSON.stringify(vertices),
                   project
@@ -414,6 +451,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 );
                 vertices.splice(index, 1);
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   'vertices',
                   JSON.stringify(vertices),
                   project
@@ -431,6 +469,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               step={0.1}
               onUpdate={newValue => {
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   'density',
                   parseFloat(newValue) > 0 ? newValue : '0',
                   project
@@ -445,7 +484,12 @@ export default class Physics2Editor extends React.Component<Props, State> {
               propertyName={'gravityScale'}
               step={0.1}
               onUpdate={newValue => {
-                behavior.updateProperty('gravityScale', newValue, project);
+                behavior.updateProperty(
+                  behaviorContent.getContent(),
+                  'gravityScale',
+                  newValue,
+                  project
+                );
                 this.forceUpdate();
               }}
             />
@@ -459,6 +503,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               step={0.1}
               onUpdate={newValue => {
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   'friction',
                   parseFloat(newValue) > 0 ? newValue : '0',
                   project
@@ -474,6 +519,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
               step={0.1}
               onUpdate={newValue => {
                 behavior.updateProperty(
+                  behaviorContent.getContent(),
                   'restitution',
                   parseFloat(newValue) > 0 ? newValue : '0',
                   project
@@ -490,7 +536,12 @@ export default class Physics2Editor extends React.Component<Props, State> {
               propertyName={'linearDamping'}
               step={0.05}
               onUpdate={newValue => {
-                behavior.updateProperty('linearDamping', newValue, project);
+                behavior.updateProperty(
+                  behaviorContent.getContent(),
+                  'linearDamping',
+                  newValue,
+                  project
+                );
                 this.forceUpdate();
               }}
             />
@@ -501,7 +552,12 @@ export default class Physics2Editor extends React.Component<Props, State> {
               propertyName={'angularDamping'}
               step={0.05}
               onUpdate={newValue => {
-                behavior.updateProperty('angularDamping', newValue, project);
+                behavior.updateProperty(
+                  behaviorContent.getContent(),
+                  'angularDamping',
+                  newValue,
+                  project
+                );
                 this.forceUpdate();
               }}
             />
@@ -525,6 +581,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                     enabled
                   );
                   this.props.behavior.updateProperty(
+                    behaviorContent.getContent(),
                     'layers',
                     newValue.toString(10),
                     this.props.project
@@ -550,6 +607,7 @@ export default class Physics2Editor extends React.Component<Props, State> {
                 onUpdate={enabled => {
                   const newValue = this._enableBit(masksValues, index, enabled);
                   this.props.behavior.updateProperty(
+                    behaviorContent.getContent(),
                     'masks',
                     newValue.toString(10),
                     this.props.project

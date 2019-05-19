@@ -27,7 +27,7 @@ type Props = {
   getThumbnail?: () => string,
   selected: true,
   onItemSelected: () => void,
-  buildMenuTemplate: Item => any,
+  buildMenuTemplate: () => any,
   hasErrors: boolean,
 };
 
@@ -41,7 +41,7 @@ class ThemableItemRow extends React.Component<Props, *> {
             <MoreVertIcon />
           </IconButton>
         }
-        buildMenuTemplate={() => this.props.buildMenuTemplate(item)}
+        buildMenuTemplate={this.props.buildMenuTemplate}
       />
     );
   }

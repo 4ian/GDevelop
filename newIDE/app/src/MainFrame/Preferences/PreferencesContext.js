@@ -6,7 +6,9 @@ export type AlertMessageIdentifier =
   | 'use-nearest-scale-mode'
   | 'maximum-fps-too-low'
   | 'minimum-fps-too-low'
-  | 'function-extractor-explanation';
+  | 'function-extractor-explanation'
+  | 'events-based-behavior-explanation'
+  | 'empty-events-based-behavior-explanation';
 
 export type PreferencesValues = {|
   language: string,

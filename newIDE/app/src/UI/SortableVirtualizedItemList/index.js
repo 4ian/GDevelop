@@ -3,7 +3,7 @@ import * as React from 'react';
 import { List } from 'react-virtualized';
 import { ListItem } from 'material-ui/List';
 import ItemRow from './ItemRow';
-import { makeAddItem } from '../ListAddItem';
+import { makeAddItem } from '../ListCommonItem';
 import { SortableContainer, SortableElement } from 'react-sortable-hoc';
 
 const listItemHeight = 48; // TODO: Move this into theme?
@@ -39,7 +39,7 @@ type ItemsListProps = {
   onItemSelected: (?Item) => void,
   renamedItem: ?Item,
   addNewItemLabel: React.Node | string,
-  buildMenuTemplate: Item => any,
+  buildMenuTemplate: (Item, index: number) => any,
   erroredItems?: { [string]: boolean },
 };
 
@@ -96,7 +96,9 @@ class ItemsList extends React.Component<ItemsListProps, *> {
               getThumbnail={getThumbnail ? () => getThumbnail(item) : undefined}
               selected={item === selectedItem}
               onItemSelected={this.props.onItemSelected}
-              buildMenuTemplate={this.props.buildMenuTemplate}
+              buildMenuTemplate={() =>
+                this.props.buildMenuTemplate(item, index)
+              }
               hasErrors={erroredItems ? !!erroredItems[item.getName()] : false}
             />
           );

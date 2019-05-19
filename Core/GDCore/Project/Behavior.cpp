@@ -5,7 +5,9 @@
  */
 #include "GDCore/Project/Behavior.h"
 #include <iostream>
+#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/Dialogs/PropertyDescriptor.h"
+#endif
 
 namespace gd {
 
@@ -13,7 +15,7 @@ Behavior::~Behavior(){};
 
 #if defined(GD_IDE_ONLY)
 std::map<gd::String, gd::PropertyDescriptor> Behavior::GetProperties(
-    gd::Project& project) const {
+    const gd::SerializerElement& behaviorContent, gd::Project& project) const {
   std::map<gd::String, gd::PropertyDescriptor> nothing;
   return nothing;
 }

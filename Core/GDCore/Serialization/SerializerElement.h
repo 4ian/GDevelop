@@ -16,14 +16,45 @@
 namespace gd {
 
 /**
- * \brief An element used during serialization from/to XML or JSON.
+ * \brief A generic container that can represent a value (
+ * containing a string, double, bool or int), an object ("associative array",
+ * "dictionary") with children or an array (children indexed by numeric
+ * properties).
+ *
+ * It is used for serialization (to JSON or XML), or as a generic
+ * container for properties of objects (see for example gd::BehaviorContent).
+ *
+ * It also has specialized methods in GDevelop.js (see postjs.js) to be
+ * converted to a JavaScript object.
  *
  * \see gd::Serializer
  */
 class GD_CORE_API SerializerElement {
  public:
+  /**
+   * \brief Create an empty element with no value, no children and no
+   * attributes.
+   */
   SerializerElement();
+
+  /**
+   * \brief Create an element with the specified value.
+   */
   SerializerElement(const SerializerValue &value);
+
+  /**
+   * Copy constructor.
+   */
+  SerializerElement(const gd::SerializerElement &object) { Init(object); };
+
+  /**
+   * Assignment operator.
+   */
+  SerializerElement &operator=(const gd::SerializerElement &object) {
+    if ((this) != &object) Init(object);
+    return *this;
+  }
+
   virtual ~SerializerElement();
 
   /** \name Value
@@ -37,35 +68,106 @@ class GD_CORE_API SerializerElement {
     valueUndefined = false;
     elementValue = value;
   }
+
+  /**
+   * \brief Set the value of the element, as a boolean.
+   */
   void SetValue(bool val) {
     valueUndefined = false;
     elementValue.SetBool(val);
   }
+
+  /**
+   * \brief Set the value of the element, as a boolean.
+   */
+  void SetBoolValue(bool val) { SetValue(val); }
+
+  /**
+   * \brief Set the value of the element, as a string.
+   */
   void SetValue(const gd::String &val) {
     valueUndefined = false;
     elementValue.SetString(val);
   }
+
+  /**
+   * \brief Set the value of the element, as a string.
+   */
+  void SetStringValue(const gd::String &val) { SetValue(val); }
+
+  /**
+   * \brief Set the value of the element, as an integer.
+   */
   void SetValue(int val) {
     valueUndefined = false;
     elementValue.SetInt(val);
   }
+
+  /**
+   * \brief Set the value of the element, as an integer.
+   */
+  void SetIntValue(int val) { SetValue(val); }
+
+  /**
+   * \brief Set the value of the element, as an unsigned integer.
+   */
   void SetValue(unsigned int val) {
     valueUndefined = false;
     elementValue.SetInt((int)val);
   }
+
+  /**
+   * \brief Set the value of the element, as a double precision floating point
+   * number.
+   */
   void SetValue(double val) {
     valueUndefined = false;
     elementValue.SetDouble(val);
   }
+
+  /**
+   * \brief Set the value of the element, as a double precision floating point
+   * number.
+   */
+  void SetDoubleValue(double val) { SetValue(val); }
+
+  /**
+   * \brief Set the value of the element, as a floating point number.
+   */
   void SetValue(float val) { SetValue((double)val); }
 
   /**
-   * \brief Get the value of the element.
+   * \brief Set the value of the element, as a floating point number.
+   */
+  void SetFloatValue(float val) { SetValue(val); }
+
+  /**
+   * \brief Get the value of the element, as a generic gd::SerializerValue.
    *
-   * If not value was set, an attribute named "value" is searched. If found, its
-   * value is returned.
+   * \note If not value was set, an attribute named "value" is searched (for
+   * backward compatiblity). If found, its value is returned.
    */
   const SerializerValue &GetValue() const;
+
+  /**
+   * \brief Get the value, its type being a boolean.
+   */
+  bool GetBoolValue() const { return GetValue().GetBool(); };
+
+  /**
+   * \brief Get the value, its type being a gd::String.
+   */
+  gd::String GetStringValue() const { return GetValue().GetString(); };
+
+  /**
+   * \brief Get the value, its type being an int.
+   */
+  int GetIntValue() const { return GetValue().GetInt(); };
+
+  /**
+   * \brief Get the value, its type being a double
+   */
+  double GetDoubleValue() const { return GetValue().GetDouble(); };
 
   /**
    * \brief Return true if no value was set for the element.
@@ -74,18 +176,31 @@ class GD_CORE_API SerializerElement {
   ///@}
 
   /** \name Attributes
-   * Methods related to the attributes of the element
+   * Methods related to the attributes of the element.
+   *
+   * Attributes are stored differently than children elements, but
+   * are serialized to the same in JSON. Hence, the attribute getters
+   * will also search in children elements.
    */
   ///@{
   /**
-   * \brief Set the value of an attribute of the element
+   * \brief Set the boolean value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
    */
   SerializerElement &SetAttribute(const gd::String &name, bool value);
 
   /**
-   * \brief Set the value of an attribute of the element
+   * \brief Set the boolean value of an attribute of the element
+   * \param name The name of the attribute.
+   * \param value The value of the attribute.
+   */
+  SerializerElement &SetBoolAttribute(const gd::String &name, bool value) {
+    return SetAttribute(name, value);
+  }
+
+  /**
+   * \brief Set the string value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
    */
@@ -93,7 +208,17 @@ class GD_CORE_API SerializerElement {
                                   const gd::String &value);
 
   /**
-   * \brief Set the value of an attribute of the element
+   * \brief Set the string value of an attribute of the element
+   * \param name The name of the attribute.
+   * \param value The value of the attribute.
+   */
+  SerializerElement &SetStringAttribute(const gd::String &name,
+                                        const gd::String &value) {
+    return SetAttribute(name, value);
+  }
+
+  /**
+   * \brief Set the string value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
    */
@@ -103,18 +228,36 @@ class GD_CORE_API SerializerElement {
   };
 
   /**
-   * \brief Set the value of an attribute of the element
+   * \brief Set the integer value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
    */
   SerializerElement &SetAttribute(const gd::String &name, int value);
 
   /**
-   * \brief Set the value of an attribute of the element
+   * \brief Set the integer value of an attribute of the element
    * \param name The name of the attribute.
    * \param value The value of the attribute.
    */
+  SerializerElement &SetIntAttribute(const gd::String &name, int value) {
+    return SetAttribute(name, value);
+  }
+
+  /**
+   * \brief Set the double precision floating point number value of an attribute
+   * of the element \param name The name of the attribute. \param value The
+   * value of the attribute.
+   */
   SerializerElement &SetAttribute(const gd::String &name, double value);
+
+  /**
+   * \brief Set the double precision floating point number value of an attribute
+   * of the element \param name The name of the attribute. \param value The
+   * value of the attribute.
+   */
+  SerializerElement &SetDoubleAttribute(const gd::String &name, double value) {
+    return SetAttribute(name, value);
+  }
 
   /**
    * Get the value of an attribute being a boolean.
@@ -167,7 +310,7 @@ class GD_CORE_API SerializerElement {
   bool HasAttribute(const gd::String &name) const;
 
   /**
-   * \brief Return all the children of the element.
+   * \brief Return all the attributes of the element.
    */
   const std::map<gd::String, SerializerValue> &GetAllAttributes() const {
     return attributes;
@@ -223,13 +366,16 @@ class GD_CORE_API SerializerElement {
 
   /**
    * \brief Add a child at the end of the children list with the given name and
-   * return a reference to it. \param name The name of the new child.
+   * return a reference to it.
+   *
+   * \param name The name of the new child.
    */
   SerializerElement &AddChild(gd::String name);
 
   /**
    * \brief Get a child of the element using its name.
-   * \param name The name of the new child.
+   *
+   * \param name The name of the child.
    * \param name The index of the child
    */
   SerializerElement &GetChild(gd::String name,
@@ -238,7 +384,9 @@ class GD_CORE_API SerializerElement {
 
   /**
    * \brief Get a child of the element using its index (when the element is
-   * considered as an array). \param name The index of the child
+   * considered as an array).
+   *
+   * \param name The index of the child
    */
   SerializerElement &GetChild(std::size_t index) const;
 
@@ -263,6 +411,12 @@ class GD_CORE_API SerializerElement {
   bool HasChild(const gd::String &name, gd::String deprecatedName = "") const;
 
   /**
+   * \brief Remove the child with the specified name
+   * \param name The name of the child to remove.
+   */
+  void RemoveChild(const gd::String &name);
+
+  /**
    * \brief Return all the children of the element.
    */
   const std::vector<std::pair<gd::String, std::shared_ptr<SerializerElement> > >
@@ -274,6 +428,12 @@ class GD_CORE_API SerializerElement {
   static SerializerElement nullElement;
 
  private:
+  /**
+   * Initialize element using another element. Used by copy-ctor and assign-op.
+   * Don't forget to update me if members were changed!
+   */
+  void Init(const gd::SerializerElement& other);
+
   bool valueUndefined;  ///< If true, the element does not have a value.
   SerializerValue elementValue;
 

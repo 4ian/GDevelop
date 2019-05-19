@@ -14,7 +14,8 @@ namespace gd {
 class Instruction;
 class BaseEvent;
 class EventsList;
-}
+class ObjectsContainer;
+}  // namespace gd
 
 namespace gd {
 
@@ -22,6 +23,8 @@ namespace gd {
  * \brief ArbitraryEventsWorker is an abstract class used to browse events (and
  * instructions) and do some work on them. Can be used to implement refactoring
  * for example.
+ *
+ * \see gd::ArbitraryEventsWorkerWithContext
  *
  * \ingroup IDE
  */
@@ -69,6 +72,53 @@ class GD_CORE_API ArbitraryEventsWorker {
                                   bool isCondition) {
     return false;
   };
+};
+
+/**
+ * \brief An events worker that will know about the context (the objects
+ * container). Useful for workers working on expressions notably.
+ *
+ * \see gd::ArbitraryEventsWorker
+ *
+ * \ingroup IDE
+ */
+class GD_CORE_API ArbitraryEventsWorkerWithContext
+    : public ArbitraryEventsWorker {
+ public:
+  ArbitraryEventsWorkerWithContext()
+      : currentGlobalObjectsContainer(nullptr),
+        currentObjectsContainer(nullptr){};
+  virtual ~ArbitraryEventsWorkerWithContext();
+
+  /**
+   * \brief Launch the worker on the specified events list,
+   * giving the objects container on which the events are applying to.
+   */
+  void Launch(gd::EventsList& events,
+              const gd::ObjectsContainer& globalObjectsContainer_,
+              const gd::ObjectsContainer& objectsContainer_) {
+    currentGlobalObjectsContainer = &globalObjectsContainer_;
+    currentObjectsContainer = &objectsContainer_;
+    ArbitraryEventsWorker::Launch(events);
+  };
+
+  void Launch(gd::EventsList& events) = delete;
+
+ protected:
+  const gd::ObjectsContainer& GetGlobalObjectsContainer() {
+    // Pointers are guaranteed to be not nullptr after
+    // Launch was called.
+    return *currentGlobalObjectsContainer;
+  };
+  const gd::ObjectsContainer& GetObjectsContainer() {
+    // Pointers are guaranteed to be not nullptr after
+    // Launch was called.
+    return *currentObjectsContainer;
+  };
+
+ private:
+  const gd::ObjectsContainer* currentGlobalObjectsContainer;
+  const gd::ObjectsContainer* currentObjectsContainer;
 };
 
 }  // namespace gd

@@ -266,9 +266,6 @@ class GD_CORE_API BaseEvent {
   float percentDuringLastSession;  ///< Total time used by the event during the
                                    ///< last run. Used for profiling.
 
- protected:
-  mutable unsigned int renderedHeight;
-
  private:
   bool folded;  ///< True if the subevents should be hidden in the events editor
   bool disabled;    ///< True if the event is disabled and must not be executed

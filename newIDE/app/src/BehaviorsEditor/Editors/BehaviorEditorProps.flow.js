@@ -8,7 +8,8 @@ import { type ResourceExternalEditor } from '../../ResourcesList/ResourceExterna
  * The props given to any behavior editor
  */
 export type BehaviorEditorProps = {|
-  behavior: Object,
+  behavior: gdBehavior,
+  behaviorContent: gdBehaviorContent,
   project: gdProject,
   resourceSources: Array<ResourceSource>,
   onChooseResource: ChooseResourceFunction,

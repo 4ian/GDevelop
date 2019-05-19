@@ -11,7 +11,7 @@
 #include "GDCpp/Runtime/String.h"
 class BehaviorsRuntimeSharedData;
 namespace gd {
-class BehaviorsSharedData;
+class BehaviorContent;
 }
 
 /**
@@ -34,17 +34,17 @@ class GD_API BehaviorsRuntimeSharedDataHolder {
       const gd::String& behaviorName) const;
 
   /**
-   * \brief Create all runtime shared data according to the initial shared data
+   * \brief Create all runtime shared data according to the shared data content
    * passed as argument.
    */
   void LoadFrom(
-      const std::map<gd::String, std::shared_ptr<gd::BehaviorsSharedData> >&
+      const std::map<gd::String, std::unique_ptr<gd::BehaviorContent>>&
           sharedData);
 
  private:
   void Init(const BehaviorsRuntimeSharedDataHolder& other);
 
-  std::map<gd::String, std::shared_ptr<BehaviorsRuntimeSharedData> >
+  std::map<gd::String, std::shared_ptr<BehaviorsRuntimeSharedData>>
       behaviorsSharedDatas;
 };
 

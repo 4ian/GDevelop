@@ -35,8 +35,8 @@ gdjs.TiledSpriteRuntimeObject.prototype.getRendererObject = function() {
 gdjs.TiledSpriteRuntimeObject.prototype.onDeletedFromScene = function(runtimeScene) {
     gdjs.RuntimeObject.prototype.onDeletedFromScene.call(this, runtimeScene);
 
-    if (this._renderer.ownerRemovedFromScene) {
-        this._renderer.ownerRemovedFromScene();
+    if (this._renderer.onOwnerRemovedFromScene) {
+        this._renderer.onOwnerRemovedFromScene();
     }
 };
 

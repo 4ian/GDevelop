@@ -29,7 +29,7 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
 
   componentDidUpdate(prevProps: *) {
     if (prevProps.isActive && !this.props.isActive) {
-      this.props.onReloadEventsFunctionsExtensions();
+      this.props.onLoadEventsFunctionsExtensions();
     }
   }
 
@@ -43,8 +43,12 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
     return project.getEventsFunctionsExtension(eventsFunctionsExtensionName);
   }
 
-  selectEventsFunctionByName(eventsFunctionName: string) {
-    if (this.editor) this.editor.selectEventsFunctionByName(eventsFunctionName);
+  selectEventsFunctionByName(
+    eventsFunctionName: string,
+    behaviorName: ?string
+  ) {
+    if (this.editor)
+      this.editor.selectEventsFunctionByName(eventsFunctionName, behaviorName);
   }
 
   render() {
@@ -71,6 +75,7 @@ export default class EventsFunctionsExtensionEditorWrapper extends BaseEditor {
           openInstructionOrExpression={this.props.openInstructionOrExpression}
           onCreateEventsFunction={this.props.onCreateEventsFunction}
           initiallyFocusedFunctionName={this.props.initiallyFocusedFunctionName}
+          initiallyFocusedBehaviorName={this.props.initiallyFocusedBehaviorName}
           ref={editor => (this.editor = editor)}
         />
       </div>

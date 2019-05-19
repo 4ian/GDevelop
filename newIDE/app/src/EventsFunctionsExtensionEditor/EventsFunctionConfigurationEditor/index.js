@@ -14,6 +14,7 @@ type Props = {|
   globalObjectsContainer: gdObjectsContainer,
   objectsContainer: gdObjectsContainer,
   eventsFunction: gdEventsFunction,
+  eventsBasedBehavior: ?gdEventsBasedBehavior,
   onParametersOrGroupsUpdated: () => void,
   helpPagePath?: string,
   onConfigurationUpdated?: () => void,
@@ -47,6 +48,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
       globalObjectsContainer,
       objectsContainer,
       eventsFunction,
+      eventsBasedBehavior,
       freezeEventsFunctionType,
       onConfigurationUpdated,
       onParametersOrGroupsUpdated,
@@ -77,6 +79,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
           <ScrollView>
             <EventsFunctionPropertiesEditor
               eventsFunction={eventsFunction}
+              eventsBasedBehavior={eventsBasedBehavior}
               helpPagePath={helpPagePath}
               onConfigurationUpdated={onConfigurationUpdated}
               renderConfigurationHeader={renderConfigurationHeader}
@@ -89,6 +92,7 @@ export default class EventsFunctionConfigurationEditor extends React.Component<
             <EventsFunctionParametersEditor
               project={project}
               eventsFunction={eventsFunction}
+              eventsBasedBehavior={eventsBasedBehavior}
               onParametersUpdated={onParametersOrGroupsUpdated}
               helpPagePath={helpPagePath}
               freezeParameters={freezeParameters}

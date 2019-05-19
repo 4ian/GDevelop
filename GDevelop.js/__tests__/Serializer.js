@@ -7,26 +7,26 @@ describe('libGD.js object serialization', function() {
   describe('gd.SerializerElement', function() {
     it('should support operations on its value', function() {
       var element = new gd.SerializerElement();
-      element.setString('aaa');
-      expect(element.getValue().getString()).toBe('aaa');
+      element.setStringValue('aaa');
+      expect(element.getStringValue()).toBe('aaa');
 
-      element.setInt(123);
-      expect(element.getValue().getInt()).toBe(123);
+      element.setIntValue(123);
+      expect(element.getIntValue()).toBe(123);
 
-      element.setDouble(123.456);
-      expect(element.getValue().getDouble()).toBe(123.456);
+      element.setDoubleValue(123.456);
+      expect(element.getDoubleValue()).toBe(123.456);
     });
     it('should cast values from a type to another', function() {
       var element = new gd.SerializerElement();
-      element.setString('123');
-      expect(element.getValue().getString()).toBe('123');
-      expect(element.getValue().getInt()).toBe(123);
-      expect(element.getValue().getDouble()).toBe(123.0);
+      element.setStringValue('123');
+      expect(element.getStringValue()).toBe('123');
+      expect(element.getIntValue()).toBe(123);
+      expect(element.getDoubleValue()).toBe(123.0);
 
-      element.setString('true');
-      expect(element.getValue().getBool()).toBe(true);
-      element.setBool(false);
-      expect(element.getValue().getBool()).toBe(false);
+      element.setStringValue('true');
+      expect(element.getBoolValue()).toBe(true);
+      element.setBoolValue(false);
+      expect(element.getBoolValue()).toBe(false);
     });
     it('should support operations on its children', function() {
       var element = new gd.SerializerElement();
@@ -37,7 +37,7 @@ describe('libGD.js object serialization', function() {
       expect(element.getChild('Child1').ptr).toBe(child1.ptr);
 
       var child2 = new gd.SerializerElement();
-      child2.addChild('subChild').setString('Hello world!');
+      child2.addChild('subChild').setStringValue('Hello world!');
       element.addChild('Child2');
       element.setChild('Child2', child2);
 
@@ -45,8 +45,7 @@ describe('libGD.js object serialization', function() {
         element
           .getChild('Child2')
           .getChild('subChild')
-          .getValue()
-          .getString()
+          .getStringValue()
       ).toBe('Hello world!');
     });
   });

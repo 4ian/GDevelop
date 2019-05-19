@@ -101,8 +101,8 @@ Use [`addAction`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/
 
 Add a behavior using [`addBehavior`](http://4ian.github.io/GD-Documentation/GDCore%20Documentation/classgd_1_1_platform_extension.html#a75992fed9afce730db56af9d4d8177ca). The last two parameters are the `gd.Behavior` and the `gd.BehaviorsSharedData` object representing the behavior and its (optional) shared data
 
-- For the behavior, create a `new gd.BehaviorJsImplementation()` and define `updateProperty` and `getProperties`.
-- For the shared data (which are properties shared between all behaviors of the same type), if you don't have the need for it, just pass `new gd.BehaviorsSharedData()`. If you need shared data, create a `new gd.BehaviorSharedDataJsImplementation()` and define `updateProperty` and `getProperties`.
+- For the behavior, create a `new gd.BehaviorJsImplementation()` and define `initializeContent`, `updateProperty` and `getProperties`.
+- For the shared data (which are properties shared between all behaviors of the same type), if you don't have the need for it, just pass `new gd.BehaviorsSharedData()`. If you need shared data, create a `new gd.BehaviorSharedDataJsImplementation()` and define `initializeContent`, `updateProperty` and `getProperties`.
 
 > ⚠️ Like other functions to declare extensions, make sure that you've not forgotten to declare a function and that all arguments are correct.
 

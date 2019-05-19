@@ -11,11 +11,13 @@
 #include "GDCore/CommonTools.h"
 #include "GDCore/Tools/Localization.h"
 #include "GDCpp/Extensions/Builtin/MathematicalTools.h"
+#include "GDCpp/Extensions/CppPlatform.h"
 #include "GDCpp/Runtime/CommonTools.h"
 #include "GDCpp/Runtime/Polygon2d.h"
 #include "GDCpp/Runtime/PolygonCollision.h"
 #include "GDCpp/Runtime/Project/Behavior.h"
 #include "GDCpp/Runtime/Project/Object.h"
+#include "GDCpp/Runtime/RuntimeBehavior.h"
 #include "GDCpp/Runtime/RuntimeScene.h"
 
 using namespace std;
@@ -30,13 +32,15 @@ RuntimeObject::RuntimeObject(RuntimeScene &scene, const gd::Object &object)
       objectVariables(object.GetVariables()) {
   ClearForce();
 
+  // Create the behaviors
   behaviors.clear();
-  // Insert the new behaviors.
-  for (auto it = object.GetAllBehaviors().cbegin();
-       it != object.GetAllBehaviors().cend();
-       ++it) {
-    behaviors[it->first] = std::unique_ptr<gd::Behavior>(it->second->Clone());
-    behaviors[it->first]->SetOwner(this);
+  for (auto &it : object.GetAllBehaviorContents()) {
+    std::unique_ptr<RuntimeBehavior> behavior =
+        CppPlatform::Get().CreateRuntimeBehavior(it.second->GetTypeName(),
+                                                  it.second->GetContent());
+    if (behavior) {
+      AddBehavior(it.first, std::move(behavior));
+    }
   }
 }
 
@@ -55,13 +59,24 @@ void RuntimeObject::Init(const RuntimeObject &object) {
   force5 = object.force5;
   forces = object.forces;
 
+  // Clone behaviors
   behaviors.clear();
   for (auto it = object.behaviors.cbegin(); it != object.behaviors.cend();
        ++it) {
-    behaviors[it->first] = std::unique_ptr<gd::Behavior>(it->second->Clone());
+    behaviors[it->first] =
+        gd::make_unique<RuntimeBehavior>(*it->second->Clone());
     behaviors[it->first]->SetOwner(this);
   }
 }
+
+/**
+ * \brief Add the specified behavior to the object
+ */
+void RuntimeObject::AddBehavior(const gd::String &name,
+                                std::unique_ptr<RuntimeBehavior> behavior) {
+  behaviors[name] = std::move(behavior);
+  behaviors[name]->SetOwner(this);
+};
 
 #if defined(GD_IDE_ONLY)
 void RuntimeObject::GetPropertyForDebugger(std::size_t propertyNb,
@@ -652,11 +667,12 @@ bool RuntimeObject::CursorOnObject(RuntimeScene &scene, bool) {
   return false;
 }
 
-Behavior *RuntimeObject::GetBehaviorRawPointer(const gd::String &name) {
+RuntimeBehavior *RuntimeObject::GetBehaviorRawPointer(const gd::String &name) {
   return behaviors.find(name)->second.get();
 }
 
-Behavior *RuntimeObject::GetBehaviorRawPointer(const gd::String &name) const {
+RuntimeBehavior *RuntimeObject::GetBehaviorRawPointer(
+    const gd::String &name) const {
   return behaviors.find(name)->second.get();
 }
 

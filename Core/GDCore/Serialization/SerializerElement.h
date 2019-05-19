@@ -264,7 +264,7 @@ class GD_CORE_API SerializerElement {
    * \param name The name of the attribute
    * \param defaultValue The value returned if the attribute is not found.
    * \param deprecatedName An alternative name for the attribute that will be
-   * used if the first one doesn't exists.
+   * used if the first one doesn't exist.
    */
   bool GetBoolAttribute(const gd::String &name,
                         bool defaultValue = false,
@@ -275,7 +275,7 @@ class GD_CORE_API SerializerElement {
    * \param name The name of the attribute
    * \param defaultValue The value returned if the attribute is not found.
    * \param deprecatedName An alternative name for the attribute that will be
-   * used if the first one doesn't exists.
+   * used if the first one doesn't exist.
    */
   gd::String GetStringAttribute(const gd::String &name,
                                 gd::String defaultValue = "",
@@ -286,7 +286,7 @@ class GD_CORE_API SerializerElement {
    * \param name The name of the attribute
    * \param defaultValue The value returned if the attribute is not found.
    * \param deprecatedName An alternative name for the attribute that will be
-   * used if the first one doesn't exists.
+   * used if the first one doesn't exist.
    */
   int GetIntAttribute(const gd::String &name,
                       int defaultValue = 0,
@@ -297,7 +297,7 @@ class GD_CORE_API SerializerElement {
    * \param name The name of the attribute
    * \param defaultValue The value returned if the attribute is not found.
    * \param deprecatedName An alternative name for the attribute that will be
-   * used if the first one doesn't exists.
+   * used if the first one doesn't exist.
    */
   double GetDoubleAttribute(const gd::String &name,
                             double defaultValue = 0.0,

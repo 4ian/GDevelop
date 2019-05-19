@@ -65,7 +65,7 @@ export const userWantsToUseExternalPath = (
     // eslint-disable-next-line
     const answer = confirm(
       resourcePath +
-        '\n\nIs residing outside of the project folder and may no longer be found if the project folder is moved!\nAre you sure you want to proceed?'
+        ' is located outside of the project folder. If the project is moved, the path to the resource can be broken.\nAre you sure you want to proceed?'
     );
     return answer;
   }

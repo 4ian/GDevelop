@@ -79,14 +79,15 @@ const filterExtensionShortHeaders = (
   extensionShortHeaders: Array<ExtensionShortHeader>,
   { searchText, chosenTag }: FilteringOptions
 ): Array<ExtensionShortHeader> => {
-  if (!searchText) return extensionShortHeaders;
+  if (!searchText && !chosenTag) return extensionShortHeaders;
 
   return extensionShortHeaders
-    .filter(({ tags }) => chosenTag && tags.indexOf(chosenTag) !== -1)
+    .filter(({ tags }) => !chosenTag || tags.indexOf(chosenTag) !== -1)
     .filter(
       ({ name, shortDescription }) =>
-        name.indexOf(searchText) !== -1 ||
-        shortDescription.indexOf(searchText) !== -1
+        !searchText ||
+        (name.indexOf(searchText) !== -1 ||
+          shortDescription.indexOf(searchText) !== -1)
     );
 };
 

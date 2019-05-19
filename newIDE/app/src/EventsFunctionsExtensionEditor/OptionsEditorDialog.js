@@ -168,7 +168,9 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                   fullWidth
                 />
                 <TextField
-                  floatingLabelText={<Trans>Author (Name, email or GitHub handle)</Trans>}
+                  floatingLabelText={
+                    <Trans>Author (Name, email or GitHub handle)</Trans>
+                  }
                   value={eventsFunctionsExtension.getAuthor()}
                   onChange={(e, text) => {
                     eventsFunctionsExtension.setAuthor(text);
@@ -216,9 +218,7 @@ export default class OptionsEditorDialog extends React.Component<Props, State> {
                         }
                       />
                       <FlatButton
-                        label={
-                          <Trans>Submit extension to the community</Trans>
-                        }
+                        label={<Trans>Submit extension to the community</Trans>}
                         onClick={openGitHubIssue}
                       />
                     </Line>

@@ -11,7 +11,8 @@
   "scripts": {
     "postinstall": "cd app && npm install",
     "app-build": "node scripts/app-build.js",
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "electron-win": "node node_modules/electron/cli.js app"
   },
   "build": {
     "appId": "com.gdevelop-app.ide",

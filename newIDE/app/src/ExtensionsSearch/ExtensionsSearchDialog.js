@@ -99,6 +99,7 @@ export default class ExtensionsSearchDialog extends Component<Props, {||}> {
                     onRegistryLoaded={() => {
                       this.forceUpdate(); // Force update to ensure dialog is properly positioned.
                     }}
+                    showOnlyWithBehaviors={false}
                   />
                 </Dialog>
               );

@@ -58,6 +58,7 @@ export const addSerializedExtensionToProject = (
 
 type Props = {|
   project: gdProject,
+  showOnlyWithBehaviors: boolean,
   onNewExtensionInstalled: () => void,
   onRegistryLoaded?: () => void,
 |};
@@ -74,15 +75,20 @@ type State = {|
 type FilteringOptions = {|
   searchText: string,
   chosenTag: string,
+  showOnlyWithBehaviors: boolean,
 |};
 
 const filterExtensionShortHeaders = (
   extensionShortHeaders: Array<ExtensionShortHeader>,
-  { searchText, chosenTag }: FilteringOptions
+  { searchText, chosenTag, showOnlyWithBehaviors }: FilteringOptions
 ): Array<ExtensionShortHeader> => {
-  if (!searchText && !chosenTag) return extensionShortHeaders;
+  const behaviorsFilteredHeaders = extensionShortHeaders.filter(
+    ({ eventsBasedBehaviorsCount }) =>
+      !showOnlyWithBehaviors || eventsBasedBehaviorsCount > 0
+  );
 
-  return extensionShortHeaders
+  if (!searchText && !chosenTag) return behaviorsFilteredHeaders;
+  return behaviorsFilteredHeaders
     .filter(({ tags }) => !chosenTag || tags.indexOf(chosenTag) !== -1)
     .filter(
       ({ name, shortDescription }) =>
@@ -181,7 +187,7 @@ export default class ExtensionsSearch extends Component<Props, State> {
   };
 
   render() {
-    const { project } = this.props;
+    const { project, showOnlyWithBehaviors } = this.props;
     const {
       selectedExtensionShortHeader,
       extensionsRegistry,
@@ -195,6 +201,7 @@ export default class ExtensionsSearch extends Component<Props, State> {
       ? filterExtensionShortHeaders(extensionsRegistry.extensionShortHeaders, {
           searchText,
           chosenTag,
+          showOnlyWithBehaviors,
         })
       : [];
 

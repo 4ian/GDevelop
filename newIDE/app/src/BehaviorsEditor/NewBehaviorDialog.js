@@ -277,6 +277,7 @@ export default class NewBehaviorDialog extends Component<Props, State> {
                 <ExtensionsSearch
                   project={project}
                   onNewExtensionInstalled={this._onNewExtensionInstalled}
+                  showOnlyWithBehaviors
                 />
               </Tab>
             </Tabs>

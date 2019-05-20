@@ -4,11 +4,14 @@ import { type ParameterValues } from './ExpressionParametersEditorDialog';
 
 const filterOutCodeOnlyParameters = (
   array: Array<string>,
-  expressionMetadata: Object
+  expressionMetadata: Object,
+  firstParameterIndex: number
 ) => {
   const parametersCount = expressionMetadata.getParametersCount();
 
   return array.filter((parameter, index) => {
+    if (index < firstParameterIndex) return false;
+
     return (
       index < parametersCount &&
       !expressionMetadata.getParameter(index).isCodeOnly()
@@ -23,25 +26,29 @@ export const formatExpressionCall = (
   const functionName = expressionInfo.name || '';
 
   if (expressionInfo.objectMetadata) {
-    const [objectName, ...otherParameters] = parameterValues;
+    const objectName = parameterValues[0];
 
     const functionArgs = filterOutCodeOnlyParameters(
-      otherParameters,
-      expressionInfo.metadata
+      parameterValues,
+      expressionInfo.metadata,
+      1
     ).join(', ');
     return `${objectName}.${functionName}(${functionArgs})`;
   } else if (expressionInfo.behaviorMetadata) {
-    const [objectName, behaviorName, ...otherParameters] = parameterValues;
+    const objectName = parameterValues[0];
+    const behaviorName = parameterValues[1];
 
     const functionArgs = filterOutCodeOnlyParameters(
-      otherParameters,
-      expressionInfo.metadata
+      parameterValues,
+      expressionInfo.metadata,
+      2
     ).join(', ');
     return `${objectName}.${behaviorName}::${functionName}(${functionArgs})`;
   } else {
     const functionArgs = filterOutCodeOnlyParameters(
       parameterValues,
-      expressionInfo.metadata
+      expressionInfo.metadata,
+      0
     ).join(', ');
     return `${functionName}(${functionArgs})`;
   }

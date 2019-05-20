@@ -455,6 +455,8 @@ class GD_CORE_API ExpressionParser2 {
             parameters.push_back(Expression(type, objectName));
           } else if (gd::ParameterMetadata::IsObject(type)) {
             parameters.push_back(Expression(type));
+          } else if (gd::ParameterMetadata::IsBehavior(type)) {
+            parameters.push_back(ReadText()); // TODO
           } else {
             size_t parameterStartPosition = GetCurrentPosition();
             parameters.push_back(Expression("unknown"));

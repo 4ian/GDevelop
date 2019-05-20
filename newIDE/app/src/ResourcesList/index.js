@@ -31,7 +31,7 @@ const styles = {
 type State = {|
   renamedResource: ?gdResource,
   searchText: string,
-  resourcesWithErrors: { [string]: 0 | 1 | 2 },
+  resourcesWithErrors: { [string]: '' | 'error' | 'warning' },
 |};
 
 type Props = {|
@@ -151,7 +151,7 @@ export default class ResourcesList extends React.Component<Props, State> {
       .getAllResourceNames()
       .toJSArray()
       .forEach(resourceName => {
-        if (getResourceFilePathStatus(project, resourceName) === 2) {
+        if (getResourceFilePathStatus(project, resourceName) === 'error') {
           resourcesManager.removeResource(resourceName);
           console.info('Removed due to invalid path: ' + resourceName);
         }

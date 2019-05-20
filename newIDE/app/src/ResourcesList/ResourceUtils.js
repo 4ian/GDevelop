@@ -49,7 +49,7 @@ export const getLocalResourceFullPath = (
   return resourcePath;
 };
 
-export const isResourcePathinProjectFolder = (
+export const isPathInProjectFolder = (
   project: gdProject,
   resourcePath: string
 ) => {
@@ -57,11 +57,11 @@ export const isResourcePathinProjectFolder = (
   return resourcePath.includes(projectPath);
 };
 
-export const userWantsToUseExternalPath = (
+export const confirmResourcePath = (
   project: gdProject,
   resourcePath: string
 ) => {
-  if (!isResourcePathinProjectFolder(project, resourcePath)) {
+  if (!isPathInProjectFolder(project, resourcePath)) {
     // eslint-disable-next-line
     const answer = confirm(
       resourcePath +
@@ -82,9 +82,9 @@ export const getResourceFilePathStatus = (
   );
 
   // the resource path is outside of the project folder
-  if (!isResourcePathinProjectFolder(project, resourcePath)) return 1;
-  // the resource path doesnt exist
-  if (!fs.existsSync(resourcePath)) return 2;
+  if (!isPathInProjectFolder(project, resourcePath)) return 'warning';
+  // the resource path doesn't exist
+  if (!fs.existsSync(resourcePath)) return 'error';
   // the resource path seems ok
-  return 0;
+  return '';
 };

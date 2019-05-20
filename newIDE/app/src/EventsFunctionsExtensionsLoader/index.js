@@ -238,10 +238,7 @@ function generateBehavior(
         eventsBasedBehavior,
         eventsFunction
       );
-      declareEventsFunctionParameters(
-        eventsFunction,
-        instructionOrExpression
-      );
+      declareEventsFunctionParameters(eventsFunction, instructionOrExpression);
 
       // Hide "lifecycle" methods as they are called automatically by
       // the game engine.

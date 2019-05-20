@@ -119,13 +119,16 @@ export default class ExtensionsSearch extends Component<Props, State> {
     });
     getExtensionsRegistry().then(
       extensionsRegistry => {
-        this.setState({
-          extensionsRegistry,
-        }, () => {
-          if (this.props.onRegistryLoaded) {
-            this.props.onRegistryLoaded();
+        this.setState(
+          {
+            extensionsRegistry,
+          },
+          () => {
+            if (this.props.onRegistryLoaded) {
+              this.props.onRegistryLoaded();
+            }
           }
-        });
+        );
       },
       error => {
         this.setState({

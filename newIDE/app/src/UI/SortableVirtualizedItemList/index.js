@@ -96,7 +96,7 @@ class ItemsList extends React.Component<ItemsListProps, *> {
               getThumbnail={getThumbnail ? () => getThumbnail(item) : undefined}
               selected={item === selectedItem}
               onItemSelected={this.props.onItemSelected}
-              errorStatus={erroredItems ? erroredItems[item.getName()] : 0}
+              errorStatus={erroredItems ? erroredItems[item.getName()] : ''}
               buildMenuTemplate={() =>
                 this.props.buildMenuTemplate(item, index)
               }
